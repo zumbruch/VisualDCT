@@ -30,6 +30,7 @@ package com.cosylab.vdct.util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -165,6 +166,97 @@ public class PathSpecification
 		throw new FileNotFoundException("File '"+fileName+"' not found (path: \""+path.toString()+"\", addpath: \""+addpath.toString()+"\").");
 	}
 
+	/**
+	 * @param path
+	 * @param relativeToPath
+	 * @return
+	 */
+	public static File getRelativeName(File path, File relativeToPath)
+	{
+		System.out.print(path.getAbsolutePath()+" vs. "+relativeToPath.getAbsolutePath()+"\n\t");
+
+		// make both paths absolute
+		if (!path.isAbsolute())
+			path = path.getAbsoluteFile();
+		if (!relativeToPath.isAbsolute())
+			relativeToPath = relativeToPath.getAbsoluteFile();
+			
+		// make both cannonical
+		try
+		{
+			path = path.getCanonicalFile();
+			relativeToPath = relativeToPath.getCanonicalFile();
+		}
+		catch (IOException ioe)
+		{
+			return path;
+		}
+		
+		// make relativeToPath directory
+		if (!relativeToPath.isDirectory())
+			relativeToPath = relativeToPath.getParentFile();
+			
+		String strPath;
+		if (path.isDirectory())
+			strPath = path.getAbsolutePath()+File.separator;
+		else
+			strPath = path.getAbsolutePath();
+		String strRelativeToPath = relativeToPath.getAbsolutePath()+File.separator;
+		
+		// get common part of path
+		int commonLength = 0;
+		int minLength = Math.min(strPath.length(), strRelativeToPath.length());
+		while (commonLength < minLength && 
+			   strPath.charAt(commonLength) == strRelativeToPath.charAt(commonLength))
+			commonLength++;
+			
+		// if none, return entire path
+		if (commonLength == 0)
+			return path;
+			
+		// strip off common part to separator
+		// there should be no separator in commonLength
+		commonLength = strPath.lastIndexOf(File.separatorChar, commonLength-1);
+			
+		// if none, return entire path
+		if (commonLength == 0)
+			return path;
+
+		String commonPath = strPath.substring(0, commonLength);
+		StringBuffer resultingRelativePath = new StringBuffer();
+		
+		
+		//calculcate "step downs"
+		final String stepDown = File.separator+"..";
+		while (relativeToPath.getParent()!=null &&		// needed to handle "<driveLetter>:" to "<driveLetter>:/" comparison  
+			   !relativeToPath.getAbsolutePath().equals(commonPath))
+		{
+			resultingRelativePath.append(stepDown);
+			relativeToPath = relativeToPath.getParentFile();
+		}
+		
+		// move up to path
+		resultingRelativePath.append(strPath.substring(commonLength));
+	
+		return new File(resultingRelativePath.substring(1));
+	}
+
+/*	
+	public static void main(String[] argv)
+	{
+		System.out.println(getRelativeName(new File("/home/matej/test.dbd"), new File("/elsewhere/epics/vbds/test.vdb")));
+		System.out.println(getRelativeName(new File("/home/matej/test.dbd"), new File("/home/matejEpics/vbds/test.vdb")));
+		System.out.println(getRelativeName(new File("/home/matej/test.dbd"), new File("/homeHome/epics/vbds/test.vdb")));
+		System.out.println(getRelativeName(new File("/home/matej/test.dbd"), new File("/home/epics/vbds/test.vdb")));
+		System.out.println(getRelativeName(new File("C:/home/matej/test.dbd"), new File("D:/home/matej/test.vdb")));
+		System.out.println(getRelativeName(new File("/home/matej/test.dbd"), new File("/home/matej/test.vdb")));
+		System.out.println(getRelativeName(new File("/home/matej/test.dbd"), new File("/")));
+		
+		// test:
+		// new File(getRelativeName(path1, path2), path2).getCannonicalPath().equals(path1)
+
+	}
+*/
 /*
 	public static void main(String[] argv)
 	{
