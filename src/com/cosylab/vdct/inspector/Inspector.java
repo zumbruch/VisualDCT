@@ -777,12 +777,13 @@ public void setMode(int mode)
  */
 private void mouseEvent(MouseEvent event, int row, int col)
 {
-	if (event.isPopupTrigger())
+//	if (event.isPopupTrigger())
 	{
+		InspectableProperty property = (InspectableProperty)tableModel.getPropertyAt(row);
+
 		// change visibility
-		if (col==0)
+		if (col==0 && event.isPopupTrigger())
 		{
-			InspectableProperty property = (InspectableProperty)tableModel.getPropertyAt(row);
 			if (property!=null && property instanceof VDBFieldData)  ///!!! define interface
 			{
 				int visibility = property.getVisibility();
@@ -792,9 +793,10 @@ private void mouseEvent(MouseEvent event, int row, int col)
 				getScrollPaneTable().tableChanged(new TableModelEvent(tableModel, row, row, col));
 			}
 		}
-		else if (col>0)
+		// !!!
+		else if (event.isPopupTrigger() || !property.isEditable())
+//		else if (col>0 && (event.isPopupTrigger() || property.isEditable()))
 		{
-			InspectableProperty property = (InspectableProperty)tableModel.getPropertyAt(row);
 			if (property!=null)
 				property.popupEvent(getScrollPaneTable(), event.getX(), event.getY());
 		}

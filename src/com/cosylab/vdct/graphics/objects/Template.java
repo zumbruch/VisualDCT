@@ -38,6 +38,7 @@ import java.util.Vector;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 
 import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.graphics.FontMetricsBuffer;
@@ -48,6 +49,7 @@ import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.inspector.InspectorManager;
 import com.cosylab.vdct.vdb.GUISeparator;
 import com.cosylab.vdct.vdb.LinkProperties;
+import com.cosylab.vdct.vdb.MonitoredActionProperty;
 import com.cosylab.vdct.vdb.MonitoredProperty;
 import com.cosylab.vdct.vdb.MonitoredPropertyListener;
 import com.cosylab.vdct.vdb.NameValueInfoProperty;
@@ -436,13 +438,16 @@ public class Template
 			items.addElement(e.nextElement());
 		
 		items.addElement(getPropertiesSeparator());
+
 		e = templateData.getProperties().keys();
 		while (e.hasMoreElements())
 		{
 			String name = e.nextElement().toString();
-				// !!!
 			items.addElement(new MonitoredProperty(name, (String)templateData.getProperties().get(name), this));
 		}
+		
+		String addString = "Add property...";
+		items.addElement(new MonitoredActionProperty(addString, this));
 	
 		InspectableProperty[] properties = new InspectableProperty[items.size()];
 		items.copyInto(properties);
@@ -767,6 +772,33 @@ public VDBFieldData getField(String name) {
  */
 public void addProperty()
 {
+	String message = "Enter property name:";
+	int type = JOptionPane.QUESTION_MESSAGE;
+	while (true)
+	{
+		String reply = JOptionPane.showInputDialog( null,
+			                           message,
+			                           "Add property...",
+			                           type );
+		if (reply!=null)
+		{
+			// other templates check
+			if (!templateData.getProperties().containsKey(reply))
+				templateData.getProperties().put(reply, nullString);
+			else
+			{
+				message = "Property '"+reply+"' already exists. Enter other name:";
+				type = JOptionPane.WARNING_MESSAGE;
+				continue;
+			}
+		
+			InspectorManager.getInstance().updateObject(this);
+			unconditionalValidation();
+			com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+		}
+		
+		break;
+	}
 }
 
 /**
@@ -792,6 +824,43 @@ public void removeProperty(MonitoredProperty property)
 	unconditionalValidation();
 	com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 	
+}
+
+/**
+ * @see com.cosylab.vdct.vdb.MonitoredPropertyListener#renameProperty(MonitoredProperty)
+ */
+public void renameProperty(MonitoredProperty property)
+{
+	String message = "Enter new property name of '"+property.getName()+"':";
+	int type = JOptionPane.QUESTION_MESSAGE;
+	while (true)
+	{
+		String reply = JOptionPane.showInputDialog( null,
+			                           message,
+			                           "Rename property...",
+			                            type);
+		if (reply!=null)
+		{
+			// other templates check
+			if (!templateData.getProperties().containsKey(reply))
+			{
+				Object value = templateData.getProperties().remove(property.getName());
+				templateData.getProperties().put(reply, value);
+			}
+			else
+			{
+				message = "Property '"+reply+"' already exists. Enter other name:";
+				type = JOptionPane.WARNING_MESSAGE;
+				continue;
+			}
+		
+			InspectorManager.getInstance().updateObject(this);
+			unconditionalValidation();
+			com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+		}
+		
+		break;
+	}
 }
 
 }

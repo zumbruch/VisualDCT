@@ -29,6 +29,8 @@ package com.cosylab.vdct.inspector;
  */
 
 import java.awt.*;
+import java.awt.event.ActionListener;
+
 import javax.swing.*;
 import javax.swing.table.*;
 import javax.swing.border.*;
@@ -49,7 +51,7 @@ public class InspectorTableCellRenderer extends DefaultTableCellRenderer {
 	private ImageIcon blankIcon = null;
 	private ImageIcon eyeIcon = null;
 	private ImageIcon noeyeIcon = null;
-	
+
 /**
  * InspectorTableCellRenderer constructor comment.
  */
@@ -76,6 +78,7 @@ public InspectorTableCellRenderer(JTable table, InspectorTableModel tableModel) 
 		System.out.println();
 	}
 }
+
 /**
  * Insert the method's description here.
  * Creation date: (7.1.2001 11:08:56)

@@ -35,7 +35,6 @@ import java.util.regex.Pattern;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import javax.swing.JSeparator;
 import javax.swing.Popup;
 
 import com.cosylab.vdct.inspector.*;
@@ -45,15 +44,14 @@ import com.cosylab.vdct.inspector.*;
  * Creation date: (1.2.2001 22:49:33)
  * @author Matej Sekoranja
  */
-public class MonitoredProperty implements InspectableProperty {
-	private String name;
+public class MonitoredActionProperty implements InspectableProperty {
 	private String value;
 	private MonitoredPropertyListener listener = null;
+	private static final String nullString = "";
 /**
  * DTYPInfoProperty constructor comment.
  */
-public MonitoredProperty(String name, String value, MonitoredPropertyListener listener) {
-	this.name=name;
+public MonitoredActionProperty(String value, MonitoredPropertyListener listener) {
 	this.value=value;
 	this.listener=listener;
 }
@@ -79,7 +77,7 @@ public String getHelp() {
  * @return java.lang.String
  */
 public String getName() {
-	return name;
+	return nullString;
 }
 /**
  * Insert the method's description here.
@@ -112,7 +110,7 @@ public String getInitValue()
  * @return boolean
  */
 public boolean isEditable() {
-	return true;
+	return false;
 }
 /**
  * Insert the method's description here.
@@ -120,7 +118,7 @@ public boolean isEditable() {
  * @return boolean
  */
 public boolean isSepatator() {
-	return false;
+	return true;
 }
 /**
  * Insert the method's description here.
@@ -129,7 +127,6 @@ public boolean isSepatator() {
  */
 public void setValue(String value) {
 	this.value=value;
-	listener.propertyChanged(this);
 }
 /**
  * Insert the method's description here.
@@ -176,31 +173,7 @@ public int getVisibility()
  */
 public void popupEvent(Component component, int x, int y)
 {
-	ActionListener al = new ActionListener()
-	{
-		public void actionPerformed(ActionEvent e) {
-			String action = e.getActionCommand();
-			if (action.equals("Rename"))
-				listener.renameProperty(MonitoredProperty.this);
-			else if (action.equals("Remove"))
-				listener.removeProperty(MonitoredProperty.this);
-		}
-
-	};
-	
-	JPopupMenu popup = new JPopupMenu("Inspector popup");
-	
-	JMenuItem mi = new JMenuItem("Rename");
-	mi.addActionListener(al);
-	popup.add(mi);
-
-	popup.add(new JSeparator());
-	
-	mi = new JMenuItem("Remove");
-	mi.addActionListener(al);
-	popup.add(mi);
-
-	popup.show(component, x, y);
+	listener.addProperty();
 }
 
 }

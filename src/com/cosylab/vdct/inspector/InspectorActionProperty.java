@@ -1,4 +1,4 @@
-package com.cosylab.vdct.vdb;
+package com.cosylab.vdct.inspector;
 
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
@@ -28,9 +28,12 @@ package com.cosylab.vdct.vdb;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-public interface MonitoredPropertyListener {
-	void addProperty();
-	void removeProperty(MonitoredProperty property);
-	void propertyChanged(MonitoredProperty property);
-	void renameProperty(MonitoredProperty property);
+import java.awt.event.ActionListener;
+
+/**
+ * @author Matej
+ */
+public interface InspectorActionProperty extends InspectableProperty, ActionListener
+{
+
 }
