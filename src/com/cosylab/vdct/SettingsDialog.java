@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.JLabel;
@@ -780,6 +782,11 @@ private void initialize() {
 		setTitle("Visual DCT Settings");
 		setContentPane(getJDialogContentPane());
 		initConnections();
+		addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				cancelButton_ActionPerformed(null);
+			}
+		});
 		pack();
 	} catch (java.lang.Throwable ivjExc) {
 		handleException(ivjExc);
