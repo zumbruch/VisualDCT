@@ -4197,7 +4197,20 @@ private javax.swing.JMenuItem getRecentFilesMenuItem() {
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-					VisualDCT.this.openDB(e.getActionCommand());
+
+					GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
+					if (cmd!=null && cmd.getGUIMenuInterface().isModified())
+					{
+						if (JOptionPane.showConfirmDialog(VisualDCT.this, "The file has been modified. Discard changes?", "Confirmation", 
+							JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE)==JOptionPane.OK_OPTION)
+							VisualDCT.this.openDB(e.getActionCommand());
+					}
+					else
+					{
+						VisualDCT.this.openDB(e.getActionCommand());
+					}
+				
+
 				}
 			}
 			ivjRecentFilesMenuItem.addActionListener(new OpenRecentFile());
@@ -5402,7 +5415,7 @@ public void newMenuItem_ActionPerformed() {
 	GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
 	if (cmd.getGUIMenuInterface().isModified())
 	{
-		if (JOptionPane.showConfirmDialog(this, "The file has been modified. Discard changes and exit?", "Confirmation", 
+		if (JOptionPane.showConfirmDialog(this, "The file has been modified. Discard changes?", "Confirmation", 
 			JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE)==JOptionPane.OK_OPTION)
 		{
 			GetGUIInterface cmd2 = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
