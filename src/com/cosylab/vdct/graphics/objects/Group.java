@@ -1073,6 +1073,8 @@ public static void writeObjects(Vector elements, java.io.DataOutputStream file, 
 			 	record = (Record)obj;
 	 			recordData = record.getRecordData();
 
+				if (record.getRecordData().getName().startsWith(Constants.CLIPBOARD_NAME)) continue;
+
 			 	name = renamer.getResolvedName(recordData.getName());
 			 	if (export) name = renamer.matchAndReplace(name);
 			 	
@@ -1273,6 +1275,8 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 	 	if (obj instanceof Record)
 	 		{
 			 	record = (Record)obj;
+
+				if (record.getRecordData().getName().startsWith(Constants.CLIPBOARD_NAME)) continue;
 
 	 			file.writeBytes(RECORD_START+
 			 		StringUtils.quoteIfMacro(
