@@ -265,7 +265,7 @@ public java.util.Vector getItems() {
 	{
 		JMenuItem upItem = new JMenuItem(moveUpString);
 		upItem.addActionListener(createPopupmenuHandler());
-		upItem.setIcon(new ImageIcon(getClass().getResource("/up.gif")));
+		upItem.setIcon(new ImageIcon(getClass().getResource("/images/up.gif")));
 		items.addElement(upItem);
 	}
 
@@ -273,7 +273,7 @@ public java.util.Vector getItems() {
 	{
 		JMenuItem downItem = new JMenuItem(moveDownString);
 		downItem.addActionListener(createPopupmenuHandler());
-		downItem.setIcon(new ImageIcon(getClass().getResource("/down.gif")));
+		downItem.setIcon(new ImageIcon(getClass().getResource("/images/down.gif")));
 		items.addElement(downItem);
 	}
 
