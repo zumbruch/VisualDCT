@@ -37,6 +37,7 @@ import javax.swing.event.*;
 import com.cosylab.vdct.about.VisualDCTAboutDialogEngine;
 import com.cosylab.vdct.events.*;
 import com.cosylab.vdct.events.commands.*;
+import com.cosylab.vdct.plugin.PluginManager;
 import com.cosylab.vdct.util.StringUtils;
 import com.cosylab.vdct.util.UniversalFileFilter;
 import com.cosylab.vdct.vdb.VDBData;
@@ -182,6 +183,8 @@ public class VisualDCT extends JFrame {
 	private boolean lineButtonEnabled = false;
 	private boolean boxButtonEnabled = false;
 	private boolean textBoxButtonEnabled = false;
+
+	private PluginManagerDialog pluginManagerDialog = null;
 
 // shp: not final solution
 	private static VisualDCT instance = null;
@@ -5497,9 +5500,11 @@ public void pasteMenuItem_ActionPerformed() {
  */
 public void pluginManagerMenuItem_ActionPerformed(java.awt.event.ActionEvent actionEvent)
 {
-	PluginManagerDialog dialog = new PluginManagerDialog(this);
-	dialog.setLocationRelativeTo(this);
-	dialog.setVisible(true);
+	if(pluginManagerDialog == null)
+		pluginManagerDialog = new PluginManagerDialog(this);
+
+	pluginManagerDialog.setLocationRelativeTo(this);
+	pluginManagerDialog.setVisible(true);
 }
 /**
  * Comment

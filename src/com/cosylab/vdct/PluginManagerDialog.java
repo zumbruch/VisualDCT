@@ -8,6 +8,7 @@ package com.cosylab.vdct;
  */
 import java.awt.*;
 import java.awt.event.*;
+import java.beans.*;
 import java.net.*;
 import java.util.*;
 
@@ -21,7 +22,8 @@ import com.cosylab.vdct.xml.*;
 
 import org.w3c.dom.*;
 
-public class PluginManagerDialog extends JDialog
+public class PluginManagerDialog extends JDialog implements PluginListener,
+	PropertyChangeListener
 {
 
 class ButtonEventHandler implements ActionListener
@@ -43,15 +45,6 @@ public void actionPerformed(java.awt.event.ActionEvent event)
 
 private void installButtonActionPerformed()
 {
-	JFileChooser pluginChooser = new JFileChooser();
-	UniversalFileFilter pluginFileFilter =
-		new UniversalFileFilter(new String("jar"), "Jar File");
-
-	pluginChooser.resetChoosableFileFilters();
-	pluginChooser.addChoosableFileFilter(pluginFileFilter);
-	pluginChooser.setDialogTitle("Load Plugin");
-	pluginChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-
 	if(pluginChooser.showOpenDialog(PluginManagerDialog.this) == JFileChooser.CANCEL_OPTION)
 		return;
 
@@ -70,7 +63,7 @@ private void installButtonActionPerformed()
 	URL[] listOfURLs = new URL[1];
 	listOfURLs[0] = jarURL;
 		
-	URLClassLoader pluginClassLoader = new URLClassLoader(listOfURLs);
+	URLClassLoader pluginClassLoader = new URLClassLoader(listOfURLs, null);
 
 	URL xml = pluginClassLoader.getResource(Constants.PLUGINS_FILE_NAME);
 
@@ -92,8 +85,6 @@ private void installButtonActionPerformed()
 		Console.getInstance().println("An error occured while loading the plugins list!");
 		Console.getInstance().println(exception);
 	}
-
-	table.tableChanged(new TableModelEvent(pluginTableModel));
 }
 
 private void startButtonActionPerformed()
@@ -108,13 +99,10 @@ private void startButtonActionPerformed()
 		plugin = (PluginObject)(pluginIterator.next());
 
 		if(table.isRowSelected(rowCounter))
-		{
 			plugin.start();
-			table.tableChanged(new TableModelEvent(pluginTableModel, rowCounter));
-		}
+
 		rowCounter++;
 	}
-	validateButtons();
 }
 
 private void stopButtonActionPerformed()
@@ -129,13 +117,10 @@ private void stopButtonActionPerformed()
 		plugin = (PluginObject)(pluginIterator.next());
 
 		if(table.isRowSelected(rowCounter))
-		{
 			plugin.stop();
-			table.tableChanged(new TableModelEvent(pluginTableModel, rowCounter));
-		}
+
 		rowCounter++;
 	}
-	validateButtons();
 }
 
 private void uninstallButtonActionPerformed()
@@ -163,9 +148,6 @@ private void uninstallButtonActionPerformed()
 	for(rowCounter = 0; rowCounter < numberOfPlugins; rowCounter++)
 		if(table.isRowSelected(rowCounter))
 			PluginManager.getInstance().removePlugin(plugins[rowCounter]);
-
-	table.tableChanged(new TableModelEvent(pluginTableModel));
-	validateButtons();
 }
 
 };
@@ -180,10 +162,11 @@ private final static String INITIALIZED_PLUGIN = "Initialized";
 private final static String STARTED_PLUGIN = "Started";
 private final static String STOPPED_PLUGIN = "Stopped";
 	
-private final static String AUTOSTART_PLUGIN = "Auto";
-private final static String NO_AUTOSTART_PLUGIN = "Manual";
+// shp: unused
+//private final static String AUTOSTART_PLUGIN = "Auto";
+//private final static String NO_AUTOSTART_PLUGIN = "Manual";
 
-private final String[] columnName = {"Status", "Name", "Version", "Startup", "Description", "Author"};
+private final String[] columnName = {"Autostart", "Status", "Name", "Version", "Description", "Author"};
 
 public int getRowCount()
 {
@@ -211,21 +194,13 @@ public String getColumnName(int col)
 
 public Object getValueAt(int row, int column)
 {
-	Iterator pluginIterator = PluginManager.getInstance().getPlugins();
-
-	int rowCounter = 0;
-
-	while((rowCounter < row) && (pluginIterator.hasNext()))
-	{
-		pluginIterator.next();
-		rowCounter++;
-	}
-
-	PluginObject plugin = (PluginObject)(pluginIterator.next());
+	PluginObject plugin = getPluginAtRow(row);
 
 	switch(column)
 	{
 		case(0):
+			return Boolean.valueOf(plugin.isAutoStart());
+		case(1):
 		{
 			int status = plugin.getStatus();
 			if(status == PluginObject.PLUGIN_NOT_LOADED)
@@ -241,12 +216,10 @@ public Object getValueAt(int row, int column)
 			else if(status == PluginObject.PLUGIN_STOPPED)
 				return STOPPED_PLUGIN;
 		}
-		case(1):
-			return plugin.getName();
 		case(2):
-			return plugin.getVersion();
+			return plugin.getName();
 		case(3):
-			return (plugin.isAutoStart() ? AUTOSTART_PLUGIN : NO_AUTOSTART_PLUGIN);
+			return plugin.getVersion();
 		case(4):
 			return plugin.getDescription();
 		case(5):
@@ -254,6 +227,56 @@ public Object getValueAt(int row, int column)
 	}
 	
 	return null;
+}
+
+public int getPluginRow(Object plugin)
+{
+	Iterator pluginIterator = PluginManager.getInstance().getPlugins();
+
+	int rowCounter = -1;
+	Object currentPlugin = null;
+
+	while((currentPlugin != plugin) && (pluginIterator.hasNext()))
+	{
+		currentPlugin = pluginIterator.next();
+		rowCounter++;
+	}
+
+	if(currentPlugin == plugin)
+		return rowCounter;
+	else
+		return -1;
+}
+
+public PluginObject getPluginAtRow(int row)
+{
+	Iterator pluginIterator = PluginManager.getInstance().getPlugins();
+
+	int rowCounter = 0;
+
+	while((rowCounter < row) && (pluginIterator.hasNext()))
+	{
+		pluginIterator.next();
+		rowCounter++;
+	}
+
+	return (PluginObject)(pluginIterator.next());
+}
+
+public boolean isCellEditable(int rowIndex, int columnIndex)
+{
+	if(columnIndex == 0)
+		return true;
+	else
+		return false;
+}
+
+public Class getColumnClass(int columnIndex)
+{
+	if(columnIndex == 0)
+		return Boolean.class;
+	else
+		return String.class;
 }
 
 };
@@ -264,6 +287,21 @@ class TableEventHandler extends MouseAdapter implements KeyListener
 public void mouseReleased(MouseEvent event)
 {
 	validateButtons();
+
+	Point point = event.getPoint();
+	
+	int row = table.rowAtPoint(point);
+	
+	if(row == -1)
+		return;
+
+	int column = table.columnAtPoint(point);
+		
+	if(column == 0)
+	{
+		PluginObject plugin = pluginTableModel.getPluginAtRow(row);
+		plugin.setAutoStart(!plugin.isAutoStart());
+	}
 }
 
 public void keyPressed(KeyEvent event)
@@ -279,6 +317,23 @@ public void keyReleased(KeyEvent event)
 {
 }
 	
+};
+
+private class PluginCellRenderer extends DefaultTableCellRenderer
+{
+
+public PluginCellRenderer()
+{
+	setHorizontalAlignment(JLabel.CENTER);
+}
+
+public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+	boolean hasFocus, int  row, int column)
+{
+	super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+	return this;
+}
+
 };
 
 private PluginTableModel pluginTableModel = null;
@@ -301,7 +356,9 @@ private JButton startButton = null;
 private JButton stopButton = null;
 private JButton closeButton = null;
 
-private final int[] columnWidths = {64, 192, 54, 54, 320, 192};
+private JFileChooser pluginChooser = null;
+
+private final int[] columnWidths = {64, 64, 192, 54, 320, 192};
 
 public PluginManagerDialog(Frame owner)
 {
@@ -321,10 +378,14 @@ public PluginManagerDialog(Frame owner)
 
 	TableColumn column = null;
 
+	PluginCellRenderer renderer = new PluginCellRenderer();
+
 	for(int counter = 0; counter < table.getColumnCount(); counter++)
 	{
 		column = table.getColumnModel().getColumn(counter);
 		column.setPreferredWidth(columnWidths[counter]);
+		if((counter == 1) || (counter == 3))
+			column.setCellRenderer(renderer);
 	}
 
 	table.setRowHeight(20);
@@ -397,6 +458,17 @@ public PluginManagerDialog(Frame owner)
 	contentPane.add(buttonPanel, buttonPanelConstraints);
 
 	setContentPane(contentPane);
+
+	PluginManager.getInstance().addPluginListener(this);
+
+	pluginChooser = new JFileChooser();
+	UniversalFileFilter pluginFileFilter =
+		new UniversalFileFilter(new String("jar"), "Jar File");
+
+	pluginChooser.resetChoosableFileFilters();
+	pluginChooser.addChoosableFileFilter(pluginFileFilter);
+	pluginChooser.setDialogTitle("Load Plugin");
+	pluginChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 }
 
 private void validateButtons()
@@ -435,6 +507,27 @@ private void validateButtons()
 	startButton.setEnabled(oneStartablePlugin);
 	stopButton.setEnabled(oneStoppablePlugin);
 	uninstallButton.setEnabled(oneUninstallablePlugin);
+}
+
+public void pluginAdded(PluginObject plugin)
+{
+	plugin.addPropertyChangeListener(this);
+	table.tableChanged(new TableModelEvent(pluginTableModel));
+	validateButtons();
+}
+
+public void pluginRemoved(PluginObject plugin)
+{
+	plugin.removePropertyChangeListener(this);
+	table.tableChanged(new TableModelEvent(pluginTableModel));
+	validateButtons();
+}
+
+public void propertyChange(PropertyChangeEvent event)
+{
+	int row = pluginTableModel.getPluginRow(event.getSource());
+	table.tableChanged(new TableModelEvent(pluginTableModel, row));
+	validateButtons();
 }
 	
 }
