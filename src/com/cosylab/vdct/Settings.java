@@ -340,7 +340,7 @@ public void loadRecentFiles()
 		{
 			try
 			{
-				VisualDCT.getInstance().getRecentFilesMenu().addFile(new File(fileName));
+				VisualDCT.getInstance().getRecentFilesMenu().addFile(new File(fileName), true);
 			}
 			catch (Exception ex)
 			{

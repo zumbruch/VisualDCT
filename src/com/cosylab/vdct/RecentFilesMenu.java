@@ -101,7 +101,17 @@ public RecentFilesMenu()
  * Creation date: (7.12.2001 17:09:23)
  * @param
  */
-public synchronized void addFile(File file)
+public void addFile(File file)
+{
+	addFile(file, false);
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (7.12.2001 17:09:23)
+ * @param
+ */
+public synchronized void addFile(File file, boolean makeLast)
 {
 	
 	RecentFileMenuItem mi = null;
@@ -128,7 +138,10 @@ public synchronized void addFile(File file)
 	
 	
 	// add new one at the top
-	insert(mi, 0);
+	if (!makeLast)
+		insert(mi, 0);
+	else
+		add(mi);
 	
 	// remove last
 	if (getItemCount()>Constants.MAX_RECENT_FILES)
