@@ -60,6 +60,9 @@ import com.cosylab.vdct.vdb.*;
  * Graphical representation of templates.
  * @author Matej
  */
+// TODO template - undo after destroy
+// TODO save fields positions
+// TODO do not show hidden macros in properties
 public class Template
 	extends LinkManagerObject
 	implements /*Descriptable,*/ Movable, Inspectable, Popupable, Flexible, Selectable, Clipboardable, Hub, MonitoredPropertyListener, SaveInterface, SaveObject
@@ -110,6 +113,9 @@ public class Template
 	protected long macrosID = -1;
 
 	protected Vector invalidLinks = null;
+	
+	protected int leftFields = 0;
+	protected int rightFields = 0;
 	
 	/**
 	 * Insert the method's description here.
@@ -274,10 +280,7 @@ public class Template
 
 
 		  // fields
-
-		// TODO this will have to change
-		 int fieldRows = Math.max(templateData.getTemplate().getPorts().size(),
-		 						  templateData.getTemplate().getMacros().size());
+		  int fieldRows = Math.max(leftFields, rightFields);
 		  height += fieldRows * Constants.FIELD_HEIGHT;
 		 // height = Math.max(height, Constants.TEMPLATE_MIN_HEIGHT);
 		  int frheight = (int)(scale*height);
@@ -751,18 +754,19 @@ private void revalidateFieldsPosition() {
   EPICSLink field; Object obj;
   while (e.hasMoreElements()) {
 	obj = e.nextElement();
-	if (obj instanceof Field) {
+	if (obj instanceof EPICSLink) {
 		field = (EPICSLink)obj;
-		if (field.isRight())
-		{
-			field.revalidatePosition(rx, ry);
-			ry+=field.getHeight();
-		}
-		else
-		{
-			field.revalidatePosition(lx, ly);
-			ly+=field.getHeight();
-		}
+		if (field.isVisible())
+			if (field.isRight())
+			{
+				field.revalidatePosition(rx, ry);
+				ry+=field.getHeight();
+			}
+			else
+			{
+				field.revalidatePosition(lx, ly);
+				ly+=field.getHeight();
+			}
 	}
   }
 
@@ -779,6 +783,7 @@ private void paintSubObjects(Graphics g, boolean hilited) {
 	VisibleObject vo;
 	while (e.hasMoreElements()) {
 		vo = (VisibleObject)(e.nextElement());
+		if (vo.isVisible())
 			vo.paint(g, hilited);
 	}
 	
@@ -829,9 +834,17 @@ private EPICSLink createLinkField(VDBFieldData field)
 
 	if (field instanceof VDBTemplatePort)
 		link = new TemplateEPICSPort(this, field);
-
 	else if (field instanceof VDBTemplateMacro)
 		link = new TemplateEPICSMacro(this, field);
+
+	if (link!=null)
+	{
+		if (link.isVisible())
+			if (link.isRight())
+				rightFields++;
+			else
+				leftFields++;
+	}
 
 	return link;
 }
@@ -854,7 +867,7 @@ private void initializeLinkFields()
 		EPICSLink link = createLinkField(tf);
 		if (link!=null)
 		{
-			link.setRight(true);
+			//link.setRight(true);
 			addSubObject(tf.getName(), link);
 		}
 	}
@@ -877,7 +890,7 @@ private void initializeLinkFields()
 		EPICSLink link = createLinkField(tf);
 		if (link!=null)
 		{
-			link.setRight(false);
+			//link.setRight(false);
 			addSubObject(tf.getName(), link);
 		}
 	}
@@ -1771,6 +1784,54 @@ public void generateMacros(HashMap macros) {
  */
 private Template.PopupMenuHandler createPopupmenuHandler() {
 	return new PopupMenuHandler();
+}
+
+/**
+ * @param link
+ * @param isRight
+ */
+public void fieldSideChange(EPICSLink link, boolean isRight)
+{
+	if (isRight)
+	{
+		leftFields--; rightFields++;
+	}
+	else
+	{
+		leftFields++; rightFields--;
+	}
+	
+	unconditionalValidation();
+	com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+}
+
+/**
+ * @param field
+ * @param oldValue
+ * @param newValue
+ */
+public void fieldVisibilityChange(VDBFieldData fieldData, boolean newVisible)
+{
+
+	EPICSLink link = (EPICSLink)getSubObject(fieldData.getName());
+	if (newVisible)
+	{
+		if (link.isRight())
+			rightFields++;
+		else			
+			leftFields++;
+	}
+	else
+	{
+		if (link.isRight())
+			rightFields--;
+		else			
+			leftFields--;
+	}
+	
+	unconditionalValidation();
+	com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+	
 }
 
 }

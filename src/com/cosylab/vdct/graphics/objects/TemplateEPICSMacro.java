@@ -79,6 +79,14 @@ public TemplateEPICSMacro(ContainerObject parent, VDBFieldData fieldData) {
 	setWidth(Constants.TEMPLATE_WIDTH/2);
 
 	updateTemplateLink();
+
+	// set default side (left)
+	int mode = InLink.INPUT_MACRO_MODE;
+	Macro visibleMacro = ((VDBTemplateMacro)fieldData).getMacro().getVisibleObject();
+	if (visibleMacro!=null)
+		mode = visibleMacro.getMode();
+
+	super.setRight(mode==InLink.OUTPUT_MACRO_MODE);
 }
 
 /**
@@ -104,14 +112,6 @@ public void fixTemplateLink()
 	updateTemplateLink();
 	//nothing can be linked to this object
 	//LinkManagerObject.fixLink(this);
-}
-
-/**
- * Insert the method's description here.
- * Creation date: (30.1.2001 16:58:58)
- */
-public void rotate() {
-	// do not change rotation
 }
 
 /**
@@ -379,7 +379,7 @@ public java.util.Vector getItems() {
 
 	items.add(new JSeparator());
 
-//TODO
+//TODO moving fields
 /*
 	if (getParent() instanceof Record)
 	{
@@ -462,6 +462,27 @@ private void updateLink() {
  */
 public void valueChanged() {
 	updateLink();
+}
+
+/**
+ * @see com.cosylab.vdct.graphics.objects.TemplateEPICSLink#isVisible()
+ */
+public boolean isVisible() {
+	return (fieldData.getVisibility() == InspectableProperty.ALWAYS_VISIBLE ||
+			(fieldData.getVisibility() == InspectableProperty.NON_DEFAULT_VISIBLE && !fieldData.hasDefaultValue()));
+}
+
+/**
+ * @see com.cosylab.vdct.graphics.objects.Rotatable#setRight(boolean)
+ */
+public void setRight(boolean isRight)
+{
+	boolean oldValue = isRight();
+	if (oldValue != isRight)
+	{
+		super.setRight(isRight);
+		((Template)getParent()).fieldSideChange(this, isRight);
+	}
 }
 
 }

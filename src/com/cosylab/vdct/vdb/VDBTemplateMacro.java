@@ -35,6 +35,7 @@ import com.cosylab.vdct.graphics.objects.Descriptable;
 import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.objects.Template;
 import com.cosylab.vdct.inspector.ChangableVisibility;
+import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.inspector.InspectorManager;
 
 /**
@@ -108,7 +109,24 @@ public class VDBTemplateMacro extends VDBFieldData implements Descriptable, Chan
 	 */
 	public void setVisibility(int visibility)
 	{
+		int oldValue = this.visibility;
 		this.visibility = visibility;
+
+		if (oldValue != visibility)
+		{
+			boolean hasDefaultValue = hasDefaultValue();
+			boolean oldVisible = (oldValue == InspectableProperty.ALWAYS_VISIBLE ||
+								 (oldValue == InspectableProperty.NON_DEFAULT_VISIBLE && !hasDefaultValue));
+			boolean newVisible = (visibility == InspectableProperty.ALWAYS_VISIBLE ||
+								 (visibility == InspectableProperty.NON_DEFAULT_VISIBLE && !hasDefaultValue));
+			if (oldVisible != newVisible)
+			{						 
+				Template visualTemplate = (Template)Group.getRoot().findObject(templateInstance.getName(), true);
+				if (visualTemplate!=null)
+					visualTemplate.fieldVisibilityChange(this, newVisible);
+			}
+		}
+			
 		updateInspector();
 	}
 
@@ -250,14 +268,29 @@ public boolean hasDefaultValue() {
  */
 public void setValue(java.lang.String newValue) {
 
+	boolean oldVisible = (getVisibility() == InspectableProperty.ALWAYS_VISIBLE ||
+						 (getVisibility() == InspectableProperty.NON_DEFAULT_VISIBLE && !hasDefaultValue()));
+
 	// buffer value
 	super.setValue(newValue);
+
+	boolean newVisible = (getVisibility() == InspectableProperty.ALWAYS_VISIBLE ||
+						 (getVisibility() == InspectableProperty.NON_DEFAULT_VISIBLE && !hasDefaultValue()));
+						 
+	Template visualTemplate = null;
+	if (oldVisible != newVisible)
+	{						 
+		visualTemplate = (Template)Group.getRoot().findObject(templateInstance.getName(), true);
+		if (visualTemplate!=null)
+			visualTemplate.fieldVisibilityChange(this, newVisible);
+	}
 
 	// mapping to property 
 	updateProperty();
 
 	// field changed
-	Template visualTemplate = (Template)Group.getRoot().findObject(templateInstance.getName(), true);
+	if (visualTemplate!=null)
+		visualTemplate = (Template)Group.getRoot().findObject(templateInstance.getName(), true);
 	if (visualTemplate!=null)
 	{
 		if (visualTemplate.manageLink(this)) {

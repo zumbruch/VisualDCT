@@ -64,6 +64,14 @@ public TemplateEPICSPort(ContainerObject parent, VDBFieldData fieldData) {
 	setWidth(Constants.TEMPLATE_WIDTH/2);
 
 	updateTemplateLink();
+
+	// set default side (left)
+	int mode = OutLink.INPUT_PORT_MODE;
+	Port visiblePort = ((VDBTemplatePort)fieldData).getPort().getVisibleObject();
+	if (visiblePort!=null)
+		mode = visiblePort.getMode();
+
+	super.setRight(mode==OutLink.OUTPUT_PORT_MODE);
 }
 
 /**
@@ -104,14 +112,6 @@ public void fixTemplateLink()
 {
 	updateTemplateLink();
 	LinkManagerObject.fixLink(this);
-}
-
-/**
- * Insert the method's description here.
- * Creation date: (30.1.2001 16:58:58)
- */
-public void rotate() {
-	// do not change rotation
 }
 
 /**
@@ -309,6 +309,27 @@ public javax.swing.Icon getIcon() {
  */
 public String getDescription() {
 	return ((VDBTemplatePort)fieldData).getDescription();
+}
+
+/**
+ * @see com.cosylab.vdct.graphics.objects.TemplateEPICSLink#isVisible()
+ */
+public boolean isVisible() {
+	return (fieldData.getVisibility() == InspectableProperty.ALWAYS_VISIBLE ||
+			(fieldData.getVisibility() == InspectableProperty.NON_DEFAULT_VISIBLE && !fieldData.hasDefaultValue()));
+}
+
+/**
+ * @see com.cosylab.vdct.graphics.objects.Rotatable#setRight(boolean)
+ */
+public void setRight(boolean isRight)
+{
+	boolean oldValue = isRight();
+	if (oldValue != isRight)
+	{
+		super.setRight(isRight);
+		((Template)getParent()).fieldSideChange(this, isRight);
+	}
 }
 
 }

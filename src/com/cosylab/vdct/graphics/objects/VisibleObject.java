@@ -467,4 +467,11 @@ public void unconditionalValidation() {
  * Creation date: (19.12.2000 21:31:15)
  */
 protected abstract void validate();
+
+/**
+ * Insert the method's description here.
+ * Creation date: (30.1.2001 16:58:58)
+ * @return boolean
+ */
+public boolean isVisible() { return true; }
 }

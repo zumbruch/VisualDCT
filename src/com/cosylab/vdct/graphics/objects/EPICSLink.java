@@ -129,7 +129,7 @@ public boolean isStaticRight() {
  * Insert the method's description here.
  * Creation date: (30.1.2001 16:58:58)
  */
-public void rotate() { right=!right; }
+public void rotate() { setRight(!right); }
 /**
  * Insert the method's description here.
  * Creation date: (24.4.2001 17:40:45)

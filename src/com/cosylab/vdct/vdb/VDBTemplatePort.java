@@ -35,6 +35,7 @@ import com.cosylab.vdct.graphics.objects.Descriptable;
 import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.objects.Template;
 import com.cosylab.vdct.inspector.ChangableVisibility;
+import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.inspector.InspectorManager;
 
 /**
@@ -107,7 +108,24 @@ public class VDBTemplatePort extends VDBFieldData implements Descriptable, Chang
 	 */
 	public void setVisibility(int visibility)
 	{
+		int oldValue = this.visibility;
 		this.visibility = visibility;
+
+		if (oldValue != visibility)
+		{
+			boolean hasDefaultValue = hasDefaultValue();
+			boolean oldVisible = (oldValue == InspectableProperty.ALWAYS_VISIBLE ||
+								 (oldValue == InspectableProperty.NON_DEFAULT_VISIBLE && !hasDefaultValue));
+			boolean newVisible = (visibility == InspectableProperty.ALWAYS_VISIBLE ||
+								 (visibility == InspectableProperty.NON_DEFAULT_VISIBLE && !hasDefaultValue));
+			if (oldVisible != newVisible)
+			{						 
+				Template visualTemplate = (Template)Group.getRoot().findObject(templateInstance.getName(), true);
+				if (visualTemplate!=null)
+					visualTemplate.fieldVisibilityChange(this, newVisible);
+			}
+		}
+					
 		updateInspector();
 	}
 
