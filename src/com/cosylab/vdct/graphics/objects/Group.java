@@ -1288,7 +1288,7 @@ public void writeVDCTData(java.io.DataOutputStream file, java.lang.String path2r
 						}
 						
 						if (!value.equals(fd.getValue()))
-						 	file.writeBytes(TEMPLATE_PROPERTY_START+
+						 	file.writeBytes(TEMPLATE_VALUE_START+
 			 					 quote + templateName + quote +
 			 					 comma + quote + name + quote +
 								 comma + quote + value + quote +

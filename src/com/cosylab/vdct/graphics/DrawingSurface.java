@@ -549,6 +549,9 @@ public void initializeWorkspace() {
 	
 	UndoManager.getInstance().reset();
 
+	// !!! call all destory() in objects
+	DataProvider.getInstance().getLookupTable().clear();
+
 	setModified(false);
 	viewGroup = new Group(null);
 	viewGroup.setAbsoluteName("");

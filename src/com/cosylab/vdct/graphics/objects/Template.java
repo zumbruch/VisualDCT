@@ -1106,7 +1106,7 @@ protected void destroyFields() {
 public void writeObjects(DataOutputStream file, String path2remove)
 	throws IOException
 {
-	System.out.print("Template.writeObjects");
+	System.out.println("Template.writeObjects");
 }
 
 /**
@@ -1115,7 +1115,7 @@ public void writeObjects(DataOutputStream file, String path2remove)
 public void writeVDCTData(DataOutputStream file, String path2remove)
 	throws IOException
 {
-	System.out.print("Template.writeVDCTData");
+	System.out.println("Template.writeVDCTData");
 }
 
 }
