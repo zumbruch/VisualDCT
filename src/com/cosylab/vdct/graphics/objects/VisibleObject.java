@@ -84,6 +84,8 @@ public VisibleObject(ContainerObject parent) {
  */
 public void destroy() {
 	destroyed=true;
+	if (ViewState.getInstance().getHilitedObject() == this)
+		ViewState.getInstance().setAsHilited(null);
 }
 /**
  * Insert the method's description here.

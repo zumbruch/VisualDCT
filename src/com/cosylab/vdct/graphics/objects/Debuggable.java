@@ -48,4 +48,9 @@ String getFullName();
  * @param value java.lang.String
  */
 void setDebugValue(String value, Date timeStamp, short severity);
+
+/**
+ * Sets values to initial state.
+ */
+void initialize();
 }

@@ -1269,7 +1269,19 @@ protected void validate() {
   int y0 = (int)(4*scale);
 
   Font font;
-  setLabel(recordData.getName());
+  
+  // translate name
+  if (PluginDebugManager.isDebugState())
+  {
+	Map macroSet = PluginDebugManager.getDebugPlugin().getMacroSet();
+	if (macroSet != null)
+		setLabel(VDBTemplateInstance.applyProperties(recordData.getName(), macroSet));
+	else
+		setLabel(recordData.getName());
+  }
+  else
+	  setLabel(recordData.getName());
+  
   if (rwidth<(2*x0)) font = null;
   else
 	  font = FontMetricsBuffer.getInstance().getAppropriateFont(
@@ -1357,7 +1369,25 @@ private void validateDebug(VDBFieldData valField)
 	int x0 = (int)(8*scale);		// insets
 	int y0 = (int)(4*scale);
 
-	debugValueColor = valField.getDebugValueColor();
+	// select debug color (follows MEDM standard)
+	switch (valField.getSeverity())
+	{
+		// 0 = no alarm
+		case 0 :
+			debugValueColor = Constants.LINE_COLOR;
+			break;
+		// 1 = minor
+		case 1 :
+			debugValueColor = Color.YELLOW;
+			break;
+		// 2 = major
+		case 2 :
+			debugValueColor = Color.RED;
+			break;
+		// 3 = invalid
+		default :
+			debugValueColor = Constants.LINE_COLOR;
+	}
 
 	// TODO for timestamp this could be optimized
 	timestamp = valField.getDebugValueTimeStamp();

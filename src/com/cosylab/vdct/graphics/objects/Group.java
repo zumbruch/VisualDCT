@@ -554,7 +554,7 @@ public void initializeLayout() {
 			if (e.nextElement() instanceof ContainerObject)
 				containerCount++;
 					
-		final int offset = 20;
+		final int offset = view.getGridSize()*2;
 		
 		// groups should be the widest
 		int nx = (view.getWidth()-offset)/(Constants.GROUP_WIDTH+offset);
