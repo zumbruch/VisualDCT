@@ -29,6 +29,7 @@ package com.cosylab.vdct.graphics.objects;
  */
 
 import com.cosylab.vdct.Constants;
+import com.cosylab.vdct.vdb.LinkProperties;
 
 /**
  * Insert the type's description here.
@@ -159,4 +160,8 @@ public void validate() {
 	r = (int)(getRscale()*Constants.LINK_RADIOUS);
 	rtailLen = (int)(getRscale()*Constants.TAIL_LENGTH);
 }
+
+/// Called after chaning value silently (fixLinks)
+public abstract void fixLinkProperties();
+
 }

@@ -436,4 +436,11 @@ public ArrayList getModeNames()
 }
 
 
+/**
+ * @see com.cosylab.vdct.graphics.objects.EPICSLink#fixLinkProperties()
+ */
+public void fixLinkProperties()
+{
+}
+
 }

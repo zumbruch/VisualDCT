@@ -635,7 +635,16 @@ public void linkCommand(VisibleObject linkObject, LinkSource linkData) {
 		hiliter.start();
 	}
 	else {
-		if (linkData==null && linkObject instanceof Record)
+		if (!(tmplink instanceof VDBPort) &&
+				(tmplink.getType() != DBDConstants.DBF_INLINK) &&
+			  	(tmplink.getType() != DBDConstants.DBF_OUTLINK) &&
+				(tmplink.getType() != DBDConstants.DBF_FWDLINK))
+			{
+				// VAR->PORT
+				if (linkData instanceof VDBTemplatePort)
+					tmplink.setValue(linkData.getFullName());
+			}
+		else if (linkData==null && linkObject instanceof Record)
 			tmplink.setValue(((Record)linkObject).getName());		// fwd link to manager
 		else 
 			tmplink.setValue(linkData.getFullName());
@@ -1198,7 +1207,7 @@ public void mousePressed(MouseEvent e) {
 				if (hilitedObject instanceof LinkManagerObject) {
 					//((LinkManagerObject)hilitedObject).setTarget((tmplink!=null));
 					// show all for VBDPorts
-					((LinkManagerObject)hilitedObject).setTarget((tmplink!=null) && !(tmplink instanceof VDBPort));
+					((LinkManagerObject)hilitedObject).setTargetLink(tmplink);
 				}
 				
 				PopUpMenu.getInstance().show(

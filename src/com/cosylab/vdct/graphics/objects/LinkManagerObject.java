@@ -62,11 +62,12 @@ public abstract class LinkManagerObject extends ContainerObject implements Hub, 
 	public final static String nullString = "";
 
 	// GUI linking support
-    private boolean target = false;
+    private LinkSource targetLink = null;
 	public final static String inlinkString = "INLINK";
 	public final static String outlinkString = "OUTLINK";
 	public final static String fwdlinkString = "FWDLINK";
 	public final static String varlinkString = "VARIABLE";
+	public final static String varlinkPortString = "VARIABLE to PORT";
 
 /**
  * LinkManagerObject constructor comment.
@@ -140,6 +141,51 @@ public void fixEPICSOutLinks(Enumeration e, String prevGroup, String group) {
  * (linked list). It compares start point end end point and ...
  * Creation date: (2.5.2001 19:37:46)
  */
+public void fixLinksNew() {
+
+	Object unknownField;
+	InLink inlink;
+	
+	Enumeration e = getSubObjectsV().elements();
+	while (e.hasMoreElements())
+	{
+			unknownField = e.nextElement();
+			
+			// go and find source
+			if (unknownField instanceof InLink)
+			{
+				inlink = (EPICSVarLink)unknownField;
+				//!!fixLink(inlink);
+			}
+
+/*
+			else if (unknownField instanceof EPICSLinkOut)
+			{
+				source = (EPICSLinkOut)unknownField;
+				InLink inlink = EPICSLinkOut.getEndPoint(source);
+				if (inlink!=null && inlink instanceof EPICSVarLink)
+				{
+					varlink = (EPICSVarLink)inlink;
+					targetName = varlink.getFieldData().getFullName();
+					// now I got source and target, compare values
+					String oldTarget = LinkProperties.getTarget(source.getFieldData());
+					if (!oldTarget.equalsIgnoreCase(targetName))
+					{
+						// not the same, fix it gently as a doctor :)
+						String value = source.getFieldData().getValue();
+						value = targetName + com.cosylab.vdct.util.StringUtils.removeBegining(value, oldTarget);
+						source.getFieldData().setValueSilently(value);
+						source.fixLinkProperties();
+					}
+				}
+			}
+
+*/
+			
+	}
+	
+}
+
 public void fixLinks() {
 
 	Object unknownField;
@@ -187,18 +233,17 @@ public void fixLinks() {
 
 public static void fixLink(EPICSVarLink varlink)
 {
-	EPICSLinkOut source;
+	EPICSLink source;
 	String targetName = varlink.getFieldData().getFullName();
 	
 	Enumeration e2 = varlink.getStartPoints().elements();
 	while (e2.hasMoreElements())
 	{
 		Object unknownField = e2.nextElement();
-		if (unknownField instanceof EPICSLinkOut) 
-			source = (EPICSLinkOut)unknownField;  
+		if (unknownField instanceof OutLink && unknownField instanceof EPICSLink) 
+			source = (EPICSLink)unknownField;  
 		else
 			continue;	// nothing to fix
-	
 	
 		// now I got source and target, compare values
 		String oldTarget = LinkProperties.getTarget(source.getFieldData());
@@ -214,6 +259,33 @@ public static void fixLink(EPICSVarLink varlink)
 	}
 }
 
+public static void fixLink_(EPICSVarLink varlink)
+{
+	EPICSLinkOut source;
+	String targetName = varlink.getFieldData().getFullName();
+	
+	Enumeration e2 = varlink.getStartPoints().elements();
+	while (e2.hasMoreElements())
+	{
+		Object unknownField = e2.nextElement();
+		if (unknownField instanceof EPICSLinkOut) 
+			source = (EPICSLinkOut)unknownField;  
+		else
+			continue;	// nothing to fix
+	
+		// now I got source and target, compare values
+		String oldTarget = LinkProperties.getTarget(source.getFieldData());
+		if (!oldTarget.equalsIgnoreCase(targetName))
+		{
+			// not the same, fix it gently as a doctor :)
+			String value = source.getFieldData().getValue();
+			// value = targetName + link properties
+			value = targetName + com.cosylab.vdct.util.StringUtils.removeBegining(value, oldTarget);
+			source.getFieldData().setValueSilently(value);
+			source.fixLinkProperties();
+		}
+	}
+}
 
 /**
  * Returns true if link is softeare link
@@ -243,30 +315,50 @@ public boolean manageLink(VDBFieldData field) {
 	int type = LinkProperties.getType(field);
 	if (type == LinkProperties.VARIABLE_FIELD)
 	{
-		if (this.containsObject(field.getName()))
-		{
-			EPICSVarLink link = (EPICSVarLink)getSubObject(field.getName());
-			link.validateLink();
-			return true;			
-		}
-		else
-		{
-			// new VAR->PORT link
-			LinkProperties properties = new LinkProperties(field);
-			InLink portLink = EPICSLinkOut.getTarget(properties);
-			
-			if (portLink==null || !(portLink instanceof TemplateEPICSPort))
-				return false;
-				
-			EPICSVarOutLink varlink = new EPICSVarOutLink(this, field);
+		// invoke validateLink at the end
+
+		EPICSVarOutLink link = null;
 		
-			addLink(varlink);
+		if (this.containsObject(field.getName()))
+			link = (EPICSVarOutLink)getSubObject(field.getName());
 
-			portLink.setOutput(varlink, null);
-			varlink.setInput(portLink);
-
+		
+		if (link!=null && link.getInput()!=null)
+		{
+			link.validateLink();
 			return true;
 		}
+		
+		
+		// check new VAR->PORT link
+		LinkProperties properties = new LinkProperties(field);
+		InLink portLink = EPICSLinkOut.getTarget(properties);
+		
+		if (portLink==null || !(portLink instanceof TemplateEPICSPort))
+		{
+			if (link!=null)
+			{
+				link.validateLink();
+				return true;
+			}
+			else
+				return false;
+		}
+		
+		// create a new one	
+		if (link==null)
+		{
+			link = new EPICSVarOutLink(this, field);
+			addLink(link);
+		}
+
+		portLink.setOutput(link, null);
+		link.setInput(portLink);
+
+		if (link!=null)
+			link.validateLink();
+			
+		return true;
 
 	}	
 	else
@@ -434,24 +526,6 @@ public void postDraw(Graphics g, boolean hilited) {
 
 /**
  * Insert the method's description here.
- * Creation date: (3.2.2001 13:25:42)
- * @return boolean
- */
-public boolean isTarget() {
-	return target;
-}
-
-/**
- * Insert the method's description here.
- * Creation date: (3.2.2001 13:25:42)
- * @param newTarget boolean
- */
-public void setTarget(boolean newTarget) {
-	target = newTarget;
-}
-
-/**
- * Insert the method's description here.
  * Creation date: (2.2.2001 20:31:29)
  * @return java.util.Vector
  */
@@ -460,60 +534,25 @@ public Vector getLinkMenus(Enumeration vdbFields) {
 	ActionListener l = createPopupmenuHandler();
 	VDBFieldData field;
 	JMenuItem menuitem;
-	
-	if (isTarget()) {
-		int count = 0;
-		JMenu varlinkItem = new JMenu(varlinkString);
-		JMenu menu = varlinkItem;
-		
-		while (vdbFields.hasMoreElements()) {
-			field = (VDBFieldData)(vdbFields.nextElement());
-/*			switch (field.getType()) {
-				case DBDConstants.DBF_CHAR: 
-				case DBDConstants.DBF_UCHAR: 
-				case DBDConstants.DBF_SHORT: 
-				case DBDConstants.DBF_USHORT: 
-				case DBDConstants.DBF_LONG: 
-				case DBDConstants.DBF_ULONG: 
-				case DBDConstants.DBF_FLOAT: 
-				case DBDConstants.DBF_DOUBLE: 
-				case DBDConstants.DBF_STRING:
-				case DBDConstants.DBF_NOACCESS:		// added by request of APS
-				case DBDConstants.DBF_ENUM:
-				case DBDConstants.DBF_MENU:
-				case DBDConstants.DBF_DEVICE:  // ?
-				  menuitem = new JMenuItem(field.getName());
-				  menuitem.addActionListener(l);
-				  menu = PopUpMenu.addItem(menuitem, menu, count);
-				  count++; 
-			}
-*/
-			if (field.getType()!=DBDConstants.DBF_INLINK &&
-				field.getType()!=DBDConstants.DBF_OUTLINK &&
-				field.getType()!=DBDConstants.DBF_FWDLINK)
-			{
-				  menuitem = new JMenuItem(field.getName());
-				  menuitem.addActionListener(l);
-				  menu = PopUpMenu.addItem(menuitem, menu, count);
-				  count++; 
-			}
 
-		}
-		if (count > 0) items.addElement(varlinkItem);
-		
-	}
-	else {
+	boolean disableVarLinks = (getTargetLink() instanceof VDBPort);
+	
+	if (getTargetLink()==null || disableVarLinks) {
 		
 		JMenu inlinks = new JMenu(inlinkString);
 		JMenu outlinks = new JMenu(outlinkString);
 		JMenu fwdlinks = new JMenu(fwdlinkString);
+		JMenu varlinks = new JMenu(varlinkPortString); // -> port
 		
 		JMenu inMenu = inlinks;	
 		JMenu outMenu = outlinks;	
 		JMenu fwdMenu = fwdlinks;	
+		JMenu varMenu = varlinks;	// -> port
 		
 		int inpItems, outItems, fwdItems;
+		int varItems; // -> port
 		inpItems=outItems=fwdItems=0;
+		varItems=0; // -> port
 
 		while (vdbFields.hasMoreElements()) {
 			field = (VDBFieldData)(vdbFields.nextElement());
@@ -537,6 +576,20 @@ public Vector getLinkMenus(Enumeration vdbFields) {
 						 fwdlinks = PopUpMenu.addItem(menuitem, fwdlinks, fwdItems); 
 						 fwdItems++;
 						 break;
+					default:
+						 if (disableVarLinks)
+						 	break;
+
+						 // no not add fields with undefined GUI type
+						 if (field.getGUI_type() == DBDConstants.GUI_UNDEFINED)
+						 	break;
+
+						 menuitem = new JMenuItem(field.getName());
+						 menuitem.addActionListener(l);
+						 varlinks = PopUpMenu.addItem(menuitem, varlinks, varItems); 
+						 varItems++;
+						 break;
+					
 				}
 			}
 		}
@@ -547,7 +600,52 @@ public Vector getLinkMenus(Enumeration vdbFields) {
 			items.addElement(outMenu);
 		if (fwdMenu.getItemCount() > 0)
 			items.addElement(fwdMenu);
+		if (varMenu.getItemCount() > 0)
+			items.addElement(varMenu);
 
+	}
+	else if ((getTargetLink().getType() == DBDConstants.DBF_INLINK) ||
+		  	  (getTargetLink().getType() == DBDConstants.DBF_OUTLINK) ||
+			  (getTargetLink().getType() == DBDConstants.DBF_FWDLINK)) { // no targets (only ports) for VAR->PORTS
+		int count = 0;
+		JMenu varlinkItem = new JMenu(varlinkString);
+		JMenu menu = varlinkItem;
+		
+		while (vdbFields.hasMoreElements()) {
+			field = (VDBFieldData)(vdbFields.nextElement());
+/*			switch (field.getType()) {
+				case DBDConstants.DBF_CHAR: 
+				case DBDConstants.DBF_UCHAR: 
+				case DBDConstants.DBF_SHORT: 
+				case DBDConstants.DBF_USHORT: 
+				case DBDConstants.DBF_LONG: 
+				case DBDConstants.DBF_ULONG: 
+				case DBDConstants.DBF_FLOAT: 
+				case DBDConstants.DBF_DOUBLE: 
+				case DBDConstants.DBF_STRING:
+				case DBDConstants.DBF_NOACCESS:	
+				case DBDConstants.DBF_ENUM:
+				case DBDConstants.DBF_MENU:
+				case DBDConstants.DBF_DEVICE:  // ?
+				  menuitem = new JMenuItem(field.getName());
+				  menuitem.addActionListener(l);
+				  menu = PopUpMenu.addItem(menuitem, menu, count);
+				  count++; 
+			}
+*/
+			if (field.getType()!=DBDConstants.DBF_INLINK &&
+				field.getType()!=DBDConstants.DBF_OUTLINK &&
+				field.getType()!=DBDConstants.DBF_FWDLINK)
+			{
+				  menuitem = new JMenuItem(field.getName());
+				  menuitem.addActionListener(l);
+				  menu = PopUpMenu.addItem(menuitem, menu, count);
+				  count++; 
+			}
+
+		}
+		if (count > 0) items.addElement(varlinkItem);
+		
 	}
 		
 	return items;
@@ -575,5 +673,23 @@ protected void destroyFields() {
 	
 }
 
+
+	/**
+	 * Returns the targetLink.
+	 * @return LinkSource
+	 */
+	public LinkSource getTargetLink()
+	{
+		return targetLink;
+	}
+
+	/**
+	 * Sets the targetLink.
+	 * @param targetLink The targetLink to set
+	 */
+	public void setTargetLink(LinkSource targetLink)
+	{
+		this.targetLink = targetLink;
+	}
 
 }

@@ -155,7 +155,7 @@ public void destroy() {
  * @param out source of the link
  */
 public static void destroyChain(Linkable link, OutLink out) {
-	while (link instanceof OutLink && !(link instanceof EPICSLinkOut)) {
+	while (link instanceof OutLink && !(link instanceof EPICSVarOutLink) && !(link instanceof EPICSLinkOut)) {
 		out = (OutLink)link;
 		link = out.getInput();
 		if (out instanceof Connector)
@@ -225,7 +225,7 @@ public com.cosylab.vdct.inspector.InspectableProperty getCommentProperty() {
  */
 public static InLink getEndPoint(Linkable link) {
 	//!!!
-	while (link instanceof OutLink)
+	while (link instanceof OutLink && !(link instanceof EPICSVarOutLink))
 		link = ((OutLink)link).getInput();
 	return (InLink)link;
 }
@@ -382,7 +382,7 @@ public static com.cosylab.vdct.vdb.GUISeparator getRecordSeparator() {
  * @param link com.cosylab.vdct.graphics.objects.Linkable
  */
 public static OutLink getStartPoint(Linkable link) {
-	while (!(link instanceof EPICSLinkOut) && link instanceof InLink)
+	while (!(link instanceof EPICSVarOutLink) && !(link instanceof EPICSLinkOut) && link instanceof InLink)
 		link = ((InLink)link).getOutput();
 	return (OutLink)link;
 }
@@ -484,7 +484,7 @@ public boolean isRight() {
 public void setColor(Color newColor) {
 		super.setColor(newColor);
 		Linkable link = this;
-		while (link instanceof OutLink) {
+		while (link instanceof OutLink && !(link instanceof EPICSVarOutLink)) {
 			link = ((OutLink)link).getInput();
 			if (link instanceof VisibleObject) 
 				((VisibleObject)link).setColor(newColor);

@@ -110,7 +110,7 @@ private static void drawIntergroupLink(Graphics g, ViewState view, int x1, int y
 			if (target instanceof Descriptable)
 				label = ((Descriptable)target).getDescription();
 		}
-		else if (descPoint instanceof OutLink)
+		else if (descPoint instanceof OutLink && !(descPoint instanceof EPICSVarOutLink))
 		{
 			target = EPICSLinkOut.getStartPoint(descPoint);
 			// any special threatment ??
@@ -184,7 +184,7 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 		if (font!=null) {
 			g.setFont(font);
 			Linkable target = null;
-			//else if (descPoint instanceof OutLink)
+			//else if (descPoint instanceof OutLink && !(descPoint instanceof EPICSVarOutLink))
 			{
 				target = EPICSLinkOut.getEndPoint(descPoint);
 				// any special threatment ??
@@ -260,7 +260,7 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 		if (font!=null) {
 			g.setFont(font);
 			Linkable target = null;
-			//else if (descPoint instanceof OutLink)
+			//else if (descPoint instanceof OutLink && !(descPoint instanceof EPICSVarOutLink))
 			{
 				target = EPICSLinkOut.getStartPoint(descPoint);
 				// any special threatment ??
@@ -309,7 +309,7 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 		if (font!=null) {
 			g.setFont(font);
 			Linkable target = null;
-			//else if (descPoint instanceof OutLink)
+			//else if (descPoint instanceof OutLink && !(descPoint instanceof EPICSVarOutLink))
 			{
 				target = EPICSLinkOut.getStartPoint(descPoint);
 				// any special threatment ??

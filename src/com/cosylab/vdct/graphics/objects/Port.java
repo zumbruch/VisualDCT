@@ -755,7 +755,7 @@ protected void validate() {
 public void setColor(Color newColor) {
 		super.setColor(newColor);
 		Linkable link = this;
-		while ((link instanceof OutLink) && !(link instanceof EPICSLinkOut)) {
+		while ((link instanceof OutLink) && !(link instanceof EPICSLinkOut) && !(link instanceof EPICSVarOutLink)) {
 			link = ((OutLink)link).getInput();
 			if (link instanceof VisibleObject && !(link instanceof EPICSLinkOut)) 
 				((VisibleObject)link).setColor(newColor);
@@ -925,5 +925,13 @@ public void rename(String oldName, String newName)
 	com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 }
 
+/**
+ * @see com.cosylab.vdct.graphics.objects.EPICSLink#fixLinkProperties()
+ */
+public void fixLinkProperties()
+{
+	LinkProperties newProperties = new LinkProperties(data);
+	properties = newProperties;
+}
 
 }

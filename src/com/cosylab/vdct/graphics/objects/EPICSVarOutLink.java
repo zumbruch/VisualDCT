@@ -51,21 +51,31 @@ public class EPICSVarOutLink extends EPICSVarLink implements OutLink
 	class PopupMenuHandler implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 			String action = e.getActionCommand();
-			/*
-			if (action.equals())
+/*			if (action.equals(colorString))
 			{			
+				Color newColor = ColorChooser.getColor(selectTitle, getColor());
+				if (newColor!=null)
+					setColor(newColor);
+				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
 			else if (action.equals(addConnectorString))
 			{
-				//addConnector();
+				addConnector();
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
-			else if (action.equals(removeLinkString))
+			else*/ if (action.equals(moveUpString))
 			{
-				removeLink();
-				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+				((Record)getParent()).moveFieldUp(EPICSVarOutLink.this);
 			}
-			*/
+			else if (action.equals(moveDownString))
+			{
+				((Record)getParent()).moveFieldDown(EPICSVarOutLink.this);
+			}
+			else if (action.equals(removeString))
+			{
+				destroy();
+			}
+			
 		}
 	}
 	
@@ -75,7 +85,10 @@ public class EPICSVarOutLink extends EPICSVarLink implements OutLink
 	private boolean hasEndpoint = false;
 
 	private static final String addConnectorString = "Add connector";
-	private static final String removeLinkString = "Remove Link";
+
+	private static final String moveUpString = "Move Up";
+	private static final String moveDownString = "Move Down";
+	private static final String removeString = "Remove Link";
 
 	private static final String nullString = "";
 
@@ -156,10 +169,11 @@ private com.cosylab.vdct.graphics.objects.EPICSVarOutLink.PopupMenuHandler creat
 	 */
 	public void destroy() {
 		if (!isDestroyed()) {
+			boolean clearValue = (inlink!=null);
 			super.destroy();
 			EPICSLinkOut.destroyChain(inlink, this);
 			setInput(null);
-			getFieldData().setValue(nullString);
+			if (clearValue) getFieldData().setValue(nullString);
 			properties = new LinkProperties(fieldData);
 		}
 	}
@@ -195,7 +209,8 @@ private com.cosylab.vdct.graphics.objects.EPICSVarOutLink.PopupMenuHandler creat
 	protected void draw(Graphics g, boolean hilited) {
 		super.draw(g, hilited);
 	
-		if (inlink!=null) {
+		if (inlink!=null)
+		{
 	
 			Color c = getColor();
 			if (c==Constants.BACKGROUND_COLOR)
@@ -205,13 +220,29 @@ private com.cosylab.vdct.graphics.objects.EPICSVarOutLink.PopupMenuHandler creat
 					c=Color.black;
 			g.setColor(c);
 	
+			boolean isRightSide = isRight();
+
 			// draw missing tail
 			if (outlinks.size()==0)
 			{
-				//!!!
+				com.cosylab.vdct.graphics.ViewState view = com.cosylab.vdct.graphics.ViewState.getInstance();
+			
+				int rrx;			// rrx, rry is center
+				if (isRightSide)
+					rrx = getRx()+r+getRwidth()-view.getRx();
+				else 
+					rrx = getRx()-r-view.getRx();
+			
+				int rry = (int)(getRscale()*getInY()- view.getRy());
+			
+		
+				if (isRightSide)
+					g.drawLine(rrx+2*r, rry, rrx+rtailLen-r, rry);
+				else 
+					g.drawLine(rrx-rtailLen+r, rry, rrx-3*r, rry);
 			}
-	
-			LinkDrawer.drawLink(g, this, inlink, getQueueCount(), isRight());
+			
+			LinkDrawer.drawLink(g, this, inlink, getQueueCount(), isRightSide);
 		}
 	
 	}
@@ -235,10 +266,11 @@ private com.cosylab.vdct.graphics.objects.EPICSVarOutLink.PopupMenuHandler creat
 	public void removeLink()
 	{
 		if (!isDestroyed()) {
+			boolean clearValue = (inlink!=null);
 			disconnected = true;
 			EPICSLinkOut.destroyChain(inlink, this);
 			setInput(null);
-			getFieldData().setValue(nullString);
+			if (clearValue) getFieldData().setValue(nullString);
 			properties = new LinkProperties(getFieldData());
 		}
 	}
@@ -286,11 +318,10 @@ private com.cosylab.vdct.graphics.objects.EPICSVarOutLink.PopupMenuHandler creat
 	 * Creation date: (30.1.2001 16:58:58)
 	 * @return boolean
 	 */
-/*	public boolean isRight() {
-		if (disconnected || inlink==null ||
-			!inlink.getLayerID().equals(getLayerID())) 
-			return true;
-		else {
+	public boolean isRight()
+	{
+		if (outlinks.size()==0 && inlink!=null)
+		{
 			if (inlink instanceof Connector) {	
 				return (inlink.getInX()>(getX()+getWidth()/2));
 			}
@@ -301,6 +332,75 @@ private com.cosylab.vdct.graphics.objects.EPICSVarOutLink.PopupMenuHandler creat
 			else 
 				return true;
 		}
+		else
+			return super.isRight();
 	}
+
+	/**
+	 * @see com.cosylab.vdct.graphics.objects.EPICSLink#fixLinkProperties()
+	 */
+	public void fixLinkProperties()
+	{
+		super.fixLinkProperties();
+		LinkProperties newProperties = new LinkProperties(fieldData);
+		properties = newProperties;
+	}
+	
+/**
+ * Insert the method's description here.
+ * Creation date: (4.5.2001 8:00:56)
+ * @return java.util.Vector
+ */
+public java.util.Vector getItems() {
+	
+	if (getLinkCount()==0 && inlink==null) return null;
+	
+	Vector items = new Vector();
+
+	ActionListener al = createPopupmenuHandler();
+
+/*	JMenuItem colorItem = new JMenuItem(colorString);
+	colorItem.addActionListener(al);
+	items.addElement(colorItem);
+
+	JMenuItem addItem = new JMenuItem(addConnectorString);
+	addItem.addActionListener(al);
+	items.addElement(addItem);
+
+	items.add(new JSeparator());
 */
+	if (getParent() instanceof Record)
+	{
+		Record parRec = (Record)getParent();
+		boolean isFirst = parRec.isFirstField(this);
+		boolean isLast = parRec.isLastField(this);
+		
+	
+		if (!isFirst)
+		{
+			JMenuItem upItem = new JMenuItem(moveUpString);
+			upItem.addActionListener(al);
+			upItem.setIcon(new ImageIcon(getClass().getResource("/images/up.gif")));
+			items.addElement(upItem);
+		}
+	
+		if (!isLast)
+		{
+			JMenuItem downItem = new JMenuItem(moveDownString);
+			downItem.addActionListener(al);
+			downItem.setIcon(new ImageIcon(getClass().getResource("/images/down.gif")));
+			items.addElement(downItem);
+		}
+	
+		if (!(isFirst && isLast))
+			items.add(new JSeparator());
+	}
+	
+	JMenuItem removeItem = new JMenuItem(removeString);
+	removeItem.addActionListener(al);
+	items.addElement(removeItem);
+
+	return items;
+}
+
 }
