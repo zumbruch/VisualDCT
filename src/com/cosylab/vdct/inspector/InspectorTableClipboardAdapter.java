@@ -205,7 +205,12 @@ public class InspectorTableClipboardAdapter implements ActionListener {
      */
     private void performPaste()
     {
+        final String EMPTY_STRING = "";
+
         int startRow = (table.getSelectedRows())[0];
+        
+        int tableRowCount = table.getRowCount();
+        int tableColumnCount = table.getColumnCount();
 
         // inspector case
         //int startCol = (table.getSelectedColumns())[0];
@@ -221,15 +226,26 @@ public class InspectorTableClipboardAdapter implements ActionListener {
             {
                 String rowString = st1.nextToken();
                 StringTokenizer st2 = new StringTokenizer(rowString, "\t");
-                for (int j = 0; st2.hasMoreTokens(); j++)
+                int j = 0;
+                for (; st2.hasMoreTokens(); j++)
                 {
                     String value = (String)st2.nextToken();
                     
                     // set value
-                    if (startRow + i < table.getRowCount() && 
-                        startCol + j < table.getColumnCount())
-                        table.setValueAt(value, startRow + i, startCol + j);
+                    int columnToSet = startCol + j;
+                    // inspector sets only column 2
+                    if (columnToSet == 2)
+	                    if (startRow + i < tableRowCount && 
+	                        columnToSet < tableColumnCount)
+	                        table.setValueAt(value, startRow + i, columnToSet);
                 }
+                
+                // clear the rest
+                // only one field - inspector case
+                if (startCol + j == 2)
+                    table.setValueAt(EMPTY_STRING, startRow + i, 2);
+                
+                
             }
         } catch (Throwable th) {
             // noop
