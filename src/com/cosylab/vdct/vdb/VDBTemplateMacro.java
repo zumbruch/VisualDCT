@@ -30,6 +30,7 @@ package com.cosylab.vdct.vdb;
 
 import java.util.regex.Pattern;
 
+import com.cosylab.vdct.dbd.DBDConstants;
 import com.cosylab.vdct.graphics.objects.Descriptable;
 import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.objects.Template;
@@ -252,13 +253,8 @@ public void setValue(java.lang.String newValue) {
 	// buffer value
 	super.setValue(newValue);
 
-	// mapping to properties 
-	if (hasDefaultValue())
-		templateInstance.removeProperty(macro.getName());
-	else if (!templateInstance.properties.containsKey(macro.getName()))
-		templateInstance.addProperty(macro.getName(), newValue);
-	else
-		templateInstance.getProperties().put(macro.getName(), newValue);
+	// mapping to property 
+	updateProperty();
 
 	// field changed
 	Template visualTemplate = (Template)Group.getRoot().findObject(templateInstance.getName(), true);
@@ -276,6 +272,36 @@ public void setValue(java.lang.String newValue) {
 /**
  * Insert the method's description here.
  * Creation date: (9.12.2000 18:11:46)
+ * @param newValue java.lang.String
+ */
+public void setValueSilently(java.lang.String newValue) {
+
+	// buffer value
+	super.setValueSilently(newValue);
+
+	// mapping to property 
+	updateProperty();
+
+}
+
+/**
+ * Insert the method's description here.
+ */
+private void updateProperty() {
+
+	// mapping to properties 
+	if (hasDefaultValue())
+		templateInstance.removeProperty(macro.getName());
+	else if (!templateInstance.properties.containsKey(macro.getName()))
+		templateInstance.addProperty(macro.getName(), value);
+	else
+		templateInstance.getProperties().put(macro.getName(), value);
+
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (9.12.2000 18:11:46)
  * @return java.lang.String
  */
 public java.lang.String getValue() {
@@ -283,6 +309,14 @@ public java.lang.String getValue() {
 		return value;
 	else
 		return debugValue;
+}
+
+/**
+ * @see com.cosylab.vdct.graphics.objects.LinkSource#getType()
+ */
+public int getType()
+{
+	return DBDConstants.DBF_TEMPLATE_MACRO;
 }
 
 }

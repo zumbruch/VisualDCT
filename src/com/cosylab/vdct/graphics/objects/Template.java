@@ -548,31 +548,70 @@ public class Template
 	{
 		ActionListener l = createPopupmenuHandler();
 
-		JMenu macros = new JMenu("MACRO");
-		int macroItems = 0;
-		
-		Object obj;
-		Enumeration e = subObjectsV.elements();
-		while (e.hasMoreElements())
+		// template has link destination 
+		if (getTargetLink()==null)
 		{
-			obj = e.nextElement();
-			if (obj instanceof TemplateEPICSMacro)
+			JMenu macros = new JMenu("MACRO");
+			int macroItems = 0;
+			
+			Object obj;
+			Enumeration e = subObjectsV.elements();
+			while (e.hasMoreElements())
 			{
-				JMenuItem menuitem = new JMenuItem(((TemplateEPICSMacro)obj).getFieldData().getName());
-				menuitem.addActionListener(l);
-				macros = PopUpMenu.addItem(menuitem, macros, macroItems); 
-				macroItems++;
+				obj = e.nextElement();
+				if (obj instanceof TemplateEPICSMacro)
+				{
+					TemplateEPICSMacro tem = (TemplateEPICSMacro)obj;
+					// if not default (empty)
+					if (tem.getFieldData().hasDefaultValue())
+					{
+						JMenuItem menuitem = new JMenuItem(tem.getFieldData().getName());
+						menuitem.addActionListener(l);
+						macros = PopUpMenu.addItem(menuitem, macros, macroItems); 
+						macroItems++;
+					}
+				}
 			}
+			
+			if (macros.getItemCount() > 0)
+			{
+				Vector items = new Vector();
+				items.addElement(macros);
+				return items;
+			}
+			else
+				return null;
 		}
-		
-		if (macros.getItemCount() > 0)
-		{
-			Vector items = new Vector();
-			items.addElement(macros);
-			return items;
-		}
+		// template has link target 
 		else
-			return null;
+		{
+			JMenu ports = new JMenu("PORT");
+			int portItems = 0;
+			
+			Object obj;
+			Enumeration e = subObjectsV.elements();
+			while (e.hasMoreElements())
+			{
+				obj = e.nextElement();
+				if (obj instanceof TemplateEPICSPort)
+				{
+					TemplateEPICSPort tep = (TemplateEPICSPort)obj;
+					JMenuItem menuitem = new JMenuItem(tep.getFieldData().getName());
+					menuitem.addActionListener(l);
+					ports = PopUpMenu.addItem(menuitem, ports, portItems); 
+					portItems++;
+				}
+			}
+			
+			if (ports.getItemCount() > 0)
+			{
+				Vector items = new Vector();
+				items.addElement(ports);
+				return items;
+			}
+			else
+				return null;
+		}
 			
 	}
 
@@ -1138,9 +1177,9 @@ public void fieldChanged(VDBFieldData field) {
 /**
  */
 public VDBFieldData getField(String name) {
-	TemplateEPICSMacro tem = (TemplateEPICSMacro)getSubObject(name);
-	if (tem!=null)
-		return tem.getFieldData();
+	EPICSLink el = (EPICSLink)getSubObject(name);
+	if (el!=null)
+		return el.getFieldData();
 	else
 		return null;
 }

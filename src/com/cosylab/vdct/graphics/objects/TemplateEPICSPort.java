@@ -208,19 +208,14 @@ protected void draw(Graphics g, boolean hilited) {
 		// constant (none)
 
 
-
+	// invalid
 	if (lastUpdatedFullName==null)
 	{
-		//ViewState view = ViewState.getInstance();
-		//int rrx = getRx()-view.getRx();
-		//int rry = getRy()-view.getRy();
+		rrx = getRx()-view.getRx();
+		rry = getRy()-view.getRy();
 		int rwidth = getRwidth();
 		int rheight = getRheight();
 			
-		// clipping
-		if ((rrx>view.getViewWidth()) || (rry>view.getViewHeight())
-		    || ((rrx+rwidth)<0) || ((rry+rheight)<0)) return;
-	
 		g.setColor(Color.red);
 
 		g.drawLine(rrx, rry, rrx+rwidth, rry+rheight);

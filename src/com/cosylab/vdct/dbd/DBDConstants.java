@@ -48,11 +48,13 @@ public interface DBDConstants {
 	public static final int DBF_INLINK	= 12;
 	public static final int DBF_OUTLINK	= 13;
 	public static final int DBF_FWDLINK	= 14;
-	public static final int DBF_NOACCESS	= 15;
+	public static final int DBF_NOACCESS= 15;
 
 	// artificial type
-	public static final int DBF_PORT	 = Integer.MAX_VALUE-1;
-	public static final int DBF_MACRO  = Integer.MAX_VALUE-2;
+	public static final int DBF_PORT	 		= Integer.MAX_VALUE-1;
+	public static final int DBF_MACRO    		= Integer.MAX_VALUE-2;
+	public static final int DBF_TEMPLATE_PORT	= Integer.MAX_VALUE-3;
+	public static final int DBF_TEMPLATE_MACRO	= Integer.MAX_VALUE-4;
 	
 	public static final int DECIMAL	= 0;
 	public static final int HEX		= 1;

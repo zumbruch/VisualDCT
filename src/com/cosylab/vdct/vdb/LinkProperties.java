@@ -56,6 +56,7 @@ public final class LinkProperties {
 	public final static int FWDLINK_FIELD = 2;
 	public final static int VARIABLE_FIELD = 3;
 	public final static int PORT_FIELD = 4;
+	public final static int TEMPLATE_MACRO = 5;
 
 	private int type;
 	private String varName;
@@ -249,6 +250,7 @@ public static int getType(LinkSource fd) {
 		case DBDConstants.DBF_OUTLINK : return OUTLINK_FIELD;
 		case DBDConstants.DBF_FWDLINK : return FWDLINK_FIELD;
 		case DBDConstants.DBF_PORT    : return PORT_FIELD;
+		case DBDConstants.DBF_TEMPLATE_MACRO : return TEMPLATE_MACRO;
 		default: return VARIABLE_FIELD;
 	}
 }

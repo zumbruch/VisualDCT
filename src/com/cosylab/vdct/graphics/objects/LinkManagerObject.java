@@ -443,7 +443,7 @@ public boolean manageLink(VDBFieldData field) {
 			return true;
 			
 		}
-		else
+		else if (type!=LinkProperties.TEMPLATE_MACRO)
 		{
 			if (!LinkManagerObject.isSoftwareLink(field))
 				return false;
@@ -469,6 +469,8 @@ public boolean manageLink(VDBFieldData field) {
 
 			return true;
 		}
+		else
+			return false;
 	}
 }
 
@@ -605,15 +607,16 @@ public Vector getLinkMenus(Enumeration vdbFields) {
 	VDBFieldData field;
 	JMenuItem menuitem;
 
-	boolean port2All = (getTargetLink() instanceof VDBPort);
+	boolean portOrTemplateMacro2All = (getTargetLink() instanceof VDBPort) ||
+									  (getTargetLink() instanceof VDBTemplateMacro);
 	
-	if (getTargetLink()==null || port2All) {
+	if (getTargetLink()==null || portOrTemplateMacro2All) {
 		
 		JMenu inlinks = new JMenu(inlinkString);
 		JMenu outlinks = new JMenu(outlinkString);
 		JMenu fwdlinks = new JMenu(fwdlinkString);
 		JMenu varlinks = null;
-		if (port2All)
+		if (portOrTemplateMacro2All)
 			varlinks = new JMenu(varlinkString);
 		else
 			varlinks = new JMenu(varlinkPortString); 
@@ -653,7 +656,7 @@ public Vector getLinkMenus(Enumeration vdbFields) {
 					default:
 
 						 // no not add fields with undefined GUI type
-						 if (!port2All && field.getGUI_type() == DBDConstants.GUI_UNDEFINED)
+						 if (!portOrTemplateMacro2All && field.getGUI_type() == DBDConstants.GUI_UNDEFINED)
 						 	break;
 
 						 menuitem = new JMenuItem(field.getName());

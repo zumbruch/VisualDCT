@@ -44,6 +44,7 @@ import com.cosylab.vdct.graphics.ColorChooser;
 import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.vdb.GUIHeader;
 import com.cosylab.vdct.vdb.GUISeparator;
+import com.cosylab.vdct.vdb.LinkProperties;
 import com.cosylab.vdct.vdb.NameValueInfoProperty;
 import com.cosylab.vdct.vdb.VDBFieldData;
 import com.cosylab.vdct.vdb.VDBTemplateMacro;
@@ -90,24 +91,8 @@ public void updateTemplateLink()
 	if (lastUpdatedFullName!=null && getFieldData().getFullName().equals(lastUpdatedFullName))
 		return;
 		
-	// remove old one		
-	if (lastUpdatedFullName!=null)
-		Group.getRoot().getLookupTable().remove(lastUpdatedFullName);
-	
-	// ups, we already got this registered
-	if (Group.getRoot().getLookupTable().containsKey(getFieldData().getFullName()))
-	{
-		lastUpdatedFullName = null;
-		((LinkManagerObject)getParent()).addInvalidLink(this);
-	}
-	// everything is OK
-	else
-	{
-		lastUpdatedFullName = getFieldData().getFullName();
-		Group.getRoot().getLookupTable().put(lastUpdatedFullName, this);
-		LinkManagerObject.fixLink(this);
-		((LinkManagerObject)getParent()).removeInvalidLink(this);
-	}
+	lastUpdatedFullName = getFieldData().getFullName();
+	LinkManagerObject.fixLink(this);
 }
 
 /**
@@ -117,7 +102,8 @@ public void updateTemplateLink()
 public void fixTemplateLink()
 {
 	updateTemplateLink();
-	LinkManagerObject.fixLink(this);
+	//nothing can be linked to this object
+	//LinkManagerObject.fixLink(this);
 }
 
 /**
@@ -222,19 +208,14 @@ protected void draw(Graphics g, boolean hilited) {
 		// constant (none)
 
 
-
+	// invalid
 	if (lastUpdatedFullName==null)
 	{
-		//ViewState view = ViewState.getInstance();
-		//int rrx = getRx()-view.getRx();
-		//int rry = getRy()-view.getRy();
+		rrx = getRx()-view.getRx();
+		rry = getRy()-view.getRy();
 		int rwidth = getRwidth();
 		int rheight = getRheight();
 			
-		// clipping
-		if ((rrx>view.getViewWidth()) || (rry>view.getViewHeight())
-		    || ((rrx+rwidth)<0) || ((rry+rheight)<0)) return;
-	
 		g.setColor(Color.red);
 
 		g.drawLine(rrx, rry, rrx+rwidth, rry+rheight);
@@ -436,6 +417,51 @@ public java.util.Vector getItems() {
 	items.addElement(removeItem);
 
 	return items;
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (30.1.2001 12:25:44)
+ */
+private void updateLink() {
+	LinkProperties newProperties = new LinkProperties(fieldData);
+
+	if (newProperties.getRecord()==null) {			// empty field
+		valueWithNoRecord();
+		return;
+	}
+	else if (!newProperties.getRecord().equals(properties.getRecord()) ||
+			 !newProperties.getVarName().equals(properties.getVarName()) ||
+			 !hasEndpoint) {
+		// find endpoint
+		Linkable preendpoint = this;
+		Linkable endpoint = getInput();
+		while (((endpoint instanceof InLink) && (endpoint instanceof OutLink)) && !(endpoint instanceof EPICSVarOutLink)) {
+			preendpoint = endpoint;
+			endpoint = ((OutLink)endpoint).getInput();
+		}
+		if ((endpoint!=null) && hasEndpoint) ((InLink)endpoint).disconnect(preendpoint);
+		//OutLink lol = getTarget(properties).getOutput();
+		InLink il = EPICSLinkOut.getTarget(newProperties, true);
+		OutLink ol = (OutLink)preendpoint;
+		ol.setInput(il);
+		if (il!=null) { 
+			il.setOutput(ol, null);
+			hasEndpoint = true;
+		}
+		else hasEndpoint = false;
+	}
+
+	properties = newProperties;
+	setLabel(properties.getOptions());
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (30.1.2001 12:24:26)
+ */
+public void valueChanged() {
+	updateLink();
 }
 
 }

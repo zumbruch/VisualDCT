@@ -30,6 +30,7 @@ package com.cosylab.vdct.vdb;
 
 import java.util.regex.Pattern;
 
+import com.cosylab.vdct.dbd.DBDConstants;
 import com.cosylab.vdct.graphics.objects.Descriptable;
 import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.objects.Template;
@@ -269,6 +270,14 @@ public String getInitValue()
  */
 public boolean hasDefaultValue() {
 	return false;
+}
+
+/**
+ * @see com.cosylab.vdct.graphics.objects.LinkSource#getType()
+ */
+public int getType()
+{
+	return DBDConstants.DBF_TEMPLATE_PORT;
 }
 
 }
