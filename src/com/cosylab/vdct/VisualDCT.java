@@ -110,6 +110,8 @@ public class VisualDCT extends JFrame {
 	private JPanel ivjStatusBarPane = null;
 	private JLabel ivjStatusMsg1 = null;
 	private JLabel ivjStatusMsg2 = null;
+	private JLabel ivjModeStatus = null;
+	private JPanel ivjStatusGroupAndModePane = null;
 	private JCheckBoxMenuItem ivjToolbarMenuItem = null;
 	private JToolBar ivjToolBarPane = null;
 	private JButton ivjUndoButton = null;
@@ -4397,7 +4399,8 @@ private javax.swing.JPanel getStatusBarPane() {
 			ivjStatusBarPane.setName("StatusBarPane");
 			ivjStatusBarPane.setLayout(new java.awt.BorderLayout());
 			getStatusBarPane().add(getStatusMsg1(), "West");
-			getStatusBarPane().add(getStatusMsg2(), "Center");
+			//getStatusBarPane().add(getStatusMsg2(), "Center");
+			getStatusBarPane().add(getStatusGroupAndModePanel(), "Center");
 			getStatusBarPane().add(getZoomPanel(), "East");
 			// user code begin {1}
 			// user code end
@@ -4410,6 +4413,29 @@ private javax.swing.JPanel getStatusBarPane() {
 	return ivjStatusBarPane;
 }
 /**
+ * Return the ivjStatusGroupAndModePane property value.
+ * @return javax.swing.JPanel
+ */
+/* WARNING: THIS METHOD WILL BE REGENERATED. */
+private javax.swing.JPanel getStatusGroupAndModePanel() {
+	if (ivjStatusGroupAndModePane == null) {
+		try {
+			ivjStatusGroupAndModePane = new javax.swing.JPanel();
+			ivjStatusGroupAndModePane.setName("StatusGroupAndModePanel");
+			ivjStatusGroupAndModePane.setLayout(new java.awt.BorderLayout());
+			ivjStatusGroupAndModePane.add(getStatusMsg2(), "Center");
+			ivjStatusGroupAndModePane.add(getModeStatus(), "East");
+			// user code begin {1}
+			// user code end
+		} catch (java.lang.Throwable ivjExc) {
+			// user code begin {2}
+			// user code end
+			handleException(ivjExc);
+		}
+	}
+	return ivjStatusGroupAndModePane;
+}
+/**
  * Return the StatusMsg1 property value.
  * @return javax.swing.JLabel
  */
@@ -4420,7 +4446,7 @@ private javax.swing.JLabel getStatusMsg1() {
 			ivjStatusMsg1 = new javax.swing.JLabel();
 			ivjStatusMsg1.setName("StatusMsg1");
 			ivjStatusMsg1.setBorder(new javax.swing.border.EtchedBorder());
-			ivjStatusMsg1.setText("StatusMsg1    ");
+			ivjStatusMsg1.setText("StatusMsg1");
 			// user code begin {1}
 			//Font font = ivjStatusMsg1.getFont();
 			//ivjStatusMsg1.setFont(font.deriveFont(Font.PLAIN));
@@ -4455,6 +4481,30 @@ private javax.swing.JLabel getStatusMsg2() {
 	}
 	return ivjStatusMsg2;
 }
+
+/**
+ * Return the ModeStatus property value.
+ * @return javax.swing.JLabel
+ */
+/* WARNING: THIS METHOD WILL BE REGENERATED. */
+private javax.swing.JLabel getModeStatus() {
+	if (ivjModeStatus == null) {
+		try {
+			ivjModeStatus = new javax.swing.JLabel();
+			ivjModeStatus.setName("ModeStatus");
+			ivjModeStatus.setBorder(new javax.swing.border.EtchedBorder());
+			ivjModeStatus.setText(" Edit Mode ");
+			// user code begin {1}
+			// user code end
+		} catch (java.lang.Throwable ivjExc) {
+			// user code begin {2}
+			// user code end
+			handleException(ivjExc);
+		}
+	}
+	return ivjModeStatus;
+}
+
 /**
  * Return the StopDebugMenuItem property value.
  * @return com.cosylab.vdct.plugin.debug.DebugStopMenuItem
@@ -6449,6 +6499,14 @@ public void setBoxButtonEnabled(boolean parBoxButtonEnabled)
  */
 public void setCurrentGroup(String groupName) {
 	getStatusMsg2().setText(" "+groupName);
+}
+/**
+ * Insert the method's description here.
+ * Creation date: (29.4.2001 11:17:11)
+ * @param groupName java.lang.String
+ */
+public void setMode(String mode) {
+	getModeStatus().setText(" "+mode+" ");
 }
 /**
  * Insert the method's description here.
