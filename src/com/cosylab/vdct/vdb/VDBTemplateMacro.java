@@ -289,14 +289,11 @@ public void setValue(java.lang.String newValue) {
 	updateProperty();
 
 	// field changed
-	if (visualTemplate!=null)
+	if (visualTemplate==null)
 		visualTemplate = (Template)Group.getRoot().findObject(templateInstance.getName(), true);
 	if (visualTemplate!=null)
 	{
-		if (visualTemplate.manageLink(this)) {
-			visualTemplate.unconditionalValidation();
-			com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
-		}
+		visualTemplate.fieldChanged(this);
 		InspectorManager.getInstance().updateProperty(visualTemplate, this);
 	}
 
