@@ -4665,10 +4665,11 @@ private javax.swing.JPanel getStatusBarPane() {
 			ivjStatusBarPane = new javax.swing.JPanel();
 			ivjStatusBarPane.setName("StatusBarPane");
 			ivjStatusBarPane.setLayout(new java.awt.BorderLayout());
+			
+			getStatusBarPane().add(getZoomPanel(), "East");
 			getStatusBarPane().add(getStatusMsg1(), "West");
 			//getStatusBarPane().add(getStatusMsg2(), "Center");
 			getStatusBarPane().add(getStatusGroupAndModePanel(), "Center");
-			getStatusBarPane().add(getZoomPanel(), "East");
 			// user code begin {1}
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
