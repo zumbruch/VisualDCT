@@ -860,12 +860,18 @@ public void ungroup() {
  */
 public void updateMenuItems() {
 	SetRedoMenuItemState cmd = (SetRedoMenuItemState)CommandManager.getInstance().getCommand("SetRedoMenuItemState");
-	cmd.setState(UndoManager.getInstance().actions2redo()>0);
-	cmd.execute();
+	if (cmd != null)
+	{
+		cmd.setState(UndoManager.getInstance().actions2redo()>0);
+		cmd.execute();
+	}
 	
 	SetUndoMenuItemState cmd2 = (SetUndoMenuItemState)CommandManager.getInstance().getCommand("SetUndoMenuItemState");
-	cmd2.setState(UndoManager.getInstance().actions2undo()>0);
-	cmd2.execute();
+	if (cmd2 != null)
+	{
+		cmd2.setState(UndoManager.getInstance().actions2undo()>0);
+		cmd2.execute();
+	}
 }
 
 /**

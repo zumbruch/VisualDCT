@@ -216,7 +216,8 @@ public DrawingSurface() {
 	commandManager.addCommand("GetPrintableInterface", new GetPrintableInterface(this));
 	commandManager.addCommand("RepaintWorkspace", new RepaintCommand(this));
 
-	new Thread(this, "DrawingSurface Repaint Thread").start();
+	if (VisualDCT.getInstance() != null)
+		new Thread(this, "DrawingSurface Repaint Thread").start();
 
 }
 /**
@@ -1629,7 +1630,8 @@ public boolean open(File file, boolean importDB) throws IOException {
 		}
 
 		// !!!
-		VisualDCT.getInstance().updateLoadLabel();	
+		if (VisualDCT.getInstance() != null)
+			VisualDCT.getInstance().updateLoadLabel();	
 		//updateWorkspaceGroup();
 
 		blockNavigatorRedrawOnce = false;
@@ -2091,7 +2093,8 @@ public boolean openDBD(File file, boolean importDBD) throws IOException {
 	DataProvider.getInstance().getDBDs().addElement(file.getAbsoluteFile());
 
 	// !!!
-	VisualDCT.getInstance().updateLoadLabel();	
+	if (VisualDCT.getInstance()!=null)
+		VisualDCT.getInstance().updateLoadLabel();	
 
 	restoreCursor();
 	return true;
@@ -2617,6 +2620,8 @@ private void stopLinking() {
  */
 private void updateWorkspaceScale() {
 	SetWorkspaceScale cmd = (SetWorkspaceScale)CommandManager.getInstance().getCommand("SetWorkspaceScale");
+	if (cmd == null)
+		return;
 	cmd.setScale(ViewState.getInstance().getScale());
 	cmd.execute();
 }
@@ -2862,6 +2867,9 @@ public void moveToGroup(Group group)
 public void updateWorkspaceGroup()
 {
 	SetWorkspaceGroup cmd = (SetWorkspaceGroup)CommandManager.getInstance().getCommand("SetGroup");
+	
+	if (cmd == null)
+		return;
 	
 	String name = viewGroup.getAbsoluteName();
 	if (name.length()==0)
