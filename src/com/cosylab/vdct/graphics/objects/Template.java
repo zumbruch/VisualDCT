@@ -1407,7 +1407,7 @@ public void destroy() {
 		super.destroy();
 		destroyFields();
 		
-		clear();
+		//clear();
 		getParent().removeObject(Group.substractObjectName(getName()));
 	}
 }
@@ -1441,6 +1441,25 @@ public boolean copyToGroup(java.lang.String group) {
 	//theTemplateCopy.setDescription(getTemplateData().getTemplate().getDescription());
 	theTemplateCopy.setX(getX()); theTemplateCopy.setY(getY());
 	theTemplateCopy.move(20-view.getRx(), 20-view.getRy());
+	
+	// apply fields data
+	Enumeration e = subObjectsV.elements();
+	EPICSLink field; Object obj;
+	while (e.hasMoreElements()) {
+		obj = e.nextElement();
+		if (obj instanceof EPICSLink) {
+			field = (EPICSLink) obj;
+
+			EPICSLink fieldCopy = (EPICSLink) theTemplateCopy.getSubObject(field.getFieldData().getName());
+			if (fieldCopy != null)
+			{
+				fieldCopy.setColor(field.getColor());
+				fieldCopy.setRight(field.isRight());
+				fieldCopy.getFieldData().setVisibility(field.getFieldData().getVisibility());
+			}
+		}
+	}
+		
 	theTemplateCopy.updateTemplateFields();
 	unconditionalValidation();
 	return true;
@@ -1547,12 +1566,14 @@ protected void destroyFields() {
 	subObjectsV.copyInto(objs);
 	for (int i=0; i < objs.length; i++)
 	{
+		/*
 		if (objs[i] instanceof TemplateEPICSLink)
 		{
 			TemplateEPICSLink tel = (TemplateEPICSLink)objs[i];
 			tel.destroyAndRemove();
 		}
 		else
+		*/
 			((VisibleObject)objs[i]).destroy();
 	}
 }
