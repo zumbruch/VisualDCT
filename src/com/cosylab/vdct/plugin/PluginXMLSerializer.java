@@ -76,6 +76,7 @@ public void exportPlugins(String fileName, PluginManager pluginManager) throws E
 
 	XMLManager.writeDocument(fileName, doc, null, DTD_SYMBOL, null);
 }
+	
 /**
  * Insert the method's description here.
  * Creation date: (7.12.2001 14:52:16)

@@ -38,7 +38,7 @@ import java.util.*;
 public final class PluginManager
 {
 
-    private static final String PLUGINS_FILE = "plugins.xml";
+    private static final String PLUGINS_FILE = ".vdctplugins.xml";
 
 	private static PluginManager instance = null;
     private LinkedList pluginListeners = null;
@@ -165,7 +165,8 @@ private void load()
 {
 	try
 	{
-		String fileName = com.cosylab.vdct.Settings.getInstance().getDefaultDir()+com.cosylab.vdct.Constants.CONFIG_DIR+PLUGINS_FILE;
+		//String fileName = com.cosylab.vdct.Settings.getInstance().getDefaultDir()+com.cosylab.vdct.Constants.CONFIG_DIR+PLUGINS_FILE;
+		String fileName = System.getProperty("user.home")+"/"+PLUGINS_FILE;
 		pluginSerializer.importPlugins(fileName, this);
 	}
 	catch (Exception e)
@@ -214,7 +215,8 @@ public void save()
 {
 	try
 	{
-		String fileName = com.cosylab.vdct.Settings.getInstance().getDefaultDir()+com.cosylab.vdct.Constants.CONFIG_DIR+PLUGINS_FILE;
+		//String fileName = com.cosylab.vdct.Settings.getInstance().getDefaultDir()+com.cosylab.vdct.Constants.CONFIG_DIR+PLUGINS_FILE;
+		String fileName = System.getProperty("user.home")+"/"+PLUGINS_FILE;
 		pluginSerializer.exportPlugins(fileName, this);
 	}
 	catch (Exception e)

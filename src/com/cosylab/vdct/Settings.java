@@ -28,8 +28,7 @@ package com.cosylab.vdct;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.io.*;
-import java.util.*;
+import java.util.prefs.*;
 
 /**
  * Insert the type's description here.
@@ -37,57 +36,36 @@ import java.util.*;
  * @author: Matej Sekoranja
  */
 public class Settings {
-	private static final String SETTINGS_HEADER = "VisualDCT v"+Version.VERSION+" settings file";
 	private static Settings instance = null;
 	private static String defaultDir = "./";
-	private File file = null;
-	private Properties properties;
 
+	// preferences API class
+	private Preferences prefs;
+	
 	// caching
 	private boolean snapToGrid = true;
 	private boolean showGrid = true;
 	private boolean navigator = true;
+	
 /**
  * Settings constructor comment.
  */
-protected Settings(String fileName) {
-	fileName = getDefaultDir()+fileName;
-	file = new File(fileName);
-
-	int pos = file.getAbsolutePath().lastIndexOf(File.separatorChar);
-	if (pos>0)
-	{
-		String configDir = file.getAbsolutePath().substring(0, pos);
-		File dir = new File(configDir);
-		if (!dir.exists())
-			dir.mkdirs();
-	}
+protected Settings() {
 	
-	properties = new Properties();
-	if (!load()) {
-		setProperty("SnapToGrid", String.valueOf(snapToGrid));
-		setProperty("ShowGrid", String.valueOf(showGrid));
-		setProperty("GridSize", String.valueOf(Constants.GRID_SIZE));
-		setProperty("Toolbar", String.valueOf(true));
-		setProperty("Statusbar", String.valueOf(true));
-		setProperty("Navigator", String.valueOf(navigator));
-		//setProperty("GroupSeparator", String.valueOf(Constants.GROUP_SEPARATOR));
-		Console.getInstance().println("o) No settings file loaded. Using defaults...");
-	}
-	else {
-		
-		String val = getProperty("SnapToGrid");
-		if (val!=null)
-			snapToGrid = val.toLowerCase().equals("true");
-		
-		val = getProperty("ShowGrid");
-		if (val!=null)
-			showGrid = val.toLowerCase().equals("true");
+	// user settings
+	prefs = Preferences.userNodeForPackage(this.getClass());
 
-		val = getProperty("Navigator");
-		if (val!=null)
-			navigator = val.toLowerCase().equals("true");
-	}
+	// Console.getInstance().println("o) No settings file loaded. Using defaults...");
+
+	// initialize buffered properties
+	snapToGrid = prefs.getBoolean("SnapToGrid", true);
+	showGrid = prefs.getBoolean("ShowGrid", true);
+	navigator = prefs.getBoolean("Navigator", true);
+
+	String separator = prefs.get("GroupSeparator", null);
+	if (separator!=null && separator.length()>0)
+		Constants.GROUP_SEPARATOR = separator.charAt(0);
+		
 }
 /**
  * Insert the method's description here.
@@ -97,25 +75,14 @@ protected Settings(String fileName) {
 public static java.lang.String getDefaultDir() {
 	return defaultDir;
 }
-/**
- * Insert the method's description here.
- * Creation date: (4.2.2001 11:37:11)
- * @return java.io.File
- */
-public java.io.File getFile() {
-	return file;
-}
+
 /**
  * Insert the method's description here.
  * Creation date: (27.4.2001 18:48:59)
  * @return int
  */
 public int getGridSize() {
-	String size = getProperty("GridSize");
-	if (size!=null)
-		return Integer.parseInt(size);
-	else
-		return Constants.GRID_SIZE;
+	return prefs.getInt("GridSize", Constants.GRID_SIZE);
 }
 /**
  * Insert the method's description here.
@@ -123,7 +90,7 @@ public int getGridSize() {
  * @return com.cosylab.vdct.Settings
  */
 public static Settings getInstance() {
-	if (instance==null) instance = new Settings(Constants.CONFIG_DIR+Constants.SETTINGS_FILE);
+	if (instance==null) instance = new Settings();
 	return instance;
 }
 /**
@@ -132,21 +99,7 @@ public static Settings getInstance() {
  * @return boolean
  */
 public boolean getNavigator() {
-/*	String snap = getProperty("Navigator");
-	if (snap!=null)
-		return snap.toLowerCase().equals("true");
-	else
-		return false;*/
 	return navigator;
-}
-/**
- * Insert the method's description here.
- * Creation date: (4.2.2001 12:00:51)
- * @return java.lang.String
- * @param key java.lang.String
- */
-public String getProperty(String key) {
-	return properties.getProperty(key);
 }
 /**
  * Insert the method's description here.
@@ -156,7 +109,7 @@ public String getProperty(String key) {
  * @param defaultValue java.lang.String
  */
 public String getProperty(String key, String defaultValue) {
-	return properties.getProperty(key, defaultValue);
+	return prefs.get(key, defaultValue);
 	
 }
 /**
@@ -165,11 +118,6 @@ public String getProperty(String key, String defaultValue) {
  * @return boolean
  */
 public boolean getShowGrid() {
-/*	String show = getProperty("ShowGrid");
-	if (show!=null)
-		return show.toLowerCase().equals("true");
-	else
-		return false;*/
 	return showGrid;
 }
 /**
@@ -178,11 +126,6 @@ public boolean getShowGrid() {
  * @return boolean
  */
 public boolean getSnapToGrid() {
-/*	String snap = getProperty("SnapToGrid");
-	if (snap!=null)
-		return snap.toLowerCase().equals("true");
-	else
-		return false;*/
 	return snapToGrid;
 }
 /**
@@ -191,11 +134,7 @@ public boolean getSnapToGrid() {
  * @return boolean
  */
 public boolean getStatusbar() {
-	String show = getProperty("Statusbar");
-	if (show!=null)
-		return show.toLowerCase().equals("true");
-	else
-		return false;
+	return prefs.getBoolean("Statusbar", true);
 }
 /**
  * Insert the method's description here.
@@ -203,60 +142,7 @@ public boolean getStatusbar() {
  * @return boolean
  */
 public boolean getToolbar() {
-	String show = getProperty("Toolbar");
-	if (show!=null)
-		return show.toLowerCase().equals("true");
-	else
-		return false;
-}
-/**
- * Insert the method's description here.
- * Creation date: (4.2.2001 11:32:25)
- * @return boolean
- */
-public boolean load() {
-	if ((file!=null) && file.exists()) {
-		try {
-			properties.load(new BufferedInputStream(new FileInputStream(file)));
-		} catch (Exception e) {
-			Console.getInstance().println("o) Failed to load settings file:");
-			Console.getInstance().println(e.toString());
-			return false;
-		}
-
-		// set constants
-		String separator = properties.getProperty("GroupSeparator");
-		if (separator!=null && separator.length()>0)
-			Constants.GROUP_SEPARATOR = separator.charAt(0);
-		
-		return true;	
-	}
-	else
-		return false;
-}
-/**
- * Insert the method's description here.
- * Creation date: (4.2.2001 11:32:36)
- * @return boolean
- */
-public boolean save() {
-	if (file!=null) {
-		try {
-
-			properties.setProperty("GroupSeparator", String.valueOf(Constants.GROUP_SEPARATOR));
-			
-			properties.store(new BufferedOutputStream(
-								new FileOutputStream(file)),
-							 SETTINGS_HEADER);
-		} catch (Exception e) {
-			Console.getInstance().println("o) Failed to save settings file:");
-			Console.getInstance().println(e.toString());
-			return false;
-		}
-		return true;	
-	}
-	else
-		return false;
+	return prefs.getBoolean("Toolbar", true);
 }
 /**
  * Insert the method's description here.
@@ -265,16 +151,8 @@ public boolean save() {
  */
 public static void setDefaultDir(java.lang.String newDefaultDir) {
 	defaultDir = newDefaultDir;
-	if (defaultDir.charAt(defaultDir.length()-1)!=File.separatorChar)
-		defaultDir += File.separatorChar;
-}
-/**
- * Insert the method's description here.
- * Creation date: (4.2.2001 11:37:11)
- * @param newFile java.io.File
- */
-public void setFile(java.io.File newFile) {
-	file = newFile;
+	if (defaultDir.charAt(defaultDir.length()-1)!=java.io.File.separatorChar)
+		defaultDir += java.io.File.separatorChar;
 }
 /**
  * Insert the method's description here.
@@ -282,7 +160,8 @@ public void setFile(java.io.File newFile) {
  * @param size int
  */
 public void setGridSize(int size) {
-	setProperty("GridSize", String.valueOf(size));
+	prefs.putInt("GridSize", size);
+	sync();
 }
 /**
  * Insert the method's description here.
@@ -291,7 +170,8 @@ public void setGridSize(int size) {
  */
 public void setNavigator(boolean state) {
 	navigator = state;
-	setProperty("Navigator", String.valueOf(state));
+	prefs.putBoolean("Navigator", state);
+	sync();
 }
 /**
  * Insert the method's description here.
@@ -300,7 +180,8 @@ public void setNavigator(boolean state) {
  * @param value java.lang.String
  */
 public void setProperty(String key, String value) {
-	properties.setProperty(key, value);
+	prefs.put(key, value);
+	sync();
 }
 /**
  * Insert the method's description here.
@@ -309,7 +190,8 @@ public void setProperty(String key, String value) {
  */
 public void setShowGrid(boolean state) {
 	showGrid = state;
-	setProperty("ShowGrid", String.valueOf(state));
+	prefs.putBoolean("ShowGrid", state);
+	sync();
 }
 /**
  * Insert the method's description here.
@@ -318,7 +200,8 @@ public void setShowGrid(boolean state) {
  */
 public void setSnapToGrid(boolean state) {
 	snapToGrid = state;
-	setProperty("SnapToGrid", String.valueOf(state));
+	prefs.putBoolean("SnapToGrid", state);
+	sync();
 }
 /**
  * Insert the method's description here.
@@ -326,7 +209,8 @@ public void setSnapToGrid(boolean state) {
  * @param state boolean
  */
 public void setStatusbar(boolean state) {
-	setProperty("Statusbar", String.valueOf(state));
+	prefs.putBoolean("Statusbar", state);
+	sync();
 }
 /**
  * Insert the method's description here.
@@ -334,6 +218,46 @@ public void setStatusbar(boolean state) {
  * @param state boolean
  */
 public void setToolbar(boolean state) {
-	setProperty("Toolbar", String.valueOf(state));
+	prefs.putBoolean("Toolbar", state);
+	sync();
+}
+/**
+ * Insert the method's description here.
+ * Creation date: (4.2.2001 11:32:36)
+ * @return boolean
+ */
+public boolean save() {
+	try
+	{
+		// save
+		prefs.put("GroupSeparator", String.valueOf(Constants.GROUP_SEPARATOR));
+
+		prefs.flush();
+		return true;
+	}
+	catch (BackingStoreException bse)
+	{
+		Console.getInstance().println("o) Failed to flush VisualDCT settings:");
+		Console.getInstance().println(bse);
+		return false;
+	}
+}
+/**
+ * Insert the method's description here.
+ * Creation date: (4.2.2001 11:32:36)
+ * @return boolean
+ */
+public boolean sync() {
+	try
+	{
+		prefs.sync();
+		return true;
+	}
+	catch (BackingStoreException bse)
+	{
+		Console.getInstance().println("o) Failed to sync VisualDCT settings:");
+		Console.getInstance().println(bse);
+		return false;
+	}
 }
 }

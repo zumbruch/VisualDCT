@@ -52,16 +52,12 @@ public class Constants {
     public final static String UNTITLED = "Untitled";
     public final static String MAIN_GROUP = "Main group";
 
-    public final static String NONE = "<none>";
-	public final static String MENU_DEFAULT_VALUE_INDICATOR = "*";
-    public final static String CLIPBOARD_NAME = "<clipboard>";
-
     public final static String CONFIG_DIR = "config/";
     public final static String DTD_DIR = CONFIG_DIR + "dtd/";
 
-    // in future setting will become XML
-    //public final static String SETTINGS_FILE = "VisualDCT.xml";
-    public final static String SETTINGS_FILE = "VisualDCT.set";
+    public final static String NONE = "<none>";
+	public final static String MENU_DEFAULT_VALUE_INDICATOR = "*";
+    public final static String CLIPBOARD_NAME = "<clipboard>";
 
     public final static int MAX_RECORD_NAME_LENGTH = 29;
     public final static int MAX_GROUP_NAME_LENGTH = MAX_RECORD_NAME_LENGTH - 2;
