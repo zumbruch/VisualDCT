@@ -29,6 +29,8 @@ package com.cosylab.vdct.graphics.objects;
  */
 
 import java.awt.*;
+
+import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.graphics.*;
 
 /**
@@ -122,6 +124,16 @@ public void forceValidation() {
  */
 public java.awt.Color getColor() {
 	return color;
+}
+
+public Color getVisibleColor() {
+	Color c = getColor();
+	if (c.equals(Constants.BACKGROUND_COLOR))
+		if (c.equals(Color.black))
+			c=Color.white;
+		else
+			c=Color.black;
+	return c;
 }
 /**
  * Insert the method's description here.

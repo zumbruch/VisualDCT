@@ -57,7 +57,7 @@ public abstract class EPICSLinkOutIn extends EPICSLinkOut implements MultiInLink
 	/**
 	 * Extra lasy initalization pattern for <code>outlinks</code> object.
 	 */
-	protected Vector getOutlinks()
+	public Vector getOutlinks()
 	{
 		if (outlinks==null)
 			outlinks = new Vector();

@@ -331,7 +331,7 @@ protected void draw(Graphics g, boolean hilited) {
 			g.setColor(Constants.FRAME_COLOR);
 		else
 			g.setColor(
-				(this == view.getHilitedObject())
+				(view.isHilitedObject(this))
 					? Constants.HILITE_COLOR
 					: Constants.FRAME_COLOR);
 
@@ -419,15 +419,9 @@ protected void draw(Graphics g, boolean hilited) {
 
 			Color recordColor = g.getColor();
 			Color linkColor = recordColor;
-			if (outlinks.firstElement() instanceof VisibleObject)
-				linkColor = ((VisibleObject) outlinks.firstElement()).getColor();
-
-
-			if (linkColor==Constants.BACKGROUND_COLOR)
-				if (linkColor==Color.black)
-					linkColor=Color.white;
-				else
-					linkColor=Color.black;
+			if (!(hilited && view.isHilitedObject(this)))
+				if (outlinks.firstElement() instanceof VisibleObject)
+					linkColor = ((VisibleObject) outlinks.firstElement()).getVisibleColor();
 
 			// draw link and its tail
 			boolean isRightSide = isRight();
@@ -1634,6 +1628,12 @@ public int getRightX() {
  */
 public String getType() {
 	return getRecordData().getType();
+}
+/* (non-Javadoc)
+ * @see com.cosylab.vdct.graphics.objects.MultiInLink#getOutlinks()
+ */
+public Vector getOutlinks() {
+	return outlinks;
 }
 
 }

@@ -300,7 +300,7 @@ protected void draw(Graphics g, boolean hilited) {
 	
 		g.fillRect(rrx, rry, rwidth, rheight);
 		if (!hilited) g.setColor(Constants.FRAME_COLOR);
-		else g.setColor((this==view.getHilitedObject()) ? 
+		else g.setColor((view.isHilitedObject(this)) ? 
 						Constants.HILITE_COLOR : Constants.FRAME_COLOR);
 
 		g.drawRect(rrx, rry, rwidth, rheight);

@@ -130,7 +130,7 @@ protected void draw(Graphics g, boolean hilited) {
 	int rry = (int)(getRscale()*getOutY()-view.getRy());
 	
 	if (!hilited) g.setColor(Constants.FRAME_COLOR);
-	else g.setColor((this==view.getHilitedObject()) ? 
+	else g.setColor((view.isHilitedObject(this)) ? 
 					Constants.HILITE_COLOR : Constants.FRAME_COLOR);
 
 	if (inlink!=null) {
@@ -159,14 +159,7 @@ protected void draw(Graphics g, boolean hilited) {
 		
 		//if (inlink.getLayerID().equals(getLayerID()))
 		
-		//g.setColor(getColor());
-		Color c = getColor();
-		if (c==Constants.BACKGROUND_COLOR)
-			if (c==Color.black)
-				c=Color.white;
-			else
-				c=Color.black;
-		g.setColor(c);
+		g.setColor(hilited && view.isHilitedObject(this) ? Constants.HILITE_COLOR : getVisibleColor());
 
 		LinkDrawer.drawLink(g, this, inlink, getQueueCount(), rightSide);
 	} else {

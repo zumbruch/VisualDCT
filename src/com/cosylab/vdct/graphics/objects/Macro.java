@@ -30,6 +30,7 @@ package com.cosylab.vdct.graphics.objects;
 
 import java.awt.*;
 import java.util.*;
+
 import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.graphics.*;
 
@@ -50,7 +51,7 @@ import java.awt.event.*;
  * Creation date: (29.1.2001 20:05:51)
  * @author Matej Sekoranja
  */
-public class Macro extends VisibleObject implements Descriptable, Movable, InLink, Popupable, Selectable, Inspectable
+public class Macro extends VisibleObject implements Descriptable, Movable, InLink, Popupable, Selectable, Inspectable, MultiInLink
 {
 	class PopupMenuHandler implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
@@ -309,7 +310,7 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 			drawColor = Constants.FRAME_COLOR;
 		else
 			drawColor =
-				(this == view.getHilitedObject())
+				(view.isHilitedObject(this))
 					? Constants.HILITE_COLOR
 					: Constants.FRAME_COLOR;
 
@@ -353,13 +354,7 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 	{
 		
 		// draw link
-		Color c = getColor();
-		if (c==Constants.BACKGROUND_COLOR)
-			if (c==Color.black)
-				c=Color.white;
-			else
-				c=Color.black;
-		g.setColor(c);
+		g.setColor(getVisibleColor());
 
 		//LinkDrawer.drawLink(g, this, inlink, getQueueCount(), rightSide);
 	}
@@ -912,18 +907,23 @@ public void updateTemplateLink()
 		//((LinkManagerObject)getParent()).removeInvalidLink(this);
 	}
 }
-/* (non-Javadoc)
- * @see com.cosylab.vdct.graphics.objects.InLink#getMinX()
- */
+
 public int getLeftX() {
 	return getX()-Constants.LINK_RADIOUS*4;
 }
 
-/* (non-Javadoc)
- * @see com.cosylab.vdct.graphics.objects.InLink#getMaxX()
- */
 public int getRightX() {
 	return getX()+getWidth()+Constants.LINK_RADIOUS*4;
+}
+
+public int getLinkCount() {
+	return outlinks.size();
+}
+/* (non-Javadoc)
+ * @see com.cosylab.vdct.graphics.objects.MultiInLink#getOutlinks()
+ */
+public Vector getOutlinks() {
+	return outlinks;
 }
 
 }

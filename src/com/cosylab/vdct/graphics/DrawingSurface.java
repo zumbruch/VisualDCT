@@ -404,8 +404,12 @@ public void draw(Graphics g) {
 
 	// hilite object
 	if (!fastDrawing) {
-		VisibleObject vo = view.getHilitedObject();
-		if (vo!=null && !view.getBlinkingObjects().contains(vo)) vo.paint(g, true);
+		LinkedHashSet objs = view.getHilitedObjects();
+		Iterator i = objs.iterator();
+		while (i.hasNext()) {
+			VisibleObject vo = (VisibleObject)i.next(); 
+			if (vo!=null && !view.getBlinkingObjects().contains(vo)) vo.paint(g, true);
+		}
 	}
 
 	drawOnlyHilitedOnce=alsoDrawHilitedOnce=false;

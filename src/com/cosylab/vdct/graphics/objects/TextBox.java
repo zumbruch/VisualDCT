@@ -394,13 +394,7 @@ protected void draw(Graphics g, boolean hilited)
 			Shape clip = g.getClip();
 			g.setClip(posX, posY, rwidth, rheight);
 
-			Color c = getColor();
-			if (c==Constants.BACKGROUND_COLOR)
-				if (c==Color.black)
-					c=Color.white;
-				else
-					c=Color.black;
-			g.setColor(c);
+			g.setColor(getVisibleColor());
 
 			drawMultiLineText(g, posX+2, posY+2, rwidth-4);	
 			g.setClip(clip);
@@ -437,13 +431,7 @@ private void drawDashedBorder(Graphics g, boolean hilited,
 		g.setColor(Constants.SELECTION_COLOR);
 	else
 	{
-		Color c = getColor();
-		if (c==Constants.BACKGROUND_COLOR)
-			if (c==Color.black)
-				c=Color.white;
-			else
-				c=Color.black;
-		g.setColor(c);
+		g.setColor(getVisibleColor());
 	}
 		
 	//double scale = view.getScale();

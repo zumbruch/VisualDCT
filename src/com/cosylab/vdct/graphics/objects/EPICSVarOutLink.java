@@ -34,6 +34,8 @@ import com.cosylab.vdct.Constants;
 
 import javax.swing.*;
 import java.awt.event.*;
+
+import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.vdb.*;
 
 /**
@@ -207,14 +209,7 @@ private com.cosylab.vdct.graphics.objects.EPICSVarOutLink.PopupMenuHandler creat
 	
 		if (inlink!=null)
 		{
-	
-			Color c = getColor();
-			if (c==Constants.BACKGROUND_COLOR)
-				if (c==Color.black)
-					c=Color.white;
-				else
-					c=Color.black;
-			g.setColor(c);
+			g.setColor(hilited && ViewState.getInstance().isHilitedObject(this) ? Constants.HILITE_COLOR : getVisibleColor());
 	
 			boolean isRightSide = isRight();
 

@@ -300,7 +300,7 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 			drawColor = Constants.FRAME_COLOR;
 		else
 			drawColor =
-				(this == view.getHilitedObject())
+				(view.isHilitedObject(this))
 					? Constants.HILITE_COLOR
 					: Constants.FRAME_COLOR;
 
@@ -316,15 +316,8 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 
 	if (inlink!=null)
 	{
-		
 		// draw link
-		Color c = getColor();
-		if (c==Constants.BACKGROUND_COLOR)
-			if (c==Color.black)
-				c=Color.white;
-			else
-				c=Color.black;
-		g.setColor(c);
+		g.setColor(hilited && view.isHilitedObject(this) ? Constants.HILITE_COLOR : getVisibleColor());
 
 		LinkDrawer.drawLink(g, this, inlink, getQueueCount(), rightSide);
 	}

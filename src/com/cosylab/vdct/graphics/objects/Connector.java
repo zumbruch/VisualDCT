@@ -284,15 +284,9 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 			g.fillRect(rrx, rry, rwidth, rheight);
 		}
 
-		Color c = getColor();
+		Color c = getVisibleColor();
 		if (hilited)
-			c = (this==view.getHilitedObject()) ? Constants.HILITE_COLOR : c;
-
-		if (c==Constants.BACKGROUND_COLOR)
-			if (c==Color.black)
-				c=Color.white;
-			else
-				c=Color.black;
+			c = (view.isHilitedObject(this)) ? Constants.HILITE_COLOR : c;
 		g.setColor(c);
 		
 		if (inlink!=null || hilited) 
@@ -306,15 +300,8 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 	
 	}
 
-	if (!hilited && (inlink!=null || getMode()==EXTERNAL_OUTPUT_MODE || getMode()==EXTERNAL_INPUT_MODE)) {
-//		g.setColor(getColor());
-		Color c = getColor();
-		if (c==Constants.BACKGROUND_COLOR)
-			if (c==Color.black)
-				c=Color.white;
-			else
-				c=Color.black;
-		g.setColor(c);
+	if (/*!hilited &&*/ (inlink!=null || getMode()==EXTERNAL_OUTPUT_MODE || getMode()==EXTERNAL_INPUT_MODE)) {
+		//g.setColor(getVisibleColor());
 		if (inlink!=null)
 			LinkDrawer.drawLink(g, this, inlink, getQueueCount(), 
 								getOutX()<inlink.getInX());

@@ -29,6 +29,10 @@ package com.cosylab.vdct.graphics;
  */
 
 import java.util.*;
+
+import com.cosylab.vdct.graphics.objects.InLink;
+import com.cosylab.vdct.graphics.objects.MultiInLink;
+import com.cosylab.vdct.graphics.objects.OutLink;
 import com.cosylab.vdct.graphics.objects.VisibleObject;
 
 /**
@@ -61,6 +65,7 @@ public class ViewState {
 	protected static boolean flat = false;
 	
 	protected VisibleObject hilitedObject = null;
+	protected LinkedHashSet hilitedObjects = new LinkedHashSet(); 
 	protected Vector selectedObjects = null;
 
 	protected Vector blinkingObjects = null;
@@ -161,6 +166,15 @@ public int getHeight() {
 public VisibleObject getHilitedObject() {
 	return hilitedObject;
 }
+
+public LinkedHashSet getHilitedObjects() {
+	return hilitedObjects;
+}
+
+public boolean isHilitedObject(VisibleObject object) {
+	return hilitedObjects.contains(object);
+}
+
 /**
  * Insert the method's description here.
  * Creation date: (21.12.2000 21:02:40)
@@ -350,6 +364,37 @@ public void setAsBlinking(VisibleObject object) {
 public boolean setAsHilited(VisibleObject object) {
 	if (object!=hilitedObject) {
 		hilitedObject=object;
+		
+		//initialization
+		hilitedObjects.clear();
+		hilitedObjects.add(hilitedObject);
+		Object obj = hilitedObject;
+		
+		// inlinks
+		Vector outlinks = null;  
+		if (obj instanceof MultiInLink) {
+			 outlinks = ((MultiInLink)obj).getOutlinks();
+		} else if (obj instanceof InLink){
+			outlinks = new Vector();
+			outlinks.add(((InLink)obj).getOutput());
+		}
+		if (outlinks != null)
+			for (int i=0; i<outlinks.size(); i++) {
+				obj = outlinks.elementAt(i);
+				hilitedObjects.add(obj);
+				while (obj instanceof InLink) {
+					obj = ((InLink)obj).getOutput();
+					hilitedObjects.add(obj);
+				}
+			}
+			
+		// outLinks
+		obj = hilitedObject;
+		while (obj instanceof OutLink) {
+			obj = ((OutLink)obj).getInput();
+			hilitedObjects.add(obj);
+		}
+		
 		return true;
 	}
 	else

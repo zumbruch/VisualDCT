@@ -162,7 +162,7 @@ protected void draw(Graphics g, boolean hilited) {
 	int rry = (int)(getRscale()*getInY()- view.getRy());
 	
 	if (!hilited) g.setColor(Constants.FRAME_COLOR);
-	else g.setColor((this==view.getHilitedObject()) ? 
+	else g.setColor((view.isHilitedObject(this)) ? 
 					Constants.HILITE_COLOR : Constants.FRAME_COLOR);
 
 	g.drawOval(rrx-r, rry-r, 2*r,2*r);
@@ -181,14 +181,7 @@ protected void draw(Graphics g, boolean hilited) {
 		}*/
 
 		// tail
-		// g.setColor(getColor());
-		Color c = getColor();
-		if (c==Constants.BACKGROUND_COLOR)
-			if (c==Color.black)
-				c=Color.white;
-			else
-				c=Color.black;
-		g.setColor(c);
+		g.setColor(hilited && view.isHilitedObject(this) ? Constants.HILITE_COLOR : getVisibleColor());
 
 		if (isRightSide)
 			g.drawLine(rrx+2*r, rry, rrx+rtailLen-r, rry);
@@ -463,17 +456,23 @@ public void revalidateOutlinkConnectors() {
 	}
 }
 public int getRightX() {
-	if (outlinks.size()!=1 || !getLayerID().equals(getOutput().getLayerID()))
+	if (outlinks.size()==1 && !getLayerID().equals(getOutput().getLayerID()))
 		return getX()+getWidth()+Constants.TAIL_LENGTH;	 
 	else	
 		return getX()+getWidth()+Constants.TAIL_LENGTH + getVerticalPosition()*Constants.LINK_SLOT_WIDTH;
 }
 
 public int getLeftX() {
-	if (outlinks.size()!=1 || !getLayerID().equals(getOutput().getLayerID()))
+	if (outlinks.size()==1 && !getLayerID().equals(getOutput().getLayerID()))
 		return getX()-Constants.TAIL_LENGTH;
 	else
 		return getX()-Constants.TAIL_LENGTH - getVerticalPosition()*Constants.LINK_SLOT_WIDTH;
+}
+/* (non-Javadoc)
+ * @see com.cosylab.vdct.graphics.objects.MultiInLink#getOutlinks()
+ */
+public Vector getOutlinks() {
+	return outlinks;
 }
 
 

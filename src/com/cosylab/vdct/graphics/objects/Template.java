@@ -180,7 +180,7 @@ public class Template
 
 
 			if (!hilited) g.setColor(Constants.FRAME_COLOR);
-			else g.setColor((this==view.getHilitedObject()) ? 
+			else g.setColor((view.isHilitedObject(this)) ? 
 							Constants.HILITE_COLOR : Constants.FRAME_COLOR);
 	
 			g.drawRect(rrx, rry, rwidth, rheight);

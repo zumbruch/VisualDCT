@@ -1,5 +1,7 @@
 package com.cosylab.vdct.graphics.objects;
 
+import java.util.Vector;
+
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
  * All rights reserved.
@@ -40,4 +42,8 @@ public interface MultiInLink extends InLink {
  * @return java.util.Vector
  */
 int getLinkCount();
+
+Vector getStartPoints();
+
+Vector getOutlinks();
 }
