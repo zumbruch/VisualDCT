@@ -258,8 +258,8 @@ public void setGroupSeparator(char sep) {
 		else
 			sep = '\0';
 	
-	prefs.putInt("GroupSeparator", (int)(Constants.GROUP_SEPARATOR));
 	Constants.GROUP_SEPARATOR = sep;
+	prefs.putInt("GroupSeparator", (int)(Constants.GROUP_SEPARATOR));
 	sync();
 
 	if (grouping && Constants.GROUP_SEPARATOR=='\0')

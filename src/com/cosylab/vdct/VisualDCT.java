@@ -1644,10 +1644,14 @@ public void exitMenuItem_ActionPerformed() {
 			this.dispose();
 		}
 		else
+		{
 			this.dispose();
+		}
 	}
 	else
+	{
 		this.dispose();
+	}
 }
 /**
  * Comment
