@@ -821,7 +821,8 @@ public EPICSLink initializeLinkField(VDBFieldData field) {
 				break;
 		}
 
-		if (link!=null)	addLink(link);
+		if (link!=null)
+			addLink(link);
 		return link;
 	}
 	else

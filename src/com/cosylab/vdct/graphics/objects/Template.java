@@ -1309,7 +1309,9 @@ public void writeObjects(DataOutputStream file, NameManipulator namer, boolean e
 		
 		// expand start
 		file.writeBytes(nl+DBResolver.EXPAND+"(\""+getTemplateData().getTemplate().getId()+"\""+
-						comma + getTemplateData().getName() + ") {"+nl);
+						comma + 
+							StringUtils.quoteIfMacro(getTemplateData().getName())
+						 + ") {"+nl);
 	
 		// macros
 		Map macros = getTemplateData().getProperties();

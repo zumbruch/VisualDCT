@@ -1059,7 +1059,7 @@ public static void writeObjects(Vector elements, java.io.DataOutputStream file, 
  	{
 	 	obj = e.nextElement();
 	
-	 	// go throught the records	
+	 	// go through the records	
 	 	if (obj instanceof Record)
 	 		{
 			 	record = (Record)obj;

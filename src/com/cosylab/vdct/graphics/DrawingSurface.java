@@ -300,6 +300,7 @@ public void draw(Graphics g) {
 
 	ViewState view = ViewState.getInstance();
 
+	// forceReadraw does not force really
 	if (fastDrawing || fastDrawingOnce || drawOnlyHilitedOnce || !forceRedraw) {
 		// copy devices buffer
 		copyCanvasImage(g);
@@ -1000,10 +1001,11 @@ public void mouseDragged(MouseEvent e) {
 			{
 				pressedX-=dx; pressedY-=dy;
 				forceRedraw=true;
-				
+				fastDrawing = false;
 			}
 			
 			recalculateNavigatorPosition();
+			blockNavigatorRedrawOnce = true;
 			repaint();
 		}
 	}
@@ -1660,6 +1662,7 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 					}
 				}
 
+				// field has to be already created
 				Object unknownTarget = record.getSubObjects().get(fieldName);
 				if (unknownTarget instanceof OutLink)
 				{
@@ -1706,6 +1709,7 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 						record = (Record) rootGroup.findObject(recordName, true);
 						if (record != null)
 						{
+							// field has to be already created
 							Object unknown = record.getSubObjects().get(fieldName);
 							if (unknown instanceof InLink)
 							{
@@ -1731,6 +1735,7 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 							else
 							{
 								// VAL
+								// field has to be already created
 								inlink = (InLink) record.getSubObjects().get("VAL");
 								if (inlink != null)
 								{

@@ -106,8 +106,9 @@ public abstract class EPICSLinkOut extends EPICSLink implements OutLink, Popupab
 protected EPICSLinkOut(ContainerObject parent, VDBFieldData fieldData) {
 	super(parent, fieldData);
 	properties = new LinkProperties(fieldData);
-	updateLink();
+	//updateLink(); // this causes problems in applyVisualData (connectors are not completed)
 }
+
 /**
  * Insert the method's description here.
  * Creation date: (4.2.2001 12:50:51)
@@ -459,7 +460,8 @@ public void setColor(Color newColor) {
  */
 public void setInput(InLink input) {
 	if (inlink==input) return;
-	if (inlink!=null) inlink.disconnect(this);
+	if (inlink!=null)
+		inlink.disconnect(this);
 	inlink=input;
 	if (inlink!=null) disconnected=false;
 }
