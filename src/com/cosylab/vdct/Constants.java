@@ -46,6 +46,39 @@ public class Constants {
     public final static String COPY_SUFFIX = "2";
     public final static String MOVE_SUFFIX = "2";
 
+    // default config dir
+ 	public final static String VDCT_DEFAULT_CONFIG_DIR = "/etc/vdct";
+ 	
+ 	// JVM parameter which can override VDCT_DEFAULT_CONFIG_DIR 
+ 	public final static String VDCT_CONFIG_DIR_ENV = "VDCT_CONFIG_DIR";
+
+ 	// current config dir
+ 	public final static String VDCT_CONFIG_DIR = System.getProperty(VDCT_CONFIG_DIR_ENV, VDCT_DEFAULT_CONFIG_DIR);
+
+ 	/**
+ 	 * Generate full config file path using default algoritm: override JVM property, user home, sys home.
+ 	 * @param fileName	config file name (w/o path)
+ 	 * @param overrideProperty	override property (JVM parameter) which overrides default config file name (full path), can be <code>null</code>. 
+ 	 * @return full config file path (file might not exist).
+ 	 */
+ 	public static String getConfigFile(final String fileName, final String overrideProperty) {
+ 	    
+ 	    // first check override property, if available
+ 	    if (overrideProperty != null) {
+			String overriden = System.getProperty(overrideProperty);
+			if (overriden != null)
+			    return overriden;
+ 	    }
+		
+		// check user home
+		String file = System.getProperty("user.home") + "/" + fileName;
+		if (new java.io.File(file).exists())
+		    return file;
+		
+		// return sys dir
+		return VDCT_CONFIG_DIR + "/" + fileName;
+ 	}
+ 	
  	public final static String VDCT_PLUGINS_FILE = "VDCT_PLUGINS_FILE";
  	public final static String PLUGINS_FILE_NAME = ".vdctplugins.xml";
  	

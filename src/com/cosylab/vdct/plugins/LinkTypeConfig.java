@@ -37,6 +37,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.plugin.PluginContext;
 import com.cosylab.vdct.plugin.config.LinkTypeConfigPlugin;
 import com.cosylab.vdct.xml.XMLManager;
@@ -44,7 +45,7 @@ import com.cosylab.vdct.xml.XMLManager;
 /**
  * A default LinkTypeConfig plugin. 
  * It reads link type configuration from an XML file. The file name is defined by VDCT_LINK_CONFIG_FILE filename located
- * in user home directory. Use VDCT_LINK_CONFIG_FILE_ENV environment variable to override this default setting.
+ * in user home directory (or in VDCT_CONFIG_DIR dir). Use VDCT_LINK_CONFIG_FILE_ENV environment variable to override this default setting.
  * An example of XML file:
  * <?xml version="1.0" encoding="UTF-8"?>
  * 
@@ -80,9 +81,7 @@ public class LinkTypeConfig implements LinkTypeConfigPlugin
 		Document doc = null;
 		try
 		{
-			fileName = System.getProperty(VDCT_LINK_CONFIG_FILE_ENV);
-			if (fileName == null)
-				fileName = System.getProperty("user.home")+"/"+VDCT_LINK_CONFIG_FILE;
+		    fileName = Constants.getConfigFile(VDCT_LINK_CONFIG_FILE, VDCT_LINK_CONFIG_FILE_ENV);
 		
 			// is file does not exists, load default file
 			if (!(new java.io.File(fileName).exists()))

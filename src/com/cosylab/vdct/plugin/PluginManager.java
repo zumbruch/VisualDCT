@@ -178,10 +178,7 @@ private void load()
 {
 	try
 	{
-		//String fileName = com.cosylab.vdct.Settings.getInstance().getDefaultDir()+com.cosylab.vdct.Constants.CONFIG_DIR+PLUGINS_FILE;
-		String fileName = System.getProperty(Constants.VDCT_PLUGINS_FILE);
-		if (fileName == null)
-			fileName = System.getProperty("user.home") + "/" + Constants.PLUGINS_FILE_NAME;
+	    String fileName = Constants.getConfigFile(Constants.PLUGINS_FILE_NAME, Constants.VDCT_PLUGINS_FILE);
 	
 		// is file does not exists, load default file
 		if (!(new java.io.File(fileName).exists()))
