@@ -1247,6 +1247,7 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
  final String TEXTBOX_START = "#! "+DBResolver.VDCTTEXTBOX+"(";
 
  final String TEMPLATE_INSTANCE_START  = "#! "+DBResolver.TEMPLATE_INSTANCE+"(";
+ final String NULL  = "null";
  	
  Enumeration e = elements.elements();
  while (e.hasMoreElements()) 
@@ -1275,15 +1276,20 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 			 		{
 			 			connector = (Connector)obj;
 
+						String target = NULL;
+						if (connector.getInput()!=null)
+							target = namer.getResolvedName(connector.getInput().getID());
+							
 			 			file.writeBytes(CONNECTOR_START+
 					 		StringUtils.quoteIfMacro(
 						 		namer.getResolvedName(connector.getID())
 						 	) + comma +  
 					 		StringUtils.quoteIfMacro(
-						 		namer.getResolvedName(connector.getInput().getID())
+						 		target
 						 	) + comma + connector.getX() + comma + connector.getY() + 
 						 	comma + StringUtils.color2string(connector.getColor()) +
 							comma + quote + /*!!!+ StringUtils.removeBegining(connector.getDescription(), path2remove) +*/ quote +
+							comma + connector.getMode() +
 							ending);
 		 			 }
 			 		else

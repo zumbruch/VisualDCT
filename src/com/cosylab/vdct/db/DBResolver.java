@@ -32,6 +32,7 @@ import java.io.*;
 import java.util.*;
 import com.cosylab.vdct.Console;
 import com.cosylab.vdct.DataProvider;
+import com.cosylab.vdct.util.*;
 import com.cosylab.vdct.util.StringUtils;
 
 /**
@@ -163,7 +164,7 @@ public static void initializeTokenizer(StreamTokenizer tokenizer) {
 
 
 
-private static String loadTemplate(DBData data, String templateFile, String referencedFromFile, DBPathSpecification paths) throws Exception
+private static String loadTemplate(DBData data, String templateFile, String referencedFromFile, PathSpecification paths) throws Exception
 {
 
 	File file = paths.search4File(templateFile);
@@ -387,7 +388,14 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 						(tokenizer.ttype == DBConstants.quoteChar)) desc=tokenizer.sval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
-					data.addConnector(new DBConnectorData(str, str2, tx, ty, StringUtils.int2color(t), desc));
+					// read mode
+					int mode = 0;
+					tokenizer.nextToken();
+					if (tokenizer.ttype == tokenizer.TT_NUMBER) mode=(int)tokenizer.nval;
+					else 
+						tokenizer.pushBack();
+
+					data.addConnector(new DBConnectorData(str, str2, tx, ty, StringUtils.int2color(t), desc, mode));
 
 				}
 
@@ -867,7 +875,7 @@ public static void skipLines(int linesToSkip, StreamTokenizer tokenizer, String 
  * @param rootData com.cosylab.vdct.db.DBData
  * @param tokenizer java.io.StreamTokenizer
  */
-public static void processDB(DBData data, StreamTokenizer tokenizer, String fileName, DBPathSpecification paths) throws Exception
+public static void processDB(DBData data, StreamTokenizer tokenizer, String fileName, PathSpecification paths) throws Exception
 {
 	
 	String comment = nullString;
@@ -906,7 +914,7 @@ public static void processDB(DBData data, StreamTokenizer tokenizer, String file
 
 					rd.setComment(comment);	comment = nullString;
 					
-					processFields(rd, tokenizer, fileName);
+					processFields(rd, tokenizer, fileName, paths);
 					data.addRecord(rd);
 					
 				}
@@ -948,7 +956,7 @@ public static void processDB(DBData data, StreamTokenizer tokenizer, String file
 						comment = nullString;
 					}
 					
-					processPorts(templateData, tokenizer, fileName);
+					processPorts(templateData, tokenizer, fileName, paths);
 					
 					//System.out.println("}");
 
@@ -976,7 +984,7 @@ public static void processDB(DBData data, StreamTokenizer tokenizer, String file
 					DBTemplateInstance ti = new DBTemplateInstance(str2, loadedTemplateId);
 					ti.setComment(comment);	comment = nullString;
 
-					processMacros(ti, tokenizer, fileName);
+					processMacros(ti, tokenizer, fileName, paths);
 					
 					data.addTemplateInstance(ti);
 
@@ -997,11 +1005,8 @@ public static void processDB(DBData data, StreamTokenizer tokenizer, String file
 					data.addEntry(entry);
 
 					File file = paths.search4File(include_filename);
-					//if (file!=null)
-					//{
-						inctokenizer = getStreamTokenizer(file.getAbsolutePath());
-						if (inctokenizer!=null) processDB(data, inctokenizer, include_filename, new DBPathSpecification(file.getParentFile().getAbsolutePath()));
-					//}
+					inctokenizer = getStreamTokenizer(file.getAbsolutePath());
+					if (inctokenizer!=null) processDB(data, inctokenizer, include_filename, new PathSpecification(file.getParentFile().getAbsolutePath()));
 				}
 			
 				/****************** path ********************/
@@ -1051,7 +1056,7 @@ public static void processDB(DBData data, StreamTokenizer tokenizer, String file
  * @param tokenizer java.io.StreamTokenizer
  * @exception java.lang.Exception The exception description.
  */
-public static void processMacros(DBTemplateInstance templateInstance, StreamTokenizer tokenizer, String fileName) throws Exception {
+public static void processMacros(DBTemplateInstance templateInstance, StreamTokenizer tokenizer, String fileName, PathSpecification paths) throws Exception {
 
 	String name;
 	String value;
@@ -1092,12 +1097,10 @@ public static void processMacros(DBTemplateInstance templateInstance, StreamToke
 				if (tokenizer.ttype == DBConstants.quoteChar) include_filename=tokenizer.sval;
 				else throw (new DBParseException("Invalid include filename...", tokenizer, fileName));
 
-				// if not absulute fileName, do not use relative path
-				if (!(include_filename.charAt(0)=='/' || include_filename.charAt(0)=='\\' || (include_filename.length()>1 && include_filename.charAt(1)==':')))
-					include_filename = com.cosylab.vdct.util.StringUtils.replaceFileName(fileName, include_filename);
+				File file = paths.search4File(include_filename);
+				inctokenizer = getStreamTokenizer(file.getAbsolutePath());
+				if (inctokenizer!=null) processMacros(templateInstance, inctokenizer, include_filename, new PathSpecification(file.getParentFile().getAbsolutePath()));
 
-				inctokenizer = getStreamTokenizer(include_filename);
-				if (inctokenizer!=null) processMacros(templateInstance, inctokenizer, include_filename);
 			}	
 						
 	/***********************************************************/
@@ -1110,7 +1113,7 @@ public static void processMacros(DBTemplateInstance templateInstance, StreamToke
  * @param tokenizer java.io.StreamTokenizer
  * @exception java.lang.Exception The exception description.
  */
-public static void processPorts(DBTemplate template, StreamTokenizer tokenizer, String fileName) throws Exception {
+public static void processPorts(DBTemplate template, StreamTokenizer tokenizer, String fileName, PathSpecification paths) throws Exception {
 
 	String name;
 	String value;
@@ -1165,12 +1168,10 @@ public static void processPorts(DBTemplate template, StreamTokenizer tokenizer, 
 				if (tokenizer.ttype == DBConstants.quoteChar) include_filename=tokenizer.sval;
 				else throw (new DBParseException("Invalid include filename...", tokenizer, fileName));
 
-				// if not absulute fileName, do not use relative path
-				if (!(include_filename.charAt(0)=='/' || include_filename.charAt(0)=='\\' || (include_filename.length()>1 && include_filename.charAt(1)==':')))
-					include_filename = com.cosylab.vdct.util.StringUtils.replaceFileName(fileName, include_filename);
+				File file = paths.search4File(include_filename);
+				inctokenizer = getStreamTokenizer(file.getAbsolutePath());
+				if (inctokenizer!=null) processPorts(template, inctokenizer, include_filename, new PathSpecification(file.getParentFile().getAbsolutePath()));
 
-				inctokenizer = getStreamTokenizer(include_filename);
-				if (inctokenizer!=null) processPorts(template, inctokenizer, include_filename);
 			}	
 						
 	/***********************************************************/
@@ -1185,7 +1186,7 @@ public static void processPorts(DBTemplate template, StreamTokenizer tokenizer, 
  * @param tokenizer java.io.StreamTokenizer
  * @exception java.lang.Exception The exception description.
  */
-public static void processFields(DBRecordData rd, StreamTokenizer tokenizer, String fileName) throws Exception {
+public static void processFields(DBRecordData rd, StreamTokenizer tokenizer, String fileName, PathSpecification paths) throws Exception {
 
 	String name;
 	String value;
@@ -1227,12 +1228,10 @@ public static void processFields(DBRecordData rd, StreamTokenizer tokenizer, Str
 				if (tokenizer.ttype == DBConstants.quoteChar) include_filename=tokenizer.sval;
 				else throw (new DBParseException("Invalid include filename...", tokenizer, fileName));
 
-				// if not absulute fileName, do not use relative path
-				if (!(include_filename.charAt(0)=='/' || include_filename.charAt(0)=='\\' || (include_filename.length()>1 && include_filename.charAt(1)==':')))
-					include_filename = com.cosylab.vdct.util.StringUtils.replaceFileName(fileName, include_filename);
+				File file = paths.search4File(include_filename);
+				inctokenizer = getStreamTokenizer(file.getAbsolutePath());
+				if (inctokenizer!=null) processFields(rd, inctokenizer, include_filename, new PathSpecification(file.getParentFile().getAbsolutePath()));
 
-				inctokenizer = getStreamTokenizer(include_filename);
-				if (inctokenizer!=null) processFields(rd, inctokenizer, include_filename);
 			}	
 						
 	/***********************************************************/
@@ -1309,7 +1308,7 @@ public static DBData resolveDB(String fileName) {
 			// generate template id from fileName
 			File file = new File(fileName);
 			
-			DBPathSpecification paths = new DBPathSpecification(file.getParentFile().getAbsolutePath());
+			PathSpecification paths = new PathSpecification(file.getParentFile().getAbsolutePath());
 			data = new DBData(file.getName(), file.getAbsolutePath());
 
 			processDB(data, tokenizer, fileName, paths);

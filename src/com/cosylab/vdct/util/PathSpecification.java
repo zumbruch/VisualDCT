@@ -1,4 +1,4 @@
-package com.cosylab.vdct.db;
+package com.cosylab.vdct.util;
 
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
@@ -37,7 +37,7 @@ import java.util.StringTokenizer;
 /**
  * @author Matej
  */
-public class DBPathSpecification
+public class PathSpecification
 {
 	
 	protected ArrayList currentPath = null;
@@ -48,7 +48,7 @@ public class DBPathSpecification
 	
 	/**
 	 */
-	public DBPathSpecification (String defaultPath)
+	public PathSpecification (String defaultPath)
 	{
 		currentDir = defaultPath;
 		

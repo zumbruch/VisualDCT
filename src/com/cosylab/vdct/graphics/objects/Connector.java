@@ -258,16 +258,18 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 				c=Color.black;
 		g.setColor(c);
 		
-		if (inlink!=null) 
+		if (inlink!=null || hilited) 
 			g.drawRect(rrx, rry, rwidth, rheight);
-		else {
+//		else {
+		else if (getMode()!=EXTERNAL_OUTPUT_MODE && getMode()!=EXTERNAL_INPUT_MODE)
+		{
 			g.drawLine(rrx, rry, rrx+rwidth, rry+rheight);
 			g.drawLine(rrx+rwidth, rry, rrx, rry+rheight);
 		}
 	
 	}
 
-	if (!hilited && inlink!=null) {
+	if (!hilited && (inlink!=null || getMode()==EXTERNAL_OUTPUT_MODE || getMode()==EXTERNAL_INPUT_MODE)) {
 //		g.setColor(getColor());
 		Color c = getColor();
 		if (c==Constants.BACKGROUND_COLOR)
@@ -276,8 +278,12 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 			else
 				c=Color.black;
 		g.setColor(c);
-		LinkDrawer.drawLink(g, this, inlink, getQueueCount(), 
-							getOutX()<inlink.getInX());
+		if (inlink!=null)
+			LinkDrawer.drawLink(g, this, inlink, getQueueCount(), 
+								getOutX()<inlink.getInX());
+		else if (getOutput()!=null)
+			LinkDrawer.drawLink(g, this, null, getQueueCount(), 
+								getOutput().getOutX()<getX());
 	}
 		
 }

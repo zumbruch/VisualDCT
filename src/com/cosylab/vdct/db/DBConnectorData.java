@@ -38,6 +38,7 @@ public class DBConnectorData {
 	protected String targetID;
 	protected int x;
 	protected int y;
+	protected int mode;
 	protected java.awt.Color color;
 	protected String description;
 /**
@@ -49,12 +50,13 @@ public class DBConnectorData {
  * @param color java.awt.Color
  * @param description java.lang.String
  */
-public DBConnectorData(String id, String targetID, int x, int y, java.awt.Color color, String description) {
+public DBConnectorData(String id, String targetID, int x, int y, java.awt.Color color, String description, int mode) {
 	this.connectorID = id;
 	this.targetID=targetID;
 	this.x=x; this.y=y;
 	this.color=color;
 	this.description=description;
+	this.mode=mode;
 }
 /**
  * Insert the method's description here.
@@ -152,4 +154,22 @@ public void setX(int newX) {
 public void setY(int newY) {
 	y = newY;
 }
+/**
+ * Returns the mode.
+ * @return int
+ */
+public int getMode()
+{
+	return mode;
+}
+
+/**
+ * Sets the mode.
+ * @param mode The mode to set
+ */
+public void setMode(int mode)
+{
+	this.mode = mode;
+}
+
 }

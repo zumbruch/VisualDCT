@@ -696,11 +696,11 @@ public void mouseClicked(MouseEvent e) {
 				else if (hilited instanceof Connector)
 				{
 					Connector con = (Connector)hilited;
-					if (con.getMode()==OutLink.INVISIBLE_MODE && con.getInput()!=null)
+					if (/*con.getMode()==OutLink.INVISIBLE_MODE &&*/ con.getInput()!=null)
 					{
 						centerObject((VisibleObject)con.getInput());			// !!! now is always true, but...
 					}
-					else if (con.getOutput()!=null && con.getOutput().getMode()==OutLink.INVISIBLE_MODE)
+					else if (con.getOutput()!=null /*&& con.getOutput().getMode()==OutLink.INVISIBLE_MODE*/)
 					{
 						centerObject((VisibleObject)con.getOutput());			// !!! now is always true, but...
 					}
@@ -1379,7 +1379,7 @@ public boolean open(File file, boolean importDB) throws IOException {
 
 		VDBData vdbData = VDBData.generateVDBData(dbdData, dbData);
 
-		applyVisualData(importDB, viewGroup, dbData, vdbData);
+		//applyVisualData(importDB, viewGroup, dbData, vdbData);
 
 		if (!importDB)
 		{
@@ -1625,7 +1625,8 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 		DBConnectorData connectorData;
 		DBLinkData dbLink;
 		e = dbData.getLinks().elements();
-		while (e.hasMoreElements()) {
+		while (e.hasMoreElements())
+		{
 			dbLink = (DBLinkData) (e.nextElement());
 
 			pos = dbLink.getFieldName().lastIndexOf(Constants.FIELD_SEPARATOR);
@@ -1633,9 +1634,12 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 			fieldName = dbLink.getFieldName().substring(pos + 1);
 
 			record = (Record) rootGroup.findObject(recordName, true);
-			if (record != null) {
-				if (importDB) {
-					if (blackList.contains(record)) {
+			if (record != null)
+			{
+				if (importDB)
+				{
+					if (blackList.contains(record))
+					{
 						Console.getInstance().println(
 							"Link "
 								+ dbLink.getFieldName()
@@ -1648,17 +1652,19 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 				if (unknownTarget instanceof OutLink)
 				{
 					outlink = (OutLink) unknownTarget;
-
+					
 					target = dbLink.getTargetID();
 					pos = target.lastIndexOf(EPICSLinkOut.LINK_SEPARATOR);
 					if (pos >= 0) // connectors
+					{
+						while ((connectorData = (DBConnectorData) dbData.getConnectors().get(target))!= null)
 						{
-						while ((connectorData = (DBConnectorData) dbData.getConnectors().get(target))!= null) {
 							connector = new Connector(target, record, null, null);
 							connector.setColor(connectorData.getColor());
 							connector.setDescription(connectorData.getDescription());
 							connector.setX(connectorData.getX());
 							connector.setY(connectorData.getY());
+							connector.setMode(connectorData.getMode());
 							record.addSubObject(connector.getID(), connector);
 							connector.setOutput(outlink, null);
 							outlink.setInput(connector);
@@ -1668,9 +1674,9 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 						}
 					}
 
-					// final target
 					pos = target.lastIndexOf(Constants.FIELD_SEPARATOR);
-					if (pos >= 0) {
+					if (pos >= 0)
+					{
 						recordName = target.substring(0, pos);
 						fieldName = target.substring(pos + 1);
 
@@ -1680,21 +1686,26 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 							fieldName = fieldName.substring(0, pos);
 
 						record = (Record) rootGroup.findObject(recordName, true);
-						if (record != null) {
+						if (record != null)
+						{
 							Object unknown = record.getSubObjects().get(fieldName);
-							if (unknown instanceof InLink) {
+							if (unknown instanceof InLink)
+							{
 								inlink = (InLink)unknown;
 								inlink.setOutput(outlink, null);
 								outlink.setInput(inlink);
 							}
 						}
-					} else {
+					}
+					else
+					{
 						Record targetRecord = null;
 						if ((targetRecord = (Record) rootGroup.findObject(target, true)) != null)
 						{
 							// VAL or forward link
 							VDBFieldData fieldData = (VDBFieldData) record.getRecordData().getField(fieldName);		// existance already checked
-							if (fieldData.getType() == DBDConstants.DBF_FWDLINK) {
+							if (fieldData.getType() == DBDConstants.DBF_FWDLINK)
+							{
 								// forward link
 								targetRecord.setOutput(outlink, null);
 								outlink.setInput(targetRecord);
@@ -1703,62 +1714,60 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 							{
 								// VAL
 								inlink = (InLink) record.getSubObjects().get("VAL");
-								if (inlink != null) {
+								if (inlink != null)
+								{
 									inlink.setOutput(outlink, null);
 									outlink.setInput(inlink);
 								}
 
 							}
-
 						}
 					}
-
 				}
 			}
+		}
 
-			// lines 
-			DBLine dbLine;
-			e = dbData.getLines().elements();
-			while (e.hasMoreElements())
-			{
-				dbLine = (DBLine)e.nextElement();
-				Line line = new Line(dbLine.getName(), null, dbLine.getX(), dbLine.getY(), dbLine.getX2(), dbLine.getY2());
-				line.setDashed(dbLine.isDashed());
-				line.setStartArrow(dbLine.isStartArrow());
-				line.setEndArrow(dbLine.isEndArrow());
-				line.setColor(dbLine.getColor());
-				rootGroup.addSubObject(line.getName(), line, true);
-			}
+		// lines 
+		DBLine dbLine;
+		e = dbData.getLines().elements();
+		while (e.hasMoreElements())
+		{
+			dbLine = (DBLine)e.nextElement();
+			Line line = new Line(dbLine.getName(), null, dbLine.getX(), dbLine.getY(), dbLine.getX2(), dbLine.getY2());
+			line.setDashed(dbLine.isDashed());
+			line.setStartArrow(dbLine.isStartArrow());
+			line.setEndArrow(dbLine.isEndArrow());
+			line.setColor(dbLine.getColor());
+			rootGroup.addSubObject(line.getName(), line, true);
+		}
 
-			// boxes 
-			DBBox dbBox;
-			e = dbData.getBoxes().elements();
-			while (e.hasMoreElements())
-			{
-				dbBox = (DBBox)e.nextElement();
-				Box box = new Box(dbBox.getName(), null, dbBox.getX(), dbBox.getY(), dbBox.getX2(), dbBox.getY2());
-				box.setIsDashed(dbBox.isDashed());
-				box.setColor(dbBox.getColor());
-				rootGroup.addSubObject(box.getName(), box, true);
-			}
+		// boxes 
+		DBBox dbBox;
+		e = dbData.getBoxes().elements();
+		while (e.hasMoreElements())
+		{
+			dbBox = (DBBox)e.nextElement();
+			Box box = new Box(dbBox.getName(), null, dbBox.getX(), dbBox.getY(), dbBox.getX2(), dbBox.getY2());
+			box.setIsDashed(dbBox.isDashed());
+			box.setColor(dbBox.getColor());
+			rootGroup.addSubObject(box.getName(), box, true);
+		}
 
-			// textboxes 
-			DBTextBox dbTextBox;
-			e = dbData.getTextboxes().elements();
-			while (e.hasMoreElements())
-			{
-				dbTextBox = (DBTextBox)e.nextElement();
-				TextBox textbox = new TextBox(dbTextBox.getName(), null, dbTextBox.getX(), dbTextBox.getY(), dbTextBox.getX2(), dbTextBox.getY2());
-				textbox.setBorder(dbTextBox.getBorder());
-				
-				Font font = FontMetricsBuffer.getInstance().getFont(dbTextBox.getFontName(), dbTextBox.getFontSize(), dbTextBox.getFontStyle());
-				textbox.setFont(font);
-				
-				textbox.setDescription(dbTextBox.getDescription());
-				textbox.setColor(dbTextBox.getColor());
-				rootGroup.addSubObject(textbox.getName(), textbox, true);
-			}
-
+		// textboxes 
+		DBTextBox dbTextBox;
+		e = dbData.getTextboxes().elements();
+		while (e.hasMoreElements())
+		{
+			dbTextBox = (DBTextBox)e.nextElement();
+			TextBox textbox = new TextBox(dbTextBox.getName(), null, dbTextBox.getX(), dbTextBox.getY(), dbTextBox.getX2(), dbTextBox.getY2());
+			textbox.setBorder(dbTextBox.getBorder());
+			
+			Font font = FontMetricsBuffer.getInstance().getFont(dbTextBox.getFontName(), dbTextBox.getFontSize(), dbTextBox.getFontStyle());
+			textbox.setFont(font);
+			
+			textbox.setDescription(dbTextBox.getDescription());
+			textbox.setColor(dbTextBox.getColor());
+			rootGroup.addSubObject(textbox.getName(), textbox, true);
 		}
 
 	} catch (Exception e) {
@@ -2523,9 +2532,24 @@ public void setScale(double scale) {
  */
 public void centerObject(VisibleObject object) {
 
-	ViewState view = ViewState.getInstance();
+	// check if Groups are the same
+	// not so clean !!!
+	if (object.getParent() instanceof Group)
+	{
+		if (object.getParent()!=viewGroup)
+		{
+			moveToGroup((Group)object.getParent());
+		}
+	}
+	else if (object.getParent().getParent() instanceof Group)
+	{
+		if (object.getParent().getParent()!=viewGroup)
+		{
+			moveToGroup((Group)object.getParent().getParent());
+		}
+	}
 
-	// TBD: what if groups are not the same !!!
+	ViewState view = ViewState.getInstance();
 
 	// find center
 	int drx = object.getRx()+object.getRwidth()/2;

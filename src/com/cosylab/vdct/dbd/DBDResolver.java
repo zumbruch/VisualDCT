@@ -31,6 +31,7 @@ package com.cosylab.vdct.dbd;
 import java.io.*;
 import java.util.*;
 import com.cosylab.vdct.Console;
+import com.cosylab.vdct.util.PathSpecification;
 
 /**
  * This type was created in VisualAge.
@@ -225,12 +226,13 @@ public static void initializeTokenizer(StreamTokenizer tokenizer) {
  * @param data com.cosylab.vdct.dbd.DBDData
  * @param tokenizer java.io.StreamTokenizer
  */
-public static void processDBD(DBDData data, StreamTokenizer tokenizer, String fileName) {
+public static void processDBD(DBDData data, StreamTokenizer tokenizer, String fileName, PathSpecification paths) throws Exception {
 	
 	DBDRecordData rd;
 	DBDMenuData md;
 	DBDDeviceData dd;
 
+	String str;
 	String include_filename;
 	StreamTokenizer inctokenizer = null;
 
@@ -252,7 +254,7 @@ public static void processDBD(DBDData data, StreamTokenizer tokenizer, String fi
 						(tokenizer.ttype == DBDConstants.quoteChar)) rd.setName(tokenizer.sval);
 					else throw (new DBDParseException("Invalid record_type...", tokenizer, fileName));
 
-					processFields(rd, tokenizer, fileName);
+					processFields(rd, tokenizer, fileName, paths);
 					data.addRecord(rd);
 				}
 				
@@ -267,7 +269,7 @@ public static void processDBD(DBDData data, StreamTokenizer tokenizer, String fi
 						(tokenizer.ttype == DBDConstants.quoteChar)) md.setName(tokenizer.sval);
 					else throw (new DBDParseException("Invalid menu_name...", tokenizer, fileName));
 
-					processMenuChoices(md, tokenizer, fileName);
+					processMenuChoices(md, tokenizer, fileName, paths);
 					data.addMenu(md);
 				}
 				
@@ -311,23 +313,43 @@ public static void processDBD(DBDData data, StreamTokenizer tokenizer, String fi
 					if (tokenizer.ttype == DBDConstants.quoteChar) include_filename=tokenizer.sval;
 					else throw (new DBDParseException("Invalid include_filename...", tokenizer, fileName));
 
-					// if not absulute fileName, do not use relative path
-					if (!(include_filename.charAt(0)=='/' || include_filename.charAt(0)=='\\' || (include_filename.length()>1 && include_filename.charAt(1)==':')))
-						include_filename = com.cosylab.vdct.util.StringUtils.replaceFileName(fileName, include_filename);
+					File file = paths.search4File(include_filename);
+					inctokenizer = getStreamTokenizer(file.getAbsolutePath());
+					if (inctokenizer!=null) processDBD(data, inctokenizer, include_filename, new PathSpecification(file.getParentFile().getAbsolutePath()));
 
-					inctokenizer = getStreamTokenizer(include_filename);
-					if (inctokenizer!=null) processDBD(data, inctokenizer, include_filename);
 				}
 
 				/****************** path ********************/
-				else if (tokenizer.sval.equalsIgnoreCase(PATH) ||
- 						 tokenizer.sval.equalsIgnoreCase(ADDPATH))
-					Console.getInstance().println("Warning: 'path' and 'addpath' commands are not yet supported...");
-						
+
+				else if (tokenizer.sval.equalsIgnoreCase(PATH))
+  				{
+					// read paths
+					tokenizer.nextToken();
+					if (tokenizer.ttype == DBDConstants.quoteChar) str=tokenizer.sval;
+					else throw (new DBDParseException("Invalid path...", tokenizer, fileName));
+
+					paths.setPath(str);
+					//Console.getInstance().println("Warning: 'path' command is not yet supported...");
+  				}
+				
+				/****************** addpath ********************/
+
+				else if (tokenizer.sval.equalsIgnoreCase(ADDPATH))
+  				{
+					// read add paths
+					tokenizer.nextToken();
+					if (tokenizer.ttype == DBDConstants.quoteChar) str=tokenizer.sval;
+					else throw (new DBDParseException("Invalid addpath...", tokenizer, fileName));
+
+					paths.addAddPath(str);
+					//Console.getInstance().println("Warning: 'addpath' command is not yet supported...");
+  				}
+
 				// driver, breaktable not read
 
 	} catch (Exception e) {
 		Console.getInstance().println("\n"+e);
+		throw e;
 	}	
 	
 }
@@ -335,7 +357,7 @@ public static void processDBD(DBDData data, StreamTokenizer tokenizer, String fi
  * This method was created in VisualAge.
  * @param tokenizer java.io.StreamTokenizer
  */
-public static void processFields(DBDRecordData rd, StreamTokenizer tokenizer, String fileName) throws Exception {
+public static void processFields(DBDRecordData rd, StreamTokenizer tokenizer, String fileName, PathSpecification paths) throws Exception {
 
 	DBDFieldData fd;
 
@@ -423,12 +445,10 @@ public static void processFields(DBDRecordData rd, StreamTokenizer tokenizer, St
 				if (tokenizer.ttype == DBDConstants.quoteChar) include_filename=tokenizer.sval;
 				else throw (new DBDParseException("Invalid include_filename...", tokenizer, fileName));
 
-				// if not absulute fileName, do not use relative path
-				if (!(include_filename.charAt(0)=='/' || include_filename.charAt(0)=='\\' || (include_filename.length()>1 && include_filename.charAt(1)==':')))
-					include_filename = com.cosylab.vdct.util.StringUtils.replaceFileName(fileName, include_filename);
+				File file = paths.search4File(include_filename);
+				inctokenizer = getStreamTokenizer(file.getAbsolutePath());
+				if (inctokenizer!=null) processFields(rd, inctokenizer, include_filename, new PathSpecification(file.getParentFile().getAbsolutePath()));
 
-				inctokenizer = getStreamTokenizer(include_filename);
-				if (inctokenizer!=null) processFields(rd, inctokenizer, include_filename);
 			}	
 						
 	/***********************************************************/
@@ -440,7 +460,7 @@ public static void processFields(DBDRecordData rd, StreamTokenizer tokenizer, St
  * @param tokenizer java.io.StreamTokenizer
  * @exception java.lang.Exception The exception description.
  */
-public static void processMenuChoices(DBDMenuData md, StreamTokenizer tokenizer, String fileName) throws Exception {
+public static void processMenuChoices(DBDMenuData md, StreamTokenizer tokenizer, String fileName, PathSpecification paths) throws Exception {
 
 	String choice_name;
 	String choice_value;
@@ -479,10 +499,9 @@ public static void processMenuChoices(DBDMenuData md, StreamTokenizer tokenizer,
 				if (tokenizer.ttype == DBDConstants.quoteChar) include_filename=tokenizer.sval;
 				else throw (new DBDParseException("Invalid include_filename...", tokenizer, fileName));
 	
-				include_filename = com.cosylab.vdct.util.StringUtils.replaceFileName(fileName, include_filename);
-
-				inctokenizer = getStreamTokenizer(include_filename);
-				if (inctokenizer!=null) processMenuChoices(md, inctokenizer, include_filename);
+				File file = paths.search4File(include_filename);
+				inctokenizer = getStreamTokenizer(file.getAbsolutePath());
+				if (inctokenizer!=null) processMenuChoices(md, inctokenizer, include_filename, new PathSpecification(file.getParentFile().getAbsolutePath()));
 			}	
 						
 	/***********************************************************/
@@ -502,7 +521,14 @@ public static DBDData resolveDBD(DBDData data, String fileName) {
 	{
 		try
 		{
-			processDBD(data, tokenizer, fileName);
+			File file = new File(fileName);
+			PathSpecification paths = new PathSpecification(file.getParentFile().getAbsolutePath());
+
+			processDBD(data, tokenizer, fileName, paths);
+		}
+		catch (Exception e)
+		{
+			data = null;
 		}
 		finally
 		{
@@ -539,7 +565,14 @@ public static DBDData resolveDBDasURL(DBDData data, java.net.URL url) {
 	{
 		try
 		{
-			processDBD(data, tokenizer, url.toString());
+			//File file = new File(fileName);
+			//PathSpecification paths = new PathSpecification(file.getParentFile().getAbsolutePath());
+/// TDB - not supported
+			//processDBD(data, tokenizer, url.toString(), null);
+		}
+		catch (Exception e)
+		{
+			data = null;
 		}
 		finally
 		{

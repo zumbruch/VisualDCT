@@ -141,9 +141,14 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 	double scale = view.getScale();
 	int x1 = (int)(scale*out.getOutX())-view.getRx();
 	int y1 = (int)(scale*out.getOutY())-view.getRy();
-	int x2 = (int)(scale*in.getInX())-view.getRx();
-	int y2 = (int)(scale*in.getInY())-view.getRy();
-
+	
+	int x2 = x1;
+	int y2 = y1;
+	if (in!=null)
+	{
+		x2 = (int)(scale*in.getInX())-view.getRx();
+		y2 = (int)(scale*in.getInY())-view.getRy();
+	}
 
 	// 
 	// !!! temporary "solution"
@@ -229,8 +234,9 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 		
 		int s = (int)(scale*Constants.LINK_STUB_SIZE/2.0);
 		
-		if (x2<x1) s = -s;
-		
+//		if (x2<x1) s = -s;
+		if (!firstHorizontal) s = -s;
+	
 		g.drawLine(x1, y1-s, x1, y1+s);
 
 		g.drawLine(x1, y1-s, x1+s, y1-s);
@@ -238,6 +244,31 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 
 		g.drawLine(x1+s, y1-s, x1+2*s, y1);
 		g.drawLine(x1+s, y1+s, x1+2*s, y1);
+
+		Linkable descPoint = out;			
+		int r = (int)(LARGE_RECT*view.getScale());
+		int dx = tailLenOfR*r;
+			
+		String label = null;
+		validateFont(view);
+		if (font!=null) {
+			g.setFont(font);
+			Linkable target = null;
+			//else if (descPoint instanceof OutLink)
+			{
+				target = EPICSLinkOut.getStartPoint(descPoint);
+				// any special threatment ??
+				if (target instanceof Descriptable)
+					label = ((Descriptable)target).getDescription();
+			}
+				
+			if (label!=null) {
+				/*if (isRight) dx = 3*r; 
+				else*/ 
+				if (!firstHorizontal) dx = -fontMetrics.stringWidth(label)+3*s;
+				g.drawString(label, x1+dx, y1+dy);
+			}
+		}
 
 		return;
 	}
@@ -247,7 +278,8 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 		
 		int s = (int)(scale*Constants.LINK_STUB_SIZE/2.0);
 		
-		if (x2<x1) s = -s;
+//		if (x2<x1) s = -s;
+		if (!firstHorizontal) s = -s;
 		
 		g.drawLine(x1, y1-s, x1, y1+s);
 
@@ -256,6 +288,31 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 
 		g.drawLine(x1+2*s, y1-s, x1+s, y1);
 		g.drawLine(x1+2*s, y1+s, x1+s, y1);
+
+		Linkable descPoint = out;			
+		int r = (int)(LARGE_RECT*view.getScale());
+		int dx = tailLenOfR*r;
+			
+		String label = null;
+		validateFont(view);
+		if (font!=null) {
+			g.setFont(font);
+			Linkable target = null;
+			//else if (descPoint instanceof OutLink)
+			{
+				target = EPICSLinkOut.getStartPoint(descPoint);
+				// any special threatment ??
+				if (target instanceof Descriptable)
+					label = ((Descriptable)target).getDescription();
+			}
+				
+			if (label!=null) {
+				/*if (isRight) dx = 3*r; 
+				else*/ 
+				if (!firstHorizontal) dx = -fontMetrics.stringWidth(label)+3*s;
+				g.drawString(label, x1+dx, y1+dy);
+			}
+		}
 
 		return;
 	}
@@ -279,14 +336,15 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 		return;
 	}
 */	
-	if (firstHorizontal) {
-		g.drawLine(x1, y1, x2, y1);
-		g.drawLine(x2, y1, x2, y2);
-	}
-	else {
-		g.drawLine(x1, y1, x1, y2);
-		g.drawLine(x1, y2, x2, y2);
-	}
+	if (in!=null)
+		if (firstHorizontal) {
+			g.drawLine(x1, y1, x2, y1);
+			g.drawLine(x2, y1, x2, y2);
+		}
+		else {
+			g.drawLine(x1, y1, x1, y2);
+			g.drawLine(x1, y2, x2, y2);
+		}
 
 }
 /**
@@ -298,7 +356,9 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
  * @param isRight boolean
  */
 public static void drawLink(Graphics g, OutLink out, InLink in, int count, boolean isRight) {
-	if (out.getLayerID().equals(in.getLayerID()))
+	if (in==null)
+		drawKneeLine(g, out, null, isRight);
+	else if (out.getLayerID().equals(in.getLayerID()))
 		drawKneeLine(g, out, in, ((count%2)==0));
 	else {
 		
