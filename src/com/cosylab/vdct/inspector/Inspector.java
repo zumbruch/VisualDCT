@@ -32,12 +32,14 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.TableModelEvent;
 import javax.swing.table.*;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.*;
 import com.cosylab.vdct.Console;
+import com.cosylab.vdct.vdb.VDBFieldData;
 
 /**
  * Insert the type's description here.
@@ -418,6 +420,18 @@ private javax.swing.JTable getScrollPaneTable() {
 			ivjScrollPaneTable.setDefaultRenderer(String.class, new InspectorTableCellRenderer(ivjScrollPaneTable, tableModel));
 			ivjScrollPaneTable.setDefaultEditor(String.class, new InspectorCellEditor(tableModel));
 
+			ivjScrollPaneTable.addMouseListener(new MouseAdapter() {
+				public void mouseReleased(MouseEvent evt) {
+						java.awt.Point pnt = evt.getPoint();
+						int popupAtRow = ivjScrollPaneTable.rowAtPoint(pnt);
+						int popupAtCol = -1;
+						if ((popupAtRow != -1) && 
+							((popupAtCol=ivjScrollPaneTable.columnAtPoint(pnt)) != -1)) {
+								mouseEvent(evt, popupAtRow, popupAtCol); 
+							}
+					}
+			});
+
 			// lock field name column width
 			int width = 117;
 		    TableColumn col = ivjScrollPaneTable.getColumnModel().getColumn(0);
@@ -721,7 +735,6 @@ public int getMode()
 	return mode;
 }
 
-
 /**
  * Sets the mode.
  * @param mode The mode to set
@@ -730,4 +743,23 @@ public void setMode(int mode)
 {
 	this.mode = mode;
 }
+
+/**
+ */
+private void mouseEvent(MouseEvent event, int row, int col)
+{
+	if ((event.getButton()==MouseEvent.BUTTON3 && col==0))
+	{
+		InspectableProperty property = (InspectableProperty)tableModel.getPropertyAt(row);
+		if (property!=null)
+		{
+			int visibility = property.getVisibility();
+			visibility = (visibility+1) % 3;
+			((VDBFieldData)property).setVisibility(visibility);
+			
+			getScrollPaneTable().tableChanged(new TableModelEvent(tableModel, row, row, col));
+		}
+	}
+}
+
 }

@@ -30,6 +30,7 @@ package com.cosylab.vdct.vdb;
 
 import java.util.regex.Pattern;
 
+import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.util.StringUtils;
 
 /**
@@ -209,6 +210,13 @@ public boolean isValid()
 {
 	return true;
 }
-
-
+/**
+ * Insert the method's description here.
+ * Creation date: (11.1.2001 21:30:04)
+ * @return int
+ */
+public int getVisibility()
+{
+	return InspectableProperty.UNDEFINED_VISIBILITY;
+}
 }

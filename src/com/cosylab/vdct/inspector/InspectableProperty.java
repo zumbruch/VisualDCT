@@ -36,6 +36,12 @@ import java.util.regex.Pattern;
  * @author Matej Sekoranja 
  */
 public interface InspectableProperty {
+	
+	public static final int NON_DEFAULT_VISIBLE = 0; 
+	public static final int ALWAYS_VISIBLE = 1;
+	public static final int NEVER_VISIBLE = 2;
+	public static final int UNDEFINED_VISIBILITY = Integer.MAX_VALUE;
+
 /**
  * Insert the method's description here.
  * Creation date: (11.1.2001 21:34:58)
@@ -108,4 +114,10 @@ public Pattern getEditPattern();
  * @return java.lang.String
  */
 public String getToolTipText();
+/**
+ * Insert the method's description here.
+ * Creation date: (11.1.2001 21:30:04)
+ * @return int
+ */
+public int getVisibility();
 }

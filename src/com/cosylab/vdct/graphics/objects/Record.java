@@ -101,7 +101,8 @@ public Record(ContainerObject parent, VDBRecordData recordData, int x, int y) {
 	Enumeration e = recordData.getFieldsV().elements();
 	while (e.hasMoreElements()) {
 		field = (VDBFieldData)e.nextElement();
-		if (!field.hasDefaultValue())
+		if (field.getVisibility() == VDBFieldData.ALWAYS_VISIBLE ||
+			(field.getVisibility() == VDBFieldData.NON_DEFAULT_VISIBLE && !field.hasDefaultValue()))
 			changedFields.addElement(field);
 	}
 
@@ -407,8 +408,11 @@ public void fieldChanged(VDBFieldData field) {
 	boolean repaint = false;
 
 	if (manageLink(field)) repaint=true;
+	
+	int visibility = field.getVisibility();
 		
-	if (field.hasDefaultValue()) {
+	if (visibility == VDBFieldData.NEVER_VISIBLE ||
+		(visibility == VDBFieldData.NON_DEFAULT_VISIBLE && field.hasDefaultValue())) {
 		if (changedFields.contains(field)) {
 				changedFields.removeElement(field);
 				repaint = true;

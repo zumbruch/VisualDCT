@@ -91,8 +91,12 @@ public int getRowCount() {
  * getValueAt method comment.
  */
 public Object getValueAt(int row, int column) {
-	if (column==0) return data[row].getName();
-	else return data[row].getValue();
+	switch (column)
+	{
+		case 0: return data[row].getName();
+		case 1: return data[row].getValue();
+	}
+	return null;
 }
 /**
  * Insert the method's description here.
@@ -147,7 +151,8 @@ public void setValueAt(Object aValue, int row, int column) {
 public void updateProperty(InspectableProperty property) {
 	for (int row=0; row < data.length; row++)
 		if (data[row]==property)
-			fireTableCellUpdated(row, 1);
+				fireTableRowsUpdated(row, row);
+//				fireTableCellUpdated(row, 1);
 }
 /**
  * Insert the method's description here.
@@ -157,6 +162,7 @@ public void updateProperty(InspectableProperty property) {
 public void updateProperty(String propertyName) {
 	for (int row=0; row < data.length; row++)
 		if (data[row].getName().equals(propertyName))
-			fireTableCellUpdated(row, 1);
+				fireTableRowsUpdated(row, row);
+//			fireTableCellUpdated(row, 1);
 }
 }

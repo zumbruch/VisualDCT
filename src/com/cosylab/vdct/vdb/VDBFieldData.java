@@ -33,7 +33,11 @@ import com.cosylab.vdct.dbd.*;
 import com.cosylab.vdct.DataProvider;
 import com.cosylab.vdct.Console;
 import com.cosylab.vdct.inspector.InspectableProperty;
+import com.cosylab.vdct.inspector.InspectorManager;
 import com.cosylab.vdct.graphics.objects.Debuggable;
+import com.cosylab.vdct.graphics.objects.Group;
+import com.cosylab.vdct.graphics.objects.Record;
+
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -53,6 +57,8 @@ public class VDBFieldData implements InspectableProperty, Debuggable {
 
 	private static final String debugDefault = "###";
 	protected String debugValue = debugDefault;
+	
+	protected int visibility = NON_DEFAULT_VISIBLE;
 
 /**
  * Insert the method's description here.
@@ -339,6 +345,22 @@ public void setRecord(VDBRecordData newRecord) {
 public void setType(int newType) {
 	type = newType;
 }
+
+/**
+ * Insert the method's description here.
+ * Creation date: (9.12.2000 18:11:46)
+ */
+public void updateInspector()
+{
+	Record visualRecord = (Record)Group.getRoot().findObject(record.getName(), true);
+	if (visualRecord==null) {
+		//com.cosylab.vdct.Console.getInstance().println("o) Internal error: no visual representaton of record "+getName()+" found.");
+		return;
+	}
+
+	InspectorManager.getInstance().updateProperty(visualRecord, this);
+}
+
 /**
  * Insert the method's description here.
  * Creation date: (9.12.2000 18:11:46)
@@ -365,7 +387,7 @@ public void setValue(java.lang.String newValue) {
 				if (f!=this &&
 					((f.getDbdData().getField_type()==DBDConstants.DBF_INLINK) ||
 					(f.getDbdData().getField_type()==DBDConstants.DBF_OUTLINK)))
-					f.setValue(f.getValue());
+						f.updateInspector();
 			}
 		}
 	}
@@ -443,4 +465,25 @@ public boolean isValid()
 	}
 	return true;
 }
+/**
+ * Insert the method's description here.
+ * Creation date: (11.1.2001 21:30:04)
+ * @return int
+ */
+public int getVisibility()
+{
+	return visibility;
+}
+
+/**
+ * Sets the visibility.
+ * @param visibility The visibility to set
+ */
+public void setVisibility(int visibility)
+{
+	this.visibility = visibility;
+	record.fieldValueChanged(this);
+	//updateInspector();
+}
+
 }

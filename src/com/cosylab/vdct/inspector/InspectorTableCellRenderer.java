@@ -39,12 +39,17 @@ import javax.swing.border.*;
  * @author Matej Sekoranja
  */
 public class InspectorTableCellRenderer extends DefaultTableCellRenderer {
-	private Color bgColor;
-	private Color fgColor;
+	private Color bgColor = null;
+	private Color fgColor = null;
 	private Color sectionbgColor = Color.black;
 	private Color sectionfgColor = Color.white;
 	private Color invalidColor = Color.red;
 	private InspectorTableModel tableModel;
+	
+	private ImageIcon blankIcon = null;
+	private ImageIcon eyeIcon = null;
+	private ImageIcon noeyeIcon = null;
+	
 /**
  * InspectorTableCellRenderer constructor comment.
  */
@@ -57,6 +62,19 @@ public InspectorTableCellRenderer(JTable table, InspectorTableModel tableModel) 
 	sectionfgColor = Color.white;
 	setFont(table.getFont());
 	setBorder(noFocusBorder);
+
+	try
+	{
+		blankIcon = new ImageIcon(getClass().getResource("/images/blank.gif"));
+		eyeIcon = new ImageIcon(getClass().getResource("/images/eye.gif"));
+		noeyeIcon = new ImageIcon(getClass().getResource("/images/noeye.gif"));
+	}
+	catch (Exception e)
+	{
+		System.out.println("Failed to load icons!");
+		System.out.println(e);
+		System.out.println();
+	}
 }
 /**
  * Insert the method's description here.
@@ -72,6 +90,8 @@ public InspectorTableCellRenderer(JTable table, InspectorTableModel tableModel) 
 public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 	String str = value.toString();
 	InspectableProperty property = tableModel.getPropertyAt(row);
+
+	setIcon(null);
 	
 	if (tableModel.getPropertyAt(row).isSepatator()) {
 		super.setHorizontalAlignment(JLabel.CENTER);
@@ -81,6 +101,25 @@ public Component getTableCellRendererComponent(JTable table, Object value, boole
 	else {
 		super.setHorizontalAlignment(JLabel.LEFT);
 		super.setBackground(bgColor);
+
+		if (column==0)
+		{
+			switch (property.getVisibility())
+			{
+				case InspectableProperty.NON_DEFAULT_VISIBLE:
+					setIcon(blankIcon);
+					break;
+				case InspectableProperty.ALWAYS_VISIBLE:
+					setIcon(eyeIcon);
+					break;
+				case InspectableProperty.NEVER_VISIBLE:
+					setIcon(noeyeIcon);
+					break;
+				default:
+					setIcon(blankIcon);
+			}
+		}
+		
 		if (column==1 && !property.isValid())
 			super.setForeground(invalidColor);
 		else
