@@ -496,6 +496,8 @@ public class FindPanel extends JPanel
     class FindTabs extends JTabbedPane {
         protected String TAB_NAME = "Name";
 
+        protected String TAB_TYPE = "Type";
+        
         protected String TAB_RESULTS = "Results";
 
         protected FindResults resultsPanel = null;
@@ -515,7 +517,10 @@ public class FindPanel extends JPanel
             // Add search-by-name panel
             addTab(TAB_NAME, new FindByName());
 
-            // TODO add panels here 
+            // Add search-by-type panel
+            addTab(TAB_TYPE, new FindByType());
+
+            // TODO add panels here...
 
             // Add results panel
             resultsScroller = new JScrollPane(resultsPanel = new FindResults());
@@ -801,6 +806,167 @@ class FindByName extends JPanel implements FindFilterFactory {
                 return true;
 
             String name = ((Record)candidate).getName();
+
+            if (howToMatch == NAME_CONTAINS_INDEX)
+            {
+                if (ignoreCase)
+                {
+                    if (name.toLowerCase().indexOf(match.toLowerCase()) >= 0)
+                        return true;
+                    else
+                        return false;
+                } else
+                {
+                    if (name.indexOf(match) >= 0)
+                        return true;
+                    else
+                        return false;
+                }
+            } else if (howToMatch == NAME_IS_INDEX)
+            {
+                if (ignoreCase)
+                {
+                    if (name.equalsIgnoreCase(match))
+                        return true;
+                    else
+                        return false;
+                } else
+                {
+                    if (name.equals(match))
+                        return true;
+                    else
+                        return false;
+                }
+            } else if (howToMatch == NAME_STARTS_WITH_INDEX)
+            {
+                if (ignoreCase)
+                {
+                    if (name.toLowerCase().startsWith(match.toLowerCase()))
+                        return true;
+                    else
+                        return false;
+                } else
+                {
+                    if (name.startsWith(match))
+                        return true;
+                    else
+                        return false;
+                }
+            } else if (howToMatch == NAME_ENDS_WITH_INDEX)
+            {
+                if (ignoreCase)
+                {
+                    if (name.toLowerCase().endsWith(match.toLowerCase()))
+                        return true;
+                    else
+                        return false;
+                } else
+                {
+                    if (name.endsWith(match))
+                        return true;
+                    else
+                        return false;
+                }
+            }
+
+            return true;
+        }
+    }
+
+}
+
+/**
+ * Implements user interface and generates FindFilter for selecting files by
+ * type.
+ */
+class FindByType extends JPanel implements FindFilterFactory {
+    protected String NAME_CONTAINS = "contains";
+
+    protected String NAME_IS = "is";
+
+    protected String NAME_STARTS_WITH = "starts with";
+
+    protected String NAME_ENDS_WITH = "ends with";
+
+    protected int NAME_CONTAINS_INDEX = 0;
+
+    protected int NAME_IS_INDEX = 1;
+
+    protected int NAME_STARTS_WITH_INDEX = 2;
+
+    protected int NAME_ENDS_WITH_INDEX = 3;
+
+    protected String[] criteria = { NAME_CONTAINS, NAME_IS, NAME_STARTS_WITH,
+            NAME_ENDS_WITH };
+
+    protected JTextField nameField = null;
+
+    protected JComboBox combo = null;
+
+    protected JCheckBox ignoreCaseCheck = null;
+
+    FindByType() {
+        super();
+        setLayout(new BorderLayout());
+
+        // Grid Layout
+        JPanel p = new JPanel();
+        p.setLayout(new GridLayout(0, 2, 2, 2));
+
+        // Name
+        combo = new JComboBox(criteria);
+        //combo.setFont(new Font("Helvetica", Font.PLAIN, 10));
+        combo.setPreferredSize(combo.getPreferredSize());
+        p.add(combo);
+
+        nameField = new JTextField(12);
+        //nameField.setFont(new Font("Helvetica", Font.PLAIN, 10));
+        p.add(nameField);
+
+        // ignore case
+        p.add(new JLabel("", SwingConstants.RIGHT));
+
+        ignoreCaseCheck = new JCheckBox("ignore case", true);
+        ignoreCaseCheck.setForeground(Color.black);
+        //ignoreCaseCheck.setFont(new Font("Helvetica", Font.PLAIN, 10));
+        p.add(ignoreCaseCheck);
+
+        add(p, BorderLayout.NORTH);
+    }
+
+    public FindFilter createFindFilter()
+    {
+        return new TypeFilter(nameField.getText(), combo.getSelectedIndex(),
+                ignoreCaseCheck.isSelected());
+    }
+
+    /**
+     * Filter object for selecting files by name.
+     */
+    class TypeFilter implements FindFilter {
+        protected String match = null;
+
+        protected int howToMatch = -1;
+
+        protected boolean ignoreCase = true;
+
+        TypeFilter(String name, int how, boolean ignore) {
+            match = name;
+            howToMatch = how;
+            ignoreCase = ignore;
+        }
+
+        public boolean accept(Object candidate, FindProgressCallback callback)
+        {
+            if (!(candidate instanceof Record))
+                return false;
+
+            if ((match == null) || (match.length() == 0))
+                return true;
+            if (howToMatch < 0)
+                return true;
+
+            String name = ((Record)candidate).getType();
 
             if (howToMatch == NAME_CONTAINS_INDEX)
             {
