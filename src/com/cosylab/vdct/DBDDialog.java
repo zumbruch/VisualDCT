@@ -263,9 +263,8 @@ public DBDDialog(java.awt.Frame owner, boolean modal) {
  * Comment
  */
 public void addDBDButton_ActionPerformed(java.awt.event.ActionEvent actionEvent) {
-	ComboBoxFileChooser chooserDialog = ((VisualDCT)getParent()).getComboBoxFileChooser();
+	ComboBoxFileChooser chooser = ((VisualDCT)getParent()).getComboBoxFileChooser();
 	//JFileChooser chooser = ((VisualDCT)getParent()).getfileChooser();
-	JFileChooser chooser = chooserDialog.getJFileChooser();
 	UniversalFileFilter filter = new UniversalFileFilter(
 		new String("dbd"), "DBD File");
 	chooser.resetChoosableFileFilters();
@@ -273,12 +272,12 @@ public void addDBDButton_ActionPerformed(java.awt.event.ActionEvent actionEvent)
 	chooser.setDialogTitle("Import DBD");
 	chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 	chooser.setDialogType(JFileChooser.OPEN_DIALOG);
-	int retval = chooserDialog.showDialog(); //showOpenDialog(this);
+	int retval = chooser.showOpenDialog(this);
 
-	if(retval != JFileChooser.CANCEL_OPTION) {
+	if(retval == JFileChooser.APPROVE_OPTION) {
 	    java.io.File theFile = chooser.getSelectedFile();
 	    if(theFile != null) {
-	    	if (chooserDialog.getJCheckBoxAbsoluteDBD().isSelected()) {
+	    	if (chooser.getJCheckBoxAbsoluteDBD().isSelected()) {
 	    		theFile = theFile.getAbsoluteFile(); 			
 	    	} else {
 	    		if (VisualDCT.getInstance().getOpenedFile()==null)

@@ -6942,7 +6942,7 @@ public void setDefaultDirectory(String dir) {
 	if (directory.exists() && directory.isDirectory()) {
 		Settings.setDefaultDir(directory.toString());
 		getfileChooser().setCurrentDirectory(directory);
-		getComboBoxFileChooser().getJFileChooser().setCurrentDirectory(directory);
+		getComboBoxFileChooser().setCurrentDirectory(directory);
 	}
 }
 /**
@@ -7264,7 +7264,7 @@ public void updateLoadLabel() {
 	 */
 	public ComboBoxFileChooser getComboBoxFileChooser() {
 		if (comboBoxFileChooser == null) 
-			comboBoxFileChooser = new ComboBoxFileChooser(this, true);
+			comboBoxFileChooser = new ComboBoxFileChooser();
 		return comboBoxFileChooser;
 	}
 
