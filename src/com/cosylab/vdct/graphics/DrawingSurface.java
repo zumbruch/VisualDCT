@@ -2282,15 +2282,19 @@ private void redraw(Graphics g) {
 		canvasGraphics.fillRect(origX, 0, width, origY);
 	}
 		
-	if ((view.getRx()+view.getViewWidth())>(int)(view.getScale()*view.getWidth()))
+	int reachX = view.getRx()+view.getViewWidth()+origX;
+	int wX = (int)(view.getScale()*view.getWidth());
+	if (reachX>wX)
 	{
-		w += (int)(view.getScale()*view.getWidth()) - view.getRx() - view.getViewWidth();
+		w += wX - reachX;
 		canvasGraphics.fillRect(w, origY, width, height);
 	}
-	
-	if ((view.getRy()+view.getViewHeight())>(int)(view.getScale()*view.getHeight()))
+
+	int reachY = view.getRy()+view.getViewHeight()+origY;
+	int hY = (int)(view.getScale()*view.getHeight());	
+	if (reachY>hY)
 	{
-		h += (int)(view.getScale()*view.getHeight()) - view.getRy() - view.getViewHeight();
+		h += hY - reachY;
 		canvasGraphics.fillRect(origX, h, width, height);
 	}
 
@@ -2310,10 +2314,8 @@ private void redraw(Graphics g) {
 		if (view.getRy()>0)
 			y0 += (view.getGridSize() - view.getRy()) % gridSize;
 			
-//		int xsteps = view.getViewWidth() / gridSize + 1;
-//		int ysteps = view.getViewHeight() / gridSize + 1;
-		int xsteps = (w-origX+1) / gridSize + 1;
-		int ysteps = (h-origY+1) / gridSize + 1;
+		int xsteps = (w+1) / gridSize + 1;
+		int ysteps = (h+1) / gridSize + 1;
 
 		if (gridSize >= 15)
 		// crosses
