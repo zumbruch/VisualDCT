@@ -132,12 +132,14 @@ public boolean consistencyCheck(com.cosylab.vdct.db.DBData db) {
 						dev = dbRecord.getRecord_type()+"/"+dbField.getValue();
 						if (dbField.getValue().indexOf("$")!=-1) {
 								console.println();
-								console.print("\t Warning: Value '"+dbField.getValue()+"' is not valid device -> template definition?...");
+								console.print("\tWarning: Record '"+dbRecord.getName()+"', field '"+dbField.getName()+"':");
+								console.print(" Value '"+dbField.getValue()+"' is not valid device -> template definition?...");
 								dbField.setTemplate_def(true);
 						}
 						else if (this.getDBDDeviceData(dev) == null) {
 							console.println();
-							console.print("\t Warning: Device '"+dev+"' is not defined DBD file. Using defaults...");
+							console.print("\tWarning: Record type '"+dbRecord.getRecord_type()+"', field '"+dbdField.getName()+"':");
+							console.print(" Device '"+dev+"' is not defined DBD file. Using defaults...");
 
 						    illegalString="# field("+dbField.getName()+",\""+dbField.getValue()+"\")";
 							if (dbField.getComment()!=null)	illegalString=dbField.getComment()+"\n"+illegalString;
@@ -152,7 +154,8 @@ public boolean consistencyCheck(com.cosylab.vdct.db.DBData db) {
 						if (menu==null) {
 							isOK = false;
 							console.println();
-							console.print("\t Menu '"+dbdField.getMenu_name()+"' is not defined DBD file (DBD file error)...");
+							console.print("\tRecord type '"+dbRecord.getRecord_type()+"', field '"+dbdField.getName()+"':");
+							console.print(" Menu '"+dbdField.getMenu_name()+"' is not defined DBD file (DBD file error)...");
 						}
 						else {
 							if (!menu.containsValue(dbField.getValue())) {
@@ -165,7 +168,8 @@ public boolean consistencyCheck(com.cosylab.vdct.db.DBData db) {
 							
 								dbField.setValue("");*/
 								
-								console.print("\t Warning: Value '"+dbField.getValue()+"' is not valid for menu '"+dbdField.getMenu_name()+" -> template definition?...");
+								console.print("\tWarning: Record '"+dbRecord.getName()+"', field '"+dbField.getName()+"':");			
+								console.print(" Value '"+dbField.getValue()+"' is not valid for menu '"+dbdField.getMenu_name()+" -> template definition?...");
 								dbField.setTemplate_def(true);
 								
 							}
@@ -177,7 +181,8 @@ public boolean consistencyCheck(com.cosylab.vdct.db.DBData db) {
 				else {
 					isOK=false;
 					console.println();
-					console.print("\t Field '"+dbField.getName()+"' in record '"+dbRecord.getRecord_type()+"' is not defined in DBD file.");
+					console.print("\tRecord '"+dbRecord.getName()+"':");
+					console.print(" Field '"+dbField.getName()+"' in record type '"+dbRecord.getRecord_type()+"' is not defined in DBD file.");
 					
 					illegalString="# illegal line - undefined field: field("+dbField.getName()+",\""+dbField.getValue()+"\")";
 					if (dbRecord.getComment()!=null) illegalString=dbRecord.getComment()+"\n"+illegalString;
@@ -188,12 +193,15 @@ public boolean consistencyCheck(com.cosylab.vdct.db.DBData db) {
 		else {
 			isOK=false;
 			console.println();
-			console.print("\t Record type '"+dbRecord.getRecord_type()+"' is not defined in DBD file.");
+			console.print("\tRecord '"+dbRecord.getName()+"':");
+			console.print(" Record type '"+dbRecord.getRecord_type()+"' is not defined in DBD file.");
 		}
 	}
 
-	if (isOK) console.print(" OK");
-	else {
+	if (isOK) {
+		console.println();
+		console.print("\tOK");
+	} else {
 		console.println();
 		console.print("o) DB file is not consistent with DBD file!");
 	}
