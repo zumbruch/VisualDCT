@@ -2354,7 +2354,7 @@ private javax.swing.JMenuItem getImport_DBDMenuItem() {
 		try {
 			ivjImport_DBDMenuItem = new javax.swing.JMenuItem();
 			ivjImport_DBDMenuItem.setName("Import_DBDMenuItem");
-			ivjImport_DBDMenuItem.setText("Import DBD");
+			ivjImport_DBDMenuItem.setText("Import DBD...");
 			// user code begin {1}
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {

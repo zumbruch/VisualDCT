@@ -90,7 +90,7 @@ protected void draw(Graphics g, boolean hilited) {
 			g.setFont(font2);
 			rry += realHalfHeight;
 			if (rightSide)
-				rrx += rtailLen-2*labelLen+realLabelLen;
+				rrx += (labelLen-realLabelLen)/2+arrowLength/2;
 			else
 				rrx += arrowLength-rtailLen+labelLen-realLabelLen;
 			g.drawString(label2, rrx, rry);

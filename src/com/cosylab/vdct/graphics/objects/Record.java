@@ -40,6 +40,7 @@ import com.cosylab.vdct.inspector.*;
 import com.cosylab.vdct.graphics.popup.*;
 import javax.swing.*;
 import java.awt.event.*;
+
 import com.cosylab.vdct.events.*;
 import com.cosylab.vdct.events.commands.*;
 
@@ -366,20 +367,21 @@ protected void draw(Graphics g, boolean hilited) {
 
 			// draw link and its tail
 			boolean isRightSide = isRight();
-			int r = (int) (Constants.LINK_RADIOUS * getRscale());
-			int cy = rry + rheight / 2;
+			int r = (int)(Constants.LINK_RADIOUS * getRscale());
+			int cy = (int)(getRscale()*getInY()- view.getRy());
+			int ccx = (int)(getRscale()*getInX()- view.getRx());
 
 			int cx;
 			if (isRightSide) {
 				cx = rrx + rwidth + r;
 				g.drawOval(cx - r, cy - r, 2 * r, 2 * r);
 				g.setColor(linkColor);
-				g.drawLine(cx + 2 * r, cy, cx + (2 + tailSizeOfR) * r, cy);
+				g.drawLine(cx + 2 * r, cy, ccx, cy);
 			} else {
 				cx = rrx - r;
 				g.drawOval(cx - r, cy - r, 2 * r, 2 * r);
 				g.setColor(linkColor);
-				g.drawLine(cx - (2 + tailSizeOfR) * r, cy, cx - 2 * r, cy);
+				g.drawLine(ccx, cy, cx - 2 * r, cy);
 			}
 
 			// !!! more intergroup inlinks?!
@@ -393,6 +395,7 @@ protected void draw(Graphics g, boolean hilited) {
 	}
 
 	paintSubObjects(g, hilited);
+
 }
 /**
  * Insert the method's description here.

@@ -293,11 +293,6 @@ public boolean isDestroyed() {
 }
 /**
  * Insert the method's description here.
- * Creation date: (25.4.2001 18:32:14)
- */
-public void newMethod() {}
-/**
- * Insert the method's description here.
  * Creation date: (19.12.2000 21:33:47)
  * @param g java.awt.Graphics
  * @param hilited boolean

@@ -172,6 +172,7 @@ protected void validate() {
 	  setRlabelX((rwidth-fm.stringWidth(getLabel()))/2);
  	  setRlabelY((rheight-fm.getHeight())/2+fm.getAscent());
   }
+  
   setFont(font);
 
 }
