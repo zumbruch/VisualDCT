@@ -1458,15 +1458,34 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 /**
  * Insert the method's description here.
  */
-private static void writeUsedDBDs(DataOutputStream stream) throws IOException
+private static void writeUsedDBDs(File dbFile, DataOutputStream stream) throws IOException
 {
 	 // write used DBDs
+	 //String dbFilePath = dbFile.getAbsolutePath().replace('\\', '/');
 	 stream.writeBytes(DBResolver.DBD_START);
 	 Enumeration edbd = DataProvider.getInstance().getDBDs().elements();
 	 while (edbd.hasMoreElements())
 	 {
 	 		String file = ((File)edbd.nextElement()).getAbsolutePath();
 	 		file = file.replace('\\', '/');
+/*
+	 		// make it relative to DB
+	 		int common = 0;
+	 		int pos = file.indexOf('/');
+	 		while (pos!=-1)
+		 		if (file.regionMatches(0, dbFilePath, 0, pos))
+		 		{
+		 			common = pos;
+		 			pos = file.indexOf('/', pos+1);
+		 		}
+		 		else
+		 			break;
+
+			// do not remove first slash
+	 		if (common>0) common++;
+	 		file = file.substring(common);	
+*/
+	 		// replace back-slash separator
 			stream.writeBytes(DBResolver.DBD_ENTRY+file+"\")\n");
 	 }
 	 stream.writeBytes(DBResolver.DBD_END);
@@ -1586,7 +1605,7 @@ public static void save(Group group2save, File file, NameManipulator namer, bool
 	
 	if (!export)	
 	{
-		writeUsedDBDs(stream);
+		writeUsedDBDs(file, stream);
 	}
 	
 	writeIncludes(stream);

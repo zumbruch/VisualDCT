@@ -247,7 +247,7 @@ public static VDBData generateVDBData(DBDData dbd, DBData db) {
  * @param dbd com.cosylab.vdct.dbd.DBDData
  * @param db com.cosylab.vdct.db.DBData
  */
-private static VDBData generateVDBDataInternal(DBDData dbd, DBData db) {
+private static VDBData generateVDBDataInternal(DBDData dbd, DBData db) throws DBException {
 	
 	VDBData vdb = new VDBData();
 
@@ -288,7 +288,7 @@ private static VDBData generateVDBDataInternal(DBDData dbd, DBData db) {
 /**
  * 
  */
-private static void generateRecords(DBDData dbd, DBData db, VDBData vdb)
+private static void generateRecords(DBDData dbd, DBData db, VDBData vdb) throws DBException
 {
 	// add records
 	DBRecordData dbRecord;
@@ -603,7 +603,7 @@ public static VDBFieldData generateVDBFieldData(DBDData dbd, DBRecordData dbReco
  * @param dbd com.cosylab.vdct.dbd.DBDData
  * @param dbRecord com.cosylab.vdct.db.DBRecordData
  */
-public static VDBRecordData generateVDBRecordData(DBDData dbd, DBRecordData dbRecord) {
+public static VDBRecordData generateVDBRecordData(DBDData dbd, DBRecordData dbRecord) throws DBException {
 
 	DBDRecordData dbdRecord = dbd.getDBDRecordData(dbRecord.getRecord_type());
 	if (dbdRecord==null) {
@@ -624,6 +624,8 @@ public static VDBRecordData generateVDBRecordData(DBDData dbd, DBRecordData dbRe
 	while (e.hasMoreElements()) {
 		dbField = (DBFieldData)(e.nextElement());
 		dbdField = (DBDFieldData)(dbdRecord.getFields().get(dbField.getName()));
+		if (dbdField==null)
+			throw new DBException("DBD inconsistency detected! Field '"+dbdRecord.getName()+"."+dbField.getName()+"' is not defined in DBD.");
 		vdbRecord.addField(generateVDBFieldData(dbd, dbRecord, vdbRecord, dbdField));
 	}
 

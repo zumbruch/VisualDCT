@@ -422,9 +422,6 @@ private void drawDashedBorder(Graphics g, boolean hilited,
 		
 	double scale = view.getScale();
 	
-	int rw = (int)(Constants.CONNECTOR_WIDTH * scale / 2);
-	int rh = (int)(Constants.CONNECTOR_HEIGHT * scale / 2);
-	
 	int posX2 = posX + rwidth;
 	int posY2 = posY + rheight;
 	
@@ -520,9 +517,9 @@ public int getX()
 {
 	int posX = super.getX();
 	if(Settings.getInstance().getSnapToGrid())
-		return posX  - posX % Constants.GRID_SIZE;
-		
-	return posX;
+		return posX - posX % Constants.GRID_SIZE;
+	else	
+		return posX;
 }
 
 public int getY()
@@ -530,8 +527,8 @@ public int getY()
 	int posY = super.getY();
 	if(Settings.getInstance().getSnapToGrid())
 		return posY - posY % Constants.GRID_SIZE;
-		
-	return posY;
+	else	
+		return posY;
 }
 
 public boolean move(int dx, int dy)
@@ -621,8 +618,8 @@ public void revalidatePosition()
 	int posX2 = endVertex.getX();
 	int posY2 = endVertex.getY();
 
-	setX(Math.min(posX, posX2) + Constants.CONNECTOR_WIDTH / 2);
-	setY(Math.min(posY, posY2) + Constants.CONNECTOR_HEIGHT / 2);
+	setX(Math.min(posX, posX2));
+	setY(Math.min(posY, posY2));
 	setWidth(Math.abs(posX2 - posX));
 	setHeight(Math.abs(posY2 - posY));
 

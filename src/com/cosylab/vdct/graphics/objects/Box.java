@@ -210,14 +210,11 @@ protected void draw(Graphics g, boolean hilited)
 
 	double scale = view.getScale();
 	
-	int rw = (int)(Constants.CONNECTOR_WIDTH * scale / 2);
-	int rh = (int)(Constants.CONNECTOR_HEIGHT * scale / 2);
+	posX = startVertex.getRx() - offsetX;
+	posY = startVertex.getRy() - offsetY;
 		
-	posX = startVertex.getRx() + rw - offsetX;
-	posY = startVertex.getRy() + rh - offsetY;
-		
-	int posX2 = endVertex.getRx() + rw - offsetX;
-	int posY2 = endVertex.getRy() + rh - offsetY;
+	int posX2 = endVertex.getRx() - offsetX;
+	int posY2 = endVertex.getRy() - offsetY;
 
 	int t;
 	if(posX > posX2)
@@ -319,20 +316,18 @@ public int getX()
 {
 	int posX = super.getX();
 	if(Settings.getInstance().getSnapToGrid())
-		return (posX + Constants.CONNECTOR_WIDTH / 2) - (posX + Constants.CONNECTOR_WIDTH / 2)
-			% Constants.GRID_SIZE - Constants.CONNECTOR_WIDTH / 2;
-		
-	return posX;
+		return posX - posX % Constants.GRID_SIZE;
+	else	
+		return posX;
 }
 
 public int getY()
 {
 	int posY = super.getY();
 	if(Settings.getInstance().getSnapToGrid())
-		return (posY + Constants.CONNECTOR_HEIGHT / 2) - (posY + Constants.CONNECTOR_HEIGHT / 2)
-			% Constants.GRID_SIZE - Constants.CONNECTOR_HEIGHT / 2;
-		
-	return posY;
+		return posY - posY % Constants.GRID_SIZE;
+	else	
+		return posY;
 }
 
 public boolean move(int dx, int dy)

@@ -43,7 +43,6 @@ import java.awt.event.*;
  * @author Matej Sekoranja
  */
 public class Connector extends VisibleObject implements Descriptable, InLink, Movable, OutLink, Popupable {
-
 	private static final String modeString = "Mode";
 	private static final String normalString = "Normal";
 	private static final String invisibleString = "Invisible";
@@ -231,10 +230,10 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 	
 	ViewState view = ViewState.getInstance();
 
-	int rrx = getRx()-view.getRx();
-	int rry = getRy()-view.getRy();
 	int rwidth = getRwidth();
 	int rheight = getRheight();
+	int rrx = getRx()-view.getRx()-rwidth/2;	// position is center
+	int rry = getRy()-view.getRy()-rheight/2;
 		
 	// clipping
 	if ((!(rrx>view.getViewWidth()) || (rry>view.getViewHeight())
@@ -325,7 +324,7 @@ public InLink getInput() {
  * @return int
  */
 public int getInX() {
-	return getX()+getWidth()/2;
+	return getX();
 }
 /**
  * Insert the method's description here.
@@ -333,7 +332,7 @@ public int getInX() {
  * @return int
  */
 public int getInY() {
-	return getY()+getHeight()/2;
+	return getY();
 }
 /**
  * Insert the method's description here.
@@ -411,7 +410,7 @@ public OutLink getOutput() {
  * @return int
  */
 public int getOutX() {
-	return getX()+getWidth()/2;
+	return getX();
 }
 /**
  * Insert the method's description here.
@@ -419,7 +418,7 @@ public int getOutX() {
  * @return int
  */
 public int getOutY() {
-	return getY()+getHeight()/2;
+	return getY();
 }
 /**
  * Insert the method's description here.
@@ -440,7 +439,7 @@ public int getQueueCount() {
 public int getX() {
 	int posX = super.getX();
 	if (com.cosylab.vdct.Settings.getInstance().getSnapToGrid())
-		return posX - posX % Constants.GRID_SIZE - Constants.CONNECTOR_WIDTH / 2;
+		return posX - posX % Constants.GRID_SIZE;
 	else
 		return posX;
 }
@@ -452,7 +451,7 @@ public int getX() {
 public int getY() {
 	int posY = super.getY();
 	if (com.cosylab.vdct.Settings.getInstance().getSnapToGrid())
-		return posY - posY % Constants.GRID_SIZE - Constants.CONNECTOR_HEIGHT / 2;
+		return posY - posY % Constants.GRID_SIZE;
 	else
 		return posY;
 }
@@ -580,5 +579,47 @@ public void setMode(int mode)
 {
 	this.mode = mode;
 }
+
+/**
+ * Default impmlementation for square (must be rescaled)
+ * Creation date: (19.12.2000 20:20:20)
+ * @return com.cosylab.visible.objects.VisibleObject
+ * @param px int
+ * @param py int
+ */
+public VisibleObject intersects(int px, int py) {
+	int rwidth = getRwidth();
+	int rheight = getRheight();
+	int rx = getRx()-rwidth/2;	// position is center
+	int ry = getRy()-rheight/2;
+	if ((rx<=px) && (ry<=py) && 
+			((rx+rwidth)>=px) && 
+			((ry+rheight)>=py)) return this;
+	else return null;
+}
+
+	/**
+ * Default impmlementation for square (must be rescaled)
+ * p1 is upper-left point
+ * Creation date: (19.12.2000 20:20:20)
+ * @return com.cosylab.visible.objects.VisibleObject
+ * @param p1x int
+ * @param p1y int
+ * @param p2x int
+ * @param p2y int
+ */
+
+public VisibleObject intersects(int p1x, int p1y, int p2x, int p2y) {
+	int rwidth = getRwidth();
+	int rheight = getRheight();
+	int rx = getRx()-rwidth/2;	// position is center
+	int ry = getRy()-rheight/2;
+	if ((rx>=p1x) && (ry>=p1y) && 
+			((rx+rwidth)<=p2x) && 
+			((ry+rheight)<=p2y)) return this;
+	else return null;
+}
+
+
 
 }

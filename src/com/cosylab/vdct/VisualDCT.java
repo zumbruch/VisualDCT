@@ -5474,7 +5474,7 @@ public void openMenuItem_ActionPerformed() {
 		    try {
 				cmd.getGUIMenuInterface().openDB(theFile);
 			    openedFile = theFile;
-			} catch (java.io.IOException e) {
+			} catch (IOException e) {
 		 		Console.getInstance().println("o) Failed to open DB: '"+theFile.toString()+"'");
 			    Console.getInstance().println(e);
 			}

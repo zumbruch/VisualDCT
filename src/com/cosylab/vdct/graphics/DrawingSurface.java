@@ -917,11 +917,11 @@ public void mouseDragged(MouseEvent e) {
 			
 			case OBJECT_MOVE : {
 //System.out.println("Dragged: OBJECT_MOVE");
-				int dx = px-draggedX;
-				int dy = py-draggedY;
+				int rdx = px-draggedX;
+				int rdy = py-draggedY;
 				
-				dx = (int)(dx/view.getScale()); 
-				dy = (int)(dy/view.getScale());
+				int dx = (int)(rdx/view.getScale()); 
+				int dy = (int)(rdy/view.getScale());
 
 				Movable hilitedObject = (Movable)view.getHilitedObject();
 				
@@ -929,14 +929,16 @@ public void mouseDragged(MouseEvent e) {
 					if (moveSelection(dx, dy)) {			// move selection
 						blockNavigatorRedrawOnce = true;	/// !!! performance
 						repaint();
-						draggedX=px; draggedY=py;
+						if (dx!=0) draggedX=px-(int)(rdx-dx*view.getScale());
+						if (dy!=0) draggedY=py-(int)(rdy-dy*view.getScale());
 					}
 				}
 				else if (hilitedObject.move(dx, dy)) {
 					alsoDrawHilitedOnce = true;
 					blockNavigatorRedrawOnce = true;	/// !!! performance
 					repaint();
-					draggedX=px; draggedY=py;
+					if (dx!=0) draggedX=px-(int)(rdx-dx*view.getScale());
+					if (dy!=0) draggedY=py-(int)(rdy-dy*view.getScale());
 				}
 				break; }
 				
@@ -1027,22 +1029,22 @@ public void mouseMoved(MouseEvent e)
 
 	if(grLine != null)
 	{
-		grLine.getEndVertex().setX((int)((cx + view.getRx()) / scale - Constants.CONNECTOR_WIDTH / 2));
-		grLine.getEndVertex().setY((int)((cy + view.getRy()) / scale - Constants.CONNECTOR_HEIGHT / 2));
+		grLine.getEndVertex().setX((int)((cx + view.getRx()) / scale));
+		grLine.getEndVertex().setY((int)((cy + view.getRy()) / scale));
 		
 		repaint();
 	}
 	else if(grBox != null)
 	{
-		grBox.getEndVertex().setX((int)((cx + view.getRx()) / scale - Constants.CONNECTOR_WIDTH / 2));
-		grBox.getEndVertex().setY((int)((cy + view.getRy()) / scale - Constants.CONNECTOR_HEIGHT / 2));
+		grBox.getEndVertex().setX((int)((cx + view.getRx()) / scale));
+		grBox.getEndVertex().setY((int)((cy + view.getRy()) / scale));
 		
 		repaint();
 	}
 	else if(grTextBox != null)
 	{
-		grTextBox.getEndVertex().setX((int)((cx + view.getRx()) / scale - Constants.CONNECTOR_WIDTH / 2));
-		grTextBox.getEndVertex().setY((int)((cy + view.getRy()) / scale - Constants.CONNECTOR_HEIGHT / 2));
+		grTextBox.getEndVertex().setX((int)((cx + view.getRx()) / scale));
+		grTextBox.getEndVertex().setY((int)((cy + view.getRy()) / scale));
 		
 		repaint();
 	}
@@ -2381,8 +2383,14 @@ private void redraw(Graphics g) {
 
 		canvasGraphics.setColor(Constants.GRID_COLOR);
 		int gridSize = view.getGridSize();
-		int sx = origX + (view.getGridSize() - view.getRx()) % gridSize;
-		int y0 = origY + (view.getGridSize() - view.getRy()) % gridSize;
+		int sx = origX;
+		if (view.getRx()>0)
+			sx += (view.getGridSize() - view.getRx()) % gridSize;
+			
+		int y0 = origY;
+		if (view.getRy()>0)
+			y0 += (view.getGridSize() - view.getRy()) % gridSize;
+			
 //		int xsteps = view.getViewWidth() / gridSize + 1;
 //		int ysteps = view.getViewHeight() / gridSize + 1;
 		int xsteps = (w-origX+1) / gridSize + 1;
@@ -2871,6 +2879,9 @@ public Stack getTemplateStack()
  */
 public boolean reloadTemplate(VDBTemplate data)
 {
+	if (data==null)
+		return true;
+	
 	// remove from template repository
 	VDBData.removeTemplate(data);
 

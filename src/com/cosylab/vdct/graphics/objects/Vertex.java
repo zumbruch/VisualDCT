@@ -57,8 +57,8 @@ public Vertex(VisibleObject owner, int parX, int parY)
 	
 	ViewState view = ViewState.getInstance();
 
-	setX(parX - Constants.CONNECTOR_WIDTH / 2);
-	setY(parY - Constants.CONNECTOR_HEIGHT / 2);
+	setX(parX);
+	setY(parY);
 	setWidth(Constants.CONNECTOR_WIDTH);
 	setHeight(Constants.CONNECTOR_HEIGHT);
 
@@ -92,10 +92,10 @@ protected void draw(Graphics g, boolean hilited)
 	int offsetX = view.getRx();
 	int offsetY = view.getRy();
 	
-	int posX = getRx() - offsetX;
-	int posY = getRy() - offsetY;
 	int rwidth = getRwidth();
 	int rheight = getRheight();
+	int posX = getRx() - offsetX - rwidth/2;
+	int posY = getRy() - offsetY - rheight/2;
 
 	if((hilited) && (!((posX > view.getViewWidth()) || (posY > view.getViewHeight())
 		|| ((posX + rwidth) < 0) || ((posY + rheight) < 0))))
@@ -132,20 +132,18 @@ public int getX()
 {
 	int posX = super.getX();
 	if(Settings.getInstance().getSnapToGrid())
-		return (posX + Constants.CONNECTOR_WIDTH / 2) - (posX + Constants.CONNECTOR_WIDTH / 2)
-			% Constants.GRID_SIZE - Constants.CONNECTOR_WIDTH / 2;
-		
-	return posX;
+		return posX - posX % Constants.GRID_SIZE;
+	else	
+		return posX;
 }
 
 public int getY()
 {
 	int posY = super.getY();
 	if(Settings.getInstance().getSnapToGrid())
-		return (posY + Constants.CONNECTOR_HEIGHT / 2) - (posY + Constants.CONNECTOR_HEIGHT / 2)
-			% Constants.GRID_SIZE - Constants.CONNECTOR_HEIGHT / 2;
-		
-	return posY;
+		return posY - posY % Constants.GRID_SIZE;
+	else		
+		return posY;
 }
 
 public boolean move(int dx, int dy)
@@ -204,6 +202,46 @@ protected void validate()
 public boolean isHilited()
 {
 	return hilited;
+}
+
+/**
+ * Default impmlementation for square (must be rescaled)
+ * Creation date: (19.12.2000 20:20:20)
+ * @return com.cosylab.visible.objects.VisibleObject
+ * @param px int
+ * @param py int
+ */
+public VisibleObject intersects(int px, int py) {
+	int rwidth = getRwidth();
+	int rheight = getRheight();
+	int rx = getRx()-rwidth/2;	// position is center
+	int ry = getRy()-rheight/2;
+	if ((rx<=px) && (ry<=py) && 
+			((rx+rwidth)>=px) && 
+			((ry+rheight)>=py)) return this;
+	else return null;
+}
+
+	/**
+ * Default impmlementation for square (must be rescaled)
+ * p1 is upper-left point
+ * Creation date: (19.12.2000 20:20:20)
+ * @return com.cosylab.visible.objects.VisibleObject
+ * @param p1x int
+ * @param p1y int
+ * @param p2x int
+ * @param p2y int
+ */
+
+public VisibleObject intersects(int p1x, int p1y, int p2x, int p2y) {
+	int rwidth = getRwidth();
+	int rheight = getRheight();
+	int rx = getRx()-rwidth/2;	// position is center
+	int ry = getRy()-rheight/2;
+	if ((rx>=p1x) && (ry>=p1y) && 
+			((rx+rwidth)<=p2x) && 
+			((ry+rheight)<=p2y)) return this;
+	else return null;
 }
 
 }
