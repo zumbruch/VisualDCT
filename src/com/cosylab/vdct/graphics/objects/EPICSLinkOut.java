@@ -34,6 +34,9 @@ import com.cosylab.vdct.Constants;
 
 import javax.swing.*;
 import java.awt.event.*;
+
+import com.cosylab.vdct.undo.CreateConnectorAction;
+import com.cosylab.vdct.undo.UndoManager;
 import com.cosylab.vdct.vdb.*;
 import com.cosylab.vdct.graphics.*;
 import com.cosylab.vdct.inspector.*;
@@ -114,8 +117,12 @@ protected EPICSLinkOut(ContainerObject parent, VDBFieldData fieldData) {
  */
 public Connector addConnector() {
 	String id = generateConnectorID(this);
+	String inlinkStr = "";
+	String outlinkStr = getID();
+	if (inlink!=null) inlinkStr = inlink.getID();
 	Connector connector = new Connector(id, (LinkManagerObject)getParent(), this, getInput());
 	getParent().addSubObject(id, connector);
+	UndoManager.getInstance().addAction(new CreateConnectorAction(connector, inlinkStr, outlinkStr));
 	return connector;
 }
 /**

@@ -336,11 +336,9 @@ public void delete() {
 		{
 			obj = (VisibleObject)selected.nextElement();
 
-			// ugly code!!!
 			if (obj instanceof Connector)
 			{
 				((Connector)obj).bypass();
-				//!!! bypass undo action
 			}
 			else
 			{
@@ -631,17 +629,18 @@ public void morph() {
 public void morph(java.lang.String name, java.lang.String newType) {
 	ViewState view = ViewState.getInstance();
 	Object oldObject = Group.getRoot().findObject(name, true);
-	if (oldObject instanceof Morphable)
+	if (oldObject instanceof Record)
 	{
 		try {
 			UndoManager.getInstance().startMacroAction();
 		
-			Morphable morphable = (Morphable)oldObject;
-			String oldType = morphable.getType();
+			Record record = (Record)oldObject;
 			
-			if (morphable.morph(newType))
+			VDBRecordData oldRecordData = record.getRecordData();
+			
+			if (record.morph(newType))
 			{	
-				UndoManager.getInstance().addAction(new MorphAction(morphable, oldType, newType));
+				UndoManager.getInstance().addAction(new MorphAction(record, oldRecordData, record.getRecordData()));
 			
 				view.deselectObject((VisibleObject)oldObject);
 				drawingSurface.repaint();

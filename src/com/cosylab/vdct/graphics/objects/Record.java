@@ -1102,26 +1102,36 @@ public boolean morph(java.lang.String newType) {
 		return false;
 	}					   
 	
-	this.recordData = recordData;
+	setRecordData(recordData);
+		
+	return true;
+}
+
+public void setRecordData(VDBRecordData recordData) {
+		this.recordData = recordData;
 	
-	//	fix object links
-	Object[] objs = new Object[subObjectsV.size()];
-	subObjectsV.copyInto(objs);
-	for (int i=0; i < objs.length; i++) {
-		if (objs[i] instanceof Field)	{
-			Field field = (Field)objs[i];
-			VDBFieldData fieldData = field.getFieldData();
-			VDBFieldData newFieldData = recordData.getField(fieldData.getName());
-			if (newFieldData!=null) {
-				field.fieldData=newFieldData;
-			} else {
-				removeLink((Linkable)field);	
-				field.destroy();	// this also adds an undo action (FieldValueChanged)
+		//	fix object links
+		Object[] objs = new Object[subObjectsV.size()];
+		subObjectsV.copyInto(objs);
+		for (int i=0; i < objs.length; i++) {
+			if (objs[i] instanceof Field)	{
+				Field field = (Field)objs[i];
+				VDBFieldData fieldData = field.getFieldData();
+				VDBFieldData newFieldData = recordData.getField(fieldData.getName());
+				if (newFieldData!=null) {
+					field.fieldData=newFieldData;
+				} else {
+					removeLink((Linkable)field);	
+					field.destroy();	// this also adds an undo action (FieldValueChanged)
+				}
 			}
 		}
-	}
-	
-	return true;
+		
+		Enumeration e = recordData.getFieldsV().elements();
+		while (e.hasMoreElements()) {
+			VDBFieldData fieldData = (VDBFieldData)e.nextElement();
+			fieldChanged(fieldData);
+		}
 }
 /**
  * Insert the method's description here.

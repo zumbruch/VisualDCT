@@ -34,6 +34,10 @@ import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.graphics.*;
 
 import com.cosylab.vdct.graphics.popup.*;
+import com.cosylab.vdct.undo.CreateConnectorAction;
+import com.cosylab.vdct.undo.DeleteConnectorAction;
+import com.cosylab.vdct.undo.UndoManager;
+
 import javax.swing.*;
 import java.awt.event.*;
 
@@ -153,8 +157,12 @@ public Connector addConnector() {
 	EPICSLinkOut start = (EPICSLinkOut)EPICSLinkOut.getStartPoint(this);
 	if (start==null) return null;
 	String id = EPICSLinkOut.generateConnectorID(start);
+	String inlinkStr = "";
+	String outlinkStr = getID();
+	if (inlink!=null) inlinkStr = inlink.getID();
 	Connector connector = new Connector(id, (LinkManagerObject)getParent(), this, getInput());
 	getParent().addSubObject(id, connector);
+	UndoManager.getInstance().addAction(new CreateConnectorAction(connector, inlinkStr, outlinkStr));
 	return connector;
 }
 /**
@@ -162,10 +170,25 @@ public Connector addConnector() {
  * Creation date: (4.2.2001 12:35:05)
  */
 public void bypass() {
-	InLink il = inlink;
-	if (inlink!=null) inlink.setOutput(outlink, this);
-	if (outlink!=null) outlink.setInput(il);
-	destroy();
+	if (!isDestroyed()) {
+		super.destroy();
+
+		String inlinkStr = "";
+		String outlinkStr = "";
+		if (inlink!=null) inlinkStr=inlink.getID();
+		if (outlink!=null) outlinkStr=outlink.getID();
+
+		InLink il = inlink;
+		if (inlink!=null) inlink.setOutput(outlink, this);
+		if (outlink!=null) outlink.setInput(il);
+
+	
+		getParent().removeObject(ID);
+		setInput(null);
+		setOutput(null, outlink);
+		
+		UndoManager.getInstance().addAction(new DeleteConnectorAction(this, inlinkStr, outlinkStr));
+	}
 }
 /**
  * Insert the method's description here.
@@ -202,6 +225,13 @@ public void destroy() {
 	if (!isDestroyed()) {
 		super.destroy();
 		getParent().removeObject(ID);
+		
+		String inlinkStr = "";
+		String outlinkStr = "";
+		if (inlink!=null) inlinkStr=inlink.getID();
+		if (outlink!=null) outlinkStr=outlink.getID();
+		UndoManager.getInstance().addAction(new DeleteConnectorAction(this, inlinkStr, outlinkStr));
+		
 		setInput(null);
 		setOutput(null, outlink);
 	}

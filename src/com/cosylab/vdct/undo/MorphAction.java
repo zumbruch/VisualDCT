@@ -1,5 +1,8 @@
 package com.cosylab.vdct.undo;
 
+import com.cosylab.vdct.graphics.objects.Record;
+import com.cosylab.vdct.vdb.VDBRecordData;
+
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
  * All rights reserved.
@@ -34,9 +37,10 @@ package com.cosylab.vdct.undo;
  * @author 
  */
 public class MorphAction extends ActionObject {
-	private com.cosylab.vdct.graphics.objects.Morphable object;
-	private String oldType;
-	private String newType;
+	private VDBRecordData oldRecordData;
+	private VDBRecordData newRecordData;
+	private Record object;
+
 /**
  * Insert the method's description here.
  * Creation date: (4.5.2001 11:40:19)
@@ -44,10 +48,10 @@ public class MorphAction extends ActionObject {
  * @param oldName java.lang.String
  * @param newName java.lang.String
  */
-public MorphAction(com.cosylab.vdct.graphics.objects.Morphable object, String oldType, String newType) {
+public MorphAction(Record object, VDBRecordData oldRecordData, VDBRecordData newRecordData) {
 	this.object=object;
-	this.oldType=oldType;
-	this.newType=newType;
+	this.oldRecordData=oldRecordData;
+	this.newRecordData=newRecordData;
 }
 /**
  * Insert the method's description here.
@@ -55,18 +59,18 @@ public MorphAction(com.cosylab.vdct.graphics.objects.Morphable object, String ol
  * @return java.lang.String
  */
 public String getDescription() {
-	return "Morph ["+object.getName()+"](\""+oldType+"\" to \""+newType+"\")";
+	return "Morph ["+object.getName()+"]()";
 }
 /**
  * This method was created in VisualAge.
  */
 protected void redoAction() {
-	object.morph(newType);
+	object.setRecordData(newRecordData);
 }
 /**
  * This method was created in VisualAge.
  */
 protected void undoAction() {
-	object.morph(oldType);
+	object.setRecordData(oldRecordData);
 }
 }
