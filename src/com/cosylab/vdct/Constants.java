@@ -44,6 +44,8 @@ public class Constants {
     public final static String COPY_SUFFIX = "_copy";
     public final static String MOVE_SUFFIX = "_2";
 
+ 	public final static String VDCT_PLUGINS_FILE = "VDCT_PLUGINS_FILE";
+ 	
     public /*final*/
     static char GROUP_SEPARATOR = ':';
     public final static char FIELD_SEPARATOR = '.';

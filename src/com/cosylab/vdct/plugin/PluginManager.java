@@ -30,6 +30,8 @@ package com.cosylab.vdct.plugin;
 
 import java.util.*;
 
+import com.cosylab.vdct.Constants;
+
 /**
  * Insert the class' description here.
  * Creation date: (6.12.2001 22:14:18)
@@ -166,7 +168,9 @@ private void load()
 	try
 	{
 		//String fileName = com.cosylab.vdct.Settings.getInstance().getDefaultDir()+com.cosylab.vdct.Constants.CONFIG_DIR+PLUGINS_FILE;
-		String fileName = System.getProperty("user.home")+"/"+PLUGINS_FILE;
+		String fileName = System.getProperty(Constants.VDCT_PLUGINS_FILE);
+		if (fileName == null)
+			fileName = System.getProperty("user.home")+"/"+PLUGINS_FILE;
 		pluginSerializer.importPlugins(fileName, this);
 	}
 	catch (Exception e)
@@ -216,7 +220,9 @@ public void save()
 	try
 	{
 		//String fileName = com.cosylab.vdct.Settings.getInstance().getDefaultDir()+com.cosylab.vdct.Constants.CONFIG_DIR+PLUGINS_FILE;
-		String fileName = System.getProperty("user.home")+"/"+PLUGINS_FILE;
+		String fileName = System.getProperty(Constants.VDCT_PLUGINS_FILE);
+		if (fileName == null)
+			fileName = System.getProperty("user.home")+"/"+PLUGINS_FILE;
 		pluginSerializer.exportPlugins(fileName, this);
 	}
 	catch (Exception e)

@@ -49,6 +49,10 @@ public class DSGUIInterface implements GUIMenuInterface, VDBInterface {
 	private DrawingSurface drawingSurface;
 
 	private ArrayList pasteNames = null;
+
+ 	// used format #! DBD("DBD filename")
+	final static String DBD_START       = "#! DBD(\"";
+	
 /**
  * Insert the method's description here.
  * Creation date: (4.2.2001 15:32:49)
@@ -479,6 +483,12 @@ public void save(java.io.File file) throws IOException {
  group2save.writeObjects(stream, path2remove);
  
  stream.writeBytes("\n#! Further lines contain layout data used by VisualDCT\n\n");
+
+ // write used DBDs
+ Enumeration edbd = DataProvider.getInstance().getDBDs().elements();
+ while (edbd.hasMoreElements())
+		stream.writeBytes(DBD_START+edbd.nextElement().toString()+"\")\n");
+
  group2save.writeVDCTData(stream, path2remove);
 
  stream.flush();
@@ -509,6 +519,12 @@ public void saveAsGroup(java.io.File file) throws IOException {
  group2save.writeObjects(stream, path2remove);
  
  stream.writeBytes("\n#! Further lines contain layout data used by VisualDCT\n\n");
+
+ // write used DBDs
+ Enumeration edbd = DataProvider.getInstance().getDBDs().elements();
+ while (edbd.hasMoreElements())
+		stream.writeBytes(DBD_START+edbd.nextElement().toString()+"\")\n");
+
  group2save.writeVDCTData(stream, path2remove);
 
  stream.flush();

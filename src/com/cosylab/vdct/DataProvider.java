@@ -44,11 +44,14 @@ public class DataProvider {
 	private static DataProvider instance = null;
 	private DBDData dbdDB = null;
 	private Vector inspectableListeners = null;
+	private Vector DBDs = null;
+
 /**
  * DataProvider constructor comment.
  */
 protected DataProvider() {
 	inspectableListeners = new Vector();
+	DBDs = new Vector();
 }
 /**
  * Insert the method's description here.
@@ -152,4 +155,13 @@ public void removeInspectableListener(InspectableObjectsListener listener) {
 public void setDbdDB(com.cosylab.vdct.dbd.DBDData newDbdDB) {
 	dbdDB = newDbdDB;
 }
+	/**
+	 * Returns the dBDs.
+	 * @return Vector
+	 */
+	public Vector getDBDs()
+	{
+		return DBDs;
+	}
+
 }

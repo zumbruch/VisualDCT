@@ -1322,6 +1322,9 @@ public boolean openDBD(File file, boolean importDBD) throws IOException {
 		if (viewGroup==null) initializeWorkspace();
 	}
 
+	// add to list of DBDs
+	DataProvider.getInstance().getDBDs().addElement(file.getAbsoluteFile());
+
 	restoreCursor();
 	return true;
 }
