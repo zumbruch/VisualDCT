@@ -349,7 +349,7 @@ protected void draw(Graphics g, boolean hilited) {
 			g.setColor(debugValueColor);
 
 			if (valueFont != null) {
-				g.setFont(getFont());
+				g.setFont(valueFont);
 				g.drawString(value, rrx + valueX, rry + valueY + recordSize);
 			}
 
@@ -1373,7 +1373,7 @@ private void validateDebug(VDBFieldData valField)
 	value = valField.getValue();
 	valueFont = FontMetricsBuffer.getInstance().getAppropriateFont(
 					Constants.DEFAULT_FONT, Font.PLAIN, 
-					value, rwidth-x0, rheight/2+y0);
+					value, rwidth-x0, rheight/2-y0);
 
 	if (valueFont!=null) {
 		FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(valueFont);
