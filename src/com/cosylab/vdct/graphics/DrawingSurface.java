@@ -150,6 +150,7 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 	// mickeys
 	private int pressedX, pressedY;
 	private int draggedX, draggedY;
+	private boolean resetDraggedPosition = false;
 	// modification
 	private boolean modified = false;
 	// linking
@@ -511,6 +512,12 @@ public int getPressedX() {
  */
 public int getPressedY() {
 	return pressedY;
+}
+
+/**
+ */
+public void resetDraggedPosition() {
+	resetDraggedPosition = true;
 }
 	/**
 	 * Returns the <code>Printable</code> instance responsible for
@@ -1008,6 +1015,14 @@ public void mouseDragged(MouseEvent e) {
 	ViewState view = ViewState.getInstance();
 	int px = e.getX()-view.getX0();
 	int py = e.getY()-view.getY0();
+	
+	if (resetDraggedPosition)
+	{
+		pressedX = draggedX = px;
+		pressedY = draggedY = py;
+		resetDraggedPosition = false;
+	}
+	
 	if ((px>0) && (py>0) && (px<width) && (py<height)) {
 		switch (mouseOperation) {
 

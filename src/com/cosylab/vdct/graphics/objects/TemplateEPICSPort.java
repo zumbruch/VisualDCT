@@ -34,6 +34,8 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 import com.cosylab.vdct.Constants;
+import com.cosylab.vdct.graphics.DrawingSurface;
+import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.vdb.GUIHeader;
 import com.cosylab.vdct.vdb.GUISeparator;
@@ -47,7 +49,7 @@ import com.cosylab.vdct.vdb.VDBTemplatePort;
  * Creation date: (29.1.2001 21:27:30)
  * @author Matej Sekoranja
  */
-public class TemplateEPICSPort extends EPICSVarLink implements TemplateEPICSLink {
+public class TemplateEPICSPort extends EPICSVarLink implements TemplateEPICSLink, Movable {
 
  	private String lastUpdatedFullName = null;
 	private static GUISeparator portSeparator = null;
@@ -329,6 +331,71 @@ public void setRight(boolean isRight)
 		super.setRight(isRight);
 		((Template)getParent()).fieldSideChange(this, isRight);
 	}
+}
+
+/**
+ * @see com.cosylab.vdct.graphics.objects.Movable#checkMove(int, int)
+ */
+public boolean checkMove(int dx, int dy) {
+	// this method is called only on selection move
+	// and this object is not selectable
+	return false; 
+}
+
+/**
+ * @see com.cosylab.vdct.graphics.objects.Movable#move(int, int)
+ */
+public boolean move(int dx, int dy) {
+
+	boolean moved = false;
+
+	ViewState view = ViewState.getInstance();
+	dx = (int)(dx*view.getScale());
+	dy = (int)(dy*view.getScale());
+	int x = DrawingSurface.getInstance().getPressedX() + view.getRx();
+	int y = DrawingSurface.getInstance().getPressedY() + view.getRy();
+
+	if (dx > 0 && !isRight())
+	{
+		if ((x+dx) > (getRx()+getRwidth()))
+		{
+			rotate();
+			moved = true;
+		}
+	}
+	else if (dx < 0 && isRight())
+	{
+		if ((x+dx) < getRx())
+		{
+			rotate();
+			moved = true;
+		}
+	}
+
+	LinkManagerObject lmo = (LinkManagerObject)getParent(); 
+	if (dy > 0 && !lmo.isLastField(this))
+	{
+		if ((y+dy) > (getRy()+getRheight()))
+		{
+			lmo.moveFieldDown(this);
+			moved = true;
+		}
+	}
+	else if (dy < 0 && !lmo.isFirstField(this))
+	{
+		if ((y+dy) < getRy())
+		{
+			lmo.moveFieldUp(this);
+			moved = true;
+		}
+	}
+
+	// should be done for discrete move
+	if (moved)
+		DrawingSurface.getInstance().resetDraggedPosition();
+
+	return moved;
+		
 }
 
 }
