@@ -35,6 +35,7 @@ import com.cosylab.vdct.Console;
 import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.graphics.objects.Debuggable;
 import java.util.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -350,7 +351,24 @@ public void setValue(java.lang.String newValue) {
 			new com.cosylab.vdct.undo.FieldValueChangeAction(this, value, newValue)
 		);
 	value = newValue;
-	if (record!=null) record.fieldValueChanged(this);
+	if (record!=null)
+	{
+		record.fieldValueChanged(this);
+
+		// if DTYP has changed - notify all INP/OUT links
+		if (name.equals("DTYP") && !com.cosylab.vdct.plugin.debug.PluginDebugManager.isDebugState())
+		{
+			java.util.Enumeration e = record.getFieldsV().elements();
+			while (e.hasMoreElements())
+			{
+				VDBFieldData f = (VDBFieldData)e.nextElement();
+				if (f!=this &&
+					((f.getDbdData().getField_type()==DBDConstants.DBF_INLINK) ||
+					(f.getDbdData().getField_type()==DBDConstants.DBF_OUTLINK)))
+					f.setValue(f.getValue());
+			}
+		}
+	}
 }
 /**
  * Insert the method's description here.
@@ -403,4 +421,26 @@ public Pattern getEditPattern()
 	return null;
 }
 
+/**
+ * Insert the method's description here.
+ * Creation date: (11.1.2001 21:28:51)
+ * @return boolean
+ */
+public boolean isValid()
+{
+	if ((dbdData.getField_type()==DBDConstants.DBF_INLINK) ||
+		(dbdData.getField_type()==DBDConstants.DBF_OUTLINK))
+	{
+		Pattern pattern = getEditPattern();
+		if (pattern!=null)
+		{
+    	   Matcher m = pattern.matcher(getValue());
+        	if (m.matches())
+        		return true;
+        	else
+				return false;			
+		}
+	}
+	return true;
+}
 }

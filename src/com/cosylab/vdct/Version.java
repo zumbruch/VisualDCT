@@ -35,6 +35,6 @@ package com.cosylab.vdct;
  * @author Matej Sekoranja
  */
 public interface Version {
-	public final static String VERSION = "2.1";
-	public final static String BUILD = "1235";
+	public final static String VERSION = "2.2";
+	public final static String BUILD = "1236";
 }

@@ -30,6 +30,13 @@ package com.cosylab.vdct.graphics.objects;
 
 import java.util.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JSeparator;
+
 import com.cosylab.vdct.Constants;
 
 /**
@@ -38,6 +45,59 @@ import com.cosylab.vdct.Constants;
  * @author Matej Sekoranja
  */
 public class EPICSInLink extends EPICSLinkOut {
+
+	private static final String processString = "Process";
+	private static final String nppString = "NPP - No Process Passive";
+	private static final String ppString ="PP - Process Passive";
+	private static final String caString = "CA - Channel Access";
+	private static final String cpString = "CP - CA process on monitor";
+	private static final String cppString = "CPP - CP if record passive";
+
+	private static final String severityString = "Severity";
+	private static final String nmsString = "NMS - No Maximize Severity";
+	private static final String msString = "MS - Maximize Severity";
+
+	class PopupMenuHandler implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+			String action = e.getActionCommand();
+			if (action.equals(nppString))
+			{
+				EPICSInLink.this.getLinkProperties().setProcess("NPP");
+				EPICSInLink.this.getFieldData().setValue(EPICSInLink.this.getLinkProperties().getCompactLinkDef());
+			}
+			else if (action.equals(ppString))
+			{			
+				EPICSInLink.this.getLinkProperties().setProcess("PP");
+				EPICSInLink.this.getFieldData().setValue(EPICSInLink.this.getLinkProperties().getCompactLinkDef());
+			}
+			else if (action.equals(caString))
+			{			
+				EPICSInLink.this.getLinkProperties().setProcess("CA");
+				EPICSInLink.this.getFieldData().setValue(EPICSInLink.this.getLinkProperties().getCompactLinkDef());
+			}
+			else if (action.equals(cpString))
+			{			
+				EPICSInLink.this.getLinkProperties().setProcess("CP");
+				EPICSInLink.this.getFieldData().setValue(EPICSInLink.this.getLinkProperties().getCompactLinkDef());
+			}
+			else if (action.equals(cppString))
+			{			
+				EPICSInLink.this.getLinkProperties().setProcess("CPP");
+				EPICSInLink.this.getFieldData().setValue(EPICSInLink.this.getLinkProperties().getCompactLinkDef());
+			}
+			else if (action.equals(nmsString))
+			{			
+				EPICSInLink.this.getLinkProperties().setMaximize("NMS");
+				EPICSInLink.this.getFieldData().setValue(EPICSInLink.this.getLinkProperties().getCompactLinkDef());
+			}
+			else if (action.equals(msString))
+			{			
+				EPICSInLink.this.getLinkProperties().setMaximize("MS");
+				EPICSInLink.this.getFieldData().setValue(EPICSInLink.this.getLinkProperties().getCompactLinkDef());
+			}
+		}
+	}
+
 /**
  * EPICSInLink constructor comment.
  * @param parent com.cosylab.vdct.graphics.objects.ContainerObject
@@ -107,5 +167,62 @@ protected void draw(Graphics g, boolean hilited) {
 		g.drawLine(rrx+r, rry-r, rrx-r, rry+r);
 	}
 
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (2.2.2001 23:00:51)
+ * @return com.cosylab.vdct.graphics.objects.EPICSInLink.PopupMenuHandler
+ */
+private com.cosylab.vdct.graphics.objects.EPICSInLink.PopupMenuHandler createPopupmenuHandler() {
+	return new PopupMenuHandler();
+}
+
+
+/**
+ * Insert the method's description here.
+ * Creation date: (3.2.2001 11:23:59)
+ * @return java.util.Vector
+ */
+public java.util.Vector getItems() {
+	Vector items = super.getItems();
+
+	items.add(new JSeparator());
+
+	JMenu processMenu = new JMenu(processString);
+	items.addElement(processMenu);
+	
+	JMenuItem npp = new JMenuItem(nppString);
+	npp.addActionListener(createPopupmenuHandler());
+	processMenu.add(npp);	
+	
+	JMenuItem pp = new JMenuItem(ppString);
+	pp.addActionListener(createPopupmenuHandler());
+	processMenu.add(pp);	
+
+	JMenuItem ca = new JMenuItem(caString);
+	ca.addActionListener(createPopupmenuHandler());
+	processMenu.add(ca);
+
+	JMenuItem cp = new JMenuItem(cpString);
+	cp.addActionListener(createPopupmenuHandler());
+	processMenu.add(cp);
+
+	JMenuItem cpp = new JMenuItem(cppString);
+	cpp.addActionListener(createPopupmenuHandler());
+	processMenu.add(cpp);
+
+	JMenu severityMenu = new JMenu(severityString);
+	items.addElement(severityMenu);
+
+	JMenuItem nms = new JMenuItem(nmsString);
+	nms.addActionListener(createPopupmenuHandler());
+	severityMenu.add(nms);
+
+	JMenuItem ms = new JMenuItem(msString);
+	ms.addActionListener(createPopupmenuHandler());
+	severityMenu.add(ms);
+
+	return items;
 }
 }

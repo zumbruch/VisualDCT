@@ -200,6 +200,15 @@ public String getToolTipText()
 {
 	return null;
 }
+/**
+ * Insert the method's description here.
+ * Creation date: (11.1.2001 21:28:51)
+ * @return boolean
+ */
+public boolean isValid()
+{
+	return true;
+}
 
 
 }

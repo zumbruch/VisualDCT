@@ -43,6 +43,7 @@ public class InspectorTableCellRenderer extends DefaultTableCellRenderer {
 	private Color fgColor;
 	private Color sectionbgColor = Color.black;
 	private Color sectionfgColor = Color.white;
+	private Color invalidColor = Color.red;
 	private InspectorTableModel tableModel;
 /**
  * InspectorTableCellRenderer constructor comment.
@@ -70,6 +71,8 @@ public InspectorTableCellRenderer(JTable table, InspectorTableModel tableModel) 
  */
 public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 	String str = value.toString();
+	InspectableProperty property = tableModel.getPropertyAt(row);
+	
 	if (tableModel.getPropertyAt(row).isSepatator()) {
 		super.setHorizontalAlignment(JLabel.CENTER);
 		super.setBackground(sectionbgColor);
@@ -78,7 +81,10 @@ public Component getTableCellRendererComponent(JTable table, Object value, boole
 	else {
 		super.setHorizontalAlignment(JLabel.LEFT);
 		super.setBackground(bgColor);
-		super.setForeground(fgColor);
+		if (column==1 && !property.isValid())
+			super.setForeground(invalidColor);
+		else
+			super.setForeground(fgColor);
 	}
 	setValue(str); 
 	return this;

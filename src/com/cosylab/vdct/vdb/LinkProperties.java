@@ -86,6 +86,36 @@ public java.lang.String getMaximize() {
 public String getOptions() {
 	return process+spaceString+maximize;
 }
+
+/**
+ * Insert the method's description here.
+ * Creation date: (30.1.2001 14:01:58)
+ * @return java.lang.String
+ */
+public String getCompactOptions() {
+	if (maximize.equals(defaultMaximize) && process.equals(defaultProcess))
+		return nullString;
+	else if (maximize.equals(defaultMaximize))
+		return process;
+	else
+		return process+spaceString+maximize;
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (30.1.2001 14:01:58)
+ * @return java.lang.String
+ */
+public String getCompactLinkDef() {
+	String link = record;
+	/// !!!! proc
+	if (!varName.equals(defaultVarName))
+		link += Constants.FIELD_SEPARATOR + varName;
+	String opt = getCompactOptions();
+	if (!opt.equals(nullString))
+		link += spaceString + opt;
+	return link;
+}
 /**
  * This method was created in VisualAge.
  * @return java.lang.String
@@ -155,7 +185,7 @@ public static String getTarget(VDBFieldData fd) {
 	if (value.indexOf(Constants.FIELD_SEPARATOR) > -1) {
 		if (tokenizer.hasMoreTokens()) {
 			String var = tokenizer.nextToken(); 				// read var variable
-			if ((LinkProperties.getType(fd)==LinkProperties.FWDLINK_FIELD) &&		// !!! proc
+			if ((LinkProperties.getType(fd)==LinkProperties.FWDLINK_FIELD) &&		// !!! proc !!!
 				!var.equalsIgnoreCase("PROC"))
 				return nullString;
 			else
@@ -286,11 +316,11 @@ private void setProperties(VDBFieldData fd) {
 	if (value.indexOf(Constants.FIELD_SEPARATOR) > -1) {
 		if (tokenizer.hasMoreTokens()) {
 			setVarName(tokenizer.nextToken()); // read var variable
-			if ((getType()==FWDLINK_FIELD) &&
-				getVarName().equalsIgnoreCase("PROC")) {		// !!! proc
+			//if ((getType()==FWDLINK_FIELD) &&
+			//	!getVarName().equalsIgnoreCase("PROC")) {		// !!! proc
 				//setType(NOT_VALID); ?!!
 				//return;
-			}
+			//}
 		}
 	}
 
