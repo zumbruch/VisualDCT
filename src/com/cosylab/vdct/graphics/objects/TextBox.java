@@ -179,8 +179,7 @@ protected void draw(Graphics g, boolean hilited)
 		    }
 		};
 	
-//		final String html="<html><font size=+10>Text</font>";	
-		final String html="<p align='center'><i><b><font size='5'>Visual DCT Help</font></b></i></p><div align='center'>  <center>  <table border='0' width='73%' cellspacing='2' height='195' bgcolor='#0000FF'>    <tr>      <td width='100%' colspan='2' height='41' bgcolor='#FFFFFF' align='left'>        <p align='center'><i><font size='3'><b>Mouse events</b></font></i></td>    </tr></table>  </center></div><br>";	
+		final String html="<html><font size=+10>VisualDCT rules</font>";	
 		l.setVerticalAlignment(JLabel.TOP);
 		l.setText(html);
 		l.setForeground(getColor());

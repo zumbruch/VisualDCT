@@ -37,6 +37,7 @@ import java.awt.print.*;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.JSeparator;
 import javax.swing.event.*;
 import com.cosylab.vdct.*;
 import com.cosylab.vdct.db.*;
@@ -153,6 +154,9 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 	
 	private static final String newRecordString = "New record...";
 	private static final String newTemplesString = "New template";
+	private static final String newLineString = "New line";
+	private static final String newBoxString = "New box";
+	private static final String newTextBoxString = "New textbox";
 
 	private LineVertex lineVertex = null;
 	private BoxVertex boxVertex = null;
@@ -679,7 +683,34 @@ public void mouseClicked(MouseEvent e) {
 		else {
 			pressedX=cx; pressedY=cy;
 
-			if (e.getClickCount()==1 && e.getButton()==MouseEvent.BUTTON3)
+			if((e.getClickCount() >= 1) && (lineVertex != null))
+			{
+					lineVertex = null;
+
+					// cancel action
+					if (e.getButton() == MouseEvent.BUTTON3)
+						UndoManager.getInstance().undo();
+			}
+			else if((e.getClickCount() >= 1) && (boxVertex != null))
+			{
+					boxVertex = null;
+
+					// cancel action
+					if (e.getButton() == MouseEvent.BUTTON3)
+						UndoManager.getInstance().undo();
+			}
+			else if((e.getClickCount() >= 1) && (textBoxVertex != null))
+			{
+					textBoxVertex.getPartnerVertex().setIsAlwaysDrawn(false);
+					textBoxVertex.setIsAlwaysDrawn(false);
+	
+					textBoxVertex = null;
+
+					// cancel action
+					if (e.getButton() == MouseEvent.BUTTON3)
+						UndoManager.getInstance().undo();
+			}
+			else if (e.getClickCount()==1 && e.getButton()==MouseEvent.BUTTON3)
 			{
 				
 				ActionListener al = new ActionListener()
@@ -688,6 +719,12 @@ public void mouseClicked(MouseEvent e) {
 						String action = e.getActionCommand();
 						if (action.equals(newRecordString))
 							CommandManager.getInstance().execute("ShowNewDialog");
+						else if (action.equals(newLineString))
+							createLine();
+						else if (action.equals(newBoxString))
+							createBox();
+						else if (action.equals(newTextBoxString))
+							createTextBox();
 						else
 							createTemplateInstance(null, action, true);
 					}
@@ -714,56 +751,32 @@ public void mouseClicked(MouseEvent e) {
 
 				if (templatesMenu.getItemCount()==0)
 					templatesMenu.setEnabled(false);
+
+				popUp.add(new JSeparator());
+
+				JMenuItem lineMenuItem = new JMenuItem(newLineString);
+				lineMenuItem.addActionListener(al);
+				popUp.add(lineMenuItem);
+
+				JMenuItem boxMenuItem = new JMenuItem(newBoxString);
+				boxMenuItem.addActionListener(al);
+				popUp.add(boxMenuItem);
 				
+				JMenuItem textboxMenuItem = new JMenuItem(newTextBoxString);
+				textboxMenuItem.addActionListener(al);
+				popUp.add(textboxMenuItem);
+
 				popUp.show(getWorkspacePanel(), e.getX(), e.getY());
 				
-			}
-			else 
-			
-			if((e.getClickCount() >= 1) && (lineVertex != null))
-				lineVertex = null;
-			else if((e.getClickCount() >= 1) && (boxVertex != null))
-				boxVertex = null;
-			else if((e.getClickCount() >= 1) && (textBoxVertex != null))
-			{
-				textBoxVertex.getPartnerVertex().setIsAlwaysDrawn(false);
-				textBoxVertex.setIsAlwaysDrawn(false);
-
-				textBoxVertex = null;
 			}
 			else if (e.getClickCount()>=2)
 			{
 				if(VisualDCT.getInstance().getLineButtonEnabled())
-				{
-					GetVDBManager manager =
-						(GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
-
-					LineVertex startingLineVertex = manager.getManager().createLineVertex(null);
-					lineVertex = manager.getManager().createLineVertex(startingLineVertex);
-					
-					startingLineVertex.setPartnerVertex(lineVertex);
-					lineVertex.setIsArrow(LineVertex.getCurrentIsArrow());
-				}
+					createLine();
 				else if(VisualDCT.getInstance().getBoxButtonEnabled())
-				{
-					GetVDBManager manager =
-						(GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
-
-					BoxVertex startingBoxVertex = manager.getManager().createBoxVertex(null);
-					boxVertex = manager.getManager().createBoxVertex(startingBoxVertex);
-					startingBoxVertex.setPartnerVertex(boxVertex);
-				}
+					createBox();
 				else if(VisualDCT.getInstance().getTextBoxButtonEnabled())
-				{
-					GetVDBManager manager =
-						(GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
-
-					TextBoxVertex startingTextBoxVertex = manager.getManager().createTextBoxVertex(null);
-					textBoxVertex = manager.getManager().createTextBoxVertex(startingTextBoxVertex);
-					startingTextBoxVertex.setPartnerVertex(textBoxVertex);
-
-					manager.getManager().createTextBox(startingTextBoxVertex, textBoxVertex);
-				}
+					createTextBox();
 				else
 					CommandManager.getInstance().execute("ShowNewDialog");
 			}
@@ -774,6 +787,92 @@ public void mouseClicked(MouseEvent e) {
 
 		stopLinking();
 			
+	}
+}
+private void createTextBox()
+{
+	try
+	{
+	
+		UndoManager.getInstance().startMacroAction();
+	
+		GetVDBManager manager =
+			(GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
+	
+		TextBoxVertex startingTextBoxVertex = manager.getManager().createTextBoxVertex(null);
+		UndoManager.getInstance().addAction(new CreateAction(startingTextBoxVertex));
+	
+		textBoxVertex = manager.getManager().createTextBoxVertex(startingTextBoxVertex);
+		UndoManager.getInstance().addAction(new CreateAction(textBoxVertex));
+	
+		startingTextBoxVertex.setPartnerVertex(textBoxVertex);
+	
+		TextBox textBox = manager.getManager().createTextBox(startingTextBoxVertex, textBoxVertex);
+		UndoManager.getInstance().addAction(new CreateAction(textBox));
+	
+	}
+	catch (Exception ex)
+	{
+	}
+	finally
+	{
+		UndoManager.getInstance().stopMacroAction();
+	}
+}
+private void createBox()
+{
+	try
+	{
+	
+		UndoManager.getInstance().startMacroAction();
+	
+		GetVDBManager manager =
+			(GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
+	
+		BoxVertex startingBoxVertex = manager.getManager().createBoxVertex(null);
+		UndoManager.getInstance().addAction(new CreateAction(startingBoxVertex));
+	
+		boxVertex = manager.getManager().createBoxVertex(startingBoxVertex);
+		UndoManager.getInstance().addAction(new CreateAction(boxVertex));
+	
+		startingBoxVertex.setPartnerVertex(boxVertex);
+	
+	}
+	catch (Exception ex)
+	{
+	}
+	finally
+	{
+		UndoManager.getInstance().stopMacroAction();
+	}
+}
+private void createLine()
+{
+	try
+	{
+	
+		UndoManager.getInstance().startMacroAction();
+	
+		GetVDBManager manager =
+			(GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
+	
+		LineVertex startingLineVertex = manager.getManager().createLineVertex(null);
+		UndoManager.getInstance().addAction(new CreateAction(startingLineVertex));
+	
+		lineVertex = manager.getManager().createLineVertex(startingLineVertex);
+		UndoManager.getInstance().addAction(new CreateAction(lineVertex));
+		
+		startingLineVertex.setPartnerVertex(lineVertex);
+		lineVertex.setIsArrow(LineVertex.getCurrentIsArrow());
+	
+	
+	}
+	catch (Exception ex)
+	{
+	}
+	finally
+	{
+		UndoManager.getInstance().stopMacroAction();
 	}
 }
 	/**
