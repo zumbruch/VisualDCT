@@ -948,12 +948,22 @@ public EPICSLink initializeLinkField(VDBFieldData field) {
  * @param py int
  */
 public VisibleObject intersects(int px, int py) {
-	if ((getRx()<=px) && (getRy()<=py) && 
+/*
+  	if ((getRx()<=px) && (getRy()<=py) && 
 		((getRx()+getRwidth())>=px) && 
 		((getRy()+getRheight())>=py))
 		return this;
 	else 
 		return hiliteComponentsCheck(px, py);
+*/
+	// first check on small sub-objects like connectors
+	VisibleObject spotted = hiliteComponentsCheck(px, py);
+  	if ((spotted==null) &&
+  		(getRx()<=px) && (getRy()<=py) && 
+		((getRx()+getRwidth())>=px) && 
+		((getRy()+getRheight())>=py))
+		spotted = this;
+	return spotted;
 }
 /**
  * Insert the method's description here.
@@ -1271,6 +1281,22 @@ private void paintSubObjects(Graphics g, boolean hilited) {
 	VisibleObject vo;
 	while (e.hasMoreElements()) {
 		vo = (VisibleObject)(e.nextElement());
+			vo.paint(g, hilited);
+	}
+	
+}
+/**
+ * Insert the method's description here.
+ * Creation date: (21.12.2000 21:58:56)
+ * @param g java.awt.Graphics
+ * @param hilited boolean
+ */
+public void postDraw(Graphics g, boolean hilited) {
+	Enumeration e = subObjectsV.elements();
+	VisibleObject vo;
+	while (e.hasMoreElements()) {
+		vo = (VisibleObject)(e.nextElement());
+		if (vo instanceof Connector)
 			vo.paint(g, hilited);
 	}
 	

@@ -94,6 +94,14 @@ public void destroy() {
 protected abstract void draw(Graphics g, boolean hilited);
 /**
  * Insert the method's description here.
+ * Creation date: (19.12.2000 21:30:46)
+ * @param g java.awt.Graphics
+ * @param hilited boolean
+ */
+protected void postDraw(Graphics g, boolean hilited) {}
+
+/**
+ * Insert the method's description here.
  * Creation date: (25.4.2001 17:56:23)
  */
 public void forceValidation() {
@@ -300,6 +308,16 @@ public boolean isDestroyed() {
 public void paint(Graphics g, boolean hilited) {
 	forceValidation();
 	draw(g, hilited);
+}
+/**
+ * Insert the method's description here.
+ * Creation date: (19.12.2000 21:33:47)
+ * @param g java.awt.Graphics
+ * @param hilited boolean
+ */
+public void postPaint(Graphics g, boolean hilited) {
+	forceValidation();
+	postDraw(g, hilited);
 }
 /**
  * Insert the method's description here.

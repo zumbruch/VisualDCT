@@ -302,6 +302,7 @@ public Object findObject(String objectName, boolean deep) {
 	else if (Group.hasTokens(relName)) {
 		if (!deep) return null;
 		String parentName = Group.substractToken(relName);
+		// !!! check if parent is always Group object
 		Group parent = (Group)getSubObject(parentName);
 		if (parent==null) {
 			//com.cosylab.vdct.Console.getInstance().println("o) Internal error: no parent found / no such object");
@@ -477,8 +478,14 @@ public VisibleObject hiliteComponentsCheck(int x, int y) {
 		vo = (VisibleObject)(e.nextElement());
 		vo = vo.intersects(x, y);
 		if (vo!=null) {
-			spotted=vo;
-			if (view.getHilitedObject()!=vo) return vo;
+			// special hanadling for connectors
+			if (vo instanceof Connector)
+				return vo;
+			/*else if (view.getHilitedObject()!=vo)
+			 	spotted = vo;
+			else if (spotted==null)*/
+			else
+			 	spotted = vo;
 		}
 	}
 
@@ -670,6 +677,7 @@ public void paintComponents(Graphics g, boolean hilited, boolean flatten) {
 			else
 				((VisibleObject)obj).paint(g, hilited);
 		}
+		// no post paint here!!!
 	}
 	else
 	{
@@ -677,6 +685,12 @@ public void paintComponents(Graphics g, boolean hilited, boolean flatten) {
 		while (e.hasMoreElements()) {
 			vo = (VisibleObject)(e.nextElement());
 			vo.paint(g, hilited);
+		}
+		
+		e = subObjectsV.elements();
+		while (e.hasMoreElements()) {
+			vo = (VisibleObject)(e.nextElement());
+			vo.postPaint(g, hilited);
 		}
 	}
 	
