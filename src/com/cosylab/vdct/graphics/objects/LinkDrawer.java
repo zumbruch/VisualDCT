@@ -237,7 +237,12 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 		
 //		if (x2<x1) s = -s;
 		if (!firstHorizontal) s = -s;
+
+		// draw tail
+		g.drawLine(x1, y1, x1+s, y1);
+		x1+=s;
 	
+		// drawing -->
 		g.drawLine(x1, y1-s, x1, y1+s);
 
 		g.drawLine(x1, y1-s, x1+s, y1-s);
@@ -282,6 +287,11 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 //		if (x2<x1) s = -s;
 		if (!firstHorizontal) s = -s;
 		
+		// draw tail
+		g.drawLine(x1, y1, x1+s, y1);
+		x1+=s;
+	
+		// drawing -->
 		g.drawLine(x1, y1-s, x1, y1+s);
 
 		g.drawLine(x1, y1-s, x1+2*s, y1-s);

@@ -45,6 +45,7 @@ import com.cosylab.vdct.vdb.VDBPort;
 import com.cosylab.vdct.vdb.VDBTemplate;
 
 import javax.swing.*;
+
 import java.awt.event.*;
 
 /**
@@ -69,9 +70,21 @@ public class Port extends VisibleObject implements Descriptable, Movable, OutLin
 				//addConnector();
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
-			else if (action.equals(removeString))
+			else if (action.equals(removeLinkString))
 			{
 				destroy();
+			}
+			else if (action.equals(constantString)) {
+				setMode(OutLink.CONSTANT_PORT_MODE);
+				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+			}
+			else if (action.equals(inputString)) {
+				setMode(OutLink.INPUT_PORT_MODE);
+				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+			}
+			else if (action.equals(outputString)) {
+				setMode(OutLink.OUTPUT_PORT_MODE);
+				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
 			
 		}
@@ -86,13 +99,28 @@ public class Port extends VisibleObject implements Descriptable, Movable, OutLin
 	private static final String selectTitle = "Select link color...";
 	private static final String addConnectorString = "Add connector";
 	private static final String colorString = "Color...";
-	private static final String removeString = "Remove Port";
+	private static final String removeLinkString = "Remove Link";
+	private static final String removePortString = "Remove Port";
+
+	private static final String modeString = "Port Mode";
+	private static final String constantString = "CONSTANT";
+	private static final String inputString = "INPUT";
+	private static final String outputString = "OUTPUT";
 
 	private static final String nullString = "";
+
+	private int mode = OutLink.CONSTANT_PORT_MODE;
 
 	private static javax.swing.ImageIcon icon = null;
 	private static GUISeparator portSeparator = null;
 	protected VDBPort data = null;
+	
+	protected int rightXtranslation = 0;
+	protected int rightYtranslation = 0;
+	protected int leftXtranslation = 0;
+	protected int leftYtranslation = 0;
+	protected Polygon leftPoly;
+	protected Polygon rightPoly;
 
 /**
  * Insert the method's description here.
@@ -101,7 +129,7 @@ public class Port extends VisibleObject implements Descriptable, Movable, OutLin
 public Port(VDBPort data, ContainerObject parent, int x, int y) {
 	super(parent);
 	this.data = data;
-	
+
 	setColor(Constants.FRAME_COLOR);
 	
 	setWidth(Constants.LINK_STUB_SIZE);
@@ -113,6 +141,11 @@ public Port(VDBPort data, ContainerObject parent, int x, int y) {
 	properties = new LinkProperties(data);
 		
 	data.setVisibleObject(this);
+	
+	// initialize polygon so that it contains 5 points
+	int[] pts = new int[5];
+	leftPoly = new Polygon(pts, pts, 5);
+	rightPoly = new Polygon(pts, pts, 5);
 }
 /**
  * Insert the method's description here.
@@ -158,6 +191,7 @@ public void destroy() {
 		data.setValue(nullString);
 		properties = new LinkProperties(data);
 		//getParent().removeObject(getID());
+		setDestroyed(false); ///?!!!
 	}
 }
 /**
@@ -182,9 +216,25 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 	int rrx = getRx() - view.getRx();
 	int rry = getRy() - view.getRy();
 
-	int rwidth = getRwidth();
+	int rwidth = getRwidth()/2;
 	int rheight = getRheight();
 
+	boolean rightSide = isRight();
+
+	Polygon poly = null;
+	if (rightSide)
+	{
+		poly = rightPoly;
+		poly.translate(rrx-rightXtranslation, rry-rightYtranslation);
+		rightXtranslation = rrx; rightYtranslation = rry;
+	}
+	else
+	{
+		poly = leftPoly;
+		poly.translate(rrx-leftXtranslation, rry-leftYtranslation);
+		leftXtranslation = rrx; leftYtranslation = rry;
+	}
+	
 	// clipping
 	if (!((rrx > view.getViewWidth())
 		|| (rry > view.getViewHeight())
@@ -201,8 +251,9 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 					g.setColor(Constants.SELECTION_COLOR);
 				else
 					g.setColor(Constants.RECORD_COLOR);
+	
+		g.fillPolygon(poly);
 
-		g.fillRect(rrx, rry, rwidth, rheight);
 		if (!hilited)
 			g.setColor(Constants.FRAME_COLOR);
 		else
@@ -211,41 +262,13 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 					? Constants.HILITE_COLOR
 					: Constants.FRAME_COLOR);
 
-		g.drawRect(rrx, rry, rwidth, rheight);
+		g.drawPolygon(poly);
+		
 
-
-		int r = 5;//!!!
-		int arrowLength = 2*r;
-	boolean rightSide = isRight();
-
-		if (inlink!=null) {
-
-	
-			// draw arrow
-			g.drawLine(rrx, rry-r, rrx+arrowLength, rry-r);
-			g.drawLine(rrx, rry+r, rrx+arrowLength, rry+r);
+		if (inlink!=null)
+		{
 			
-			int dr=-r; 
-			if (rightSide) {
-				dr=-dr;
-				rrx+=arrowLength;
-			}
-			g.drawLine(rrx, rry-r, rrx+dr, rry);
-			g.drawLine(rrx, rry+r, rrx+dr, rry);
-	/*
-			if (font2!=null) {
-				g.setFont(font2);
-				rry += realHalfHeight;
-				if (rightSide)
-					rrx += (labelLen-realLabelLen)/2+arrowLength/2;
-				else
-					rrx += arrowLength-rtailLen+labelLen-realLabelLen;
-				g.drawString(label2, rrx, rry);
-			}
-	*/		
-			//if (inlink.getLayerID().equals(getLayerID())) 
-	
-			//g.setColor(getColor());
+			// draw link
 			Color c = getColor();
 			if (c==Constants.BACKGROUND_COLOR)
 				if (c==Color.black)
@@ -255,14 +278,7 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 			g.setColor(c);
 	
 			LinkDrawer.drawLink(g, this, inlink, getQueueCount(), rightSide);
-		} else {
-			// draw cross
-			if (!rightSide) rrx+=arrowLength;
-			g.drawLine(rrx-r, rry-r, rrx+r, rry+r);
-			g.drawLine(rrx+r, rry-r, rrx-r, rry+r);
 		}
-
-
 
 	}
 		
@@ -318,6 +334,27 @@ public java.util.Vector getItems() {
 	addItem.addActionListener(al);
 	items.addElement(addItem);
 
+	// modes
+	items.addElement(new JSeparator());
+	
+	JMenu modeMenu = new JMenu(modeString);
+	items.addElement(modeMenu);
+
+	JRadioButtonMenuItem constantModeItem = new JRadioButtonMenuItem(constantString, getMode()==OutLink.CONSTANT_PORT_MODE);
+	constantModeItem.setEnabled(getMode()!=OutLink.CONSTANT_PORT_MODE);
+	constantModeItem.addActionListener(al);
+	modeMenu.add(constantModeItem);
+
+	JRadioButtonMenuItem inputModeItem = new JRadioButtonMenuItem(inputString, getMode()==OutLink.INPUT_PORT_MODE);
+	inputModeItem.setEnabled(getMode()!=OutLink.INPUT_PORT_MODE);
+	inputModeItem.addActionListener(al);
+	modeMenu.add(inputModeItem);
+
+	JRadioButtonMenuItem outputModeItem = new JRadioButtonMenuItem(outputString, getMode()==OutLink.OUTPUT_PORT_MODE);
+	outputModeItem.setEnabled(getMode()!=OutLink.OUTPUT_PORT_MODE);
+	outputModeItem.addActionListener(al);
+	modeMenu.add(outputModeItem);
+
 	items.add(new JSeparator());
 
 	JMenuItem descItem = new JMenuItem(descriptionString);
@@ -325,6 +362,17 @@ public java.util.Vector getItems() {
 	descItem.addActionListener(al);
 	items.addElement(descItem);
 	
+	items.add(new JSeparator());
+
+	JMenuItem removeLinkItem = new JMenuItem(removeLinkString);
+	removeLinkItem.addActionListener(al);
+	items.addElement(removeLinkItem);
+
+	JMenuItem removePortItem = new JMenuItem(removePortString);
+	removePortItem.setEnabled(false); //!!!
+	removePortItem.addActionListener(al);
+	items.addElement(removePortItem);
+
 	return items;
 }
 /**
@@ -364,10 +412,15 @@ public boolean isRight() {
  * @return int
  */
 public int getOutX() {
-	if (isRight())
-		return getX()+getWidth()+Constants.TAIL_LENGTH;
+	boolean right = !isRight();
+	/* ??? what is nicer
+	 boolean right = isRight();
+     if (getMode()==OutLink.CONSTANT_PORT_MODE) right=!right
+    */
+	if (right)
+		return getX();
 	else 
-		return getX()-Constants.TAIL_LENGTH;
+		return getX()+getWidth();
 }
 /**
  * Insert the method's description here.
@@ -481,9 +534,132 @@ public void setLayerID(String id) {
  */
 protected void validate() {
   revalidatePosition();
+
+  leftXtranslation = 0; leftYtranslation = 0;
+  rightXtranslation = 0; rightYtranslation = 0;
+  
+  if (getMode() == OutLink.OUTPUT_PORT_MODE)
+  {
+	  setWidth(Constants.LINK_STUB_SIZE);
+	  setHeight(Constants.LINK_STUB_SIZE);
+
+	  // to make it nice, do /2)*2
+	  int rwidth = (int)(getWidth()*getRscale()/2)*2;
+	  int rheight = (int)(getHeight()*getRscale()/2)*2;
+	  
+	  setRwidth(rwidth);
+	  setRheight(rheight);
+
+	  // left poly
+	  leftPoly.xpoints[0]=0;
+	  leftPoly.xpoints[1]=rwidth/2;
+	  leftPoly.xpoints[2]=rwidth;
+	  leftPoly.xpoints[3]=leftPoly.xpoints[2];
+	  leftPoly.xpoints[4]=leftPoly.xpoints[1];
 	
-  setRwidth((int)(getWidth()*getRscale()));
-  setRheight((int)(getHeight()*getRscale()));
+	  leftPoly.ypoints[0]=rheight/2;
+	  leftPoly.ypoints[1]=rheight;
+	  leftPoly.ypoints[2]=leftPoly.ypoints[1];
+	  leftPoly.ypoints[3]=0;
+	  leftPoly.ypoints[4]=leftPoly.ypoints[3];
+
+	
+	  // right poly
+	  rightPoly.xpoints[0]=0;
+	  rightPoly.xpoints[1]=rightPoly.xpoints[0];
+	  rightPoly.xpoints[2]=rwidth/2;
+	  rightPoly.xpoints[3]=rwidth;
+	  rightPoly.xpoints[4]=rightPoly.xpoints[2];
+	
+	  rightPoly.ypoints[0]=0;
+	  rightPoly.ypoints[1]=rheight;
+	  rightPoly.ypoints[2]=rightPoly.ypoints[1];
+	  rightPoly.ypoints[3]=rheight/2;
+	  rightPoly.ypoints[4]=rightPoly.ypoints[0];
+  }
+  else if (getMode() == OutLink.INPUT_PORT_MODE)
+  {
+	  setWidth(Constants.LINK_STUB_SIZE);
+	  setHeight(Constants.LINK_STUB_SIZE);
+
+	  // to make it nice, do /2)*2
+	  int rwidth = (int)(getWidth()*getRscale()/2)*2;
+	  int rheight = (int)(getHeight()*getRscale()/2)*2;
+	  
+	  setRwidth(rwidth);
+	  setRheight(rheight);
+
+	  // left poly
+	  leftPoly.xpoints[0]=rwidth/2;
+	  leftPoly.xpoints[1]=0;
+	  leftPoly.xpoints[2]=rwidth;
+	  leftPoly.xpoints[3]=leftPoly.xpoints[2];
+	  leftPoly.xpoints[4]=leftPoly.xpoints[1];
+	
+	  leftPoly.ypoints[0]=rheight/2;
+	  leftPoly.ypoints[1]=rheight;
+	  leftPoly.ypoints[2]=leftPoly.ypoints[1];
+	  leftPoly.ypoints[3]=0;
+	  leftPoly.ypoints[4]=leftPoly.ypoints[3];
+
+	
+	  // right poly
+	  rightPoly.xpoints[0]=0;
+	  rightPoly.xpoints[1]=rightPoly.xpoints[0];
+	  rightPoly.xpoints[2]=rwidth;
+	  rightPoly.xpoints[3]=rwidth/2;
+	  rightPoly.xpoints[4]=rightPoly.xpoints[2];
+	
+	  rightPoly.ypoints[0]=0;
+	  rightPoly.ypoints[1]=rheight;
+	  rightPoly.ypoints[2]=rightPoly.ypoints[1];
+	  rightPoly.ypoints[3]=rheight/2;
+	  rightPoly.ypoints[4]=rightPoly.ypoints[0];
+  }
+  else if (getMode() == OutLink.CONSTANT_PORT_MODE)
+  {
+  	  int factor = 4;
+  	
+	  setWidth(Constants.LINK_STUB_SIZE*factor);
+	  setHeight(Constants.LINK_STUB_SIZE);
+
+	  // to make it nice, do /2)*2
+	  int rwidth = (int)(getWidth()*getRscale()/2)*2;
+	  int rheight = (int)(getHeight()*getRscale()/2)*2;
+	  
+	  setRwidth(rwidth);
+	  setRheight(rheight);
+
+	  rwidth /= factor;
+	  
+	  // left poly
+	  leftPoly.xpoints[0]=0;
+	  leftPoly.xpoints[1]=rwidth/2;
+	  leftPoly.xpoints[2]=rwidth*factor;
+	  leftPoly.xpoints[3]=leftPoly.xpoints[2];
+	  leftPoly.xpoints[4]=leftPoly.xpoints[1];
+	
+	  leftPoly.ypoints[0]=rheight/2;
+	  leftPoly.ypoints[1]=rheight;
+	  leftPoly.ypoints[2]=leftPoly.ypoints[1];
+	  leftPoly.ypoints[3]=0;
+	  leftPoly.ypoints[4]=leftPoly.ypoints[3];
+
+	
+	  // right poly
+	  rightPoly.xpoints[0]=0;
+	  rightPoly.xpoints[1]=rightPoly.xpoints[0];
+	  rightPoly.xpoints[2]=factor*rwidth-rwidth/2;
+	  rightPoly.xpoints[3]=rwidth*factor;
+	  rightPoly.xpoints[4]=rightPoly.xpoints[2];
+	
+	  rightPoly.ypoints[0]=0;
+	  rightPoly.ypoints[1]=rheight;
+	  rightPoly.ypoints[2]=rightPoly.ypoints[1];
+	  rightPoly.ypoints[3]=rheight/2;
+	  rightPoly.ypoints[4]=rightPoly.ypoints[0];
+  }
+
 }
 
 /**
@@ -508,7 +684,17 @@ public void setColor(Color newColor) {
  */
 public int getMode()
 {
-	return NORMAL_MODE;
+	return mode;
+}
+
+/**
+ */
+public void setMode(int mode)
+{
+	this.mode = mode;
+	
+	// reload symbol
+	forceValidation();
 }
 
 /**
