@@ -454,6 +454,8 @@ private void fixForwardLinks() {
 			else
 				continue;	// nothing to fix
 		
+		// !!!!
+		
 		// now I got source and target, compare values
 		String oldTarget = LinkProperties.getTarget(source.getFieldData());
 		if (!oldTarget.equalsIgnoreCase(targetName))

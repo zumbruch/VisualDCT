@@ -50,6 +50,11 @@ String getValue();
  */
 void setValue(String value);
 /**
+ * Sets (value of )the link target.
+ * @param value
+ */
+void setValueSilently(String value);
+/**
  * Returns fill name of the source.
  * @return java.lang.String
  */

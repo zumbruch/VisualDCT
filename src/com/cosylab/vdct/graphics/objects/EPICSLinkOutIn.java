@@ -28,6 +28,7 @@ package com.cosylab.vdct.graphics.objects;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.util.Enumeration;
 import java.util.Vector;
 
 import com.cosylab.vdct.Constants;
@@ -207,6 +208,25 @@ public abstract class EPICSLinkOutIn extends EPICSLinkOut implements MultiInLink
 		}
 		else 
 			return super.isRight();
+	}
+
+	/**
+	 * Insert the method's description here.
+	 * Creation date: (5.2.2001 12:10:18)
+	 * @return java.util.Vector
+	 */
+	public Vector getStartPoints() {
+		OutLink out;
+		Vector starts = new Vector();
+		if (outlinks!=null)
+		{
+			Enumeration e = outlinks.elements();
+			while (e.hasMoreElements()) {
+				out = EPICSLinkOut.getStartPoint((Linkable)e.nextElement());
+				if (out!=null) starts.addElement(out);
+			}
+		}
+		return starts;
 	}
 
 }

@@ -141,10 +141,9 @@ public void fixEPICSOutLinks(Enumeration e, String prevGroup, String group) {
  * (linked list). It compares start point end end point and ...
  * Creation date: (2.5.2001 19:37:46)
  */
-public void fixLinksNew() {
+public void fixLinks() {
 
 	Object unknownField;
-	InLink inlink;
 	
 	Enumeration e = getSubObjectsV().elements();
 	while (e.hasMoreElements())
@@ -152,41 +151,21 @@ public void fixLinksNew() {
 			unknownField = e.nextElement();
 			
 			// go and find source
-			if (unknownField instanceof InLink)
+			if (unknownField instanceof EPICSVarLink)
 			{
-				inlink = (EPICSVarLink)unknownField;
-				//!!fixLink(inlink);
+				fixLink((EPICSVarLink)unknownField);
+			}
+			else if (unknownField instanceof EPICSLinkOutIn)
+			{
+				fixLink((EPICSLinkOutIn)unknownField);
 			}
 
-/*
-			else if (unknownField instanceof EPICSLinkOut)
-			{
-				source = (EPICSLinkOut)unknownField;
-				InLink inlink = EPICSLinkOut.getEndPoint(source);
-				if (inlink!=null && inlink instanceof EPICSVarLink)
-				{
-					varlink = (EPICSVarLink)inlink;
-					targetName = varlink.getFieldData().getFullName();
-					// now I got source and target, compare values
-					String oldTarget = LinkProperties.getTarget(source.getFieldData());
-					if (!oldTarget.equalsIgnoreCase(targetName))
-					{
-						// not the same, fix it gently as a doctor :)
-						String value = source.getFieldData().getValue();
-						value = targetName + com.cosylab.vdct.util.StringUtils.removeBegining(value, oldTarget);
-						source.getFieldData().setValueSilently(value);
-						source.fixLinkProperties();
-					}
-				}
-			}
-
-*/
-			
 	}
 	
 }
 
-public void fixLinks() {
+
+public void fixLinks_() {
 
 	Object unknownField;
 	EPICSVarLink varlink;
@@ -233,28 +212,76 @@ public void fixLinks() {
 
 public static void fixLink(EPICSVarLink varlink)
 {
-	EPICSLink source;
+	LinkSource data = null;
 	String targetName = varlink.getFieldData().getFullName();
 	
 	Enumeration e2 = varlink.getStartPoints().elements();
 	while (e2.hasMoreElements())
 	{
 		Object unknownField = e2.nextElement();
-		if (unknownField instanceof OutLink && unknownField instanceof EPICSLink) 
-			source = (EPICSLink)unknownField;  
+		if (unknownField instanceof OutLink) 
+		{
+			if (unknownField instanceof EPICSLink)
+				data = ((EPICSLink)unknownField).getFieldData();
+			else if (unknownField instanceof Port)
+				data = ((Port)unknownField).getData();
+		}
 		else
 			continue;	// nothing to fix
 	
 		// now I got source and target, compare values
-		String oldTarget = LinkProperties.getTarget(source.getFieldData());
+		String oldTarget = LinkProperties.getTarget(data);
 		if (!oldTarget.equalsIgnoreCase(targetName))
 		{
 			// not the same, fix it gently as a doctor :)
-			String value = source.getFieldData().getValue();
+			String value = data.getValue();
 			// value = targetName + link properties
 			value = targetName + com.cosylab.vdct.util.StringUtils.removeBegining(value, oldTarget);
-			source.getFieldData().setValueSilently(value);
-			source.fixLinkProperties();
+			data.setValueSilently(value);
+			
+			// !!!!
+			if (unknownField instanceof EPICSLink)
+				((EPICSLink)unknownField).fixLinkProperties();
+			else if (unknownField instanceof Port)
+				((Port)unknownField).fixLinkProperties();
+		}
+	}
+}
+
+public static void fixLink(EPICSLinkOutIn linkoutin)
+{
+	LinkSource data = null;
+	String targetName = linkoutin.getFieldData().getFullName();
+	
+	Enumeration e2 = linkoutin.getStartPoints().elements();
+	while (e2.hasMoreElements())
+	{
+		Object unknownField = e2.nextElement();
+		if (unknownField instanceof OutLink) 
+		{
+			if (unknownField instanceof EPICSLink)
+				data = ((EPICSLink)unknownField).getFieldData();
+			else if (unknownField instanceof Port)
+				data = ((Port)unknownField).getData();
+		}
+		else
+			continue;	// nothing to fix
+	
+		// now I got source and target, compare values
+		String oldTarget = LinkProperties.getTarget(data);
+		if (!oldTarget.equalsIgnoreCase(targetName))
+		{
+			// not the same, fix it gently as a doctor :)
+			String value = data.getValue();
+			// value = targetName + link properties
+			value = targetName + com.cosylab.vdct.util.StringUtils.removeBegining(value, oldTarget);
+			data.setValueSilently(value);
+			
+			// !!!!
+			if (unknownField instanceof EPICSLink)
+				((EPICSLink)unknownField).fixLinkProperties();
+			else if (unknownField instanceof Port)
+				((Port)unknownField).fixLinkProperties();
 		}
 	}
 }
@@ -535,24 +562,28 @@ public Vector getLinkMenus(Enumeration vdbFields) {
 	VDBFieldData field;
 	JMenuItem menuitem;
 
-	boolean disableVarLinks = (getTargetLink() instanceof VDBPort);
+	boolean port2All = (getTargetLink() instanceof VDBPort);
 	
-	if (getTargetLink()==null || disableVarLinks) {
+	if (getTargetLink()==null || port2All) {
 		
 		JMenu inlinks = new JMenu(inlinkString);
 		JMenu outlinks = new JMenu(outlinkString);
 		JMenu fwdlinks = new JMenu(fwdlinkString);
-		JMenu varlinks = new JMenu(varlinkPortString); // -> port
+		JMenu varlinks = null;
+		if (port2All)
+			varlinks = new JMenu(varlinkString);
+		else
+			varlinks = new JMenu(varlinkPortString); 
 		
 		JMenu inMenu = inlinks;	
 		JMenu outMenu = outlinks;	
 		JMenu fwdMenu = fwdlinks;	
-		JMenu varMenu = varlinks;	// -> port
+		JMenu varMenu = varlinks;	
 		
 		int inpItems, outItems, fwdItems;
-		int varItems; // -> port
+		int varItems;
 		inpItems=outItems=fwdItems=0;
-		varItems=0; // -> port
+		varItems=0; 
 
 		while (vdbFields.hasMoreElements()) {
 			field = (VDBFieldData)(vdbFields.nextElement());
@@ -577,11 +608,9 @@ public Vector getLinkMenus(Enumeration vdbFields) {
 						 fwdItems++;
 						 break;
 					default:
-						 if (disableVarLinks)
-						 	break;
 
 						 // no not add fields with undefined GUI type
-						 if (field.getGUI_type() == DBDConstants.GUI_UNDEFINED)
+						 if (!port2All && field.getGUI_type() == DBDConstants.GUI_UNDEFINED)
 						 	break;
 
 						 menuitem = new JMenuItem(field.getName());

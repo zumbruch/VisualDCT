@@ -136,7 +136,7 @@ public String getTarget() {
  * @return java.lang.String
  * @param fd com.cosylab.vdct.vdb.VDBFieldData
  */
-public static String getOptions(VDBFieldData fd) {
+public static String getOptions(LinkSource fd) {
 
 	if ((fd.getValue()==null) || fd.getValue().equals(nullString)) return null;
 
@@ -187,7 +187,7 @@ public java.lang.String getRecord() {
  * @return java.lang.String
  * @param fd com.cosylab.vdct.vdb.VDBFieldData
  */
-public static String getTarget(VDBFieldData fd) {
+public static String getTarget(LinkSource fd) {
 	
 	if ((fd.getValue()==null) || fd.getValue().equals(nullString)) return null;
 

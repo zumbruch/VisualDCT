@@ -934,4 +934,13 @@ public void fixLinkProperties()
 	properties = newProperties;
 }
 
+	/**
+	 * Returns the data.
+	 * @return VDBPort
+	 */
+	public VDBPort getData()
+	{
+		return data;
+	}
+
 }

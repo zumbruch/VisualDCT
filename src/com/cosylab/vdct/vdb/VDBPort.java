@@ -343,6 +343,15 @@ public class VDBPort implements InspectableProperty, Descriptable, ChangableVisi
 	}
 
 	/**
+	 * Insert the method's description here.
+	 * Creation date: (9.12.2000 18:11:46)
+	 * @param newValue java.lang.String
+	 */
+	public void setValueSilently(java.lang.String newValue) {
+		target = newValue;
+	}
+
+	/**
 	 * @see com.cosylab.vdct.inspector.InspectableProperty#setValue(String)
 	 */
 	public void setValue(String value)
