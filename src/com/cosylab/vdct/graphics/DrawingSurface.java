@@ -1607,6 +1607,100 @@ public void checkForIncodedDBDs(File file) throws IOException
 		
 }
 
+
+/**
+ * Import the fields from a .db file (option
+ * to ignore database link fields). Only the fields of the records that
+ * are already defined in VDCT are overriden with the new settings. This
+ * would allow easy definition of the limits, hardware addresses, display
+ * range etc.
+ */
+public boolean importFields(File file, boolean ignoreLinkFields)
+{
+    boolean imported = false;
+    try
+    {
+        setCursor(hourCursor);
+
+		// load
+		DBData dbData = null;
+		/*if (getAppletBase()!=null) 	// applet
+			try
+			{
+				dbData = DBResolver.resolveDBasURL(new java.net.URL(getVDCTFrame().getAppletBase(), file.getAbsolutePath()));
+			} catch (java.net.MalformedURLException e) { Console.getInstance().println(e); }
+		else  */
+	
+		try
+		{
+			dbData = DBResolver.resolveDB(file.getAbsolutePath());
+		} 
+		catch(Exception e)
+		{
+			Console.getInstance().println(e);
+		}
+		
+	    //
+	    // override fields of record which already exist in the opened DB
+	    //
+		Group rootGroup = Group.getRoot();
+		Enumeration enum = dbData.getRecordsV().elements();
+		while (enum.hasMoreElements())
+		{
+		    DBRecordData recordData = (DBRecordData)enum.nextElement();
+	
+		    // does exist?
+		    Record existingRecord = (Record)rootGroup.findObject(recordData.getName(), true);
+		    if (existingRecord == null)
+		        continue;
+		    
+		    VDBRecordData existingRecordData = existingRecord.getRecordData();
+		    
+		    // override here
+		    Enumeration fieldsEnum = recordData.getFieldsV().elements();
+		    while (fieldsEnum.hasMoreElements())
+		    {
+		        DBFieldData field = (DBFieldData)fieldsEnum.nextElement();
+	
+		        VDBFieldData existingField = (VDBFieldData)existingRecordData.getFields().get(field.getName());
+		        if (existingField != null)
+		        {
+		            // check link type
+		            if (ignoreLinkFields) {
+		                int fieldType = existingField.getType();
+		                if (fieldType == DBDConstants.DBF_INLINK ||
+		                    fieldType == DBDConstants.DBF_OUTLINK ||
+		                    fieldType == DBDConstants.DBF_FWDLINK)
+		                    continue;
+		            }
+	
+		            // packed undo
+		            if (!imported)
+		            {
+		                imported = true;
+		                UndoManager.getInstance().startMacroAction();
+		            }
+		            
+		            // do the override
+		            existingField.setValue(field.getValue());
+		        }
+		    }
+		}
+		
+		return true;
+    }
+    catch (Throwable th) {
+        return false;
+    }
+    finally {
+        
+        if (imported)
+            UndoManager.getInstance().stopMacroAction();
+        
+		restoreCursor();
+    }
+}
+
 /**
  * SEPARATE DOWN CODE TO METHODS
  * Creation date: (6.1.2001 22:35:40)
@@ -1666,6 +1760,7 @@ public boolean open(File file, boolean importDB) throws IOException {
 		// check for sucess
 		if ((dbData == null) || !dbdData.consistencyCheck(dbData))
 		{
+			UndoManager.getInstance().setMonitor(true);
 			restoreCursor();
 			return false;
 		}
@@ -1744,12 +1839,10 @@ public boolean open(File file, boolean importDB) throws IOException {
 		createNavigatorImage();
 		forceRedraw = true;
 		repaint();
+
+		///!!! TODO put somewhere in try-finally block
 		restoreCursor();
-
 		UndoManager.getInstance().setMonitor(true);
-
-
-		///!!! put somewhere in try-finally block
 		// free db memory	    
 		dbData = null;
 		System.gc();
