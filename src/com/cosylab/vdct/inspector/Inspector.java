@@ -675,7 +675,13 @@ public void reinitialize() {}
  * Insert the method's description here.
  * Creation date: (8.1.2001 17:50:20)
  */
-public void updateObject() { Inspectable ins = inspectedObject; inspectedObject=null; inspectObject(ins); }
+public void updateObject() { 
+    Inspectable ins = inspectedObject;
+    inspectedObject=null;
+    inspectObject(ins);
+    // name/type might change, do the repaint to force the change 
+    getObjectComboBox().repaint();
+}
 /**
  * Insert the method's description here.
  * Creation date: (26.1.2001 15:18:44)
