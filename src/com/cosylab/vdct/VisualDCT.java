@@ -73,6 +73,7 @@ public class VisualDCT extends JFrame {
 	private JMenu ivjHelpMenu = null;
 	private JMenuItem ivjImport_DBDMenuItem = null;
 	private JMenuItem ivjImport_DBMenuItem = null;
+	private JMenuItem ivjImportFieldsMenuItem = null;
 	private JPanel ivjJFrameContentPane = null;
 	private JSeparator ivjJSeparator1 = null;
 	private JSeparator ivjJSeparator10 = null;
@@ -229,6 +230,8 @@ class IvjEventHandler implements java.awt.event.ActionListener, java.awt.event.I
 				connEtoC7(e);
 			else if (e.getSource() == VisualDCT.this.getImport_DBMenuItem()) 
 				connEtoC8(e);
+			else if (e.getSource() == VisualDCT.this.getImportFieldsMenuItem())
+			    VisualDCT.this.importFieldsActionPerformed();
 			else if (e.getSource() == VisualDCT.this.getImport_DBDMenuItem()) 
 				connEtoC9(e);
 			else if (e.getSource() == VisualDCT.this.getSaveMenuItem()) 
@@ -2529,6 +2532,7 @@ private javax.swing.JMenu getFileMenu() {
 			ivjFileMenu.add(getNewMenuItem());
 			ivjFileMenu.add(getOpenMenuItem());
 			ivjFileMenu.add(getImport_DBMenuItem());
+			ivjFileMenu.add(getImportFieldsMenuItem());
 			ivjFileMenu.add(getImport_DBDMenuItem());
 			ivjFileMenu.add(getJSeparator1());
 			ivjFileMenu.add(getSaveMenuItem());
@@ -2847,6 +2851,28 @@ private javax.swing.JMenuItem getImport_DBMenuItem() {
 		}
 	}
 	return ivjImport_DBMenuItem;
+}
+
+/**
+ * Return the ImportFieldsMenuItem property value.
+ * @return javax.swing.JMenuItem
+ */
+/* WARNING: THIS METHOD WILL BE REGENERATED. */
+private javax.swing.JMenuItem getImportFieldsMenuItem() {
+	if (ivjImportFieldsMenuItem == null) {
+		try {
+			ivjImportFieldsMenuItem = new javax.swing.JMenuItem();
+			ivjImportFieldsMenuItem.setName("ImportFieldsMenuItem");
+			ivjImportFieldsMenuItem.setText("Import fields...");
+			// user code begin {1}
+			// user code end
+		} catch (java.lang.Throwable ivjExc) {
+			// user code begin {2}
+			// user code end
+			handleException(ivjExc);
+		}
+	}
+	return ivjImportFieldsMenuItem;
 }
 
 // shp: not final solution
@@ -5495,6 +5521,34 @@ public void import_DBMenuItem_ActionPerformed() {
 		}
 	}
 }
+
+/**
+ * Comment
+ */
+public void importFieldsActionPerformed() {
+	JFileChooser chooser = getfileChooser();
+	UniversalFileFilter filter = new UniversalFileFilter(
+		new String[] {"db", "vdb"}, "EPICS DB files");
+	chooser.resetChoosableFileFilters();
+	chooser.addChoosableFileFilter(filter);
+	chooser.setDialogTitle("Import fields...");
+	chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+	int retval = chooser.showOpenDialog(this);
+
+	if(retval == JFileChooser.APPROVE_OPTION) {
+	    java.io.File theFile = chooser.getSelectedFile();
+	    if(theFile != null) {
+		    GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
+		    try {
+	  		 	cmd.getGUIMenuInterface().importFields(theFile);
+		    } catch (java.io.IOException e) {
+			    Console.getInstance().println("o) Failed to import fields from DB file: '"+theFile.toString()+"'");
+			    Console.getInstance().println(e);
+		    }
+		}
+	}
+}
+
 /**
  * Initializes connections
  * @exception java.lang.Exception The exception description.
@@ -5516,6 +5570,7 @@ private void initConnections() throws java.lang.Exception {
 	getNewMenuItem().addActionListener(ivjEventHandler);
 	getOpenMenuItem().addActionListener(ivjEventHandler);
 	getImport_DBMenuItem().addActionListener(ivjEventHandler);
+	getImportFieldsMenuItem().addActionListener(ivjEventHandler);
 	getImport_DBDMenuItem().addActionListener(ivjEventHandler);
 	getSaveMenuItem().addActionListener(ivjEventHandler);
 	getSave_AsMenuItem().addActionListener(ivjEventHandler);

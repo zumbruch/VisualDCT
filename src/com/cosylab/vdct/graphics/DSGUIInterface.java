@@ -31,6 +31,7 @@ package com.cosylab.vdct.graphics;
 import java.io.*;
 import java.util.*;
 
+import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 
 import com.cosylab.vdct.*;
@@ -427,6 +428,25 @@ public void group(String groupName) {
  */
 public void importDB(java.io.File file) throws IOException {
 	drawingSurface.open(file, true);
+}
+/**
+ * Insert the method's description here.
+ * Creation date: (4.2.2001 15:32:01)
+ * @param file java.io.File
+ */
+public void importFields(java.io.File file) throws IOException {
+    int result = JOptionPane.showConfirmDialog(VisualDCT.getInstance(),
+            		"Do you want to ignore database link fields?",
+            		"Import fields", 
+            		JOptionPane.YES_NO_OPTION,
+            		JOptionPane.QUESTION_MESSAGE);
+    
+    // window closed
+	if (result == JOptionPane.CLOSED_OPTION)
+	    return;
+    
+    boolean ignoreLinkFields = (result == JOptionPane.OK_OPTION);
+	drawingSurface.importFields(file, ignoreLinkFields);
 }
 /**
  * Insert the method's description here.
