@@ -76,7 +76,7 @@ public class DBResolver {
 	public final static String DBD_ENTRY	= "#! "+DBD_ENTRY_STR+"(\"";
 	public final static String DBD_END	= "#! "+DBD_END_STR+"\n";
 
-	// templates
+	// template definition
 	// used format:
 	// #! TEMPLATESTART
  	// #! TemplateDescription("description")
@@ -95,6 +95,14 @@ public class DBResolver {
 	
 	// automatically auto-triggered at EOF (stores template data && resets all current template data)
 	private static String TEMPLATE_END = "TEMPLATEEND";
+
+	// template 'instatiation'
+	// used format:
+ 	// #! TemplateInstance("templateid", x, y, color, "desc")
+ 	// #! TemplateProperty("templateid", "name", "value")
+	private static String TEMPLATE_INSTANCE = "TemplateInstance";
+	private static String TEMPLATE_PROPERTY= "TemplateProperty";
+
 	
 	// template
 	private static DBTemplate templateData = null;
@@ -368,6 +376,60 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 					templateData.setDescription(id);		// default
 					templateData.setFileName(fileName);
 				}
+				else if (tokenizer.sval.equalsIgnoreCase(TEMPLATE_INSTANCE)) {
+					// read template id
+					tokenizer.nextToken();
+					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+						(tokenizer.ttype == DBConstants.quoteChar)) str=tokenizer.sval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+					
+					// read x pos
+					tokenizer.nextToken();
+					if (tokenizer.ttype == tokenizer.TT_NUMBER) tx=(int)tokenizer.nval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+					
+					// read y pos
+					tokenizer.nextToken();
+					if (tokenizer.ttype == tokenizer.TT_NUMBER) ty=(int)tokenizer.nval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					// read color
+					tokenizer.nextToken();
+					if (tokenizer.ttype == tokenizer.TT_NUMBER) t=(int)tokenizer.nval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					// read description
+					tokenizer.nextToken();
+					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+						(tokenizer.ttype == DBConstants.quoteChar)) desc=tokenizer.sval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					data.addTemplateInstance(new DBTemplateInstance(str, tx, ty, StringUtils.int2color(t), desc));
+				}
+				else if (tokenizer.sval.equalsIgnoreCase(TEMPLATE_PROPERTY)) {
+					// read template id
+					tokenizer.nextToken();
+					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+						(tokenizer.ttype == DBConstants.quoteChar)) str=tokenizer.sval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+					
+					// read name
+					tokenizer.nextToken();
+					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+						(tokenizer.ttype == DBConstants.quoteChar)) str2=tokenizer.sval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					// read value
+					tokenizer.nextToken();
+					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+						(tokenizer.ttype == DBConstants.quoteChar)) desc=tokenizer.sval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					DBTemplateInstance ti = (DBTemplateInstance)data.getTemplateInstances().get(str);
+					if (ti==null)
+						ti.getProperties().put(str2, desc);
+					
+				}
 				else if (templateData!=null && tokenizer.sval.equalsIgnoreCase(TEMPLATE_DESC)) {
 
 					// read description
@@ -557,7 +619,6 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 
 private static void templateEnd()
 {
-	System.out.println("Template end");
 	// store templateData
 	///!!!
 

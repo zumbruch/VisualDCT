@@ -41,6 +41,7 @@ public class DBData {
 	protected Hashtable groups = null;
 	protected Hashtable links = null;
 	protected Hashtable connectors = null;
+	protected Hashtable templateInstances = null;
 /**
  * DBDData constructor comment.
  */
@@ -50,6 +51,7 @@ public DBData() {
 	groups = new Hashtable();
 	links = new Hashtable();
 	connectors = new Hashtable();
+	templateInstances = new Hashtable();
 }
 /**
  * Insert the method's description here.
@@ -87,6 +89,17 @@ public void addRecord(DBRecordData rd) {
 	}
 	else
 		Console.getInstance().println("Warning: Record with name '"+rd.getName()+"' already exists, skiping...");
+}
+/**
+ * This method was created in VisualAge.
+ * @param rd com.cosylab.vdct.db.DBTemplateInstance
+ */
+public void addTemplateInstance(DBTemplateInstance ti) {
+	if (!templateInstances.containsKey(ti.getTemplateID())) {
+		templateInstances.put(ti.getTemplateID(), ti);
+	}
+	else
+		Console.getInstance().println("Warning: Template instance of '"+ti.getTemplateID()+"' already exists, skiping...");
 }
 /**
  * Insert the method's description here.
@@ -167,4 +180,13 @@ public Hashtable getRecords() {
 public Vector getRecordsV() {
 	return recordsV;
 }
+/**
+ * Returns the templateInstances.
+ * @return Hashtable
+ */
+public Hashtable getTemplateInstances()
+{
+	return templateInstances;
+}
+
 }
