@@ -629,4 +629,20 @@ public void validateLink()
 {
 }
 
+
+
+public int getRightX() {
+	if (inlink==null || !getLayerID().equals(inlink.getLayerID()))
+		return getX()+getWidth()+Constants.TAIL_LENGTH;	 
+	else	
+		return getX()+getWidth()+Constants.TAIL_LENGTH + getVerticalPosition()*Constants.LINK_SLOT_WIDTH;
+}
+
+public int getLeftX() {
+	if (inlink==null || !getLayerID().equals(inlink.getLayerID()))
+		return getX()-Constants.TAIL_LENGTH;
+	else
+		return getX()-Constants.TAIL_LENGTH - getVerticalPosition()*Constants.LINK_SLOT_WIDTH;
+}
+
 }

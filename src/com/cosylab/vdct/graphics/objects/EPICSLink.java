@@ -163,13 +163,4 @@ public void validate() {
 /// Called after chaning value silently (fixLinks)
 public abstract void fixLinkProperties();
 
-
-public int getRightX() {
-	return getX()+getWidth()+Constants.TAIL_LENGTH + getVerticalPosition()*Constants.LINK_SLOT_WIDTH;
-}
-
-public int getLeftX() {
-	return getX()-Constants.TAIL_LENGTH - getVerticalPosition()*Constants.LINK_SLOT_WIDTH;
-}
-
 }

@@ -462,5 +462,19 @@ public void revalidateOutlinkConnectors() {
 		}
 	}
 }
+public int getRightX() {
+	if (outlinks.size()!=1 || !getLayerID().equals(getOutput().getLayerID()))
+		return getX()+getWidth()+Constants.TAIL_LENGTH;	 
+	else	
+		return getX()+getWidth()+Constants.TAIL_LENGTH + getVerticalPosition()*Constants.LINK_SLOT_WIDTH;
+}
+
+public int getLeftX() {
+	if (outlinks.size()!=1 || !getLayerID().equals(getOutput().getLayerID()))
+		return getX()-Constants.TAIL_LENGTH;
+	else
+		return getX()-Constants.TAIL_LENGTH - getVerticalPosition()*Constants.LINK_SLOT_WIDTH;
+}
+
 
 }
