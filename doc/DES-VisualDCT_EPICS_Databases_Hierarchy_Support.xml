@@ -31,7 +31,7 @@
 		</modification>
 
 		<scope>
-			This document is presents a new EPICS databases hierarchy mechanism used by VisualDCT and it is a proposal for EPICS database model for Base R3.15 and later.
+			This document presents a new EPICS databases hierarchy mechanism used by VisualDCT and it is a proposal for EPICS database model for Base R3.15 and later.
 			<p>
 			The document is based on discussion between Andrew Johnson, John Maclean and Matej Sekoranja.
 			</p>
@@ -43,7 +43,7 @@
 		
 		<reference id="visualdct"
 			   title="VisualDCT Project"
-			   href="http://visuladct.cosylab.com/"
+			   href="http://visualdct.cosylab.com/"
 			   author="Matej Sekoranja"
 			   date="2002"
 			   publisher="Cosylab, Ltd."

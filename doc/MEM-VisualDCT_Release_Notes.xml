@@ -32,7 +32,7 @@
 		
 		<reference id="visualdct"
 			   title="VisualDCT Project"
-			   href="http://visuladct.cosylab.com/"
+			   href="http://visualdct.cosylab.com/"
 			   author="Matej Sekoranja"
 			   date="2002"
 			   publisher="Cosylab, Ltd."
@@ -40,7 +40,7 @@
 			   
 		<reference id="visualdct_latest"
 			   title="VisualDCT latest build"
-			   href="http://visuladct.cosylab.com/builds/VisualDCT/"
+			   href="http://visualdct.cosylab.com/builds/VisualDCT/"
 			   author="Matej Sekoranja"
 			   date="2002"
 			   publisher="Cosylab, Ltd."
