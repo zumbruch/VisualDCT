@@ -4,8 +4,58 @@
 <TITLE>ChangeLog: VisualDCT - Visual Database Configuration Tool</TITLE>
 </HEAD>
 <BODY>
-<font size="+2"><b>VisualDCT</b></font><br>Visual Database Configuration Tool<p><font size="-1">See a
+<font size="+2"><b>VisualDCT</b></font><br>Visual Database Configuration Tool<p><font size="-1">See a 
           <a href="#developer-list">list of developers/initials.</a></font></p>
+<hr>
+<table border="0" width="100%" cellspacing="2" cellpadding="3" bgcolor="#000000">
+<tr bgcolor="#bbbbff">
+<td align="right" width="10%">
+<font size="+2">
+							v2.1</font>
+</td>
+<td width="5%" align="center"><a href="#personref-ms">ms</a></td>
+<td>
+<font size="+2">
+    	   					build 1227,
+	        	  			released 2001-12-15</font>
+</td>
+</tr>
+<tr bgcolor="#bbffbb">
+<td align="right">fix</td>
+<td align="center"><a href="#personref-"></a></td>
+<td>Not all fields are available as link destinations.</td>
+</tr>
+<tr bgcolor="#bbffbb">
+<td align="right">fix</td>
+<td align="center"><a href="#personref-"></a></td>
+<td>Type combo-box has multiple instances of the same type.</td>
+</tr>
+<tr bgcolor="#bbffff">
+<td align="right">enhancement</td>
+<td align="center"><a href="#personref-"></a></td>
+<td>If DBF_MENU or DBF_DEVICE field has defined 'initial' value, than "&lt;intial_value&gt;*" (e.g. "INVALID*") is used instead "&lt;none&gt;".</td>
+</tr>
+<tr bgcolor="#ffffff">
+<td align="right">comment</td>
+<td align="center"><a href="#personref-"></a></td>
+<td>For DBF_MENU or DBF_DEVICE fields only values with "&lt;intial_value&gt;*" and "&lt;none&gt;" are threated as default, e.g. "INVALID*" is default, but "INVALID" not.</td>
+</tr>
+<tr bgcolor="#ffffff">
+<td align="right">comment</td>
+<td align="center"><a href="#personref-"></a></td>
+<td>Navigation using arrow keys to be added.</td>
+</tr>
+<tr bgcolor="#ffffff">
+<td align="right">comment</td>
+<td align="center"><a href="#personref-"></a></td>
+<td>"New record dialog" to be enhanced.</td>
+</tr>
+<tr bgcolor="#ffbbbb">
+<td align="right">bug</td>
+<td><a align="center" href="#personref-"></a></td>
+<td>Changing record type in the "New record dialog" erases record name.</td>
+</tr>
+</table>
 <hr>
 <table border="0" width="100%" cellspacing="2" cellpadding="3" bgcolor="#000000">
 <tr bgcolor="#bbbbff">
@@ -23,7 +73,7 @@
 <tr bgcolor="#bbffbb">
 <td align="right">fix</td>
 <td align="center"><a href="#personref-"></a></td>
-<td>Not all fields are available as link destinations</td>
+<td>Not all fields are available as link destinations.</td>
 </tr>
 <tr bgcolor="#ffffff">
 <td align="right">comment</td>
@@ -108,18 +158,18 @@
 <tr bgcolor="#ffffff">
 <td align="right">comment</td>
 <td align="center"><a href="#personref-jfm">jfm</a></td>
-<td>Agreed to act as requirements coordinator and quality control point of contact between JSI and EPICS community.</td>
+<td>Agreed to act as requirements coordinator and quality control point of contact between Cosylab and EPICS community.</td>
 </tr>
 </table>
 <hr>
 <H3><a name="developer-list">Developers:</a></H3>
 <p>A list of some of people currently working on working on VisualDCT:</p>
 <ul>
-<li><a href="mailto:matej.sekoranja@ijs.si">Matej Sekoranja</a><a name="personref-ms"> (ms)</a><BR>
+<li><a href="mailto:matej.sekoranja@cosylab.com">Matej Sekoranja</a><a name="personref-ms"> (ms)</a><BR>
 			Lead developer on VisualDCT.
   		<BR><BR></li>
 <li><a href="mailto:jfm@aps.anl.gov">John F. Maclean</a><a name="personref-jfm"> (jfm)</a><BR>
-			Requirements coordinator and quality control point of contact between JSI and EPICS community.
+			Requirements coordinator and quality control point of contact between Cosylab and EPICS community.
   		<BR><BR></li>
 </ul>
 </BODY>

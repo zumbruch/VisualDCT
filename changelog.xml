@@ -33,7 +33,7 @@ Please specify your id as who field, if not specified version/who is assumed.
 		<comment>For DBF_MENU or DBF_DEVICE fields only values with "&lt;intial_value&gt;*" and "&lt;none&gt;" are threated as default, e.g. "INVALID*" is default, but "INVALID" not.</comment>
 		<comment>Navigation using arrow keys to be added.</comment>
 		<comment>"New record dialog" to be enhanced.</comment>
-		<bug>Changing record type in the "New record dialog" erases record name.</bug>
+		<bug severity="minor">Changing record type in the "New record dialog" erases record name.</bug>
 	</version>
 
 	<version ver="2.1" build="1226" date="2001-12-09" who="ms">
