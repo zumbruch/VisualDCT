@@ -42,6 +42,10 @@
 			<section>Package D1 release candidate.</section>
 		</modification>
 
+		<modification version="2.4.1256" by="msekoranja" date="2004-11-18">
+			<section>Package D2 pre-release.</section>
+		</modification>
+
 		<scope>
 			This document is contains release notes of the current build.
 		</scope>
@@ -63,7 +67,7 @@
 			   author="Matej Sekoranja"
 			   date="2004"
 			   publisher="Cosylab, Ltd."
-			   revision="2.4.1250"/>
+			   revision="2.4.1256"/>
 
 	</head>
 	
@@ -72,25 +76,22 @@
 			<p>
 			Changes in current version:
 			<ul>
-			  <li>Morphing.</li>
-			  <li>DrawingSurface canvas size.</li>
-			  <li>Popup for common actions.</li>
-			  <li>Linking bugfix.</li>
-			  <li>Create command line tool for flatterning hierarchical databases.</li>
-			  <li>User settable screen pan direction.</li>
-			  <li>Local/global macro property.</li>
-			  <li>Resize (move record up) record text area and not move link area.</li>
-			  <li>Macros aren't always substituted.</li>
-			  <li>Produce hierarchical names like Capfast.</li>
-			  <li>Storing DBD path names.</li>
-			  <li>Allow option on record name lenght limit.</li>
-			  <li>Double-click problem.</li>
-			  <li>Printing large databases at a small zoom (text readability problem).</li>
-			  <li>Connectors undo managing.</li>
-			  <li>Link Highlighting.</li>
-			  <li>Speed up move.</li>
-			  <li>External links have wrong description.</li>
-			  <li>... and bugfixes.</li>
+				<li>Check for configuration files of the vdct plugins also in sys directory</li>
+				<li>FileChooser on Mac OSX</li>
+				<li>JCA debug plugin future in VDCT</li>
+				<li>DBD path/filename overlaps with the zoom level</li>
+				<li>Print with legend</li>
+				<li>Don't show fields in text area if they are links</li>
+				<li>Copy-paste a field value from a record</li>
+				<li>Search for a record in a record list</li>
+				<li>DrawingSurface canvas size</li>
+				<li>Visibility of the fields</li>
+				<li>Editable combo box</li>
+				<li>Make vdct debug work in latest jca (port to JCA2 and Pure Java CA)</li>
+				<li>Provide 'application runner plugin'</li>
+				<li>Override fields of an already imported record</li>
+				<li>New record dialog focus</li>
+				<li>... and bugfixes.</li>
 			</ul>
 			</p>
 			<p>
@@ -105,9 +106,7 @@
 			<p>
 			Still there are quite a lot of ideas and nice features to be implemeted in the next releases:
 			<ul>
-			  <li>search for objects</li>
-			  <li>better printing support</li>
-			  <li>pure Java CA debugging plug-in</li>
+			  <li>fix printing support</li>
 			  <li>...</li>
 			</ul>
 			</p>
