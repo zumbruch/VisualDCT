@@ -30,6 +30,10 @@
 			<section>Package C (full graphical hierarchy support) release candidate.</section>
 		</modification>
 
+		<modification version="2.4.1247" by="msekoranja" date="2003-12-28">
+			<section>Minor bugfixes.</section>
+		</modification>
+
 		<scope>
 			This document is contains release notes of the current build.
 		</scope>
@@ -51,16 +55,33 @@
 			   author="Matej Sekoranja"
 			   date="2003"
 			   publisher="Cosylab, Ltd."
-			   revision="2.4.1244"/>
+			   revision="2.4.1247"/>
 
 	</head>
 	
 	<body>
 		<section id="noted" title="Release Notes">
 			<p>
-			Current version has been added full graphical hierarchy support. Also some useful features like recent file list,
-			last DB workspace view, relative DBD paths, etc., where implemented.
-			Current build has the following disabilities:
+			Changes in current version:
+			<ul>
+			  <li>An invalid link can be displayed as a link because VDCT appears
+				  to be case-insensitive even though EPICS requires field names to be
+				  upper-case</li>
+			  <li>A minor problem: VME_IO I/O fields are required to
+				  have a trailing <kwd>@</kwd> parameter according to VDCT. e.g. it demands
+				  an address <kwd>#C0 S0 @</kwd> rather than <kwd>#C0 S0</kwd>.</li>
+			  <li><kwd>VAL</kwd> field is always shown in inspector (some DBD do not have prompt_gui defined).</li>
+			  <li>This is really important - novices can easily overwrite a
+				  <kwd>.dbd</kwd> file because VDCT always seems to take the last used file extension
+				  as the default. So the first save operation of your new <kwd>.db</kwd> file will
+				  attempt to overwrite the <kwd>.dbd</kwd> file you have just opened, by default.</li>
+			  <li>fixed VAL -> VAL linking - should not be possible</li>
+			  <li>links starting with digits are not assumed to be constant links anymore,
+				  only if records does not exists</li>
+			</ul>
+			</p>
+			<p>
+			Disabilities/missing:
 			<ul>
 			  <li><kwd>include</kwd> statement is implemented, but saving files containing <kwd>include</kwd> statements 
 			  	   will also include all the content of includes files.</li>
@@ -71,7 +92,6 @@
 			<p>
 			Still there are quite a lot of ideas and nice features to be implemeted in the next releases:
 			<ul>
-			  <li>all Package D items</li>
 			  <li>search for objects</li>
 			  <li>record morphing</li>
 			  <li>pop-up menu for commonly used commands on objects</li>
