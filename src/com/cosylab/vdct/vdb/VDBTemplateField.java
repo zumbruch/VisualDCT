@@ -29,7 +29,10 @@ package com.cosylab.vdct.vdb;
  */
 
 import com.cosylab.vdct.graphics.objects.Descriptable;
+import com.cosylab.vdct.graphics.objects.Group;
+import com.cosylab.vdct.graphics.objects.Template;
 import com.cosylab.vdct.inspector.InspectableProperty;
+import com.cosylab.vdct.inspector.InspectorManager;
 
 /**
  * @author Matej
@@ -167,5 +170,68 @@ public class VDBTemplateField extends VDBFieldData implements Descriptable
 	{
 		return templateInstance;
 	}
+
+	/**
+	 * Insert the method's description here.
+	 * Creation date: (7.12.2001 19:13:20)
+	 * @param value java.lang.String
+	 */
+	public void setDebugValue(String newValue)
+	{
+		if (com.cosylab.vdct.plugin.debug.PluginDebugManager.isDebugState())
+		{
+			debugValue = newValue; 
+			//if (record!=null) record.fieldValueChanged(this);
+		}
+	}
+
+	/**
+	 * Insert the method's description here.
+	 * Creation date: (9.12.2000 18:11:46)
+	 * @param newValue java.lang.String
+	 */
+	public void setValue(java.lang.String newValue) {
+	
+		if ((value!=null) && !value.equals(newValue))
+			com.cosylab.vdct.undo.UndoManager.getInstance().addAction(
+				new com.cosylab.vdct.undo.FieldValueChangeAction(this, value, newValue)
+			);
+		value = newValue;
+		/*if (record!=null)
+		{
+			record.fieldValueChanged(this);
+	
+			// if DTYP has changed - notify all INP/OUT links
+			if (name.equals("DTYP") && !com.cosylab.vdct.plugin.debug.PluginDebugManager.isDebugState())
+			{
+				java.util.Enumeration e = record.getFieldsV().elements();
+				while (e.hasMoreElements())
+				{
+					VDBFieldData f = (VDBFieldData)e.nextElement();
+					if (f!=this &&
+						((f.getDbdData().getField_type()==DBDConstants.DBF_INLINK) ||
+						(f.getDbdData().getField_type()==DBDConstants.DBF_OUTLINK)))
+							f.updateInspector();
+				}
+			}
+		}*/
+	}
+
+	/**
+	 * Insert the method's description here.
+	 * Creation date: (9.12.2000 18:11:46)
+	 */
+	public void updateInspector()
+	{
+		Template visualTemplate = (Template)Group.getRoot().findObject(templateInstance.getName(), true);
+		if (visualTemplate==null) {
+			//com.cosylab.vdct.Console.getInstance().println("o) Internal error: no visual representaton of record "+getName()+" found.");
+			return;
+		}
+	
+		InspectorManager.getInstance().updateProperty(visualTemplate, this);
+	}
+
+
 
 }

@@ -31,6 +31,8 @@ package com.cosylab.vdct.graphics.objects;
 import java.util.*;
 import java.awt.*;
 import com.cosylab.vdct.Constants;
+import com.cosylab.vdct.DataProvider;
+
 import javax.swing.*;
 import java.awt.event.*;
 import com.cosylab.vdct.vdb.*;
@@ -380,12 +382,18 @@ public static InLink getTarget(LinkProperties link) {
 	// !!! check for getType()==LinkProperties.NOT_VALID
 	if ((recName==null) || recName.equals(nullString)) return null;
 
+	System.out.println("searching: "+link.getTarget());
+
+	InLink templateLink = (InLink)DataProvider.getInstance().getLookupTable().get(link.getTarget());
+	if (templateLink!=null)
+{
+	System.out.println("found: "+link.getTarget());
+		return templateLink;
+}
 	Record record = (Record)Group.getRoot().findObject(recName, true);
-	//LinkManagerObject record = (LinkManagerObject)Group.getRoot().findObject(recName, true);
 	if (record==null) return null;
 	else if (link.getType()==link.FWDLINK_FIELD) {
 		if (!link.getVarName().equalsIgnoreCase("PROC"))		// !!! proc
-//			return (Record)record;
 			return record;
 	}
 
@@ -394,7 +402,6 @@ public static InLink getTarget(LinkProperties link) {
 		var = (EPICSVarLink)record.getSubObject(link.getVarName());
 	else {
 		VDBFieldData target = record.getRecordData().getField(link.getVarName());
-		//VDBFieldData target = ((Record)record).getRecordData().getField(link.getVarName());
 		if ((target==null) ||
 			LinkProperties.getType(target)!=LinkProperties.VARIABLE_FIELD) return null;
 		else { 

@@ -116,6 +116,19 @@ public String getCompactLinkDef() {
 		link += spaceString + opt;
 	return link;
 }
+
+/**
+ * Insert the method's description here.
+ * Creation date: (30.1.2001 14:01:58)
+ * @return java.lang.String
+ */
+public String getTarget() {
+	String link = record;
+	/// !!!! proc
+	link += Constants.FIELD_SEPARATOR + varName;
+	return link;
+}
+
 /**
  * This method was created in VisualAge.
  * @return java.lang.String

@@ -59,6 +59,9 @@ public class DataProvider {
 	// edit masks
 	private Hashtable linkTypeConfigTable = null;
 	
+	// template instances fields lookuptable 
+	private Hashtable lookupTable = null;
+
 /**
  * DataProvider constructor comment.
  */
@@ -69,6 +72,8 @@ protected DataProvider() {
 
 	linkTypeConfigTable = new Hashtable();
 	loadDefaultLinkTypeConfig();
+
+	lookupTable = new Hashtable();
 }
 /**
  * Insert the method's description here.
@@ -255,6 +260,15 @@ public void setDbdDB(com.cosylab.vdct.dbd.DBDData newDbdDB) {
 	public Vector getLoadedDBDs()
 	{
 		return loadedDBDs;
+	}
+
+	/**
+	 * Returns the lookupTable.
+	 * @return Hashtable
+	 */
+	public Hashtable getLookupTable()
+	{
+		return lookupTable;
 	}
 
 }
