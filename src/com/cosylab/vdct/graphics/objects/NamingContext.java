@@ -232,7 +232,7 @@ public class NamingContext {
 		String record=LinkProperties.getRecordFromString(target);
 		Object rec=null;								
 		
-		if (record!=null) rec=template.getGroup().findObject(record, true);
+		if (record!=null && template !=null) rec=template.getGroup().findObject(record, true);
 		if (rec !=null && rec instanceof Record) {
 			target=getResolvedName(target);
 		}
