@@ -60,7 +60,6 @@ import com.cosylab.vdct.vdb.*;
  * Graphical representation of templates.
  * @author Matej
  */
-// TODO template - undo after destroy
 // TODO do not show hidden macros (with fields?) in properties or not?!
 // TODO make serialization of macro w/o vis. rep. work, but macro is defined only as visible object?!
 public class Template
