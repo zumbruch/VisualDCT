@@ -639,11 +639,13 @@ public void linkCommand(VisibleObject linkObject, LinkSource linkData) {
 				(tmplink.getType() != DBDConstants.DBF_INLINK) &&
 			  	(tmplink.getType() != DBDConstants.DBF_OUTLINK) &&
 				(tmplink.getType() != DBDConstants.DBF_FWDLINK))
-			{
-				// VAR->PORT
-				if (linkData instanceof VDBTemplatePort)
-					tmplink.setValue(linkData.getFullName());
-			}
+		{
+			// VAR->Template PORT or VAR->Macro
+			if (linkData instanceof VDBTemplatePort ||
+				linkData instanceof VDBMacro)
+				tmplink.setValue(linkData.getFullName());
+			
+		}
 		else if (linkData==null && linkObject instanceof Record)
 			tmplink.setValue(((Record)linkObject).getName());		// fwd link to manager
 		else 
@@ -681,12 +683,17 @@ public void mouseClicked(MouseEvent e) {
 						return;
 					//}
 				}
+				// support all -> Macro
+				else if (hilited instanceof Macro) {
+					Macro macrolink = (Macro)hilited;
+					linkCommand(null, macrolink.getData());
+					return;
+				}
 				// support port -> EPICSLinkOut
 				else if (tmplink instanceof VDBPort && hilited instanceof EPICSLinkOutIn) {
-						EPICSLinkOutIn link = (EPICSLinkOutIn)hilited;
-						linkCommand((LinkManagerObject)link.getParent(), link.getFieldData());
-						return;
-					//}
+					EPICSLinkOutIn link = (EPICSLinkOutIn)hilited;
+					linkCommand((LinkManagerObject)link.getParent(), link.getFieldData());
+					return;
 				}
 			}
 			

@@ -211,6 +211,10 @@ public void destroy() {
 			Group.getRoot().getLookupTable().remove(data.getFullName());
 		//else
 		//	((LinkManagerObject)getParent()).removeInvalidLink(this);
+
+		data.setVisibleObject(null);
+		getParent().removeObject(getName());
+		
 	}
 	
 }
@@ -221,10 +225,12 @@ public void destroy() {
 public void disconnect(Linkable disconnector) {
 	if (!disconnected && outlinks.contains(disconnector)) {
 		outlinks.removeElement(disconnector);
-		if (outlinks.size()==0) {
-			destroy();
-		}
-		else if (outlinks.size()==1)
+		// cannot be destoryed by removing links
+		//if (outlinks.size()==0) {
+		//	destroy();
+		//}
+		//else
+		 if (outlinks.size()==1)
 			if (outlinks.firstElement() instanceof VisibleObject)
 				setColor(((VisibleObject)outlinks.firstElement()).getColor());
 	}
@@ -725,6 +731,10 @@ public void setDestroyed(boolean newDestroyed)
 	{
 		// set data appropriate visibleObject
 		data.setVisibleObject(this);
+		
+		// update lookup table
+		lastUpdatedFullName = null;
+		updateTemplateLink();
 	}
 }
 

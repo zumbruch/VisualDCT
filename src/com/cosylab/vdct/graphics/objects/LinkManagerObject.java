@@ -67,7 +67,7 @@ public abstract class LinkManagerObject extends ContainerObject implements Hub, 
 	public final static String outlinkString = "OUTLINK";
 	public final static String fwdlinkString = "FWDLINK";
 	public final static String varlinkString = "VARIABLE";
-	public final static String varlinkPortString = "VARIABLE to PORT";
+	public final static String varlinkPortString = "VAR. to PORT/MACRO";
 
 /**
  * LinkManagerObject constructor comment.
