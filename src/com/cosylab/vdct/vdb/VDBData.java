@@ -245,16 +245,16 @@ public static void generateTemplateInstances(DBData db, VDBData vdb)
 	e = db.getTemplateInstances().elements();
 	while (e.hasMoreElements()) {
 		dbTemplateInstance = (DBTemplateInstance)(e.nextElement());
-		VDBTemplate t = (VDBTemplate)vdb.getTemplates().get(dbTemplateInstance.getTemplateClassID());
+		VDBTemplate t = (VDBTemplate)vdb.getTemplates().get(dbTemplateInstance.getTemplateId());
 		if (t==null)
 		{
 			Console.getInstance().println(
-				"Template instance "+dbTemplateInstance.getTemplateID()+" cannot be created since "
-					+ dbTemplateInstance.getTemplateClassID()
+				"Template instance "+dbTemplateInstance.getTemplateInstanceId()+" cannot be created since "
+					+ dbTemplateInstance.getTemplateInstanceId()
 					+ " does not exist - this definition will be ignored.");
 			continue;
 		}
-		VDBTemplateInstance vti = new VDBTemplateInstance(dbTemplateInstance.getTemplateID(), t);
+		VDBTemplateInstance vti = new VDBTemplateInstance(dbTemplateInstance.getTemplateInstanceId(), t);
 		vti.setProperties(new TreeMap(dbTemplateInstance.getProperties()));
 			
 		vti.setInputs(generateTemplateInstanceIOFields(vti, dbTemplateInstance.getValues(), t.getInputs(), t.getInputComments()));

@@ -1081,41 +1081,43 @@ public static void writeObjects(Vector elements, java.io.DataOutputStream file, 
 						if (fieldData.getComment()!=null)
 							file.writeBytes(fieldData.getComment()+"\n");
 							
+						String value = fieldData.getValue();
+						if (namer.getSubstitutions()!=null && value!=null)
+							 value = VDBTemplateInstance.applyProperties(value, namer.getSubstitutions());
+							
 						// if value is different from init value
-						if (!fieldData.hasDefaultValue() /*&&
-					!!! is default value enough
-							!(((fieldData.getType()==DBDConstants.DBF_MENU) ||
-							   (fieldData.getType()==DBDConstants.DBF_DEVICE)) && 
-							  fieldData.getValue().equals(com.cosylab.vdct.Constants.NONE) && menu...)*/)
+						if (!fieldData.hasDefaultValue())
+						{
+			    				// write field value
+								if (((fieldData.getType()==DBDConstants.DBF_INLINK) ||
+								    (fieldData.getType()==DBDConstants.DBF_OUTLINK) ||
+								    (fieldData.getType()==DBDConstants.DBF_FWDLINK))
+								    && !value.startsWith(Constants.HARDWARE_LINK))
+								  value = namer.getResolvedName(value);
+								
+								file.writeBytes("  field("+fieldData.getName()+",\""+value+"\")\n");
+				    
+		 				}
+						// write field value if has a comment
+		 				else if (fieldData.getComment()!=null)
+	 			       	{
+
+							if (value.equals(nullString))
+								// comment it out if it has null value
+				 				file.writeBytes("  "+com.cosylab.vdct.db.DBConstants.commentString+
+					 							  "field("+fieldData.getName()+",\""+value+"\")\n");
+							else
 							{
 			    				// write field value
 								if (((fieldData.getType()==DBDConstants.DBF_INLINK) ||
 								    (fieldData.getType()==DBDConstants.DBF_OUTLINK) ||
 								    (fieldData.getType()==DBDConstants.DBF_FWDLINK))
-								    && !fieldData.getValue().startsWith(Constants.HARDWARE_LINK))
-									file.writeBytes("  field("+fieldData.getName()+",\""+namer.getResolvedName(fieldData.getValue())+"\")\n");
-						 		 else
-	 								file.writeBytes("  field("+fieldData.getName()+",\""+fieldData.getValue()+"\")\n");
-				    
-			 				}
-						// write field value if has a comment
-		 				else if (fieldData.getComment()!=null)
-		 			       	{
+								    && !value.startsWith(Constants.HARDWARE_LINK))
+								  value = namer.getResolvedName(value);
 
-							if ((((fieldData.getType()==DBDConstants.DBF_MENU) ||
-							   	  (fieldData.getType()==DBDConstants.DBF_DEVICE)) && 
-							  	 (fieldData.getValue().equals(com.cosylab.vdct.Constants.NONE) ||
-							  	 fieldData.getValue().equals(fieldData.getDbdData().getInit_value()+Constants.MENU_DEFAULT_VALUE_INDICATOR))) || 
-							  	fieldData.getValue().equals(nullString))
-								// up code is a little bi messy, consider using hasDefaultValue(), etc. !!!
-							
-								// comment it out if it has null value
-				 				file.writeBytes("  "+com.cosylab.vdct.db.DBConstants.commentString+
-					 							  "field("+fieldData.getName()+",\""+fieldData.getValue()+"\")\n");
-							else
-								file.writeBytes("  field("+fieldData.getName()+",\""+fieldData.getValue()+"\")\n");
-								
-			 				}
+								file.writeBytes("  field("+fieldData.getName()+",\""+value+"\")\n");
+							}								
+			 			}
 	 				}
 	
 					file.writeBytes("}\n");
@@ -1361,7 +1363,7 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 					 comma + box.getFont().getSize() +	
 					 comma + box.getFont().getStyle() +	
 				 	 comma + StringUtils.color2string(box.getColor()) +
-					 comma + quote + box.getDescription() + quote +			//!! new lines, quotes
+					 comma + quote + StringUtils.removeQuotesAndLineBreaks(box.getDescription()) + quote +
 					 ending);
 	 		}
 
@@ -1459,10 +1461,7 @@ private static void writeTemplateData(DataOutputStream stream) throws IOExceptio
 	VDBTemplate data = Group.getEditingTemplateData();
 	
 	// template start
-	stream.writeBytes("#! "+DBResolver.TEMPLATE_START+"("+data.getId()+")\n\n");
-
-	// description
-	stream.writeBytes("#! "+DBResolver.TEMPLATE_DESC+"("+data.getDescription()+")\n\n");
+	stream.writeBytes("#! "+DBResolver.TEMPLATE+"("+data.getDescription()+")\n\n");
 
 	final String nl = "\n";
 	

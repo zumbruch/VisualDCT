@@ -142,12 +142,19 @@ public static String replaceEnding(String str, String s1, String s2) {
  * @param s1 java.lang.String
  * @param s2 java.lang.String
  */
-public static String replace(String str, String s1, String s2) {
-	if (str.equals(s1)) return s2;
-	int pos = str.indexOf(s1);
-	if (pos<0) return str;
-	return str.substring(0, pos)+s2+str.substring(pos+s1.length());
-}
+public static String replace(String source, String from, String to)
+  {
+  StringBuffer sb = new StringBuffer();
+  int oldIndex=0, newIndex;
+  while (-1 != (newIndex = source.indexOf(from,oldIndex)))
+    {
+    sb.append(source.substring(oldIndex,newIndex)).append(to);
+    oldIndex=newIndex+from.length();
+    }
+  if (oldIndex < source.length())
+    sb.append(source.substring(oldIndex));
+  return sb.toString();
+  }
 /**
  * This method was created in VisualAge.
  * @param fileName java.lang.String
@@ -161,7 +168,7 @@ public static String replaceFileName(String fileName, String newFN) {
 
 	String onlyFN = fileName.substring(pos+1);
 	
-	return replace(fileName, onlyFN, newFN);
+	return replaceEnding(fileName, onlyFN, newFN);
 	
 }
 /**
@@ -190,6 +197,15 @@ public static java.awt.Color string2color(String str) {
 		default: return new Color(rgb);
 	}
 	
+}
+/**
+ * Insert the method's description here.
+ * Creation date: (23.4.2001 18:52:04)
+ * @return java.lang.String
+ * @param str java.lang.String
+ */
+public static String removeQuotesAndLineBreaks(String str) {
+	return str.replaceAll("\\\"", "\\\\\"").replaceAll("\\n", "\\\\n");
 }
 /**
  * Insert the method's description here.

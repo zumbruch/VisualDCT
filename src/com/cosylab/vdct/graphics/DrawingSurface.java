@@ -265,8 +265,9 @@ private void createNavigatorImage() {
 		(navigatorSize.width!=navigator.width) || 
 		(navigatorSize.height!=navigator.height)) {
 	
-	    navigatorImage = getWorkspacePanel().createImage(navigator.width, 
-		    											 navigator.height);
+		if (navigator.width > 0 && navigator.height > 0)
+		    navigatorImage = getWorkspacePanel().createImage(navigator.width, 
+			    											 navigator.height);
 	    if (navigatorImage==null) return;
 	    navigatorSize = new Dimension(navigator.width, navigator.height);
 	    navigatorGraphics = navigatorImage.getGraphics();
@@ -1532,7 +1533,7 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 		while (e.hasMoreElements()) {
 			dbTemplate = (DBTemplateInstance) (e.nextElement());
 
-			VDBTemplate template = (VDBTemplate)vdbData.getTemplates().get(dbTemplate.getTemplateClassID());
+			VDBTemplate template = (VDBTemplate)vdbData.getTemplates().get(dbTemplate.getTemplateId());
 			if (template==null)
 			{
 				/*// already issued
@@ -1543,16 +1544,16 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 				continue;
 			}			
 			
-			VDBTemplateInstance templateInstance = (VDBTemplateInstance)vdbData.getTemplateInstances().get(dbTemplate.getTemplateID());
+			VDBTemplateInstance templateInstance = (VDBTemplateInstance)vdbData.getTemplateInstances().get(dbTemplate.getTemplateInstanceId());
 			if (templateInstance==null)
 			{
 				Console.getInstance().println(
-					"Template instance "+dbTemplate.getTemplateID()+" does not exist - this definition will be ignored.");
+					"Template instance "+dbTemplate.getTemplateInstanceId()+" does not exist - this definition will be ignored.");
 				continue;
 			}			
 
 			Template templ = new Template(null, templateInstance);
-			group.addSubObject(dbTemplate.getTemplateID(), templ, true);
+			group.addSubObject(dbTemplate.getTemplateInstanceId(), templ, true);
 
 			//templ.setDescription(dbTemplate.getDescription());
 			templ.setDescription(template.getDescription());
@@ -1773,6 +1774,7 @@ public boolean openDBD(File file, boolean importDBD) throws IOException {
 	{
 		DataProvider.getInstance().setDbdDB(dbdData);
 		if (viewGroup==null) initializeWorkspace();
+		createNavigatorImage();
 	}
 
 	// add to list of DBDs
@@ -1961,9 +1963,6 @@ public void recalculateNavigatorPosition() {
  */
 private void redraw(Graphics g) {
 
-	// better solution?
-	FontMetricsBuffer.createInstance(g);
-	
 	if (Settings.getInstance().getNavigator())
 		createNavigatorImage();
 
@@ -2092,6 +2091,7 @@ public void resize(int x0, int y0, int width, int height) {
 	navigator.y = y0;
 
 	recalculateNavigatorPosition();
+	forceRedraw = true;	
 }
 /**
  * Insert the method's description here.

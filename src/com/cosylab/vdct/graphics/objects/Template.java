@@ -1126,43 +1126,8 @@ public void writeObjects(DataOutputStream file, NameManipulator namer, boolean e
 	
 	 String templateName = namer.getResolvedName(getName());
  	
-	 //
-	 // new fileName
-	 //
 /*
-	// !!! if not already added as addedPrefix
-	 // get fileName and remove extension
-	 String rootFileName = namer.getFile().getName();
-	 int pos = rootFileName.lastIndexOf('.');
-	 if (pos>0)
-	 	rootFileName = rootFileName.substring(0, pos);
-	 
- 		// !!!? path can be removed - relative to root file
-	 String path = namer.getFile().getAbsolutePath();
-	 pos = path.lastIndexOf(File.separatorChar);
-	 if (pos>0)
-	 	path = path.substring(0, pos+1);	// include File.separatorChar
-
-	 StringBuffer fnb = new StringBuffer();
-	 fnb.append(path);
-	 fnb.append(rootFileName);
-	 fnb.append("_");
-	 fnb.append(templateName.replace('\\', '_').replace(':', '_'));
-	 fnb.append(".db");
-	 
- 	 String fn = fnb.toString();
-	 // override action is already accepted by overriding root DB file
-	 File newFile = new File(fn);			// /!!!! bug - identical names can be generated !!!
-
-
-
- 	 file.writeBytes("\n#! "+DBResolver.VDCTSKIP+"\n");
- 	 fn = fn.replace('\\', '/');
- 	 file.writeBytes(DBResolver.INCLUDE+" \""+fn+"\"\n");
-
-*/
-
-	 // new substitutions 
+	 // merge all marcos
 	 Map properties = null;
 	 if (namer.getSubstitutions()==null)
 	 	properties = templateData.getProperties();
@@ -1172,7 +1137,28 @@ public void writeObjects(DataOutputStream file, NameManipulator namer, boolean e
 	 	properties = namer.getSubstitutions();
 	 	properties.putAll(templateData.getProperties());
 	 }
-	 
+*/
+	 // Note:
+ 	 // the macro values given in an expand(){} statement should not be
+	 // automatically passed down into any templates that are expanded within the
+	 // lower level file unless they are explicitly named as macros there too. 
+	 Map properties = null;
+	 if (namer.getSubstitutions()==null)
+	 	properties = templateData.getProperties();
+	 else
+	 {
+	 	properties = templateData.getProperties();
+		
+		// update values
+	 	Iterator i = properties.keySet().iterator();
+	 	while (i.hasNext())
+	 	{
+	 		Object key = i.next();
+		 	properties.put(key, VDBTemplateInstance.applyProperties(properties.get(key).toString(), namer.getSubstitutions()));
+	 	}
+	 }
+	
+		 
 	 // new removedPrefix
 	 String removedPrefix = namer.getRemovedPrefix();
 	 
@@ -1198,11 +1184,13 @@ public void writeObjects(DataOutputStream file, NameManipulator namer, boolean e
 	 		addedPrefix = addedPrefix + Constants.GROUP_SEPARATOR;
 	 }
 	 
-//	 NameManipulator newNamer = new DefaultNamer(newFile, removedPrefix, addedPrefix, properties);
-	 // always pass root file name
 	 NameManipulator newNamer = new DefaultNamer(namer.getFile(), removedPrefix, addedPrefix, properties);
-//	 Group.save(getTemplateData().getTemplate().getGroup(), newFile, newNamer);
+
+	 file.writeBytes("\n# expand(\""+getTemplateData().getTemplate().getFileName()+"\", "+templateName+")\n");
+
 	 getTemplateData().getTemplate().getGroup().writeObjects(file, newNamer, export);
+
+	 file.writeBytes("\n# end("+templateName+")\n");
 	 
 }
 

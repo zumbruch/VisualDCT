@@ -34,6 +34,8 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.cosylab.vdct.util.StringUtils;
+
 /**
  * @author Matej
  */
@@ -125,19 +127,17 @@ public class VDBTemplateInstance
 	 * @param properties The properties to use
 	 * @return String  
 	 */
-//	public static String applyProperties(String s, Hashtable properties)
 	public static String applyProperties(String s, Map properties)
 	{
 		java.util.Iterator e = properties.keySet().iterator();
-//		Enumeration e = properties.keys();
-//		while (s.indexOf('$')>=0 && e.hasMoreElements())
 		while (s.indexOf('$')>=0 && e.hasNext())
 		{
 			String key = e.next().toString();
-//			String key = e.nextElement().toString();
 			String val = properties.get(key).toString();
-			s = s.replaceAll("\\$\\("+key+"\\)", val);
-			s = s.replaceAll("\\$\\{"+key+"\\}", val);
+
+			s = StringUtils.replace(s, "$("+key+")", val);
+			s = StringUtils.replace(s, "${"+key+"}", val);
+
 		}
 		return s;
 	}

@@ -36,28 +36,27 @@ import java.util.Hashtable;
  */
 public class DBTemplateInstance
 {
-	String templateID;
-	String templateClassID;
-	Hashtable properties = null;
-	Hashtable values = null;
+	protected String templateInstanceId;
+	protected String templateId;
+	protected Hashtable properties = null;
+	protected Hashtable values = null;
+
+	protected String comment = null;
 
 	protected int x = -1;			// used for layout
 	protected int y = -1;
-	protected java.awt.Color color;
-	protected String description;
+	protected java.awt.Color color = java.awt.Color.black;
+	protected String description = null;
 
 	/**
 	 * Constructor.
 	 */
-	public DBTemplateInstance(String templateID, String templateClassID, int x, int y, java.awt.Color color, String description)
+	public DBTemplateInstance(String templateInstanceId, String templateId)
 	{
 		properties = new Hashtable();
 		values = new Hashtable();
-		this.templateID = templateID;
-		this.templateClassID = templateClassID;
-		this.x=x; this.y=y;
-		this.color=color;
-		this.description=description;
+		this.templateInstanceId = templateInstanceId;
+		this.templateId = templateId;
 	}
 	
 	/**
@@ -70,12 +69,12 @@ public class DBTemplateInstance
 	}
 
 	/**
-	 * Returns the templateID.
+	 * Returns the templateId.
 	 * @return String
 	 */
-	public String getTemplateID()
+	public String getTemplateId()
 	{
-		return templateID;
+		return templateId;
 	}
 
 	/**
@@ -160,12 +159,30 @@ public class DBTemplateInstance
 	}
 
 	/**
-	 * Returns the templateClassID.
+	 * Returns the templateInstanceId.
 	 * @return String
 	 */
-	public String getTemplateClassID()
+	public String getTemplateInstanceId()
 	{
-		return templateClassID;
+		return templateInstanceId;
+	}
+
+	/**
+	 * Returns the comment.
+	 * @return String
+	 */
+	public String getComment()
+	{
+		return comment;
+	}
+
+	/**
+	 * Sets the comment.
+	 * @param comment The comment to set
+	 */
+	public void setComment(String comment)
+	{
+		this.comment = comment;
 	}
 
 }

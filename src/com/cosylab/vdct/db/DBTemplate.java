@@ -36,23 +36,28 @@ import java.util.Hashtable;
  */
 public class DBTemplate
 {
-	String id;
-	String fileName;
-	String description;
-	Hashtable inputs = null;
-	Hashtable inputComments = null;
-	Hashtable outputs = null;
-	Hashtable outputComments = null;
+	protected String id;
+	protected String fileName;
+	protected String description;
+	protected String comment;
+	protected Hashtable inputs = null;
+	protected Hashtable inputComments = null;
+	protected Hashtable outputs = null;
+	protected Hashtable outputComments = null;
+
+	protected boolean initialized;
 
 	// data
-	DBData data = null;
+	protected DBData data = null;
 
 	/**
 	 * Constructor.
 	 */
-	public DBTemplate()
+	public DBTemplate(String id, String fileName)
 	{
-		data = new DBData();
+		this.id=id;
+		this.description=id;		// default description
+		this.fileName=fileName;
 		reset();
 	}
 	
@@ -62,9 +67,10 @@ public class DBTemplate
 	 */
 	public void reset()
 	{
-		id = null;
-		fileName = null;
-		description = null;
+		description = id;
+		comment = null;
+		initialized = false;
+		data = null;
 
 		if (inputs==null)
 			inputs = new Hashtable();
@@ -184,6 +190,51 @@ public class DBTemplate
 	public Hashtable getOutputComments()
 	{
 		return outputComments;
+	}
+
+	/**
+	 * Returns the comment.
+	 * @return String
+	 */
+	public String getComment()
+	{
+		return comment;
+	}
+
+	/**
+	 * Sets the comment.
+	 * @param comment The comment to set
+	 */
+	public void setComment(String comment)
+	{
+		this.comment = comment;
+	}
+
+	/**
+	 * Sets the data.
+	 * @param data The data to set
+	 */
+	public void setData(DBData data)
+	{
+		this.data = data;
+	}
+
+	/**
+	 * Returns the initialized.
+	 * @return boolean
+	 */
+	public boolean isInitialized()
+	{
+		return initialized;
+	}
+
+	/**
+	 * Sets the initialized.
+	 * @param initialized The initialized to set
+	 */
+	public void setInitialized(boolean initialized)
+	{
+		this.initialized = initialized;
 	}
 
 }

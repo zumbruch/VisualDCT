@@ -36,6 +36,11 @@ import java.util.*;
  * This type was created in VisualAge.
  */
 public class DBData {
+	
+	// also this file is a template
+	protected DBTemplate templateData = null;
+
+
 	protected Hashtable lines = null;
 	protected Hashtable boxes = null;
 	protected Hashtable textboxes = null;
@@ -44,12 +49,15 @@ public class DBData {
 	protected Hashtable groups = null;
 	protected Hashtable links = null;
 	protected Hashtable connectors = null;
-	protected Hashtable templates = null;
+	protected Hashtable templates = null;		// templates loaded by the way
 	protected Hashtable templateInstances = null;
 /**
  * DBDData constructor comment.
  */
-public DBData() {
+public DBData(String id, String fileName) {
+	
+	templateData = new DBTemplate(id, fileName);
+	
 	records = new Hashtable();
 	recordsV = new Vector();
 	groups = new Hashtable();
@@ -131,12 +139,25 @@ public void addRecord(DBRecordData rd) {
  * @param rd com.cosylab.vdct.db.DBTemplateInstance
  */
 public void addTemplateInstance(DBTemplateInstance ti) {
-	if (!templateInstances.containsKey(ti.getTemplateID())) {
-		templateInstances.put(ti.getTemplateID(), ti);
+	if (!templateInstances.containsKey(ti.getTemplateInstanceId())) {
+		templateInstances.put(ti.getTemplateInstanceId(), ti);
 	}
 	else
-		Console.getInstance().println("Warning: Template instance of '"+ti.getTemplateID()+"' already exists, skiping...");
+		Console.getInstance().println("Warning: Template instance of '"+ti.getTemplateInstanceId()+"' already exists, skiping...");
 }
+
+/**
+ * This method was created in VisualAge.
+ * @param rd com.cosylab.vdct.db.DBTemplate
+ */
+public void addTemplate(DBTemplate t) {
+	if (!templates.containsKey(t.getId())) {
+		templates.put(t.getId(), t);
+	}
+	else
+		Console.getInstance().println("Warning: Template of '"+t.getId()+"' already exists, skiping...");
+}
+
 /**
  * Check is DTYP fields are defined before any DBF_INPUT/DBF_OUTPUT fields...
  * Insert the method's description here.
@@ -260,6 +281,15 @@ public Hashtable getTemplates()
 	public Hashtable getTextboxes()
 	{
 		return textboxes;
+	}
+
+	/**
+	 * Returns the templateData.
+	 * @return DBTemplate
+	 */
+	public DBTemplate getTemplateData()
+	{
+		return templateData;
 	}
 
 }
