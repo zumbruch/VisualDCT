@@ -56,9 +56,10 @@ import com.cosylab.vdct.undo.DescriptionChangeAction;
 public class VDBMacro implements InspectableProperty, Descriptable, ChangableVisibility, LinkSource
 {
 	protected String name = null;
-	protected String target = null;
 	protected String description = null;
 	protected String comment = null;
+	
+	private static final String nullString = "";
 
 	protected static String defaultDescription = "";
 
@@ -78,7 +79,6 @@ public class VDBMacro implements InspectableProperty, Descriptable, ChangableVis
 	{
 		this.template = template;
 		this.name = macro.getName();
-		this.target = macro.getTarget();
 		this.description = macro.getDescription();
 		this.comment = macro.getComment();
 	}
@@ -86,12 +86,11 @@ public class VDBMacro implements InspectableProperty, Descriptable, ChangableVis
 	/**
 	 * Insert the method's description here.
 	 */
-	public VDBMacro(VDBTemplate template, String name, String target, String description)
+	public VDBMacro(VDBTemplate template, String name, String description)
 	{
 		this.template = template;
 
 		this.name = name;
-		this.target = target;
 		this.description = description;
 	}
 	
@@ -111,15 +110,6 @@ public class VDBMacro implements InspectableProperty, Descriptable, ChangableVis
 	public String getFullName()
 	{
 		return template.getId()+":"+name;
-	}
-
-	/**
-	 * Returns the target.
-	 * @return String
-	 */
-	public String getTarget()
-	{
-		return target;
 	}
 
 	/**
@@ -274,7 +264,7 @@ public class VDBMacro implements InspectableProperty, Descriptable, ChangableVis
 	 */
 	public String getValue()
 	{
-		return target;
+		return nullString;
 	}
 
 	/**
@@ -290,7 +280,7 @@ public class VDBMacro implements InspectableProperty, Descriptable, ChangableVis
 	 */
 	public boolean isEditable()
 	{
-		return true;
+		return false;
 	}
 
 	/**
@@ -349,7 +339,6 @@ public class VDBMacro implements InspectableProperty, Descriptable, ChangableVis
 	 * @param newValue java.lang.String
 	 */
 	public void setValueSilently(java.lang.String newValue) {
-		target = newValue;
 	}
 
 	/**
@@ -357,27 +346,6 @@ public class VDBMacro implements InspectableProperty, Descriptable, ChangableVis
 	 */
 	public void setValue(String value)
 	{
-		//String oldValue = target;
-
-		if ((target!=null) && !target.equals(value))
-		{
-			com.cosylab.vdct.undo.UndoManager.getInstance().addAction(
-				new com.cosylab.vdct.undo.MacroValueChangeAction(this, target, value)
-			);
-
-			target = value;
-
-			if (visibleObject!=null)
-				visibleObject.valueChanged();
-			
-			template.propertyChanged(this);
-			
-			// update inspector (if inspecting visible rep.)
-			if (visibleObject!=null && InspectorManager.getInstance().isInspected(visibleObject))
-			{
-				InspectorManager.getInstance().updateObject(visibleObject);
-			}
-		}
 	}
 
 	/**

@@ -1580,15 +1580,15 @@ private static void writeTemplateData(DataOutputStream stream, NameManipulator n
 
 		switch (visiblePort.getMode())
 		{
-			case Port.CONSTANT_PORT_MODE:
+			case OutLink.CONSTANT_PORT_MODE:
 				stream.writeBytes(portPrefix);
 				stream.writeBytes(DBResolver.VDCT_CONSTANT_PORT);
 				break;
-			case Port.INPUT_PORT_MODE:
+			case OutLink.INPUT_PORT_MODE:
 				stream.writeBytes(portPrefix);
 				stream.writeBytes(DBResolver.VDCT_INPUT_PORT);
 				break;
-			case Port.OUTPUT_PORT_MODE:
+			case OutLink.OUTPUT_PORT_MODE:
 				stream.writeBytes(portPrefix);
 				stream.writeBytes(DBResolver.VDCT_OUTPUT_PORT);
 				break;
@@ -1633,11 +1633,11 @@ private static void writeTemplateData(DataOutputStream stream, NameManipulator n
 
 		switch (visibleMacro.getMode())
 		{
-			case Macro.INPUT_MACRO_MODE:
+			case InLink.INPUT_MACRO_MODE:
 				stream.writeBytes(macroPrefix);
 				stream.writeBytes(DBResolver.VDCT_INPUT_MACRO);
 				break;
-			case Macro.OUTPUT_MACRO_MODE:
+			case InLink.OUTPUT_MACRO_MODE:
 				stream.writeBytes(macroPrefix);
 				stream.writeBytes(DBResolver.VDCT_OUTPUT_MACRO);
 				break;
@@ -1649,14 +1649,9 @@ private static void writeTemplateData(DataOutputStream stream, NameManipulator n
 
 		stream.writeBytes(macroPostfix);
 		
-		///!!!! not needed for macros
-		String target = NULL;
-		if (visibleMacro.getInput()!=null)
-			target = namer.getResolvedName(visibleMacro.getInput().getID());
-		
 		stream.writeBytes(
 			visibleMacro.getName() +
-			justComma + StringUtils.quoteIfMacro(target) +
+			justComma + quote + StringUtils.removeQuotes(macro.getDescription()) + quote +
 			justComma + visibleMacro.getX() + justComma + visibleMacro.getY() + 
 			justComma + StringUtils.color2string(visibleMacro.getColor()) +
 			justComma + macro.getVisibility());

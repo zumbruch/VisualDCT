@@ -28,7 +28,7 @@ package com.cosylab.vdct.db;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import com.cosylab.vdct.graphics.objects.OutLink;
+import com.cosylab.vdct.graphics.objects.InLink;
 import com.cosylab.vdct.inspector.InspectableProperty;
 
 /**
@@ -37,24 +37,21 @@ import com.cosylab.vdct.inspector.InspectableProperty;
 public class DBMacro extends DBComment
 {
 	protected String name = null;
-	protected String target = null;
 	protected String description = null;
 
 	protected boolean hasVisual = false;
 	protected int x = -1;			// used for layout
 	protected int y = -1;
-	protected int mode = OutLink.INPUT_MACRO_MODE;
+	protected int mode = InLink.INPUT_MACRO_MODE;
 	protected int defaultVisibility = InspectableProperty.UNDEFINED_VISIBILITY;
 	protected java.awt.Color color = java.awt.Color.black;
-	protected String inLinkID = null;
 	
 	/**
 	 * Insert the method's description here.
 	 */
-	public DBMacro(String name, String target)
+	public DBMacro(String name)
 	{
 		this.name = name;
-		this.target = target;
 	}
 	
 	
@@ -68,30 +65,12 @@ public class DBMacro extends DBComment
 	}
 
 	/**
-	 * Returns the target.
-	 * @return String
-	 */
-	public String getTarget()
-	{
-		return target;
-	}
-
-	/**
 	 * Sets the name.
 	 * @param name The name to set
 	 */
 	public void setName(String name)
 	{
 		this.name = name;
-	}
-
-	/**
-	 * Sets the target.
-	 * @param target The target to set
-	 */
-	public void setTarget(String target)
-	{
-		this.target = target;
 	}
 
 	/**
@@ -182,24 +161,6 @@ public class DBMacro extends DBComment
 	public void setY(int y)
 	{
 		this.y = y;
-	}
-
-	/**
-	 * Returns the inLinkID.
-	 * @return String
-	 */
-	public String getInLinkID()
-	{
-		return inLinkID;
-	}
-
-	/**
-	 * Sets the inLinkID.
-	 * @param inLinkID The inLinkID to set
-	 */
-	public void setInLinkID(String inLinkID)
-	{
-		this.inLinkID = inLinkID;
 	}
 
 	/**

@@ -31,8 +31,6 @@ package com.cosylab.vdct.graphics.objects;
 import java.awt.*;
 import java.util.*;
 import com.cosylab.vdct.Constants;
-import com.cosylab.vdct.events.CommandManager;
-import com.cosylab.vdct.events.commands.LinkCommand;
 import com.cosylab.vdct.graphics.*;
 
 import com.cosylab.vdct.graphics.popup.*;
@@ -40,7 +38,6 @@ import com.cosylab.vdct.inspector.Inspectable;
 import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.vdb.GUIHeader;
 import com.cosylab.vdct.vdb.GUISeparator;
-import com.cosylab.vdct.vdb.LinkProperties;
 import com.cosylab.vdct.vdb.MacroDescriptionProperty;
 import com.cosylab.vdct.vdb.VDBMacro;
 
@@ -53,11 +50,12 @@ import java.awt.event.*;
  * Creation date: (29.1.2001 20:05:51)
  * @author Matej Sekoranja
  */
-public class Macro extends VisibleObject implements Descriptable, Movable, OutLink, Popupable, Selectable, Inspectable
+public class Macro extends VisibleObject implements Descriptable, Movable, InLink, Popupable, Selectable, Inspectable
 {
 	class PopupMenuHandler implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 			String action = e.getActionCommand();
+			/*
 			if (action.equals(colorString))
 			{			
 				Color newColor = ColorChooser.getColor(selectTitle, getColor());
@@ -65,16 +63,18 @@ public class Macro extends VisibleObject implements Descriptable, Movable, OutLi
 					setColor(newColor);
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
-			else if (action.equals(addConnectorString))
+			else*/ if (action.equals(addConnectorString))
 			{
 				//addConnector();
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
+			/*
 			else if (action.equals(removeLinkString))
 			{
 				removeLink();
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
+			*/
 			else if (action.equals(removeMacroString))
 			{
 				//destroy();
@@ -83,34 +83,24 @@ public class Macro extends VisibleObject implements Descriptable, Movable, OutLi
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
 			else if (action.equals(inputString)) {
-				setMode(OutLink.INPUT_MACRO_MODE);
+				setMode(InLink.INPUT_MACRO_MODE);
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
 			else if (action.equals(outputString)) {
-				setMode(OutLink.OUTPUT_MACRO_MODE);
+				setMode(InLink.OUTPUT_MACRO_MODE);
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
-			}
-			else if (action.equals(startLinkingString))
-			{
-			    LinkCommand cmd = (LinkCommand)CommandManager.getInstance().getCommand("LinkCommand");
-			    cmd.setData(Macro.this, data);
-		 		cmd.execute();
 			}
 			
 		}
 	}
 	
-	protected InLink inlink = null;
 	protected boolean disconnected = true;
-	protected LinkProperties properties = null;
-	private boolean hasEndpoint = false;
 
 	private static final String descriptionString = "Description";
 	private static final String selectTitle = "Select link color...";
 	private static final String addConnectorString = "Add connector";
 	private static final String colorString = "Color...";
-	private static final String removeLinkString = "Remove Link";
-	private static final String startLinkingString = "Start linking...";
+	//private static final String removeLinkString = "Remove Link";
 	private static final String removeMacroString = "Remove Macro";
 
 	private static final String modeString = "Macro Mode";
@@ -119,8 +109,9 @@ public class Macro extends VisibleObject implements Descriptable, Movable, OutLi
 
 	private static final String nullString = "";
 
-	private int mode = OutLink.INPUT_MACRO_MODE;
+	private int mode = InLink.INPUT_MACRO_MODE;
 
+	protected Vector outlinks;
 	private static javax.swing.ImageIcon icon = null;
 	private static GUISeparator macroSeparator = null;
 	protected VDBMacro data = null;
@@ -132,6 +123,8 @@ public class Macro extends VisibleObject implements Descriptable, Movable, OutLi
 	protected Polygon leftPoly;
 	protected Polygon rightPoly;
 
+	private int r = 0;
+	
 /**
  * Insert the method's description here.
  * Creation date: (1.2.2001 17:22:29)
@@ -147,16 +140,14 @@ public Macro(VDBMacro data, ContainerObject parent, int x, int y) {
 
 	setX(x); setY(y);
 	
-	properties = new LinkProperties(data);
-		
 	data.setVisibleObject(this);
 	
 	// initialize polygon so that it contains 5 points
 	int[] pts = new int[5];
 	leftPoly = new Polygon(pts, pts, 5);
 	rightPoly = new Polygon(pts, pts, 5);
-	
-	valueChanged();
+
+	outlinks = new Vector();
 }
 /**
  * Insert the method's description here.
@@ -191,40 +182,42 @@ private com.cosylab.vdct.graphics.objects.Macro.PopupMenuHandler createPopupmenu
 }
 /**
  * Insert the method's description here.
- * Creation date: (1.2.2001 16:40:51)
+ * Creation date: (29.1.2001 21:59:34)
  */
 public void destroy() {
 	if (!isDestroyed()) {
-		removeLink();
 		super.destroy();
-		data.setVisibleObject(null);
-		getParent().removeObject(getName());
+		if (outlinks.size()>0) {
+			Object[] objs = new Object[outlinks.size()];
+			outlinks.copyInto(objs);
+			for(int i=0; i<objs.length; i++) {
+				OutLink outlink = (OutLink)objs[i];
+				OutLink start = EPICSLinkOut.getStartPoint(outlink);
+				if((start instanceof EPICSLinkOut))
+					((EPICSLinkOut)start).sourceDestroyed();
+				else if (start!=null)
+					start.disconnect(this);
+				else 
+					outlink.disconnect(this);
+			}
+			outlinks.clear();
+		}
 	}
+	
 }
-
 /**
  * Insert the method's description here.
- * Creation date: (1.2.2001 16:40:51)
- */
-public void removeLink() {
-	if (!isDestroyed()) {
-		disconnected = true;
-		EPICSLinkOut.destroyChain(inlink, this);
-		setInput(null);
-		data.setValue(nullString);
-		properties = new LinkProperties(data);
-	}
-}
-
-
-/**
- * ...
- * Creation date: (29.1.2001 20:05:51)
+ * Creation date: (29.1.2001 21:23:04)
  */
 public void disconnect(Linkable disconnector) {
-	if (!disconnected && (inlink==disconnector) ) {
-		disconnected = true;
-		data.setValue("");
+	if (!disconnected && outlinks.contains(disconnector)) {
+		outlinks.removeElement(disconnector);
+		if (outlinks.size()==0) {
+			destroy();
+		}
+		else if (outlinks.size()==1)
+			if (outlinks.firstElement() instanceof VisibleObject)
+				setColor(((VisibleObject)outlinks.firstElement()).getColor());
 	}
 }
 /**
@@ -292,6 +285,8 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 		g.setColor(drawColor);
 		g.drawPolygon(poly);
 		
+		g.drawOval(rrx-r, rry+(rheight-r)/2, r, r);
+
 		if (getFont()!=null) {
 			//g.setColor(drawColor);
 			g.setFont(getFont());
@@ -299,7 +294,7 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 		}
 	}
 
-	if (inlink!=null)
+	if (false)///!!!
 	{
 		
 		// draw link
@@ -311,7 +306,7 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 				c=Color.black;
 		g.setColor(c);
 
-		LinkDrawer.drawLink(g, this, inlink, getQueueCount(), rightSide);
+		//LinkDrawer.drawLink(g, this, inlink, getQueueCount(), rightSide);
 	}
 
 		
@@ -342,14 +337,6 @@ public java.lang.String getID() {
 }
 /**
  * Insert the method's description here.
- * Creation date: (29.1.2001 20:05:52)
- * @return com.cosylab.vdct.graphics.objects.InLink
- */
-public InLink getInput() {
-	return inlink;
-}
-/**
- * Insert the method's description here.
  * Creation date: (3.2.2001 11:23:59)
  * @return java.util.Vector
  */
@@ -357,11 +344,11 @@ public java.util.Vector getItems() {
 	Vector items = new Vector();
 
 	ActionListener al = createPopupmenuHandler();
-
+/*
 	JMenuItem colorItem = new JMenuItem(colorString);
 	colorItem.addActionListener(al);
 	items.addElement(colorItem);
-
+*/
 	// no connectors for macros yet
 	/*
 	JMenuItem addItem = new JMenuItem(addConnectorString);
@@ -376,13 +363,13 @@ public java.util.Vector getItems() {
 	JMenu modeMenu = new JMenu(modeString);
 	items.addElement(modeMenu);
 
-	JRadioButtonMenuItem inputModeItem = new JRadioButtonMenuItem(inputString, getMode()==OutLink.INPUT_MACRO_MODE);
-	inputModeItem.setEnabled(getMode()!=OutLink.INPUT_MACRO_MODE);
+	JRadioButtonMenuItem inputModeItem = new JRadioButtonMenuItem(inputString, getMode()==InLink.INPUT_MACRO_MODE);
+	inputModeItem.setEnabled(getMode()!=InLink.INPUT_MACRO_MODE);
 	inputModeItem.addActionListener(al);
 	modeMenu.add(inputModeItem);
 
-	JRadioButtonMenuItem outputModeItem = new JRadioButtonMenuItem(outputString, getMode()==OutLink.OUTPUT_MACRO_MODE);
-	outputModeItem.setEnabled(getMode()!=OutLink.OUTPUT_MACRO_MODE);
+	JRadioButtonMenuItem outputModeItem = new JRadioButtonMenuItem(outputString, getMode()==InLink.OUTPUT_MACRO_MODE);
+	outputModeItem.setEnabled(getMode()!=InLink.OUTPUT_MACRO_MODE);
 	outputModeItem.addActionListener(al);
 	modeMenu.add(outputModeItem);
 
@@ -396,25 +383,14 @@ public java.util.Vector getItems() {
 	items.addElement(descItem);
 	*/
 	
+	/*	
 	items.add(new JSeparator());
 
-	if (isDisconnected())
-	{
-		JMenuItem linkItem = new JMenuItem(startLinkingString);
-		linkItem.addActionListener(al);
-		items.addElement(linkItem);
-	}
-	else
-	{
-		JMenuItem removeLinkItem = new JMenuItem(removeLinkString);
-		removeLinkItem.addActionListener(al);
-		items.addElement(removeLinkItem);
-	}
-	
 	JMenuItem removeMacroItem = new JMenuItem(removeMacroString);
 	removeMacroItem.addActionListener(al);
 	items.addElement(removeMacroItem);
-
+	*/
+	
 	return items;
 }
 /**
@@ -428,57 +404,27 @@ public String getLayerID() {
 
 /**
  * Insert the method's description here.
- * Creation date: (30.1.2001 16:58:58)
- * @return boolean
- */
-public boolean isRight() {
-	if (disconnected || inlink==null ||
-		!inlink.getLayerID().equals(getLayerID())) 
-		return true;
-	else {
-		if (inlink instanceof Connector) {	
-			return (inlink.getInX()>(getX()+getWidth()/2));
-		}
-		else if (inlink instanceof VisibleObject) {			// do not cycle !!!
-			VisibleObject obj = (VisibleObject)inlink;
-			return ((obj.getX()+obj.getWidth()/2)>(getX()+getWidth()/2));
-		}
-		else 
-			return true;
-	}
-}
-
-/**
- * Insert the method's description here.
  * Creation date: (29.1.2001 22:22:13)
  * @return int
  */
-public int getOutX() {
+public int getInX() {
 	// ??? what is nicer
 	//boolean right = !isRight();
 	
 	boolean right = isRight();
-	 
+
 	if (right)
-		return getX();
+		return getX()-r;
 	else 
-		return getX()+getWidth();
+		return getX()+getWidth()+r;
 }
 /**
  * Insert the method's description here.
  * Creation date: (29.1.2001 22:22:13)
  * @return int
  */
-public int getOutY() {
+public int getInY() {
 	return getY()+getHeight()/2;
-}
-/**
- * Insert the method's description here.
- * Creation date: (30.1.2001 14:50:26)
- * @return int
- */
-public int getQueueCount() {
-		return 0;
 }
 /**
  * Insert the method's description here.
@@ -553,17 +499,6 @@ public void revalidatePosition() {
 public void setDescription(java.lang.String description) {}
 /**
  * Insert the method's description here.
- * Creation date: (29.1.2001 20:05:52)
- */
-public void setInput(InLink input) {
-	if (inlink==input) return;
-	if (inlink!=null)
-		inlink.disconnect(this);
-	inlink=input;
-	if (inlink!=null) disconnected=false;
-}
-/**
- * Insert the method's description here.
  * Creation date: (29.1.2001 20:05:51)
  * @param id java.lang.String
  */
@@ -583,7 +518,7 @@ protected void validate() {
   int rwidth = 0;
   int rheight = 0;
   
-  if (getMode() == OutLink.OUTPUT_MACRO_MODE)
+  if (getMode() == InLink.OUTPUT_MACRO_MODE)
   {
 	  setWidth(Constants.LINK_STUB_SIZE);
 	  setHeight(Constants.LINK_STUB_SIZE);
@@ -622,7 +557,7 @@ protected void validate() {
 	  rightPoly.ypoints[3]=rheight/2;
 	  rightPoly.ypoints[4]=rightPoly.ypoints[0];
   }
-  else if (getMode() == OutLink.INPUT_MACRO_MODE)
+  else if (getMode() == InLink.INPUT_MACRO_MODE)
   {
 	  setWidth(Constants.LINK_STUB_SIZE);
 	  setHeight(Constants.LINK_STUB_SIZE);
@@ -679,23 +614,8 @@ protected void validate() {
   
   setFont(font);
 
-}
+  r = (int)(getRscale()*Constants.LINK_RADIOUS*2);
 
-/**
- * Insert the method's description here.
- * Creation date: (4.2.2001 12:46:30)
- * @param newColor java.awt.Color
- */
-public void setColor(Color newColor) {
-		super.setColor(newColor);
-		Linkable link = this;
-		while ((link instanceof OutLink) && !(link instanceof EPICSLinkOut) && !(link instanceof EPICSVarOutLink)) {
-			link = ((OutLink)link).getInput();
-			if (link instanceof VisibleObject && !(link instanceof EPICSLinkOut)) 
-				((VisibleObject)link).setColor(newColor);
-		}
-		if (link instanceof VisibleObject && !(link instanceof EPICSLinkOut)) 
-			((VisibleObject)link).setColor(newColor);
 }
 
 /**
@@ -786,55 +706,6 @@ public InspectableProperty[] getProperties(int mode)
 
 
 /**
- * Insert the method's description here.
- * Creation date: (30.1.2001 12:25:44)
- */
-private void updateLink() {
-	LinkProperties newProperties = new LinkProperties(data);
-
-	if (newProperties.getRecord()==null) {			// empty field
-		removeLink();
-		return;
-	}
-	else if (!newProperties.getRecord().equals(properties.getRecord()) ||
-			 !newProperties.getVarName().equals(properties.getVarName()) ||
-			 !hasEndpoint) {
-		// find endpoint
-		Linkable preendpoint = this;
-		Linkable endpoint = getInput();
-		while (!(endpoint instanceof EPICSLinkOutIn) && !(endpoint instanceof EPICSVarOutLink) && (endpoint instanceof InLink) && (endpoint instanceof OutLink) && !(endpoint instanceof EPICSVarOutLink)) {
-			preendpoint = endpoint;
-			endpoint = ((OutLink)endpoint).getInput();
-		}
-		if ((endpoint!=null) && hasEndpoint) ((InLink)endpoint).disconnect(preendpoint);
-		//OutLink lol = getTarget(properties).getOutput();
-		InLink il = EPICSLinkOut.getTarget(newProperties, true);
-		OutLink ol = (OutLink)preendpoint;
-		ol.setInput(il);
-		if (il!=null) { 
-			il.setOutput(ol, null);
-			hasEndpoint = true;
-		}
-		else hasEndpoint = false;
-	}
-
-	properties = newProperties;
-
-}
-
-/**
- * Insert the method's description here.
- * Creation date: (30.1.2001 12:25:44)
- */
-public void valueChanged()
-{
-	updateLink();
-
-	unconditionalValidation();
-	com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
-}
-
-/**
  * @see com.cosylab.vdct.graphics.objects.VisibleObject#setDestroyed(boolean)
  */
 public void setDestroyed(boolean newDestroyed)
@@ -860,21 +731,74 @@ public void rename(String oldName, String newName)
 }
 
 /**
- * @see com.cosylab.vdct.graphics.objects.EPICSLink#fixLinkProperties()
+ * Returns the data.
+ * @return VDBMacro
  */
-public void fixLinkProperties()
+public VDBMacro getData()
 {
-	LinkProperties newProperties = new LinkProperties(data);
-	properties = newProperties;
+	return data;
 }
 
-	/**
-	 * Returns the data.
-	 * @return VDBMacro
-	 */
-	public VDBMacro getData()
-	{
-		return data;
+/**
+ * Insert the method's description here.
+ * Creation date: (5.2.2001 12:10:18)
+ * @return java.util.Vector
+ */
+public Vector getStartPoints() {
+	OutLink out;
+	Vector starts = new Vector();
+	Enumeration e = outlinks.elements();
+	while (e.hasMoreElements()) {
+		out = EPICSLinkOut.getStartPoint((Linkable)e.nextElement());
+		if (out!=null) starts.addElement(out);
 	}
+	return starts;
+}
+/**
+ * Insert the method's description here.
+ * Creation date: (30.1.2001 16:58:58)
+ * @return boolean
+ */
+public boolean isRight() {
+	if (disconnected || outlinks.size()!=1)
+		return true;
+	else {
+		OutLink first = (OutLink)outlinks.firstElement();
+		if (first.getLayerID().equals(getLayerID()))
+			return (first.getOutX()>(getX()+getWidth()/2));
+		else
+			return true;
+	}
+}
+/**
+ * Insert the method's description here.
+ * Creation date: (29.1.2001 21:34:27)
+ * @param output com.cosylab.vdct.graphics.objects.OutLink
+ * @param prevOutput com.cosylab.vdct.graphics.objects.OutLink
+ */
+public void setOutput(OutLink output, OutLink prevOutput) {
+	if (prevOutput!=null) outlinks.removeElement(prevOutput);
+	if (!outlinks.contains(output)) {
+		outlinks.addElement(output);
+		if (outlinks.size()>0) disconnected=false;
+	}
+
+	if (outlinks.firstElement() instanceof VisibleObject)
+		setColor(((VisibleObject)outlinks.firstElement()).getColor());
+
+
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (29.1.2001 21:34:27)
+ * @return com.cosylab.vdct.graphics.objects.OutLink
+ */
+public OutLink getOutput() {
+	if (outlinks.size()==1)
+		return (OutLink)outlinks.firstElement();
+	else
+		return null;
+}
 
 }

@@ -766,7 +766,7 @@ public VDBPort addPort(String name)
  */
 public VDBMacro addMacro(String name)
 {
-	VDBMacro vdbMacro = new VDBMacro(this, name, nullString, null);	
+	VDBMacro vdbMacro = new VDBMacro(this, name, null);	
 	macros.put(name, vdbMacro);
 	macrosV.addElement(vdbMacro);
 

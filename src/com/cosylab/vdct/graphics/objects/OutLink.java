@@ -42,8 +42,6 @@ public interface OutLink extends Linkable {
 	public static final int CONSTANT_PORT_MODE = 4;
 	public static final int INPUT_PORT_MODE = 5;
 	public static final int OUTPUT_PORT_MODE = 6;
-	public static final int INPUT_MACRO_MODE = 7;
-	public static final int OUTPUT_MACRO_MODE = 8;
 
 /**
  * 

@@ -31,6 +31,7 @@ package com.cosylab.vdct.db;
 import java.io.*;
 import java.util.*;
 import com.cosylab.vdct.Console;
+import com.cosylab.vdct.graphics.objects.InLink;
 import com.cosylab.vdct.graphics.objects.OutLink;
 import com.cosylab.vdct.util.*;
 import com.cosylab.vdct.util.StringUtils;
@@ -97,8 +98,8 @@ public class DBResolver {
 	public static final String VDCT_INPUT_PORT = "InputPort";
 	public static final String VDCT_OUTPUT_PORT = "OutputPort";
 
-	// used format #! InputMacro(portname, inLinkID, xpos, ypos, color, defaultVisibility)
-	// used format #! OutputMacro(portname, inLinkID, xpos, ypos, color, defaultVisibility)
+	// used format #! InputMacro(portname, description, xpos, ypos, color, defaultVisibility)
+	// used format #! OutputMacro(portname, description, xpos, ypos, color, defaultVisibility)
 	public static final String VDCT_INPUT_MACRO = "InputMacro";
 	public static final String VDCT_OUTPUT_MACRO = "OutputMacro";
 
@@ -989,9 +990,9 @@ public static String processTemplateComment(DBTemplate template, StreamTokenizer
 
 					int mode;
 					if (tokenizer.sval.equalsIgnoreCase(VDCT_INPUT_MACRO))
-						mode = OutLink.INPUT_MACRO_MODE;
+						mode = InLink.INPUT_MACRO_MODE;
 					else /*if (tokenizer.sval.equalsIgnoreCase(VDCT_OUTPUT_MACRO))*/
-						mode = OutLink.OUTPUT_MACRO_MODE;
+						mode = InLink.OUTPUT_MACRO_MODE;
 						
 					// read port name
 					tokenizer.nextToken();
@@ -1002,20 +1003,17 @@ public static String processTemplateComment(DBTemplate template, StreamTokenizer
 					DBMacro macro = (DBMacro)(template.getMacros().get(str));
 					if (macro==null)
 					{
-						macro = new DBMacro(str, nullString);
-						/*
-						macro.setComment(comment); comment = nullString;
-						macro.setDescription(description);
-						*/
+						macro = new DBMacro(str);
+						// macro.setComment(comment); comment = nullString;
 						
 						template.addMacro(macro);
 												
 						macro.setMode(mode);
 						
-						// read port inlink
+						// read port description
 						tokenizer.nextToken();
 						if ((tokenizer.ttype == tokenizer.TT_WORD)||
-							(tokenizer.ttype == DBConstants.quoteChar)) macro.setInLinkID(tokenizer.sval);
+							(tokenizer.ttype == DBConstants.quoteChar)) macro.setDescription(tokenizer.sval);
 						else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 						// read x pos
