@@ -22,6 +22,10 @@
 			<section>Package B alpha integration build.</section>
 		</modification>
 
+		<modification version="2.3.1237" by="msekoranja" date="2002-10-20">
+			<section>Package B release candidate.</section>
+		</modification>
+
 		<scope>
 			This document is contains release notes of the current build.
 		</scope>
@@ -35,8 +39,7 @@
 			   href="http://visualdct.cosylab.com/"
 			   author="Matej Sekoranja"
 			   date="2002"
-			   publisher="Cosylab, Ltd."
-			   />
+			   publisher="Cosylab, Ltd."/>
 			   
 		<reference id="visualdct_latest"
 			   title="VisualDCT latest build"
@@ -44,23 +47,30 @@
 			   author="Matej Sekoranja"
 			   date="2002"
 			   publisher="Cosylab, Ltd."
-			   revision="2.2.1236"/>
+			   revision="2.3.1237"/>
 
 	</head>
 	
 	<body>
-		<section id="intro" title="Release Notes">
+		<section id="noted" title="Release Notes">
 			<p>
-			This alpha integration build has the following disabilities:
+			Current build has the following disabilities:
 			<ul>
-			  <li><kwd>path, addpath</kwd> statements are not supported (this includes path searching)</li>
 			  <li><kwd>include</kwd> statement is implemented, but saving files containing <kwd>include</kwd> statements 
 			  	   will also include all the content of includes files.</li>
-			  <li>multiple templates are not supported</li>
-			  <li>visual definition of template inputs and outputs is not implemented</li>
-			  <li>cyclic referece check of templates not implemented</li>
-			  <li>template instances are not revalidated when the template is changed</li>
-			  <li>no updated documentation and user's manual</li>
+			  <li>multiple template definitions in one DB are not supported</li>
+			  <li>user's manual to be completed</li>
+			</ul>
+			</p>
+			<p>
+			Still there are quite a lot of ideas and nice features to be implemeted in the next releases:
+			<ul>
+			  <li>all Package C items</li>
+			  <li>recently used files list</li>
+			  <li>search for objects</li>
+			  <li>record morphing</li>
+			  <li>pop-up menu for commonly used commands on objects</li>
+			  <li>...</li>
 			</ul>
 			</p>
 		</section>

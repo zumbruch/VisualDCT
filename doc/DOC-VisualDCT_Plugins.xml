@@ -9,12 +9,12 @@
 <title>VisualDCT Plugins</title>
 
 <info file="DOC-VisualDCT_Plugins"
-	url="http://visualdct.cosylab.com/docs"
+	url="http://visualdct.cosylab.com/builds/VisualDCT"
 	class="doc"
 	year="2002"
 	id="XX"
 	confidentiality="public"
-	project="VisualDCT-Common"/>
+	project="VisualDCT"/>
 		  
 <contributor name="Sunil Sah" id="ssah" email="sunil.sah@cosylab.com"/>
 					 
@@ -29,6 +29,13 @@ This document contains information on writing plugins for VisualDCT and their in
 <audience>
 The audience of this document are the users of VisualDCT who wish to create or use its plugins.
 </audience>
+
+<reference id="visualdct"
+	   title="VisualDCT Project"
+	   href="http://visualdct.cosylab.com/"
+	   author="Matej Sekoranja"
+	   date="2002"
+	   publisher="Cosylab, Ltd."/>
 		
 </head>
 

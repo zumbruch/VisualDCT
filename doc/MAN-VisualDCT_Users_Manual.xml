@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?xml-stylesheet type="text/xsl" href="../../Common/Documentation/Normal.xsl"?>
+
+<cosydoc xmlns="urn:schemas-cosylab-com:Document">
+	<head>
+		<title>VisualDCT User's Manual</title>
+		
+		<info file="MAN-VisualDCT_Users_Manual"
+			  url="http://visualdct.cosylab.com/builds/VisualDCT"
+			  class="man"
+			  year="2002"
+			  id="xxxxxx"
+			  confidentiality="public"
+			  project="VisualDCT"/>
+			  
+		<contributor name="Matej Sekoranja"
+				id="msekoranja"
+				email="matej.sekoranja@cosylab.com"/>
+
+		<modification version="1.0" by="msekoranja" date="2002-10-19">
+			<section>Created.</section>
+		</modification>
+		<release version="1.1" by="msekoranja" date="2002-10-21">
+
+		</release>
+
+		<scope>
+			This document is a users manual of how to use VisualDCT and also contains some tips and ticks.
+		</scope>
+		
+		<audience>
+			The audience of this document are all users of VisualDCT.
+		</audience>
+		
+		<reference id="visualdct"
+			   title="VisualDCT Project"
+			   href="http://visualdct.cosylab.com/"
+			   author="Matej Sekoranja"
+			   date="2002"
+			   publisher="Cosylab, Ltd."/>
+			   
+		<reference id="visualdct_latest"
+			   title="VisualDCT latest build"
+			   href="http://visualdct.cosylab.com/builds/VisualDCT/"
+			   author="Matej Sekoranja"
+			   date="2002"
+			   publisher="Cosylab, Ltd."
+			   revision="2.3.1237"/>
+
+		<reference id="vdct_installation"
+			   title="Java Installation and Build Process of VisualDCT"
+			   href="DOC-Java_Installation_and_Build_Process_of_VisualDCT.html"
+			   author="Matej Sekoranja"
+			   date="2002"
+			   publisher="Cosylab, Ltd."/>
+
+		<reference id="hierarchies"
+			   title="VisualDCT EPICS Databases Hierarchy Support"
+			   href="MAN-VisualDCT_Users_Manual.html"
+			   author="Matej Sekoranja"
+			   date="2002"
+			   publisher="Cosylab, Ltd."/>
+	</head>
+	
+	<body>
+		<section id="intro" title="Introduction">
+			<p>
+				Visual Database Configuration Tool (VisualDCT) is an EPICS database configuration tool completely written in Java
+				and therefore supported in various systems. It was developed to provide features missing in existing configuration tools
+				as Capfast and Graphical Database Configuration Tool (GDCT). Visually VisualDCT resembles GDCT; records can be created,
+				moved and linked, fields and links can be easily modified. But VisualDCT offers more: using hierarchical design od DBs and groups,
+				records can be grouped together in a logical block. Additionally indication of data flow direction using arrows makes the design
+				easier to understand. VisualDCT has a powerful DB parser, which allows importing existing DB and DBD files.
+				Output file is also DB file, all comments and record order is preserved and visual data saved as comment,
+				which allows DBs to be edited in other tools or manually.<br/>
+				This manual describes the VisualDCT version 2.3 build 1237.
+			</p>
+		</section>
+		
+		<section id="basic" title="Basic principles">
+			<p>
+				VisualDCT is designed to create and maintain EPICS record instance database (<f>.db</f>) files.
+				In order for VisualDCT to execute properly, a database definition (<f>.dbd</f>) file has to be provided
+				which contains the specifications for the various record and device types that they intend to
+				reference in any record instance database (<f>.db</f>) file to be created by VisualDCT. Once a database
+				definition (<f>.dbd</f>) file has been specified, records can be created, copied, renamed, etc. using the
+				various facilities provided by the VisualDCT. 
+				As the user interacts with the various VisualDCT windows, selections, and data entry fields,
+				the results of these interactions are displayed on the screen. Revisions and data entry updates
+				of record instance data displayed on the screen do not replace previously stored record instance
+				data until the user saves currently modified record instance database (<f>.db</f>) file.
+				As VisualDCT executes, it attempts to trap and display the most common situations that might lead
+				to diminishing the integrity of the user supplied information.
+			</p>
+		</section>
+
+		<section id="running" title="Running VisualDCT">
+			<p>
+				In order to run VisualDCT, Java Runtime Environment 1.4 is required.
+				VisualDCT is distributed as a Java ARchive package (<f>.jar</f> file),
+				so there is only one file in the binary distribution.
+				This file has to be added to the java <kwd>classpath</kwd> variable
+				(search path for application classes and resources) to help JVM find <kwd>com.cosylab.vdct.VisualDCT</kwd> class,
+				which is the main class of the VisualDCT.<br/>
+						
+				Usage of VisualDCT:
+			</p>
+				<code language="command line" id="cmdln">
+				  java -cp VisualDCT.jar com.cosylab.vdct.VisualDCT [&lt;DBD&gt;* or &lt;DB&gt;*]<desc>Basic run command.</desc>
+				</code>
+				
+			<p>
+				VisualDCT Java ARchive package (<f>.jar</f> file) is so called executable JAR file, which means it can be run as:
+			</p>
+
+				<code language="command line" id="cmdln">
+				  java -jar VisualDCT.jar [&lt;DBD&gt;* or &lt;DB&gt;*]<desc>Running executable JAR.</desc>
+				</code>
+				
+			<p>
+				or if you GUI has this feature double-click on <f>VisualDCT.jar</f> will also do it.
+
+				VisualDCT accepts two parameters which are not obligatory: database definition files and
+				record instance database files (if this is already specified in DBs, specification of database definition
+				file is not needed). DBD is recognised as a file with <f>.dbd</f> extension otherwise DB is assumed.
+				If there is no DBDs specified an Open dialog will appear allowing you to specify DBD file.
+				If even then there is no valid DBD specified VisualDCT will exit with the following output:
+			</p>
+
+				<code language="command line" id="cmdln">
+				  o) No DBD loaded! Exiting...<desc>No DBD loaded error message.</desc>
+				</code>
+
+			<p>
+				An example of running VisualDCT, using <f>test.dbd</f> definition database and <f>test.db</f> instance database file:
+			</p>
+				
+				<code language="command line" id="cmdln">
+				  java -jar VisualDCT.jar -DVDCT_DIR=~/epics test.dbd test.db<desc>An example of running VisualDCT.</desc>
+				</code>
+			<p>
+				<kwd>VDCT_DIR</kwd> environment variable is used to define the default working directory.<br/>
+				For saving configuration data Java Preferences API is used. This means configuration is kept in
+				a system depended configuration storeage, e.g. registry when using Windows OS.
+			</p>
+		</section>
+
+		<section id="hierarchies" title="Hierarchy support">
+			<p>
+				VisualDCT also supports hierarchical design of EPICS databases. For detailed information about it
+				refer to <a aref="hierarchies">VisualDCT EPICS Databases Hierarchy Support</a> document.
+			</p>
+		</section>
+
+		<section id="features" title="Features">
+
+			<section id="rdd" title="Rapid Database Development (RDD)">
+				<p>
+					VisualDCT can be considered as a rapid database development tool -
+					unintuitive database construction using ordinary text editors can be done quickly
+					with a few simple mouse-clicks minimizing all unnecessary keyboard input.
+					Visualization of the record instance database makes databases easier to understand,
+					errors are much easier to find (e.g. broken links are indicated by a red cross)
+					and helps find a better design of the databases. Allowing user to user hierarchal design
+					and split databases into logical blocks.
+				</p>
+			</section>
+
+			<section id="parser" title="Database file parser, input/output file">
+				<p>
+				VisualDCT creates and maintains only one file, the record instance database (<f>.db</f> or <f>.vdb</f>) file,
+				and does not have any additional graphical information file avoiding any possible consistency
+				problems when having multiple files, all necessary visual composition data is stored as
+				comments at the end of the DB file.
+				An example of DB file:
+				</p>
+			<code language="EPICS DB" id="db_example">
+			  <desc>An example of complete DB file.</desc><![CDATA[
+#! Generated by VisualDCT v2.3
+#! DBDSTART
+#! DBD("/home/matej/epics/test1.dbd")
+#! DBDEND
+
+path ":/home/matej"
+addpath "epics:epics/templates"
+include "dummy.db"
+
+# This is an record comment...
+record(calc, error) {
+  field(INPA, "$(slmot1.position)")
+}
+
+record(ao, speed) {
+  field(DTYP, "Soft Channel")
+  field(OUT, "$(slmot1.speed)")
+  field(HIHI, "1208")
+}
+
+# This is an expand comment...
+expand("slideMotor.vdb", slmot1) {
+  macro(name, "sm1")
+  macro(address, "4")
+  macro(demand, "slide1:demand.VAL")
+}
+
+#! Further lines contain data used by VisualDCT
+
+#! TemplateInstance("slmot1",100,340,0,"")
+
+#! Record(error,640,20,0,0,"error")
+#! Field("error.INPA",16777215,0,"error.INPA")
+#! Link("error.INPA","error/INPA")
+#! Connector("error/INPA","$(slmot1.position)",417,117,16777215,"",0)
+#! Record(speed,720,500,0,0,"speed")
+#! Field("speed.OUT",16777215,0,"speed.OUT")
+#! Link("speed.OUT","speed/OUT")
+#! Connector("speed/OUT","$(slmot1.speed)",617,577,16777215,"",0)]]>
+			</code>
+			<p>
+			VisualDCT has powerful parser which has ability to parse already existing DBs,
+			files which have been created or modified with other tool. It also detects syntax errors in databases,
+			including DBDs. Defective visual composition data or its absence are safely handled and do not raise
+			any critical error, VisualDCT simply automatically layouts all objects without any visual data.
+			What is more, VisualDCT preserves comments and record/field order in the record instance database,
+			which offers the ability to edit your databases in other tools or manually without making any harm
+			to the databases and VisualDCT.
+			</p>
+
+			</section>
+
+			<section id="representation" title="Visual representation of objects">
+				<section id="record" title="Record">
+					<p>
+					</p>
+				</section>
+
+				<section id="group" title="Group">
+					<p>
+					</p>
+				</section>
+
+				<section id="templateInstance" title="Template Instance">
+					<p>
+					</p>
+				</section>
+
+				<section id="links" title="Links">
+					<p>
+					</p>
+				</section>
+				
+				<section id="other" title="Other Graphical Objects">
+					<p>
+					</p>
+				</section>
+
+			</section>
+		</section>
+
+
+		<section id="ui" title="User Interface">
+			<p>
+			As every powerful IDE also VisualDCT provides indispensable facilities as clipboard and undo support.
+			A great effort was given to synchronization between the record instance database and its visualization.
+			Every change done visually is immediately reflected in the database and vice versa;
+			all actions like moving, renaming and deletion of records which affect links are automatically fixed
+			by the VisualDCT.
+			</p>
+
+			<section id="gui" title="Graphical User Interface">
+				<p>
+					Graphical User Interface of the VisualDCT tool consists of 3 main windows:
+					<ol>
+					  <li>Main window</li>
+					  <li>Inspector window</li>
+					  <li>Console window</li>
+					</ol>
+				</p>
+
+				<figure id="visualdct.png">Graphical User Interface of the VisualDCT.</figure>
+
+				<section id="main" title="Main window">
+					<p>
+					</p>
+				</section>
+
+				<section id="inspector" title="Inspector window">
+					<p>
+					</p>
+				</section>
+
+				<section id="console" title="Console window">
+					<p>
+					</p>
+				</section>
+
+			</section>
+
+			<section id="cmdref" title="Command reference">
+				<p>
+				This section describes all commands available by the VisualDCT.
+				</p>
+
+				<section id="menuref" title="Menu command reference">
+					<p>
+					This section describes menu commands available by the VisualDCT.
+					</p>
+					
+					<section id="fileMenu" title="File Menu">
+					</section>
+					
+					<section id="editMenu" title="Edit Menu">
+					</section>
+
+					<section id="viewMenu" title="View Menu">
+					</section>
+
+					<section id="pluginMenu" title="Plugin Menu">
+					</section>
+
+					<section id="debugMenu" title="Debug Menu">
+					</section>
+
+					<section id="helpMenu" title="Help Menu">
+					</section>
+				</section>
+
+				<section id="mouse" title="Mouse command reference">
+					<p>
+					</p>
+				</section>
+
+				<section id="keyboard" title="Keyboard command reference">
+					<p>
+					</p>
+				</section>
+
+			</section>
+		</section>
+
+
+
+		<section id="plan" title="Future Plans">
+			<p>
+				Since VisualDCT is an active project, there are some features to be implemented in the future releases of VisualDCT
+				and all bug reports, suggestions and ideas are very appriciated.
+			</p>
+		</section>
+
+		<section id="conclusion" title="Conclusion">
+			<p>
+				If this manual did not meet all of your expectations or if you have any questions or suggestions,
+				please feel free to contact the author. <br/>
+				Enjoy using VisualDCT.
+			</p>
+		</section>
+	</body>
+</cosydoc>

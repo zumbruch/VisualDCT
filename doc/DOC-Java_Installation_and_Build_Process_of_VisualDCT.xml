@@ -42,7 +42,7 @@
 		
 		<reference id="cosy_java_installation"
 			   title="Java Installation and Build Process HowTo"
-			   href="http://www.cosylab.com/docs"
+			   href="http://visualdct.cosylab.com/builds/VisualDCT/"
 			   author="Gasper Tkacik"
 			   date="2002"
 			   publisher="Cosylab"
