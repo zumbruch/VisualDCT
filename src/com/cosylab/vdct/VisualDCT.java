@@ -3455,7 +3455,7 @@ private javax.swing.JMenuItem getMorphMenuItem() {
 			ivjMorphMenuItem.setName("MorphMenuItem");
 			ivjMorphMenuItem.setMnemonic('o');
 			ivjMorphMenuItem.setText("Morph");
-			ivjMorphMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R,java.awt.Event.CTRL_MASK));
+			ivjMorphMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_M,java.awt.Event.CTRL_MASK));
 			// user code begin {1}
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {

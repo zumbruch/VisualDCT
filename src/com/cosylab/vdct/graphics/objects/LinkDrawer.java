@@ -348,60 +348,69 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 	}
 */	
 
-	int vx = firstHorizontal ? x2 : x1;
+	final boolean SMART_CONNECTORS = true;
 	
-	if (out instanceof EPICSLink) {
-		if (((EPICSLink)out).isRight()) {
-			int rx=(int)(out.getRightX()*scale)  - view.getRx();
-			if (vx<rx) vx = rx;
-		} else {
-			int lx=(int)(out.getLeftX()*scale)  - view.getRx();
-			if (vx>lx) vx = lx;
-		}
-	}
-	
-	if (in instanceof EPICSLink) {
-		if (((EPICSLink)in).isRight()) {
-			int rx=(int)(in.getRightX()*scale)  - view.getRx();
-			if (vx<rx) vx = rx;
-		} else {
-			int lx=(int)(in.getLeftX()*scale)  - view.getRx();
-			if (vx>lx) vx = lx;
-		}
-	}
-	
-	/*if (in instanceof Field) {
-		int n = ((Field)in).getVerticalPosition();
-		int f = (int)(Constants.LINK_SLOT_WIDTH * n * scale);
-	
-		if (in.isRight()) vx += f; else vx -= f;
-	}	*/
-	
-	if (in!=null) {
-		g.drawLine(x1,y1,vx,y1);  // --->
-		g.drawLine(vx,y1,vx,y2); //      |
-		g.drawLine(vx,y2,x2,y2); //      <-----
-	
-		//line for out
-		if (out instanceof Field) {
-			if (out.isRight()) g.drawLine(x1,y1,x1-(int)(((Field)out).getVerticalPosition()*Constants.LINK_SLOT_WIDTH*scale),y1);
-			else g.drawLine(x1,y1,x1+(int)(((Field)out).getVerticalPosition()*Constants.LINK_SLOT_WIDTH*scale),y1);
+	if (SMART_CONNECTORS)
+	{
+		int vx = firstHorizontal ? x2 : x1;
+		
+		if (out instanceof EPICSLink) {
+			if (((EPICSLink)out).isRight()) {
+				int rx=(int)(out.getRightX()*scale)  - view.getRx();
+				if (vx<rx) vx = rx;
+			} else {
+				int lx=(int)(out.getLeftX()*scale)  - view.getRx();
+				if (vx>lx) vx = lx;
+			}
 		}
 		
-		//line for int
-		if (in instanceof Field) {
-			if (in.isRight()) g.drawLine(x2,y2,x2-(int)(((Field)in).getVerticalPosition()*Constants.LINK_SLOT_WIDTH*scale),y2);
-				else g.drawLine(x2,y2,x2+(int)(((Field)in).getVerticalPosition()*Constants.LINK_SLOT_WIDTH*scale),y2);
+		if (in instanceof EPICSLink) {
+			if (((EPICSLink)in).isRight()) {
+				int rx=(int)(in.getRightX()*scale)  - view.getRx();
+				if (vx<rx) vx = rx;
+			} else {
+				int lx=(int)(in.getLeftX()*scale)  - view.getRx();
+				if (vx>lx) vx = lx;
 			}
-				
-		/*if (firstHorizontal) {	
-			g.drawLine(x1, y1, x2, y1);
-			g.drawLine(x2, y1, x2, y2);
 		}
-		else {
-			g.drawLine(x1, y1, x1, y2);
-			g.drawLine(x1, y2, x2, y2);
-		}*/
+		
+		/*if (in instanceof Field) {
+			int n = ((Field)in).getVerticalPosition();
+			int f = (int)(Constants.LINK_SLOT_WIDTH * n * scale);
+		
+			if (in.isRight()) vx += f; else vx -= f;
+		}	*/
+		
+		if (in!=null) {
+			g.drawLine(x1,y1,vx,y1);  // --->
+			g.drawLine(vx,y1,vx,y2); //      |
+			g.drawLine(vx,y2,x2,y2); //      <-----
+		
+			//line for out
+			if (out instanceof Field) {
+				if (out.isRight()) g.drawLine(x1,y1,x1-(int)(((Field)out).getVerticalPosition()*Constants.LINK_SLOT_WIDTH*scale),y1);
+				else g.drawLine(x1,y1,x1+(int)(((Field)out).getVerticalPosition()*Constants.LINK_SLOT_WIDTH*scale),y1);
+			}
+			
+			//line for int
+			if (in instanceof Field) {
+				if (in.isRight()) g.drawLine(x2,y2,x2-(int)(((Field)in).getVerticalPosition()*Constants.LINK_SLOT_WIDTH*scale),y2);
+					else g.drawLine(x2,y2,x2+(int)(((Field)in).getVerticalPosition()*Constants.LINK_SLOT_WIDTH*scale),y2);
+				}
+		}
+	}
+	else
+	{
+	    if (in!=null) {
+			if (firstHorizontal) {	
+				g.drawLine(x1, y1, x2, y1);
+				g.drawLine(x2, y1, x2, y2);
+			}
+			else {
+				g.drawLine(x1, y1, x1, y2);
+				g.drawLine(x1, y2, x2, y2);
+			}
+	    }
 	}
 }
 
