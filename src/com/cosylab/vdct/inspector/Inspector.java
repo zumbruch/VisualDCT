@@ -437,8 +437,14 @@ private javax.swing.JTable getScrollPaneTable() {
 			ivjScrollPaneTable.setShowVerticalLines(true);
 			ivjScrollPaneTable.setGridColor(java.awt.Color.black);
 			ivjScrollPaneTable.setBounds(0, 0, 200, 200);
-			ivjScrollPaneTable.setRowSelectionAllowed(false);
 			ivjScrollPaneTable.setRowHeight(17);
+			
+			// enable clipboard actions
+			new InspectorTableClipboardAdapter(ivjScrollPaneTable);
+			ivjScrollPaneTable.setRowSelectionAllowed(true);
+			// note: selection is possible only on name column
+			ivjScrollPaneTable.setColumnSelectionAllowed(false);
+			
 			// user code begin {1}
 			tableModel = new InspectorTableModel(this);
 			ivjScrollPaneTable.setModel(tableModel);

@@ -41,8 +41,10 @@ import javax.swing.table.*;
 public class InspectorTableCellRenderer extends DefaultTableCellRenderer {
 	private Color bgColor = null;
 	private Color fgColor = null;
-	private Color sectionbgColor = Color.black;
-	private Color sectionfgColor = Color.white;
+	private Color selectionbgColor = null;
+	private Color selectionfgColor = null;
+	private Color separatorbgColor = Color.black;
+	private Color separatorfgColor = Color.white;
 	private Color invalidColor = Color.red;
 	private Color undefinedVisibility = new Color(128, 128, 128);
 	private InspectorTableModel tableModel;
@@ -59,8 +61,10 @@ public InspectorTableCellRenderer(JTable table, InspectorTableModel tableModel) 
 	this.tableModel=tableModel;
 	bgColor = table.getBackground();
 	fgColor = table.getForeground();
-	sectionbgColor = table.getGridColor();
-	sectionfgColor = Color.white;
+	selectionbgColor = table.getSelectionBackground();
+	selectionfgColor = table.getSelectionForeground();
+	separatorbgColor = table.getGridColor();
+	separatorfgColor = Color.white;
 	setFont(table.getFont());
 	setBorder(noFocusBorder);
 
@@ -99,8 +103,8 @@ public Component getTableCellRendererComponent(JTable table, Object value, boole
 	
 	if (tableModel.getPropertyAt(row).isSepatator()) {
 		super.setHorizontalAlignment(JLabel.CENTER);
-		super.setBackground(sectionbgColor);
-		super.setForeground(sectionfgColor);
+		super.setBackground(separatorbgColor);
+		super.setForeground(separatorfgColor);
 		if (column==0)
 		{
 			switch (property.getVisibility())
@@ -116,7 +120,11 @@ public Component getTableCellRendererComponent(JTable table, Object value, boole
 	}
 	else {
 		super.setHorizontalAlignment(JLabel.LEFT);
-		super.setBackground(bgColor);
+
+		if (isSelected)
+			super.setBackground(selectionbgColor);
+		else
+		    super.setBackground(bgColor);
 
 		if (column==0)
 		{
@@ -139,6 +147,8 @@ public Component getTableCellRendererComponent(JTable table, Object value, boole
 		
 		if (column==2 && !property.isValid())
 			super.setForeground(invalidColor);
+		else if (isSelected) 
+			super.setForeground(selectionfgColor);
 		else
 			super.setForeground(fgColor);
 	}
