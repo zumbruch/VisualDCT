@@ -30,9 +30,11 @@
   <news date="2002-07-23" developer="msekoranja" title="Package A implemented."/>
   <news date="2002-08-20" developer="msekoranja" title="Package B alpha integration build available."/>
   <news date="2003-07-18" developer="msekoranja" title="Package C (full graphical hierarchy support) release candidate."/>
+  <news date="2003-09-27" developer="msekoranja" title="Minor bugfixes, debug plugin support."/>
  
   <!-- additional documentation -->
   <document url="http://visualdct.cosylab.com" comment="VisualDCT homepage where you can find all related manuals, articles and presentations." title="VisualDCT homepage"/>
+  <document url="http://visualdct.cosylab.com/builds/VisualDCT-JCADebugPlugin" comment="JCA Debug Plugin is a VisualDCT plugin allowing to display actual values in the control system inside the control boxes for records displayed within VisualDCT." title="VisualDCT JCA Debug Plugin homepage"/>
 
 </cosydoc>
 
