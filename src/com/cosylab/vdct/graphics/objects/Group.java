@@ -599,9 +599,13 @@ public boolean moveToGroup(java.lang.String group) {
 	else
 		newName = group+Constants.GROUP_SEPARATOR+getName();
 
-	while (Group.getRoot().findObject(newName, true)!=null)
+	Object obj = Group.getRoot().findObject(newName, true);
+	while (obj!=null && obj!=this)
+	{
 		newName += Constants.MOVE_SUFFIX;
-
+		obj = Group.getRoot().findObject(newName, true);
+	}
+	
 	//getRoot().addSubObject(newName, this, true);
 	//setAbsoluteName(newName);
 /*	Group g = getRoot().createGroup(newName);
