@@ -191,4 +191,9 @@ public static FontMetricsBuffer getInstance() {
 private void setGraphics(Graphics g) {
 	graphics = g;
 }
+
+public static void setInstance(FontMetricsBuffer fmb) {
+	instance = fmb;
+}
+
 }

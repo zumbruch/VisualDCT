@@ -129,7 +129,7 @@ public void addSubObject(String id, VisibleObject object, boolean create) {
 		com.cosylab.vdct.Console.getInstance().println("Invalid name object name '"+id+"'. Skipping...");
 	else if (!Group.hasTokens(id)) addSubObject(id, object);
 	else {
-		Group parent = null;
+		Object parent = null;
 		String parentName = Group.substractParentName(id);
 
 		// find parent
@@ -138,26 +138,27 @@ public void addSubObject(String id, VisibleObject object, boolean create) {
 			firstParentName = Group.substractToken(parentName);
 		else
 			firstParentName = parentName;
-		parent = (Group)getSubObject(firstParentName);
+		parent = getSubObject(firstParentName);
 
-		if (parent==null) {
+		if (parent==null || !(parent instanceof Group)) {
 			if (!create) {
 				com.cosylab.vdct.Console.getInstance().println("o) Internal error: no parent found");
 				com.cosylab.vdct.Console.getInstance().println("\t id="+id+", current group="+getAbsoluteName());
 				return;
 			}
 			else {
-				parent = new Group(this);
-				parent.setX(object.getX());
-				parent.setY(object.getY());
-				parent.setName(firstParentName);
-				parent.setNamePrefix(getAbsoluteName());
-				addSubObject(firstParentName, parent);
+				Group group = new Group(this);
+				group.setX(object.getX());
+				group.setY(object.getY());
+				group.setName(firstParentName);
+				group.setNamePrefix(getAbsoluteName());
+				addSubObject(firstParentName, group);
+				parent=group;
 			}
 		}
 		// first parent created, recursive call
 		id = substractRelativeName(firstParentName, id);
-		parent.addSubObject(id, object, create);
+		((Group)parent).addSubObject(id, object, create);
 	}
 }
 /**
@@ -346,16 +347,16 @@ public Object findObject(String objectName, boolean deep) {
 	{
 		if (!deep) return null;
 		String parentName = Group.substractToken(relName);
-		// !!! check if parent is always Group object
-		Group parent = (Group)getSubObject(parentName);
-		if (parent==null)
+		// parent is not Group in case of bad grouping
+		Object parent = getSubObject(parentName);
+		if (parent==null || !(parent instanceof Group))
 		{
 			//com.cosylab.vdct.Console.getInstance().println("o) Internal error: no parent found / no such object");
 			//com.cosylab.vdct.Console.getInstance().println("\t objectName="+objectName+", current group="+getAbsoluteName());
 			return null;
 		}
 		else 
-			return parent.findObject(objectName, deep);
+			return ((Group)parent).findObject(objectName, deep);
 	}
 	else {
 		return getSubObject(relName);

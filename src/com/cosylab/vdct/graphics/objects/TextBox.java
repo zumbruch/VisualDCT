@@ -222,11 +222,19 @@ public TextBox(String parName, Group parentGroup, int posX, int posY, int posX2,
 	label = new javax.swing.JLabel() {
 		    public void paint(Graphics g) {
 				Shape clip = g.getClip();
-				g.translate(this.getX(),this.getY());
-				g.setClip(0, 0, getWidth(), getHeight());
-				super.paint(g);
-				g.translate(-this.getX(),-this.getY());
-				g.setClip(clip);
+				
+				Rectangle clipRect = g.getClipBounds();
+				Rectangle newClipRect = new Rectangle(this.getX(), this.getY(), getWidth(), getHeight());
+				if (clipRect!= null) newClipRect = newClipRect.intersection(clipRect);
+				if (!newClipRect.isEmpty()) {
+					newClipRect.setLocation(-this.getX(), -this.getY());
+					
+					g.translate(this.getX(),this.getY());				
+					g.setClip(newClipRect);
+					super.paint(g);
+					g.translate(-this.getX(),-this.getY());
+					g.setClip(clip);
+				}
 		    }
 		};
 
@@ -379,8 +387,8 @@ protected void draw(Graphics g, boolean hilited)
 		{
 			Color tmp = label.getForeground();
 			Color c = tmp;
-			if (c==Constants.BACKGROUND_COLOR)
-				if (c==Color.black)
+			if (c.equals(Constants.BACKGROUND_COLOR))
+				if (c.equals(Color.black))
 					c=Color.white;
 				else
 					c=Color.black;
@@ -392,12 +400,19 @@ protected void draw(Graphics g, boolean hilited)
 		else
 		{
 			Shape clip = g.getClip();
-			g.setClip(posX, posY, rwidth, rheight);
-
-			g.setColor(getVisibleColor());
-
-			drawMultiLineText(g, posX+2, posY+2, rwidth-4);	
-			g.setClip(clip);
+				
+			Rectangle clipRect = g.getClipBounds();
+			Rectangle newClipRect = new Rectangle(posX, posY, rwidth, rheight);
+			if (clipRect != null) newClipRect = newClipRect.intersection(clipRect);
+	
+			if (!newClipRect.isEmpty()) {								
+				g.setClip(newClipRect);
+				
+				g.setColor(getVisibleColor());
+				drawMultiLineText(g, posX+2, posY+2, rwidth-4);	
+	
+				g.setClip(clip);
+			}
 		}
 	
 		if(border || hilited)

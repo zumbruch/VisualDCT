@@ -449,7 +449,7 @@ private void drawNavigator(Graphics g) {
 	g.setColor(Color.blue);
 	g.drawRect(navigator.x,
 			   navigator.y, 
-			   (int)(view.getWidth()*navigatorView.getScale()-1), 
+			   (int)(view.getWidth()*navigatorView.getScale())-1, 
 			   (int)(view.getHeight()*navigatorView.getScale())-1);
 	
 	// add lock rectangle if necessary
@@ -2274,15 +2274,28 @@ public int print(java.awt.Graphics graphics, java.awt.print.PageFormat pageForma
 	
 	int rx = view.getRx(); int ry = view.getRy();
 	double scale = view.getScale();
+	int viewWidth = view.getViewWidth(), viewHeight = view.getViewHeight();
+
+	FontMetricsBuffer fmb = FontMetricsBuffer.getInstance();
 
 	try
 	{
-		
 		view.setScale(screen2printer);
 	
 		view.setRx((int)(rx*converter+x));
 		view.setRy((int)(ry*converter+y));
+
+		view.setViewWidth(imageWidth);
+		view.setViewHeight(imageHeight);
+		
+		fmb.setInstance(new FontMetricsBuffer(graphics));
 	
+		/*Shape clip = graphics.getClip();
+		graphics.setClip(null);
+		graphics.setColor(Color.black);
+		graphics.drawRect(0,0,view.getViewWidth(), view.getViewHeight());
+		graphics.setClip(clip);*/
+		
 		if (Settings.getInstance().getShowGrid())
 		{
 
@@ -2325,8 +2338,15 @@ public int print(java.awt.Graphics graphics, java.awt.print.PageFormat pageForma
 		//resets clipping
 		if (Page.getPrintMode()==Page.FIT_SCALE) graphics.translate(-(pageWidth-w)/2, -(pageHeight-h)/2);
 		graphics.setClip(0,0,pageWidth, pageHeight);
-		if ((Settings.getInstance().getLegendVisibility()==1 && pageIndex==0) || Settings.getInstance().getLegendVisibility()==2)
-		printLegend(graphics, pageWidth, pageHeight, pageIndex+1, maxNumPage);
+		
+		//prints label
+		if ((Settings.getInstance().getLegendVisibility()==1 && pageIndex==0) || Settings.getInstance().getLegendVisibility()==2) {
+			if (Settings.getInstance().getLegendVisibility()==1) { // correct navigator rect
+				view.setViewWidth((int)(viewWidth*converter));
+				view.setViewHeight((int)(viewHeight*converter));
+			}
+			printLegend(graphics, pageWidth, pageHeight, pageIndex+1, maxNumPage);
+		}
 	
 	}
 	catch (Exception e)
@@ -2336,9 +2356,13 @@ public int print(java.awt.Graphics graphics, java.awt.print.PageFormat pageForma
 	{
 		view.setScale(scale);
 		view.setRx(rx); view.setRy(ry);
+		view.setViewWidth(viewWidth); view.setViewHeight(viewHeight);
+		
+		FontMetricsBuffer.setInstance(fmb);
 		
 //		restore color sheme 
 		 loadWhiteOnBlackColorScheme();
+		navigatorImage=null;
 		 createNavigatorImage();
 	}
 	
@@ -2356,7 +2380,7 @@ private void printLegend(Graphics graphics, int width, int height, int page, int
 	Settings s = Settings.getInstance();
 	
 	//prepare
-	int navigatorWidth = 100, navigatorHeight = 100;
+	int navigatorWidth = navigator.width, navigatorHeight = navigator.height;
 	
 	Image img = Toolkit.getDefaultToolkit().getImage(s.getLegendLogo());
 	MediaTracker mediaTracker = new MediaTracker(VisualDCT.getInstance());
@@ -2416,6 +2440,8 @@ private void printLegend(Graphics graphics, int width, int height, int page, int
 	
 	Rectangle backup = navigator;
 	navigator = new Rectangle(navX, navY,navigatorWidth,navigatorHeight);
+	navigatorImage=null;
+	
 	createNavigatorImage();
 	drawNavigator(graphics);
 	navigator = backup;
@@ -2433,7 +2459,7 @@ public void recalculateNavigatorPosition() {
 	ViewState view = ViewState.getInstance();
 
 	double ratio = navigatorView.getScale()/view.getScale();
-	/// bug here
+	/// bug was here
 	navigatorRect.x = (int)(view.getRx()*ratio) + navigator.x;
 	navigatorRect.y = (int)(view.getRy()*ratio) + navigator.y;
 	navigatorRect.width = (int)(view.getViewWidth()*ratio);
