@@ -472,7 +472,7 @@ public class Template
 	 * @return com.cosylab.vdct.vdb.GUISeparator
 	 */
 	public static com.cosylab.vdct.vdb.GUISeparator getPropertiesSeparator() {
-		if (propertiesSeparator==null) propertiesSeparator = new GUISeparator("Properties");
+		if (propertiesSeparator==null) propertiesSeparator = new GUISeparator("Macros");
 		return propertiesSeparator;
 	}
 
@@ -502,7 +502,7 @@ public class Template
 			if (obj instanceof TemplateEPICSMacro)
 			{
 				TemplateEPICSMacro tem = (TemplateEPICSMacro)obj;
-				items.addElement(new GUISeparator(tem.getName()));
+				items.addElement(new GUISeparator(tem.getFieldData().getName()));
 				items.addElement(tem.getFieldData());
 				items.addElement(new NameValueInfoProperty(descriptionString, tem.getDescription()));
 			}
@@ -517,7 +517,7 @@ public class Template
 			if (obj instanceof TemplateEPICSPort)
 			{
 				TemplateEPICSPort tep = (TemplateEPICSPort)obj;
-				items.addElement(new GUISeparator(tep.getName()));
+				items.addElement(new GUISeparator(tep.getFieldData().getName()));
 				items.addElement(tep.getFieldData());
 				items.addElement(new NameValueInfoProperty(descriptionString, tep.getDescription()));
 			}
@@ -530,10 +530,12 @@ public class Template
 		while (i.hasNext())
 		{
 			String name = i.next().toString();
+			// if not already added above as macro
+			if (getSubObject(name)==null)
 			items.addElement(new MonitoredProperty(name, (String)templateData.getProperties().get(name), this));
 		}
 
-		final String addString = "Add property...";
+		final String addString = "Add macro...";
 		items.addElement(new MonitoredActionProperty(addString, this));
 	
 		InspectableProperty[] properties = new InspectableProperty[items.size()];
@@ -1190,17 +1192,18 @@ public VDBFieldData getField(String name) {
  */
 public void addProperty()
 {
-	String message = "Enter property name:";
+	String message = "Enter macro name:";
 	int type = JOptionPane.QUESTION_MESSAGE;
 	while (true)
 	{
 		String reply = JOptionPane.showInputDialog( null,
 			                           message,
-			                           "Add property...",
+			                           "Add macro...",
 			                           type );
 		if (reply!=null)
 		{
-			if (!templateData.getProperties().containsKey(reply))
+			if (!templateData.getProperties().containsKey(reply) &&
+				getSubObject(reply)==null)
 			{
 				// check name
 				if (reply.trim().length()==0)
@@ -1230,7 +1233,7 @@ public void addProperty()
 			}
 			else
 			{
-				message = "Property '"+reply+"' already exists. Enter other name:";
+				message = "Macro '"+reply+"' already exists. Enter other name:";
 				type = JOptionPane.WARNING_MESSAGE;
 				continue;
 			}
@@ -1281,13 +1284,13 @@ public void removeProperty(InspectableProperty property)
  */
 public void renameProperty(InspectableProperty property)
 {
-	String message = "Enter new property name of '"+property.getName()+"':";
+	String message = "Enter new macro name of '"+property.getName()+"':";
 	int type = JOptionPane.QUESTION_MESSAGE;
 	while (true)
 	{
 		String reply = JOptionPane.showInputDialog( null,
 			                           message,
-			                           "Rename property...",
+			                           "Rename macro...",
 			                            type);
 		if (reply!=null)
 		{
@@ -1304,7 +1307,8 @@ public void renameProperty(InspectableProperty property)
 				type = JOptionPane.WARNING_MESSAGE;
 				continue;
 			}
-			else if (!templateData.getProperties().containsKey(reply))
+			else if (!templateData.getProperties().containsKey(reply) &&
+					 getSubObject(reply)==null)
 			{
 				com.cosylab.vdct.undo.ComposedAction composedAction = 
 												new com.cosylab.vdct.undo.ComposedAction();
@@ -1325,7 +1329,7 @@ public void renameProperty(InspectableProperty property)
 			}
 			else
 			{
-				message = "Property '"+reply+"' already exists. Enter other name:";
+				message = "Macro '"+reply+"' already exists. Enter other name:";
 				type = JOptionPane.WARNING_MESSAGE;
 				continue;
 			}
