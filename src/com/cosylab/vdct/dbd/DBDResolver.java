@@ -36,23 +36,23 @@ import com.cosylab.vdct.Console;
  * This type was created in VisualAge.
  */
 public class DBDResolver {
-	private static String MENU   	 = "menu";
-	private static String FIELD  	 = "field";
-	private static String PATH  	 = "path";
-	private static String ADDPATH  	 = "addpath";
-	private static String DEVICE     = "device";
-	private static String INCLUDE    = "include";
-	private static String RECORDTYPE = "recordtype";
+	private static final String MENU   	 = "menu";
+	private static final String FIELD  	 = "field";
+	private static final String PATH  	 = "path";
+	private static final String ADDPATH  	 = "addpath";
+	private static final String DEVICE     = "device";
+	private static final String INCLUDE    = "include";
+	private static final String RECORDTYPE = "recordtype";
 
-	private static String CHOICE = "choice";
+	private static final String CHOICE = "choice";
 
-	private static String ENDSTR		 = "}";
+	private static final String ENDSTR		 = "}";
 
-	private static String BASE		 = "base";
-	private static String SIZE		 = "size";
-	private static String INITIAL	 = "initial";
-	private static String PROMPT	 = "prompt";
-	private static String PROMPTGROUP  = "promptgroup";
+	private static final String BASE		 = "base";
+	private static final String SIZE		 = "size";
+	private static final String INITIAL	 = "initial";
+	private static final String PROMPT	 = "prompt";
+	private static final String PROMPTGROUP  = "promptgroup";
 
 /**
  * This method was created in VisualAge.

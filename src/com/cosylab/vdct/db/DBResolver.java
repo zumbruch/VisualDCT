@@ -39,28 +39,36 @@ import com.cosylab.vdct.util.StringUtils;
 public class DBResolver {
 	private static final String errorString = "Invalid VisualDCT layout data..."; 
 
-	private static String nullString = "";
+	private static final String nullString = "";
 
 	// DB definitions
-	private static String FIELD   = "field";
-	private static String RECORD  = "record";
-	private static String GRECORD = "grecord";
-	private static String INCLUDE = "include";
+	public static final String FIELD   = "field";
+	public static final String RECORD  = "record";
+	public static final String GRECORD = "grecord";
+	public static final String INCLUDE = "include";
 
-	private static String PATH  	 = "path";
-	private static String ADDPATH  	 = "addpath";
+	public static final String PATH  	 = "path";
+	public static final String ADDPATH  	 = "addpath";
 
-	private static String ENDSTR = "}";
-	private static String SPACE = " ";
-	private static String NL = "\n";
+	private static final String ENDSTR = "}";
+	private static final String SPACE = " ";
+	private static final String NL = "\n";
 	
+	// skip commands
+	
+	// skip one line
+ 	// #! SKIP					
+	// skip n lines
+ 	// #! SKIP(number of lines)
+	public static final String VDCTSKIP = "SKIP";
+
 	// visual data
-	public static String VDCTRECORD = "Record";
-	public static String VDCTGROUP = "Group";
-	public static String VDCTFIELD = "Field";
-	public static String VDCTLINK = "Link";
-	public static String VDCTVISIBILITY = "Visibility";
-	public static String VDCTCONNECTOR = "Connector";
+	public static final String VDCTRECORD = "Record";
+	public static final String VDCTGROUP = "Group";
+	public static final String VDCTFIELD = "Field";
+	public static final String VDCTLINK = "Link";
+	public static final String VDCTVISIBILITY = "Visibility";
+	public static final String VDCTCONNECTOR = "Connector";
 
 	// incoded DBDs
  	// used format:
@@ -69,13 +77,13 @@ public class DBResolver {
 	// ...
  	// #! DBD("DBD filename")
  	// #! DBDEND
-	private final static String DBD_START_STR	= "DBDSTART";
-	private final static String DBD_ENTRY_STR	= "DBD";
-	private final static String DBD_END_STR		= "DBDEND";
+	private static final String DBD_START_STR	= "DBDSTART";
+	private static final String DBD_ENTRY_STR	= "DBD";
+	private static final String DBD_END_STR		= "DBDEND";
 
-	public final static String DBD_START	= "#! "+DBD_START_STR+"\n";
-	public final static String DBD_ENTRY	= "#! "+DBD_ENTRY_STR+"(\"";
-	public final static String DBD_END	= "#! "+DBD_END_STR+"\n";
+	public static final String DBD_START	= "#! "+DBD_START_STR+"\n";
+	public static final String DBD_ENTRY	= "#! "+DBD_ENTRY_STR+"(\"";
+	public static final String DBD_END	= "#! "+DBD_END_STR+"\n";
 
 	// template definition
 	// used format:
@@ -88,23 +96,23 @@ public class DBResolver {
 	// #! TEMPLATEEND
 	
 	// resets all template data && generates template name
-	public static String TEMPLATE_START = "TEMPLATESTART";
+	public static final String TEMPLATE_START = "TEMPLATESTART";
 
-	public static String TEMPLATE_DESC = "TemplateDescription";
-	public static String TEMPLATE_INPUT = "TemplateInput";
-	public static String TEMPLATE_OUTPUT = "TemplateOutput";
+	public static final String TEMPLATE_DESC = "TemplateDescription";
+	public static final String TEMPLATE_INPUT = "TemplateInput";
+	public static final String TEMPLATE_OUTPUT = "TemplateOutput";
 	
 	// automatically auto-triggered at EOF (stores template data && resets all current template data)
-	public static String TEMPLATE_END = "TEMPLATEEND";
+	public static final String TEMPLATE_END = "TEMPLATEEND";
 
 	// template 'instatiation'
 	// used format:
  	// #! TemplateInstance("templateid", "templateClassID", x, y, color, "desc")
  	// #! TemplateProperty("templateid", "name", "value")
  	// #! TemplateFieldValue("templateid", "alias", "value")
-	public static String TEMPLATE_INSTANCE = "TemplateInstance";
-	public static String TEMPLATE_PROPERTY = "TemplateProperty";
-	public static String TEMPLATE_VALUE ="TemplateFieldValue";
+	public static final String TEMPLATE_INSTANCE = "TemplateInstance";
+	public static final String TEMPLATE_PROPERTY = "TemplateProperty";
+	public static final String TEMPLATE_VALUE ="TemplateFieldValue";
 
 	
 	// template
@@ -564,6 +572,20 @@ public static String processComment(DBData rootData, StreamTokenizer tokenizer, 
 					data = rootData;
 					templateEnd(data);
 				}
+				else if (tokenizer.sval.equalsIgnoreCase(VDCTSKIP)) {
+
+					// read optional n of lines
+					tokenizer.nextToken();
+					if (tokenizer.ttype == tokenizer.TT_NUMBER) tx=(int)tokenizer.nval;
+					else
+					{
+						tx = 1; 
+						tokenizer.pushBack();
+					}	
+					
+					// skip tx lines (including the rest of this one)
+					skipLines(tx+1, tokenizer, fileName);
+				}
 
 				/***************************************************/
 				/************* Version v1.0 support ****************/
@@ -702,6 +724,28 @@ public static String processComment(DBData rootData, StreamTokenizer tokenizer, 
 		return nullString;
   }
 }
+
+/**
+ * VisualDCT layout data is also processed here
+ * @param tokenizer java.io.StreamTokenizer
+ */
+public static void skipLines(int linesToSkip, StreamTokenizer tokenizer, String fileName) throws Exception {
+  
+	int lines = 0;
+	while (lines < linesToSkip)
+	{
+		tokenizer.nextToken();
+		
+		// end of file
+		if (tokenizer.ttype == tokenizer.TT_EOF)		
+			return;
+			
+		else if (tokenizer.ttype == tokenizer.TT_EOL)
+			lines++;
+	}
+}
+
+
 
 private static void templateEnd(DBData data)
 {

@@ -1,4 +1,4 @@
-package com.cosylab.vdct;
+package com.cosylab.vdct.about;
 
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
@@ -28,15 +28,16 @@ package com.cosylab.vdct;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 /**
- * Insert the type's description here.
- * Creation date: (24.4.2001 15:59:00)
- * @author Matej Sekoranja
+ * @author
+ *
+ * To change this generated comment edit the template variable "typecomment":
+ * Window>Preferences>Java>Templates.
+ * To enable and disable the creation of type comments go to
+ * Window>Preferences>Java>Code Generation.
  */
-public interface Version {
-	public final static String VERSION = "2.2";
-	public final static String BUILD = "1236";
+public interface LicenseTabModel extends AboutTabModel {
 
-	public final static String JAVA_VERSION_REQUIRED = "1.4.0";
+public abstract String getLicense();
+
 }

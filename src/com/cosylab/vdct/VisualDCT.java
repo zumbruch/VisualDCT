@@ -31,6 +31,8 @@ package com.cosylab.vdct;
 import java.awt.*;
 import java.awt.print.*;
 import javax.swing.*;
+
+import com.cosylab.vdct.about.VisualDCTAboutDialogEngine;
 import com.cosylab.vdct.events.*;
 import com.cosylab.vdct.events.commands.*;
 import com.cosylab.vdct.util.UniversalFileFilter;
@@ -4836,7 +4838,7 @@ private DBDDialog getDBDDialog()
  * Comment
  */
 public void help_TopicsMenuItem_ActionPerformed() {
-	VisualDCTDocument doc = new VisualDCTDocument(this,	getClass().getResource("/docs/help.html"));
+	VisualDCTDocument doc = new VisualDCTDocument(this, getClass().getResource("/docs/help.html"));
 	doc.setLocationRelativeTo(this);
 	doc.setVisible(true);
 }
@@ -5014,8 +5016,11 @@ public void lineButton_ActionPerformed()
 public static void main(java.lang.String[] args) {
 	try {
 
-		System.out.println("Loading Visual DCT v"+Version.VERSION+" build "+Version.BUILD+"...\n");
+		System.out.println("Loading VisualDCT v"+Version.VERSION+" build "+Version.BUILD+"...\n");
 		
+		String javaVersion = (String)System.getProperties().get("java.version");
+		if (javaVersion!=null && javaVersion.compareTo(Version.JAVA_VERSION_REQUIRED) == -1)
+			System.out.println("WARNING: Java "+javaVersion+" detected. VisualDCT requires Java "+Version.JAVA_VERSION_REQUIRED+" or newer!\n");
 
 		/* Set default directory */
 		String dir = System.getProperty("VDCT_DIR");
@@ -5057,7 +5062,7 @@ public static void main(java.lang.String[] args) {
 		
 		/* Parameters */
 		Console console = Console.getInstance();
-		console.silent("Loading Visual DCT v"+Version.VERSION+" build "+Version.BUILD+"...\n");
+		console.silent("Loading VisualDCT v"+Version.VERSION+" build "+Version.BUILD+"...\n");
 
 		/* Plugins */
 		com.cosylab.vdct.plugin.PluginManager.getInstance().checkAutoStartPlugins();
@@ -5990,13 +5995,7 @@ public void show_PointsMenuItem_ItemStateChanged(java.awt.event.ItemEvent itemEv
 }
 public void showAboutBox() {
 	/* Create the AboutBox dialog */
-	VisualDCTAboutBox aVisualDCTAboutBox = new VisualDCTAboutBox();
-	Dimension dialogSize = aVisualDCTAboutBox.getPreferredSize();
-	Dimension frameSize = getSize();
-	Point loc = getLocation();
-	aVisualDCTAboutBox.setLocation((frameSize.width - dialogSize.width) / 2 + loc.x, (frameSize.height - dialogSize.height) / 2 + loc.y);
-	aVisualDCTAboutBox.setModal(true);
-	aVisualDCTAboutBox.show();
+	new VisualDCTAboutDialogEngine(this).triggerReceiver();
 }
 /**
  * Insert the method's description here.

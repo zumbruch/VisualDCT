@@ -790,6 +790,12 @@ public boolean selectAllComponents() {
  
 public boolean selectComponentsCheck(int x1, int y1, int x2, int y2) {
 
+	int t;
+	if (x1>x2)
+		{ t=x1; x1=x2; x2=t; }
+	if (y1>y2)
+		{ t=y1; y1=y2; y2=t; }
+
 	ViewState view = ViewState.getInstance();
 	boolean anyNew = false;
 	
@@ -978,6 +984,7 @@ public void writeObjects(java.io.DataOutputStream file, java.lang.String path2re
  Object obj;
  String name;
  Group group;
+ Template template;
  Record record;
  VDBFieldData fieldData = null;
  VDBRecordData recordData;
@@ -1089,6 +1096,11 @@ public void writeObjects(java.io.DataOutputStream file, java.lang.String path2re
  	 		{
 			 	 group = (Group)obj;
 			 	 group.writeObjects(file, path2remove);
+	 		}
+ 	    else if (obj instanceof Template)
+ 	 		{
+			 	 template = (Template)obj;
+			 	 template.writeObjects(file, path2remove);
 	 		}
   }
 
@@ -1297,7 +1309,6 @@ public void writeVDCTData(java.io.DataOutputStream file, java.lang.String path2r
 				 }					 
 
 			     file.writeBytes(nl);
-			 	 template.writeVDCTData(file, path2remove);
 	 		}
 
  	 		

@@ -110,6 +110,7 @@ public class Constants {
 
     public final static Color GRID_COLOR = Color.lightGray;
 */
+
 	// Capfast mode
     public final static Color BACKGROUND_COLOR = Color.black;
     public final static Color PICK_COLOR = Color.red;

@@ -43,6 +43,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
 import com.cosylab.vdct.Constants;
+import com.cosylab.vdct.db.DBResolver;
 import com.cosylab.vdct.graphics.FontMetricsBuffer;
 import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.graphics.popup.Popupable;
@@ -1106,7 +1107,9 @@ protected void destroyFields() {
 public void writeObjects(DataOutputStream file, String path2remove)
 	throws IOException
 {
-	System.out.println("Template.writeObjects");
+	 String templateName = StringUtils.removeBegining(getName(), path2remove);
+ 	 file.writeBytes("\n#! "+DBResolver.VDCTSKIP+"\n");
+ 	 file.writeBytes(DBResolver.INCLUDE+" \""+templateName+".db\"\n");
 }
 
 /**

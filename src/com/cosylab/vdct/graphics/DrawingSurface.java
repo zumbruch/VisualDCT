@@ -775,6 +775,7 @@ public void mouseClicked(MouseEvent e) {
 			}
 			else if (e.getClickCount()>=2)
 			{
+				// !!! to be changed...
 				if(VisualDCT.getInstance().getLineButtonEnabled())
 					createLine();
 				else if(VisualDCT.getInstance().getBoxButtonEnabled())
