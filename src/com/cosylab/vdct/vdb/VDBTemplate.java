@@ -447,7 +447,7 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 			{
 				update=true;
 
-				if (this.description!=null && !this.description.equals(description))
+				if (this.description==null || !this.description.equals(description))
 					com.cosylab.vdct.undo.UndoManager.getInstance().addAction(
 							new DescriptionChangeAction(this, this.description, description));
 

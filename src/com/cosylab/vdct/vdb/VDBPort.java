@@ -41,6 +41,7 @@ import javax.swing.JSeparator;
 import com.cosylab.vdct.db.DBPort;
 import com.cosylab.vdct.graphics.objects.Descriptable;
 import com.cosylab.vdct.inspector.InspectableProperty;
+import com.cosylab.vdct.inspector.InspectorManager;
 import com.cosylab.vdct.undo.DescriptionChangeAction;
 
 /**
@@ -142,11 +143,22 @@ public class VDBPort implements InspectableProperty, Descriptable
 	 */
 	public void setDescription(String description)
 	{
-		if (this.description!=null && !this.description.equals(description))
+		boolean update = false;
+		
+		if (this.description==null || !this.description.equals(description))
+		{
 			com.cosylab.vdct.undo.UndoManager.getInstance().addAction(
 					new DescriptionChangeAction(this, this.description, description));
+			update = true;
+		}
 
 		this.description = description;
+
+		if (update)
+		{
+			InspectorManager.getInstance().updateObject(template);
+		}
+
 	}
 	
 	/**

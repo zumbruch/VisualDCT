@@ -162,12 +162,11 @@ public static void initializeTokenizer(StreamTokenizer tokenizer) {
 
 
 
-private static String loadTemplate(DBData data, String templateFile, String referencedFromFile)
+private static String loadTemplate(DBData data, String templateFile, String referencedFromFile, DBPathSpecification paths) throws FileNotFoundException
 {
 
-	/// !!! temp
-	String templateToResolve = com.cosylab.vdct.util.StringUtils.replaceFileName(referencedFromFile, templateFile);
-
+	File file = paths.search4File(templateFile);
+	String templateToResolve = file.getAbsolutePath();
 
 	// check if file already loaded
 	// !!!
@@ -177,7 +176,6 @@ private static String loadTemplate(DBData data, String templateFile, String refe
 		
 		// extract id (not a prefect solution)
 		// id is name
-		File file = new File(templateToResolve);
 		return file.getName();
 	}
 
@@ -869,7 +867,7 @@ public static void skipLines(int linesToSkip, StreamTokenizer tokenizer, String 
  * @param rootData com.cosylab.vdct.db.DBData
  * @param tokenizer java.io.StreamTokenizer
  */
-public static void processDB(DBData data, StreamTokenizer tokenizer, String fileName) {
+public static void processDB(DBData data, StreamTokenizer tokenizer, String fileName, DBPathSpecification paths) {
 	
 	String comment = nullString;
 	String str, str2;
@@ -970,7 +968,7 @@ public static void processDB(DBData data, StreamTokenizer tokenizer, String file
 						(tokenizer.ttype == DBConstants.quoteChar)) str2 = tokenizer.sval;
 					else throw (new DBParseException("Invalid expand template instance name...", tokenizer, fileName));
 
-					String loadedTemplateId = loadTemplate(data, str, fileName);
+					String loadedTemplateId = loadTemplate(data, str, fileName, paths);
 
 					//System.out.println("expand(\""+str+"\", "+str2+")\n{");
 
@@ -997,12 +995,12 @@ public static void processDB(DBData data, StreamTokenizer tokenizer, String file
 					entry.setComment(comment);	comment = nullString;
 					data.addEntry(entry);
 
-					// if not absulute fileName, do not use relative path
-					if (!(include_filename.charAt(0)=='/' || include_filename.charAt(0)=='\\' || (include_filename.length()>1 && include_filename.charAt(1)==':')))
-						include_filename = com.cosylab.vdct.util.StringUtils.replaceFileName(fileName, include_filename);
-					
-					inctokenizer = getStreamTokenizer(include_filename);
-					if (inctokenizer!=null) processDB(data, inctokenizer, include_filename);
+					File file = paths.search4File(include_filename);
+					//if (file!=null)
+					//{
+						inctokenizer = getStreamTokenizer(file.getAbsolutePath());
+						if (inctokenizer!=null) processDB(data, inctokenizer, include_filename, new DBPathSpecification(file.getParentFile().getAbsolutePath()));
+					//}
 				}
 			
 				/****************** path ********************/
@@ -1018,7 +1016,8 @@ public static void processDB(DBData data, StreamTokenizer tokenizer, String file
 					entry.setComment(comment);	comment = nullString;
 					data.addEntry(entry);
 
-					Console.getInstance().println("Warning: 'path' command is not yet supported...");
+					paths.setPath(str);
+					//Console.getInstance().println("Warning: 'path' command is not yet supported...");
   				}
 				
 				/****************** addpath ********************/
@@ -1034,7 +1033,8 @@ public static void processDB(DBData data, StreamTokenizer tokenizer, String file
 					entry.setComment(comment);	comment = nullString;
 					data.addEntry(entry);
 
-					Console.getInstance().println("Warning: 'addpath' command is not yet supported...");
+					paths.addAddPath(str);
+					//Console.getInstance().println("Warning: 'addpath' command is not yet supported...");
   				}
 
 	} catch (Exception e) {
@@ -1298,7 +1298,7 @@ public static String[] resolveIncodedDBDs(String fileName) throws IOException {
 public static DBData resolveDB(String fileName) {
 	
 	DBData data = null; 
-
+	
 	StreamTokenizer tokenizer = getStreamTokenizer(fileName);
 	if (tokenizer!=null) 
 	{
@@ -1306,9 +1306,11 @@ public static DBData resolveDB(String fileName) {
 		{
 			// generate template id from fileName
 			File file = new File(fileName);
+			
+			DBPathSpecification paths = new DBPathSpecification(file.getParentFile().getAbsolutePath());
 			data = new DBData(file.getName(), file.getAbsolutePath());
 
-			processDB(data, tokenizer, fileName);
+			processDB(data, tokenizer, fileName, paths);
 		}
 		finally
 		{
@@ -1351,7 +1353,7 @@ public static DBData resolveDBasURL(java.net.URL url) {
 
 			// !!! TDB not supported yet 
 			
-			processDB(data, tokenizer, url.toString());
+			processDB(data, tokenizer, url.toString(), null);
 		}
 		finally
 		{
@@ -1361,4 +1363,5 @@ public static DBData resolveDBasURL(java.net.URL url) {
 	
 	return data;
 }
+
 }
