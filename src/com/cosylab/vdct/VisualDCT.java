@@ -375,10 +375,11 @@ class IvjEventHandler implements java.awt.event.ActionListener, java.awt.event.I
  */
 public VisualDCT() {
 	super();
-	initialize();
 
-// shp: not final solution
-	instance = this;
+//	shp: not final solution
+	 instance = this;
+	 
+	initialize();
 }
 /**
  * VisualDCT constructor comment.
