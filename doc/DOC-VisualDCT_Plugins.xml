@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?xml-stylesheet type="text/xsl" href="Normal.xsl"?>
+<?xml-stylesheet type="text/xsl" href="../../Common/Documentation/Normal.xsl"?>
 
 <cosydoc xmlns="urn:schemas-cosylab-com:Document">
 
@@ -12,7 +12,7 @@
 	url="http://visualdct.cosylab.com/docs"
 	class="doc"
 	year="2002"
-	id="000001"
+	id="XX"
 	confidentiality="public"
 	project="VisualDCT-Common"/>
 		  

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?xml-stylesheet type="text/xsl" href="..\..\Common\Documentation\Normal.xsl"?>
+<?xml-stylesheet type="text/xsl" href="../../Common/Documentation/Normal.xsl"?>
 
 <cosydoc xmlns="urn:schemas-cosylab-com:Document">
 	<head>
