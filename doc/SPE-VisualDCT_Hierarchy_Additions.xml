@@ -123,8 +123,8 @@
 				There are two different macro types:
 				</p>
 				<ul>
-				  <li><img src="SPE-VisualDCT_Hierarchy_Additions/inport.png"/><b>INPUT</b> - macro passing a name of <kwd>INPUT</kwd> type field.</li>
-				  <li><img src="SPE-VisualDCT_Hierarchy_Additions/outport.png"/><b>OUTPUT</b> - macro passing a name of <kwd>OUTPUT</kwd> type field.</li>
+				  <li><img src="SPE-VisualDCT_Hierarchy_Additions/inmacro.png"/><b>INPUT</b> - macro passing a name of <kwd>INPUT</kwd> type field.</li>
+				  <li><img src="SPE-VisualDCT_Hierarchy_Additions/outmacro.png"/><b>OUTPUT</b> - macro passing a name of <kwd>OUTPUT</kwd> type field.</li>
 				</ul>
 				<comment by="msekoranja">INPUT and OUTPUT ports can be automatically determined by checking field type of the 'macro source'.</comment>
 				<p>
