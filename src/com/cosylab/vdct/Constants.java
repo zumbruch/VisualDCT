@@ -70,9 +70,6 @@ public class Constants {
 
     public final static int UNDO_STEPS_TO_REMEMBER = 25;
 
-    public final static int VIRTUAL_WIDTH = 5000;
-    public final static int VIRTUAL_HEIGHT = 5000;
-
     public final static int GRID_SIZE = 20;
 
     public static final int RECORD_WIDTH = 160;

@@ -30,6 +30,7 @@ package com.cosylab.vdct.graphics;
 
 import java.util.*;
 
+import com.cosylab.vdct.Settings;
 import com.cosylab.vdct.graphics.objects.InLink;
 import com.cosylab.vdct.graphics.objects.MultiInLink;
 import com.cosylab.vdct.graphics.objects.OutLink;
@@ -55,9 +56,7 @@ public class ViewState {
 	protected int ry = 0;
 
 	protected double scale = 1.0;		// scale
-	protected static int width = com.cosylab.vdct.Constants.VIRTUAL_WIDTH; 			// canvas size 
-	protected static int height = com.cosylab.vdct.Constants.VIRTUAL_HEIGHT;
-
+	
  	// viewport size 
  	protected static int viewWidth = com.cosylab.vdct.Constants.VDCT_WIDTH;
 	protected static int viewHeight = com.cosylab.vdct.Constants.VDCT_HEIGHT;
@@ -156,7 +155,7 @@ public int getGridSize() {
  * @return int
  */
 public int getHeight() {
-	return height;
+	return Settings.getInstance().getCanvasHeight();
 }
 /**
  * Insert the method's description here.
@@ -238,7 +237,7 @@ public int getViewWidth() {
  * @return int
  */
 public int getWidth() {
-	return width;
+	return Settings.getInstance().getCanvasWidth();
 }
 /**
  * Insert the method's description here.
@@ -311,9 +310,9 @@ public boolean moveOrigin(int dx, int dy) {
 	int nry = ry+dy;
 
 	if (nrx<0) nrx=0;
-	else nrx=Math.min(nrx, (int)(width*scale-viewWidth));
+	else nrx=Math.min(nrx, (int)(getWidth()*scale-viewWidth));
 	if (nry<0) nry=0;
-	else nry=Math.min(nry, (int)(height*scale-viewHeight));
+	else nry=Math.min(nry, (int)(getHeight()*scale-viewHeight));
 
 	boolean change = (nrx!=rx) || (nry!=ry);
 	rx=nrx; ry=nry;
@@ -432,14 +431,6 @@ public void setFlat(boolean newFlat) {
 }
 /**
  * Insert the method's description here.
- * Creation date: (11.12.2000 17:56:18)
- * @param newHeight int
- */
-public void setHeight(int newHeight) {
-	height = newHeight;
-}
-/**
- * Insert the method's description here.
  * Creation date: (21.12.2000 21:02:40)
  * @param newInstance com.cosylab.vdct.graphics.ViewState
  */
@@ -489,14 +480,6 @@ public void setViewHeight(int newViewHeight) {
  */
 public void setViewWidth(int newViewWidth) {
 	viewWidth = newViewWidth;
-}
-/**
- * Insert the method's description here.
- * Creation date: (11.12.2000 17:56:18)
- * @param newWidth int
- */
-public void setWidth(int newWidth) {
-	width = newWidth;
 }
 /**
  * Insert the method's description here.

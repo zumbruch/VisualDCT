@@ -200,8 +200,6 @@ public DrawingSurface() {
 	setModified(false);
 
 	ViewState view = new ViewState();
-	view.setWidth(Constants.VIRTUAL_WIDTH);
-	view.setHeight(Constants.VIRTUAL_HEIGHT);
 	view.setScale(1.0);
 	ViewState.setInstance(view);
 
@@ -3347,6 +3345,25 @@ public void generateMacros()
 	Group.getRoot().manageLinks(true);
 
 	//drawingSurface.setModified(true);
+	repaint();
+}
+
+public void reset() {
+	canvasImage = null;
+	navigatorImage = null;
+	ViewState view = ViewState.getInstance();
+
+	if (view.getRx()+view.getViewWidth() > view.getWidth()) view.setRx(Math.max(0,view.getWidth()-view.getViewWidth()));
+	if (view.getRy()+view.getViewHeight() > view.getHeight()) view.setRx(Math.max(0,view.getHeight()-view.getViewHeight()));
+	
+	initializeNavigator();
+	navigator.height = height / 6;
+	navigator.width = (int)(navigator.height * (view.getWidth()/(double)view.getHeight()));
+	navigator.x = width - navigator.width + x0;
+	navigator.y = y0;	
+	createNavigatorImage();
+	
+	redrawRequest = true;
 	repaint();
 }
 

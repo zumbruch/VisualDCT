@@ -56,6 +56,12 @@ public class Settings {
 	private int recordLength = 40;
 	private boolean fastMove = false;
 	
+	private int canvasWidth = 5000;
+	private int canvasHeight = 5000;
+	
+	private boolean defaultVisibility = true;
+	private boolean hideLinks = false;
+	
 	private int doubleClickSpeed = -1;
 	private int doubleClickSmudge = 4;
 	
@@ -88,6 +94,11 @@ protected Settings() {
 	
 	doubleClickSpeed = prefs.getInt("DoubleClickSpeed", doubleClickSpeed);
 	doubleClickSmudge = prefs.getInt("DoubleClickSmudge", doubleClickSmudge);
+	
+	canvasWidth = prefs.getInt("CanvasWidth", 5000);
+	canvasHeight = prefs.getInt("CanvasHeight", 5000);
+	defaultVisibility = prefs.getBoolean("DefaultVisibility", true);
+	hideLinks = prefs.getBoolean("HideLinks", false);
 	
 	legendLogo = prefs.get("LegendLogo", "");
 	legendVisibility = prefs.getInt("LegendVisibility", 1);
@@ -559,6 +570,70 @@ public void loadRecentFiles()
 	public void setLegendVisibility(int i) {		
 		legendVisibility = i;
 		prefs.putInt("LegendVisibility", legendVisibility);
+		sync();
+	}
+
+	/**
+	 * @return
+	 */
+	public int getCanvasHeight() {
+		return canvasHeight;
+	}
+
+	/**
+	 * @return
+	 */
+	public int getCanvasWidth() {
+		return canvasWidth;
+	}
+
+	/**
+	 * @return
+	 */
+	public boolean isDefaultVisibility() {
+		return defaultVisibility;
+	}
+
+	/**
+	 * @return
+	 */
+	public boolean isHideLinks() {
+		return hideLinks;
+	}
+
+	/**
+	 * @param i
+	 */
+	public void setCanvasHeight(int i) {
+		canvasHeight = i;
+		prefs.putInt("CanvasHeight", canvasHeight);
+		sync();
+	}
+
+	/**
+	 * @param i
+	 */
+	public void setCanvasWidth(int i) {
+		canvasWidth = i;
+		prefs.putInt("CanvasWidth", canvasWidth);
+		sync();
+	}
+
+	/**
+	 * @param b
+	 */
+	public void setDefaultVisibility(boolean b) {
+		defaultVisibility = b;
+		prefs.putBoolean("DefaultVisibility", defaultVisibility);
+		sync();
+	}
+
+	/**
+	 * @param b
+	 */
+	public void setHideLinks(boolean b) {
+		hideLinks = b;
+		prefs.putBoolean("HideLinks", hideLinks);
 		sync();
 	}
 

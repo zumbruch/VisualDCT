@@ -34,6 +34,7 @@ import java.util.*;
 import com.cosylab.vdct.Console;
 import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.DataProvider;
+import com.cosylab.vdct.Settings;
 import com.cosylab.vdct.graphics.*;
 import com.cosylab.vdct.plugin.debug.PluginDebugManager;
 import com.cosylab.vdct.util.StringUtils;
@@ -128,8 +129,7 @@ public Record(ContainerObject parent, VDBRecordData recordData, int x, int y) {
 	Enumeration e = recordData.getFieldsV().elements();
 	while (e.hasMoreElements()) {
 		field = (VDBFieldData)e.nextElement();
-		if (field.getVisibility() == VDBFieldData.ALWAYS_VISIBLE ||
-			(field.getVisibility() == VDBFieldData.NON_DEFAULT_VISIBLE && !field.hasDefaultValue()))
+		if (isVisible(field))
 			changedFields.addElement(field);
 	}
 	oldNumOfFields = changedFields.size();
@@ -530,20 +530,16 @@ public void fieldChanged(VDBFieldData field) {
 	else
 		if (manageLink(field)) repaint=true;
 		
-	int visibility = field.getVisibility();
-		
-	if (visibility == VDBFieldData.NEVER_VISIBLE ||
-		(visibility == VDBFieldData.NON_DEFAULT_VISIBLE && field.hasDefaultValue())) {
-		if (changedFields.contains(field)) {
-				changedFields.removeElement(field);
-				repaint = true;
-		}
-				
+	if (isVisible(field)) {
+		if (!changedFields.contains(field))
+			changedFields.addElement(field);
+		repaint=true;		
 	}
 	else {
-		if (!changedFields.contains(field))
-				changedFields.addElement(field);
-		repaint=true;
+		if (changedFields.contains(field)) {
+			changedFields.removeElement(field);
+			repaint = true;
+		}
 	}
 		
 	if (repaint) {
@@ -555,6 +551,23 @@ public void fieldChanged(VDBFieldData field) {
 			com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 		}
 	}
+}
+
+public boolean isVisible(VDBFieldData field) {
+	int visibility = field.getVisibility();
+	boolean link = field.getDbdData().getGUI_type()==DBDConstants.GUI_LINKS ||
+		field.getDbdData().getGUI_type()==DBDConstants.GUI_OUTPUT ||
+		field.getDbdData().getGUI_type()==DBDConstants.GUI_INPUTS;
+	
+	boolean validLink = false;	
+	Object obj = getSubObject(field.getName());
+	if (obj instanceof Linkable && EPICSOutLink.getEndPoint((Linkable)obj) != null) validLink = true;
+	
+	if (visibility == VDBFieldData.NEVER_VISIBLE ||
+		(visibility == VDBFieldData.NON_DEFAULT_VISIBLE && (field.hasDefaultValue() || !Settings.getInstance().isDefaultVisibility())) ||
+		(validLink && Settings.getInstance().isHideLinks())) return false;
+		
+	return true;
 }
 /**
  * Insert the method's description here.
@@ -1634,6 +1647,14 @@ public String getType() {
  */
 public Vector getOutlinks() {
 	return outlinks;
+}
+
+public void fieldsChanged() {
+	Enumeration e = recordData.getFieldsV().elements();
+	while (e.hasMoreElements()) {
+		VDBFieldData fieldData = (VDBFieldData)e.nextElement();
+		fieldChanged(fieldData);
+	}
 }
 
 }
