@@ -53,6 +53,7 @@ public class Settings {
 	private boolean globalMacros = false;
 	private boolean hierarhicalNames = false;
 	private boolean windowsPan = false;
+	private int recordLength = 40;
 	
 	private int doubleClickSpeed = -1;
 	private int doubleClickSmudge = 4;
@@ -75,7 +76,8 @@ protected Settings() {
 	globalMacros = prefs.getBoolean("GlobalMacros", globalMacros);
 	hierarhicalNames = prefs.getBoolean("HierarhicalNames", hierarhicalNames);
 	windowsPan = prefs.getBoolean("WindowsPan", windowsPan);
-
+	recordLength = prefs.getInt("RecordLength", 40);
+	
 	doubleClickSpeed = prefs.getInt("DoubleClickSpeed", -1);
 	doubleClickSmudge = prefs.getInt("DoubleClickSmudge", 4);
 	
@@ -412,6 +414,8 @@ public void loadRecentFiles()
 		sync();
 	}
 
+	
+
 	/**
 	 * @return
 	 */
@@ -456,5 +460,21 @@ public void loadRecentFiles()
 			prefs.putInt("DoubleClickSpeed", doubleClickSpeed);
 			sync();
 	}	
+
+	/**
+	 * @return
+	 */
+	public int getRecordLength() {
+		return recordLength;
+	}
+
+	/**
+	 * @param i
+	 */
+	public void setRecordLength(int i) {
+		recordLength = i;
+		prefs.putInt("RecordLength", recordLength);
+		sync();
+	}
 
 }

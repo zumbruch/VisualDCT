@@ -132,7 +132,7 @@ public java.lang.String checkRecordName(String name, boolean relative) {
 		return "Name already exists!";
 	else if (relative && (drawingSurface.getViewGroup().findObject(name, true)!=null)) 
 		return "Name already exists!";
-	else if (name.length()>Constants.WARNING_RECORD_NAME_LENGTH) {
+	else if (name.length()>Settings.getInstance().getRecordLength()) {
 		return "WARNING: Name length is "+name.length()+" characters!";
 	}
 	else

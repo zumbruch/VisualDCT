@@ -66,7 +66,7 @@ public class Constants {
 	public final static String MENU_DEFAULT_VALUE_INDICATOR = "*";
     public final static String CLIPBOARD_NAME = "<clipboard>";
 
-    public final static int WARNING_RECORD_NAME_LENGTH = 40;
+//    public final static int WARNING_RECORD_NAME_LENGTH = 40;
 
     public final static int UNDO_STEPS_TO_REMEMBER = 25;
 

@@ -11,6 +11,7 @@ import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.JSpinner;
 import javax.swing.event.MouseInputListener;
 
 import com.cosylab.vdct.util.DoubleClickProxy;
@@ -65,8 +66,10 @@ public class SettingsDialog extends javax.swing.JDialog {
 	private javax.swing.JCheckBox HierarhicalNamesCheckBox = null; 
 	private javax.swing.JPanel MacrosPanel = null;
 	private javax.swing.JPanel DoubleClickPanel = null;
+	private javax.swing.JPanel RecordLengthPanel = null;
 	private JSlider JSliderDoubleClickSpeed = null;
 	private JSlider JSliderDoubleClickSmudge = null;
+	private JSpinner JSpinnerRecordLength = null;
 	
 class IvjEventHandler implements java.awt.event.ActionListener, java.awt.event.KeyListener {
 		public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -402,7 +405,7 @@ private javax.swing.JPanel getDoubleClickPanel() {
 			gridBagConstraints.gridx = 1;
 			gridBagConstraints.gridy = 0;
 			gridBagConstraints.anchor = GridBagConstraints.WEST;
-			gridBagConstraints.insets = new java.awt.Insets(4, 4, 14, 4);
+			gridBagConstraints.insets = new java.awt.Insets(4, 4, 14, 14);
 			getDoubleClickPanel().add(new JLabel("Test"), gridBagConstraints);
 
 			final JPanel testPanel = new JPanel();
@@ -450,7 +453,7 @@ private javax.swing.JPanel getDoubleClickPanel() {
 			gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 			gridBagConstraints.gridheight=3;
 		//	gridBagConstraints.fill = GridBagConstraints.BOTH;
-			gridBagConstraints.insets = new java.awt.Insets(4, 4, 14, 4);
+			gridBagConstraints.insets = new java.awt.Insets(4, 4, 14, 14);
 			getDoubleClickPanel().add(testPanel, gridBagConstraints);
 
 		} catch (java.lang.Throwable ivjExc) {
@@ -459,6 +462,39 @@ private javax.swing.JPanel getDoubleClickPanel() {
 		}
 	}
 	return DoubleClickPanel;
+}
+
+private javax.swing.JPanel getRecordLengthPanel() {
+	if (RecordLengthPanel == null) {
+		try {
+			RecordLengthPanel = new javax.swing.JPanel();
+			RecordLengthPanel.setName("RecordLengthPanel");
+			RecordLengthPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(" Record Name Length Limit Settings "));
+			RecordLengthPanel.setLayout(new java.awt.GridBagLayout());
+
+			java.awt.GridBagConstraints gridBagConstraints;
+			
+			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints.gridx = 0;
+			gridBagConstraints.gridy = 0;
+			gridBagConstraints.anchor = GridBagConstraints.WEST;
+			gridBagConstraints.insets = new java.awt.Insets(4, 14, 14, 4);
+			getRecordLengthPanel().add(new JLabel("Record name length limit: "), gridBagConstraints);
+			
+			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints.gridx = 1;
+			gridBagConstraints.gridy = 0;
+			gridBagConstraints.anchor = GridBagConstraints.WEST;
+			gridBagConstraints.weightx = 1.0;
+			gridBagConstraints.insets = new java.awt.Insets(4, 4, 14, 14);
+			getRecordLengthPanel().add(getJSpinnerRecordLength(), gridBagConstraints);
+
+		} catch (java.lang.Throwable ivjExc) {
+							
+			handleException(ivjExc);
+		}
+	}
+	return RecordLengthPanel;
 }
 
 /**
@@ -471,6 +507,7 @@ private JSlider getJSliderDoubleClickSmudge() {
 			JSliderDoubleClickSmudge.setMajorTickSpacing(1);
 			JSliderDoubleClickSmudge.setSnapToTicks(true);
 			JSliderDoubleClickSmudge.setPaintTicks(true);
+			JSliderDoubleClickSmudge.setMinimumSize(JSliderDoubleClickSmudge.getPreferredSize());
 			JSliderDoubleClickSmudge.setModel(new DefaultBoundedRangeModel(){
 				public int getMaximum() {
 					return 10;
@@ -490,6 +527,20 @@ private JSlider getJSliderDoubleClickSmudge() {
 	}
 	return JSliderDoubleClickSmudge;
 }
+
+private JSpinner getJSpinnerRecordLength() {
+	if (JSpinnerRecordLength == null) {
+		try {
+			JSpinnerRecordLength = new JSpinner();			
+			JSpinnerRecordLength.setPreferredSize(new Dimension(60,20));
+			JSpinnerRecordLength.setMinimumSize(new Dimension(60,20));
+		} catch (java.lang.Throwable ivjExc) {
+			handleException(ivjExc);
+		}
+	}
+	return JSpinnerRecordLength;
+}
+
 /**
  * @return
  */
@@ -499,6 +550,7 @@ private JSlider getJSliderDoubleClickSpeed() {
 			JSliderDoubleClickSpeed = new javax.swing.JSlider();			
 			JSliderDoubleClickSpeed.setMajorTickSpacing(100);
 			JSliderDoubleClickSpeed.setPaintTicks(true);
+			JSliderDoubleClickSpeed.setMinimumSize(JSliderDoubleClickSpeed.getPreferredSize());
 			JSliderDoubleClickSpeed.setModel(new DefaultBoundedRangeModel(){
 				public int getMaximum() {
 					return 1000;
@@ -625,11 +677,19 @@ private javax.swing.JPanel getJDialogContentPane() {
 			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 			gridBagConstraints.weightx = 1.0;
 			gridBagConstraints.weighty = 1.0;
-			getJDialogContentPane().add(getDoubleClickPanel(), gridBagConstraints);
+			getJDialogContentPane().add(getRecordLengthPanel(), gridBagConstraints);
 			
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 0;
 			gridBagConstraints.gridy = 3;
+			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+			gridBagConstraints.weightx = 1.0;
+			gridBagConstraints.weighty = 1.0;
+			getJDialogContentPane().add(getDoubleClickPanel(), gridBagConstraints);
+			
+			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints.gridx = 0;
+			gridBagConstraints.gridy = 4;
 			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 			gridBagConstraints.weightx = 1.0;
 			getJDialogContentPane().add(getJPanel1(), gridBagConstraints);			
@@ -796,6 +856,7 @@ private void initialize() {
 }
 
 private void initializeMacros() {
+	getJSpinnerRecordLength().setValue(new Integer(Settings.getInstance().getRecordLength()));
 	getGlobalMacrosCheckBox().setSelected(Settings.getInstance().getGlobalMacros());
 	getHierarhicalNamesCheckBox().setSelected(Settings.getInstance().getHierarhicalNames());
 }
@@ -836,6 +897,8 @@ public void oKButton_ActionPerformed(java.awt.event.ActionEvent actionEvent) {
 	{
 		Settings.getInstance().setGroupSeparator('\0');
 	}
+	
+	Settings.getInstance().setRecordLength(((Integer)getJSpinnerRecordLength().getValue()).intValue());
 
 	Settings.getInstance().setGlobalMacros(getGlobalMacrosCheckBox().isSelected());
 	Settings.getInstance().setHierarhicalNames(getHierarhicalNamesCheckBox().isSelected());
