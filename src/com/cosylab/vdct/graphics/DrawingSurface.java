@@ -59,7 +59,7 @@ import com.cosylab.vdct.graphics.printing.Page;
  * Creation date: (10.12.2000 13:19:16)
  * @author Matej Sekoranja
  */
-public final class DrawingSurface extends Decorator implements Pageable, Printable, MouseInputListener {
+public final class DrawingSurface extends Decorator implements Pageable, Printable, MouseInputListener, Runnable {
 
 	class Hiliter extends Thread {
 		//private VisibleObject object;
@@ -157,6 +157,9 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 	private LinkSource tmplink = null;
 	private Hiliter hiliter;
 	
+	// see run()
+	private boolean redrawRequest = false;
+	
 	//private ComposedAction undoAction = null;
 	
 	private static final String newRecordString = "New record...";
@@ -212,6 +215,8 @@ public DrawingSurface() {
 	commandManager.addCommand("LinkCommand", new LinkCommand(this));
 	commandManager.addCommand("GetPrintableInterface", new GetPrintableInterface(this));
 	commandManager.addCommand("RepaintWorkspace", new RepaintCommand(this));
+
+	new Thread(this, "DrawingSurface Repaint Thread").start();
 
 }
 /**
@@ -2021,6 +2026,22 @@ public boolean openDBD(File file, boolean importDBD) throws IOException {
 		Console.getInstance().println("o) DBD file '"+file.getAbsolutePath()+"' is already loaded.");
 		return true;
 	}
+	else
+	{
+		// more exact compare
+		String canonicalFile = file.getCanonicalPath();
+		Enumeration e = DataProvider.getInstance().getLoadedDBDs().elements();
+		while (e.hasMoreElements())
+		{
+			String loadedFile = ((File)e.nextElement()).getCanonicalPath();
+			if (canonicalFile.equals(loadedFile))
+			{
+				Console.getInstance().println();
+				Console.getInstance().println("o) DBD file '"+file.getAbsolutePath()+"' is already loaded.");
+				return true;
+			}
+		}
+	}
 
 	setCursor(hourCursor);
 
@@ -2346,14 +2367,48 @@ private void redraw(Graphics g) {
 	if (canvasGraphics!=null) copyCanvasImage(g);
 	
 }
+
+/**
+ * DrawingSurface thread.
+ * Aim of this thread is to optimize drawing on the surface.
+ * It could happen that <code>repaint()</code> method is called very often
+ * (e.g. 100-times per second). Drawing at such rate is non-sence. 
+ * The idea is to repaint whole workspace at maximum rate of 10 repaints/second.
+ * @see java.lang.Runnable#run()
+ */
+public void run() {
+
+	while (true)
+	{
+		try
+		{
+			Thread.sleep(100);
+		}
+		catch (InterruptedException ie)
+		{
+		}
+		
+		if (redrawRequest)
+		{
+			redrawRequest = false;
+			getWorkspacePanel().repaint();
+		}
+			
+	}
+
+}
+
+
 /**
  * Insert the method's description here.
  * Creation date: (25.12.2000 14:59:05)
  */
 public void repaint() {
 	// set clip to x0, y0, width, height !!!?
-	forceRedraw = true;	
-	getWorkspacePanel().repaint();
+	forceRedraw = true;
+	redrawRequest = true;
+	//getWorkspacePanel().repaint();
+		
 }
 /**
  * Insert the method's description here.

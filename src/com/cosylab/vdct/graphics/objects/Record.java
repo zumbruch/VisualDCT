@@ -90,6 +90,8 @@ public class Record
 	protected String value;
 	protected Font valueFont = null;
 	
+	private static final String VAL_FIELD = "VAL";
+	
 	private static GUISeparator alphaSeparator = null;
 	private static GUISeparator dbdSeparator = null;
 
@@ -454,10 +456,15 @@ protected void draw(Graphics g, boolean hilited) {
  * @param field com.cosylab.vdct.vdb.VDBFieldData
  */
 public void fieldChanged(VDBFieldData field) {
+	
 	boolean repaint = false;
 
-	if (manageLink(field)) repaint=true;
-	
+	if (inDebugMode && field.getName().equals(VAL_FIELD))
+		// always repaint, VAL field linking is irrelevant in debug mode
+		repaint = true;
+	else
+		if (manageLink(field)) repaint=true;
+		
 	int visibility = field.getVisibility();
 		
 	if (visibility == VDBFieldData.NEVER_VISIBLE ||
@@ -473,9 +480,15 @@ public void fieldChanged(VDBFieldData field) {
 				changedFields.addElement(field);
 		repaint=true;
 	}
+		
 	if (repaint) {
-		unconditionalValidation();
-		com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+		// do not repaint non-viewing group
+		// might happen in debug mode and any other
+		if (DrawingSurface.getInstance().getViewGroup() == getParent())
+		{
+			unconditionalValidation();
+			com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+		}
 	}
 }
 /**
@@ -1290,30 +1303,10 @@ protected void validate() {
   // increase record size for VAL value and timestamp
   if (PluginDebugManager.isDebugState())
   {
-	VDBFieldData fld = getField("VAL");
+	VDBFieldData fld = getField(VAL_FIELD);
 	if (fld != null)
 	{
-		// TODO for timestamp this could be optimized
-		timestamp = fld.getDebugValueTimeStamp();
-		timestampFont = FontMetricsBuffer.getInstance().getAppropriateFont(
-					    Constants.DEFAULT_FONT, Font.PLAIN, 
-						timestamp, rwidth-x0, (rheight-y0)/2-y0);
-		if (timestampFont!=null) {
-			FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(timestampFont);
-			timestampX = (rwidth-fm.stringWidth(timestamp))/2;
-			timestampY = rheight/2+(rheight/2-fm.getHeight())/2+fm.getAscent();
-		}
-
-		value = fld.getValue();
-		valueFont = FontMetricsBuffer.getInstance().getAppropriateFont(
-						Constants.DEFAULT_FONT, Font.PLAIN, 
-						value, rwidth-x0, rheight/2+y0);
-
-		if (valueFont!=null) {
-			FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(valueFont);
-			valueX = (rwidth-fm.stringWidth(value))/2;
-			valueY = (rheight/2-fm.getHeight())/2+fm.getAscent();
-		}
+		validateDebug(fld);
 
 		inDebugMode = true;
 		rheight *= 2;
@@ -1352,6 +1345,41 @@ protected void validate() {
   validateFields();
  
 }
+
+
+private void validateDebug(VDBFieldData valField)
+{
+	double scale = getRscale();
+	int rwidth = (int)(getWidth()*scale);
+	int rheight = (int)(Constants.RECORD_HEIGHT*scale);
+
+	// set appropriate font size
+	int x0 = (int)(8*scale);		// insets
+	int y0 = (int)(4*scale);
+
+	// TODO for timestamp this could be optimized
+	timestamp = valField.getDebugValueTimeStamp();
+	timestampFont = FontMetricsBuffer.getInstance().getAppropriateFont(
+					Constants.DEFAULT_FONT, Font.PLAIN, 
+					timestamp, rwidth-x0, (rheight-y0)/2-y0);
+	if (timestampFont!=null) {
+		FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(timestampFont);
+		timestampX = (rwidth-fm.stringWidth(timestamp))/2;
+		timestampY = rheight/2+(rheight/2-fm.getHeight())/2+fm.getAscent();
+	}
+
+	value = valField.getValue();
+	valueFont = FontMetricsBuffer.getInstance().getAppropriateFont(
+					Constants.DEFAULT_FONT, Font.PLAIN, 
+					value, rwidth-x0, rheight/2+y0);
+
+	if (valueFont!=null) {
+		FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(valueFont);
+		valueX = (rwidth-fm.stringWidth(value))/2;
+		valueY = (rheight/2-fm.getHeight())/2+fm.getAscent();
+	}
+}
+
 /**
  * Insert the method's description here.
  * Creation date: (26.1.2001 17:19:47)

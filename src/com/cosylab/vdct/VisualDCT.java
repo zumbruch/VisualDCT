@@ -5361,6 +5361,7 @@ public static void main(java.lang.String[] args) {
 		
 		if (DataProvider.getInstance().getDbdDB()==null) {
 			System.out.println("No DBD loaded! Exiting...");
+			com.cosylab.vdct.plugin.PluginManager.getInstance().destroyAllPlugins();
 			System.exit(1);
 		}
 
@@ -5381,6 +5382,7 @@ public static void main(java.lang.String[] args) {
 			public void windowClosed(java.awt.event.WindowEvent e) {
 				Settings.getInstance().save();
 				com.cosylab.vdct.plugin.PluginManager.getInstance().save();
+				com.cosylab.vdct.plugin.PluginManager.getInstance().destroyAllPlugins();
 				System.out.println();
 				System.out.println("VisualDCT exited.");
 				System.exit(0);

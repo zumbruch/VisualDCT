@@ -103,65 +103,83 @@ public void run()
 
 	// all new (or deleted) filed are not updated
 	// if field has InspectableProperty.ALWAYS_VISIBLE visibility then is is monitored
-	// (otherwise only remote value is retrieved) - removed, it took to much time
 	// VAL fields is always registered
 	final String valFieldName = "VAL";
+	
+	// count loop
+	int recordCount = 0;
+	Stack groupStack = new Stack();
+	groupStack.push(Group.getRoot());
 
-	Group group = com.cosylab.vdct.graphics.DrawingSurface.getInstance().getViewGroup();
-	//Group group = Group.getRoot();
+	while (!groupStack.isEmpty())
+	{
+		Group group = (Group)groupStack.pop();
+		Enumeration e = group.getSubObjectsV().elements();
+		while (e.hasMoreElements())
+		{
+			Object obj = e.nextElement();
+			if (obj instanceof Record)
+				recordCount++;
+			else if (obj instanceof Group)
+				groupStack.push(obj);
+		}
+	}
+
+
+	// connect loop
+	groupStack.push(Group.getRoot());
 
 	int progress = 0;
 	ProgressMonitor progressMonitor = new ProgressMonitor(VisualDCT.getInstance(),
 								"Connecting to PVs",
-								"Initializing...", 0, group.getSubObjectsV().size());
+								"Initializing...", 0, recordCount);
 	progressMonitor.setProgress(0);
 
-	Enumeration e = group.getSubObjectsV().elements();
-	while (e.hasMoreElements() && !progressMonitor.isCanceled())
+	while (!groupStack.isEmpty())
 	{
-		Object obj = e.nextElement();
-		if (obj instanceof com.cosylab.vdct.graphics.objects.Record)
+
+		Group group = (Group)groupStack.pop();
+		Enumeration e = group.getSubObjectsV().elements();
+		while (e.hasMoreElements() && !progressMonitor.isCanceled())
 		{
-			VDBRecordData rec = ((Record)obj).getRecordData();
-			Enumeration e2 = rec.getFieldsV().elements();
-			while (e2.hasMoreElements() && !progressMonitor.isCanceled())
+			Object obj = e.nextElement();
+			if (obj instanceof Record)
 			{
-				VDBFieldData field = (VDBFieldData)e2.nextElement();
-					
-				//if (!field.equals(valFieldName))
+				VDBRecordData rec = ((Record)obj).getRecordData();
+				Enumeration e2 = rec.getFieldsV().elements();
+				while (e2.hasMoreElements() && !progressMonitor.isCanceled())
+				{
+					VDBFieldData field = (VDBFieldData)e2.nextElement();
+						
 					if (field.getVisibility() == InspectableProperty.ALWAYS_VISIBLE && !field.equals(valFieldName))
 					{
 						progressMonitor.setNote("Connecting to "+field.getFullName()+"...");
 						debugPlugin.registerMonitor(field);
 					}
-							
-					/*
-					{
-						String debugValue = debugPlugin.getValue(field.getFullName());
-						if (debugValue != null)
-							field.setDebugValue(debugValue);
-					}
-					*/
+				}
+	
+				if (progressMonitor.isCanceled())
+					break;
+	
+				// always register VAL field
+				Debuggable valField = (Debuggable)rec.getField(valFieldName);
+				if (valField != null)
+				{
+					progressMonitor.setNote("Connecting to "+valField.getFullName()+"...");
+					debugPlugin.registerMonitor(valField);
+				}
+						
 			}
-
-			if (progressMonitor.isCanceled())
-				break;
-
-			// always register VAL field
-			Debuggable valField = (Debuggable)rec.getField(valFieldName);
-			if (valField != null)
-			{
-				progressMonitor.setNote("Connecting to "+valField.getFullName()+"...");
-				debugPlugin.registerMonitor(valField);
-			}
-					
+			else if (obj instanceof Group)
+				groupStack.push(obj);
+				
+			progress++;
+			progressMonitor.setProgress(progress);
+				
 		}
-			
-		progress++;
-		progressMonitor.setProgress(progress);
-			
 	}
-		
+	
+			
 	if (progressMonitor.isCanceled())
 	{
 		Console.getInstance().println("Debugging canceled.");
