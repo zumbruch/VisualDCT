@@ -72,7 +72,7 @@ public class Record
 	// changed fields label
 	protected int rfieldLabelX;
 	protected int rfieldLabelY;
-	protected int rfieldRowHeight;
+	protected double rfieldRowHeight;
 	protected Font fieldFont = null;
 	protected Vector changedFields;
 	protected Vector outlinks;
@@ -334,7 +334,8 @@ protected void draw(Graphics g, boolean hilited) {
 			String val;
 			VDBFieldData fd;
 			int px = rrx + rfieldLabelX;
-			int py = rry + rfieldLabelY;
+			int py0 = rry + rfieldLabelY;
+			int py = py0; int n = 0;
 			Enumeration e = changedFields.elements();
 			while (e.hasMoreElements()) {
 				fd = (VDBFieldData) (e.nextElement());
@@ -342,7 +343,7 @@ protected void draw(Graphics g, boolean hilited) {
 				while ((fm.stringWidth(val) + ox) > rwidth)
 					val = val.substring(0, val.length() - 2);
 				g.drawString(val, px, py);
-				py += rfieldRowHeight;
+				py = py0 + (int)((++n)*rfieldRowHeight);
 			}
 		}
 
@@ -1265,19 +1266,24 @@ protected void validate() {
  	  rtypeLabelY = (rheight/2-fm.getHeight())/2+fm.getAscent();
   }
 
+ 
+ // !!! optimize - static
+ 
+  rfieldRowHeight = (rheight-2*y0)*0.375;
+
   if (rwidth<(2*x0)) fieldFont = null;
   else
 	  fieldFont = FontMetricsBuffer.getInstance().getAppropriateFont(
 		  			 Constants.DEFAULT_FONT, Font.PLAIN, 
-	 	 			 fieldMaxStr, rwidth-x0, rheight-y0);
+	 	 			 fieldMaxStr, rwidth-x0, (int)rfieldRowHeight);
 
   int ascent = 0;
-  rfieldRowHeight = 0;
+  //rfieldRowHeight = 0;
   if (fieldFont!=null) {
 	  FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(fieldFont);
 	  rfieldLabelX = x0;
  	  rfieldLabelY = rheight+2*fm.getAscent();
-	  rfieldRowHeight = fm.getHeight();
+	  //rfieldRowHeight = fm.getHeight();
 	  ascent = fm.getAscent();
   }
 

@@ -73,7 +73,7 @@ public class Template
 	// properties field
 	protected int rfieldLabelX;
 	protected int rfieldLabelY;
-	protected int rfieldRowHeight;
+	protected double rfieldRowHeight;
 	protected Font fieldFont = null;
 
 	// templateid (fileName) label
@@ -182,8 +182,8 @@ public class Template
 				FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(fieldFont);
 				String val;
 				int px = rrx + rfieldLabelX;
-				int py = rry + rfieldLabelY;
-				
+				int py0 = rry + rfieldLabelY;
+				int py = py0; int n = 0;
 		 		java.util.Iterator e = templateData.getPropertiesV().iterator();
 				while (e.hasNext())
 				{				
@@ -192,7 +192,7 @@ public class Template
 					while ((fm.stringWidth(val) + ox) > rwidth)
 						val = val.substring(0, val.length() - 2);
 					g.drawString(val, px, py);
-					py += rfieldRowHeight;
+					py = py0 + (int)((++n)*rfieldRowHeight);
 				}
 
 			}
@@ -246,7 +246,7 @@ public class Template
 		  // fields
 
 //int fieldRows = Math.max(templateData.getInputs().size(), templateData.getOutputs().size());
-int fieldRows = templateData.getTemplate().getPorts().size();
+		 int fieldRows = templateData.getTemplate().getPorts().size();
 		  height += fieldRows * Constants.FIELD_HEIGHT;
 		 // height = Math.max(height, Constants.TEMPLATE_MIN_HEIGHT);
 		  int frheight = (int)(scale*height);
@@ -258,24 +258,29 @@ int fieldRows = templateData.getTemplate().getPorts().size();
 		  int xx0 = (int)(14*scale);		// insets
 		  int yy0 = (int)(8*scale);
 
+
+  		 // !!! optimize - static
+ 
+		  rfieldRowHeight = (frheight-2*y0)*0.092;
+
 		  if (rwidth<(2*xx0)) fieldFont = null;
 		  else
 			  fieldFont = FontMetricsBuffer.getInstance().getAppropriateFont(
 				  			 Constants.DEFAULT_FONT, Font.PLAIN, 
-			 	 			 fieldMaxStr, rwidth-x0, frheight-y0);
+			 	 			 fieldMaxStr, rwidth-x0, (int)rfieldRowHeight);
 
 		  int ascent = 0;
-		  rfieldRowHeight = 0;
+		  //rfieldRowHeight = 0;
 		  if (fieldFont!=null)
 		  {
 			  FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(fieldFont);
 			  rfieldLabelX = xx0;
 		 	  rfieldLabelY = frheight+2*fm.getAscent();
-			  rfieldRowHeight = fm.getHeight();
+			  //rfieldRowHeight = fm.getHeight();
 			  ascent = fm.getAscent();
 		  }
-		
-		  int rheight = frheight + yy0 + rfieldRowHeight*templateData.getProperties().size()+ascent;
+
+		  int rheight = frheight + yy0 + (int)(rfieldRowHeight*templateData.getProperties().size())+ascent;
 		  setHeight((int)(rheight/scale));
 
 		  setRwidth(rwidth);

@@ -128,7 +128,7 @@ public Component getTableCellRendererComponent(JTable table, Object value, boole
 		else
 			super.setForeground(fgColor);
 	}
-	setValue(str); 
+	setValue(str);
 
 	setToolTipText(property.getToolTipText());
 

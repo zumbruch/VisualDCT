@@ -162,6 +162,8 @@ protected void validate() {
 
   setLabel(fieldData.getName());
 
+	///!!! optimize static
+
   Font font;
   if (rwidth<(2*x0)) font = null;
   else

@@ -52,7 +52,7 @@ public class FontMetricsBuffer {
 		public FontMetrics getFontMetrics() { return fontMetrics; }
 		
 	}
-	private final static int MIN_SIZE = 3;
+	private final static int MIN_SIZE = 1;
 	private final static int MAX_SIZE = 72;
 	private Hashtable fonts;
 	private Graphics graphics;

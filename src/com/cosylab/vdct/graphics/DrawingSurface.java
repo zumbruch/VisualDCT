@@ -2722,6 +2722,7 @@ public void moveToGroup(Group group)
 
 	updateWorkspaceScale();
 	
+	blockNavigatorRedrawOnce = false;
 	forceRedraw = true;
 	repaint();
 }
