@@ -500,8 +500,15 @@ public static String processComment(DBData rootData, StreamTokenizer tokenizer, 
 						(tokenizer.ttype == DBConstants.quoteChar)) str2=tokenizer.sval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
+					// read description
+					tokenizer.nextToken();
+					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+						(tokenizer.ttype == DBConstants.quoteChar)) desc=tokenizer.sval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
 					// set data
 					templateData.getInputs().put(str, str2);
+					templateData.getInputComments().put(str, desc);
 				}
 				else if (templateData!=null && tokenizer.sval.equalsIgnoreCase(TEMPLATE_OUTPUT)) {
 
@@ -517,8 +524,15 @@ public static String processComment(DBData rootData, StreamTokenizer tokenizer, 
 						(tokenizer.ttype == DBConstants.quoteChar)) str2=tokenizer.sval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
+					// read description
+					tokenizer.nextToken();
+					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+						(tokenizer.ttype == DBConstants.quoteChar)) desc=tokenizer.sval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
 					// set data
 					templateData.getOutputs().put(str, str2);
+					templateData.getOutputComments().put(str, desc);
 				}
 				else if (templateData!=null && tokenizer.sval.equalsIgnoreCase(TEMPLATE_END)) {
 					data = rootData;

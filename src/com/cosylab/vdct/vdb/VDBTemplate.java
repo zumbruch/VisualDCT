@@ -47,6 +47,8 @@ public class VDBTemplate
 	String description = null;
 	Hashtable inputs = null;
 	Hashtable outputs = null;
+	Hashtable inputComments = null;
+	Hashtable outputComments = null;
 	Group group = null;
 	
 	/**
@@ -146,6 +148,42 @@ public class VDBTemplate
 	public String getId()
 	{
 		return id;
+	}
+
+	/**
+	 * Returns the inputComments.
+	 * @return Hashtable
+	 */
+	public Hashtable getInputComments()
+	{
+		return inputComments;
+	}
+
+	/**
+	 * Returns the outputComments.
+	 * @return Hashtable
+	 */
+	public Hashtable getOutputComments()
+	{
+		return outputComments;
+	}
+
+	/**
+	 * Sets the inputComments.
+	 * @param inputComments The inputComments to set
+	 */
+	public void setInputComments(Hashtable inputComments)
+	{
+		this.inputComments = inputComments;
+	}
+
+	/**
+	 * Sets the outputComments.
+	 * @param outputComments The outputComments to set
+	 */
+	public void setOutputComments(Hashtable outputComments)
+	{
+		this.outputComments = outputComments;
 	}
 
 }

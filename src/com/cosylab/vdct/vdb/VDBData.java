@@ -202,8 +202,8 @@ public static void generateTemplateInstances(DBData db, VDBData vdb)
 		VDBTemplateInstance vti = new VDBTemplateInstance(dbTemplateInstance.getTemplateID(), t);
 		vti.setProperties(dbTemplateInstance.getProperties());
 			
-		vti.setInputs(generateTemplateInstanceIOFields(t.getInputs()));
-		vti.setOutputs(generateTemplateInstanceIOFields(t.getOutputs()));
+		vti.setInputs(generateTemplateInstanceIOFields(t.getInputs(), t.getInputComments()));
+		vti.setOutputs(generateTemplateInstanceIOFields(t.getOutputs(), t.getOutputComments()));
 	
 		vdb.addTemplateInstance(vti);
 	}
@@ -212,7 +212,7 @@ public static void generateTemplateInstances(DBData db, VDBData vdb)
 /**
  * 
  */
-private static Hashtable generateTemplateInstanceIOFields(Hashtable table)
+private static Hashtable generateTemplateInstanceIOFields(Hashtable table, Hashtable descTable)
 {
 	Hashtable ios = new Hashtable();
 	Enumeration keys = table.keys();
@@ -220,7 +220,9 @@ private static Hashtable generateTemplateInstanceIOFields(Hashtable table)
 	{
 		String key = keys.nextElement().toString();
 		VDBFieldData field = (VDBFieldData)table.get(key);
-		ios.put(key, new VDBTemplateField(key, field));
+		VDBTemplateField tf = new VDBTemplateField(key, field);
+		tf.setDescription((String)descTable.get(key));
+		ios.put(key, tf);
 	}
 	return ios;
 }
@@ -257,6 +259,9 @@ public static void extractTemplates(DBDData dbd, DBData db, VDBData vdb)
 			
 			vt.setInputs(generateTemplateIOFields(dbTemplate, dbTemplate.getInputs(), "input"));
 			vt.setOutputs(generateTemplateIOFields(dbTemplate, dbTemplate.getOutputs(), "output"));
+
+			vt.setInputComments(dbTemplate.getInputComments());
+			vt.setOutputComments(dbTemplate.getOutputComments());
 			
 			vdb.addTemplate(vt);
 		}

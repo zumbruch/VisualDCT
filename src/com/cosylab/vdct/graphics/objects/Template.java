@@ -40,7 +40,9 @@ import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.graphics.popup.Popupable;
 import com.cosylab.vdct.inspector.Inspectable;
 import com.cosylab.vdct.inspector.InspectableProperty;
+import com.cosylab.vdct.vdb.GUISeparator;
 import com.cosylab.vdct.vdb.LinkProperties;
+import com.cosylab.vdct.vdb.NameValueInfoProperty;
 import com.cosylab.vdct.vdb.VDBFieldData;
 import com.cosylab.vdct.vdb.VDBTemplateField;
 import com.cosylab.vdct.vdb.VDBTemplateInstance;
@@ -72,6 +74,10 @@ public class Template
 	protected int initY;
 	protected int rlinkY;
 
+	private static GUISeparator templateSeparator = null;
+	private static GUISeparator inputsSeparator = null;
+	private static GUISeparator outputsSeparator = null;
+	private static GUISeparator templateInstanceSeparator = null;
 	private final static String fieldMaxStr = "01234567890123456789012345";
 
 	/**
@@ -89,7 +95,7 @@ public class Template
 		setHeight(Constants.TEMPLATE_INITIAL_HEIGHT);
 		
 		initializeLinkFields();		
-		forceValidation();
+		//forceValidation();
 
 	}
 
@@ -343,11 +349,73 @@ public class Template
 	}
 
 	/**
+	 * Insert the method's description here.
+	 * Creation date: (3.2.2001 13:07:04)
+	 * @return com.cosylab.vdct.vdb.GUISeparator
+	 */
+	public static com.cosylab.vdct.vdb.GUISeparator getTemplateSeparator() {
+		if (templateSeparator==null) templateSeparator = new GUISeparator("Template");
+		return templateSeparator;
+	}
+	
+	/**
+	 * Insert the method's description here.
+	 * Creation date: (3.2.2001 13:07:04)
+	 * @return com.cosylab.vdct.vdb.GUISeparator
+	 */
+	public static com.cosylab.vdct.vdb.GUISeparator getTemplateInstanceSeparator() {
+		if (templateInstanceSeparator==null) templateInstanceSeparator = new GUISeparator("Template Instance");
+		return templateInstanceSeparator;
+	}
+
+	/**
+	 * Insert the method's description here.
+	 * Creation date: (3.2.2001 13:07:04)
+	 * @return com.cosylab.vdct.vdb.GUISeparator
+	 */
+	public static com.cosylab.vdct.vdb.GUISeparator getInputsSeparator() {
+		if (inputsSeparator==null) inputsSeparator = new GUISeparator("Inputs");
+		return inputsSeparator;
+	}
+	
+	/**
+	 * Insert the method's description here.
+	 * Creation date: (3.2.2001 13:07:04)
+	 * @return com.cosylab.vdct.vdb.GUISeparator
+	 */
+	public static com.cosylab.vdct.vdb.GUISeparator getOutputsSeparator() {
+		if (outputsSeparator==null) outputsSeparator = new GUISeparator("Outputs");
+		return outputsSeparator;
+	}
+
+
+	/**
 	 * @see com.cosylab.vdct.inspector.Inspectable#getProperties(int)
 	 */
 	public InspectableProperty[] getProperties(int mode)
 	{
-		return null;
+		Vector items = new Vector();
+
+		items.addElement(getTemplateSeparator());
+		items.addElement(new NameValueInfoProperty("Class", templateData.getTemplate().getId()));
+		items.addElement(new NameValueInfoProperty("FileName", templateData.getTemplate().getFileName()));
+
+		items.addElement(getTemplateInstanceSeparator());
+
+		items.addElement(getInputsSeparator());
+		Enumeration e = templateData.getInputs().elements();
+		while (e.hasMoreElements())
+			items.addElement(e.nextElement());
+
+		items.addElement(getOutputsSeparator());
+		e = templateData.getOutputs().elements();
+		while (e.hasMoreElements())
+			items.addElement(e.nextElement());
+		
+	
+		InspectableProperty[] properties = new InspectableProperty[items.size()];
+		items.copyInto(properties);
+		return properties;
 	}
 
 	/**

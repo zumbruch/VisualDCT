@@ -28,12 +28,16 @@ package com.cosylab.vdct.vdb;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import com.cosylab.vdct.graphics.objects.Descriptable;
+import com.cosylab.vdct.inspector.InspectableProperty;
+
 /**
  * @author Matej
  */
-public class VDBTemplateField extends VDBFieldData
+public class VDBTemplateField extends VDBFieldData implements Descriptable
 {
 	String alias;
+	String description = null;
 	
 	/**
 	 */
@@ -42,7 +46,7 @@ public class VDBTemplateField extends VDBFieldData
 		super();
 		this.alias=alias;
 		
-		// copy (is this good - what about ...?!!!)
+		// copy (is this good - what about delegation...?!!!)
 		this.setType(field.getType());
 		this.setName(field.getName());
 		this.setValue(field.getInit_value());
@@ -78,6 +82,70 @@ public class VDBTemplateField extends VDBFieldData
 	public void setAlias(String alias)
 	{
 		this.alias = alias;
+	}
+
+	/**
+	 * Insert the method's description here.
+	 * Creation date: (1.2.2001 12:11:29)
+	 * @return java.lang.String
+	 */
+	public String toString() {
+		return alias;
+	}
+
+	/**
+	 * Insert the method's description here.
+	 * Creation date: (1.2.2001 12:11:29)
+	 * @return java.lang.String
+	 */
+	public String getName() {
+		return alias;
+	}
+	/**
+	 * Insert the method's description here.
+	 * Creation date: (11.1.2001 21:30:04)
+	 * @return int
+	 */
+	public int getVisibility()
+	{
+		return InspectableProperty.UNDEFINED_VISIBILITY;
+	}
+	
+	/**
+	 * Sets the visibility.
+	 * @param visibility The visibility to set
+	 */
+	public void setVisibility(int visibility)
+	{
+	}
+
+	/**
+	 * Insert the method's description here.
+	 * Creation date: (26.1.2001 15:03:07)
+	 * @return java.lang.String
+	 */
+	public java.lang.String getHelp() {
+		if (description!=null)
+			return description;
+		else
+			return super.getHelp();
+	}
+
+	
+	/**
+	 * @see com.cosylab.vdct.graphics.objects.Descriptable#getDescription()
+	 */
+	public String getDescription()
+	{
+		return description;
+	}
+
+	/**
+	 * @see com.cosylab.vdct.graphics.objects.Descriptable#setDescription(String)
+	 */
+	public void setDescription(String description)
+	{
+		this.description = description;
 	}
 
 }

@@ -82,6 +82,10 @@ public class Record extends ContainerObject implements Clipboardable, Descriptab
 	private final static String outlinkString = "OUTLINK";
 	private final static String fwdlinkString = "FWDLINK";
 	private final static String varlinkString = "VARIABLE";
+	
+	private static GUISeparator alphaSeparator = null;
+	private static GUISeparator dbdSeparator = null;
+	
 /**
  * Group constructor comment.
  * @param parent com.cosylab.vdct.graphics.objects.ContainerObject
@@ -799,6 +803,26 @@ public OutLink getOutput() {
 	else
 		return null;
 }
+	/**
+	 * Insert the method's description here.
+	 * Creation date: (3.2.2001 13:07:04)
+	 * @return com.cosylab.vdct.vdb.GUISeparator
+	 */
+	public static com.cosylab.vdct.vdb.GUISeparator getAlphaSeparator() {
+		if (alphaSeparator==null) alphaSeparator = new GUISeparator("Alphabetical");
+		return alphaSeparator;
+	}
+
+	/**
+	 * Insert the method's description here.
+	 * Creation date: (3.2.2001 13:07:04)
+	 * @return com.cosylab.vdct.vdb.GUISeparator
+	 */
+	public static com.cosylab.vdct.vdb.GUISeparator getDBDSeparator() {
+		if (dbdSeparator==null) dbdSeparator = new GUISeparator("DBD Order");
+		return dbdSeparator;
+	}
+
 /**
  * Return properties to be inspected
  * Creation date: (11.1.2001 21:43:31)
@@ -857,9 +881,9 @@ public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode) 
 		Vector all = new Vector();
 
 		if (mode == Inspector.SORT_ORDER)
-			all.addElement(new GUISeparator("Alphabetical"));
+			all.addElement(getAlphaSeparator());
 		else
-			all.addElement(new GUISeparator("DBD Order"));
+			all.addElement(getDBDSeparator());
 	
 		Enumeration e = recordData.getFieldsV().elements();
 		while (e.hasMoreElements()) {

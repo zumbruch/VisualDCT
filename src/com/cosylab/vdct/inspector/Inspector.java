@@ -775,7 +775,7 @@ private void mouseEvent(MouseEvent event, int row, int col)
 	if ((event.getButton()==MouseEvent.BUTTON3 && col==0))
 	{
 		InspectableProperty property = (InspectableProperty)tableModel.getPropertyAt(row);
-		if (property!=null)
+		if (property!=null && property instanceof VDBFieldData)  ///!!! define interface
 		{
 			int visibility = property.getVisibility();
 			visibility = (visibility+1) % 3;

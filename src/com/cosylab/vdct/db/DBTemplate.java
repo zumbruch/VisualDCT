@@ -40,7 +40,9 @@ public class DBTemplate
 	String fileName;
 	String description;
 	Hashtable inputs = null;
+	Hashtable inputComments = null;
 	Hashtable outputs = null;
+	Hashtable outputComments = null;
 
 	// data
 	DBData data = null;
@@ -63,14 +65,26 @@ public class DBTemplate
 		id = null;
 		fileName = null;
 		description = null;
+
 		if (inputs==null)
 			inputs = new Hashtable();
 		else 
 			inputs.clear();
+
 		if (outputs==null)
 			outputs = new Hashtable();
 		else 
 			outputs.clear();
+
+		if (inputComments==null)
+			inputComments = new Hashtable();
+		else 
+			inputComments.clear();
+
+		if (outputComments==null)
+			outputComments = new Hashtable();
+		else 
+			outputComments.clear();
 	}
 
 	/**
@@ -146,30 +160,30 @@ public class DBTemplate
 	}
 
 	/**
-	 * Sets the inputs.
-	 * @param inputs The inputs to set
-	 */
-	public void setInputs(Hashtable inputs)
-	{
-		this.inputs = inputs;
-	}
-
-	/**
-	 * Sets the outputs.
-	 * @param outputs The outputs to set
-	 */
-	public void setOutputs(Hashtable outputs)
-	{
-		this.outputs = outputs;
-	}
-
-	/**
 	 * Returns the data.
 	 * @return DBData
 	 */
 	public DBData getData()
 	{
 		return data;
+	}
+
+	/**
+	 * Returns the inputComments.
+	 * @return Hashtable
+	 */
+	public Hashtable getInputComments()
+	{
+		return inputComments;
+	}
+
+	/**
+	 * Returns the outputComments.
+	 * @return Hashtable
+	 */
+	public Hashtable getOutputComments()
+	{
+		return outputComments;
 	}
 
 }
