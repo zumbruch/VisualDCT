@@ -88,8 +88,8 @@ public static void createInstance(Graphics g) {
 public Font getAppropriateFont(String fontName, int style, String str, int maxWidth, int maxHeight) {
   if (graphics==null) return null;
   int size = MIN_SIZE;				// find better starting point !!!
+  FontData fl = null;
   FontData fd = getFontData(fontName, size, style);
-  FontData fl = fd;
   while ((size<=MAX_SIZE) &&
 	  	 (fd.getFontMetrics().getHeight() < maxHeight) &&
 	  	 (fd.getFontMetrics().stringWidth(str) < maxWidth)) {
@@ -97,7 +97,8 @@ public Font getAppropriateFont(String fontName, int style, String str, int maxWi
  	fl = fd;
 	fd = getFontData(fontName, size, style);
   }
-  return fl.getFont();
+  if (fl==null) return null;
+  else return fl.getFont();
 }
 /**
  * Insert the method's description here.

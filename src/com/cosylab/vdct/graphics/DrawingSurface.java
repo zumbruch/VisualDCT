@@ -2462,7 +2462,7 @@ private void printLegend(Graphics graphics, int width, int height, int page, int
 	((Graphics2D)graphics).setTransform(transf);
 	graphics.translate(navX, navY);
 
-	graphics.setColor(Color.red);
+	graphics.setColor(Color.black);
 	graphics.drawRect((int)rx, (int)ry, rwidth, rheight);
 
 //	add lock rectangle if necessary
@@ -2473,7 +2473,7 @@ private void printLegend(Graphics graphics, int width, int height, int page, int
 		 		(int)(rwidth+2*min), (int)(rheight+2*min));
 	 }
 	 
-	graphics.setColor(Color.blue);
+	graphics.setColor(Color.gray);
 	graphics.drawRect(0, 0, navigatorWidth-1, navigatorHeight-1);
 	
 	graphics.setClip(null);
