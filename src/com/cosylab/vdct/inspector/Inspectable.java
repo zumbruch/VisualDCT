@@ -57,7 +57,7 @@ public String getName();
  * 
  * @return com.cosylab.vdct.inspector.InspectableProperty[]
  */
-com.cosylab.vdct.inspector.InspectableProperty[] getProperties();
+com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode);
 /**
  * Insert the method's description here.
  * Creation date: (10.1.2001 14:48:10)

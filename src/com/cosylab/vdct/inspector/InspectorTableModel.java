@@ -38,11 +38,13 @@ import javax.swing.table.AbstractTableModel;
 public class InspectorTableModel extends javax.swing.table.AbstractTableModel {
 	private InspectableProperty[] data = null;
 	private Inspectable dataObject = null;
+	private InspectorInterface inspector = null;
 /**
  * InspactorTableModel constructor comment.
  */
-public InspectorTableModel() {
+public InspectorTableModel(InspectorInterface inspector) {
 	super();
+	this.inspector=inspector;
 }
 /**
  * Insert the method's description here.
@@ -116,7 +118,7 @@ public boolean isCellEditable(int rowIndex, int columnIndex) {
 public void setDataObject(Inspectable object) {
 	dataObject = object;
 	if (object!=null)
-		data = object.getProperties();
+		data = object.getProperties(inspector.getMode());
 	else
 		data = null;
 	fireTableDataChanged();

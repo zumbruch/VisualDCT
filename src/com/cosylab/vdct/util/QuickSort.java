@@ -41,7 +41,7 @@ public abstract boolean lessThan(Object oFirst, Object oSecond);
 public void sort(Object[] table) {
 	sort(table, 0, table.length - 1);
 }      
-private void sort(Object[] table, int nLow0, int nHigh0) {
+public void sort(Object[] table, int nLow0, int nHigh0) {
   int nLow = nLow0;
   int nHigh = nHigh0;
   Object pivot;

@@ -224,13 +224,13 @@ public static VDBRecordData generateVDBRecordData(DBDData dbd, DBRecordData dbRe
 	}
 
 	VDBRecordData vdbRecord = new VDBRecordData();
-	DBFieldData dbField;
+	//DBFieldData dbField;
 	DBDFieldData dbdField;
 
 	vdbRecord.setType(dbRecord.getRecord_type());
 	vdbRecord.setName(dbRecord.getName());
 	vdbRecord.setComment(dbRecord.getComment());
-	
+/*	
 	Enumeration e = dbRecord.getFieldsV().elements();
 	while (e.hasMoreElements()) {
 		dbField = (DBFieldData)(e.nextElement());
@@ -243,6 +243,14 @@ public static VDBRecordData generateVDBRecordData(DBDData dbd, DBRecordData dbRe
 		dbdField = (DBDFieldData)(e.nextElement());
 		if (!vdbRecord.getFields().containsKey(dbdField.getName()))
 			vdbRecord.addField(generateVDBFieldData(dbd, dbRecord, vdbRecord, dbdField));
+	}
+*/
+
+	/// should I add NOACCESS fields, etc... !!!
+	Enumeration e = dbdRecord.getFieldsV().elements();
+	while (e.hasMoreElements()) {
+		dbdField = (DBDFieldData)(e.nextElement());
+		vdbRecord.addField(generateVDBFieldData(dbd, dbRecord, vdbRecord, dbdField));
 	}
 
 	//vdbRecord.updateDTYP(dbd);

@@ -793,49 +793,85 @@ public OutLink getOutput() {
  * Creation date: (11.1.2001 21:43:31)
  * @return com.cosylab.vdct.inspector.InspectableProperty[]
  */
-public com.cosylab.vdct.inspector.InspectableProperty[] getProperties() {
-
-	int size = 0;
-	VDBFieldData field;	Integer key;
-	Hashtable groups = new Hashtable();
-	Enumeration e = recordData.getFieldsV().elements();
-	while (e.hasMoreElements()) {
-		field = (VDBFieldData)e.nextElement();
-		if (field.getDbdData().getField_type() != 
-			com.cosylab.vdct.dbd.DBDConstants.DBF_NOACCESS) {
-
-			key = new Integer(field.getGUI_type());
-			if (groups.containsKey(key)) {
-				((Vector)(groups.get(key))).addElement(field);
-				size++;
-			}
-			else {
-				Vector v = new Vector();
-				v.addElement(field);
-				groups.put(key, v);
-				size+=2;	// separator + property
+public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode) {
+	
+	if (mode == Inspector.GUI_GROUP_ORDER)
+	{
+		int size = 0;
+		VDBFieldData field;	Integer key;
+		Hashtable groups = new Hashtable();
+		Enumeration e = recordData.getFieldsV().elements();
+		while (e.hasMoreElements()) {
+			field = (VDBFieldData)e.nextElement();
+			if (field.getDbdData().getField_type() != 
+				com.cosylab.vdct.dbd.DBDConstants.DBF_NOACCESS) {
+	
+				key = new Integer(field.getGUI_type());
+				if (groups.containsKey(key)) {
+					((Vector)(groups.get(key))).addElement(field);
+					size++;
+				}
+				// do not add fields with undefined GUI type
+				else if (key.intValue()!=DBDConstants.GUI_UNDEFINED) {
+					Vector v = new Vector();
+					v.addElement(field);
+					groups.put(key, v);
+					size+=2;	// separator + property
+				}
+	
 			}
 		}
-	}
+		
+		Object[] grps;
+		grps = new com.cosylab.vdct.util.IntegerQuickSort().sortEnumeration(groups.keys());
 	
-	Object[] grps;
-	grps = new com.cosylab.vdct.util.IntegerQuickSort().sortEnumeration(groups.keys());
+		Vector all = new Vector();
+		
+		Vector items; int grp;
+		for (int gn=0; gn < grps.length; gn++) {
+			items = (Vector)groups.get(grps[gn]);
+			grp = ((VDBFieldData)(items.firstElement())).getGUI_type();
+			all.addElement(new GUISeparator(com.cosylab.vdct.dbd.DBDResolver.getGUIString(grp)));
+			all.addAll(items);
+		}
+		
+		InspectableProperty[] properties = new InspectableProperty[all.size()];
+		all.copyInto(properties);
+		return properties;
+	}
+	else if ((mode == Inspector.SORT_ORDER) ||
+	 		  (mode == Inspector.DBD_ORDER)) {
 
-	Vector all = new Vector();
+		VDBFieldData field;
+		Vector all = new Vector();
+
+		if (mode == Inspector.SORT_ORDER)
+			all.addElement(new GUISeparator("Alphabetical"));
+		else
+			all.addElement(new GUISeparator("DBD Order"));
 	
-	Vector items; int grp;
-	for (int gn=0; gn < grps.length; gn++) {
-		items = (Vector)groups.get(grps[gn]);
-		grp = ((VDBFieldData)(items.firstElement())).getGUI_type();
-		all.addElement(new GUISeparator(com.cosylab.vdct.dbd.DBDResolver.getGUIString(grp)));
-		all.addAll(items);
+		Enumeration e = recordData.getFieldsV().elements();
+		while (e.hasMoreElements()) {
+			field = (VDBFieldData)e.nextElement();
+			if ((field.getDbdData().getField_type() != com.cosylab.vdct.dbd.DBDConstants.DBF_NOACCESS) &&
+				(field.getGUI_type()!=DBDConstants.GUI_UNDEFINED))
+					all.addElement(field);
+			}
+	
+			
+		InspectableProperty[] properties = new InspectableProperty[all.size()];
+		all.copyInto(properties);
+	
+		if (mode == Inspector.SORT_ORDER)
+			if (properties.length>1)
+				new com.cosylab.vdct.util.StringQuickSort().sort(properties, 1, properties.length-1);
+	
+		return properties;
 	}
-	
-	InspectableProperty[] properties = new InspectableProperty[all.size()];
-	all.copyInto(properties);
-	return properties;
-	
+	else
+		return null;
 }
+
 /**
  * Insert the method's description here.
  * Creation date: (8.1.2001 21:18:50)

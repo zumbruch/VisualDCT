@@ -91,10 +91,10 @@ public void moveOrigin(int direction)
 	}
 	
 	if (ViewState.getInstance().moveOrigin(dx, dy))
-	 {
-			drawingSurface.recalculateNavigatorPosition();
-			drawingSurface.repaint();
-	 }
+	{
+		drawingSurface.recalculateNavigatorPosition();
+		drawingSurface.repaint();
+	}
 }
 
 /**

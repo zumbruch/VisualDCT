@@ -30,7 +30,12 @@ package com.cosylab.vdct.inspector;
 
 import java.util.*;
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.table.*;
+
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.*;
 import com.cosylab.vdct.Console;
 
@@ -39,7 +44,7 @@ import com.cosylab.vdct.Console;
  * Creation date: (6.1.2001 22:41:16)
  * @author Matej Sekoranja
  */
-public class Inspector extends JDialog implements InspectableObjectsListener, InspectorInterface, WindowListener {
+public class Inspector extends JDialog implements InspectableObjectsListener, InspectorInterface, WindowListener, ChangeListener {
 	private JLabel ivjCommentLabel = null;
 	private CommentTextArea ivjCommentTextArea = null;
 	private JCheckBox ivjFrozeCheckBox = null;
@@ -54,6 +59,13 @@ public class Inspector extends JDialog implements InspectableObjectsListener, In
 	IvjEventHandler ivjEventHandler = new IvjEventHandler();
 	private Vector objs;
 	private Inspectable toRemove = null;
+	private JTabbedPane ivjViewTabbedPane = null;
+
+	public final static int GUI_GROUP_ORDER = 0;  
+	public final static int SORT_ORDER = 1;
+	public final static int DBD_ORDER = 2;
+
+	private int mode = GUI_GROUP_ORDER;
 
 class IvjEventHandler implements java.awt.event.ItemListener {
 		public void itemStateChanged(java.awt.event.ItemEvent e) {
@@ -227,6 +239,48 @@ private javax.swing.JLabel getHelpLabel() {
 	}
 	return ivjHelpLabel;
 }
+
+/**
+ * TabbedPane listener 
+ */
+public void stateChanged(ChangeEvent e)
+{
+	// we have direct mapping
+	setMode(getViewTabbedPane().getSelectedIndex());
+	tableModel.setDataObject(tableModel.getDataObject());
+} 
+
+/**
+ * Return the ViewTabbedPane property value.
+ * @return javax.swing.JTabbedPane
+ */
+/* WARNING: THIS METHOD WILL BE REGENERATED. */
+private javax.swing.JTabbedPane getViewTabbedPane() {
+	if (ivjViewTabbedPane == null) {
+		try {
+			ivjViewTabbedPane = new javax.swing.JTabbedPane();
+			ivjViewTabbedPane.setName("ViewTabbedPane");
+			ivjViewTabbedPane.setTabPlacement(javax.swing.JTabbedPane.TOP);
+			// user code begin {1}
+			ivjViewTabbedPane.addTab("Group", null);
+			ivjViewTabbedPane.addTab("Alphabetical", null);
+			ivjViewTabbedPane.addTab("DBD Order", null);
+			
+			//show only tabbs
+			getViewTabbedPane().setMinimumSize(new Dimension(1, 24));
+			getViewTabbedPane().setMaximumSize(new Dimension(1000, 24));
+			getViewTabbedPane().setPreferredSize(new Dimension(250, 24));
+
+			// user code end
+		} catch (java.lang.Throwable ivjExc) {
+			// user code begin {2}
+			// user code end
+			handleException(ivjExc);
+		}
+	}
+	return ivjViewTabbedPane;
+}
+
 /**
  * Insert the method's description here.
  * Creation date: (8.1.2001 21:43:40)
@@ -247,45 +301,6 @@ private javax.swing.JPanel getJDialogContentPane() {
 			ivjJDialogContentPane.setName("JDialogContentPane");
 			ivjJDialogContentPane.setLayout(new java.awt.GridBagLayout());
 
-			java.awt.GridBagConstraints constraintsTableScrollPane = new java.awt.GridBagConstraints();
-			constraintsTableScrollPane.gridx = 0; constraintsTableScrollPane.gridy = 1;
-			constraintsTableScrollPane.gridwidth = 2;
-			constraintsTableScrollPane.fill = java.awt.GridBagConstraints.BOTH;
-			constraintsTableScrollPane.weightx = 1.0;
-			constraintsTableScrollPane.weighty = 7.0;
-			constraintsTableScrollPane.insets = new java.awt.Insets(4, 4, 4, 4);
-			getJDialogContentPane().add(getTableScrollPane(), constraintsTableScrollPane);
-
-			java.awt.GridBagConstraints constraintsHelpLabel = new java.awt.GridBagConstraints();
-			constraintsHelpLabel.gridx = 0; constraintsHelpLabel.gridy = 4;
-			constraintsHelpLabel.fill = java.awt.GridBagConstraints.HORIZONTAL;
-			constraintsHelpLabel.weightx = 1.0;
-			constraintsHelpLabel.insets = new java.awt.Insets(8, 8, 4, 4);
-			getJDialogContentPane().add(getHelpLabel(), constraintsHelpLabel);
-
-			java.awt.GridBagConstraints constraintsCommentLabel = new java.awt.GridBagConstraints();
-			constraintsCommentLabel.gridx = 0; constraintsCommentLabel.gridy = 2;
-			constraintsCommentLabel.gridwidth = 2;
-			constraintsCommentLabel.fill = java.awt.GridBagConstraints.HORIZONTAL;
-			constraintsCommentLabel.weightx = 1.0;
-			constraintsCommentLabel.insets = new java.awt.Insets(8, 4, 4, 4);
-			getJDialogContentPane().add(getCommentLabel(), constraintsCommentLabel);
-
-			java.awt.GridBagConstraints constraintsCommentTextArea = new java.awt.GridBagConstraints();
-			constraintsCommentTextArea.gridx = 0; constraintsCommentTextArea.gridy = 3;
-			constraintsCommentTextArea.gridwidth = 2;
-			constraintsCommentTextArea.fill = java.awt.GridBagConstraints.BOTH;
-			constraintsCommentTextArea.weightx = 1.0;
-			constraintsCommentTextArea.weighty = 1.0;
-			constraintsCommentTextArea.insets = new java.awt.Insets(4, 4, 4, 4);
-			getJDialogContentPane().add(getCommentTextArea(), constraintsCommentTextArea);
-
-			java.awt.GridBagConstraints constraintsFrozeCheckBox = new java.awt.GridBagConstraints();
-			constraintsFrozeCheckBox.gridx = 1; constraintsFrozeCheckBox.gridy = 4;
-			constraintsFrozeCheckBox.fill = java.awt.GridBagConstraints.HORIZONTAL;
-			constraintsFrozeCheckBox.insets = new java.awt.Insets(4, 4, 4, 4);
-			getJDialogContentPane().add(getFrozeCheckBox(), constraintsFrozeCheckBox);
-
 			java.awt.GridBagConstraints constraintsObjectComboBox = new java.awt.GridBagConstraints();
 			constraintsObjectComboBox.gridx = 0; constraintsObjectComboBox.gridy = 0;
 			constraintsObjectComboBox.gridwidth = 2;
@@ -293,6 +308,56 @@ private javax.swing.JPanel getJDialogContentPane() {
 			constraintsObjectComboBox.weightx = 1.0;
 			constraintsObjectComboBox.insets = new java.awt.Insets(8, 4, 4, 4);
 			getJDialogContentPane().add(getObjectComboBox(), constraintsObjectComboBox);
+
+			java.awt.GridBagConstraints constraintsViewTabbedPane = new java.awt.GridBagConstraints();
+			constraintsViewTabbedPane.gridx = 0; constraintsViewTabbedPane.gridy = 1;
+			constraintsViewTabbedPane.gridwidth = 2;
+			constraintsViewTabbedPane.fill = java.awt.GridBagConstraints.BOTH;
+			constraintsViewTabbedPane.weightx = 1.0;
+			constraintsViewTabbedPane.weighty = 0.0;
+			constraintsViewTabbedPane.insets = new java.awt.Insets(4, 4, 0, 4);
+			getJDialogContentPane().add(getViewTabbedPane(), constraintsViewTabbedPane);
+
+			java.awt.GridBagConstraints constraintsTableScrollPane = new java.awt.GridBagConstraints();
+			constraintsTableScrollPane.gridx = 0; constraintsTableScrollPane.gridy = 2;
+			constraintsTableScrollPane.gridwidth = 2;
+			constraintsTableScrollPane.fill = java.awt.GridBagConstraints.BOTH;
+			constraintsTableScrollPane.weightx = 1.0;
+			constraintsTableScrollPane.weighty = 7.0;
+			constraintsTableScrollPane.insets = new java.awt.Insets(0, 4, 4, 4);
+			getJDialogContentPane().add(getTableScrollPane(), constraintsTableScrollPane);
+
+			java.awt.GridBagConstraints constraintsCommentLabel = new java.awt.GridBagConstraints();
+			constraintsCommentLabel.gridx = 0; constraintsCommentLabel.gridy = 3;
+			constraintsCommentLabel.gridwidth = 2;
+			constraintsCommentLabel.fill = java.awt.GridBagConstraints.HORIZONTAL;
+			constraintsCommentLabel.weightx = 1.0;
+			constraintsCommentLabel.insets = new java.awt.Insets(8, 4, 4, 4);
+			getJDialogContentPane().add(getCommentLabel(), constraintsCommentLabel);
+
+			java.awt.GridBagConstraints constraintsCommentTextArea = new java.awt.GridBagConstraints();
+			constraintsCommentTextArea.gridx = 0; constraintsCommentTextArea.gridy = 4;
+			constraintsCommentTextArea.gridwidth = 2;
+			constraintsCommentTextArea.fill = java.awt.GridBagConstraints.BOTH;
+			constraintsCommentTextArea.weightx = 1.0;
+			constraintsCommentTextArea.weighty = 1.0;
+			constraintsCommentTextArea.insets = new java.awt.Insets(4, 4, 4, 4);
+			getJDialogContentPane().add(getCommentTextArea(), constraintsCommentTextArea);
+
+			java.awt.GridBagConstraints constraintsHelpLabel = new java.awt.GridBagConstraints();
+			constraintsHelpLabel.gridx = 0; constraintsHelpLabel.gridy = 5;
+			constraintsHelpLabel.fill = java.awt.GridBagConstraints.HORIZONTAL;
+			constraintsHelpLabel.weightx = 1.0;
+			constraintsHelpLabel.insets = new java.awt.Insets(8, 8, 4, 4);
+			getJDialogContentPane().add(getHelpLabel(), constraintsHelpLabel);
+
+
+			java.awt.GridBagConstraints constraintsFrozeCheckBox = new java.awt.GridBagConstraints();
+			constraintsFrozeCheckBox.gridx = 1; constraintsFrozeCheckBox.gridy = 5;
+			constraintsFrozeCheckBox.fill = java.awt.GridBagConstraints.HORIZONTAL;
+			constraintsFrozeCheckBox.insets = new java.awt.Insets(4, 4, 4, 4);
+			getJDialogContentPane().add(getFrozeCheckBox(), constraintsFrozeCheckBox);
+
 			// user code begin {1}
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
@@ -345,11 +410,18 @@ private javax.swing.JTable getScrollPaneTable() {
 			ivjScrollPaneTable.setRowSelectionAllowed(false);
 			ivjScrollPaneTable.setRowHeight(17);
 			// user code begin {1}
-			tableModel = new InspectorTableModel();
+			tableModel = new InspectorTableModel(this);
 			ivjScrollPaneTable.setModel(tableModel);
 			ivjScrollPaneTable.setTableHeader(null);
 			ivjScrollPaneTable.setDefaultRenderer(String.class, new InspectorTableCellRenderer(ivjScrollPaneTable, tableModel));
 			ivjScrollPaneTable.setDefaultEditor(String.class, new InspectorCellEditor(tableModel));
+
+			// lock field name column width
+			int width = 117;
+		    TableColumn col = ivjScrollPaneTable.getColumnModel().getColumn(0);
+		    col.setMinWidth(width);
+		    col.setMaxWidth(width);
+		    col.setPreferredWidth(width);
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
 			// user code begin {2}
@@ -398,6 +470,7 @@ private void handleException(java.lang.Throwable exception) {
 /* WARNING: THIS METHOD WILL BE REGENERATED. */
 private void initConnections() throws java.lang.Exception {
 	// user code begin {1}
+	getViewTabbedPane().addChangeListener(this);
 	// user code end
 	getObjectComboBox().addItemListener(ivjEventHandler);
 }
@@ -636,4 +709,23 @@ public void windowIconified(java.awt.event.WindowEvent e) {}
 	 * Invoked the first time a window is made visible.
 	 */
 public void windowOpened(java.awt.event.WindowEvent e) {}
+
+/**
+ * Returns the mode.
+ * @return int
+ */
+public int getMode()
+{
+	return mode;
+}
+
+
+/**
+ * Sets the mode.
+ * @param mode The mode to set
+ */
+public void setMode(int mode)
+{
+	this.mode = mode;
+}
 }

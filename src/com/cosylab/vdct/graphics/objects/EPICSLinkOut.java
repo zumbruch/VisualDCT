@@ -326,7 +326,7 @@ public int getOutY() {
  * Creation date: (1.2.2001 22:22:37)
  * @return com.cosylab.vdct.inspector.InspectableProperty[]
  */
-public com.cosylab.vdct.inspector.InspectableProperty[] getProperties() {
+public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode) {
 	InspectableProperty[] properties = new InspectableProperty[4];
 	properties[0]=getRecordSeparator();
 	properties[1]=new FieldInfoProperty(fieldData.getRecord().getField("DTYP"));

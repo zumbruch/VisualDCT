@@ -120,7 +120,7 @@ public static String getGUIString(int GUItype) {
 	else if (GUItype==DBDConstants.GUI_TIMER) return "GUI_TIMER";
 	else if (GUItype==DBDConstants.GUI_WAVE) return "GUI_WAVE";
 	else if (GUItype==DBDConstants.GUI_SCAN) return "GUI_SCAN";
-	else return "Miscellaneous";
+	else return "Undefined";
 }
 /**
  * This method was created in VisualAge.

@@ -121,6 +121,14 @@ public java.lang.String getName() {
 }
 /**
  * Insert the method's description here.
+ * Creation date: (9.12.2000 18:11:46)
+ * @return java.lang.String
+ */
+public java.lang.String toString() {
+	return name;
+}
+/**
+ * Insert the method's description here.
  * Creation date: (12.1.2001 20:01:39)
  * @return com.cosylab.vdct.vdb.VDBRecordData
  */

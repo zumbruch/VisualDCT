@@ -90,4 +90,7 @@ public void updateObjectList();
  * @param property com.cosylab.vdct.inspector.InspectableProperty
  */
 void updateProperty(InspectableProperty property);
+/**
+ */
+int getMode();
 }

@@ -38,6 +38,7 @@ import java.util.*;
  * !!! inspectors are not disposed !!!! (move ins.listeners in inspectors, when this is implemented);
  */
 public class InspectorManager {
+
 	private static InspectorManager instance = null;
 	private static Frame parent = null;
 	
