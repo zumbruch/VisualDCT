@@ -171,6 +171,13 @@ private void load()
 		String fileName = System.getProperty(Constants.VDCT_PLUGINS_FILE);
 		if (fileName == null)
 			fileName = System.getProperty("user.home")+"/"+PLUGINS_FILE;
+	
+		// is file does not exists, load default file
+		if (!(new java.io.File(fileName).exists()))
+		{
+			com.cosylab.vdct.Console.getInstance().println("o) No plugins configuration file found. Using defaults...");
+			fileName = getClass().getResource("/"+Constants.CONFIG_DIR+PLUGINS_FILE).getFile();
+		}
 		pluginSerializer.importPlugins(fileName, this);
 	}
 	catch (Exception e)
