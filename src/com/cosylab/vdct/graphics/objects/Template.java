@@ -748,6 +748,33 @@ private void initializeLinkFields()
 	}
 }
 
+
+
+/**
+ * Insert the method's description here.
+ * Creation date: (30.1.2001 11:35:39)
+ */
+public void manageLinks() {
+	// inputs
+	Enumeration e = templateData.getInputs().elements();
+	while (e.hasMoreElements())
+	{
+		VDBTemplateField tf = (VDBTemplateField)e.nextElement();
+		manageLink(tf);
+	}
+
+	// outputs
+	e = templateData.getOutputs().elements();
+	while (e.hasMoreElements())
+	{
+		VDBTemplateField tf = (VDBTemplateField)e.nextElement();
+		manageLink(tf);
+	}
+}
+
+
+
+
 /**
  * @param link com.cosylab.vdct.graphics.objects.Linkable
  */

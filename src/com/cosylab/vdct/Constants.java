@@ -54,6 +54,7 @@ public class Constants {
 
     public final static String UNTITLED = "Untitled";
     public final static String MAIN_GROUP = "Main group";
+    public final static String TEMPLATE_GROUP = "Template";
 
     public final static String CONFIG_DIR = "config/";
     public final static String DTD_DIR = CONFIG_DIR + "dtd/";

@@ -421,7 +421,7 @@ public static String processComment(DBData rootData, StreamTokenizer tokenizer, 
 					// set data
 					templateData.setId(id);
 					templateData.setDescription(id);		// default
-					templateData.setFileName(fileName);
+					templateData.setFileName(file.getAbsolutePath());
 
 					data = templateData.getData();			// redirect
 				}

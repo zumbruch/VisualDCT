@@ -35,7 +35,9 @@ import javax.swing.*;
 import com.cosylab.vdct.about.VisualDCTAboutDialogEngine;
 import com.cosylab.vdct.events.*;
 import com.cosylab.vdct.events.commands.*;
+import com.cosylab.vdct.util.StringUtils;
 import com.cosylab.vdct.util.UniversalFileFilter;
+import com.cosylab.vdct.vdb.VDBData;
 import com.cosylab.vdct.graphics.printing.*;
 
 import com.cosylab.vdct.graphics.*;
@@ -4847,10 +4849,15 @@ private javax.swing.JSlider getZoomSlider() {
  * Comment
  */
 public void groupDialog_WindowOpened(java.awt.event.WindowEvent windowEvent) {
-	if (getStatusMsg2().getText().trim().equals(Constants.MAIN_GROUP))
+	String groupName = getStatusMsg2().getText().trim();
+	int pos = groupName.indexOf("]");
+	if (pos>0)
+		groupName = groupName.substring(pos+2).trim();		// skip "]:"
+
+	if (groupName.equals(Constants.MAIN_GROUP))
 		getgroupNameTextField().setText("");
 	else
-		getgroupNameTextField().setText(getStatusMsg2().getText().trim()+Constants.GROUP_SEPARATOR);
+		getgroupNameTextField().setText(groupName+Constants.GROUP_SEPARATOR);
 	getGroupWarningLabel().setText(" ");
 	getOKButton().setEnabled(false);
 }
@@ -5422,9 +5429,6 @@ public boolean openDBD(String fileName, boolean allowDB) {
 			cmd.getGUIMenuInterface().openDBD(theFile);
 		else if (allowDB)
 			cmd.getGUIMenuInterface().openDB(theFile);
-		
-		//updateDBDLabel();	
-
 	} catch (java.io.IOException e) {
 	    Console.getInstance().println("o) Failed to open DBD/DB file: '"+theFile.getAbsolutePath()+"'.");
 	    Console.getInstance().println(e);
@@ -6115,8 +6119,6 @@ public void setBoxButtonEnabled(boolean parBoxButtonEnabled)
  * @param groupName java.lang.String
  */
 public void setCurrentGroup(String groupName) {
-	if ((groupName==null) || groupName.length()<1)
-		groupName = Constants.MAIN_GROUP;
 	getStatusMsg2().setText(" "+groupName);
 }
 /**
@@ -6335,15 +6337,15 @@ public void moveOrigin(int direction) {
 /**
  * Comment
  */
-public void updateDBDLabel() {
+public void updateLoadLabel() {
 
 	StringBuffer tip = new StringBuffer();
 	tip.append("<html>");
 
-
+	// DBD part
 	java.util.Vector dbds = DataProvider.getInstance().getLoadedDBDs();
 	if (dbds.size()==0)
-		tip.append("No loaded DBDs.");
+		tip.append("<p>No loaded DBDs.</p>");
 	else
 	{	
 		tip.append("Loaded DBD(s):<b><ul>");
@@ -6352,18 +6354,57 @@ public void updateDBDLabel() {
 		{
 				tip.append("<li>");
 				tip.append(e.nextElement().toString());
-				tip.append(" </li>");
+				tip.append("&nbsp;</li>");
 		}
-		tip.append("</ul></html>");
+		tip.append("</b></ul>");
 	}
 	
-	if (dbds.size()==0)
-		getStatusMsg1().setText(" No loaded DBDs ");
-	else if (dbds.size()==1)
-		getStatusMsg1().setText(" "+dbds.firstElement().toString()+" ");
+	if (VDBData.getTemplates().size()==0)
+		tip.append("<p>No loaded templates.</p>");
 	else
-		getStatusMsg1().setText(" "+dbds.size()+" loaded DBD(s) ");
+	{	
+		tip.append("Loaded template(s):<b><ul>");
+		java.util.Enumeration e = VDBData.getTemplates().keys();
+		while (e.hasMoreElements())
+		{
+				tip.append("<li>");
+				String key = e.nextElement().toString();
+				com.cosylab.vdct.vdb.VDBTemplate t = (com.cosylab.vdct.vdb.VDBTemplate)VDBData.getTemplates().get(key);
+				tip.append(t.getDescription());
+				tip.append(" - ");
+				tip.append(t.getFileName());
+				tip.append("&nbsp;</li>");
+		}
+		tip.append("</b></ul>");
+	}
+	tip.append("</html>");
+
+	StringBuffer label = new StringBuffer();
+	label.append(" ");
+	
+	if (dbds.size()==0)
+		label.append("No loaded DBDs");
+	else if (dbds.size()==1)
+		label.append(dbds.firstElement().toString());
+	else
+	{
+		label.append(dbds.size());
+		label.append(" loaded DBD(s)");
+	}
+	
+	label.append(", ");
+
+	if (VDBData.getTemplates().size()==0)
+		label.append("no loaded templates");
+	else
+	{
+		label.append(VDBData.getTemplates().size());
+		label.append(" loaded templates(s)");
+	}
+
+	label.append(" ");
 	
 	getStatusMsg1().setToolTipText(tip.toString());
+	getStatusMsg1().setText(label.toString());
 }
 }

@@ -456,10 +456,6 @@ public boolean isModified() {
  */
 public void levelUp() {
 	drawingSurface.moveLevelUp();
-
-	SetWorkspaceGroup cmd = (SetWorkspaceGroup)CommandManager.getInstance().getCommand("SetGroup");
-	cmd.setGroup(drawingSurface.getViewGroup().getAbsoluteName());
-	cmd.execute();
 }
 /**
  * Insert the method's description here.

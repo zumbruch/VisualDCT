@@ -40,6 +40,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 import javax.swing.event.*;
+
 import com.cosylab.vdct.*;
 import com.cosylab.vdct.db.*;
 import com.cosylab.vdct.dbd.*;
@@ -162,7 +163,10 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 	private LineVertex lineVertex = null;
 	private BoxVertex boxVertex = null;
 	private TextBoxVertex textBoxVertex = null;
-	
+
+	private Stack viewStack = null;	
+	private Stack templateStack = null;	
+
 /**
  * DrawingSurface constructor comment.
  */
@@ -177,6 +181,9 @@ public DrawingSurface() {
 	view.setHeight(Constants.VIRTUAL_HEIGHT);
 	view.setScale(1.0);
 	ViewState.setInstance(view);
+
+	viewStack = new Stack();
+	templateStack = new Stack();
 
 	initializeNavigator();
  		
@@ -554,12 +561,12 @@ public void initializeWorkspace() {
 		Group.getRoot().getLookupTable().clear();
 
 	setModified(false);
-	viewGroup = new Group(null);
-	viewGroup.setAbsoluteName("");
-	viewGroup.setLookupTable(new Hashtable());
-	Group.setRoot(viewGroup);
-	ViewState.getInstance().set(viewGroup);
-
+	Group group = new Group(null);
+	group.setAbsoluteName("");
+	group.setLookupTable(new Hashtable());
+	Group.setRoot(group);
+	moveToGroup(group);
+	
 	//Console.getInstance().flush();
 	InspectorManager.getInstance().disposeAllInspectors();
 
@@ -664,24 +671,15 @@ public void mouseClicked(MouseEvent e) {
 						view.setAsSelected(hilited);
 				}
 
-				
-				if (hilited instanceof Inspectable) 
+				// shift for template
+				if (e.isShiftDown() && hilited instanceof Template) {
+						descendIntoTemplate((Template)hilited);
+				}
+				else if (hilited instanceof Inspectable) 
 					InspectorManager.getInstance().requestInspectorFor((Inspectable)hilited);
 				else {
 					if (hilited instanceof Group) {
-						viewGroup = (Group)hilited;
-						ViewState.getInstance().set(viewGroup);
-						//createNavigatorImage();
-						viewGroup.unconditionalValidateSubObjects(isFlat());
-
-						SetWorkspaceGroup cmd = (SetWorkspaceGroup)CommandManager.getInstance().getCommand("SetGroup");
-						cmd.setGroup(viewGroup.getAbsoluteName());
-						cmd.execute();
-					
-						updateWorkspaceScale();
-						
-						forceRedraw = true;
-						repaint();
+						moveToGroup((Group)hilited);
 					}
 				}
 			}
@@ -1262,13 +1260,11 @@ public void mouseReleased(MouseEvent e) {
  */
 public void moveLevelUp() {
 	if (viewGroup.getParent()!=null) {
-		viewGroup = (Group)viewGroup.getParent();
-		ViewState.getInstance().set(viewGroup);
-		//createNavigatorImage();
-		viewGroup.unconditionalValidateSubObjects(isFlat());
-		updateWorkspaceScale();
-		forceRedraw = true;
-		repaint();
+		moveToGroup((Group)viewGroup.getParent());
+	}
+	else if (viewStack.size()>0)
+	{
+		ascendFromTemplate();	
 	}
 }
 /**
@@ -1405,6 +1401,9 @@ public boolean open(File file, boolean importDB) throws IOException {
 			viewGroup.unconditionalValidateSubObjects(isFlat());
 		}
 
+		// !!!
+		VisualDCT.getInstance().updateLoadLabel();	
+
 		//createNavigatorImage();
 		forceRedraw = true;
 		repaint();
@@ -1499,6 +1498,9 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 		}
 
 
+		// not all inter-template links were created (not all fields were loaded in the lookup table)
+		ArrayList tobeUpdated = new ArrayList();
+
 		// add template instances and apply their visual data
 		DBTemplateInstance dbTemplate;
 		e = dbData.getTemplateInstances().elements();
@@ -1508,10 +1510,11 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 			VDBTemplate template = (VDBTemplate)vdbData.getTemplates().get(dbTemplate.getTemplateClassID());
 			if (template==null)
 			{
+				/*// already issued
 				Console.getInstance().println(
 					"Template instance "+dbTemplate.getTemplateID()+" cannot be created since "
 						+ dbTemplate.getTemplateClassID()
-						+ " does not exist - this definition will be ignored.");
+						+ " does not exist - this definition will be ignored.");*/
 				continue;
 			}			
 			
@@ -1531,8 +1534,13 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 			templ.setColor(dbTemplate.getColor());
 			templ.move(dbTemplate.getX(), dbTemplate.getY());
 			//templ.forceValidation();
-
+			
+			tobeUpdated.add(templ);
 		}
+
+		Iterator i = tobeUpdated.iterator();
+		while (i.hasNext())
+			((Template)i.next()).manageLinks();
 
 		// add links, connectors
 		
@@ -1704,7 +1712,7 @@ public boolean openDBD(File file, boolean importDBD) throws IOException {
 	DataProvider.getInstance().getDBDs().addElement(file.getAbsoluteFile());
 
 	// !!!
-	VisualDCT.getInstance().updateDBDLabel();	
+	VisualDCT.getInstance().updateLoadLabel();	
 
 	restoreCursor();
 	return true;
@@ -2213,6 +2221,77 @@ public void createTemplateInstance(String name, String type, boolean relative) {
 	repaint();
 }
 
+/**
+ * Insert the method's description here.
+ * Creation date: (22.4.2001 18:44:03)
+ * @param template com.cosylab.vdct.graphics.objects.Template
+ */
+public void descendIntoTemplate(Template template)
+{
+	viewStack.push(viewGroup);
+	templateStack.push(template);
 
+	Group group = template.getTemplateData().getTemplate().getGroup();
+	Group.setRoot(group);
+
+	moveToGroup(group);
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (22.4.2001 18:44:03)
+ * @param template com.cosylab.vdct.graphics.objects.Template
+ */
+public void ascendFromTemplate()
+{
+	viewGroup = (Group)viewStack.pop();
+	
+	templateStack.pop();
+		
+	Group grp = viewGroup;
+	while (grp.getParent()!=null)
+		grp = (Group)grp.getParent();
+	Group.setRoot(grp);
+	
+	moveToGroup(grp);	
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (22.4.2001 18:44:03)
+ * @param group com.cosylab.vdct.graphics.objects.Group
+ */
+public void moveToGroup(Group group)
+{
+	viewGroup = group;
+	ViewState.getInstance().set(viewGroup);
+	//createNavigatorImage();
+	viewGroup.unconditionalValidateSubObjects(isFlat());
+
+	SetWorkspaceGroup cmd = (SetWorkspaceGroup)CommandManager.getInstance().getCommand("SetGroup");
+
+	String name = viewGroup.getAbsoluteName();
+	if (name.length()==0)
+		name = Constants.MAIN_GROUP;
+
+	if (isTemplateMode()) 
+		name = Constants.TEMPLATE_GROUP + " [" + ((Template)templateStack.peek()).getDescription() + "]: "+ name;
+	cmd.setGroup(name);
+	cmd.execute();
+
+	updateWorkspaceScale();
+	
+	forceRedraw = true;
+	repaint();
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (22.4.2001 18:44:03)
+ */
+public boolean isTemplateMode()
+{
+	return templateStack.size()>0;
+}
 
 }
