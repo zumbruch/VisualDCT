@@ -1727,17 +1727,14 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 					EPICSLink templateLink = null;
 					VDBMacro macro = (VDBMacro)templ.getTemplateData().getTemplate().getMacros().get(dtf.getName());
 					if (macro!=null)
-					{
 						templateLink = templ.addMacroField(macro);
-						continue;
-					}
-					
+	
 					// is it port?
-					VDBPort port = (VDBPort)templ.getTemplateData().getTemplate().getPorts().get(dtf.getName());
-					if (port!=null)
-					{
-						templateLink = templ.addPortField(port);
-						continue;
+					if (templateLink==null)
+					{				
+						VDBPort port = (VDBPort)templ.getTemplateData().getTemplate().getPorts().get(dtf.getName());
+						if (port!=null)
+							templateLink = templ.addPortField(port);
 					}
 					
 					// apply GUI data

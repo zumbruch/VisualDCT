@@ -1822,7 +1822,6 @@ private Template.PopupMenuHandler createPopupmenuHandler() {
  */
 public void fieldSideChange(EPICSLink link, boolean isRight)
 {
-	System.out.println(link+": isRight="+isRight);
 	if (isRight)
 	{
 		leftFields--; rightFields++;
