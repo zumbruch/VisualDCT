@@ -628,6 +628,12 @@ public VisibleObject intersects(int p1x, int p1y, int p2x, int p2y) {
 	else return null;
 }
 
+/**
+ * @see com.cosylab.vdct.graphics.objects.OutLink#validateLink()
+ */
+public void validateLink()
+{
+}
 
 
 }

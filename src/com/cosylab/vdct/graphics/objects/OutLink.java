@@ -77,4 +77,6 @@ void setInput(InLink input);
  * @return int
  */
 int getMode();
+
+void validateLink();
 }

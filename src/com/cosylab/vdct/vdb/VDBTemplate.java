@@ -71,12 +71,6 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 	protected String id = null;
 	protected String fileName = null;
 	protected String description = null;
-/*
-	protected Hashtable inputs = null;
-	protected Hashtable outputs = null;
-	protected Hashtable inputComments = null;
-	protected Hashtable outputComments = null;
-*/
 
 	protected Hashtable ports = null;
 	protected Vector portsV = null;
@@ -92,8 +86,6 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 	private static ImageIcon icon = null;
 
 	private static GUISeparator templateSeparator = null;
-	//private static GUISeparator inputsSeparator = null;
-	//private static GUISeparator outputsSeparator = null;
 	private static GUISeparator portsSeparator = null;
 	private static GUISeparator macrosSeparator = null;
 
@@ -285,24 +277,6 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 	}
 
 	/**
-	 * Returns the inputs.
-	 * @return Hashtable
-	 */
-/*	public Hashtable getInputs()
-	{
-		return inputs;
-	}
-
-	/**
-	 * Returns the outputs.
-	 * @return Hashtable
-	 */
-/*	public Hashtable getOutputs()
-	{
-		return outputs;
-	}
-
-	/**
 	 * Sets the description.
 	 * @param description The description to set
 	 */
@@ -367,24 +341,6 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 	}
 
 	/**
-	 * Sets the inputs.
-	 * @param inputs The inputs to set
-	 */
-/*	public void setInputs(Hashtable inputs)
-	{
-		this.inputs = inputs;
-	}
-
-	/**
-	 * Sets the outputs.
-	 * @param outputs The outputs to set
-	 */
-/*	public void setOutputs(Hashtable outputs)
-	{
-		this.outputs = outputs;
-	}
-
-	/**
 	 * Returns the fileName.
 	 * @return String
 	 */
@@ -400,42 +356,6 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 	public String getId()
 	{
 		return id;
-	}
-
-	/**
-	 * Returns the inputComments.
-	 * @return Hashtable
-	 */
-/*	public Hashtable getInputComments()
-	{
-		return inputComments;
-	}
-
-	/**
-	 * Returns the outputComments.
-	 * @return Hashtable
-	 */
-/*	public Hashtable getOutputComments()
-	{
-		return outputComments;
-	}
-
-	/**
-	 * Sets the inputComments.
-	 * @param inputComments The inputComments to set
-	 */
-/*	public void setInputComments(Hashtable inputComments)
-	{
-		this.inputComments = inputComments;
-	}
-
-	/**
-	 * Sets the outputComments.
-	 * @param outputComments The outputComments to set
-	 */
-/*	public void setOutputComments(Hashtable outputComments)
-	{
-		this.outputComments = outputComments;
 	}
 
 	/**
@@ -485,27 +405,6 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 	}
 	
 	/**
-	 * Insert the method's description here.
-	 * Creation date: (3.2.2001 13:07:04)
-	 * @return com.cosylab.vdct.vdb.GUISeparator
-	 */
-	/*public static com.cosylab.vdct.vdb.GUISeparator getInputsSeparator() {
-		if (inputsSeparator==null) inputsSeparator = new GUISeparator("Inputs");
-		return inputsSeparator;
-	}
-	
-	/**
-	 * Insert the method's description here.
-	 * Creation date: (3.2.2001 13:07:04)
-	 * @return com.cosylab.vdct.vdb.GUISeparator
-	 */
-	/*public static com.cosylab.vdct.vdb.GUISeparator getOutputsSeparator() {
-		if (outputsSeparator==null) outputsSeparator = new GUISeparator("Outputs");
-		return outputsSeparator;
-	}
-
-
-	/**
 	 * @see com.cosylab.vdct.inspector.Inspectable#getProperties(int)
 	 */
 	public InspectableProperty[] getProperties(int mode)
@@ -517,25 +416,6 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 		items.addElement(new NameValueInfoProperty("Class", id));
 		items.addElement(new NameValueInfoProperty("FileName", fileName));
 		items.addElement(new DescriptionProperty());
-/*
-		items.addElement(getInputsSeparator());
-		Enumeration e = getInputs().keys();
-		while (e.hasMoreElements())
-		{
-			String key = e.nextElement().toString();
-			VDBFieldData data = (VDBFieldData)getInputs().get(key);
-			items.addElement(new NameValueInfoProperty(key, data.getFullName()));
-		}
-		
-		items.addElement(getOutputsSeparator());
-		e = getOutputs().keys();
-		while (e.hasMoreElements())
-		{
-			String key = e.nextElement().toString();
-			VDBFieldData data = (VDBFieldData)getOutputs().get(key);
-			items.addElement(new NameValueInfoProperty(key, data.getFullName()));
-		}
-*/		
 
 		items.addElement(VDBTemplate.getPortsSeparator());
 
@@ -686,26 +566,6 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 	 * Creation date: (3.2.2001 13:07:04)
 	 * @return com.cosylab.vdct.vdb.GUISeparator
 	 */
-/*	public static com.cosylab.vdct.vdb.GUISeparator getInputsSeparator() {
-		if (inputsSeparator==null) inputsSeparator = new GUISeparator("Inputs");
-		return inputsSeparator;
-	}
-	
-	/**
-	 * Insert the method's description here.
-	 * Creation date: (3.2.2001 13:07:04)
-	 * @return com.cosylab.vdct.vdb.GUISeparator
-	 */
-/*	public static com.cosylab.vdct.vdb.GUISeparator getOutputsSeparator() {
-		if (outputsSeparator==null) outputsSeparator = new GUISeparator("Outputs");
-		return outputsSeparator;
-	}
-
-	/**
-	 * Insert the method's description here.
-	 * Creation date: (3.2.2001 13:07:04)
-	 * @return com.cosylab.vdct.vdb.GUISeparator
-	 */
 	public static com.cosylab.vdct.vdb.GUISeparator getPortsSeparator() {
 		if (portsSeparator==null) portsSeparator = new GUISeparator("Ports");
 		return portsSeparator;
@@ -719,26 +579,6 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 	public static com.cosylab.vdct.vdb.GUISeparator getMacrosSeparator() {
 		if (macrosSeparator==null) macrosSeparator = new GUISeparator("Macros");
 		return macrosSeparator;
-	}
-
-	/**
-	 * Insert the method's description here.
-	 * Creation date: (3.2.2001 13:07:04)
-	 * @return com.cosylab.vdct.vdb.GUISeparator
-	 */
-/*	public static com.cosylab.vdct.vdb.GUISeparator getInputsSeparator() {
-		if (inputsSeparator==null) inputsSeparator = new GUISeparator("Inputs");
-		return inputsSeparator;
-	}
-	
-	/**
-	 * Insert the method's description here.
-	 * Creation date: (3.2.2001 13:07:04)
-	 * @return com.cosylab.vdct.vdb.GUISeparator
-	 */
-/*	public static com.cosylab.vdct.vdb.GUISeparator getOutputsSeparator() {
-		if (outputsSeparator==null) outputsSeparator = new GUISeparator("Outputs");
-		return outputsSeparator;
 	}
 
 /**

@@ -386,11 +386,12 @@ public boolean manageLink(VDBFieldData field) {
 	{
 		// invoke validateLink at the end
 
-		EPICSVarOutLink link = null;
+//		EPICSVarOutLink link = null;
+		OutLink link = null;
 		
 		if (this.containsObject(field.getName()))
-			link = (EPICSVarOutLink)getSubObject(field.getName());
-
+//			link = (EPICSVarOutLink)getSubObject(field.getName());
+			link = (OutLink)getSubObject(field.getName());
 		
 		if (link!=null && link.getInput()!=null)
 		{

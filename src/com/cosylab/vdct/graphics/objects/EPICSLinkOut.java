@@ -608,4 +608,11 @@ public int getMode()
 	return OutLink.NORMAL_MODE;
 }
 
+/**
+ * @see com.cosylab.vdct.graphics.objects.OutLink#validateLink()
+ */
+public void validateLink()
+{
+}
+
 }

@@ -950,4 +950,11 @@ public void fixLinkProperties()
 		return data;
 	}
 
+/**
+ * @see com.cosylab.vdct.graphics.objects.OutLink#validateLink()
+ */
+public void validateLink()
+{
+}
+
 }

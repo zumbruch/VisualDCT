@@ -44,8 +44,6 @@ public class VDBTemplateInstance implements Commentable
 	protected VDBTemplate template = null;
 	protected Vector propertiesV = null;
 	protected Hashtable properties = null;
-	//protected Hashtable inputs = null;
-	//protected Hashtable outputs = null;
 
 	private String comment = null;
 	
@@ -56,23 +54,6 @@ public class VDBTemplateInstance implements Commentable
 	{
 		this.name = name;
 		this.template = template;
-	}
-		/**
-	 * Returns the inputs.
-	 * @return Hashtable
-	 */
-	/*public Hashtable getInputs()
-	{
-		return inputs;
-	}
-
-	/**
-	 * Returns the outputs.
-	 * @return Hashtable
-	 */
-	/*public Hashtable getOutputs()
-	{
-		return outputs;
 	}
 
 	/**
@@ -119,24 +100,6 @@ public class VDBTemplateInstance implements Commentable
 	public VDBTemplate getTemplate()
 	{
 		return template;
-	}
-
-	/**
-	 * Sets the inputs.
-	 * @param inputs The inputs to set
-	 */
-	/*public void setInputs(Hashtable inputs)
-	{
-		this.inputs = inputs;
-	}
-
-	/**
-	 * Sets the outputs.
-	 * @param outputs The outputs to set
-	 */
-	/*public void setOutputs(Hashtable outputs)
-	{
-		this.outputs = outputs;
 	}
 
 	/**

@@ -32,8 +32,12 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 import com.cosylab.vdct.Constants;
-import com.cosylab.vdct.graphics.ViewState;
-import com.cosylab.vdct.vdb.VDBTemplateField;
+import com.cosylab.vdct.inspector.InspectableProperty;
+import com.cosylab.vdct.vdb.GUIHeader;
+import com.cosylab.vdct.vdb.GUISeparator;
+import com.cosylab.vdct.vdb.NameValueInfoProperty;
+import com.cosylab.vdct.vdb.VDBFieldData;
+import com.cosylab.vdct.vdb.VDBTemplateMacro;
 
 /**
  * Insert the type's description here.
@@ -41,16 +45,18 @@ import com.cosylab.vdct.vdb.VDBTemplateField;
  * @author Matej Sekoranja
  */
 
-public class TemplateEPICSVarLink extends EPICSVarLink implements TemplateEPICSLink {
+public class TemplateEPICSMacro extends EPICSOutLink implements TemplateEPICSLink {
 
  	private String lastUpdatedFullName = null;
+	private static GUISeparator macroSeparator = null;
+	private static javax.swing.ImageIcon icon = null;
 
 /**
  * EPICSVarLink constructor comment.
  * @param parent com.cosylab.vdct.graphics.objects.ContainerObject
  * @param fieldData com.cosylab.vdct.vdb.VDBFieldData
  */
-public TemplateEPICSVarLink(ContainerObject parent, com.cosylab.vdct.vdb.VDBFieldData fieldData) {
+public TemplateEPICSMacro(ContainerObject parent, VDBFieldData fieldData) {
 	super(parent, fieldData);
 	setWidth(Constants.TEMPLATE_WIDTH/2);
 
@@ -88,6 +94,16 @@ public void updateTemplateLink()
 }
 
 /**
+ * e.g. for rename
+ * updates lookup table and fixes source
+ */
+public void fixTemplateLink()
+{
+	updateTemplateLink();
+	LinkManagerObject.fixLink(this);
+}
+
+/**
  * Insert the method's description here.
  * Creation date: (30.1.2001 16:58:58)
  */
@@ -101,7 +117,7 @@ public void rotate() {
  * @return String
  */
 public String getLabel() {
-	return ((VDBTemplateField)getFieldData()).getAlias();
+	return getFieldData().getName();
 }
 
 /**
@@ -124,11 +140,71 @@ public boolean isRight()
 protected void draw(Graphics g, boolean hilited) {
 	super.draw(g, hilited);
 
+	com.cosylab.vdct.graphics.ViewState view = com.cosylab.vdct.graphics.ViewState.getInstance();
+	boolean isRightSide = isRight();
+
+	int rrx;			// rrx, rry is center
+	if (isRightSide)
+		rrx = getRx()+getRwidth()-view.getRx();
+	else
+		rrx = getRx()-view.getRx();
+	
+	int rry = (int)(getRscale()*getInY()- view.getRy());
+	
+	if (!hilited) g.setColor(Constants.FRAME_COLOR);
+	else g.setColor((this==view.getHilitedObject()) ? 
+					Constants.HILITE_COLOR : Constants.FRAME_COLOR);
+
+
+	int mode = InLink.OUTPUT_MACRO_MODE;
+	Macro visibleMacro = ((VDBTemplateMacro)getFieldData()).getMacro().getVisibleObject();
+	if (visibleMacro!=null)
+		mode = visibleMacro.getMode();
+	
+	if (mode == InLink.INPUT_MACRO_MODE)
+	{
+		// input link
+		int arrowLength = 2*r;
+
+		// draw arrow
+		g.drawLine(rrx, rry-r, rrx+arrowLength, rry-r);
+		g.drawLine(rrx, rry+r, rrx+arrowLength, rry+r);
+		
+		int dr=-r; 
+		if (isRightSide) {
+			dr=-dr;
+			rrx+=arrowLength;
+		}
+		g.drawLine(rrx, rry-r, rrx+dr, rry);
+		g.drawLine(rrx, rry+r, rrx+dr, rry);
+	}
+	else if (mode == InLink.OUTPUT_MACRO_MODE)
+	{
+		// output link	
+		int arrowLength = 3*r;
+
+		// draw arrow
+		g.drawLine(rrx, rry-r, rrx+arrowLength, rry-r);
+		g.drawLine(rrx, rry+r, rrx+arrowLength, rry+r);
+		
+		int dr=r; 
+		if (isRightSide) {
+			dr=-dr;
+			rrx+=arrowLength;
+		}
+		g.drawLine(rrx, rry-r, rrx+dr, rry);
+		g.drawLine(rrx, rry+r, rrx+dr, rry);
+	}
+	//else 	
+		// constant (none)
+
+
+
 	if (lastUpdatedFullName==null)
 	{
-		ViewState view = ViewState.getInstance();
-		int rrx = getRx()-view.getRx();
-		int rry = getRy()-view.getRy();
+		//ViewState view = ViewState.getInstance();
+		//int rrx = getRx()-view.getRx();
+		//int rry = getRy()-view.getRy();
 		int rwidth = getRwidth();
 		int rheight = getRheight();
 			
@@ -157,5 +233,81 @@ public void destroyAndRemove() {
 
 }
 
+/**
+ * Insert the method's description here.
+ * Creation date: (3.2.2001 13:07:04)
+ * @return com.cosylab.vdct.vdb.GUISeparator
+ */
+public static com.cosylab.vdct.vdb.GUISeparator getMacroSeparator() {
+	if (macroSeparator==null) macroSeparator = new GUISeparator("Macro");
+	return macroSeparator;
+}
+
+/**
+ * Return properties to be inspected
+ * Creation date: (1.2.2001 22:22:37)
+ * @return com.cosylab.vdct.inspector.InspectableProperty[]
+ */
+public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode) {
+
+/*
+	OutLink out;
+	Vector starts = new Vector();
+	Enumeration e = outlinks.elements();
+	while (e.hasMoreElements()) {
+		out = EPICSLinkOut.getStartPoint((Linkable)e.nextElement());
+		if (out instanceof EPICSLinkOut) starts.addElement(out);
+	}
+*/
+
+	InspectableProperty[] properties = new InspectableProperty[1+3/*+2*starts.size()*/];
+
+	properties[0]=GUIHeader.getDefaultHeader();
+	properties[1]=getMacroSeparator();
+	properties[2]=getFieldData();
+	properties[3]=new NameValueInfoProperty("Description", getFieldData().getHelp());
+
+/*
+	int i = 4;
+	VDBFieldData fieldData;
+	e = starts.elements();
+	while (e.hasMoreElements())
+	{
+		fieldData = ((EPICSLinkOut)e.nextElement()).getFieldData();
+		properties[i++]=new GUISeparator(fieldData.getFullName());
+		properties[i++]=fieldData;
+	}
+	*/
+	return properties;
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (4.5.2001 9:20:14)
+ * @return java.lang.String
+ */
+public String toString() {
+	return "Macro: "+getName();
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (1.2.2001 22:22:37)
+ * @return javax.swing.Icon
+ */
+public javax.swing.Icon getIcon() {
+	if (icon==null)
+		icon = new javax.swing.ImageIcon(getClass().getResource("/images/link.gif"));
+	return icon;
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (1.2.2001 12:07:15)
+ * @return java.lang.String
+ */
+public String getDescription() {
+	return ((VDBTemplateMacro)fieldData).getDescription();
+}
 
 }

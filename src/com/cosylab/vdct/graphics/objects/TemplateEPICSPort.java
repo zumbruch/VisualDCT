@@ -301,4 +301,13 @@ public javax.swing.Icon getIcon() {
 	return icon;
 }
 
+/**
+ * Insert the method's description here.
+ * Creation date: (1.2.2001 12:07:15)
+ * @return java.lang.String
+ */
+public String getDescription() {
+	return ((VDBTemplatePort)fieldData).getDescription();
+}
+
 }

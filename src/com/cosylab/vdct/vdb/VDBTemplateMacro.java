@@ -39,21 +39,24 @@ import com.cosylab.vdct.inspector.InspectorManager;
 /**
  * @author Matej
  */
-public class VDBTemplatePort extends VDBFieldData implements Descriptable, ChangableVisibility
+public class VDBTemplateMacro extends VDBFieldData implements Descriptable, ChangableVisibility
 {
-	protected VDBPort port = null;
+	protected VDBMacro macro = null;
 	protected VDBTemplateInstance templateInstance = null;
 
 	protected int visibility = UNDEFINED_VISIBILITY;
 
+	private static final String nullString = "";
+
 	/**
 	 */
-	public VDBTemplatePort(VDBTemplateInstance templateInstance, VDBPort port)
+	public VDBTemplateMacro(VDBTemplateInstance templateInstance, VDBMacro macro)
 	{
 		super();
-		this.port=port;
+		this.macro = macro;
 		this.templateInstance = templateInstance;
-		this.visibility=port.getVisibility();	// obtain default
+		this.visibility = macro.getVisibility();	// obtain default
+		this.value = nullString;
 	}
 	
 
@@ -63,7 +66,7 @@ public class VDBTemplatePort extends VDBFieldData implements Descriptable, Chang
 	 * @return java.lang.String
 	 */
 	public String toString() {
-		return templateInstance.getName()+com.cosylab.vdct.Constants.FIELD_SEPARATOR+port.getName();
+		return templateInstance.getName()+com.cosylab.vdct.Constants.FIELD_SEPARATOR+macro.getName();
 	}
 
 	/**
@@ -72,7 +75,7 @@ public class VDBTemplatePort extends VDBFieldData implements Descriptable, Chang
 	 * @return java.lang.String
 	 */
 	public String getName() {
-		return port.getName();
+		return macro.getName();
 	}
 	
 	/**
@@ -81,13 +84,11 @@ public class VDBTemplatePort extends VDBFieldData implements Descriptable, Chang
 	 * @return java.lang.String
 	 */
 	public String getFullName() {
-		if (templateInstance==null)
-			return "(undefined)"+com.cosylab.vdct.Constants.FIELD_SEPARATOR+port.getName();
-		else
-		{
-			return VDBTemplateInstance.applyProperties(port.getPortDefinition(templateInstance.getName()),
-														templateInstance.getProperties());
-		}
+		StringBuffer fullName = new StringBuffer();
+		fullName.append("$(");
+		fullName.append(getName());
+		fullName.append(")");
+		return fullName.toString();
 	}
 
 	/**
@@ -116,7 +117,7 @@ public class VDBTemplatePort extends VDBFieldData implements Descriptable, Chang
 	 * @return java.lang.String
 	 */
 	public java.lang.String getHelp() {
-		return port.getDescription();
+		return macro.getDescription();
 	}
 	
 	/**
@@ -124,7 +125,7 @@ public class VDBTemplatePort extends VDBFieldData implements Descriptable, Chang
 	 */
 	public String getDescription()
 	{
-		return port.getDescription();
+		return macro.getDescription();
 	}
 
 	/**
@@ -132,7 +133,7 @@ public class VDBTemplatePort extends VDBFieldData implements Descriptable, Chang
 	 */
 	public void setDescription(String description)
 	{
-		//port.setDescription(description);
+		//macro.setDescription(description);
 	}
 
 	/**
@@ -142,37 +143,6 @@ public class VDBTemplatePort extends VDBFieldData implements Descriptable, Chang
 	public VDBTemplateInstance getTemplateInstance()
 	{
 		return templateInstance;
-	}
-
-	/**
-	 * Insert the method's description here.
-	 * Creation date: (7.12.2001 19:13:20)
-	 * @param value java.lang.String
-	 */
-	public void setDebugValue(String newValue)
-	{
-	}
-
-	/**
-	 * Insert the method's description here.
-	 * Creation date: (9.12.2000 18:11:46)
-	 * @param newValue java.lang.String
-	 */
-	public void setValue(java.lang.String newValue)
-	{
-		//port.setValue(newValue);
-	}
-
-	/**
-	 * Insert the method's description here.
-	 * Creation date: (9.12.2000 18:11:46)
-	 * @return java.lang.String
-	 */
-	public java.lang.String getValue() {
-		//if (!com.cosylab.vdct.plugin.debug.PluginDebugManager.isDebugState())
-		//	return port.getTarget();
-		//else
-			return port.getTarget();
 	}
 
 	/**
@@ -191,21 +161,21 @@ public class VDBTemplatePort extends VDBFieldData implements Descriptable, Chang
 	}
 
 	/**
-	 * Returns the port.
-	 * @return VDBPort
+	 * Returns the macro.
+	 * @return VDBmacro
 	 */
-	public VDBPort getPort()
+	public VDBMacro getMacro()
 	{
-		return port;
+		return macro;
 	}
 
 	/**
-	 * Sets the port.
-	 * @param port The port to set
+	 * Sets the macro.
+	 * @param macro The macro to set
 	 */
-	public void setPort(VDBPort port)
+	public void setMacro(VDBMacro macro)
 	{
-		this.port = port;
+		this.macro = macro;
 	}
 
 /**
@@ -250,7 +220,7 @@ public java.lang.String[] getSelectableValues() {
  * @see com.cosylab.vdct.inspector.InspectableProperty#isEditable()
  */
 public boolean isEditable() {
-	return false;
+	return true;
 }
 
 /**
@@ -268,7 +238,30 @@ public String getInitValue()
  * @return boolean
  */
 public boolean hasDefaultValue() {
-	return false;
+	return getValue().length() == 0;
+}
+
+
+/**
+ * Insert the method's description here.
+ * Creation date: (9.12.2000 18:11:46)
+ * @param newValue java.lang.String
+ */
+public void setValue(java.lang.String newValue) {
+
+	super.setValue(newValue);
+
+	// field changed
+	Template visualTemplate = (Template)Group.getRoot().findObject(templateInstance.getName(), true);
+	if (visualTemplate!=null)
+	{
+		if (visualTemplate.manageLink(this)) {
+			visualTemplate.unconditionalValidation();
+			com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+		}
+		InspectorManager.getInstance().updateProperty(visualTemplate, this);
+	}
+
 }
 
 }

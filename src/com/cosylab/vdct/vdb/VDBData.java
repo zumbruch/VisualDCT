@@ -35,9 +35,7 @@ import com.cosylab.vdct.graphics.DrawingSurface;
 import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.objects.Macro;
 import com.cosylab.vdct.graphics.objects.Port;
-import com.cosylab.vdct.graphics.objects.Record;
 import com.cosylab.vdct.Console;
-import com.cosylab.vdct.Constants;
 
 /**
  * This type was created in VisualAge.
@@ -151,45 +149,6 @@ public static VDBTemplateInstance copyVDBTemplateInstance(VDBTemplateInstance so
 
 	vdbTemplateInstance.setProperties((Hashtable)source.getProperties().clone(),
 								  	  (Vector)source.getPropertiesV().clone());
-
-/*
-	Hashtable ios = new Hashtable();
-	Enumeration keys = source.getOutputs().keys();
-	while (keys.hasMoreElements())
-	{
-		String key = keys.nextElement().toString();
-		
-		VDBFieldData field = (VDBFieldData)source.getTemplate().getOutputs().get(key);
-		VDBTemplateField sourcetf = (VDBTemplateField)source.getOutputs().get(key);
-		
-		VDBTemplateField tf = new VDBTemplateField(key, vdbTemplateInstance, field);
-		tf.setDescription(sourcetf.getDescription());
-		String initVal = sourcetf.getValue();
-		if (initVal!=null)
-			tf.setValueSilently(initVal);
-		ios.put(key, tf);
-	}
-	vdbTemplateInstance.setOutputs(ios);*/
-
-/*
-	ios = new Hashtable();
-	keys = source.getInputs().keys();
-	while (keys.hasMoreElements())
-	{
-		String key = keys.nextElement().toString();
-		
-		VDBFieldData field = (VDBFieldData)source.getTemplate().getInputs().get(key);
-		VDBTemplateField sourcetf = (VDBTemplateField)source.getInputs().get(key);
-		
-		VDBTemplateField tf = new VDBTemplateField(key, vdbTemplateInstance, field);
-		tf.setDescription(sourcetf.getDescription());
-		String initVal = sourcetf.getValue();
-		if (initVal!=null)
-			tf.setValueSilently(initVal);
-		ios.put(key, tf);
-	}
-	vdbTemplateInstance.setInputs(ios);*/
-
 
 
 	return vdbTemplateInstance;
@@ -336,11 +295,6 @@ public static VDBTemplateInstance generateVDBTemplateInstance(DBTemplateInstance
 
 	vti.setProperties(dbTemplateInstance.getProperties(), dbTemplateInstance.getPropertiesV());
 	
-	// !!! temp
-	//Hashtable table = new Hashtable();
-	//vti.setInputs(generateTemplateInstanceIOFields(vti, table, table, table));
-	//vti.setOutputs(generateTemplateInstanceIOFields(vti, table, table, table));
-	
 	return vti;
 }
 
@@ -352,42 +306,8 @@ public static VDBTemplateInstance generateNewVDBTemplateInstance(String name, VD
 	VDBTemplateInstance vti = new VDBTemplateInstance(name, t);
 	vti.setProperties(new Hashtable(), new Vector());		// empty properties
 		
-	//Hashtable hm = new Hashtable();
-	//vti.setInputs(generateTemplateInstanceIOFields(vti, hm, hm, hm));
-	//vti.setOutputs(generateTemplateInstanceIOFields(vti, hm, hm, hm));
-
 	return vti;
 }
-
-/**
- * 
- */
-public static Hashtable generateTemplateInstanceIOFields(VDBTemplateInstance vti, Hashtable values,
-															Hashtable table, Hashtable descTable)
-{
-
-	boolean monitor = com.cosylab.vdct.undo.UndoManager.getInstance().isMonitor();
-	com.cosylab.vdct.undo.UndoManager.getInstance().setMonitor(false);
-
-	Hashtable ios = new Hashtable();
-	Enumeration keys = table.keys();
-	while (keys.hasMoreElements())
-	{
-		String key = keys.nextElement().toString();
-		VDBFieldData field = (VDBFieldData)table.get(key);
-		VDBTemplateField tf = new VDBTemplateField(key, vti, field);
-		tf.setDescription((String)descTable.get(key));
-		String initVal = (String)values.get(key);
-		if (initVal!=null)
-			tf.setValueSilently(initVal);
-		ios.put(key, tf);
-	}
-	
-	com.cosylab.vdct.undo.UndoManager.getInstance().setMonitor(monitor);
-	
-	return ios;
-}
-
 
 /**
  * 
@@ -437,17 +357,7 @@ private static VDBData generateTemplate(DBDData dbd, DBTemplate dbTemplate)
 		VDBData vdbData = VDBData.generateVDBDataInternal(dbd, dbTemplate.getData());
 		DrawingSurface.applyVisualData(false, vt.getGroup(), dbTemplate.getData(), vdbData);
 		vt.getGroup().unconditionalValidateSubObjects(false);
-	/*	
-		vt.setInputs(generateTemplateIOFields(dbTemplate, dbTemplate.getInputs(), "input"));
-		vt.setOutputs(generateTemplateIOFields(dbTemplate, dbTemplate.getOutputs(), "output"));
-	
-		vt.setInputComments(dbTemplate.getInputComments());
-		vt.setOutputComments(dbTemplate.getOutputComments());
 
-		vt.setPorts(dbTemplate.getPorts());
-		vt.setPortsV(dbTemplate.getPortsV());
-	*/	
-	
 		Hashtable ports = new Hashtable();
 		Vector portsV = new Vector();
 		Enumeration keys = dbTemplate.getPorts().keys();
@@ -528,50 +438,6 @@ private static VDBData generateTemplate(DBDData dbd, DBTemplate dbTemplate)
 	
 	return null;
 }
-/**
- * 
- */
-public static Hashtable generateTemplateIOFields(DBTemplate dbTemplate, Hashtable table, String ioType)
-{
-	Hashtable ios = new Hashtable();		
-	Enumeration keys = table.keys();
-	while (keys.hasMoreElements())
-	{
-		String key = keys.nextElement().toString();
-		String field = table.get(key).toString();
-		
-		String recordName, fieldName;
-		int pos = field.lastIndexOf(Constants.FIELD_SEPARATOR);
-		if (pos>0)
-		{
-			recordName = field.substring(0, pos);
-			fieldName = field.substring(pos + 1);
-		}
-		else
-		{
-			recordName = field;
-			fieldName = "VAL";		/// always full specification required !!!
-			Console.getInstance().println("Incomplete '"+dbTemplate.getId()+"' template "+ioType+" specification - field '"+field+"'. Defaulting to VAL field.");
-		}	
-		Record rec = (Record)Group.getRoot().findObject(recordName, true);
-		if (rec!=null)
-		{
-			VDBFieldData fld = (VDBFieldData)rec.getRecordData().getField(fieldName);	 
-			if (fld!=null)
-			{
-				//System.out.println("Adding "+ioType+": "+key+" = "+field);
-				ios.put(key, fld);
-			}
-			else
-				Console.getInstance().println("Invalid '"+dbTemplate.getId()+"' template "+ioType+" specification - field '"+field+"', record field '"+fieldName+"' does not exist. Skipping "+ioType+".");
-		}
-		else
-			Console.getInstance().println("Invalid '"+dbTemplate.getId()+"' template "+ioType+" specification - field '"+field+"', record '"+recordName+"' does not exist. Skipping "+ioType+".");
-		
-	}
-	return ios;
-}
-
 /**
  * This method was created in VisualAge.
  * @return com.cosylab.vdct.vdb.VDBFieldData

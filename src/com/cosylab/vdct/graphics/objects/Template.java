@@ -84,14 +84,18 @@ public class Template
 	protected int rlinkY;
 
 	private static GUISeparator templateSeparator = null;
-	//private static GUISeparator inputsSeparator = null;
-	//private static GUISeparator outputsSeparator = null;
 
 	private static GUISeparator templateInstanceSeparator = null;
+
+	private static GUISeparator macrosSeparator = null;
+	private static GUISeparator portsSeparator = null;
+
 	private static GUISeparator propertiesSeparator = null;
+
 	private final static String fieldMaxStr = "01234567890123456789012345";
 
 	protected long portsID = -1;
+	protected long macrosID = -1;
 
 	protected Vector invalidLinks = null;
 	
@@ -237,7 +241,9 @@ public class Template
 		  else
 		  {
 		  	if (getTemplateData().getTemplate().getPortsGeneratedID()!=portsID)
-				synchronizeLinkFields();
+				synchronizePortLinkFields();
+			if (getTemplateData().getTemplate().getMacrosGeneratedID()!=macrosID)
+				synchronizeMacroLinkFields();
 		  }
 		
 		  revalidatePosition();
@@ -257,8 +263,9 @@ public class Template
 
 		  // fields
 
-//int fieldRows = Math.max(templateData.getInputs().size(), templateData.getOutputs().size());
-		 int fieldRows = templateData.getTemplate().getPorts().size();
+		// TODO we do not have only ports anymore...
+		 int fieldRows = Math.max(templateData.getTemplate().getPorts().size(),
+		 						  templateData.getTemplate().getMacros().size());
 		  height += fieldRows * Constants.FIELD_HEIGHT;
 		 // height = Math.max(height, Constants.TEMPLATE_MIN_HEIGHT);
 		  int frheight = (int)(scale*height);
@@ -432,6 +439,26 @@ public class Template
 	 * Creation date: (3.2.2001 13:07:04)
 	 * @return com.cosylab.vdct.vdb.GUISeparator
 	 */
+	public static com.cosylab.vdct.vdb.GUISeparator getPortsSeparator() {
+		if (portsSeparator==null) portsSeparator = new GUISeparator("Port fields");
+		return portsSeparator;
+	}
+
+	/**
+	 * Insert the method's description here.
+	 * Creation date: (3.2.2001 13:07:04)
+	 * @return com.cosylab.vdct.vdb.GUISeparator
+	 */
+	public static com.cosylab.vdct.vdb.GUISeparator getMacrosSeparator() {
+		if (macrosSeparator==null) macrosSeparator = new GUISeparator("Macro fields");
+		return macrosSeparator;
+	}
+
+	/**
+	 * Insert the method's description here.
+	 * Creation date: (3.2.2001 13:07:04)
+	 * @return com.cosylab.vdct.vdb.GUISeparator
+	 */
 	public static com.cosylab.vdct.vdb.GUISeparator getPropertiesSeparator() {
 		if (propertiesSeparator==null) propertiesSeparator = new GUISeparator("Properties");
 		return propertiesSeparator;
@@ -450,19 +477,41 @@ public class Template
 		items.addElement(new NameValueInfoProperty("FileName", templateData.getTemplate().getFileName()));
 
 		items.addElement(getTemplateInstanceSeparator());
-/*
-		items.addElement(getInputsSeparator());
-		Enumeration e = templateData.getInputs().elements();
+		
+		final String descriptionString = "Description";
+		
+		items.addElement(getMacrosSeparator());
+		Object obj;
+		Enumeration e = subObjectsV.elements();
+		// !!! better implementation
 		while (e.hasMoreElements())
-			items.addElement(e.nextElement());
+		{
+			obj = e.nextElement();
+			if (obj instanceof TemplateEPICSMacro)
+			{
+				TemplateEPICSMacro tem = (TemplateEPICSMacro)obj;
+				items.addElement(new GUISeparator(tem.getName()));
+				items.addElement(tem.getFieldData());
+				items.addElement(new NameValueInfoProperty(descriptionString, tem.getDescription()));
+			}
+		}
 
-		items.addElement(getOutputsSeparator());
-		e = templateData.getOutputs().elements();
+		items.addElement(getPortsSeparator());
+		// !!! better implementation
+		e = subObjectsV.elements();
 		while (e.hasMoreElements())
-			items.addElement(e.nextElement());
-*/		
+		{
+			obj = e.nextElement();
+			if (obj instanceof TemplateEPICSPort)
+			{
+				TemplateEPICSPort tep = (TemplateEPICSPort)obj;
+				items.addElement(new GUISeparator(tep.getName()));
+				items.addElement(tep.getFieldData());
+				items.addElement(new NameValueInfoProperty(descriptionString, tep.getDescription()));
+			}
+		}
 
-
+		
 		items.addElement(getPropertiesSeparator());
 
   		java.util.Iterator i = templateData.getPropertiesV().iterator();
@@ -485,9 +534,6 @@ public class Template
 	 */
 	public Vector getItems()
 	{
-		//Hashtable allLinks = (Hashtable)templateData.getInputs().clone();
-		//allLinks.putAll(templateData.getOutputs());
-		//return getLinkMenus(allLinks.elements());
 		return null;
 	}
 
@@ -700,23 +746,13 @@ private EPICSLink createLinkField(VDBFieldData field)
 {
 	
 	EPICSLink link = null;	
-/*
-	int type = LinkProperties.getType(field);
-	switch (type) {
-		case LinkProperties.INLINK_FIELD:
-			link = new TemplateEPICSInLink(this, field);
-			break;
-		case LinkProperties.OUTLINK_FIELD:
-			link = new TemplateEPICSOutLink(this, field);
-			break;
-		case LinkProperties.FWDLINK_FIELD:
-			link = new TemplateEPICSFwdLink(this, field);
-			break;
-		case LinkProperties.VARIABLE_FIELD:
-			link = new TemplateEPICSVarLink(this, field);
-			break;
-	}*/
-	link = new TemplateEPICSPort(this, field);
+
+	if (field instanceof VDBTemplatePort)
+		link = new TemplateEPICSPort(this, field);
+
+	else if (field instanceof VDBTemplateMacro)
+		link = new TemplateEPICSMacro(this, field);
+
 	return link;
 }
 
@@ -727,33 +763,7 @@ private EPICSLink createLinkField(VDBFieldData field)
 private void initializeLinkFields()
 {
 	clear();
-/*
-	// inputs
-	Enumeration e = templateData.getInputs().elements();
-	while (e.hasMoreElements())
-	{
-		VDBTemplateField tf = (VDBTemplateField)e.nextElement();
-		EPICSLink link = createLinkField(tf);
-		if (link!=null)
-		{
-			link.setRight(false);
-			addSubObject(tf.getAlias(), link);
-		}
-	}
 
-	// outputs
-	e = templateData.getOutputs().elements();
-	while (e.hasMoreElements())
-	{
-		VDBTemplateField tf = (VDBTemplateField)e.nextElement();
-		EPICSLink link = createLinkField(tf);
-		if (link!=null)
-		{
-			link.setRight(true);
-			addSubObject(tf.getAlias(), link);
-		}
-	}
-*/
 	// ports
 	Enumeration e = templateData.getTemplate().getPortsV().elements();
 	while (e.hasMoreElements())
@@ -770,6 +780,24 @@ private void initializeLinkFields()
 	}
 
 	portsID = getTemplateData().getTemplate().getPortsGeneratedID();
+
+	
+	// macros
+	e = templateData.getTemplate().getMacrosV().elements();
+	while (e.hasMoreElements())
+	{
+		VDBMacro macro = (VDBMacro)e.nextElement();
+		VDBTemplateMacro tf = new VDBTemplateMacro(getTemplateData(), macro);
+
+		EPICSLink link = createLinkField(tf);
+		if (link!=null)
+		{
+			link.setRight(false);
+			addSubObject(tf.getName(), link);
+		}
+	}
+
+	macrosID = getTemplateData().getTemplate().getMacrosGeneratedID();
 	
 }
 
@@ -778,6 +806,16 @@ private void initializeLinkFields()
  * Creation date: (26.1.2001 17:19:47)
  */
 private void synchronizeLinkFields()
+{
+	synchronizePortLinkFields();
+	synchronizeMacroLinkFields();
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (26.1.2001 17:19:47)
+ */
+private void synchronizePortLinkFields()
 {
 	Object[] objs = new Object[getSubObjectsV().size()];
 	getSubObjectsV().copyInto(objs);
@@ -888,29 +926,133 @@ private void synchronizeLinkFields()
 
 /**
  * Insert the method's description here.
- * Creation date: (30.1.2001 11:35:39)
+ * Creation date: (26.1.2001 17:19:47)
  */
-public void manageLinks() {
-	// inputs
+private void synchronizeMacroLinkFields()
+{
+	// TODO implement
 /*
-	Enumeration e = templateData.getInputs().elements();
+	Object[] objs = new Object[getSubObjectsV().size()];
+	getSubObjectsV().copyInto(objs);
+
+	// add ports
+	Enumeration e = templateData.getTemplate().getPortsV().elements();
 	while (e.hasMoreElements())
 	{
-		VDBTemplateField tf = (VDBTemplateField)e.nextElement();
-		manageLink(tf);
+		VDBPort port = (VDBPort)e.nextElement();
+		Object obj = getSubObject(port.getName());
+		if (obj==null)
+		{
+			TemplateEPICSPort tep = null;
+			for (int i=0; i<objs.length; i++)
+//				if (objs[i] instanceof TemplateEPICSPort)
+				{
+					TemplateEPICSPort t = (TemplateEPICSPort)objs[i];
+					if (t.getFieldData().getName().equals(port.getName()))
+					{
+						tep = t;
+						break;
+					}
+				}					
+
+			// renamed
+			if (tep!=null)
+			{
+				Object key = null;
+				Enumeration e2 = getSubObjects().keys();
+				while (e2.hasMoreElements())
+				{
+					Object key2 = e2.nextElement();
+					Object val = getSubObjects().get(key2);
+					if (val==tep)
+					{
+						key = key2;
+						break;
+					}
+				}
+				
+				if (key!=null)
+					removeObject(key.toString());
+				else
+					System.out.println("Internal error...");
+					
+				addSubObject(tep.getFieldData().getName(), tep);
+
+				// update lookup table and fix source links 
+				tep.fixTemplateLink();
+								
+				//System.out.println("!! renamed !! "+port.getName());
+			}
+			else
+			{
+				//System.out.println("!! added !!"+port.getName());
+
+				// add port
+				VDBTemplatePort tf = new VDBTemplatePort(getTemplateData(), port);
+				EPICSLink link = createLinkField(tf);
+				if (link!=null)
+				{
+					link.setRight(true);
+					addSubObject(tf.getName(), link);
+				}
+			}
+		}
+		else
+		{
+			// fix port if necessary (result of add+remove action)
+			VDBTemplatePort tpd = ((VDBTemplatePort)((TemplateEPICSPort)obj).getFieldData());
+			if (tpd.getPort()!=port)
+			{
+				//System.out.println("!! fixing port !!"+port.getName());
+				tpd.setPort(port);
+			}
+		}
 	}
 
-	// outputs
-	e = templateData.getOutputs().elements();
-	while (e.hasMoreElements())
+	// remove ports
+	for (int i=0; i<objs.length; i++)
 	{
-		VDBTemplateField tf = (VDBTemplateField)e.nextElement();
-		manageLink(tf);
+//		if (objs[i] instanceof TemplateEPICSPort)
+		{
+			TemplateEPICSPort link = (TemplateEPICSPort)objs[i];
+			if (!templateData.getTemplate().getPorts().containsKey(link.getFieldData().getName()))
+			{
+				//System.out.println("!! removed !! "+link.getFieldData().getName());
+
+				// remove port
+				link.destroyAndRemove();
+	
+				removeObject(link.getFieldData().getName());
+			}
+		}
+	}
+	
+	// save ports ID
+	portsID = getTemplateData().getTemplate().getPortsGeneratedID();
+	//com.cosylab.vdct.graphics.DrawingSurface.getInstance().setModified(true);
+
+	// check
+	if (getTemplateData().getTemplate().getPortsV().size()!=getSubObjectsV().size())
+	{
+		Console.getInstance().println("Failed to synchronize template ports with template instance ports. Save and restart VisualDCT.");
 	}
 */
 }
 
-
+/**
+ * Insert the method's description here.
+ * Creation date: (30.1.2001 11:35:39)
+ */
+public void manageLinks() {
+	Object obj;
+	Enumeration e = subObjectsV.elements();
+	while (e.hasMoreElements())
+	{
+		obj = e.nextElement();
+		if (obj instanceof TemplateEPICSMacro)
+			manageLink(((TemplateEPICSMacro)obj).getFieldData());
+	}
+}
 
 
 /**
@@ -946,13 +1088,7 @@ public void fieldChanged(VDBFieldData field) {
 /**
  */
 public VDBFieldData getField(String name) {
-/*
-	VDBFieldData field = (VDBFieldData)templateData.getInputs().get(name);
-	if (field==null)
-		field = (VDBFieldData)templateData.getOutputs().get(name);
-	return field;
-*/
-return null;
+	return null;
 }
 
 
@@ -1526,8 +1662,7 @@ public void generateMacros(HashMap macros) {
 	while (e.hasMoreElements())
 	{
 		obj = e.nextElement();
-		// TODO only macro fields!!!
-		if (obj instanceof Field)
+		if (obj instanceof TemplateEPICSMacro)
 			LinkManagerObject.checkIfMacroCandidate(((Field)obj).getFieldData(), macros);
 	}
 }
