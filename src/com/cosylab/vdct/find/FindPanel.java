@@ -31,11 +31,14 @@ package com.cosylab.vdct.find;
 import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
+
 import javax.swing.*;
 
 import com.cosylab.vdct.graphics.DrawingSurface;
+import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.objects.Record;
+import com.cosylab.vdct.graphics.objects.VisibleObject;
 
 /**
  * A threaded search accessory.
@@ -227,8 +230,8 @@ public class FindPanel extends JPanel
      */
     public void goTo(Object selectedObject)
     {
-        // TODO remove file
-        System.out.println(selectedObject);
+        if (selectedObject instanceof VisibleObject)
+            DrawingSurface.getInstance().centerObject((VisibleObject)selectedObject);
     }
 
     /**
@@ -622,11 +625,34 @@ public class FindPanel extends JPanel
             fileList.setFont(fileList.getFont().deriveFont(Font.PLAIN));
             add(fileList, BorderLayout.CENTER);
 
-            // Double click listener
+            final JPopupMenu menu = new JPopupMenu();
+            JMenuItem item = new JMenuItem("Select selection in workspace");
+            item.addActionListener(new ActionListener()
+                    {
+                		public void actionPerformed(ActionEvent e)
+                		{
+                		    Object[] selected = fileList.getSelectedValues();
+                		    for (int i = 0; i < selected.length; i++)
+                		        if (selected[i] instanceof VisibleObject)
+                		            ViewState.getInstance().setAsSelected((VisibleObject)selected[i]);
+                		    if (selected.length > 0)
+                		        DrawingSurface.getInstance().repaint();
+                		}
+                    });
+            menu.add(item);
+            
+            // mouse listener
             MouseListener mouseListener = new MouseAdapter() {
                 public void mouseClicked(MouseEvent e)
                 {
-                    if (e.getClickCount() == 2)
+        			boolean leftButtonPush = (e.getModifiers() & InputEvent.BUTTON1_MASK) != 0;
+        			boolean rightButtonPush = (e.getModifiers() & InputEvent.BUTTON3_MASK) != 0;
+
+                    if (e.getClickCount() == 1 && rightButtonPush) {
+                        if (fileList.getSelectedValues().length > 0)
+                            menu.show(fileList, e.getX(), e.getY());
+                    }
+                    else if (e.getClickCount() == 2 && leftButtonPush)
                     {
                         try
                         {

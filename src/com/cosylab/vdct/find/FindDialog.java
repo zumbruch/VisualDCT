@@ -51,7 +51,7 @@ public class FindDialog extends JDialog implements WindowListener {
     public FindDialog(Frame owner) throws HeadlessException {
         super(owner);
         setModal(false);
-        setTitle("Find");
+        setTitle("Find records");
         setSize(400, 300);
         addWindowListener(this);
         setLocationRelativeTo(owner);
