@@ -225,12 +225,12 @@ private com.cosylab.vdct.graphics.objects.EPICSVarOutLink.PopupMenuHandler creat
 					rrx = getRx()-r-view.getRx();
 			
 				int rry = (int)(getRscale()*getInY()- view.getRy());
-			
+				int linkx = (int)(getRscale()*getInX() - view.getRx());	
 		
 				if (isRightSide)
-					g.drawLine(rrx+2*r, rry, rrx+rtailLen-r, rry);
+					g.drawLine(rrx+2*r, rry, linkx, rry);
 				else 
-					g.drawLine(rrx-rtailLen+r, rry, rrx-3*r, rry);
+					g.drawLine(linkx, rry, rrx-3*r, rry);
 			}
 			
 			LinkDrawer.drawLink(g, this, inlink, getQueueCount(), isRightSide);

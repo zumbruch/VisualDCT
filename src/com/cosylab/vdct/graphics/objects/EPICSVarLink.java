@@ -183,10 +183,12 @@ protected void draw(Graphics g, boolean hilited) {
 		// tail
 		g.setColor(hilited && view.isHilitedObject(this) ? Constants.HILITE_COLOR : getVisibleColor());
 
+		int linkx = (int)(getRscale()*getInX() - view.getRx());
+
 		if (isRightSide)
-			g.drawLine(rrx+2*r, rry, rrx+rtailLen-r, rry);
+			g.drawLine(rrx+2*r, rry, linkx, rry);
 		else 
-			g.drawLine(rrx-rtailLen+r, rry, rrx-3*r, rry);
+			g.drawLine(linkx, rry, rrx-3*r, rry);
 
 		// !!! more intergroup inlinks?!
 		LinkDrawer.drawInIntergroupLink(g, (OutLink)outlinks.firstElement(), this, isRightSide);

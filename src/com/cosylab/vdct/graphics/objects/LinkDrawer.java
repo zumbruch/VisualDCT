@@ -139,15 +139,15 @@ private static void drawIntergroupLink(Graphics g, ViewState view, int x1, int y
 public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firstHorizontal) {
 	ViewState view = ViewState.getInstance();
 	double scale = view.getScale();
-	int x1 = (int)(scale*out.getOutX())-view.getRx();
-	int y1 = (int)(scale*out.getOutY())-view.getRy();
+	int x1 = (int)(scale*out.getOutX()-view.getRx());
+	int y1 = (int)(scale*out.getOutY()-view.getRy());
 	
 	int x2 = x1;
 	int y2 = y1;
 	if (in!=null)
 	{
-		x2 = (int)(scale*in.getInX())-view.getRx();
-		y2 = (int)(scale*in.getInY())-view.getRy();
+		x2 = (int)(scale*in.getInX()-view.getRx());
+		y2 = (int)(scale*in.getInY()-view.getRy());
 	}
 
 	// 

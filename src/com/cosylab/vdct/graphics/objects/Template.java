@@ -282,8 +282,8 @@ public class Template
 		  revalidatePosition();
 
 		  double scale = getRscale();
-		  int rwidth = (int)(getWidth()*scale);
-		  int height = Constants.TEMPLATE_INITIAL_HEIGHT;
+		  int rwidth = (int)((getX()+getWidth())*scale)-getRx();
+		  int height = (int)(getY()*scale+Constants.TEMPLATE_INITIAL_HEIGHT)-getRy();
 
 		  initY = height;
 

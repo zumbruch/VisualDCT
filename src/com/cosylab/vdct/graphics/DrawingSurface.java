@@ -56,6 +56,8 @@ import com.cosylab.vdct.inspector.*;
 import com.cosylab.vdct.graphics.popup.*;
 import com.cosylab.vdct.graphics.printing.Page;
 
+import java.awt.geom.AffineTransform;
+
 /**
  * Insert the type's description here.
  * Creation date: (10.12.2000 13:19:16)
@@ -2209,10 +2211,6 @@ public int print(java.awt.Graphics graphics, java.awt.print.PageFormat pageForma
 	int pageWidth = (int)pageFormat.getImageableWidth();
 	int pageHeight = (int)pageFormat.getImageableHeight();
 
-	//graphics.clipRect(0, 0, pageWidth, pageHeight);
-
-	//System.out.println(pageFormat.getOrientation()==PageFormat.LANDSCAPE);
-	//if (true) throw new java.awt.print.PrinterException();
 	
 	/*------------------------------------------------------------*/
 	
@@ -2275,20 +2273,21 @@ public int print(java.awt.Graphics graphics, java.awt.print.PageFormat pageForma
 	int rx = view.getRx(); int ry = view.getRy();
 	double scale = view.getScale();
 	int viewWidth = view.getViewWidth(), viewHeight = view.getViewHeight();
+	AffineTransform transf = ((Graphics2D)graphics).getTransform();
 
 	FontMetricsBuffer fmb = FontMetricsBuffer.getInstance();
 
 	try
 	{
-		view.setScale(screen2printer);
-	
-		view.setRx((int)(rx*converter+x));
-		view.setRy((int)(ry*converter+y));
-
-		view.setViewWidth(imageWidth);
-		view.setViewHeight(imageHeight);
+		((Graphics2D)graphics).scale(screen2printer, screen2printer);
 		
-		fmb.setInstance(new FontMetricsBuffer(graphics));
+		view.setScale(1.0);
+		view.setRx((int)(rx/scale+x));
+		view.setRy((int)(ry/scale+y));
+		view.setViewWidth((int)(imageWidth/screen2printer));
+		view.setViewHeight((int)(imageHeight/screen2printer));
+		
+		FontMetricsBuffer.setInstance(new FontMetricsBuffer(graphics));
 	
 		/*Shape clip = graphics.getClip();
 		graphics.setClip(null);
@@ -2336,14 +2335,15 @@ public int print(java.awt.Graphics graphics, java.awt.print.PageFormat pageForma
 		viewGroup.paintComponents(graphics, false, isFlat());
 
 		//resets clipping
+		((Graphics2D)graphics).setTransform(transf);
 		if (Page.getPrintMode()==Page.FIT_SCALE) graphics.translate(-(pageWidth-w)/2, -(pageHeight-h)/2);
-		graphics.setClip(0,0,pageWidth, pageHeight);
+		graphics.setClip(null);
 		
-		//prints label
+		//prints legend
 		if ((Settings.getInstance().getLegendVisibility()==1 && pageIndex==0) || Settings.getInstance().getLegendVisibility()==2) {
 			if (Settings.getInstance().getLegendVisibility()==1) { // correct navigator rect
-				view.setViewWidth((int)(viewWidth*converter));
-				view.setViewHeight((int)(viewHeight*converter));
+				view.setViewWidth(viewWidth);
+				view.setViewHeight(viewHeight);
 			}
 			printLegend(graphics, pageWidth, pageHeight, pageIndex+1, maxNumPage);
 		}
@@ -2362,8 +2362,6 @@ public int print(java.awt.Graphics graphics, java.awt.print.PageFormat pageForma
 		
 //		restore color sheme 
 		 loadWhiteOnBlackColorScheme();
-		navigatorImage=null;
-		 createNavigatorImage();
 	}
 	
 
@@ -2404,8 +2402,7 @@ private void printLegend(Graphics graphics, int width, int height, int page, int
 			
 	Font font =FontMetricsBuffer.getInstance().getAppropriateFont(
 		Constants.DEFAULT_FONT, Font.PLAIN, 
-		label, 200, 16);
-	graphics.setFont(font);			
+		label, 200, 16);			
 	FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(font);
 	int labelWidth = fm.stringWidth(label)+8, labelHeight = fm.getHeight();
 	
@@ -2438,17 +2435,54 @@ private void printLegend(Graphics graphics, int width, int height, int page, int
 	
 	// paints
 	
-	Rectangle backup = navigator;
-	navigator = new Rectangle(navX, navY,navigatorWidth,navigatorHeight);
-	navigatorImage=null;
+	//navigator
+	ViewState view = ViewState.getInstance();
 	
-	createNavigatorImage();
-	drawNavigator(graphics);
-	navigator = backup;
+	AffineTransform transf = ((Graphics2D)graphics).getTransform();
+	
+	graphics.translate(navX, navY);
+	graphics.setClip(new Rectangle(0,0,navigatorWidth, navigatorHeight));
+	
+	Dimension navigatorSize = new Dimension(navigatorWidth, navigatorHeight);
+	double xscale = navigatorWidth/(double)view.getWidth();
+	double yscale = navigatorHeight/(double)view.getHeight();
+	double nscale = Math.min(xscale, yscale);
+	
+	((Graphics2D)graphics).scale(nscale, nscale);
+	
+	graphics.setColor(Constants.BACKGROUND_COLOR);
+	graphics.fillRect(0, 0, view.getWidth(), view.getHeight());
+	
+	double rx=(double)view.getRx()*nscale, ry=(double)view.getRy()*nscale;
+	int rwidth = (int)(view.getViewWidth()*nscale), rheight = (int)(view.getViewHeight()*nscale);
+	
+	view.setRx(0); view.setRy(0);
+	viewGroup.paintComponents(graphics, false, isFlat());
+
+	((Graphics2D)graphics).setTransform(transf);
+	graphics.translate(navX, navY);
+
+	graphics.setColor(Color.red);
+	graphics.drawRect((int)rx, (int)ry, rwidth, rheight);
+
+//	add lock rectangle if necessary
+	 final int min = 8;
+	 if ((rwidth<min) || (rheight<min)) {
+		 graphics.setColor(Color.lightGray);
+		 graphics.drawRect((int)(rx-min), (int)(ry-min), 
+		 		(int)(rwidth+2*min), (int)(rheight+2*min));
+	 }
+	 
+	graphics.setColor(Color.blue);
+	graphics.drawRect(0, 0, navigatorWidth-1, navigatorHeight-1);
+	
+	graphics.setClip(null);
+	((Graphics2D)graphics).setTransform(transf);
 	
 	graphics.drawImage(img, logoX, logoY, null);
 	
 	graphics.setColor(Constants.FRAME_COLOR);
+	graphics.setFont(font);
 	graphics.drawString(label, labX, labY);
 }
 /**
