@@ -2851,6 +2851,9 @@ public void createMacro(VDBMacro vdbMacro) {
 
 	UndoManager.getInstance().addAction(new CreateAction(macro));
 
+	// repair the links
+	Group.getRoot().manageLinks(true);
+
 	//drawingSurface.setModified(true);
 	repaint();
 }
@@ -2860,19 +2863,51 @@ public void createMacro(VDBMacro vdbMacro) {
  */
 public void generateMacros()
 {
+	// TODO gui w/ macro (w/ visible representation option) would be welcome here
+
 	// iterate through all the records
 		// for each record iterate through all the fields
 			// if fields contains template string $(<nameWithoutDot>) the it is macro
 				// if string start this this string then propose visible macro
 				// otherwise non-visible (link cannot be drawn in this case)
+
+	final String COMMA_SEP = ", ";
+
+	Console.getInstance().println("Generating macros...");
 				
 	HashMap macros = new HashMap();
 	
 	Group.getRoot().generateMacros(macros, true);
-	
-	System.out.println("Macros: " + macros);
 
-	// TODO gui
+	Iterator i = macros.keySet().iterator();
+	while (i.hasNext())
+	{
+		String macroName = (String)i.next();
+		String name = macroName.substring(2, macroName.length()-1);
+		
+		Group.getEditingTemplateData().addMacro(name);
+
+		// output to console
+		Console.getInstance().print("Creating macro '"+name+"', referenced from: ");
+		ArrayList al = (ArrayList)macros.get(macroName);
+		Iterator i2 = al.iterator();
+		while (i2.hasNext())
+		{
+			Console.getInstance().print(((VDBFieldData)i2.next()).getFullName());
+			if (i2.hasNext())
+				Console.getInstance().print(COMMA_SEP);
+		}
+		Console.getInstance().println();
+	}
+
+	Console.getInstance().println(macros.size() + " macro(s) generated.");
+	Console.getInstance().println();
+
+	// repair the links
+	Group.getRoot().manageLinks(true);
+
+	//drawingSurface.setModified(true);
+	repaint();
 }
 
 }

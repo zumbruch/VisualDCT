@@ -78,12 +78,14 @@ public class Port extends VisibleObject implements Descriptable, Movable, OutLin
 			else if (action.equals(removePortString))
 			{
 				destroy();
+				ViewState.getInstance().deselectObject(Port.this);
 				com.cosylab.vdct.undo.UndoManager.getInstance().addAction(new com.cosylab.vdct.undo.DeleteAction(Port.this));
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
 			else if (action.equals(removePortDefString))
 			{
 				data.getTemplate().removePort(getName());
+				ViewState.getInstance().deselectObject(Port.this);
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
 			else if (action.equals(constantString)) {

@@ -63,27 +63,27 @@ public class Macro extends VisibleObject implements Descriptable, Movable, InLin
 					setColor(newColor);
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
-			else*/ if (action.equals(addConnectorString))
+			else if (action.equals(addConnectorString))
 			{
 				//addConnector();
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
-			/*
 			else if (action.equals(removeLinkString))
 			{
 				removeLink();
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
-			*/
-			else if (action.equals(removeMacroString))
+			else */if (action.equals(removeMacroString))
 			{
 				destroy();
+				ViewState.getInstance().deselectObject(Macro.this);
 				com.cosylab.vdct.undo.UndoManager.getInstance().addAction(new com.cosylab.vdct.undo.DeleteAction(Macro.this));
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
 			else if (action.equals(removeMacroDefString))
 			{
 				data.getTemplate().removeMacro(getName());
+				ViewState.getInstance().deselectObject(Macro.this);
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
 			else if (action.equals(inputString)) {
@@ -102,7 +102,7 @@ public class Macro extends VisibleObject implements Descriptable, Movable, InLin
 
 	//private static final String descriptionString = "Description";
 	//private static final String selectTitle = "Select link color...";
-	private static final String addConnectorString = "Add connector";
+	//private static final String addConnectorString = "Add connector";
 	//private static final String colorString = "Color...";
 	//private static final String removeLinkString = "Remove Link";
 //	private static final String removeMacroString = "Hide Macro";
@@ -777,6 +777,9 @@ public void setDestroyed(boolean newDestroyed)
 		// update lookup table
 		lastUpdatedFullName = null;
 		updateTemplateLink();
+		
+		// repair the links
+		//Group.getRoot().manageLinks(true);
 	}
 }
 
