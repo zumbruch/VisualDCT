@@ -205,10 +205,13 @@ private com.cosylab.vdct.graphics.objects.Port.PopupMenuHandler createPopupmenuH
  */
 public void destroy() {
 	if (!isDestroyed()) {
+		// keep the value
+		String currentValue = data.getValue();
 		removeLink();
 		super.destroy();
 		data.setVisibleObject(null);
 		getParent().removeObject(getName());
+		data.setValueSilently(currentValue);
 	}
 }
 
@@ -234,7 +237,7 @@ public void removeLink() {
 public void disconnect(Linkable disconnector) {
 	if (!disconnected && (inlink==disconnector) ) {
 		disconnected = true;
-		data.setValue("");
+		data.setValue(nullString);
 	}
 }
 /**
@@ -910,6 +913,9 @@ public void setDestroyed(boolean newDestroyed)
 	{
 		// set data appropriate visibleObject
 		data.setVisibleObject(this);
+		
+		// revalidate link
+		valueChanged();
 	}
 }
 

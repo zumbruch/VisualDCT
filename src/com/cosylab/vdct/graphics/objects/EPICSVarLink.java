@@ -344,10 +344,11 @@ public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode) 
 		if (out instanceof EPICSLinkOut) starts.addElement(out);
 	}
 
-	InspectableProperty[] properties = new InspectableProperty[1+starts.size()*5];
+	InspectableProperty[] properties = new InspectableProperty[2+starts.size()*5];
 	properties[0]=GUIHeader.getDefaultHeader();
+	properties[1]=fieldData;
 
-	int i = 1;
+	int i = 2;
 	VDBFieldData fieldData;
 	e = starts.elements();
 	while (e.hasMoreElements())

@@ -105,8 +105,10 @@ public class Macro extends VisibleObject implements Descriptable, Movable, InLin
 	private static final String addConnectorString = "Add connector";
 	private static final String colorString = "Color...";
 	private static final String removeLinkString = "Remove Link";
-	private static final String removeMacroString = "Hide Macro";
-	private static final String removeMacroDefString = "Remove Macro";
+//	private static final String removeMacroString = "Hide Macro";
+//	private static final String removeMacroDefString = "Remove Macro";
+	private static final String removeMacroString = "Remove Macro";
+	private static final String removeMacroDefString = "Remove Macro w/ definition";
 
 	private static final String modeString = "Macro Mode";
 	private static final String inputString = "INPUT";
@@ -196,6 +198,7 @@ private com.cosylab.vdct.graphics.objects.Macro.PopupMenuHandler createPopupmenu
 public void destroy() {
 	if (!isDestroyed()) {
 		super.destroy();
+
 		if (outlinks.size()>0) {
 			Object[] objs = new Object[outlinks.size()];
 			outlinks.copyInto(objs);
