@@ -868,7 +868,7 @@ private void updateLink() {
 		// find endpoint
 		Linkable preendpoint = this;
 		Linkable endpoint = getInput();
-		while (!(endpoint instanceof EPICSLinkOutIn) && (endpoint instanceof InLink) && (endpoint instanceof OutLink)) {
+		while (!(endpoint instanceof EPICSLinkOutIn) && !(endpoint instanceof EPICSVarOutLink) && (endpoint instanceof InLink) && (endpoint instanceof OutLink) && !(endpoint instanceof EPICSVarOutLink)) {
 			preendpoint = endpoint;
 			endpoint = ((OutLink)endpoint).getInput();
 		}

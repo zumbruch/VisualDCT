@@ -821,7 +821,8 @@ public EPICSLink initializeLinkField(VDBFieldData field) {
 				link = new EPICSFwdLink(this, field);
 				break;
 			case LinkProperties.VARIABLE_FIELD:
-				link = new EPICSVarLink(this, field);
+				//link = new EPICSVarLink(this, field);
+				link = new EPICSVarOutLink(this, field);
 				break;
 		}
 

@@ -1117,7 +1117,7 @@ public static void writeObjects(Vector elements, java.io.DataOutputStream file, 
 						if (fieldData.getComment()!=null)
 							file.writeBytes(fieldData.getComment()+nl);
 							
-						String value = fieldData.getValue();
+						String value = StringUtils.removeQuotes(fieldData.getValue());
 						
 						if (export)
 						{
@@ -1530,7 +1530,7 @@ private static void writeTemplateData(DataOutputStream stream, NameManipulator n
 	stream.writeBytes(nl+DBResolver.TEMPLATE+"(");
 	
 	if (data.getRealDescription()!=null && data.getRealDescription().length()>0)
-		stream.writeBytes(quote + data.getRealDescription() + quote);
+		stream.writeBytes(quote + StringUtils.removeQuotes(data.getRealDescription()) + quote);
 	
 	stream.writeBytes(") {"+nl);
 
@@ -1546,9 +1546,9 @@ private static void writeTemplateData(DataOutputStream stream, NameManipulator n
 
 		stream.writeBytes(portStart+
 			port.getName() +
-			comma + quote + port.getTarget() + quote);
+			comma + quote + StringUtils.removeQuotes(port.getTarget()) + quote);
 		if (port.getRealDescription()!=null && port.getRealDescription().length()>0)
-			stream.writeBytes(comma + quote + port.getRealDescription() + quote);
+			stream.writeBytes(comma + quote + StringUtils.removeQuotes(port.getRealDescription()) + quote);
 		stream.writeBytes(ending);
 	}	
 	

@@ -1320,7 +1320,7 @@ public void writeObjects(DataOutputStream file, NameManipulator namer, boolean e
 		while (i.hasNext())
 		{
 			String name = i.next().toString();
-			file.writeBytes(macro + name + comma + quote + macros.get(name).toString() + quote + ending);
+			file.writeBytes(macro + name + comma + quote + StringUtils.removeQuotes(macros.get(name).toString()) + quote + ending);
 		}
 			
 		// export end

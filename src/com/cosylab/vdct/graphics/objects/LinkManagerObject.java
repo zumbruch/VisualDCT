@@ -249,6 +249,84 @@ public boolean manageLink(VDBFieldData field) {
 			link.validateLink();
 			return true;			
 		}
+		else
+		{
+			// new VAR->PORT link
+			LinkProperties properties = new LinkProperties(field);
+			InLink portLink = EPICSLinkOut.getTarget(properties);
+			
+			if (portLink==null || !(portLink instanceof TemplateEPICSPort))
+				return false;
+				
+			EPICSVarOutLink varlink = new EPICSVarOutLink(this, field);
+		
+			addLink(varlink);
+
+			portLink.setOutput(varlink, null);
+			varlink.setInput(portLink);
+
+			return true;
+		}
+
+	}	
+	else
+	{
+		
+		if (this.containsObject(field.getName()))
+		{
+			// existing link
+			EPICSLinkOut link = (EPICSLinkOut)getSubObject(field.getName());
+			link.valueChanged();
+			link.setDestroyed(false);
+			return true;
+			
+		}
+		else
+		{
+			if (!LinkManagerObject.isSoftwareLink(field))
+				return false;
+				
+			// new link
+			LinkProperties properties = new LinkProperties(field);
+			InLink varlink = EPICSLinkOut.getTarget(properties);
+			// can point to null? OK, cross will be showed
+
+			EPICSLinkOut outlink = null;
+			
+			if (type==LinkProperties.INLINK_FIELD)
+				outlink = new EPICSInLink(this, field);
+			else if (type==LinkProperties.OUTLINK_FIELD)
+				outlink = new EPICSOutLink(this, field);
+			else /*if (type==LinkProperties.FWDLINK_FIELD)*/
+				outlink = new EPICSFwdLink(this, field);
+		
+			addLink(outlink);
+
+			if (varlink!=null) varlink.setOutput(outlink, null);
+			outlink.setInput(varlink);
+
+			return true;
+		}
+	}
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (30.1.2001 9:36:15)
+ * @return boolean
+ * @param field com.cosylab.vdct.vdb.VDBFieldData
+ */
+public boolean manageLink_(VDBFieldData field) {
+
+	int type = LinkProperties.getType(field);
+	if (type == LinkProperties.VARIABLE_FIELD)
+	{
+		if (this.containsObject(field.getName()))
+		{
+			EPICSVarLink link = (EPICSVarLink)getSubObject(field.getName());
+			link.validateLink();
+			return true;			
+		}
 		return false;
 	}	
 	else
@@ -304,6 +382,7 @@ public boolean manageLink(VDBFieldData field) {
 		}
 	}
 }
+
 /**
  * Insert the method's description here.
  * Creation date: (1.2.2001 17:38:36)
@@ -429,8 +508,6 @@ public Vector getLinkMenus(Enumeration vdbFields) {
 		JMenu outlinks = new JMenu(outlinkString);
 		JMenu fwdlinks = new JMenu(fwdlinkString);
 		
-		//boolean isSoft = recordData.canBePV_LINK(); !!! can be added
-
 		JMenu inMenu = inlinks;	
 		JMenu outMenu = outlinks;	
 		JMenu fwdMenu = fwdlinks;	

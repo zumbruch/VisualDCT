@@ -210,6 +210,17 @@ public static String removeQuotesAndLineBreaks(String str) {
 /**
  * Insert the method's description here.
  * Creation date: (23.4.2001 18:52:04)
+ * @return java.lang.String
+ * @param str java.lang.String
+ */
+public static String removeQuotes(String str) {
+	if (str.indexOf('"')>=0)
+		str = str.replaceAll("\\\"", "\\\\\"");
+	return str;
+}
+/**
+ * Insert the method's description here.
+ * Creation date: (23.4.2001 18:52:04)
  * @return java.awt.Color
  * @param str java.lang.String
  */
