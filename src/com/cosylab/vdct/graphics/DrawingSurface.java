@@ -2351,6 +2351,8 @@ public int print(java.awt.Graphics graphics, java.awt.print.PageFormat pageForma
 	}
 	catch (Exception e)
 	{
+		e.printStackTrace();
+		com.cosylab.vdct.Console.getInstance().println("Error while generating print image: "+e);
 	}
 	finally
 	{
@@ -2448,10 +2450,12 @@ private void printLegend(Graphics graphics, int width, int height, int page, int
 	double yscale = navigatorHeight/(double)view.getHeight();
 	double nscale = Math.min(xscale, yscale);
 	
+	graphics.setColor(Color.white);
+	graphics.fillRect(0, 0, navigatorWidth-1, navigatorHeight-1);
+	
 	((Graphics2D)graphics).scale(nscale, nscale);
 	
-	graphics.setColor(Constants.BACKGROUND_COLOR);
-	graphics.fillRect(0, 0, view.getWidth(), view.getHeight());
+	
 	
 	double rx=(double)view.getRx()*nscale, ry=(double)view.getRy()*nscale;
 	int rwidth = (int)(view.getViewWidth()*nscale), rheight = (int)(view.getViewHeight()*nscale);
@@ -2479,7 +2483,12 @@ private void printLegend(Graphics graphics, int width, int height, int page, int
 	graphics.setClip(null);
 	((Graphics2D)graphics).setTransform(transf);
 	
-	graphics.drawImage(img, logoX, logoY, null);
+	if (img!=null)
+		try {
+			graphics.drawImage(img, logoX, logoY, null);
+		} catch (NullPointerException e) {
+			// WORKAROUND when exporting to PS null pointer is thrown here
+		}
 	
 	graphics.setColor(Constants.FRAME_COLOR);
 	graphics.setFont(font);
