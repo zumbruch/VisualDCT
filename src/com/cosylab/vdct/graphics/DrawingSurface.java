@@ -1347,7 +1347,7 @@ public void mousePressed(MouseEvent e) {
 				pressedX=draggedX=px; 
 				pressedY=draggedY=py;
 				if (Settings.getInstance().getFastMove() && (hilitedObject instanceof Record
-						|| hilitedObject instanceof Template
+						|| hilitedObject instanceof Template || hilitedObject instanceof Group
 						|| view.getSelectedObjects().size()>1)) {
 					fastDrawing=true;
 					fastMove = true;
