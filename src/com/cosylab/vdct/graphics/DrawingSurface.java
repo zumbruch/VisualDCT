@@ -122,6 +122,8 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 	private boolean alsoDrawHilitedOnce = false;
 	// also force one redraw (unconditional)
 	private boolean forceRedraw = false;
+	// does not redraws navigator image
+	private boolean blockNavigatorRedrawOnce = false;
 	// current view
 	//private ViewState view;
 	// ... and history
@@ -203,6 +205,7 @@ public DrawingSurface() {
 	commandManager.addCommand("GetGUIMenuInterface", new GetGUIInterface(guimenu));
 	commandManager.addCommand("LinkCommand", new LinkCommand(this));
 	commandManager.addCommand("GetPrintableInterface", new GetPrintableInterface(this));
+	commandManager.addCommand("RepaintWorkspace", new RepaintCommand(this));
 
 }
 /**
@@ -224,7 +227,7 @@ public void baseView() {
 	view.setRy((view.getHeight()-view.getViewHeight())/2);
 	forceRedraw=true;
 	updateWorkspaceScale();
-	repaint();		// not needed...
+	repaint();	
 }
 /**
  * Insert the method's description here.
@@ -250,6 +253,12 @@ private void copyNavigatorImage(Graphics g) {
  */
 private void createNavigatorImage() {
 
+	if (blockNavigatorRedrawOnce)
+	{
+		blockNavigatorRedrawOnce = false;
+		return;
+	}
+	
 	ViewState view = ViewState.getInstance();
 	
 	if ((navigatorImage==null) || 
@@ -268,7 +277,6 @@ private void createNavigatorImage() {
 	
 		navigatorView.setScale(nscale);
 	}
-
 
 	ViewState.setInstance(navigatorView);
 		
@@ -289,19 +297,17 @@ private void createNavigatorImage() {
  */
 public void draw(Graphics g) {
 
-	// better solution?
-	FontMetricsBuffer.createInstance(g);
-	
 	ViewState view = ViewState.getInstance();
-		
-	if (forceRedraw || (!fastDrawing && !fastDrawingOnce && !drawOnlyHilitedOnce)) {
-		forceRedraw=false;
-		redraw(g);
-	} else {
+
+	if (fastDrawing || fastDrawingOnce || drawOnlyHilitedOnce || !forceRedraw) {
 		// copy devices buffer
 		copyCanvasImage(g);
 		fastDrawingOnce=false;
+	} else {
+		forceRedraw=false;
+		redraw(g);
 	}
+
 	
 	// fix offset
 /*	int prevRX = view.getRx(); int prevRY = view.getRy();
@@ -581,9 +587,9 @@ public void initializeWorkspace() {
 
 	
 	UndoManager.getInstance().setMonitor(true);
-	
+	blockNavigatorRedrawOnce = false;
+	createNavigatorImage();
 	baseView();
-
 }
 /**
  * Insert the method's description here.
@@ -898,6 +904,7 @@ public void mouseDragged(MouseEvent e) {
 				int dy = py-pressedY;
 				if (view.moveOrigin(dx, dy)) {
 					recalculateNavigatorPosition();
+					blockNavigatorRedrawOnce = true;
 					repaint();
 					pressedX=px; pressedY=py;
 				}
@@ -915,14 +922,14 @@ public void mouseDragged(MouseEvent e) {
 				
 				if (view.isSelected(hilitedObject)) {
 					if (moveSelection(dx, dy)) {			// move selection
-						// !!!createNavigatorImage();
+						blockNavigatorRedrawOnce = true;	/// !!! performance
 						repaint();
 						draggedX=px; draggedY=py;
 					}
 				}
 				else if (hilitedObject.move(dx, dy)) {
-					// !!!createNavigatorImage();
-					alsoDrawHilitedOnce=true;
+					alsoDrawHilitedOnce = true;
+					blockNavigatorRedrawOnce = true;	/// !!! performance
 					repaint();
 					draggedX=px; draggedY=py;
 				}
@@ -1038,7 +1045,7 @@ public void mouseMoved(MouseEvent e)
 	{
 		if ((cx>0) && (cy>0) && (cx<width) && (cy<height))
 		{
-		VisibleObject spotted = viewGroup.hiliteComponentsCheck(cx+view.getRx(), cy+view.getRy());
+			VisibleObject spotted = viewGroup.hiliteComponentsCheck(cx+view.getRx(), cy+view.getRy());
 			if (ViewState.getInstance().setAsHilited(spotted))
 			{
 			drawOnlyHilitedOnce=true;
@@ -1158,7 +1165,7 @@ public void mouseReleased(MouseEvent e) {
 				
 		case OBJECT_MOVE :
 //System.out.println("Released: OBJECT_MOVE");
-			//createNavigatorImage();
+			createNavigatorImage();
 
 			int dx = px-draggedX;
 			int dy = py-draggedY;
@@ -1414,8 +1421,9 @@ public boolean open(File file, boolean importDB) throws IOException {
 		// !!!
 		VisualDCT.getInstance().updateLoadLabel();	
 		//updateWorkspaceGroup();
-		
-		//createNavigatorImage();
+
+		blockNavigatorRedrawOnce = false;
+		createNavigatorImage();
 		forceRedraw = true;
 		repaint();
 		restoreCursor();
@@ -1663,8 +1671,51 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 					}
 
 				}
-
 			}
+
+			// lines 
+			DBLine dbLine;
+			e = dbData.getLines().elements();
+			while (e.hasMoreElements())
+			{
+				dbLine = (DBLine)e.nextElement();
+				Line line = new Line(dbLine.getName(), null, dbLine.getX(), dbLine.getY(), dbLine.getX2(), dbLine.getY2());
+				line.setDashed(dbLine.isDashed());
+				line.setStartArrow(dbLine.isStartArrow());
+				line.setEndArrow(dbLine.isEndArrow());
+				line.setColor(dbLine.getColor());
+				rootGroup.addSubObject(line.getName(), line, true);
+			}
+
+			// boxes 
+			DBBox dbBox;
+			e = dbData.getBoxes().elements();
+			while (e.hasMoreElements())
+			{
+				dbBox = (DBBox)e.nextElement();
+				Box box = new Box(dbBox.getName(), null, dbBox.getX(), dbBox.getY(), dbBox.getX2(), dbBox.getY2());
+				box.setIsDashed(dbBox.isDashed());
+				box.setColor(dbBox.getColor());
+				rootGroup.addSubObject(box.getName(), box, true);
+			}
+
+			// textboxes 
+			DBTextBox dbTextBox;
+			e = dbData.getTextboxes().elements();
+			while (e.hasMoreElements())
+			{
+				dbTextBox = (DBTextBox)e.nextElement();
+				TextBox textbox = new TextBox(dbTextBox.getName(), null, dbTextBox.getX(), dbTextBox.getY(), dbTextBox.getX2(), dbTextBox.getY2());
+				textbox.setBorder(dbTextBox.getBorder());
+				
+				Font font = FontMetricsBuffer.getInstance().getFont(dbTextBox.getFontName(), dbTextBox.getFontSize(), dbTextBox.getFontStyle());
+				textbox.setFont(font);
+				
+				textbox.setDescription(dbTextBox.getDescription());
+				textbox.setColor(dbTextBox.getColor());
+				rootGroup.addSubObject(textbox.getName(), textbox, true);
+			}
+
 		}
 
 	} catch (Exception e) {
@@ -1910,9 +1961,12 @@ public void recalculateNavigatorPosition() {
  */
 private void redraw(Graphics g) {
 
+	// better solution?
+	FontMetricsBuffer.createInstance(g);
+	
 	if (Settings.getInstance().getNavigator())
 		createNavigatorImage();
-	
+
 	ViewState view = ViewState.getInstance();
 		
 	if ((canvasImage==null) || 
@@ -2008,7 +2062,8 @@ private void redraw(Graphics g) {
  */
 public void repaint() {
 	// set clip to x0, y0, width, height !!!?
-	CommandManager.getInstance().execute("RepaintWorkspace");
+	forceRedraw = true;	
+	getWorkspacePanel().repaint();
 }
 /**
  * Insert the method's description here.
@@ -2036,9 +2091,6 @@ public void resize(int x0, int y0, int width, int height) {
 	navigator.x = width - navigator.width + x0;
 	navigator.y = y0;
 
-	/*
-	createNavigatorImage();
-	*/
 	recalculateNavigatorPosition();
 }
 /**
@@ -2066,7 +2118,10 @@ private void selectArea(int x1, int y1, int x2, int y2) {
 	ViewState view = ViewState.getInstance();
 	if (viewGroup.selectComponentsCheck(x1+view.getRx(), y1+view.getRy(), 
 										x2+view.getRx(), y2+view.getRy()))
+	{
+		blockNavigatorRedrawOnce = true;
 		repaint();
+	}
 }
 /**
  * Insert the method's description here.
@@ -2119,10 +2174,9 @@ public void setScale(double scale) {
 
 	view.setScale(scale);
 
+	blockNavigatorRedrawOnce = true;
 	recalculateNavigatorPosition();
 	repaint();
-
-
 }
 
 /**
@@ -2214,6 +2268,7 @@ public void zoomArea(int x1, int y1, int x2, int y2) {
 
 	updateWorkspaceScale();
 	
+	blockNavigatorRedrawOnce = true;
 	recalculateNavigatorPosition();
 	repaint();
 }
@@ -2370,5 +2425,14 @@ public Stack getTemplateStack()
 {
 	return templateStack;
 }
+
+	/**
+	 * Sets the blockNavigatorRedrawOnce.
+	 * @param blockNavigatorRedrawOnce The blockNavigatorRedrawOnce to set
+	 */
+	public void setBlockNavigatorRedrawOnce(boolean blockNavigatorRedrawOnce)
+	{
+		this.blockNavigatorRedrawOnce = blockNavigatorRedrawOnce;
+	}
 
 }

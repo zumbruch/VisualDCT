@@ -86,7 +86,6 @@ public void componentShown(ComponentEvent e) {
 protected void initialize() {
 	addComponentListener(this);
 	MouseEventManager.getInstance().registerSubscreiber("WorkspacePanel", this);
-	CommandManager.getInstance().addCommand("RepaintWorkspace", new RepaintCommand(this));
 	CommandManager.getInstance().addCommand("NullCommand", new NullCommand(this));
 }
 

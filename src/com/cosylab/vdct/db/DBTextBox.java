@@ -40,6 +40,7 @@ public class DBTextBox {
 	protected boolean border;
 	protected String fontName;
 	protected int fontSize;
+	protected int fontStyle;
 	protected Color color;
 	protected String description;
 	
@@ -47,8 +48,8 @@ public class DBTextBox {
  * Insert the method's description here.
  * Creation date: (23.4.2001 21:12:09)
  */
-public DBTextBox(String name, int x, int y, int x2, int y2, boolean border, String fontName, int fontSize,
-				  Color color, String description)
+public DBTextBox(String name, int x, int y, int x2, int y2, boolean border, String fontName, int fontSize, 
+				  int fontStyle, Color color, String description)
 {
 	this.name = name;
 	this.x=x;
@@ -58,6 +59,7 @@ public DBTextBox(String name, int x, int y, int x2, int y2, boolean border, Stri
 	this.border=border;
 	this.fontName=fontName;
 	this.fontSize=fontSize;
+	this.fontStyle=fontStyle;
 	this.color=color;
 	this.description=description;
 }
@@ -250,6 +252,24 @@ public DBTextBox(String name, int x, int y, int x2, int y2, boolean border, Stri
 	public void setFontSize(int fontSize)
 	{
 		this.fontSize = fontSize;
+	}
+
+	/**
+	 * Returns the fontStyle.
+	 * @return int
+	 */
+	public int getFontStyle()
+	{
+		return fontStyle;
+	}
+
+	/**
+	 * Sets the fontStyle.
+	 * @param fontStyle The fontStyle to set
+	 */
+	public void setFontStyle(int fontStyle)
+	{
+		this.fontStyle = fontStyle;
 	}
 
 }

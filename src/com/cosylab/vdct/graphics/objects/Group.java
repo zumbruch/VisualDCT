@@ -935,7 +935,10 @@ public void unconditionalValidateSubObjects(boolean flat) {
 	while (e.hasMoreElements()) {
 		obj = e.nextElement();
 		if (flat && obj instanceof Group)
+		{
+			((VisibleObject)obj).unconditionalValidation();
 			((Group)obj).unconditionalValidateSubObjects(true);
+		}
 		else
 			((VisibleObject)obj).unconditionalValidation();
 	}
@@ -1354,8 +1357,9 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 		 			 comma + box.getStartVertex().getX() + comma + box.getStartVertex().getY() +
 		 			 comma + box.getEndVertex().getX() + comma + box.getEndVertex().getY() + 
 				 	 comma + StringUtils.boolean2str(box.isBorder()) +
-					 comma + quote + box.getFont().getFontName() + quote +	
+					 comma + quote + box.getFont().getFamily() + quote +	
 					 comma + box.getFont().getSize() +	
+					 comma + box.getFont().getStyle() +	
 				 	 comma + StringUtils.color2string(box.getColor()) +
 					 comma + quote + box.getDescription() + quote +			//!! new lines, quotes
 					 ending);

@@ -121,6 +121,7 @@ public Line(String parName, Group parentGroup, int posX, int posY, int posX2, in
 	
 	revalidatePosition();
 
+	// for move rectangle
 	setWidth(Constants.CONNECTOR_WIDTH);
 	setHeight(Constants.CONNECTOR_HEIGHT);
 
@@ -454,21 +455,25 @@ public boolean moveToGroup(String group)
 	else
 		newName = group + Constants.GROUP_SEPARATOR + Group.substractObjectName(getName());
 
-    // object with new name already exists, add suffix // !!!
+	// object with new name already exists, add suffix // !!!
 	Object obj;
-	while((obj = Group.getRoot().findObject(newName, true)) != null)
+	boolean renameNeeded = false;
+	while ((obj=Group.getRoot().findObject(newName, true))!=null)
 	{
-		if(obj == this)	// it's me :) already moved, fix data
+		if (obj==this)	// it's me :) already moved, fix data
 		{
 			name = newName;
 			return true;
 		}
 		else
 		{
+			renameNeeded = true;
 			newName = StringUtils.incrementName(newName, Constants.MOVE_SUFFIX);
-			return rename(newName);
 		}
 	}
+
+	if (renameNeeded)
+		return rename(newName);
 	
 	getParent().removeObject(Group.substractObjectName(getName()));
 	setParent(null);
@@ -501,6 +506,9 @@ public boolean rename(String newName)
 
 public void revalidatePosition()
 {
+	startVertex.revalidatePosition();
+	endVertex.revalidatePosition();
+
 	setX((((VisibleObject)startVertex).getX() + ((VisibleObject)endVertex).getX()) / 2);
 	setY((((VisibleObject)startVertex).getY() + ((VisibleObject)endVertex).getY()) / 2);
 
@@ -527,6 +535,9 @@ public void setDashed(boolean parDashed)
 
 protected void validate()
 {
+	startVertex.validate();
+	endVertex.validate();
+
 	revalidatePosition();
 	
 	double rscale = getRscale();

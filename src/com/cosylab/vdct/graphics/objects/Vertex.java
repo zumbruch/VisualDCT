@@ -168,6 +168,7 @@ public void revalidatePosition()
 
 	setRx((int)(getX() * rscale));
 	setRy((int)(getY() * rscale));
+	
 }
 
 public void setX(int parX)

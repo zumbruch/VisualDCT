@@ -79,7 +79,7 @@ public class DBResolver {
 
 	// used format #! Line(name, xpos, ypos, xpos2, ypos2, dashed, startArrow, endArrow, color)
 	// used format #! Box(name, xpos, ypos, xpos2, ypos2, dashed, color)
-	// used format #! TextBox(name, xpos, ypos, xpos2, ypos2, border, fontName, fontSize, color, "description")
+	// used format #! TextBox(name, xpos, ypos, xpos2, ypos2, border, fontFamilyName, fontSize, fontStyle, color, "description")
 	public static final String VDCTLINE = "Line";
 	public static final String VDCTBOX = "Box";
 	public static final String VDCTTEXTBOX = "TextBox";
@@ -209,7 +209,7 @@ public static String processComment(DBData rootData, StreamTokenizer tokenizer, 
 
 	 DBRecordData rd;
 	 DBFieldData fd;
- 	 String str, str2, desc; int t, tx, tx2, ty, ty2, t2;
+ 	 String str, str2, desc; int t, tx, tx2, ty, ty2, t2, t3;
  	 boolean r1, r2;
 
  	 while ((tokenizer.nextToken() != tokenizer.TT_EOL) &&
@@ -727,9 +727,14 @@ public static String processComment(DBData rootData, StreamTokenizer tokenizer, 
 						(tokenizer.ttype == DBConstants.quoteChar)) str2=tokenizer.sval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
-					// read fontSize pos
+					// read fontSize
 					tokenizer.nextToken();
 					if (tokenizer.ttype == tokenizer.TT_NUMBER) t2=(int)tokenizer.nval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					// read fontStyle
+					tokenizer.nextToken();
+					if (tokenizer.ttype == tokenizer.TT_NUMBER) t3=(int)tokenizer.nval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 					// read color
@@ -743,7 +748,7 @@ public static String processComment(DBData rootData, StreamTokenizer tokenizer, 
 						(tokenizer.ttype == DBConstants.quoteChar)) desc=tokenizer.sval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
-					data.addTextBox(new DBTextBox(str, tx, ty, tx2, ty2, border, str2, t2, StringUtils.int2color(t), desc));
+					data.addTextBox(new DBTextBox(str, tx, ty, tx2, ty2, border, str2, t2, t3, StringUtils.int2color(t), desc));
 				}
 				else if (tokenizer.sval.equalsIgnoreCase(VDCTSKIP)) {
 

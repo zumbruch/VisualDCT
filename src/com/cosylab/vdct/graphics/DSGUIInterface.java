@@ -95,6 +95,7 @@ public void moveOrigin(int direction)
 	
 	if (ViewState.getInstance().moveOrigin(dx, dy))
 	{
+		drawingSurface.setBlockNavigatorRedrawOnce(true);
 		drawingSurface.recalculateNavigatorPosition();
 		drawingSurface.repaint();
 	}

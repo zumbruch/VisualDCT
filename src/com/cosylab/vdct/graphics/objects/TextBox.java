@@ -16,7 +16,7 @@ package com.cosylab.vdct.graphics.objects;
  * of its contributors may be used to endorse or promote products derived 
  * from this software without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS draw"AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
  * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE 
@@ -89,8 +89,9 @@ public void actionPerformed(ActionEvent event)
 		{
 			setFont(demoFont.getFont());
 		}	
-		
+
 		CommandManager.getInstance().execute("RepaintWorkspace");
+		
 	}
 	else if(action.equals(colorString))
 	{
@@ -140,11 +141,14 @@ protected boolean htmlMode = false;
 protected Hashtable map;
 protected AttributedString attText = null;
 protected AttributedCharacterIterator paragraph = null;
-int paragraphStart = 0;
-int paragraphEnd = 0;
-LineBreakMeasurer lineMeasurer = null;
-int[] breaks = null;
-FontRenderContext frc = null;
+protected int paragraphStart = 0;
+protected int paragraphEnd = 0;
+protected LineBreakMeasurer lineMeasurer = null;
+protected int[] breaks = null;
+protected FontRenderContext frc = null;
+
+protected double fontScale = 0.0;
+protected Font rfont = null;
 
 
 
@@ -199,6 +203,8 @@ public TextBox(String parName, Group parentGroup, int posX, int posY, int posX2,
 	
 	border = currentBorder;
 
+	revalidatePosition();
+
 	if(parName == null)
 	{
 		hashId = getAvailableHashId();
@@ -210,8 +216,6 @@ public TextBox(String parName, Group parentGroup, int posX, int posY, int posX2,
 	}
 	else
 		name = parName;
-
-	revalidatePosition();
 
 	label = new javax.swing.JLabel() {
 		    public void paint(Graphics g) {
@@ -229,17 +233,16 @@ public TextBox(String parName, Group parentGroup, int posX, int posY, int posX2,
 	label.setVerticalAlignment(JLabel.TOP);
 	setDescription(nullString);
 	
-	setFont(label.getFont());
-	
 	setDescription(nullString);
+	setFont(label.getFont());
 
 	// initialize plain text helpers
 	map = new Hashtable();
-        attText = null;
+	attText = null;
 	paragraph = null;;
 	paragraphStart = 0;
 	paragraphEnd = 0;
-	frc=new FontRenderContext(null, false, false);
+	frc = new FontRenderContext(null, false, false);
 
 
 }
@@ -282,7 +285,6 @@ protected void drawMultiLineText(Graphics g, float drawPosX, float drawPosY, flo
 		}
 
     }
-		System.out.println();
 
  }
 
@@ -295,12 +297,7 @@ public void setColor(java.awt.Color color)
 public void setFont(Font parFont)
 {
 	super.setFont(parFont);
-	
-	label.setFont(parFont);
-	
-	// update Attributed text
-	if (!htmlMode)
-		setDescription(getDescription());
+	updateTextFont(true);
 }
 
 public void accept(Visitor visitor)
@@ -373,7 +370,10 @@ protected void draw(Graphics g, boolean hilited)
 			g.setColor(Constants.HILITE_COLOR);
 			g.drawRect(posX - 2, posY - 2, rwidth + 4, rheight + 4);
 		}
-
+		
+		int size = (int)(getFont().getSize()*getRscale());
+		Font f = FontMetricsBuffer.getInstance().getFont(getFont().getFamily(), size, getFont().getStyle());
+		
 		if (htmlMode)
 		{
 			label.setBounds(posX + 2, posY + 2, rwidth - 4, rheight - 4);
@@ -381,17 +381,18 @@ protected void draw(Graphics g, boolean hilited)
 		}
 		else
 		{
-				Shape clip = g.getClip();
-				g.setClip(posX, posY, rwidth, rheight);
-				g.setColor(getColor());
-				drawMultiLineText(g, posX+2, posY+2, rwidth-4);	
-				g.setClip(clip);
+			Shape clip = g.getClip();
+			g.setClip(posX, posY, rwidth, rheight);
+			g.setColor(getColor());
+			drawMultiLineText(g, posX+2, posY+2, rwidth-4);	
+			g.setClip(clip);
 		}
 	
 		if(border || hilited)
 			drawDashedBorder(g, hilited, view, posX, posY, rwidth, rheight);
 			
 	}
+	
 }
 
 public void drawDashedBorder(Graphics g, boolean hilited)
@@ -563,18 +564,23 @@ public boolean moveToGroup(String group)
 
 	// object with new name already exists, add suffix // !!!
 	Object obj;
-	while((obj = Group.getRoot().findObject(newName, true)) != null)
+	boolean renameNeeded = false;
+	while ((obj=Group.getRoot().findObject(newName, true))!=null)
 	{
-		if(obj == this)	// it's me :) already moved, fix data
+		if (obj==this)	// it's me :) already moved, fix data
 		{
 			name = newName;
 			return true;
 		}
 		else
+		{
+			renameNeeded = true;
 			newName = StringUtils.incrementName(newName, Constants.MOVE_SUFFIX);
-			
-		return rename(newName);
+		}
 	}
+
+	if (renameNeeded)
+		return rename(newName);
 	
 	getParent().removeObject(Group.substractObjectName(getName()));
 	setParent(null);
@@ -594,12 +600,11 @@ public boolean rename(String newName)
 	if(!oldObjName.equals(newObjName))
 	{
 		getParent().removeObject(oldObjName);
-		String fullName = StringUtils.replaceEnding(getName(), oldObjName, newObjName);
-		name = fullName;
+		name = StringUtils.replaceEnding(getName(), oldObjName, newObjName);
 		getParent().addSubObject(newObjName, this);
 	}
 	
-// move if needed
+   // move if needed
 	moveToGroup(Group.substractParentName(newName));
 
 	return true;
@@ -607,6 +612,9 @@ public boolean rename(String newName)
 	
 public void revalidatePosition()
 {
+	startVertex.revalidatePosition();
+	endVertex.revalidatePosition();
+
 	int posX = startVertex.getX();
 	int posY = startVertex.getY();
 	
@@ -619,6 +627,8 @@ public void revalidatePosition()
 	setHeight(Math.abs(posY2 - posY));
 
 	double rscale = getRscale();
+	setRwidth((int)(getWidth() * rscale));
+	setRheight((int)(getHeight() * rscale));
 
 	setRx((int)(getX() * rscale));
 	setRy((int)(getY() * rscale));
@@ -631,12 +641,17 @@ public void setBorder(boolean parBorder)
 
 protected void validate()
 {
+	startVertex.validate();
+	endVertex.validate();
+
 	revalidatePosition();
 	
 	double rscale = getRscale();
 
 	setRwidth((int)(getWidth() * rscale));
 	setRheight((int)(getHeight() * rscale));
+
+	updateTextFont(false);
 }
 	
 /**
@@ -653,50 +668,76 @@ public String getDescription()
 public void setDescription(String description)
 {
 	this.description = description;
-		if (description.startsWith(htmlString))
+	updateText();
+}
+
+/**
+ */
+private void updateTextFont(boolean force)
+{
+	if ((force || getRscale()!=fontScale) && getFont()!=null)
+	{
+		fontScale = getRscale();
+		int size = (int)(getFont().getSize()*fontScale);
+		if (rfont!=null && size==rfont.getSize())
+			return;
+		rfont = FontMetricsBuffer.getInstance().getFont(getFont().getFamily(), size, getFont().getStyle());
+		updateText();
+	}
+}
+
+/**
+ */
+private void updateText()
+{
+	
+	if (description.startsWith(htmlString))
+	{
+		if (rfont!=null && rfont!=label.getFont())
+			label.setFont(rfont);
+
+		htmlMode = true;
+		label.setText(description);
+	}
+	else
+	{
+		htmlMode = false;
+	
+	
+		if (description.length()>1)
 		{
-			htmlMode = true;
-			label.setText(description);
+		    // let attText be an AttributedCharacterIterator containing at least one character, otherwise null
+		    if (rfont!=null) map.put(TextAttribute.FONT, rfont);
+
+	    	attText = new AttributedString(description, map);
+	
+			paragraph = attText.getIterator();
+			paragraphStart = paragraph.getBeginIndex();
+		    paragraphEnd = paragraph.getEndIndex();
+	
+			int i = 1;
+		    for (char c = paragraph.first(); c != paragraph.DONE; c = paragraph.next())
+		         if (c == '\n')
+		         	i++;
+		    breaks = new int[i];
+	
+			i = 0;
+		    for (char c = paragraph.first(); c != paragraph.DONE; c = paragraph.next())
+		         if (c == '\n')
+		         	breaks[i++]=paragraph.getIndex();
+			breaks[i] = paragraphEnd;
+			
+			lineMeasurer = new LineBreakMeasurer(paragraph, frc);
 		}
 		else
 		{
-			htmlMode = false;
-
-
-			if (description.length()>1)
-			{
-		     	// let attText be an AttributedCharacterIterator containing at least one character, otherwise null
-		        if (getFont()!=null) map.put(TextAttribute.FONT, getFont());
-		
-		    	attText = new AttributedString(description, map);
-		
-				paragraph = attText.getIterator();
-				paragraphStart = paragraph.getBeginIndex();
-			    paragraphEnd = paragraph.getEndIndex();
-
-				int i = 1;
-			    for (char c = paragraph.first(); c != paragraph.DONE; c = paragraph.next())
-			         if (c == '\n')
-			         	i++;
-			    breaks = new int[i];
-
-				i = 0;
-			    for (char c = paragraph.first(); c != paragraph.DONE; c = paragraph.next())
-			         if (c == '\n')
-			         	breaks[i++]=paragraph.getIndex();
-				breaks[i] = paragraphEnd;
-				
-	 			lineMeasurer = new LineBreakMeasurer(paragraph, frc);
-			}
-			else
-			{
-				lineMeasurer = null;
-				paragraph = null;
-				attText = null;
-				breaks = null;
-			}
+			lineMeasurer = null;
+			paragraph = null;
+			attText = null;
+			breaks = null;
 		}
 	}
+}
 
 /**
  * Returned value inicates change

@@ -1018,6 +1018,7 @@ public boolean moveToGroup(java.lang.String group) {
 
 	// object with new name already exists, add suffix // !!!
 	Object obj;
+	boolean renameNeeded = false;
 	while ((obj=Group.getRoot().findObject(newName, true))!=null)
 	{
 		if (obj==this)	// it's me :) already moved, fix data
@@ -1027,11 +1028,14 @@ public boolean moveToGroup(java.lang.String group) {
 			return true;
 		}
 		else
-			//return false;
-			//newName += Constants.MOVE_SUFFIX;
+		{
+			renameNeeded = true;
 			newName = StringUtils.incrementName(newName, Constants.MOVE_SUFFIX);
-			return rename(newName);
+		}
 	}
+
+	if (renameNeeded)
+		return rename(newName);
 	
 	getParent().removeObject(Group.substractObjectName(getName()));
 	setParent(null);
@@ -1079,6 +1083,8 @@ public void removeLink(Linkable link) {
  * @param newName java.lang.String
  */
 public boolean rename(java.lang.String newName) {
+	
+	// name has to be valid
 	
 	String newObjName = Group.substractObjectName(newName);
 	String oldObjName = Group.substractObjectName(getName());
