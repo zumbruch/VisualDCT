@@ -348,7 +348,8 @@ private void setProperties(VDBFieldData fd) {
 		}
 	}
 
-	if (Group.substractParentName(fd.getRecord().getName()).equals(Group.substractParentName(getRecord())))
+//	if (Group.substractParentName(fd.getRecord().getName()).equals(Group.substractParentName(getRecord())))
+	if (Group.substractParentName(fd.getFullName()).equals(Group.substractParentName(getRecord())))
 		setIsInterGroupLink(false);
 	else
 		setIsInterGroupLink(true);

@@ -113,7 +113,7 @@ protected EPICSLinkOut(ContainerObject parent, VDBFieldData fieldData) {
  */
 public Connector addConnector() {
 	String id = generateConnectorID(this);
-	Connector connector = new Connector(id, (Record)getParent(), this, getInput());
+	Connector connector = new Connector(id, (LinkManagerObject)getParent(), this, getInput());
 	getParent().addSubObject(id, connector);
 	return connector;
 }
@@ -181,8 +181,11 @@ public void fixLinkProperties() {
  * @param outlink com.cosylab.vdct.graphics.objects.EPICSLinkOut
  */
 public static String generateConnectorID(EPICSLinkOut outlink) {
-	String rootName = Group.substractObjectName(outlink.getFieldData().getRecord().getName())+
-					  LINK_SEPARATOR+outlink.getFieldData().getName();
+	//String rootName = Group.substractObjectName(outlink.getFieldData().getRecord().getName())+
+	//				  LINK_SEPARATOR+outlink.getFieldData().getName();
+	String rootName = Group.substractObjectName(outlink.getFieldData().getFullName());
+	rootName = rootName.replace(Constants.FIELD_SEPARATOR, LINK_SEPARATOR);
+	
 	if (!outlink.getParent().containsObject(rootName))
 		return rootName;
 	else {
@@ -382,14 +385,10 @@ public static InLink getTarget(LinkProperties link) {
 	// !!! check for getType()==LinkProperties.NOT_VALID
 	if ((recName==null) || recName.equals(nullString)) return null;
 
-	System.out.println("searching: "+link.getTarget());
-
 	InLink templateLink = (InLink)DataProvider.getInstance().getLookupTable().get(link.getTarget());
 	if (templateLink!=null)
-{
-	System.out.println("found: "+link.getTarget());
 		return templateLink;
-}
+
 	Record record = (Record)Group.getRoot().findObject(recName, true);
 	if (record==null) return null;
 	else if (link.getType()==link.FWDLINK_FIELD) {

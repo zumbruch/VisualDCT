@@ -101,8 +101,10 @@ public class DBResolver {
 	// used format:
  	// #! TemplateInstance("templateid", "templateClassID", x, y, color, "desc")
  	// #! TemplateProperty("templateid", "name", "value")
+ 	// #! TemplateFieldValue("templateid", "alias", "value")
 	private static String TEMPLATE_INSTANCE = "TemplateInstance";
-	private static String TEMPLATE_PROPERTY= "TemplateProperty";
+	private static String TEMPLATE_PROPERTY = "TemplateProperty";
+	private static String TEMPLATE_VALUE ="TemplateFieldValue";
 
 	
 	// template
@@ -473,6 +475,30 @@ public static String processComment(DBData rootData, StreamTokenizer tokenizer, 
 					DBTemplateInstance ti = (DBTemplateInstance)data.getTemplateInstances().get(str);
 					if (ti!=null)
 						ti.getProperties().put(str2, desc);
+					
+				}
+				else if (tokenizer.sval.equalsIgnoreCase(TEMPLATE_VALUE)) {
+					// read template id
+					tokenizer.nextToken();
+					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+						(tokenizer.ttype == DBConstants.quoteChar)) str=tokenizer.sval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+					
+					// read field alias
+					tokenizer.nextToken();
+					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+						(tokenizer.ttype == DBConstants.quoteChar)) str2=tokenizer.sval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					// read value
+					tokenizer.nextToken();
+					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+						(tokenizer.ttype == DBConstants.quoteChar)) desc=tokenizer.sval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					DBTemplateInstance ti = (DBTemplateInstance)data.getTemplateInstances().get(str);
+					if (ti!=null)
+						ti.getValues().put(str2, desc);
 					
 				}
 				else if (templateData!=null && tokenizer.sval.equalsIgnoreCase(TEMPLATE_DESC)) {

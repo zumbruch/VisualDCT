@@ -51,7 +51,6 @@ public TemplateEPICSVarLink(ContainerObject parent, com.cosylab.vdct.vdb.VDBFiel
 	setWidth(Constants.TEMPLATE_WIDTH/2);
 
 	// destroy !!!!
-	System.out.println("adding: "+fieldData.getFullName());
 	DataProvider.getInstance().getLookupTable().put(fieldData.getFullName(), this);
 
 }

@@ -29,6 +29,7 @@ package com.cosylab.vdct.graphics.objects;
  */
 
 import com.cosylab.vdct.Constants;
+import com.cosylab.vdct.DataProvider;
 import com.cosylab.vdct.vdb.VDBTemplateField;
 
 /**
@@ -46,6 +47,9 @@ public class TemplateEPICSInLink extends EPICSInLink {
 public TemplateEPICSInLink(ContainerObject parent, com.cosylab.vdct.vdb.VDBFieldData fieldData) {
 	super(parent, fieldData);
 	setWidth(Constants.TEMPLATE_WIDTH/2);
+
+	// destroy !!!!
+	DataProvider.getInstance().getLookupTable().put(fieldData.getFullName(), this);
 }
 
 /**

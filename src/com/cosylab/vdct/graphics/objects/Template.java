@@ -33,6 +33,7 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 
 import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.graphics.FontMetricsBuffer;
@@ -58,6 +59,8 @@ public class Template
 
 	VDBTemplateInstance templateData = null;
 	String description = null;
+
+	private static ImageIcon icon = null;
 
 	// properties field
 	protected int rfieldLabelX;
@@ -330,7 +333,9 @@ public class Template
 	 */
 	public Icon getIcon()
 	{
-		return null;
+		if (icon==null)
+			icon = new javax.swing.ImageIcon(getClass().getResource("/images/template.gif"));
+		return icon;
 	}
 
 	/**
@@ -600,7 +605,7 @@ private void revalidateFieldsPosition() {
   EPICSLink field; Object obj;
   while (e.hasMoreElements()) {
 	obj = e.nextElement();
-	//if (obj instanceof Field) {
+	if (obj instanceof Field) {
 		field = (EPICSLink)obj;
 		if (field.isRight())
 		{
@@ -612,7 +617,7 @@ private void revalidateFieldsPosition() {
 			field.revalidatePosition(lx, ly);
 			ly+=field.getHeight();
 		}
-	//}
+	}
   }
 
 }
@@ -644,7 +649,7 @@ private void validateFields() {
 	Object obj;
 	while (e.hasMoreElements()) {
 		obj = e.nextElement();
-		//if (obj instanceof Field)
+		if (obj instanceof Field)
 			((VisibleObject)obj).validate();
 	}
 	

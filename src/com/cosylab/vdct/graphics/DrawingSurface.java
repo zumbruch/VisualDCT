@@ -1276,13 +1276,14 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 			}			
 
 			Template templ = new Template(null, templateInstance);
+			group.addSubObject(dbTemplate.getTemplateID(), templ, true);
+
 			//templ.setDescription(dbTemplate.getDescription());
 			templ.setDescription(template.getDescription());
 			templ.setColor(dbTemplate.getColor());
 			templ.move(dbTemplate.getX(), dbTemplate.getY());
 			//templ.forceValidation();
 
-			group.addSubObject(dbTemplate.getTemplateID(), templ, true);
 		}
 
 		// add links, connectors

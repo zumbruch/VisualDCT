@@ -76,7 +76,7 @@ public class Connector extends VisibleObject implements Descriptable, InLink, Mo
  * @param outlink com.cosylab.vdct.graphics.objects.OutLink
  * @param inlink com.cosylab.vdct.graphics.objects.InLink
  */
-public Connector(String id, Record parent, OutLink outlink, InLink inlink) {
+public Connector(String id, LinkManagerObject parent, OutLink outlink, InLink inlink) {
 	super(parent);
 	setID(id);
 
@@ -130,7 +130,7 @@ public Connector addConnector() {
 	EPICSLinkOut start = (EPICSLinkOut)EPICSLinkOut.getStartPoint(this);
 	if (start==null) return null;
 	String id = EPICSLinkOut.generateConnectorID(start);
-	Connector connector = new Connector(id, (Record)getParent(), this, getInput());
+	Connector connector = new Connector(id, (LinkManagerObject)getParent(), this, getInput());
 	getParent().addSubObject(id, connector);
 	return connector;
 }

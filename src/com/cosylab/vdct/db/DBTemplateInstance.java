@@ -39,6 +39,7 @@ public class DBTemplateInstance
 	String templateID;
 	String templateClassID;
 	Hashtable properties = null;
+	Hashtable values = null;
 
 	protected int x = -1;			// used for layout
 	protected int y = -1;
@@ -51,6 +52,7 @@ public class DBTemplateInstance
 	public DBTemplateInstance(String templateID, String templateClassID, int x, int y, java.awt.Color color, String description)
 	{
 		properties = new Hashtable();
+		values = new Hashtable();
 		this.templateID = templateID;
 		this.templateClassID = templateClassID;
 		this.x=x; this.y=y;
@@ -74,24 +76,6 @@ public class DBTemplateInstance
 	public String getTemplateID()
 	{
 		return templateID;
-	}
-
-	/**
-	 * Sets the properties.
-	 * @param properties The properties to set
-	 */
-	public void setProperties(Hashtable properties)
-	{
-		this.properties = properties;
-	}
-
-	/**
-	 * Sets the templateID.
-	 * @param templateID The templateID to set
-	 */
-	public void setTemplateID(String templateID)
-	{
-		this.templateID = templateID;
 	}
 
 	/**
@@ -167,21 +151,21 @@ public class DBTemplateInstance
 	}
 
 	/**
+	 * Returns the values.
+	 * @return Hashtable
+	 */
+	public Hashtable getValues()
+	{
+		return values;
+	}
+
+	/**
 	 * Returns the templateClassID.
 	 * @return String
 	 */
 	public String getTemplateClassID()
 	{
 		return templateClassID;
-	}
-
-	/**
-	 * Sets the templateClassID.
-	 * @param templateClassID The templateClassID to set
-	 */
-	public void setTemplateClassID(String templateClassID)
-	{
-		this.templateClassID = templateClassID;
 	}
 
 }
