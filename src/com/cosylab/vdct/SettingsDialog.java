@@ -300,6 +300,8 @@ public class SettingsDialog extends javax.swing.JDialog {
         jPanel8 = new javax.swing.JPanel();
         jCheckBoxDefaultVisiblity = new javax.swing.JCheckBox();
         jCheckBoxLinksVisibility = new javax.swing.JCheckBox();
+        jPanel11 = new javax.swing.JPanel();
+        jCheckBoxWireCrossingAvoidiance = new javax.swing.JCheckBox();
         jPanelPrint = new javax.swing.JPanel();
         jPanelLegend = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -620,6 +622,21 @@ public class SettingsDialog extends javax.swing.JDialog {
 
         jPanelVisual.add(jPanel8);
 
+        jPanel11.setLayout(new java.awt.GridBagLayout());
+
+        jPanel11.setBorder(new javax.swing.border.TitledBorder("Wires"));
+        jCheckBoxWireCrossingAvoidiance.setSelected(true);
+        jCheckBoxWireCrossingAvoidiance.setText("Crossing avoidiance");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(7, 7, 7, 7);
+        jPanel11.add(jCheckBoxWireCrossingAvoidiance, gridBagConstraints);
+
+        jPanelVisual.add(jPanel11);
+
         jTabbedPanel.addTab("Visual", jPanelVisual);
 
         jPanelPrint.setLayout(new javax.swing.BoxLayout(jPanelPrint, javax.swing.BoxLayout.Y_AXIS));
@@ -921,6 +938,7 @@ public class SettingsDialog extends javax.swing.JDialog {
     private javax.swing.JCheckBox jCheckBoxGlobalMacros;
     private javax.swing.JCheckBox jCheckBoxLinksVisibility;
     private javax.swing.JCheckBox jCheckBoxSilhouetteMoving;
+    private javax.swing.JCheckBox jCheckBoxWireCrossingAvoidiance;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -941,6 +959,7 @@ public class SettingsDialog extends javax.swing.JDialog {
     private javax.swing.JLabel jLabelWarning;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
