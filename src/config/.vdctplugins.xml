@@ -3,6 +3,7 @@
 <!DOCTYPE plugins SYSTEM 'com.cosylab.vdct:plugins'>
 
 <plugins>
+  <plugin class="com.cosylab.vdct.plugins.LinkTypeConfig" autostart="true"/>
   <plugin class="com.cosylab.vdct.plugins.DebugSimulator" autostart="true">
     <param name="max" value="100" />
     <param name="interval" value="1000" />

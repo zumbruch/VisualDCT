@@ -57,7 +57,7 @@ public class DataProvider {
 	private Vector currentDBDs = null;
 
 	// edit masks
-	private Hashtable editMaskTable = null;
+	private Hashtable linkTypeConfigTable = null;
 	
 /**
  * DataProvider constructor comment.
@@ -67,8 +67,8 @@ protected DataProvider() {
 	loadedDBDs = new Vector();
 	currentDBDs = new Vector();
 
-	editMaskTable = new Hashtable();
-	loadDefaultEditMasks();
+	linkTypeConfigTable = new Hashtable();
+	loadDefaultLinkTypeConfig();
 }
 /**
  * Insert the method's description here.
@@ -77,7 +77,11 @@ protected DataProvider() {
  */
 public Pattern getEditPatternLinkType(String linkType)
 {
-	return (Pattern)((Object[])editMaskTable.get(linkType))[0];
+	Object[] data = (Object[])linkTypeConfigTable.get(linkType);
+	if (data!=null)
+		return (Pattern)data[0];
+	else
+		return null;
 }
 /**
  * Insert the method's description here.
@@ -86,7 +90,11 @@ public Pattern getEditPatternLinkType(String linkType)
  */
 public String getEditInitialValueLinkType(String linkType)
 {
-	return (String)((Object[])editMaskTable.get(linkType))[1];
+	Object[] data = (Object[])linkTypeConfigTable.get(linkType);
+	if (data!=null)
+		return (String)data[1];
+	else
+		return null;
 }
 /**
  * Insert the method's description here.
@@ -95,26 +103,38 @@ public String getEditInitialValueLinkType(String linkType)
  */
 public String getEditDescriptionLinkType(String linkType)
 {
-	return (String)((Object[])editMaskTable.get(linkType))[2];
+	Object[] data = (Object[])linkTypeConfigTable.get(linkType);
+	if (data!=null)
+		return (String)data[2];
+	else
+		return null;
 }
 /**
  * Insert the method's description here.
  * Creation date: (8.1.2001 22:03:39)
  */
-private void loadDefaultEditMasks()
+private void loadDefaultLinkTypeConfig()
 {
 	// pattern, default value, description
-	editMaskTable.put("CONSTANT", new Object[] { Pattern.compile(".*"), "", "CONSTANT" });
-	editMaskTable.put("PV_LINK", new Object[] { Pattern.compile(".*"), "", "PV_LINK" } );
-	editMaskTable.put("VME_IO", new Object[] { Pattern.compile("#C\\d+ S\\d+ @.*"), "#C0 S0 @", "VME_IO - #Ccard Ssignal @parm" });
-	editMaskTable.put("CAMAC_IO", new Object[] { Pattern.compile("#B\\d+ C\\d+ N\\d+ A\\d+ F\\d+ @.*"), "CAMAC_IO - #B0 C0 N0 A0 F0 @", "#Bbranch Ccrate Nstation Asubaddress Ffunction @parm" });
-	editMaskTable.put("AB_IO", new Object[] { Pattern.compile("#L\\d+ A\\d+ C\\d+ S\\d+ @.*"), "#L0 A0 C0 S0 @", "AB_IO - #Llink Aadapter Ccard Ssignal @parm" });
-	editMaskTable.put("GPIB_IO", new Object[] { Pattern.compile("#L\\d+ A\\d+ @.*"), "#L0 A0 @", "GPIB_IO - #Llink Aaddr @parm" });
-	editMaskTable.put("BITBUS_IO", new Object[] { Pattern.compile("#L\\d+ N\\d+ P\\d+ S\\d+ @.*"), "BITBUS_IO - @L0 N0 P0 S0 @", "#Llink Nnode Pport Ssignal @parm" });
-	editMaskTable.put("INST_IO", new Object[] { Pattern.compile("@.*"), "@", "INST_IO - @" });
-	editMaskTable.put("BBGPIB_IO", new Object[] { Pattern.compile("#L\\d+ B\\d+ G\\d+ @.*"), "#L0 B0 G0 @", "BBGPIB_IO - #Llink Bbbaddr Ggpibaddr @parm" });
-	editMaskTable.put("RF_IO", new Object[] { Pattern.compile("#R\\d+ M\\d+ D\\d+ E\\d+ @.*"), "#R0 M0 D0 E0 @", "RF_IO - #Rcryo Mmicro Ddataset Eelement" });
-	editMaskTable.put("VXI_IO", new Object[] { Pattern.compile("#V\\d+ (C\\d+)?+  S\\d+ @.*"), "#V0 C0 S0 @", "VXI_IO - #Vframe Cslot Ssignal @parm" });
+	linkTypeConfigTable.put("CONSTANT", new Object[] { Pattern.compile(".*"), "", "CONSTANT" });
+	linkTypeConfigTable.put("PV_LINK", new Object[] { Pattern.compile(".*"), "", "PV_LINK" } );
+	linkTypeConfigTable.put("VME_IO", new Object[] { Pattern.compile("#C\\d+ S\\d+ @.*"), "#C0 S0 @", "VME_IO - #Ccard Ssignal @parm" });
+	linkTypeConfigTable.put("CAMAC_IO", new Object[] { Pattern.compile("#B\\d+ C\\d+ N\\d+ A\\d+ F\\d+ @.*"), "CAMAC_IO - #B0 C0 N0 A0 F0 @", "#Bbranch Ccrate Nstation Asubaddress Ffunction @parm" });
+	linkTypeConfigTable.put("AB_IO", new Object[] { Pattern.compile("#L\\d+ A\\d+ C\\d+ S\\d+ @.*"), "#L0 A0 C0 S0 @", "AB_IO - #Llink Aadapter Ccard Ssignal @parm" });
+	linkTypeConfigTable.put("GPIB_IO", new Object[] { Pattern.compile("#L\\d+ A\\d+ @.*"), "#L0 A0 @", "GPIB_IO - #Llink Aaddr @parm" });
+	linkTypeConfigTable.put("BITBUS_IO", new Object[] { Pattern.compile("#L\\d+ N\\d+ P\\d+ S\\d+ @.*"), "BITBUS_IO - @L0 N0 P0 S0 @", "#Llink Nnode Pport Ssignal @parm" });
+	linkTypeConfigTable.put("INST_IO", new Object[] { Pattern.compile("@.*"), "@", "INST_IO - @" });
+	linkTypeConfigTable.put("BBGPIB_IO", new Object[] { Pattern.compile("#L\\d+ B\\d+ G\\d+ @.*"), "#L0 B0 G0 @", "BBGPIB_IO - #Llink Bbbaddr Ggpibaddr @parm" });
+	linkTypeConfigTable.put("RF_IO", new Object[] { Pattern.compile("#R\\d+ M\\d+ D\\d+ E\\d+ @.*"), "#R0 M0 D0 E0 @", "RF_IO - #Rcryo Mmicro Ddataset Eelement" });
+	linkTypeConfigTable.put("VXI_IO", new Object[] { Pattern.compile("#V\\d+ (C\\d+)?+  S\\d+ @.*"), "#V0 C0 S0 @", "VXI_IO - #Vframe Cslot Ssignal @parm" });
+}
+/**
+ * Insert the method's description here.
+ * Creation date: (8.1.2001 22:03:39)
+ */
+public void addLinkTypeConfig(Hashtable table)
+{
+	linkTypeConfigTable.putAll(table);
 }
 /**
  * Insert the method's description here.

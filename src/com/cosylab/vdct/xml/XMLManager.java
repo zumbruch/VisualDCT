@@ -67,7 +67,6 @@ public static void addDataNodeTo(Document doc, Element parentNode, String newNod
  */
 public static Node findNode(Node node, String name)
 {
-
 	if(node.getNodeName().equals(name))
 		return node;
 
@@ -96,7 +95,8 @@ private static DocumentBuilder getDocumentBuilder(final String dtdSymbol, final 
 {
 
 	DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-	docBuilderFactory.setValidating(true);
+	if (dtdSymbol!=null && dtdUrl!=null)
+		docBuilderFactory.setValidating(true);
 
 	DocumentBuilder docBuilder = null;
 

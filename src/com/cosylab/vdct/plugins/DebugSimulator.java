@@ -36,7 +36,7 @@ import java.util.*;
 /**
  * Insert the type's description here.
  * Creation date: (7.12.2001 16:40:05)
- * @author 
+ * @author Matej Sekoranja
  */
 public class DebugSimulator implements DebugPlugin, Runnable {
 	private Thread thread = null;

@@ -141,6 +141,7 @@ public static PluginManager getInstance() {
 		// !!! find a better place
 		// create plugin managers
 		PluginUIManager.getInstance();
+		com.cosylab.vdct.plugin.config.PluginLinkTypeConfigManager.getInstance();
 		com.cosylab.vdct.plugin.debug.PluginDebugManager.getInstance();
 		com.cosylab.vdct.plugin.export.PluginExportManager.getInstance();
 	}
