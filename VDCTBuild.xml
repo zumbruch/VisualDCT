@@ -1,4 +1,4 @@
-<project name="VisualDCT-Common" default="jar" basedir=".">
+<project name="VisualDCT" default="jar" basedir=".">
 	
 	<taskdef classname="au.com.Langdale.styler.StylerTask" name="styler"/>
 	<taskdef name="webdoc" classname="com.cosylab.vdct.ant.WebGeneratorTask"/>

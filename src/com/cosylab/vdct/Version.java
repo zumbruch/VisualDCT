@@ -36,7 +36,7 @@ package com.cosylab.vdct;
  */
 public interface Version {
 	public final static String VERSION = "2.3";
-	public final static String BUILD = "1241";
+	public final static String BUILD = "1242";
 
 	public final static String JAVA_VERSION_REQUIRED = "1.4.0";
 }
