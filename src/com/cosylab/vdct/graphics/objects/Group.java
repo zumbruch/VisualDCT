@@ -1747,13 +1747,28 @@ public static void save(Group group2save, File file, NamingContext renamer, bool
 		Group.getRoot().getStructure().insertElementAt(new DBTemplateEntry(), pos);
 	}
 
-	group2save.writeObjects(stream, renamer, export);
-
-	if (!export)	
-	{
-		stream.writeBytes("\n#! Further lines contain data used by VisualDCT\n");
-		group2save.writeVDCTData(stream, renamer, export);
+	// before saving, we position records in a standard way as before
+	// notice that field visibility could move records vertically 
+	boolean defaultVisibility = Settings.getInstance().isDefaultVisibility();
+	boolean hideLinks = Settings.getInstance().isHideLinks();
+	try {
+		Settings.getInstance().setDefaultVisibility(true);
+		Settings.getInstance().setHideLinks(false);
+		group2save.updateFields();
+		
+		group2save.writeObjects(stream, renamer, export);	
+		if (!export)	
+		{
+			stream.writeBytes("\n#! Further lines contain data used by VisualDCT\n");
+			group2save.writeVDCTData(stream, renamer, export);
+		}
+	
+	} finally {
+		Settings.getInstance().setDefaultVisibility(defaultVisibility);
+		Settings.getInstance().setHideLinks(hideLinks);
+		group2save.updateFields();
 	}
+	
 		
 	stream.flush();
 	stream.close();

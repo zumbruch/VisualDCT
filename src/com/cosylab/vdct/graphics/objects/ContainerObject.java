@@ -160,4 +160,13 @@ public Object removeObject(String id) {
 	else 
 		return null;
 }
+
+public void updateFields() {
+	Enumeration e = getSubObjectsV().elements();
+	while (e.hasMoreElements()) {
+		Object o = e.nextElement();
+		if (o instanceof ContainerObject)
+			((ContainerObject)o).updateFields();	
+	}
+}
 }

@@ -129,7 +129,9 @@ public Record(ContainerObject parent, VDBRecordData recordData, int x, int y) {
 	Enumeration e = recordData.getFieldsV().elements();
 	while (e.hasMoreElements()) {
 		field = (VDBFieldData)e.nextElement();
-		if (isVisible(field))
+		// we use old visibility criterion, because of records' repositioning
+		// when the fields are hidden the records are moved down
+		if (isOldVisible(field))
 			changedFields.addElement(field);
 	}
 	oldNumOfFields = changedFields.size();
@@ -566,6 +568,15 @@ public boolean isVisible(VDBFieldData field) {
 	if (visibility == VDBFieldData.NEVER_VISIBLE ||
 		(visibility == VDBFieldData.NON_DEFAULT_VISIBLE && (field.hasDefaultValue() || !Settings.getInstance().isDefaultVisibility())) ||
 		(validLink && Settings.getInstance().isHideLinks())) return false;
+		
+	return true;
+}
+
+public boolean isOldVisible(VDBFieldData field) {
+	int visibility = field.getVisibility();
+	
+	if (visibility == VDBFieldData.NEVER_VISIBLE ||
+		(visibility == VDBFieldData.NON_DEFAULT_VISIBLE && field.hasDefaultValue())) return false;
 		
 	return true;
 }
@@ -1457,7 +1468,7 @@ protected void validate() {
   if (oldNumOfFields != changedFields.size()) {
   	int difference = oldNumOfFields - changedFields.size(); 
 	oldNumOfFields = changedFields.size();
-  	move(0,(int)(rfieldRowHeight*difference+0.5));
+  	move(0,(int)Math.round(rfieldRowHeight*difference));
   }
   
   // increase record size for VAL value and timestamp
@@ -1649,12 +1660,21 @@ public Vector getOutlinks() {
 	return outlinks;
 }
 
-public void fieldsChanged() {
+public void updateFields() {
 	Enumeration e = recordData.getFieldsV().elements();
 	while (e.hasMoreElements()) {
-		VDBFieldData fieldData = (VDBFieldData)e.nextElement();
-		fieldChanged(fieldData);
+		VDBFieldData field = (VDBFieldData)e.nextElement();
+		if (isVisible(field)) {
+			if (!changedFields.contains(field)) 
+				changedFields.addElement(field); 
+		}
+		else {
+			if (changedFields.contains(field)) 
+				changedFields.removeElement(field);
+		}
+		
 	}
+	validate();
 }
 
 }

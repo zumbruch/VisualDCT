@@ -234,30 +234,12 @@ public class SettingsDialog extends javax.swing.JDialog {
 		
 		s.setDefaultVisibility(jCheckBoxDefaultVisiblity.isSelected());
 		s.setHideLinks(jCheckBoxLinksVisibility.isSelected());
-		updateFields();
+		Group.getRoot().updateFields();
 		
 		// legend
 		s.setLegendLogo(jTextFieldLogo.getText());
 		s.setLegendVisibility(Integer.parseInt(buttonGroupVisibility.getSelection().getActionCommand()));
 		s.setLegendPosition(Integer.parseInt(buttonGroupLocation.getSelection().getActionCommand()));
-	}
-
-
-	/**
-	 * 
-	 */
-	private void updateFields() {
-		updateFields(Group.getRoot());
-	}
-	
-	private void updateFields(ContainerObject obj) {
-		Enumeration e = obj.getSubObjectsV().elements();
-		while (e.hasMoreElements()) {
-			Object o = e.nextElement();
-			if (o instanceof Record) ((Record)o).fieldsChanged();
-			else if (o instanceof ContainerObject) updateFields((ContainerObject)o);
-			
-		}
 	}
 
 	/** This method is called from within the constructor to

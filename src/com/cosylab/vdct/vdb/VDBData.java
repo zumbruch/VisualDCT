@@ -433,6 +433,7 @@ private static VDBData generateTemplate(DBDData dbd, DBTemplate dbTemplate)
 	{
 		// validate all links
 		Group.getRoot().manageLinks(true);
+		Group.getRoot().updateFields();
 		Group.setRoot(root); 
 	}
 	
