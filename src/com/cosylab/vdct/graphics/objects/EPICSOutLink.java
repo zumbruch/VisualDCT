@@ -147,7 +147,16 @@ protected void draw(Graphics g, boolean hilited) {
 		}
 		
 		//if (inlink.getLayerID().equals(getLayerID())) 
-			g.setColor(getColor());
+
+		//g.setColor(getColor());
+		Color c = getColor();
+		if (c==Constants.BACKGROUND_COLOR)
+			if (c==Color.black)
+				c=Color.white;
+			else
+				c=Color.white;
+		g.setColor(c);
+
 		LinkDrawer.drawLink(g, this, inlink, getQueueCount(), rightSide);
 	} else {
 		// draw cross

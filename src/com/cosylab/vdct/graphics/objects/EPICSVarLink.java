@@ -179,7 +179,15 @@ protected void draw(Graphics g, boolean hilited) {
 		}*/
 
 		// tail
-		g.setColor(getColor());
+		// g.setColor(getColor());
+		Color c = getColor();
+		if (c==Constants.BACKGROUND_COLOR)
+			if (c==Color.black)
+				c=Color.white;
+			else
+				c=Color.white;
+		g.setColor(c);
+
 		if (isRightSide)
 			g.drawLine(rrx+2*r, rry, rrx+rtailLen-r, rry);
 		else 

@@ -366,6 +366,13 @@ protected void draw(Graphics g, boolean hilited) {
 			if (outlinks.firstElement() instanceof VisibleObject)
 				linkColor = ((VisibleObject) outlinks.firstElement()).getColor();
 
+
+			if (linkColor==Constants.BACKGROUND_COLOR)
+				if (linkColor==Color.black)
+					linkColor=Color.white;
+				else
+					linkColor=Color.white;
+
 			// draw link and its tail
 			boolean isRightSide = isRight();
 			int r = (int)(Constants.LINK_RADIOUS * getRscale());

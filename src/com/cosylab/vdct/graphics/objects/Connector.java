@@ -218,9 +218,22 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 
 		// fill or not to fill ?!!
 
+		/*
 		if (!hilited) g.setColor(getColor());
 		else g.setColor((this==view.getHilitedObject()) ? 
 						Constants.HILITE_COLOR : getColor());
+		*/
+		
+		Color c = getColor();
+		if (hilited)
+			c = (this==view.getHilitedObject()) ? Constants.HILITE_COLOR : c;
+		if (c==Constants.BACKGROUND_COLOR)
+			if (c==Color.black)
+				c=Color.white;
+			else
+				c=Color.white;
+		g.setColor(c);
+		
 
 		if (inlink!=null) 
 			g.drawRect(rrx, rry, rwidth, rheight);
@@ -232,7 +245,14 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 	}
 
 	if (!hilited && inlink!=null) {
-		g.setColor(getColor());
+//		g.setColor(getColor());
+		Color c = getColor();
+		if (c==Constants.BACKGROUND_COLOR)
+			if (c==Color.black)
+				c=Color.white;
+			else
+				c=Color.white;
+		g.setColor(c);
 		LinkDrawer.drawLink(g, this, inlink, getQueueCount(), 
 							getOutX()<inlink.getInX());
 	}
