@@ -55,12 +55,12 @@ public class DBResolver {
 	private static String NL = "\n";
 	
 	// visual data
-	private static String VDCTRECORD = "Record";
-	private static String VDCTGROUP = "Group";
-	private static String VDCTFIELD = "Field";
-	private static String VDCTLINK = "Link";
-	private static String VDCTVISIBILITY = "Visibility";
-	private static String VDCTCONNECTOR = "Connector";
+	public static String VDCTRECORD = "Record";
+	public static String VDCTGROUP = "Group";
+	public static String VDCTFIELD = "Field";
+	public static String VDCTLINK = "Link";
+	public static String VDCTVISIBILITY = "Visibility";
+	public static String VDCTCONNECTOR = "Connector";
 
 	// incoded DBDs
  	// used format:
@@ -88,23 +88,23 @@ public class DBResolver {
 	// #! TEMPLATEEND
 	
 	// resets all template data && generates template name
-	private static String TEMPLATE_START = "TEMPLATESTART";
+	public static String TEMPLATE_START = "TEMPLATESTART";
 
-	private static String TEMPLATE_DESC = "TemplateDescription";
-	private static String TEMPLATE_INPUT = "TemplateInput";
-	private static String TEMPLATE_OUTPUT = "TemplateOutput";
+	public static String TEMPLATE_DESC = "TemplateDescription";
+	public static String TEMPLATE_INPUT = "TemplateInput";
+	public static String TEMPLATE_OUTPUT = "TemplateOutput";
 	
 	// automatically auto-triggered at EOF (stores template data && resets all current template data)
-	private static String TEMPLATE_END = "TEMPLATEEND";
+	public static String TEMPLATE_END = "TEMPLATEEND";
 
 	// template 'instatiation'
 	// used format:
  	// #! TemplateInstance("templateid", "templateClassID", x, y, color, "desc")
  	// #! TemplateProperty("templateid", "name", "value")
  	// #! TemplateFieldValue("templateid", "alias", "value")
-	private static String TEMPLATE_INSTANCE = "TemplateInstance";
-	private static String TEMPLATE_PROPERTY = "TemplateProperty";
-	private static String TEMPLATE_VALUE ="TemplateFieldValue";
+	public static String TEMPLATE_INSTANCE = "TemplateInstance";
+	public static String TEMPLATE_PROPERTY = "TemplateProperty";
+	public static String TEMPLATE_VALUE ="TemplateFieldValue";
 
 	
 	// template

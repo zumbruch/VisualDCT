@@ -36,6 +36,7 @@ import com.cosylab.vdct.graphics.*;
 import com.cosylab.vdct.inspector.InspectableProperty;
 
 import com.cosylab.vdct.vdb.*;
+import com.cosylab.vdct.db.DBResolver;
 import com.cosylab.vdct.dbd.DBDConstants;
 import com.cosylab.vdct.util.*;
 
@@ -1115,21 +1116,27 @@ public void writeVDCTData(java.io.DataOutputStream file, java.lang.String path2r
  Object obj;
  Group group;
  Record record;
+ Template template;
  Connector connector;
  EPICSLinkOut link; 
  EPICSLink field; 
  Enumeration e2;
  
+ final String nl = "\n";
+
  final String comma = ",";
  final String quote = "\"";
- final String ending = ")\n";
+ final String ending = ")"+nl;
 
- final String RECORD_START    = "#! Record(";
- final String GROUP_START     = "#! Group(";
- final String FIELD_START     = "#! Field(";
- final String VISIBILITY_START= "#! Visibility(";
- final String LINK_START      = "#! Link(";
- final String CONNECTOR_START = "#! Connector(";
+ final String RECORD_START    = "#! "+DBResolver.VDCTRECORD+"(";
+ final String GROUP_START     = "#! "+DBResolver.VDCTGROUP+"(";
+ final String FIELD_START     = "#! "+DBResolver.VDCTFIELD+"(";
+ final String VISIBILITY_START= "#! "+DBResolver.VDCTVISIBILITY+"(";
+ final String LINK_START      = "#! "+DBResolver.VDCTLINK+"(";
+ final String CONNECTOR_START = "#! "+DBResolver.VDCTCONNECTOR+"(";
+ final String TEMPLATE_START  = "#! "+DBResolver.TEMPLATE_INSTANCE+"(";
+ final String TEMPLATE_PROPERTY_START  = "#! "+DBResolver.TEMPLATE_PROPERTY+"(";
+ final String TEMPLATE_VALUE_START     = "#! "+DBResolver.TEMPLATE_VALUE+"(";
  	
  Enumeration e = getSubObjectsV().elements();
  while (e.hasMoreElements()) 
@@ -1228,6 +1235,69 @@ public void writeVDCTData(java.io.DataOutputStream file, java.lang.String path2r
 					 comma + quote /*+ connector.getDescription() */+ quote +
 					 ending);
 			 	 group.writeVDCTData(file, path2remove);
+	 		}
+
+ 	 	else if (obj instanceof Template)
+ 	 		{
+			 	 template = (Template)obj;
+				 String templateName = StringUtils.removeBegining(template.getName(), path2remove);
+
+			     file.writeBytes(nl);
+			 	 file.writeBytes(TEMPLATE_START+
+ 					 quote + templateName + quote +
+ 					 comma + quote + template.getTemplateData().getTemplate().getId() + quote +
+		 			 comma + template.getX() + comma + template.getY() + 
+				 	 comma + StringUtils.color2string(template.getColor()) +
+					 comma + quote /*+ template.getDescription()*/ + quote +
+					 ending);
+					 
+				 TreeMap properties = template.getTemplateData().getProperties();
+				 Iterator i = properties.keySet().iterator();
+				 while (i.hasNext())
+				 {
+					 String name = i.next().toString();
+					 String value = (String)properties.get(name);
+				 	 file.writeBytes(TEMPLATE_PROPERTY_START+
+	 					 quote + templateName + quote +
+	 					 comma + quote + name + quote +
+						 comma + quote + value + quote +
+						 ending);
+				 }					 
+
+	 			e2 = template.getSubObjectsV().elements();
+	 			while (e2.hasMoreElements())
+	 			{
+						
+			 		obj = e2.nextElement();
+				 	if (obj instanceof EPICSLink)
+			 		{
+			 			field = (EPICSLink)obj;
+
+		 				String name = field.getFieldData().getName();
+				 		String value = field.getFieldData().getValue();
+	
+						VDBFieldData fd = null;
+						fd = (VDBFieldData)template.getTemplateData().getTemplate().getInputs().get(name);
+						if (fd==null) 
+							fd = (VDBFieldData)template.getTemplateData().getTemplate().getOutputs().get(name);
+						if (fd==null)
+						{
+							System.out.println("Internar error: field '"+name+"' not found in template definition of '"+template.getTemplateData().getTemplate().getId()+
+											   "' of template instance '"+templateName+"'. Skipping...");
+							continue;
+						}
+						
+						if (!value.equals(fd.getValue()))
+						 	file.writeBytes(TEMPLATE_PROPERTY_START+
+			 					 quote + templateName + quote +
+			 					 comma + quote + name + quote +
+								 comma + quote + value + quote +
+								 ending);
+		 			 }
+				 }					 
+
+			     file.writeBytes(nl);
+			 	 template.writeVDCTData(file, path2remove);
 	 		}
 
  	 		

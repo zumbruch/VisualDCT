@@ -32,6 +32,8 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -61,7 +63,6 @@ import com.cosylab.vdct.vdb.VDBData;
 import com.cosylab.vdct.vdb.VDBFieldData;
 import com.cosylab.vdct.vdb.VDBTemplateField;
 import com.cosylab.vdct.vdb.VDBTemplateInstance;
-import com.sun.corba.se.internal.core.Constant;
 
 /**
  * Graphical representation of templates.
@@ -69,7 +70,7 @@ import com.sun.corba.se.internal.core.Constant;
  */
 public class Template
 	extends LinkManagerObject
-	implements Descriptable, Movable, Inspectable, Popupable, Flexible, Selectable, Clipboardable, Hub, MonitoredPropertyListener
+	implements Descriptable, Movable, Inspectable, Popupable, Flexible, Selectable, Clipboardable, Hub, MonitoredPropertyListener, SaveInterface
 {
 
 	VDBTemplateInstance templateData = null;
@@ -1098,5 +1099,23 @@ protected void destroyFields() {
 
 
 
+
+/**
+ * @see com.cosylab.vdct.graphics.objects.SaveInterface#writeObjects(DataOutputStream, String)
+ */
+public void writeObjects(DataOutputStream file, String path2remove)
+	throws IOException
+{
+	System.out.print("Template.writeObjects");
+}
+
+/**
+ * @see com.cosylab.vdct.graphics.objects.SaveInterface#writeVDCTData(DataOutputStream, String)
+ */
+public void writeVDCTData(DataOutputStream file, String path2remove)
+	throws IOException
+{
+	System.out.print("Template.writeVDCTData");
+}
 
 }
