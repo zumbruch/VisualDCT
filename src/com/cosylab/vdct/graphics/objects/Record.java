@@ -105,6 +105,8 @@ public class Record
 	public final static int SORT_ORDER = 1;
 	public final static int DBD_ORDER = 2;
 
+	private int oldNumOfFields = 0;
+
 /**
  * Group constructor comment.
  * @param parent com.cosylab.vdct.graphics.objects.ContainerObject
@@ -128,6 +130,7 @@ public Record(ContainerObject parent, VDBRecordData recordData, int x, int y) {
 			(field.getVisibility() == VDBFieldData.NON_DEFAULT_VISIBLE && !field.hasDefaultValue()))
 			changedFields.addElement(field);
 	}
+	oldNumOfFields = changedFields.size();
 
 	forceValidation();
 	
@@ -1319,6 +1322,7 @@ public String toString() {
 	return recordData.toString();
 	// recordData.getName()+" ("+recordData.getType()+")"
 }
+
 /**
  * Insert the method's description here.
  * Creation date: (21.12.2000 20:46:35)
@@ -1380,6 +1384,10 @@ protected void validate() {
  
   rfieldRowHeight = (rheight-2*y0)*0.375;
 
+  // code moves record up, when fields are added and down when deleted 
+  move(0,(int)(rfieldRowHeight*(oldNumOfFields - changedFields.size())+0.5));
+  oldNumOfFields = changedFields.size();
+  
   // increase record size for VAL value and timestamp
   if (PluginDebugManager.isDebugState())
   {
