@@ -198,11 +198,7 @@ public static String getTarget(VDBFieldData fd) {
 	if (value.indexOf(Constants.FIELD_SEPARATOR) > -1) {
 		if (tokenizer.hasMoreTokens()) {
 			String var = tokenizer.nextToken(); 				// read var variable
-			if ((LinkProperties.getType(fd)==LinkProperties.FWDLINK_FIELD) &&		// !!! proc !!!
-				!var.equalsIgnoreCase("PROC"))
-				return nullString;
-			else
-				target+=Constants.FIELD_SEPARATOR+var;
+			target+=Constants.FIELD_SEPARATOR+var;
 		}
 	}
 
@@ -329,11 +325,6 @@ private void setProperties(VDBFieldData fd) {
 	if (value.indexOf(Constants.FIELD_SEPARATOR) > -1) {
 		if (tokenizer.hasMoreTokens()) {
 			setVarName(tokenizer.nextToken()); // read var variable
-			//if ((getType()==FWDLINK_FIELD) &&
-			//	!getVarName().equalsIgnoreCase("PROC")) {		// !!! proc
-				//setType(NOT_VALID); ?!!
-				//return;
-			//}
 		}
 	}
 

@@ -399,7 +399,11 @@ public static InLink getTarget(LinkProperties link) {
 	Record record = (Record)Group.getRoot().findObject(recName, true);
 	if (record==null) return null;
 	else if (link.getType()==link.FWDLINK_FIELD) {
-		if (!link.getVarName().equalsIgnoreCase("PROC"))		// !!! proc
+		//if (!link.getVarName().equalsIgnoreCase("PROC"))		// !!! proc
+		// check if variable exists
+		if (record.getRecordData().getField(link.getVarName())==null)
+			return null;
+		else
 			return record;
 	}
 

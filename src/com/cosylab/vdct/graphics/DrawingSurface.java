@@ -663,11 +663,11 @@ public void mouseClicked(MouseEvent e) {
 				}
 				else if (hilited instanceof EPICSVarLink) {
 					EPICSVarLink varlink = (EPICSVarLink)hilited;
-					if ((tmplink.getType()!=DBDConstants.DBF_FWDLINK) ||		// !!! proc
-						varlink.getFieldData().getName().equalsIgnoreCase("PROC")) {
+					//if ((tmplink.getType()!=DBDConstants.DBF_FWDLINK) ||		// !!! proc
+					//	varlink.getFieldData().getName().equalsIgnoreCase("PROC")) {
 						linkCommand((LinkManagerObject)varlink.getParent(), varlink.getFieldData());
 						return;
-					}
+					//}
 				}
 			}
 			
