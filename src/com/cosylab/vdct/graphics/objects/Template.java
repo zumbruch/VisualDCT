@@ -1312,18 +1312,19 @@ public static Map preparePorts(Group group, Map substitutions)
 
 				target = VDBTemplateInstance.applyProperties(target, newSubstitutions);
 				
-				// if target is a contains a port definition it might be defined in lover levels
+				// if target is a contains a port definition it might be defined in lower levels
 				// try to resolve it
 				int pos = target.indexOf('$');
 				int posStart = 0;  // '(' char
 				int posMiddle = 0; // '.' char
 				int posEnd = 0;	// ')' char
-				if (pos>=0)
+
+				while (pos>=0)
 				{
 					
-					System.out.println("Recursive: "+target);
+					//System.out.println("Recursive: "+target);
 					
-				/*	posStart = target.indexOf('(', pos);
+					posStart = target.indexOf('(', pos);
 					if (posStart>=0)
 					{
 						posMiddle = target.indexOf('.', posStart);
@@ -1334,19 +1335,29 @@ public static Map preparePorts(Group group, Map substitutions)
 							// we have sequence od '(' .. '.' .. ')'
 							if (posEnd>posMiddle)
 							{
+								Map lowerLevelPorts = preparePorts(t.getTemplateData().getTemplate().getGroup(), newSubstitutions);
+								/*
+								System.out.println("Ports at lower level:");
+								Iterator i3 = lowerLevelPorts.keySet().iterator();
+								while (i3.hasNext())
+								{
+									Object key = i3.next();
+									System.out.println("\t"+key+"="+lowerLevelPorts.get(key));	
+								}
+								*/
+								target = VDBTemplateInstance.applyPorts(target, lowerLevelPorts);
+								break;
 							}
 						}
 					}
-					*/
-				fix this
-					Map lowerLevelPorts = preparePorts(t.getTemplateData().getTemplate().getGroup(), newSubstitutions);
-					target = VDBTemplateInstance.applyPorts(target, lowerLevelPorts);
-
+	
+					pos = target.indexOf('$', pos+1);		// no problems if pos == length	
 				}
 				
-				
+				//System.out.println(port.getPortDefinition(t.getTemplateData().getName())+"="+target);	
 				map.put(port.getPortDefinition(t.getTemplateData().getName()), target);			
 			}
+
 		}
 	}
 	
