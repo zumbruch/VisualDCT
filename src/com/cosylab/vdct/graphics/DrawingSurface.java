@@ -2353,7 +2353,7 @@ public int print(java.awt.Graphics graphics, java.awt.print.PageFormat pageForma
 		//resets clipping
 		((Graphics2D)graphics).setTransform(transf);
 		if (Page.getPrintMode()==Page.FIT_SCALE) graphics.translate(-(pageWidth-w)/2, -(pageHeight-h)/2);
-		graphics.setClip(null);
+//		graphics.setClip(null);
 		
 		//prints legend
 		if ((Settings.getInstance().getLegendVisibility()==1 && pageIndex==0) || Settings.getInstance().getLegendVisibility()==2) {
@@ -2374,7 +2374,7 @@ public int print(java.awt.Graphics graphics, java.awt.print.PageFormat pageForma
 	{
 //		resets clipping
 		((Graphics2D)graphics).setTransform(transf);
-		graphics.setClip(null);
+		graphics.setClip(0,0,imageWidth, imageHeight);
 		
 		view.setScale(scale);
 		view.setRx(rx); view.setRy(ry);
@@ -2414,12 +2414,12 @@ private void printLegend(Graphics graphics, int width, int height, int page, int
 	catch (InterruptedException ie)
 	{
 	}
-	int logoWidth = img.getWidth(null), logoHeight = img.getHeight(null);
-	int maxLogo =Math.max(logoWidth,logoHeight);
+	int logoWidth = img.getWidth(null), logoHeight = img.getHeight(null)+8;
+	/*int maxLogo =Math.max(logoWidth,logoHeight);
 	if (maxLogo > 200) {	 
 		logoHeight = logoHeight * 200 / maxLogo; 
 		logoWidth = logoWidth * 200 / maxLogo; 
-	}
+	}*/
 	
 	
 	String label = "";
@@ -2436,7 +2436,6 @@ private void printLegend(Graphics graphics, int width, int height, int page, int
 	FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(font);
 	int labelWidth = fm.stringWidth(label)+8, labelHeight = fm.getHeight();
 	
-	logoHeight+=8;
 	int legendWidth = navigatorWidth + Math.max(logoWidth, labelWidth),
 		legendHeight = Math.max(navigatorHeight, logoHeight+labelHeight);
 	
@@ -2463,7 +2462,6 @@ private void printLegend(Graphics graphics, int width, int height, int page, int
 			labX=width-navigatorWidth-labelWidth-8-1; labY=height-1;
 			logoX=width-navigatorWidth-logoWidth-1;  logoY=height-labelHeight-logoHeight-1;
 	}
-	logoHeight-=8;
 	
 	// paints
 	
@@ -2510,13 +2508,15 @@ private void printLegend(Graphics graphics, int width, int height, int page, int
 	graphics.setColor(Color.gray);
 	graphics.drawRect(0, 0, navigatorWidth-1, navigatorHeight-1);
 	
-	graphics.setClip(null);
+	
 	((Graphics2D)graphics).setTransform(transf);
 	
+	graphics.setClip(logoX, logoY, logoWidth, logoHeight);
 	if (img!=null) {
-		graphics.drawImage(img, logoX, logoY, logoWidth, logoHeight, null);
+		graphics.drawImage(img, logoX, logoY, null);
 	}
 	
+	graphics.setClip(0,0, width, height);
 	graphics.setColor(Constants.FRAME_COLOR);
 	graphics.setFont(font);
 	graphics.drawString(label, labX, labY);
