@@ -30,10 +30,15 @@ package com.cosylab.vdct.graphics.objects;
 
 import java.awt.*;
 import java.util.*;
+
+import com.cosylab.vdct.Console;
 import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.DataProvider;
 import com.cosylab.vdct.graphics.*;
 import com.cosylab.vdct.plugin.debug.PluginDebugManager;
+import com.cosylab.vdct.undo.CreateAction;
+import com.cosylab.vdct.undo.DeleteAction;
+import com.cosylab.vdct.undo.UndoManager;
 import com.cosylab.vdct.util.StringUtils;
 import com.cosylab.vdct.vdb.*;
 import com.cosylab.vdct.dbd.DBDConstants;
@@ -1087,7 +1092,116 @@ public void manageLinks() {
  * Creation date: (4.2.2001 21:58:46)
  * @param newType java.lang.String
  */
-public void morph(java.lang.String newType) {}
+public VisibleObject morph(java.lang.String newType) {
+	//System.out.println("Morphing "+getName()+" from "+getType()+" to "+newType);
+	
+	// copies VDBData when the record is still untouched
+	VDBRecordData recordData = VDBData.morphVDBRecordData(
+				DataProvider.getInstance().getDbdDB(), getRecordData(), newType, getName());
+				
+	if (recordData==null) {
+		Console.getInstance().println("o) Interal error: failed to morph record "+getName()+" ("+getType()+")!");
+		return null;
+	}					   
+	
+	//	here are stored field values that point to us
+	Vector fieldData = new Vector();	
+	Vector values = new Vector();
+	
+	// destroys object and stores field values that point to us
+	//	*****************  destroy object ***********************
+	if (!isDestroyed()) {
+		super.destroy();
+		
+		// ***************** destroy fields ************************
+		{
+			Object[] objs = new Object[subObjectsV.size()];
+		
+			subObjectsV.copyInto(objs);
+			for (int i=0; i < objs.length; i++) {
+				
+				if (objs[i] instanceof Field) {
+					Field field = (Field)objs[i];
+					fieldData.add(field.getFieldData());
+					values.add(field.getFieldData().getValue());
+			
+					Vector startpoints = null;
+					if (objs[i] instanceof EPICSLinkOutIn) 
+						 startpoints = ((EPICSLinkOutIn)objs[i]).getStartPoints();
+					if (objs[i] instanceof EPICSVarLink)
+						startpoints = ((EPICSVarLink)objs[i]).getStartPoints();
+					if (startpoints != null) {
+						for (int j=0; j<startpoints.size(); j++) { 						 
+							Object obj = startpoints.elementAt(j);
+							if (obj instanceof Port) {
+								Port port = (Port)obj;
+								fieldData.add(port.getData());
+								values.add(port.getData().getValue());
+							} else if (obj instanceof Field) {
+								Field ofield = (Field)obj;
+								fieldData.add(ofield.getFieldData());
+								values.add(ofield.getFieldData().getValue());
+							}
+						} 
+					}
+				} // end of copying field values
+							
+				((VisibleObject)objs[i]).destroy();
+			}
+		}
+		// ****************************************** end of destroyFields()
+		
+		
+//		disconnected=true;
+		
+		if (outlinks.size()>0) {
+			Object[] objs = new Object[outlinks.size()];
+			outlinks.copyInto(objs);
+			for(int i=0; i<objs.length; i++) {
+				OutLink outlink = (OutLink)objs[i];
+				OutLink start = EPICSLinkOut.getStartPoint(outlink);
+				
+				String value = null;
+				if (start instanceof Field) {
+					Field field = (Field)start;
+					fieldData.add(field.getFieldData());
+					values.add(field.getFieldData().getValue());
+				}
+				
+				if(start instanceof EPICSLinkOut) {
+					((EPICSLinkOut)start).destroy();					
+				} else if (start!=null) 
+					start.disconnect(this);
+				else 
+					outlink.disconnect(this);
+			}
+			outlinks.clear();
+		}
+		
+		clear();
+				
+		getParent().removeObject(Group.substractObjectName(getName()));
+		UndoManager.getInstance().addAction(new DeleteAction(this));
+	}	// end if !isDestroyed()
+	// ************************** end of destroy()
+	
+	//creates new record
+	Record record = new Record(null, recordData, getX(), getY());
+	Group.getRoot().addSubObject(getName(), record, true);
+	UndoManager.getInstance().addAction(new CreateAction(record));
+	
+	// sets stored field values
+	for (int j=0; j<fieldData.size(); j++) {
+		String value = (String)values.elementAt(j);
+		LinkSource source = (LinkSource)fieldData.elementAt(j);
+		
+		source.setValue(value);
+		if (new LinkProperties(source).getType()==LinkProperties.NOT_VALID)	// verifies the link
+			source.setValue(nullString);
+	}
+
+	return record;
+}
 /**
  * Insert the method's description here.
  * Creation date: (25.12.2000 14:14:35)
@@ -1582,6 +1696,12 @@ public int getLeftX() {
  */
 public int getRightX() {
 	return getX()+getWidth()+(tailSizeOfR+3)*Constants.LINK_RADIOUS;
+}
+/* (non-Javadoc)
+ * @see com.cosylab.vdct.graphics.objects.Morphable#getType()
+ */
+public String getType() {
+	return getRecordData().getType();
 }
 
 }

@@ -600,6 +600,55 @@ public void rename(java.lang.String oldName, java.lang.String newName) {
 		}
 	}
 }
+
+public void morph() {
+	ViewState view = ViewState.getInstance();
+
+	int size = view.getSelectedObjects().size();
+	if (size==0) return;
+
+	Object objs[] = new Object[size];
+	view.getSelectedObjects().copyInto(objs);
+
+	for(int i=0; i<size; i++)
+		if (objs[i] instanceof Morphable)
+		{
+			// call gui
+			ShowMorphingDialog cmd = (ShowMorphingDialog)CommandManager.getInstance().getCommand("ShowMorphingDialog");
+			cmd.setName(((Morphable)objs[i]).getName());
+			cmd.setOldType(((Morphable)objs[i]).getType());
+			cmd.execute();
+		}
+	view.deselectAll();
+	drawingSurface.getViewGroup().manageLinks(true);
+
+	drawingSurface.repaint();
+}
+/**
+ * Insert the method's description here.
+ * Creation date: (3.5.2001 10:05:02)
+ */
+public void morph(java.lang.String name, java.lang.String newType) {
+	ViewState view = ViewState.getInstance();
+	Object oldObject = Group.getRoot().findObject(name, true);
+	if (oldObject instanceof Morphable)
+	{
+		try {
+			UndoManager.getInstance().startMacroAction();
+		
+			Morphable morphable = (Morphable)oldObject;
+			VisibleObject newObject = morphable.morph(newType); 
+			if (newObject != null)
+			{	
+				view.deselectObject((VisibleObject)newObject);
+				drawingSurface.repaint();
+			}
+		} finally {
+			UndoManager.getInstance().stopMacroAction();
+		}
+	}
+}
+
 /**
  * Insert the method's description here.
  * Creation date: (4.2.2001 15:48:27)

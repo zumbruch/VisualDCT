@@ -1,4 +1,4 @@
-package com.cosylab.vdct.graphics.objects;
+package com.cosylab.vdct.events.commands;
 
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
@@ -28,20 +28,61 @@ package com.cosylab.vdct.graphics.objects;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import com.cosylab.vdct.events.Command;
+import com.cosylab.vdct.VisualDCT;
+
 /**
- * Insert the type's description here.
- * Creation date: (4.2.2001 21:57:00)
- * @author Matej Sekoranja
+ * Insert the class' description here.
+ * Creation date: (3.2.2001 19:37:21)
+ * @author ilist
  */
-public interface Morphable {
+ 
+public class ShowMorphingDialog extends Command {
+	private VisualDCT visualDCT;
+	private String name;
+	private String oldType;
 /**
  * Insert the method's description here.
- * Creation date: (4.2.2001 21:57:20)
- * @param newType java.lang.String
+ * Creation date: (29.12.2000 12:37:58)
  */
-VisibleObject morph(String newType);
 
-String getName();
+public ShowMorphingDialog(VisualDCT visualDCT) {
+	this.visualDCT=visualDCT;
+}
+/**
+ * Insert the method's description here.
+ * Creation date: (29.12.2000 12:37:43)
+ */
+public void execute() {
+	visualDCT.showMorphingDialog(name, oldType);
+}
 
-String getType();
+	/**
+	 * @return
+	 */
+	public String getOldType() {
+		return oldType;
+	}
+
+	/**
+	 * @param string
+	 */
+	public void setOldType(String string) {
+		oldType = string;
+	}
+
+	/**
+	 * @return
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * @param string
+	 */
+	public void setName(String string) {
+		name = string;
+	}
+
 }

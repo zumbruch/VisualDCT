@@ -88,6 +88,7 @@ public class VisualDCT extends JFrame {
 	private JSeparator ivjJSeparator9 = null;
 	private JMenuItem ivjLevel_UpMenuItem = null;
 	private JMenuItem ivjMove_RenameMenuItem = null;
+	private JMenuItem ivjMorphMenuItem = null;
 	private JMenuItem ivjNewMenuItem = null;
 	private JButton ivjOpenButton = null;
 	private JMenuItem ivjOpenMenuItem = null;
@@ -132,15 +133,24 @@ public class VisualDCT extends JFrame {
 	private JCheckBoxMenuItem ivjSnapToGridMenuItem = null;
 	private JCheckBoxMenuItem ivjWindowsPanMenuItem = null;
 	private JPanel ivjButtonPanel = null;
+	private JPanel ivjButtonPanel3 = null;
 	private JPanel ivjJDialogContentPane = null;
+	private JPanel ivjJDialogContentPane3 = null;
 	private JLabel ivjNameLabel = null;
+	private JLabel ivjNameLabel3 = null;
+	private JLabel ivjNameTextLabel = null;
 	private JTextField ivjNameTextField = null;
 	private JDialog ivjNewRecordDialog = null;
+	private JDialog ivjMorphingDialog = null;
 	private JButton ivjOKButton = null;
+	private JButton ivjMorphingOKButton = null;
 	private JComboBox ivjTypeComboBox = null;
+	private JComboBox ivjTypeComboBox2 = null;
 	private JLabel ivjTypeLabel = null;
+	private JLabel ivjTypeLabel2 = null;
 	private JLabel ivjWarningLabel = null;
 	private JButton ivjCancelButton = null;
+	private JButton ivjMorphingCancelButton = null;
 	// private
 	private java.io.File openedFile = null;
 	private String addedToTitle = "";
@@ -242,6 +252,8 @@ class IvjEventHandler implements java.awt.event.ActionListener, java.awt.event.I
 				connEtoC19(e);
 			else if (e.getSource() == VisualDCT.this.getMove_RenameMenuItem()) 
 				connEtoC20(e);
+			else if (e.getSource() == VisualDCT.this.getMorphMenuItem()) 
+				connEtoC69(e);				
 			else if (e.getSource() == VisualDCT.this.getGroupMenuItem()) 
 				connEtoC21(e);
 			else if (e.getSource() == VisualDCT.this.getUngroupMenuItem()) 
@@ -282,8 +294,12 @@ class IvjEventHandler implements java.awt.event.ActionListener, java.awt.event.I
 				connEtoC45(e);
 			else if (e.getSource() == VisualDCT.this.getOKButton()) 
 				connEtoC47(e);
+			else if (e.getSource() == VisualDCT.this.getMorphingOKButton()) 
+				connEtoC66(e);				
 			else if (e.getSource() == VisualDCT.this.getCancelButton()) 
 				connEtoM2(e);
+			else if (e.getSource() == VisualDCT.this.getMorphingCancelButton()) 
+				connEtoM4(e);
 			else if (e.getSource() == VisualDCT.this.getNameTextField()) 
 				connEtoC51(e);
 			else if (e.getSource() == VisualDCT.this.getStatusbarMenuItem()) 
@@ -358,6 +374,8 @@ class IvjEventHandler implements java.awt.event.ActionListener, java.awt.event.I
 		public void windowActivated(java.awt.event.WindowEvent e) {
 			if (e.getSource() == VisualDCT.this.getNewRecordDialog()) 
 				connEtoC58(e);
+			if (e.getSource() == VisualDCT.this.getMorphingDialog()) 		
+				connEtoC67(e);				
 			if (e.getSource() == VisualDCT.this.getGroupDialog()) 
 				connEtoC59(e);
 			if (e.getSource() == VisualDCT.this.getRenameDialog()) 
@@ -370,7 +388,9 @@ class IvjEventHandler implements java.awt.event.ActionListener, java.awt.event.I
 		public void windowIconified(java.awt.event.WindowEvent e) {};
 		public void windowOpened(java.awt.event.WindowEvent e) {
 			if (e.getSource() == VisualDCT.this.getNewRecordDialog()) 
-				connEtoC48(e);
+				connEtoC48(e);				
+			if (e.getSource() == VisualDCT.this.getMorphingDialog()) 
+				connEtoC68(e);
 			if (e.getSource() == VisualDCT.this.getGroupDialog()) 
 				connEtoC50(e);
 			if (e.getSource() == VisualDCT.this.getRenameDialog()) 
@@ -654,6 +674,21 @@ private void connEtoC20(java.awt.event.ActionEvent arg1) {
 		handleException(ivjExc);
 	}
 }
+
+private void connEtoC69(java.awt.event.ActionEvent arg1) {
+	try {
+		// user code begin {1}
+		// user code end
+		this.morphMenuItem_ActionPerformed();
+		// user code begin {2}
+		// user code end
+	} catch (java.lang.Throwable ivjExc) {
+		// user code begin {3}
+		// user code end
+		handleException(ivjExc);
+	}
+}
+
 /**
  * connEtoC21:  (GroupMenuItem.action.actionPerformed(java.awt.event.ActionEvent) --> VisualDCT.groupMenuItem_ActionPerformed()V)
  * @param arg1 java.awt.event.ActionEvent
@@ -1172,6 +1207,21 @@ private void connEtoC47(java.awt.event.ActionEvent arg1) {
 		handleException(ivjExc);
 	}
 }
+
+private void connEtoC66(java.awt.event.ActionEvent arg1) {
+	try {
+		// user code begin {1}
+		// user code end
+		this.morphingOKButton_ActionPerformed(arg1);
+		// user code begin {2}
+		// user code end
+	} catch (java.lang.Throwable ivjExc) {
+		// user code begin {3}
+		// user code end
+		handleException(ivjExc);
+	}
+}
+
 /**
  * connEtoC48:  (NewRecordDialog.window.windowOpened(java.awt.event.WindowEvent) --> VisualDCT.newRecordDialog_WindowOpened(Ljava.awt.event.WindowEvent;)V)
  * @param arg1 java.awt.event.WindowEvent
@@ -1182,6 +1232,20 @@ private void connEtoC48(java.awt.event.WindowEvent arg1) {
 		// user code begin {1}
 		// user code end
 		this.newRecordDialog_WindowOpened(arg1);
+		// user code begin {2}
+		// user code end
+	} catch (java.lang.Throwable ivjExc) {
+		// user code begin {3}
+		// user code end
+		handleException(ivjExc);
+	}
+}
+
+private void connEtoC68(java.awt.event.WindowEvent arg1) {
+	try {
+		// user code begin {1}
+		// user code end
+		this.morphingDialog_WindowOpened(arg1);
 		// user code begin {2}
 		// user code end
 	} catch (java.lang.Throwable ivjExc) {
@@ -1345,6 +1409,20 @@ private void connEtoC58(java.awt.event.WindowEvent arg1) {
 		// user code begin {1}
 		// user code end
 		this.newRecordDialog_WindowOpened(arg1);
+		// user code begin {2}
+		// user code end
+	} catch (java.lang.Throwable ivjExc) {
+		// user code begin {3}
+		// user code end
+		handleException(ivjExc);
+	}
+}
+
+private void connEtoC67(java.awt.event.WindowEvent arg1) {
+	try {
+		// user code begin {1}
+		// user code end
+		this.morphingDialog_WindowOpened(arg1);
 		// user code begin {2}
 		// user code end
 	} catch (java.lang.Throwable ivjExc) {
@@ -1582,6 +1660,20 @@ private void connEtoM2(java.awt.event.ActionEvent arg1) {
 		handleException(ivjExc);
 	}
 }
+private void connEtoM4(java.awt.event.ActionEvent arg1) {
+	try {
+		// user code begin {1}
+		// user code end
+		getMorphingDialog().dispose();
+		// user code begin {2}
+		// user code end
+	} catch (java.lang.Throwable ivjExc) {
+		// user code begin {3}
+		// user code end
+		handleException(ivjExc);
+	}
+}
+
 /**
  * connEtoM3:  (RenameCancelButton.action.actionPerformed(java.awt.event.ActionEvent) --> RenameDialog.dispose()V)
  * @param arg1 java.awt.event.ActionEvent
@@ -2092,6 +2184,35 @@ private javax.swing.JPanel getButtonPanel() {
 	}
 	return ivjButtonPanel;
 }
+
+private javax.swing.JPanel getButtonPanel3() {
+	if (ivjButtonPanel3 == null) {
+		try {
+			ivjButtonPanel3 = new javax.swing.JPanel();
+			ivjButtonPanel3.setName("ButtonPanel3");
+			ivjButtonPanel3.setLayout(new java.awt.GridBagLayout());
+
+			java.awt.GridBagConstraints constraintsOKButton = new java.awt.GridBagConstraints();
+			constraintsOKButton.gridx = 0; constraintsOKButton.gridy = 0;
+			constraintsOKButton.ipadx = 16;
+			constraintsOKButton.insets = new java.awt.Insets(4, 4, 4, 4);
+			getButtonPanel3().add(getMorphingOKButton(), constraintsOKButton);
+
+			java.awt.GridBagConstraints constraintsCancelButton = new java.awt.GridBagConstraints();
+			constraintsCancelButton.gridx = 1; constraintsCancelButton.gridy = 0;
+			constraintsCancelButton.insets = new java.awt.Insets(4, 4, 4, 4);
+			getButtonPanel3().add(getMorphingCancelButton(), constraintsCancelButton);
+			// user code begin {1}
+			// user code end
+		} catch (java.lang.Throwable ivjExc) {
+			// user code begin {2}
+			// user code end
+			handleException(ivjExc);
+		}
+	}
+	return ivjButtonPanel3;
+}
+
 /**
  * Return the ButtonPanel1 property value.
  * @return javax.swing.JPanel
@@ -2176,6 +2297,23 @@ private javax.swing.JButton getCancelButton() {
 		}
 	}
 	return ivjCancelButton;
+}
+
+private javax.swing.JButton getMorphingCancelButton() {
+	if (ivjMorphingCancelButton == null) {
+		try {
+			ivjMorphingCancelButton = new javax.swing.JButton();
+			ivjMorphingCancelButton.setName("MorphingCancelButton");
+			ivjMorphingCancelButton.setText("Cancel");
+			// user code begin {1}
+			// user code end
+		} catch (java.lang.Throwable ivjExc) {
+			// user code begin {2}
+			// user code end
+			handleException(ivjExc);
+		}
+	}
+	return ivjMorphingCancelButton;
 }
 /**
  * Return the CancelButton1 property value.
@@ -2382,6 +2520,7 @@ private javax.swing.JMenu getEditMenu() {
 			ivjEditMenu.add(getCopyMenuItem());
 			ivjEditMenu.add(getPasteMenuItem());
 			ivjEditMenu.add(getMove_RenameMenuItem());
+			ivjEditMenu.add(getMorphMenuItem());
 			ivjEditMenu.add(getJSeparator5());
 			ivjEditMenu.add(getGroupMenuItem());
 			ivjEditMenu.add(getUngroupMenuItem());
@@ -2915,6 +3054,56 @@ private javax.swing.JPanel getJDialogContentPane() {
 	}
 	return ivjJDialogContentPane;
 }
+
+private javax.swing.JPanel getJDialogContentPane3() {
+	if (ivjJDialogContentPane3 == null) {
+		try {
+			ivjJDialogContentPane3 = new javax.swing.JPanel();
+			ivjJDialogContentPane3.setName("JDialogContentPane3");
+			ivjJDialogContentPane3.setLayout(new java.awt.GridBagLayout());
+
+			java.awt.GridBagConstraints constraintsTypeComboBox = new java.awt.GridBagConstraints();
+			constraintsTypeComboBox.gridx = 1; constraintsTypeComboBox.gridy = 1;
+			constraintsTypeComboBox.fill = java.awt.GridBagConstraints.HORIZONTAL;
+			constraintsTypeComboBox.weightx = 1.0;
+			constraintsTypeComboBox.insets = new java.awt.Insets(4, 4, 4, 18);
+			getJDialogContentPane3().add(getTypeComboBox2(), constraintsTypeComboBox);
+
+			java.awt.GridBagConstraints constraintsTypeLabel = new java.awt.GridBagConstraints();
+			constraintsTypeLabel.gridx = 0; constraintsTypeLabel.gridy = 1;
+			constraintsTypeLabel.insets = new java.awt.Insets(4, 18, 4, 4);
+			getJDialogContentPane3().add(getTypeLabel2(), constraintsTypeLabel);
+
+			java.awt.GridBagConstraints constraintsNameLabel = new java.awt.GridBagConstraints();
+			constraintsNameLabel.gridx = 0; constraintsNameLabel.gridy = 0;
+			constraintsNameLabel.insets = new java.awt.Insets(14, 18, 4, 4);
+			getJDialogContentPane3().add(getNameLabel3(), constraintsNameLabel);
+
+			java.awt.GridBagConstraints constraintsNameTextField = new java.awt.GridBagConstraints();
+			constraintsNameTextField.gridx = 1; constraintsNameTextField.gridy = 0;
+			constraintsNameTextField.fill = java.awt.GridBagConstraints.HORIZONTAL;
+			constraintsNameTextField.weightx = 1.0;
+			constraintsNameTextField.insets = new java.awt.Insets(14, 4, 4, 18);
+			getJDialogContentPane3().add(getNameTextLabel(), constraintsNameTextField);
+
+			java.awt.GridBagConstraints constraintsButtonPanel = new java.awt.GridBagConstraints();
+			constraintsButtonPanel.gridx = 0; constraintsButtonPanel.gridy = 2;
+			constraintsButtonPanel.gridwidth = 2;
+			constraintsButtonPanel.fill = java.awt.GridBagConstraints.BOTH;
+			constraintsButtonPanel.weightx = 1.0;
+			constraintsButtonPanel.insets = new java.awt.Insets(8, 4, 8, 4);
+			getJDialogContentPane3().add(getButtonPanel3(), constraintsButtonPanel);
+
+			// user code begin {1}
+			// user code end
+		} catch (java.lang.Throwable ivjExc) {
+			// user code begin {2}
+			// user code end
+			handleException(ivjExc);
+		}
+	}
+	return ivjJDialogContentPane3;
+}
 /**
  * Return the JDialogContentPane1 property value.
  * @return javax.swing.JPanel
@@ -3398,6 +3587,26 @@ private javax.swing.JMenuItem getMove_RenameMenuItem() {
 	}
 	return ivjMove_RenameMenuItem;
 }
+
+private javax.swing.JMenuItem getMorphMenuItem() {
+	if (ivjMorphMenuItem == null) {
+		try {
+			ivjMorphMenuItem = new javax.swing.JMenuItem();
+			ivjMorphMenuItem.setName("MorphMenuItem");
+			ivjMorphMenuItem.setMnemonic('o');
+			ivjMorphMenuItem.setText("Morph");
+			ivjMorphMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R,java.awt.Event.CTRL_MASK));
+			// user code begin {1}
+			// user code end
+		} catch (java.lang.Throwable ivjExc) {
+			// user code begin {2}
+			// user code end
+			handleException(ivjExc);
+		}
+	}
+	return ivjMorphMenuItem;
+}
+
 /**
  * Return the NameLabel property value.
  * @return javax.swing.JLabel
@@ -3420,8 +3629,45 @@ private javax.swing.JLabel getNameLabel() {
 	}
 	return ivjNameLabel;
 }
+
+private javax.swing.JLabel getNameLabel3() {
+	if (ivjNameLabel3 == null) {
+		try {
+			ivjNameLabel3 = new javax.swing.JLabel();
+			ivjNameLabel3.setName("NameLabel3");
+			ivjNameLabel3.setText("Name:");
+			ivjNameLabel3.setForeground(java.awt.Color.black);
+			// user code begin {1}
+			// user code end
+		} catch (java.lang.Throwable ivjExc) {
+			// user code begin {2}
+			// user code end
+			handleException(ivjExc);
+		}
+	}
+	return ivjNameLabel3;
+}
+
+
+private javax.swing.JLabel getNameTextLabel() {
+	if (ivjNameTextLabel == null) {
+		try {
+			ivjNameTextLabel = new javax.swing.JLabel();
+			ivjNameTextLabel.setName("NameTextLabel");
+			ivjNameTextLabel.setText("");
+			ivjNameTextLabel.setForeground(java.awt.Color.black);
+			// user code begin {1}
+			// user code end
+		} catch (java.lang.Throwable ivjExc) {
+			// user code begin {2}
+			// user code end
+			handleException(ivjExc);
+		}
+	}
+	return ivjNameTextLabel;
+}
 /**
- * Return the NameLabel1 property value.
+ * Return the NameLabel31 property value.
  * @return javax.swing.JLabel
  */
 /* WARNING: THIS METHOD WILL BE REGENERATED. */
@@ -3640,6 +3886,28 @@ private javax.swing.JDialog getNewRecordDialog() {
 	}
 	return ivjNewRecordDialog;
 }
+
+private javax.swing.JDialog getMorphingDialog() {
+	if (ivjMorphingDialog == null) {
+		try {
+			ivjMorphingDialog = new javax.swing.JDialog();
+			ivjMorphingDialog.setName("MorphingDialog");
+			ivjMorphingDialog.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+			ivjMorphingDialog.setResizable(false);
+			ivjMorphingDialog.setBounds(11, 946, 378, 154);
+			ivjMorphingDialog.setModal(true);
+			ivjMorphingDialog.setTitle("Morph");
+			getMorphingDialog().setContentPane(getJDialogContentPane3());
+			// user code begin {1}
+			// user code end
+		} catch (java.lang.Throwable ivjExc) {
+			// user code begin {2}
+			// user code end
+			handleException(ivjExc);
+		}
+	}
+	return ivjMorphingDialog;
+}
 /**
  * Return the OKButton property value.
  * @return javax.swing.JButton
@@ -3661,6 +3929,24 @@ private javax.swing.JButton getOKButton() {
 	}
 	return ivjOKButton;
 }
+
+private javax.swing.JButton getMorphingOKButton() {
+	if (ivjMorphingOKButton == null) {
+		try {
+			ivjMorphingOKButton = new javax.swing.JButton();
+			ivjMorphingOKButton.setName("MorphingOKButton");
+			ivjMorphingOKButton.setText("OK");
+			// user code begin {1}
+			// user code end
+		} catch (java.lang.Throwable ivjExc) {
+			// user code begin {2}
+			// user code end
+			handleException(ivjExc);
+		}
+	}
+	return ivjMorphingOKButton;
+}
+
 /**
  * Return the OldNameLabel property value.
  * @return javax.swing.JLabel
@@ -4687,6 +4973,24 @@ private javax.swing.JComboBox getTypeComboBox() {
 	}
 	return ivjTypeComboBox;
 }
+
+private javax.swing.JComboBox getTypeComboBox2() {
+	if (ivjTypeComboBox2 == null) {
+		try {
+			ivjTypeComboBox2 = new javax.swing.JComboBox();
+			ivjTypeComboBox2.setName("TypeComboBox2");
+			ivjTypeComboBox2.setEditable(false);
+			// user code begin {1}
+			// user code end
+		} catch (java.lang.Throwable ivjExc) {
+			// user code begin {2}
+			// user code end
+			handleException(ivjExc);
+		}
+	}
+	return ivjTypeComboBox2;
+}
+
 /**
  * Return the TypeLabel property value.
  * @return javax.swing.JLabel
@@ -4709,6 +5013,24 @@ private javax.swing.JLabel getTypeLabel() {
 	}
 	return ivjTypeLabel;
 }
+private javax.swing.JLabel getTypeLabel2() {
+	if (ivjTypeLabel2 == null) {
+		try {
+			ivjTypeLabel2 = new javax.swing.JLabel();
+			ivjTypeLabel2.setName("TypeLabel2");
+			ivjTypeLabel2.setText("Type:");
+			ivjTypeLabel2.setForeground(java.awt.Color.black);
+			// user code begin {1}
+			// user code end
+		} catch (java.lang.Throwable ivjExc) {
+			// user code begin {2}
+			// user code end
+			handleException(ivjExc);
+		}
+	}
+	return ivjTypeLabel2;
+}
+
 /**
  * Return the TypeLabel1 property value.
  * @return javax.swing.JLabel
@@ -5272,6 +5594,7 @@ private void initConnections() throws java.lang.Exception {
 	getCopyMenuItem().addActionListener(ivjEventHandler);
 	getPasteMenuItem().addActionListener(ivjEventHandler);
 	getMove_RenameMenuItem().addActionListener(ivjEventHandler);
+	getMorphMenuItem().addActionListener(ivjEventHandler);
 	getGroupMenuItem().addActionListener(ivjEventHandler);
 	getUngroupMenuItem().addActionListener(ivjEventHandler);
 	getDeleteMenuItem().addActionListener(ivjEventHandler);
@@ -5296,8 +5619,11 @@ private void initConnections() throws java.lang.Exception {
 	getWindowsPanMenuItem().addItemListener(ivjEventHandler);
 	getOKButton().addActionListener(ivjEventHandler);
 	getCancelButton().addActionListener(ivjEventHandler);
+	getMorphingOKButton().addActionListener(ivjEventHandler);
+	getMorphingCancelButton().addActionListener(ivjEventHandler);
 	getNameTextField().addActionListener(ivjEventHandler);
 	getNewRecordDialog().addWindowListener(ivjEventHandler);
+	getMorphingDialog().addWindowListener(ivjEventHandler);
 	getStatusbarMenuItem().addActionListener(ivjEventHandler);
 	getToolbarMenuItem().addActionListener(ivjEventHandler);
 	getFlat_ViewMenuItem().addActionListener(ivjEventHandler);
@@ -5336,6 +5662,7 @@ private void initialize() {
 		CommandManager.getInstance().addCommand("SetWorkspaceScale", new SetWorkspaceScale(this));
 		CommandManager.getInstance().addCommand("ShowNewDialog", new ShowNewDialog(this));
 		CommandManager.getInstance().addCommand("ShowRenameDialog", new ShowRenameDialog(this));
+		CommandManager.getInstance().addCommand("ShowMorphingDialog", new ShowMorphingDialog(this));
 		CommandManager.getInstance().addCommand("SetUndoMenuItemState", new SetUndoMenuItemState(this));
 		CommandManager.getInstance().addCommand("SetRedoMenuItemState", new SetRedoMenuItemState(this));
 		CommandManager.getInstance().addCommand("SetFile", new SetWorkspaceFile(this));
@@ -5502,6 +5829,10 @@ public void move_RenameMenuItem_ActionPerformed() {
 	GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
  	cmd.getGUIMenuInterface().rename();
 }
+public void morphMenuItem_ActionPerformed() {
+	GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
+	cmd.getGUIMenuInterface().morph();
+}
 /**
  * Comment
  */
@@ -5575,6 +5906,32 @@ public void newRecordDialog_WindowOpened(
     getWarningLabel().setText(" ");
     getOKButton().setEnabled(false);
 }
+
+public void morphingDialog_WindowOpened(
+	java.awt.event.WindowEvent windowEvent) {
+
+	// there can be no less types (for now)
+	Object[] names = DataProvider.getInstance().getRecordTypes();
+	JComboBox combo = getTypeComboBox2();
+
+	if (names.length > combo.getItemCount())
+	 {
+		ComboBoxModel model = combo.getModel();
+	    
+		for (int i = 0; i < names.length; i++)
+		{
+			boolean found = false;
+			int c = model.getSize();
+			for (int j=0;!found && (j<c); j++)
+				if (model.getElementAt(j).equals(names[i]))
+					found = true;
+					
+			if (!found)
+				combo.addItem(names[i]);
+		}
+	 }
+}
+
 /**
  * Comment
  */
@@ -5595,6 +5952,13 @@ public void oKButton_ActionPerformed(java.awt.event.ActionEvent actionEvent) {
 		}
 	}
 }
+
+public void morphingOKButton_ActionPerformed(java.awt.event.ActionEvent actionEvent) {
+	GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
+	cmd.getGUIMenuInterface().morph(getNameTextLabel().getText(), getTypeComboBox2().getSelectedItem().toString());
+	getMorphingDialog().dispose();
+}
+
 /**
  * Insert the method's description here.
  * Creation date: (26.1.2001 22:22:29)
@@ -6669,6 +7033,14 @@ public void showGroupDialog() {
 public void showNewDialog() {
 	getNewRecordDialog().setLocationRelativeTo(this);
 	getNewRecordDialog().setVisible(true);
+}
+
+public void showMorphingDialog(String name, String oldType) {
+	morphingDialog_WindowOpened(null);
+	getNameTextLabel().setText(name);
+	getTypeComboBox2().setSelectedItem(oldType);
+	getMorphingDialog().setLocationRelativeTo(this);
+	getMorphingDialog().setVisible(true);
 }
 /**
  * Insert the method's description here.

@@ -135,6 +135,10 @@ void rename();
  * Creation date: (4.2.2001 15:08:06)
  */
 void rename(String oldName, String newName);
+
+void morph();
+
+void morph(String name, String newType);
 /**
  * Insert the method's description here.
  * Creation date: (4.2.2001 15:48:15)

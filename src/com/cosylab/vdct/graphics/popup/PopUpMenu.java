@@ -39,6 +39,7 @@ import com.cosylab.vdct.events.commands.GetGUIInterface;
 import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.graphics.objects.Flexible;
 import com.cosylab.vdct.graphics.objects.Group;
+import com.cosylab.vdct.graphics.objects.Morphable;
 import com.cosylab.vdct.graphics.objects.VisibleObject;
 import com.cosylab.vdct.plugin.popup.PluginPopupManager;
 
@@ -56,6 +57,7 @@ public class PopUpMenu extends JPopupMenu {
 	private static final String cutString = "Cut";
 	private static final String copyString = "Copy";	
 	private static final String moveRenameString = "Move/Rename";
+	private static final String morphString = "Morph";
 	private static final String deleteString = "Delete";
 	
 	private static final String groupString = "Group";
@@ -143,6 +145,8 @@ class FlexiblePopupMenuHandler implements ActionListener {
 			cmd.getGUIMenuInterface().copy();
 		} else if (action.equals(moveRenameString)) {
 			cmd.getGUIMenuInterface().rename();
+		} else if (action.equals(morphString)) {
+			cmd.getGUIMenuInterface().morph();			
 		}  else if (action.equals(deleteString)) {
 			cmd.getGUIMenuInterface().delete();
 		}  else if (action.equals(groupString)) {
@@ -205,6 +209,12 @@ private void populateWithFlexible(Flexible object, Vector items) {
 		menuitem = new JMenuItem(moveRenameString);
 		menuitem.addActionListener(l);
 		items.add(menuitem);
+		
+		if (object instanceof Morphable) {
+			menuitem = new JMenuItem(morphString);
+			menuitem.addActionListener(l);
+			items.add(menuitem);	
+		}
 		
 		menuitem = new JMenuItem(deleteString);
 		menuitem.addActionListener(l);
