@@ -191,7 +191,6 @@ public static String generateConnectorID(EPICSLinkOut outlink) {
 		} while (outlink.getParent().containsObject(name));
 		return name;
 	}
-;
 }
 /**
  * Insert the method's description here.

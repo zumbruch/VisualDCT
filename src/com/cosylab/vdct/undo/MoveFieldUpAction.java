@@ -52,7 +52,6 @@ public MoveFieldUpAction(com.cosylab.vdct.graphics.objects.Field field) {
  */
 public String getDescription() {
 	return "Move field up ["+field+"]";
-;
 }
 /**
  * This method was created in VisualAge.
