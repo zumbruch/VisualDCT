@@ -28,6 +28,8 @@ package com.cosylab.vdct;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.prefs.*;
 
 /**
@@ -299,6 +301,53 @@ public boolean sync() {
 		Console.getInstance().println("o) Failed to sync VisualDCT settings:");
 		Console.getInstance().println(bse);
 		return false;
+	}
+}
+
+/**
+ * Insert the method's description here.
+ */
+public void saveRecentFiles()
+{
+	final String prefix = "file";
+
+	ArrayList files = VisualDCT.getInstance().getRecentFilesMenu().getFiles();
+	int i = 0;
+	for (; i<files.size(); i++)
+		prefs.put(prefix+String.valueOf(i), ((File)files.get(i)).getAbsolutePath());
+		
+	// add no files
+	for (; i<Constants.MAX_RECENT_FILES; i++)
+	{
+		String name = prefix+String.valueOf(i); 
+		if (prefs.get(name, null)!=null)
+		prefs.remove(name);
+	}
+}
+
+/**
+ * Insert the method's description here.
+ */
+public void loadRecentFiles()
+{
+	final String prefix = "file";
+
+	for (int i = 0; i<Constants.MAX_RECENT_FILES; i++)
+	{
+		String name = prefix+String.valueOf(i); 
+		String fileName = prefs.get(name, null);
+		if (fileName!=null)
+		{
+			try
+			{
+				VisualDCT.getInstance().getRecentFilesMenu().addFile(new File(fileName));
+			}
+			catch (Exception ex)
+			{
+			}
+		}
+		else
+			break;
 	}
 }
 

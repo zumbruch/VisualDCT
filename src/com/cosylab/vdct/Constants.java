@@ -103,6 +103,8 @@ public class Constants {
 
     public static final String DEFAULT_FONT = "sansserif";
 
+    public static final int MAX_RECENT_FILES = 10;
+
 /*
 	// white on black color scheme
     public static Color BACKGROUND_COLOR = Color.white;

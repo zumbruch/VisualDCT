@@ -29,6 +29,8 @@ package com.cosylab.vdct;
  */
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.print.*;
 import javax.swing.*;
 import javax.swing.event.*;
@@ -74,6 +76,7 @@ public class VisualDCT extends JFrame {
 	private JSeparator ivjJSeparator10 = null;
 	private JSeparator ivjJSeparator11a = null;
 	private JSeparator ivjJSeparator12 = null;
+	private JSeparator ivjJSeparator13 = null;
 	private JSeparator ivjJSeparator2 = null;
 	private JSeparator ivjJSeparator3 = null;
 	private JSeparator ivjJSeparator4 = null;
@@ -99,6 +102,7 @@ public class VisualDCT extends JFrame {
 	private JMenuItem ivjSaveAsTemplateMenuItem = null;
 	private JMenuItem ivjGenerateMenuItem = null;
 	private JMenuItem ivjGenerateAsGroupMenuItem = null;
+	private RecentFilesMenu ivjRecentFilesMenuItem = null;
 	private JMenuItem ivjSelect_AllMenuItem = null;
 	private JCheckBoxMenuItem ivjShow_PointsMenuItem = null;
 	private JMenuItem ivjSmart_ZoomMenuItem = null;
@@ -2512,6 +2516,8 @@ private javax.swing.JMenu getFileMenu() {
 			ivjFileMenu.add(getPrintPreviewMenuItem());
 			ivjFileMenu.add(getPageSetupMenuItem());
 			ivjFileMenu.add(getJSeparator3());
+			ivjFileMenu.add(getRecentFilesMenuItem());
+			ivjFileMenu.add(getJSeparator13());
 			ivjFileMenu.add(getExitMenuItem());
 			// user code begin {1}
 			// user code end
@@ -3089,6 +3095,26 @@ private javax.swing.JSeparator getJSeparator12() {
 		}
 	}
 	return ivjJSeparator12;
+}
+/**
+ * Return the JSeparator13 property value.
+ * @return javax.swing.JSeparator
+ */
+/* WARNING: THIS METHOD WILL BE REGENERATED. */
+private javax.swing.JSeparator getJSeparator13() {
+	if (ivjJSeparator13 == null) {
+		try {
+			ivjJSeparator13 = new javax.swing.JSeparator();
+			ivjJSeparator13.setName("JSeparator13");
+			// user code begin {1}
+			// user code end
+		} catch (java.lang.Throwable ivjExc) {
+			// user code begin {2}
+			// user code end
+			handleException(ivjExc);
+		}
+	}
+	return ivjJSeparator13;
 }
 /**
  * Return the JSeparator11 property value.
@@ -4156,6 +4182,33 @@ private javax.swing.JMenuItem getGenerateMenuItem() {
 		}
 	}
 	return ivjGenerateMenuItem;
+}
+/**
+ * Return the RecentFilesMenuItem property value.
+ * @return javax.swing.JMenuItem
+ */
+private javax.swing.JMenuItem getRecentFilesMenuItem() {
+	if (ivjRecentFilesMenuItem == null) {
+		try {
+			ivjRecentFilesMenuItem = new RecentFilesMenu();
+			ivjRecentFilesMenuItem.setMnemonic('R');
+			// user code begin {1}
+			class OpenRecentFile implements ActionListener
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					VisualDCT.this.openDB(e.getActionCommand());
+				}
+			}
+			ivjRecentFilesMenuItem.addActionListener(new OpenRecentFile());
+			// user code end
+		} catch (java.lang.Throwable ivjExc) {
+			// user code begin {2}
+			// user code end
+			handleException(ivjExc);
+		}
+	}
+	return ivjRecentFilesMenuItem;
 }
 /**
  * Return the GenerateAsGroupMenuItem property value.
@@ -5263,6 +5316,9 @@ public static void main(java.lang.String[] args) {
 		Console console = Console.getInstance();
 		console.silent("Loading VisualDCT v"+Version.VERSION+" build "+Version.BUILD+"...\n");
 
+		/* Recent files */
+		Settings.getInstance().loadRecentFiles();
+
 		/* Plugins */
 		com.cosylab.vdct.plugin.PluginManager.getInstance().checkAutoStartPlugins();
 	
@@ -5428,6 +5484,11 @@ public void openDB(String fileName) {
 		
 	java.io.File theFile = new java.io.File(fileName);
 	if(theFile != null && theFile.exists()) {
+		
+		// add to the recent file list
+		getRecentFilesMenu().addFile(theFile);
+		Settings.getInstance().saveRecentFiles();
+		
 	    GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
 	    try {	
 		    cmd.getGUIMenuInterface().openDB(theFile);
@@ -5540,6 +5601,11 @@ public void openMenuItem_ActionPerformed() {
 	if(retval == JFileChooser.APPROVE_OPTION) {
 	    java.io.File theFile = chooser.getSelectedFile();
 	    if(theFile != null) {
+
+			// add to the recent file list
+			getRecentFilesMenu().addFile(theFile);
+			Settings.getInstance().saveRecentFiles();
+		
 		    GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
 		    try {
 				cmd.getGUIMenuInterface().openDB(theFile);
@@ -6659,6 +6725,15 @@ public void updateLoadLabel() {
 			setFileInTitle(null);
 		else
 			setFileInTitle(openedFile.getAbsolutePath());
+	}
+
+	/**
+	 * Returns the ivjRecentFilesMenuItem.
+	 * @return RecentFilesMenu
+	 */
+	public RecentFilesMenu getRecentFilesMenu()
+	{
+		return ivjRecentFilesMenuItem;
 	}
 
 }
