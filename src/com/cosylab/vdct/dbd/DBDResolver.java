@@ -239,8 +239,8 @@ public static void processDBD(DBDData data, StreamTokenizer tokenizer, String fi
 	
 	try	{
 		
-		while (tokenizer.nextToken() != tokenizer.TT_EOF)
-			if (tokenizer.ttype == tokenizer.TT_WORD)
+		while (tokenizer.nextToken() != StreamTokenizer.TT_EOF)
+			if (tokenizer.ttype == StreamTokenizer.TT_WORD)
 
 				/****************** records ********************/
 
@@ -249,7 +249,7 @@ public static void processDBD(DBDData data, StreamTokenizer tokenizer, String fi
 
 					// read record_type
 					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD) ||
+					if ((tokenizer.ttype == StreamTokenizer.TT_WORD) ||
 						(tokenizer.ttype == DBDConstants.quoteChar)) rd.setName(tokenizer.sval);
 					else throw (new DBDParseException("Invalid record_type...", tokenizer, fileName));
 
@@ -264,7 +264,7 @@ public static void processDBD(DBDData data, StreamTokenizer tokenizer, String fi
 
 					// read menu_name
 					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD) ||
+					if ((tokenizer.ttype == StreamTokenizer.TT_WORD) ||
 						(tokenizer.ttype == DBDConstants.quoteChar)) md.setName(tokenizer.sval);
 					else throw (new DBDParseException("Invalid menu_name...", tokenizer, fileName));
 
@@ -279,19 +279,19 @@ public static void processDBD(DBDData data, StreamTokenizer tokenizer, String fi
 
 					// read record_type
 					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD) ||
+					if ((tokenizer.ttype == StreamTokenizer.TT_WORD) ||
 						(tokenizer.ttype == DBDConstants.quoteChar)) dd.setRecord_type(tokenizer.sval);
 					else throw (new DBDParseException("Invalid record_type...", tokenizer, fileName));
 
 					// read link_type
 					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD) ||
+					if ((tokenizer.ttype == StreamTokenizer.TT_WORD) ||
 						(tokenizer.ttype == DBDConstants.quoteChar)) dd.setLink_type(tokenizer.sval);
 					else throw (new DBDParseException("Invalid link_type...", tokenizer, fileName));
 
 					// read dset_name
 					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD) ||
+					if ((tokenizer.ttype == StreamTokenizer.TT_WORD) ||
 						(tokenizer.ttype == DBDConstants.quoteChar)) dd.setDset_name(tokenizer.sval);
 					else throw (new DBDParseException("Invalid dset_name...", tokenizer, fileName));
 
@@ -367,29 +367,29 @@ public static void processFields(DBDRecordData rd, StreamTokenizer tokenizer, St
 
 	/********************** fields area *************************/
 					
-	while (tokenizer.nextToken() != tokenizer.TT_EOF) 
-		if (tokenizer.ttype == tokenizer.TT_WORD) 
+	while (tokenizer.nextToken() != StreamTokenizer.TT_EOF) 
+		if (tokenizer.ttype == StreamTokenizer.TT_WORD) 
 			if (tokenizer.sval.equals(ENDSTR))	break;
 			else if (tokenizer.sval.equalsIgnoreCase(FIELD)) {
 				fd = new DBDFieldData();
 
 				// read field_name
 				tokenizer.nextToken();
-				if ((tokenizer.ttype == tokenizer.TT_WORD) ||
+				if ((tokenizer.ttype == StreamTokenizer.TT_WORD) ||
 					(tokenizer.ttype == DBDConstants.quoteChar)) fd.setName(tokenizer.sval);
 				else throw (new DBDParseException("Invalid field_name...", tokenizer, fileName));
 					
 				// read field_type
 				tokenizer.nextToken();
-				if ((tokenizer.ttype == tokenizer.TT_WORD) ||
+				if ((tokenizer.ttype == StreamTokenizer.TT_WORD) ||
 					(tokenizer.ttype == DBDConstants.quoteChar)) fd.setField_type(getFieldType(tokenizer.sval));
 				else throw (new DBDParseException("Invalid field_type...", tokenizer, fileName));
 				if (fd.field_type == DBDConstants.NOT_DEFINED) throw (new DBDParseException("Invalid field_type...", tokenizer, fileName));
 
 				/****************** field def. ********************/
 								
-			    while (tokenizer.nextToken() != tokenizer.TT_EOF)
-					if (tokenizer.ttype == tokenizer.TT_WORD) 
+			    while (tokenizer.nextToken() != StreamTokenizer.TT_EOF)
+					if (tokenizer.ttype == StreamTokenizer.TT_WORD) 
 						if (tokenizer.sval.equals(ENDSTR))	break;
 						
 						else if (tokenizer.sval.equalsIgnoreCase(INITIAL)) {
@@ -400,21 +400,21 @@ public static void processFields(DBDRecordData rd, StreamTokenizer tokenizer, St
 						
 						else if (tokenizer.sval.equalsIgnoreCase(BASE)) {
 							tokenizer.nextToken();
-							if (tokenizer.ttype == tokenizer.TT_WORD) fd.setBase_type(getBaseType(tokenizer.sval));
+							if (tokenizer.ttype == StreamTokenizer.TT_WORD) fd.setBase_type(getBaseType(tokenizer.sval));
 							else throw (new DBDParseException("Invalid base_type...", tokenizer, fileName));
 						}
 						
 						else if (tokenizer.sval.equalsIgnoreCase(SIZE)) {
 							tokenizer.nextToken();
 							/*if (tokenizer.ttype == DBDConstants.quoteChar) fd.setSize_value(Integer.parseInt(tokenizer.sval));
-							else*/ if (tokenizer.ttype == tokenizer.TT_NUMBER) fd.setSize_value((int)tokenizer.nval);
+							else*/ if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) fd.setSize_value((int)tokenizer.nval);
 							else throw (new DBDParseException("Invalid size_value...", tokenizer, fileName));
 						}
 						
 						else if (tokenizer.sval.equalsIgnoreCase(MENU)) {
 							tokenizer.nextToken();
 							if ((tokenizer.ttype == DBDConstants.quoteChar) ||
-								(tokenizer.ttype == tokenizer.TT_WORD)) fd.setMenu_name(tokenizer.sval);
+								(tokenizer.ttype == StreamTokenizer.TT_WORD)) fd.setMenu_name(tokenizer.sval);
 							else throw (new DBDParseException("Invalid menu_name...", tokenizer, fileName));
 						}
 						
@@ -426,7 +426,7 @@ public static void processFields(DBDRecordData rd, StreamTokenizer tokenizer, St
 
 						else if (tokenizer.sval.equalsIgnoreCase(PROMPTGROUP)) {
 							tokenizer.nextToken();
-							if (tokenizer.ttype == tokenizer.TT_WORD) fd.setGUI_type(getGUIType(tokenizer.sval));
+							if (tokenizer.ttype == StreamTokenizer.TT_WORD) fd.setGUI_type(getGUIType(tokenizer.sval));
 							else throw (new DBDParseException("Invalid gui_gruop...", tokenizer, fileName));
 						}
 
@@ -471,14 +471,14 @@ public static void processMenuChoices(DBDMenuData md, StreamTokenizer tokenizer,
 	
 	/********************** choices area *************************/
 					
-	while (tokenizer.nextToken() != tokenizer.TT_EOF) 
-		if (tokenizer.ttype == tokenizer.TT_WORD) 
+	while (tokenizer.nextToken() != StreamTokenizer.TT_EOF) 
+		if (tokenizer.ttype == StreamTokenizer.TT_WORD) 
 			if (tokenizer.sval.equals(ENDSTR)) break;
 			else if (tokenizer.sval.equalsIgnoreCase(CHOICE)) {
 				
 				// read choice_name
 				tokenizer.nextToken();
-				if ((tokenizer.ttype == tokenizer.TT_WORD) ||
+				if ((tokenizer.ttype == StreamTokenizer.TT_WORD) ||
 					(tokenizer.ttype == DBDConstants.quoteChar)) choice_name=tokenizer.sval;
 				else throw (new DBDParseException("Invalid choice_name...", tokenizer, fileName));
 					

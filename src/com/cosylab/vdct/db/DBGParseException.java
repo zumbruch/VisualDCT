@@ -28,6 +28,8 @@ package com.cosylab.vdct.db;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.io.StreamTokenizer;
+
 import com.cosylab.vdct.Console;
 
 /**
@@ -40,7 +42,7 @@ public class DBGParseException extends Exception {
  */
 public DBGParseException(String s, java.io.StreamTokenizer t, String fileName) {
 	super(s);
-	if (t.ttype == t.TT_WORD)
+	if (t.ttype == StreamTokenizer.TT_WORD)
 		if (t.sval!=null)
 			Console.getInstance().print("\nError found in file '"+fileName+"', line "+t.lineno()+" near token '"+t.sval+"': ");
 		else

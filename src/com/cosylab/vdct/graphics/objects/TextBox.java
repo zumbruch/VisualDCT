@@ -36,6 +36,7 @@ import java.awt.font.TextAttribute;
 import java.awt.font.TextLayout;
 import java.text.AttributedCharacterIterator;
 import java.text.AttributedString;
+import java.text.CharacterIterator;
 import java.util.*;
 import javax.swing.*;
 import com.cosylab.vdct.*;
@@ -743,14 +744,14 @@ private void updateText()
 	
 			int i = 1;
 			char c = paragraph.first();		// skip first char
-		    for (paragraph.next(); c != paragraph.DONE; c = paragraph.next())
+		    for (paragraph.next(); c != CharacterIterator.DONE; c = paragraph.next())
 		         if (c == '\n')
 		         	i++;
 		    breaks = new int[i];
 	
 			i = 0;
 			c = paragraph.first();				// skip first char
-		    for (paragraph.next(); c != paragraph.DONE; c = paragraph.next())
+		    for (paragraph.next(); c != CharacterIterator.DONE; c = paragraph.next())
 		         if (c == '\n')
 		         	breaks[i++]=paragraph.getIndex();
 			breaks[i] = paragraphEnd;

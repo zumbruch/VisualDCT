@@ -83,7 +83,7 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 				}
 
 				try {
-					this.sleep(interval);
+					Thread.sleep(interval);
 				} catch (InterruptedException e) {
 				};
 
@@ -1639,7 +1639,7 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 				
 				dbTemplate = (DBTemplateInstance)dbData.getTemplateInstances().get(vdbTemplate.getName());
 	
-				VDBTemplate template = (VDBTemplate)vdbData.getTemplates().get(dbTemplate.getTemplateId());
+				VDBTemplate template = (VDBTemplate)VDBData.getTemplates().get(dbTemplate.getTemplateId());
 				if (template==null)
 				{
 					/*// already issued
@@ -1692,7 +1692,7 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 				continue;
 			}
 			if (grp == null)
-				grp = rootGroup.createGroup(dbGrp.getName());
+				grp = Group.createGroup(dbGrp.getName());
 			grp.setColor(dbGrp.getColor());
 			grp.setDescription(dbGrp.getDescription());
 			grp.setX(dbGrp.getX()); grp.setY(dbGrp.getY());

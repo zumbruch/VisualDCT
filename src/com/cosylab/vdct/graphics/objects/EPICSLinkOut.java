@@ -422,7 +422,7 @@ public static InLink getTarget(LinkProperties link, boolean allowLinkOutAsTarget
 	Object obj = Group.getRoot().findObject(recName, true);
 	if (obj==null || !(obj instanceof Record)) return null;
 	Record record = (Record)obj;
-	if (link.getType()==link.FWDLINK_FIELD) {
+	if (link.getType()==LinkProperties.FWDLINK_FIELD) {
 		//if (!link.getVarName().equalsIgnoreCase("PROC"))		// !!! proc
 		// check if variable exists
 		if (record.getRecordData().getField(link.getVarName())==null)

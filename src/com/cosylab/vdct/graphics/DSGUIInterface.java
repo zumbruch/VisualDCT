@@ -62,7 +62,7 @@ public class DSGUIInterface implements GUIMenuInterface, VDBInterface {
  */
 public DSGUIInterface(DrawingSurface drawingSurface) {
 	this.drawingSurface=drawingSurface;
-	this.instance = this;
+	DSGUIInterface.instance = this;
 	pasteNames = new ArrayList();
 }
 /**

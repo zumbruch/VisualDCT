@@ -254,9 +254,9 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 	tokenizer.wordChars('\t', '\t');
 	tokenizer.eolIsSignificant(true);
 
-	while ((tokenizer.nextToken() != tokenizer.TT_EOL) &&						// read till EOL
-		    (tokenizer.ttype != tokenizer.TT_EOF))
-	 	if (tokenizer.ttype == tokenizer.TT_NUMBER) {
+	while ((tokenizer.nextToken() != StreamTokenizer.TT_EOL) &&						// read till EOL
+		    (tokenizer.ttype != StreamTokenizer.TT_EOF))
+	 	if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) {
 		 	//if (!comment.equals(nullString)) comment+=SPACE;
 	 		comment=comment+tokenizer.nval;
 	 	}
@@ -278,15 +278,15 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
  	 String str, str2, desc; int t, tx, tx2, ty, ty2, t2, t3;
 // 	 boolean r1, r2;
 
- 	 while ((tokenizer.nextToken() != tokenizer.TT_EOL) &&
-		    (tokenizer.ttype != tokenizer.TT_EOF)) 
-		if (tokenizer.ttype == tokenizer.TT_WORD) 
+ 	 while ((tokenizer.nextToken() != StreamTokenizer.TT_EOL) &&
+		    (tokenizer.ttype != StreamTokenizer.TT_EOF)) 
+		if (tokenizer.ttype == StreamTokenizer.TT_WORD) 
 
 				if (tokenizer.sval.equalsIgnoreCase(VDCTRECORD)) {
 
 					// read record_name
 					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+					if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
 						(tokenizer.ttype == DBConstants.quoteChar)) str=tokenizer.sval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
@@ -294,27 +294,27 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 					if (rd!=null) {
 						// read x pos
 						tokenizer.nextToken();
-						if (tokenizer.ttype == tokenizer.TT_NUMBER) rd.setX((int)tokenizer.nval);
+						if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) rd.setX((int)tokenizer.nval);
 						else throw (new DBGParseException(errorString, tokenizer, fileName));
 					
 						// read y pos
 						tokenizer.nextToken();
-						if (tokenizer.ttype == tokenizer.TT_NUMBER) rd.setY((int)tokenizer.nval);
+						if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) rd.setY((int)tokenizer.nval);
 						else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 						// read color
 						tokenizer.nextToken();
-						if (tokenizer.ttype == tokenizer.TT_NUMBER) rd.setColor(StringUtils.int2color((int)tokenizer.nval));
+						if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) rd.setColor(StringUtils.int2color((int)tokenizer.nval));
 						else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 						// read rotation
 						tokenizer.nextToken();
-						if (tokenizer.ttype == tokenizer.TT_NUMBER) rd.setRotated(((int)tokenizer.nval)!=0);
+						if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) rd.setRotated(((int)tokenizer.nval)!=0);
 						else throw (new DBGParseException(errorString, tokenizer, fileName));
 						
 						// read description
 						tokenizer.nextToken();
-						if ((tokenizer.ttype == tokenizer.TT_WORD)||
+						if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
 							(tokenizer.ttype == DBConstants.quoteChar)) rd.setDescription(tokenizer.sval);
 						else throw (new DBGParseException(errorString, tokenizer, fileName));
 
@@ -325,7 +325,7 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 
 					// read name
 					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+					if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
 						(tokenizer.ttype == DBConstants.quoteChar)) str=tokenizer.sval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
@@ -345,17 +345,17 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 							
 						// read color
 						tokenizer.nextToken();
-						if (tokenizer.ttype == tokenizer.TT_NUMBER) fd.setColor(StringUtils.int2color((int)tokenizer.nval));
+						if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) fd.setColor(StringUtils.int2color((int)tokenizer.nval));
 						else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 						// read rotation
 						tokenizer.nextToken();
-						if (tokenizer.ttype == tokenizer.TT_NUMBER) fd.setRotated(((int)tokenizer.nval)!=0);
+						if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) fd.setRotated(((int)tokenizer.nval)!=0);
 						else throw (new DBGParseException(errorString, tokenizer, fileName));
 						
 						// read description
 						tokenizer.nextToken();
-						if ((tokenizer.ttype == tokenizer.TT_WORD)||
+						if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
 							(tokenizer.ttype == DBConstants.quoteChar)) fd.setDescription(tokenizer.sval);
 						else throw (new DBGParseException(errorString, tokenizer, fileName));
 
@@ -368,7 +368,7 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 
 					// read name
 					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+					if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
 						(tokenizer.ttype == DBConstants.quoteChar)) str=tokenizer.sval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
@@ -387,7 +387,7 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 						}
 							
 						tokenizer.nextToken();
-						if (tokenizer.ttype == tokenizer.TT_NUMBER) fd.setVisibility((int)tokenizer.nval);
+						if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) fd.setVisibility((int)tokenizer.nval);
 						else throw (new DBGParseException(errorString, tokenizer, fileName));
 					}
 				}
@@ -396,41 +396,41 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 
 					// read connector id
 					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+					if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
 						(tokenizer.ttype == DBConstants.quoteChar)) str=tokenizer.sval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 					// read target id
 					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+					if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
 						(tokenizer.ttype == DBConstants.quoteChar)) str2=tokenizer.sval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 					// read x pos
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) tx=(int)tokenizer.nval;
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) tx=(int)tokenizer.nval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 					
 					// read y pos
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) ty=(int)tokenizer.nval;
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) ty=(int)tokenizer.nval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 					// read color
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) t=(int)tokenizer.nval;
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) t=(int)tokenizer.nval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 					// read description
 					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+					if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
 						(tokenizer.ttype == DBConstants.quoteChar)) desc=tokenizer.sval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 					// read mode
 					int mode = 0;
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) mode=(int)tokenizer.nval;
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) mode=(int)tokenizer.nval;
 					else 
 						tokenizer.pushBack();
 
@@ -443,13 +443,13 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 					
 					// read name
 					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+					if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
 						(tokenizer.ttype == DBConstants.quoteChar)) str=tokenizer.sval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 				
 					// read target
 					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+					if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
 						(tokenizer.ttype == DBConstants.quoteChar)) str2=tokenizer.sval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
@@ -461,28 +461,28 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 
 					// read group_name
 					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+					if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
 						(tokenizer.ttype == DBConstants.quoteChar)) str=tokenizer.sval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 					// read x pos
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) tx=(int)tokenizer.nval;
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) tx=(int)tokenizer.nval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 					
 					// read y pos
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) ty=(int)tokenizer.nval;
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) ty=(int)tokenizer.nval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 					// read color
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) t=(int)tokenizer.nval;
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) t=(int)tokenizer.nval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 					// read description
 					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+					if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
 						(tokenizer.ttype == DBConstants.quoteChar)) desc=tokenizer.sval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
@@ -493,28 +493,28 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 
 					// read template instance id
 					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+					if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
 						(tokenizer.ttype == DBConstants.quoteChar)) str=tokenizer.sval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 					
 					// read x pos
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) tx=(int)tokenizer.nval;
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) tx=(int)tokenizer.nval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 					
 					// read y pos
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) ty=(int)tokenizer.nval;
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) ty=(int)tokenizer.nval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 					// read color
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) t=(int)tokenizer.nval;
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) t=(int)tokenizer.nval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 					// read description
 					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+					if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
 						(tokenizer.ttype == DBConstants.quoteChar)) desc=tokenizer.sval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
@@ -529,19 +529,19 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 
 					// read alias
 					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+					if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
 						(tokenizer.ttype == DBConstants.quoteChar)) str=tokenizer.sval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 					
 					// read field name
 					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+					if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
 						(tokenizer.ttype == DBConstants.quoteChar)) str2=tokenizer.sval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 					// read description
 					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+					if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
 						(tokenizer.ttype == DBConstants.quoteChar)) desc=tokenizer.sval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
@@ -557,19 +557,19 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 
 					// read alias
 					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+					if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
 						(tokenizer.ttype == DBConstants.quoteChar)) str=tokenizer.sval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 					
 					// read field name
 					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+					if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
 						(tokenizer.ttype == DBConstants.quoteChar)) str2=tokenizer.sval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 					// read description
 					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+					if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
 						(tokenizer.ttype == DBConstants.quoteChar)) desc=tokenizer.sval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
@@ -585,51 +585,51 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 				else if (tokenizer.sval.equalsIgnoreCase(VDCTLINE)) {
 					// read template name
 					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+					if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
 						(tokenizer.ttype == DBConstants.quoteChar)) str=tokenizer.sval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 					
 					// read x pos
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) tx=(int)tokenizer.nval;
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) tx=(int)tokenizer.nval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 					
 					// read y pos
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) ty=(int)tokenizer.nval;
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) ty=(int)tokenizer.nval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 					// read x2 pos
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) tx2=(int)tokenizer.nval;
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) tx2=(int)tokenizer.nval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 					
 					// read y2 pos
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) ty2=(int)tokenizer.nval;
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) ty2=(int)tokenizer.nval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 					// read dashed
 					boolean dashed = false;
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) dashed=((int)tokenizer.nval)!=0;
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) dashed=((int)tokenizer.nval)!=0;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 					// read startArrow
 					boolean startArrow = false;
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) startArrow=((int)tokenizer.nval)!=0;
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) startArrow=((int)tokenizer.nval)!=0;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 					// read endArrow
 					boolean endArrow = false;
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) endArrow=((int)tokenizer.nval)!=0;
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) endArrow=((int)tokenizer.nval)!=0;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 					// read color
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) t=(int)tokenizer.nval;
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) t=(int)tokenizer.nval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 					data.addLine(new DBLine(str, tx, ty, tx2, ty2, dashed, startArrow, endArrow, StringUtils.int2color(t)));
@@ -637,39 +637,39 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 				else if (tokenizer.sval.equalsIgnoreCase(VDCTBOX)) {
 					// read template name
 					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+					if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
 						(tokenizer.ttype == DBConstants.quoteChar)) str=tokenizer.sval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 					
 					// read x pos
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) tx=(int)tokenizer.nval;
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) tx=(int)tokenizer.nval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 					
 					// read y pos
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) ty=(int)tokenizer.nval;
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) ty=(int)tokenizer.nval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 					// read x2 pos
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) tx2=(int)tokenizer.nval;
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) tx2=(int)tokenizer.nval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 					
 					// read y2 pos
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) ty2=(int)tokenizer.nval;
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) ty2=(int)tokenizer.nval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 					// read dashed
 					boolean dashed = false;
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) dashed=((int)tokenizer.nval)!=0;
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) dashed=((int)tokenizer.nval)!=0;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 					// read color
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) t=(int)tokenizer.nval;
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) t=(int)tokenizer.nval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 					data.addBox(new DBBox(str, tx, ty, tx2, ty2, dashed, StringUtils.int2color(t)));
@@ -677,60 +677,60 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 				else if (tokenizer.sval.equalsIgnoreCase(VDCTTEXTBOX)) {
 					// read template name
 					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+					if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
 						(tokenizer.ttype == DBConstants.quoteChar)) str=tokenizer.sval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 					
 					// read x pos
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) tx=(int)tokenizer.nval;
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) tx=(int)tokenizer.nval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 					
 					// read y pos
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) ty=(int)tokenizer.nval;
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) ty=(int)tokenizer.nval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 					// read x2 pos
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) tx2=(int)tokenizer.nval;
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) tx2=(int)tokenizer.nval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 					
 					// read y2 pos
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) ty2=(int)tokenizer.nval;
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) ty2=(int)tokenizer.nval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 					// read border
 					boolean border = false;
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) border=((int)tokenizer.nval)!=0;
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) border=((int)tokenizer.nval)!=0;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 					// read fontName
 					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+					if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
 						(tokenizer.ttype == DBConstants.quoteChar)) str2=tokenizer.sval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 					// read fontSize
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) t2=(int)tokenizer.nval;
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) t2=(int)tokenizer.nval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 					// read fontStyle
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) t3=(int)tokenizer.nval;
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) t3=(int)tokenizer.nval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 					// read color
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) t=(int)tokenizer.nval;
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) t=(int)tokenizer.nval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 					// read description
 					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+					if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
 						(tokenizer.ttype == DBConstants.quoteChar)) desc=tokenizer.sval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
@@ -740,7 +740,7 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 
 					// read optional n of lines
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) tx=(int)tokenizer.nval;
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) tx=(int)tokenizer.nval;
 					else
 					{
 						tx = 1; 
@@ -761,7 +761,7 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 
 					// read record_name
 					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+					if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
 						(tokenizer.ttype == DBConstants.quoteChar)) str=tokenizer.sval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
@@ -769,17 +769,17 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 					if (rd!=null) {
 						// read x pos
 						tokenizer.nextToken();
-						if (tokenizer.ttype == tokenizer.TT_NUMBER) rd.setX((int)tokenizer.nval);
+						if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) rd.setX((int)tokenizer.nval);
 						else throw (new DBGParseException(errorString, tokenizer, fileName));
 					
 						// read y pos
 						tokenizer.nextToken();
-						if (tokenizer.ttype == tokenizer.TT_NUMBER) rd.setY((int)tokenizer.nval);
+						if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) rd.setY((int)tokenizer.nval);
 						else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 						// read rotation
 						tokenizer.nextToken();
-						if (tokenizer.ttype == tokenizer.TT_NUMBER) rd.setRotated(((int)tokenizer.nval)!=0);
+						if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) rd.setRotated(((int)tokenizer.nval)!=0);
 						else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 						rd.setColor(java.awt.Color.black);
@@ -790,18 +790,18 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 
 					// read group_name
 					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+					if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
 						(tokenizer.ttype == DBConstants.quoteChar)) str=tokenizer.sval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 					// read x pos
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) tx=(int)tokenizer.nval;
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) tx=(int)tokenizer.nval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 					
 					// read y pos
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) ty=(int)tokenizer.nval;
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) ty=(int)tokenizer.nval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 					data.addGroup(new DBGroupData(str, tx, ty, java.awt.Color.black, nullString));
@@ -811,34 +811,34 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 
 					// read linkID
 					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+					if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
 						(tokenizer.ttype == DBConstants.quoteChar)) str=tokenizer.sval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 					// read desc
 					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD) ||
+					if ((tokenizer.ttype == StreamTokenizer.TT_WORD) ||
 						(tokenizer.ttype == DBConstants.quoteChar)) desc=tokenizer.sval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 					// read x pos
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) tx=(int)tokenizer.nval;
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) tx=(int)tokenizer.nval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 					
 					// read x2 pos
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) tx2=(int)tokenizer.nval;
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) tx2=(int)tokenizer.nval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 					// read obj1rotated
 					tokenizer.nextToken();
-/*					if (tokenizer.ttype == tokenizer.TT_NUMBER) r1=((int)tokenizer.nval)!=0;
+/*					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) r1=((int)tokenizer.nval)!=0;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 */
 					// read obj2rotated
 					tokenizer.nextToken();
-/*					if (tokenizer.ttype == tokenizer.TT_NUMBER) r2=((int)tokenizer.nval)!=0;
+/*					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) r2=((int)tokenizer.nval)!=0;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 */
 /*
@@ -907,9 +907,9 @@ public static String processTemplateComment(DBTemplate template, StreamTokenizer
 	tokenizer.wordChars('\t', '\t');
 	tokenizer.eolIsSignificant(true);
 
-	while ((tokenizer.nextToken() != tokenizer.TT_EOL) &&						// read till EOL
-		    (tokenizer.ttype != tokenizer.TT_EOF))
-	 	if (tokenizer.ttype == tokenizer.TT_NUMBER) {
+	while ((tokenizer.nextToken() != StreamTokenizer.TT_EOL) &&						// read till EOL
+		    (tokenizer.ttype != StreamTokenizer.TT_EOF))
+	 	if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) {
 		 	//if (!comment.equals(nullString)) comment+=SPACE;
 	 		comment=comment+tokenizer.nval;
 	 	}
@@ -928,9 +928,9 @@ public static String processTemplateComment(DBTemplate template, StreamTokenizer
 	
  	 String str;
 
- 	 while ((tokenizer.nextToken() != tokenizer.TT_EOL) &&
-		    (tokenizer.ttype != tokenizer.TT_EOF)) 
-		if (tokenizer.ttype == tokenizer.TT_WORD) 
+ 	 while ((tokenizer.nextToken() != StreamTokenizer.TT_EOL) &&
+		    (tokenizer.ttype != StreamTokenizer.TT_EOF)) 
+		if (tokenizer.ttype == StreamTokenizer.TT_WORD) 
 
 				if (tokenizer.sval.equalsIgnoreCase(VDCT_CONSTANT_PORT) ||
 					tokenizer.sval.equalsIgnoreCase(VDCT_INPUT_PORT) ||
@@ -946,7 +946,7 @@ public static String processTemplateComment(DBTemplate template, StreamTokenizer
 						
 					// read port name
 					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+					if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
 						(tokenizer.ttype == DBConstants.quoteChar)) str=tokenizer.sval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
@@ -957,28 +957,28 @@ public static String processTemplateComment(DBTemplate template, StreamTokenizer
 						
 						// read port inlink
 						tokenizer.nextToken();
-						if ((tokenizer.ttype == tokenizer.TT_WORD)||
+						if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
 							(tokenizer.ttype == DBConstants.quoteChar)) port.setInLinkID(tokenizer.sval);
 						else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 						// read x pos
 						tokenizer.nextToken();
-						if (tokenizer.ttype == tokenizer.TT_NUMBER) port.setX((int)tokenizer.nval);
+						if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) port.setX((int)tokenizer.nval);
 						else throw (new DBGParseException(errorString, tokenizer, fileName));
 					
 						// read y pos
 						tokenizer.nextToken();
-						if (tokenizer.ttype == tokenizer.TT_NUMBER) port.setY((int)tokenizer.nval);
+						if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) port.setY((int)tokenizer.nval);
 						else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 						// read color
 						tokenizer.nextToken();
-						if (tokenizer.ttype == tokenizer.TT_NUMBER) port.setColor(StringUtils.int2color((int)tokenizer.nval));
+						if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) port.setColor(StringUtils.int2color((int)tokenizer.nval));
 						else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 						// read defaultVisibility
 						tokenizer.nextToken();
-						if (tokenizer.ttype == tokenizer.TT_NUMBER) port.setDefaultVisibility((int)tokenizer.nval);
+						if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) port.setDefaultVisibility((int)tokenizer.nval);
 						else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 						port.setHasVisual(true);
@@ -996,7 +996,7 @@ public static String processTemplateComment(DBTemplate template, StreamTokenizer
 						
 					// read port name
 					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+					if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
 						(tokenizer.ttype == DBConstants.quoteChar)) str=tokenizer.sval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
@@ -1012,28 +1012,28 @@ public static String processTemplateComment(DBTemplate template, StreamTokenizer
 						
 						// read port description
 						tokenizer.nextToken();
-						if ((tokenizer.ttype == tokenizer.TT_WORD)||
+						if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
 							(tokenizer.ttype == DBConstants.quoteChar)) macro.setDescription(tokenizer.sval);
 						else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 						// read x pos
 						tokenizer.nextToken();
-						if (tokenizer.ttype == tokenizer.TT_NUMBER) macro.setX((int)tokenizer.nval);
+						if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) macro.setX((int)tokenizer.nval);
 						else throw (new DBGParseException(errorString, tokenizer, fileName));
 					
 						// read y pos
 						tokenizer.nextToken();
-						if (tokenizer.ttype == tokenizer.TT_NUMBER) macro.setY((int)tokenizer.nval);
+						if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) macro.setY((int)tokenizer.nval);
 						else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 						// read color
 						tokenizer.nextToken();
-						if (tokenizer.ttype == tokenizer.TT_NUMBER) macro.setColor(StringUtils.int2color((int)tokenizer.nval));
+						if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) macro.setColor(StringUtils.int2color((int)tokenizer.nval));
 						else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 						// read defaultVisibility
 						tokenizer.nextToken();
-						if (tokenizer.ttype == tokenizer.TT_NUMBER) macro.setDefaultVisibility((int)tokenizer.nval);
+						if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) macro.setDefaultVisibility((int)tokenizer.nval);
 						else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 						macro.setHasVisual(true);
@@ -1057,10 +1057,10 @@ public static void skipLines(int linesToSkip, StreamTokenizer tokenizer, String 
 		tokenizer.nextToken();
 		
 		// end of file
-		if (tokenizer.ttype == tokenizer.TT_EOF)		
+		if (tokenizer.ttype == StreamTokenizer.TT_EOF)		
 			return;
 			
-		else if (tokenizer.ttype == tokenizer.TT_EOL)
+		else if (tokenizer.ttype == StreamTokenizer.TT_EOL)
 			lines++;
 	}
 }
@@ -1103,8 +1103,8 @@ public static void processDB(DBData data, StreamTokenizer tokenizer, String file
 		
 		try {
 			
-			while (tokenizer.nextToken() != tokenizer.TT_EOF)
-	  		  if (tokenizer.ttype == tokenizer.TT_WORD)
+			while (tokenizer.nextToken() != StreamTokenizer.TT_EOF)
+	  		  if (tokenizer.ttype == StreamTokenizer.TT_WORD)
 				if (tokenizer.sval.startsWith(DBConstants.commentString))
 					comment+=processComment(data, tokenizer, fileName);
 				else
@@ -1118,13 +1118,13 @@ public static void processDB(DBData data, StreamTokenizer tokenizer, String file
 	
 						// read record_type
 						tokenizer.nextToken();
-						if ((tokenizer.ttype == tokenizer.TT_WORD) ||
+						if ((tokenizer.ttype == StreamTokenizer.TT_WORD) ||
 							(tokenizer.ttype == DBConstants.quoteChar)) rd.setRecord_type(tokenizer.sval);
 						else throw (new DBParseException("Invalid record type...", tokenizer, fileName));
 	
 						// read record_name
 						tokenizer.nextToken();
-						if ((tokenizer.ttype == tokenizer.TT_WORD) ||
+						if ((tokenizer.ttype == StreamTokenizer.TT_WORD) ||
 							(tokenizer.ttype == DBConstants.quoteChar)) rd.setName(tokenizer.sval);
 						else throw (new DBParseException("Invalid record name...", tokenizer, fileName));
 	
@@ -1189,7 +1189,7 @@ public static void processDB(DBData data, StreamTokenizer tokenizer, String file
 	
 						// read tempalte instance id
 						tokenizer.nextToken();
-						if ((tokenizer.ttype == tokenizer.TT_WORD) ||
+						if ((tokenizer.ttype == StreamTokenizer.TT_WORD) ||
 							(tokenizer.ttype == DBConstants.quoteChar)) str2 = tokenizer.sval;
 						else throw (new DBParseException("Invalid expand template instance name...", tokenizer, fileName));
 	
@@ -1287,8 +1287,8 @@ public static void processMacros(DBTemplateInstance templateInstance, StreamToke
 	
 	/********************** macros area *************************/
 		
-	while (tokenizer.nextToken() != tokenizer.TT_EOF) 
-		if (tokenizer.ttype == tokenizer.TT_WORD) 
+	while (tokenizer.nextToken() != StreamTokenizer.TT_EOF) 
+		if (tokenizer.ttype == StreamTokenizer.TT_WORD) 
 			if (tokenizer.sval.equals(ENDSTR)) break;
 			else if (tokenizer.sval.startsWith(DBConstants.commentString)) 
 				processComment(null, tokenizer, fileName);				// !!! no comments are preserved in macro part
@@ -1296,7 +1296,7 @@ public static void processMacros(DBTemplateInstance templateInstance, StreamToke
 
 				// read name
 				tokenizer.nextToken();
-				if ((tokenizer.ttype == tokenizer.TT_WORD) ||
+				if ((tokenizer.ttype == StreamTokenizer.TT_WORD) ||
 					(tokenizer.ttype == DBConstants.quoteChar)) name=tokenizer.sval;
 				else throw (new DBParseException("Invalid macro name...", tokenizer, fileName));
 					
@@ -1346,8 +1346,8 @@ public static void processPorts(DBTemplate template, StreamTokenizer tokenizer, 
 	
 	/********************** ports area *************************/
 		
-	while (tokenizer.nextToken() != tokenizer.TT_EOF) 
-		if (tokenizer.ttype == tokenizer.TT_WORD) 
+	while (tokenizer.nextToken() != StreamTokenizer.TT_EOF) 
+		if (tokenizer.ttype == StreamTokenizer.TT_WORD) 
 			if (tokenizer.sval.equals(ENDSTR)) break;
 			else if (tokenizer.sval.startsWith(DBConstants.commentString)) 
 				comment+=processTemplateComment(template, tokenizer, fileName);
@@ -1355,13 +1355,13 @@ public static void processPorts(DBTemplate template, StreamTokenizer tokenizer, 
 
 				// read name
 				tokenizer.nextToken();
-				if ((tokenizer.ttype == tokenizer.TT_WORD) ||
+				if ((tokenizer.ttype == StreamTokenizer.TT_WORD) ||
 					(tokenizer.ttype == DBConstants.quoteChar)) name=tokenizer.sval;
 				else throw (new DBParseException("Invalid port name...", tokenizer, fileName));
 					
 				// read field
 				tokenizer.nextToken();
-				if ((tokenizer.ttype == tokenizer.TT_WORD) ||
+				if ((tokenizer.ttype == StreamTokenizer.TT_WORD) ||
 					(tokenizer.ttype == DBConstants.quoteChar)) value=tokenizer.sval;
 				else throw (new DBParseException("Invalid port value...", tokenizer, fileName));
 
@@ -1418,8 +1418,8 @@ public static void processFields(DBRecordData rd, StreamTokenizer tokenizer, Str
 	
 	/********************** fields area *************************/
 		
-	while (tokenizer.nextToken() != tokenizer.TT_EOF) 
-		if (tokenizer.ttype == tokenizer.TT_WORD) 
+	while (tokenizer.nextToken() != StreamTokenizer.TT_EOF) 
+		if (tokenizer.ttype == StreamTokenizer.TT_WORD) 
 			if (tokenizer.sval.equals(ENDSTR)) break;
 			else if (tokenizer.sval.startsWith(DBConstants.commentString)) 
 				comment+=processComment(null, tokenizer, fileName);
@@ -1427,7 +1427,7 @@ public static void processFields(DBRecordData rd, StreamTokenizer tokenizer, Str
 
 				// read field_name
 				tokenizer.nextToken();
-				if ((tokenizer.ttype == tokenizer.TT_WORD) ||
+				if ((tokenizer.ttype == StreamTokenizer.TT_WORD) ||
 					(tokenizer.ttype == DBConstants.quoteChar)) name=tokenizer.sval;
 				else throw (new DBParseException("Invalid field name...", tokenizer, fileName));
 					
@@ -1473,14 +1473,14 @@ public static String[] resolveIncodedDBDs(String fileName) throws IOException {
 	String[] dbds = null;
 	Vector vec = null;
 	
-	while (tokenizer.nextToken() != tokenizer.TT_EOF)
-		if (tokenizer.ttype == tokenizer.TT_WORD)
+	while (tokenizer.nextToken() != StreamTokenizer.TT_EOF)
+		if (tokenizer.ttype == StreamTokenizer.TT_WORD)
 			if (tokenizer.sval.startsWith(DBConstants.layoutDataString))
 			{
 				
-	 	 		while ((tokenizer.nextToken() != tokenizer.TT_EOL) &&
-			    		(tokenizer.ttype != tokenizer.TT_EOF)) 
-					if (tokenizer.ttype == tokenizer.TT_WORD) 
+	 	 		while ((tokenizer.nextToken() != StreamTokenizer.TT_EOL) &&
+			    		(tokenizer.ttype != StreamTokenizer.TT_EOF)) 
+					if (tokenizer.ttype == StreamTokenizer.TT_WORD) 
 						if (tokenizer.sval.equalsIgnoreCase(DBD_START_STR))
 							vec = new Vector();
 						else if (tokenizer.sval.equalsIgnoreCase(DBD_ENTRY_STR))
@@ -1494,7 +1494,7 @@ public static String[] resolveIncodedDBDs(String fileName) throws IOException {
 
 							// read DBD filename
 							tokenizer.nextToken();
-							if ((tokenizer.ttype == tokenizer.TT_WORD)||
+							if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
 								(tokenizer.ttype == DBConstants.quoteChar)) vec.addElement(tokenizer.sval);
 							else
 								Console.getInstance().println("Warning: error found in file '"+fileName+"', line "+tokenizer.lineno()+" near token '"+tokenizer.sval+"':\n\tinvalid '"+DBD_ENTRY_STR+"' entry. Quoted DBD filename expected...");

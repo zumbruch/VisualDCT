@@ -1368,7 +1368,7 @@ public VDBFieldData getField(String name) {
  */
 public ArrayList getModeNames()
 {
-	return this.getModes();
+	return getModes();
 }
 
 private static ArrayList getModes()

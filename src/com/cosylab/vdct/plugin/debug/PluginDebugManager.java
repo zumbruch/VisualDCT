@@ -107,7 +107,7 @@ public void pluginRemoved(PluginObject plugin)
 {
 	if (plugin.getPlugin() instanceof DebugPlugin)
 	{
-		if (plugin.getPlugin()==this.getDebugPlugin())
+		if (plugin.getPlugin()==getDebugPlugin())
 			DebugStopMenuItem.stopDebugging();
 		
 		list.remove(plugin);

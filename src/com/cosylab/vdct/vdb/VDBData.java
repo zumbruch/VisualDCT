@@ -400,9 +400,9 @@ public static void extractTemplates(DBDData dbd, DBData db, VDBData vdb)
 	while (e.hasMoreElements()) {
 		dbTemplate = (DBTemplate)(e.nextElement());
 
-		if (vdb.getTemplates().containsKey(dbTemplate.getId()))
+		if (VDBData.getTemplates().containsKey(dbTemplate.getId()))
 		{
-			VDBTemplate t = (VDBTemplate)vdb.getTemplates().get(dbTemplate.getId());
+			VDBTemplate t = (VDBTemplate)VDBData.getTemplates().get(dbTemplate.getId());
 			Console.getInstance().println("Template with id '"+dbTemplate.getId()+"' ('"+t.getFileName()+"') already exists in repository. Skipping template from file '"+dbTemplate.getFileName()+"'...");
 			continue;
 		}

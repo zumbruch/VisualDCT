@@ -5253,7 +5253,7 @@ private void initialize() {
 		handleException(ivjExc);
 	}
 	// user code begin {2}
-	com.cosylab.vdct.inspector.InspectorManager.getInstance().setParent(this);
+	com.cosylab.vdct.inspector.InspectorManager.setParent(this);
 	// user code end
 }
 /**
@@ -6442,7 +6442,7 @@ public void setCurrentGroup(String groupName) {
 public void setDefaultDirectory(String dir) {
 	java.io.File directory = new java.io.File(dir);
 	if (directory.exists() && directory.isDirectory()) {
-		Settings.getInstance().setDefaultDir(directory.toString());
+		Settings.setDefaultDir(directory.toString());
 		getfileChooser().setCurrentDirectory(directory);
 	}
 }
