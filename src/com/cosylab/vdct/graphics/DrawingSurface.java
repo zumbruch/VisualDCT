@@ -1184,7 +1184,6 @@ public boolean open(File file, boolean importDB) throws IOException {
 				viewGroup.addSubObject(vdbRec.getName(), record, true);
 			}
 
-
 			// add groups (if not already created) and apply visual data
 
 			Group group;

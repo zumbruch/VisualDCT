@@ -33,6 +33,7 @@ import java.util.*;
 import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.DataProvider;
 import com.cosylab.vdct.graphics.*;
+import com.cosylab.vdct.inspector.InspectableProperty;
 
 import com.cosylab.vdct.vdb.*;
 import com.cosylab.vdct.dbd.DBDConstants;
@@ -1099,6 +1100,7 @@ public void writeVDCTData(java.io.DataOutputStream file, java.lang.String path2r
  // used format #! Record(recordname, xpos, ypos, color, rotated, "description")
  // used format #! Group(groupname, xpos, ypos, color, "description")
  // used format #! Field(fieldname, color, rotated, "description")
+ // used format #! Visibility(fieldname, visibility)
  // used format #! Link(fieldname, inLinkID)
  // used format #! Connector(id, outLinkID, xpos, ypos, color, "description")
 
@@ -1120,6 +1122,7 @@ public void writeVDCTData(java.io.DataOutputStream file, java.lang.String path2r
  final String RECORD_START    = "#! Record(";
  final String GROUP_START     = "#! Group(";
  final String FIELD_START     = "#! Field(";
+ final String VISIBILITY_START= "#! Visibility(";
  final String LINK_START      = "#! Link(";
  final String CONNECTOR_START = "#! Connector(";
  	
@@ -1173,7 +1176,7 @@ public void writeVDCTData(java.io.DataOutputStream file, java.lang.String path2r
 							 	) + 
 							 	comma + StringUtils.color2string(field.getColor()) +
 							 	comma + StringUtils.boolean2str(field.isRight()) +
-								comma + quote + StringUtils.removeBegining(field.getDescription(), path2remove) + quote +
+								comma + quote + StringUtils.removeBegining(field.getDescription(), path2remove) + quote + 
 								ending);
 
 			 			 }
@@ -1192,6 +1195,21 @@ public void writeVDCTData(java.io.DataOutputStream file, java.lang.String path2r
 			 			 }
 			 		}
 	 			}
+
+				VDBFieldData vfd;
+	 			e2 = record.getRecordData().getFieldsV().elements();
+	 			while (e2.hasMoreElements())
+	 			{
+			 		vfd = (VDBFieldData)e2.nextElement();
+					if (vfd.getVisibility()!=InspectableProperty.NON_DEFAULT_VISIBLE)
+		 				file.writeBytes(VISIBILITY_START+
+				 			StringUtils.quoteIfMacro(
+					 			StringUtils.removeBegining(vfd.getFullName(), path2remove)
+					 		) + comma +
+					 		String.valueOf(vfd.getVisibility()) +
+							ending);
+	 			}
+
 
  			 }
  	 	else if (obj instanceof Group)

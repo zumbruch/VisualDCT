@@ -1,5 +1,7 @@
 package com.cosylab.vdct.db;
 
+import com.cosylab.vdct.inspector.InspectableProperty;
+
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
  * All rights reserved.
@@ -43,6 +45,9 @@ public class DBFieldData extends DBComment {
 	protected String description = nullString;
 
 	protected boolean hasAdditionalData = false;
+
+	protected int visibility = InspectableProperty.NON_DEFAULT_VISIBLE;       // = 0
+	
 /**
  * FieldData constructor comment.
  */
@@ -53,12 +58,13 @@ public DBFieldData(String name, String value) {
 /**
  * FieldData constructor comment.
  */
-public DBFieldData(String name, String value, java.awt.Color color, boolean rotated, String description) {
+public DBFieldData(String name, String value, java.awt.Color color, boolean rotated, String description, int visibility) {
 	this.name=name;
 	this.value=value;
 	this.color=color;
 	this.rotated=rotated;
-	this.description=this.description;
+	this.description=description;
+	this.visibility=visibility;
 	this.hasAdditionalData=true;
 }
 /**
@@ -176,4 +182,22 @@ public void setTemplate_def(boolean newTemplate_def) {
 public void setValue(java.lang.String newValue) {
 	value = newValue;
 }
+/**
+ * Returns the visibility.
+ * @return int
+ */
+public int getVisibility()
+{
+	return visibility;
+}
+
+/**
+ * Sets the visibility.
+ * @param visibility The visibility to set
+ */
+public void setVisibility(int visibility)
+{
+	this.visibility = visibility;
+}
+
 }

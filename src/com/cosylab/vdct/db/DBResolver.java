@@ -59,6 +59,7 @@ public class DBResolver {
 	private static String VDCTGROUP = "Group";
 	private static String VDCTFIELD = "Field";
 	private static String VDCTLINK = "Link";
+	private static String VDCTVISIBILITY = "Visibility";
 	private static String VDCTCONNECTOR = "Connector";
 
 	// incoded DBDs
@@ -263,6 +264,34 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 					}
 				}
 				
+				else if (tokenizer.sval.equalsIgnoreCase(VDCTVISIBILITY)) {
+
+					// read name
+					tokenizer.nextToken();
+					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+						(tokenizer.ttype == DBConstants.quoteChar)) str=tokenizer.sval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					int pos = str.lastIndexOf(com.cosylab.vdct.Constants.FIELD_SEPARATOR);
+					str2 = str.substring(pos+1);
+					str = str.substring(0, pos);
+
+					rd = (DBRecordData)data.getRecords().get(str);
+					if (rd!=null)
+					{
+						fd=(DBFieldData)rd.getFields().get(str2);
+						if (fd==null)
+						{
+							fd = new DBFieldData(str2, nullString);
+							rd.addField(fd);
+						}
+							
+						tokenizer.nextToken();
+						if (tokenizer.ttype == tokenizer.TT_NUMBER) fd.setVisibility((int)tokenizer.nval);
+						else throw (new DBGParseException(errorString, tokenizer, fileName));
+					}
+				}
+
 				else if (tokenizer.sval.equalsIgnoreCase(VDCTCONNECTOR)) {
 
 					// read connector id

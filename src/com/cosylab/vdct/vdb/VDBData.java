@@ -85,6 +85,7 @@ public static void copyVDBFieldData(VDBFieldData sourceField, VDBFieldData targe
 	targetField.setInit_value(sourceField.getInit_value());
 	targetField.setGUI_type(sourceField.getGUI_type());
 	targetField.setDbdData(sourceField.getDbdData());
+	targetField.setVisibility(sourceField.getVisibility());
 }
 /**
  * This method was created in VisualAge.
@@ -160,6 +161,7 @@ public static VDBFieldData generateVDBFieldData(DBDData dbd, DBRecordData dbReco
 		if (dbField!=null) {
 	 	 	if (dbField.getValue()!=null) vdbField.setValue(dbField.getValue());
 			vdbField.setComment(dbField.getComment());
+			vdbField.setVisibility(dbField.getVisibility());
 		}
 	}
 

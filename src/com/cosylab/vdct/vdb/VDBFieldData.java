@@ -482,7 +482,7 @@ public int getVisibility()
 public void setVisibility(int visibility)
 {
 	this.visibility = visibility;
-	record.fieldValueChanged(this);
+	if (record!=null) record.fieldValueChanged(this);
 	//updateInspector();
 }
 
