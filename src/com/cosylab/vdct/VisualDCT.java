@@ -150,6 +150,7 @@ public class VisualDCT extends JFrame {
 	private JMenu ivjDebugMenu = null;
 	private com.cosylab.vdct.plugin.debug.DebugStartMenu ivjStartDebugMenuItem = null;
 	private com.cosylab.vdct.plugin.debug.DebugStopMenuItem ivjStopDebugMenuItem = null;
+	private DBDDialog dbdDialog = null;
 
 class IvjEventHandler implements java.awt.event.ActionListener, java.awt.event.ItemListener, java.awt.event.KeyListener, java.awt.event.MouseListener, java.awt.event.MouseMotionListener, java.awt.event.WindowListener {
 		public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -2079,7 +2080,7 @@ private com.cosylab.vdct.plugin.export.ExportMenu getExportMenuItem() {
  * @return javax.swing.JFileChooser
  */
 /* WARNING: THIS METHOD WILL BE REGENERATED. */
-private javax.swing.JFileChooser getfileChooser() {
+public javax.swing.JFileChooser getfileChooser() {
 	if (ivjfileChooser == null) {
 		try {
 			ivjfileChooser = new javax.swing.JFileChooser();
@@ -2354,7 +2355,7 @@ private javax.swing.JMenuItem getImport_DBDMenuItem() {
 		try {
 			ivjImport_DBDMenuItem = new javax.swing.JMenuItem();
 			ivjImport_DBDMenuItem.setName("Import_DBDMenuItem");
-			ivjImport_DBDMenuItem.setText("Import DBD...");
+			ivjImport_DBDMenuItem.setText("Manage DBDs...");
 			// user code begin {1}
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
@@ -4251,6 +4252,20 @@ private void handleException(java.lang.Throwable exception) {
 	Console.getInstance().println(exception);
 	exception.printStackTrace(System.out);
 }
+
+/**
+ * Comment
+ */
+private DBDDialog getDBDDialog()
+{
+	if (dbdDialog == null)
+	{
+		dbdDialog = new DBDDialog(this);
+	}
+	return dbdDialog;
+}
+
+
 /**
  * Comment
  */
@@ -4263,27 +4278,9 @@ public void help_TopicsMenuItem_ActionPerformed() {
  * Comment
  */
 public void import_DBDMenuItem_ActionPerformed() {
-	JFileChooser chooser = getfileChooser();
-	UniversalFileFilter filter = new UniversalFileFilter(
-		new String("dbd"), "DBD File");
-	chooser.resetChoosableFileFilters();
-	chooser.addChoosableFileFilter(filter);
-	chooser.setDialogTitle("Import DBD");
-	chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-	int retval = chooser.showOpenDialog(this);
-
-	if(retval == JFileChooser.APPROVE_OPTION) {
-	    java.io.File theFile = chooser.getSelectedFile();
-	    if(theFile != null) {
-		    GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
-		    try {
-	  		 	cmd.getGUIMenuInterface().importDBD(theFile);
-		    } catch (java.io.IOException e) {
-			    Console.getInstance().println("o) Failed to import DBD file: '"+theFile.toString()+"'");
-			    Console.getInstance().println(e);
-		    }
-		}
-	}
+	DBDDialog dialog = getDBDDialog();
+	dialog.setLocationRelativeTo(this);
+	dialog.show();
 }
 /**
  * Comment

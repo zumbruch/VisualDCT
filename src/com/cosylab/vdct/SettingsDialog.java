@@ -451,8 +451,8 @@ public void groupingSeparatorTextField_KeyTyped(java.awt.event.KeyEvent keyEvent
 private void handleException(java.lang.Throwable exception) {
 
 	/* Uncomment the following lines to print uncaught exceptions to stdout */
-	// System.out.println("--------- UNCAUGHT EXCEPTION ---------");
-	// exception.printStackTrace(System.out);
+	System.out.println("--------- UNCAUGHT EXCEPTION ---------");
+	exception.printStackTrace(System.out);
 }
 /**
  * Initializes connections

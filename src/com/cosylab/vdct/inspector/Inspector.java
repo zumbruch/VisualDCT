@@ -336,7 +336,7 @@ private javax.swing.JTable getScrollPaneTable() {
 			ivjScrollPaneTable = new javax.swing.JTable();
 			ivjScrollPaneTable.setName("ScrollPaneTable");
 			getTableScrollPane().setColumnHeaderView(ivjScrollPaneTable.getTableHeader());
-			getTableScrollPane().getViewport().setScrollMode(JViewport.BACKINGSTORE_SCROLL_MODE );
+			getTableScrollPane().getViewport().setScrollMode(JViewport.BACKINGSTORE_SCROLL_MODE);
 			ivjScrollPaneTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
 			ivjScrollPaneTable.setBackground(new java.awt.Color(204,204,204));
 			ivjScrollPaneTable.setShowVerticalLines(true);
