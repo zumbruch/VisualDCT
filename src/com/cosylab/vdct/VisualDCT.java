@@ -2465,6 +2465,7 @@ private javax.swing.JMenuItem getExportPostScriptFileMenuItem() {
 	return ivjExportPostScriptFileMenuItem;
 }
 /**
+ * NOTE: everytime this method is called "JFileChooser.setSelectedFile" is reset. 
  * Return the fileChooser property value.
  * @return javax.swing.JFileChooser
  */
@@ -2483,6 +2484,12 @@ public javax.swing.JFileChooser getfileChooser() {
 			handleException(ivjExc);
 		}
 	}
+	if (ivjfileChooser != null)
+	{
+		final File blankFile = new File(""); 
+		ivjfileChooser.setSelectedFile(blankFile);
+	}
+		
 	return ivjfileChooser;
 }
 /**
