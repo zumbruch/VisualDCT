@@ -6064,14 +6064,8 @@ public void preferences___MenuItem_ActionPerformed() {
 }
 
 public byte[] printGrid(PageFormat pageFormat, StringBuffer stringBuffer) {
-	ViewState view = ViewState.getInstance();
-	int rx = view.getRx();
-	int ry = view.getRy();
-	double scale = view.getScale();
-	int viewWidth = view.getViewWidth();
-	int viewHeight = view.getViewHeight();
-	
-	try {					
+		ViewState view = ViewState.getInstance();
+						
 		int pageWidth = (int)pageFormat.getImageableWidth();
 		int pageHeight = (int)pageFormat.getImageableHeight();
 		
@@ -6126,11 +6120,11 @@ public byte[] printGrid(PageFormat pageFormat, StringBuffer stringBuffer) {
 			int imageWidth = Math.min(pageWidth, w-x);
 			int imageHeight = Math.min(pageHeight, h-y);
 			
-			view.setScale(1.0);
-			view.setRx((int)(rx/scale+x));
-			view.setRy((int)(ry/scale+y));
-			view.setViewWidth((int)(imageWidth/screen2printer));
-			view.setViewHeight((int)(imageHeight/screen2printer));
+			/*view.setScale(1.0);*/
+			int viewRx = (int)(view.getRx()/view.getScale()+x);
+			int viewRy= (int)(view.getRy()/view.getScale()+y);
+			int viewViewWidth=(int)(imageWidth/screen2printer);
+			int viewViewHeight=(int)(imageHeight/screen2printer);
 	
 			String postScriptGrid = new String();
 		
@@ -6142,16 +6136,16 @@ public byte[] printGrid(PageFormat pageFormat, StringBuffer stringBuffer) {
 					/ 255.0)).toString() + " "
 					+ (new Double(Constants.GRID_COLOR.getBlue() / 255.0)).toString()
 					+ " setrgbcolor\n";
-	
-				int gridSize = view.getGridSize();
-				int sx = view.getGridSize() - view.getRx() % gridSize;
-				int y0 = view.getGridSize() - view.getRy() % gridSize;
-				int xsteps = (int)(view.getViewWidth() / gridSize + 1);
-				int ysteps = (int)(view.getViewHeight() / gridSize + 1);
+				
+				int gridSize = Math.max(1, (int)(com.cosylab.vdct.Constants.GRID_SIZE));
+				int sx = gridSize - viewRx % gridSize;
+				int y0 = gridSize - viewRy % gridSize;
+				int xsteps = (int)(viewViewWidth / gridSize + 1);
+				int ysteps = (int)(viewViewHeight / gridSize + 1);
 	
 				
-				imageWidth = Math.min(view.getViewWidth(), gridSize * xsteps + sx);
-				imageHeight = Math.min(view.getViewHeight(), gridSize * ysteps + y0);
+				imageWidth = Math.min(viewViewWidth, gridSize * xsteps + sx);
+				imageHeight = Math.min(viewViewHeight, gridSize * ysteps + y0);
 	
 				System.out.println(sx+" "+y0+" "+xsteps+" "+ysteps+" "+imageWidth+" "+imageHeight);
 	
@@ -6204,14 +6198,6 @@ public byte[] printGrid(PageFormat pageFormat, StringBuffer stringBuffer) {
 	
 			stringBuffer.insert(stringOffset, postScriptGrid + startingColour);
 		}
-			
-	} finally {
-		view.setScale(scale);
-		view.setRx(rx);
-		view.setRy(ry);
-		view.setViewWidth(viewWidth);
-		view.setViewHeight(viewHeight);
-	}
 	
 	return stringBuffer.toString().getBytes();
 }

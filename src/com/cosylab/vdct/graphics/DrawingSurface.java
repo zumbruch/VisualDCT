@@ -128,6 +128,8 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 	private boolean forceRedraw = false;
 	// does not redraws navigator image
 	private boolean blockNavigatorRedrawOnce = false;
+	
+	private boolean printing = false;
 	// current view
 	//private ViewState view;
 	// ... and history
@@ -315,6 +317,13 @@ private void createNavigatorImage() {
  * Creation date: (10.12.2000 13:19:16)
  */
 public void draw(Graphics g) {
+
+	if (printing) {
+		if (canvasImage!=null) copyCanvasImage(g);
+		if (Settings.getInstance().getNavigator())
+				drawNavigator(g);	
+		return;
+	}
 
 	ViewState view = ViewState.getInstance();
 
@@ -2285,6 +2294,8 @@ public int print(java.awt.Graphics graphics, java.awt.print.PageFormat pageForma
 	try
 	{
 		((Graphics2D)graphics).scale(screen2printer, screen2printer);
+		
+		printing = true;
 				
 		view.setScale(1.0);
 		view.setRx((int)(rx/scale+x));
@@ -2373,6 +2384,8 @@ public int print(java.awt.Graphics graphics, java.awt.print.PageFormat pageForma
 		
 //		restore color sheme 
 		 loadWhiteOnBlackColorScheme();
+		 
+		 printing = false;
 	}
 	
 
@@ -2526,6 +2539,10 @@ public void recalculateNavigatorPosition() {
  * @param g java.awt.Graphics
  */
 private synchronized void redraw(Graphics g) {
+	if (printing) {
+		if (canvasImage!=null) copyCanvasImage(g);
+		return;
+	}
 
 	if (Settings.getInstance().getNavigator())
 		createNavigatorImage();
