@@ -387,7 +387,11 @@ public static OutLink getStartPoint(Linkable link) {
 }
 
 public static InLink getTarget(LinkProperties link) {
-	return getTarget(link, false);
+	return getTarget(link, false, false);
+}
+
+public static InLink getTarget(LinkProperties link, boolean allowLinkOutAsTarget) {
+	return getTarget(link, allowLinkOutAsTarget, false);
 }
 
 /**
@@ -396,7 +400,7 @@ public static InLink getTarget(LinkProperties link) {
  * @return com.cosylab.vdct.graphics.objects.InLink
  * @param link com.cosylab.vdct.vdb.LinkProperties
  */
-public static InLink getTarget(LinkProperties link, boolean allowLinkOutAsTarget) {
+public static InLink getTarget(LinkProperties link, boolean allowLinkOutAsTarget, boolean doNotSearchRecordFields) {
 
 	String recName = link.getRecord();
 	// !!! check for getType()==LinkProperties.NOT_VALID
@@ -419,6 +423,9 @@ public static InLink getTarget(LinkProperties link, boolean allowLinkOutAsTarget
 	if (otherLinkObj!=null && otherLinkObj instanceof InLink)
 		return (InLink)otherLinkObj;
 		
+	if (doNotSearchRecordFields)
+		return null;	
+	
 	Object obj = Group.getRoot().findObject(recName, true);
 	if (obj==null || !(obj instanceof Record)) return null;
 	Record record = (Record)obj;
