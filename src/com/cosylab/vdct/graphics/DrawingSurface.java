@@ -1207,6 +1207,24 @@ public boolean open(File file, boolean importDB) throws IOException {
 				group.move(dbGrp.getX(), dbGrp.getY());
 			}
 
+
+
+			// add templates and apply visual data
+			//!!! test - template is group
+			DBTemplateInstance dbTemplate;
+			e = dbData.getTemplateInstances().elements();
+			while (e.hasMoreElements()) {
+				dbTemplate = (DBTemplateInstance) (e.nextElement());
+
+				group = Group.getRoot().createGroup(dbTemplate.getTemplateID());
+				group.setColor(dbTemplate.getColor());
+				group.setDescription(dbTemplate.getDescription());
+				group.move(dbTemplate.getX(), dbTemplate.getY());
+			}
+
+
+
+
 			// add links, connectors
 
 			int pos;
