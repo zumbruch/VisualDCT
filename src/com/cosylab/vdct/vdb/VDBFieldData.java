@@ -32,10 +32,12 @@ import com.cosylab.vdct.db.DBData;
 import com.cosylab.vdct.dbd.*;
 import com.cosylab.vdct.DataProvider;
 import com.cosylab.vdct.Console;
+import com.cosylab.vdct.inspector.ChangableVisibility;
 import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.inspector.InspectorManager;
 import com.cosylab.vdct.graphics.objects.Debuggable;
 import com.cosylab.vdct.graphics.objects.Group;
+import com.cosylab.vdct.graphics.objects.LinkSource;
 import com.cosylab.vdct.graphics.objects.Record;
 
 import java.awt.Component;
@@ -46,7 +48,7 @@ import java.util.regex.Pattern;
 /**
  * This type was created in VisualAge.
  */
-public class VDBFieldData implements InspectableProperty, Debuggable {
+public class VDBFieldData implements InspectableProperty, Debuggable, ChangableVisibility, LinkSource {
 	protected int type;
 	protected int GUI_type;
 	protected String name;

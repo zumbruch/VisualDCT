@@ -1,4 +1,4 @@
-package com.cosylab.vdct;
+package com.cosylab.vdct.graphics.objects;
 
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
@@ -28,15 +28,25 @@ package com.cosylab.vdct;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 /**
  * Insert the type's description here.
- * Creation date: (24.4.2001 15:59:00)
+ * Creation date: (29.1.2001 17:50:12)
  * @author Matej Sekoranja
  */
-public interface Version {
-	public final static String VERSION = "2.4";
-	public final static String BUILD = "1243";
-
-	public final static String JAVA_VERSION_REQUIRED = "1.4.0";
+public interface LinkSource {
+/**
+ * Returns type of the source (INPUT, OUTPUT, FORWARD, PORT or MACRO).
+ * @return int
+ */
+int getType();
+/**
+ * Returns link target.
+ * @return java.lang.String
+ */
+String getValue();
+/**
+ * Returns fill name of the source.
+ * @return java.lang.String
+ */
+String getFullName();
 }

@@ -41,6 +41,7 @@ import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.vdb.GUIHeader;
 import com.cosylab.vdct.vdb.GUISeparator;
 import com.cosylab.vdct.vdb.NameValueInfoProperty;
+import com.cosylab.vdct.vdb.ROProperty;
 import com.cosylab.vdct.vdb.VDBFieldData;
 import com.cosylab.vdct.vdb.VDBTemplateField;
 import com.cosylab.vdct.vdb.VDBTemplatePort;
@@ -236,7 +237,8 @@ public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode) 
 
 	properties[0]=GUIHeader.getDefaultHeader();
 	properties[1]=getPortSeparator();
-	properties[2]=new NameValueInfoProperty("Value", getFieldData().getValue());
+	//properties[2]=new NameValueInfoProperty("Value", getFieldData().getValue());
+	properties[2]=new ROProperty(getFieldData(), true);
 	properties[3]=new NameValueInfoProperty("Description", getFieldData().getHelp());
 
 	int i = 4;

@@ -119,6 +119,7 @@ public java.lang.String getHashID() {
  * @return int
  */
 public int getY() {
+	///!!! performance
 	getParent().forceValidation();
 	return super.getY();
 }

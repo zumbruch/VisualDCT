@@ -1,4 +1,4 @@
-package com.cosylab.vdct.inspector;
+package com.cosylab.vdct.vdb;
 
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
@@ -31,96 +31,139 @@ package com.cosylab.vdct.inspector;
 import java.awt.Component;
 import java.util.regex.Pattern;
 
+import com.cosylab.vdct.inspector.*;
 /**
  * Insert the type's description here.
- * Creation date: (11.1.2001 21:28:00)
- * @author Matej Sekoranja 
+ * Creation date: (12.1.2001 22:40:34)
+ * @author 
  */
-public interface InspectableProperty {
+public class ROProperty implements InspectableProperty, ChangableVisibility {
 	
-	public static final int NON_DEFAULT_VISIBLE = 0; 
-	public static final int ALWAYS_VISIBLE = 1;
-	public static final int NEVER_VISIBLE = 2;
-	public static final int UNDEFINED_VISIBILITY = Integer.MAX_VALUE;
+	protected boolean allowVisibilityChange = false;
+	protected InspectableProperty property = null;
+
+/**
+ * GUISeparator constructor comment.
+ */
+public ROProperty(InspectableProperty property) {
+	this(property, false);
+}
+
+/**
+ * GUISeparator constructor comment.
+ */
+public ROProperty(InspectableProperty property, boolean allowVisibilityChange) {
+	this.property = property;
+	this.allowVisibilityChange = allowVisibilityChange;
+}
 
 /**
  * Insert the method's description here.
- * Creation date: (11.1.2001 21:34:58)
+ * Creation date: (12.1.2001 22:40:34)
  * @return boolean
  */
-public boolean allowsOtherValues();
+public boolean allowsOtherValues() {
+	return property.allowsOtherValues();
+}
 /**
  * Insert the method's description here.
- * Creation date: (26.1.2001 15:01:28)
+ * Creation date: (26.1.2001 15:02:40)
  * @return java.lang.String
  */
-public String getHelp();
+public java.lang.String getHelp() {
+	return property.getHelp();
+}
 /**
  * Insert the method's description here.
- * Creation date: (11.1.2001 21:54:12)
+ * Creation date: (12.1.2001 22:40:34)
  * @return java.lang.String
  */
-public String getName();
+public String getName() {
+	return property.getName();
+}
 /**
  * Insert the method's description here.
- * Creation date: (11.1.2001 21:36:10)
+ * Creation date: (12.1.2001 22:40:34)
  * @return java.lang.String[]
  */
-public String[] getSelectableValues();
+public java.lang.String[] getSelectableValues() {
+	return property.getSelectableValues();
+}
+/**
+ * Insert the method's description here.
+ * Creation date: (12.1.2001 22:40:34)
+ * @return java.lang.String
+ */
+public String getValue() {
+	return property.getValue();
+}
 /**
  * Insert the method's description here.
  * Creation date: (11.1.2001 21:29:48)
  * @return java.lang.String
  */
-public String getValue();
+public String getInitValue()
+{
+	return property.getInitValue();
+}
 /**
  * Insert the method's description here.
- * Creation date: (11.1.2001 21:29:48)
- * @return java.lang.String
- */
-public String getInitValue();
-/**
- * Insert the method's description here.
- * Creation date: (11.1.2001 21:28:51)
+ * Creation date: (12.1.2001 22:40:34)
  * @return boolean
  */
-public boolean isEditable();
+public boolean isEditable() {
+	return false;
+}
 /**
  * Insert the method's description here.
- * Creation date: (11.1.2001 21:28:51)
+ * Creation date: (12.1.2001 22:40:34)
  * @return boolean
  */
-public boolean isValid();
+public boolean isSepatator() {
+	return property.isSepatator();
+}
 /**
  * Insert the method's description here.
- * Creation date: (11.1.2001 21:44:32)
- * @return boolean
- */
-public boolean isSepatator();
-/**
- * Insert the method's description here.
- * Creation date: (11.1.2001 21:30:04)
+ * Creation date: (12.1.2001 22:40:34)
  * @param value java.lang.String
  */
-public void setValue(String value);
+public void setValue(String value) {}
 /**
  * Insert the method's description here.
- * Creation date: (11.1.2001 21:30:04)
- * @return java.lang.String
+ * Creation date: (24/8/99 15:29:04)
+ * @return java.util.regex.Pattern
  */
-public Pattern getEditPattern();
+public Pattern getEditPattern()
+{
+	return property.getEditPattern();
+}
 /**
  * Insert the method's description here.
- * Creation date: (11.1.2001 21:30:04)
+ * Creation date: (24/8/99 15:29:04)
  * @return java.lang.String
  */
-public String getToolTipText();
+public String getToolTipText()
+{
+	return property.getToolTipText();
+}
+/**
+ * Insert the method's description here.
+ * Creation date: (11.1.2001 21:28:51)
+ * @return boolean
+ */
+public boolean isValid()
+{
+	return property.isValid();
+}
 /**
  * Insert the method's description here.
  * Creation date: (11.1.2001 21:30:04)
  * @return int
  */
-public int getVisibility();
+public int getVisibility()
+{
+	return property.getVisibility();
+}
 /**
  * Insert the method's description here.
  * Creation date: (11.1.2001 21:30:04)
@@ -128,5 +171,18 @@ public int getVisibility();
  * @param x
  * @param y
  */
-public void popupEvent(Component component, int x, int y);
+public void popupEvent(Component component, int x, int y)
+{
+	// this is only RO
+}
+
+/**
+ * @see com.cosylab.vdct.inspector.ChangableVisibility#setVisibility(int)
+ */
+public void setVisibility(int visibility)
+{
+	if (allowVisibilityChange && property instanceof ChangableVisibility)
+		((ChangableVisibility)property).setVisibility(visibility);
+}
+
 }

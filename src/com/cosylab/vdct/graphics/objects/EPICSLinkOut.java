@@ -134,7 +134,7 @@ private com.cosylab.vdct.graphics.objects.EPICSLinkOut.PopupMenuHandler createPo
 public void destroy() {
 	if (!isDestroyed()) {
 		super.destroy();
-		destroyChain();
+		destroyChain(inlink, this);
 		setInput(null);
 		getFieldData().setValue(nullString);
 		properties = new LinkProperties(fieldData);
@@ -143,10 +143,10 @@ public void destroy() {
 /**
  * Insert the method's description here.
  * Creation date: (4.2.2001 21:32:42)
+ * @param link first inlink of the out
+ * @param out source of the link
  */
-public void destroyChain() {
-	Linkable link = inlink;
-	OutLink out = this;
+public static void  destroyChain(Linkable link, OutLink out) {
 	while (link instanceof OutLink) {
 		out = (OutLink)link;
 		link = out.getInput();

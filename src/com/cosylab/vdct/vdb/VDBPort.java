@@ -39,15 +39,20 @@ import javax.swing.JSeparator;
 
 
 import com.cosylab.vdct.db.DBPort;
+import com.cosylab.vdct.dbd.DBDConstants;
 import com.cosylab.vdct.graphics.objects.Descriptable;
+import com.cosylab.vdct.graphics.objects.LinkSource;
+import com.cosylab.vdct.graphics.objects.Port;
+import com.cosylab.vdct.inspector.ChangableVisibility;
 import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.inspector.InspectorManager;
 import com.cosylab.vdct.undo.DescriptionChangeAction;
 
 /**
+ * RO property of port represented on HL (template instance is parent)
  * @author Matej
  */
-public class VDBPort implements InspectableProperty, Descriptable
+public class VDBPort implements InspectableProperty, Descriptable, ChangableVisibility, LinkSource
 {
 	protected String name = null;
 	protected String target = null;
@@ -60,6 +65,10 @@ public class VDBPort implements InspectableProperty, Descriptable
 	private static final String renameString = "Rename";
 	
 	private VDBTemplate template = null;
+
+	protected int visibility = ALWAYS_VISIBLE;
+
+	protected Port visibleObject = null;
 	
 	/**
 	 * Insert the method's description here.
@@ -268,7 +277,7 @@ public class VDBPort implements InspectableProperty, Descriptable
 	 */
 	public int getVisibility()
 	{
-		return InspectableProperty.UNDEFINED_VISIBILITY;
+		return visibility;
 	}
 
 	/**
@@ -341,6 +350,10 @@ public class VDBPort implements InspectableProperty, Descriptable
 			);
 
 			target = value;
+
+			if (visibleObject!=null)
+				visibleObject.valueChanged();
+			
 			template.propertyChanged(this);
 		}
 	}
@@ -361,6 +374,41 @@ public class VDBPort implements InspectableProperty, Descriptable
 	public void setTemplate(VDBTemplate template)
 	{
 		this.template = template;
+	}
+
+	/**
+	 * @see com.cosylab.vdct.inspector.ChangableVisibility#setVisibility(int)
+	 */
+	public void setVisibility(int visibility)
+	{
+		this.visibility = visibility;
+		template.propertyChanged(this);
+	}
+
+	/**
+	 * @see com.cosylab.vdct.graphics.objects.LinkSource#getType()
+	 */
+	public int getType()
+	{
+		return DBDConstants.DBF_PORT;
+	}
+
+	/**
+	 * Returns the visibleObject.
+	 * @return Port
+	 */
+	public Port getVisibleObject()
+	{
+		return visibleObject;
+	}
+
+	/**
+	 * Sets the visibleObject.
+	 * @param visibleObject The visibleObject to set
+	 */
+	public void setVisibleObject(Port visibleObject)
+	{
+		this.visibleObject = visibleObject;
 	}
 
 }

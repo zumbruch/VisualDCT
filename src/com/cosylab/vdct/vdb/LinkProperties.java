@@ -32,6 +32,7 @@ import java.util.*;
 import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.dbd.DBDConstants;
 import com.cosylab.vdct.graphics.objects.Group;
+import com.cosylab.vdct.graphics.objects.LinkSource;
 
 /**
  * Handles PV_LINK properties
@@ -54,6 +55,7 @@ public final class LinkProperties {
 	public final static int OUTLINK_FIELD = 1;
 	public final static int FWDLINK_FIELD = 2;
 	public final static int VARIABLE_FIELD = 3;
+	public final static int PORT_FIELD = 4;
 
 	private int type;
 	private String varName;
@@ -66,7 +68,7 @@ public final class LinkProperties {
  * Insert the method's description here.
  * Creation date: (30.1.2001 9:53:33)
  */
-public LinkProperties(VDBFieldData fd) {
+public LinkProperties(LinkSource fd) {
 	setDefaults();
 	setProperties(fd);
 }
@@ -240,13 +242,14 @@ public int getType() {
  * Insert the method's description here.
  * Creation date: (29.1.2001 22:55:09)
  * @return int
- * @param fd com.cosylab.vdct.vdb.VDBFieldData
+ * @param fd com.cosylab.vdct.graphics.object.LinkSource
  */
-public static int getType(VDBFieldData fd) {
+public static int getType(LinkSource fd) {
 	switch (fd.getType()) {
-		case DBDConstants.DBF_INLINK : return INLINK_FIELD;
+		case DBDConstants.DBF_INLINK  : return INLINK_FIELD;
 		case DBDConstants.DBF_OUTLINK : return OUTLINK_FIELD;
 		case DBDConstants.DBF_FWDLINK : return FWDLINK_FIELD;
+		case DBDConstants.DBF_PORT    : return PORT_FIELD;
 		default: return VARIABLE_FIELD;
 	}
 }
@@ -305,9 +308,9 @@ public void setProcess(java.lang.String newProcess) {
 /**
  * Insert the method's description here.
  * Creation date: (30.1.2001 9:54:05)
- * @param fd com.cosylab.vdct.vdb.VDBFieldData
+ * @param fd com.cosylab.vdct.graphics.object.LinkSource
  */
-private void setProperties(VDBFieldData fd) {
+private void setProperties(LinkSource fd) {
 
 	if ((fd.getValue()==null) || fd.getValue().equals(nullString)) {
 		setType(NOT_VALID);
@@ -374,7 +377,7 @@ public void setVarName(java.lang.String newVarName) {
  * Insert the method's description here.
  * Creation date: (30.1.2001 12:38:32)
  */
-public void update(VDBFieldData fd) {
+public void update(LinkSource fd) {
 	setProperties(fd);
 }
 }

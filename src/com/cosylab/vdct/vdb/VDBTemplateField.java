@@ -35,7 +35,6 @@ import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.objects.Template;
 import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.inspector.InspectorManager;
-import com.sun.jndi.ldap.ManageReferralControl;
 
 /**
  * @author Matej

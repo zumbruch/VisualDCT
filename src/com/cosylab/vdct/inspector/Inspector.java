@@ -802,11 +802,11 @@ private void mouseEvent(MouseEvent event, int row, int col)
 	// change visibility
 	if (col==0)
 	{
-		if (property!=null && property instanceof VDBFieldData)  ///!!! define interface!!
+		if (property!=null && property instanceof ChangableVisibility)  
 		{
 			int visibility = property.getVisibility();
 			visibility = (visibility+1) % 3;						/// !!! who said there are only three modes?!
-			((VDBFieldData)property).setVisibility(visibility);
+			((ChangableVisibility)property).setVisibility(visibility);
 
 			// this does now work permanently (try to scroll), but after table update it works?
 			getScrollPaneTable().tableChanged(new TableModelEvent(tableModel, row, row, col));

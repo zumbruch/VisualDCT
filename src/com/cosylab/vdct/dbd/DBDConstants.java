@@ -50,7 +50,8 @@ public interface DBDConstants {
 	public static final int DBF_FWDLINK	= 14;
 	public static final int DBF_NOACCESS	= 15;
 
-
+	// artificial type
+	public static final int DBF_PORT	 = Integer.MAX_VALUE-1;
 	
 	public static final int DECIMAL	= 0;
 	public static final int HEX		= 1;

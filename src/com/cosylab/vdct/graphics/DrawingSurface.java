@@ -160,6 +160,8 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 	
 	private static final String newRecordString = "New record...";
 	private static final String newTemplesString = "New template instance";
+	private static final String newPortString = "New port...";
+	private static final String newMacroString = "New macro...";
 	private static final String newLineString = "New line";
 	private static final String newBoxString = "New box";
 	private static final String newTextBoxString = "New textbox";
@@ -620,11 +622,13 @@ public boolean isModified() {
  */
 public void linkCommand(LinkManagerObject linkManager, VDBFieldData field) {
 	if (tmplink==null) {
-		// start linking
+		
+		// start linking (store source field reference)
 		tmplink = field;
 		
 		Field fld = (Field)Group.getRoot().getLookupTable().get(field.getFullName());
 		if (fld!=null)
+			// field found in lookup table (it is a special link field - not owned by linkManager container)
 			ViewState.getInstance().setAsBlinking(fld);
 		else
 			ViewState.getInstance().setAsBlinking(linkManager);
@@ -784,6 +788,9 @@ private void showPopup(MouseEvent e)
 			String action = e.getActionCommand();
 			if (action.equals(newRecordString))
 				CommandManager.getInstance().execute("ShowNewDialog");
+			else if (action.equals(newPortString))
+				createPort("testPort");
+			else if (action.equals(newMacroString));
 			else if (action.equals(newLineString))
 				createLine();
 			else if (action.equals(newBoxString))
@@ -826,6 +833,17 @@ private void showPopup(MouseEvent e)
 	if (templatesMenu.getItemCount()==0)
 		templatesMenu.setEnabled(false);
 	
+	popUp.add(new JSeparator());
+	
+	JMenuItem portMenuItem = new JMenuItem(newPortString);
+	portMenuItem.addActionListener(al);
+	popUp.add(portMenuItem);
+	
+	JMenuItem macroMenuItem = new JMenuItem(newMacroString);
+	macroMenuItem.setEnabled(false);
+	macroMenuItem.addActionListener(al);
+	popUp.add(macroMenuItem);
+
 	popUp.add(new JSeparator());
 	
 	JMenuItem lineMenuItem = new JMenuItem(newLineString);
@@ -2967,4 +2985,25 @@ public static void loadBlackOnWhiteColorScheme()
     Constants.GRID_COLOR = Color.lightGray;
 }
 
+/**
+ * Insert the method's description here.
+ * Creation date: (3.2.2001 23:27:30)
+ * @param name java.lang.String
+ */
+public void createPort(String name) {
+	ViewState view = ViewState.getInstance();
+	double scale = view.getScale();
+	
+	//!!!
+	Port port = new Port(Group.getEditingTemplateData().addPort(name), viewGroup,
+						   (int)((getPressedX() + view.getRx()) / scale),
+						   (int)((getPressedY() + view.getRy()) / scale));
+
+	getViewGroup().addSubObject(name, port);
+
+	UndoManager.getInstance().addAction(new CreateAction(port));
+
+	//drawingSurface.setModified(true);
+	repaint();
+}
 }

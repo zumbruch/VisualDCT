@@ -28,21 +28,26 @@ package com.cosylab.vdct.vdb;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.util.regex.Pattern;
+
 import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.dbd.DBDConstants;
 import com.cosylab.vdct.graphics.objects.Descriptable;
 import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.objects.Template;
+import com.cosylab.vdct.inspector.ChangableVisibility;
 import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.inspector.InspectorManager;
 
 /**
  * @author Matej
  */
-public class VDBTemplatePort extends VDBFieldData implements Descriptable
+public class VDBTemplatePort extends VDBFieldData implements Descriptable, ChangableVisibility
 {
-	public VDBPort port = null;
-	public VDBTemplateInstance templateInstance = null;
+	protected VDBPort port = null;
+	protected VDBTemplateInstance templateInstance = null;
+
+	protected int visibility = UNDEFINED_VISIBILITY;
 
 	/**
 	 */
@@ -51,6 +56,7 @@ public class VDBTemplatePort extends VDBFieldData implements Descriptable
 		super();
 		this.port=port;
 		this.templateInstance = templateInstance;
+		this.visibility=port.getVisibility();	// obtain default
 	}
 	
 
@@ -94,7 +100,7 @@ public class VDBTemplatePort extends VDBFieldData implements Descriptable
 	 */
 	public int getVisibility()
 	{
-		return InspectableProperty.UNDEFINED_VISIBILITY;
+		return visibility;
 	}
 	
 	/**
@@ -103,6 +109,8 @@ public class VDBTemplatePort extends VDBFieldData implements Descriptable
 	 */
 	public void setVisibility(int visibility)
 	{
+		this.visibility = visibility;
+		updateInspector();
 	}
 
 	/**
@@ -202,5 +210,35 @@ public class VDBTemplatePort extends VDBFieldData implements Descriptable
 	{
 		this.port = port;
 	}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (24/8/99 15:29:04)
+ */
+public String getToolTipText()
+{
+	return null;
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (24/8/99 15:29:04)
+ * @return java.util.regex.Pattern
+ */
+public Pattern getEditPattern()
+{
+	return null;
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (11.1.2001 21:28:51)
+ * @return boolean
+ */
+public boolean isValid()
+{
+	return true;
+}
+
 
 }
