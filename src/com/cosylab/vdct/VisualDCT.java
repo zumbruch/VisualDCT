@@ -38,8 +38,10 @@ import javax.swing.event.*;
 import com.cosylab.vdct.about.VisualDCTAboutDialogEngine;
 import com.cosylab.vdct.events.*;
 import com.cosylab.vdct.events.commands.*;
+import com.cosylab.vdct.util.ComboBoxFileChooser;
 import com.cosylab.vdct.util.UniversalFileFilter;
 import com.cosylab.vdct.vdb.VDBData;
+import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.printing.*;
 
 import com.cosylab.vdct.graphics.*;
@@ -191,6 +193,8 @@ public class VisualDCT extends JFrame {
 	private boolean textBoxButtonEnabled = false;
 
 	private PluginManagerDialog pluginManagerDialog = null;
+	
+	private ComboBoxFileChooser comboBoxFileChooser = null;
 
 // shp: not final solution
 	private static VisualDCT instance = null;
@@ -6215,21 +6219,25 @@ public void renameOKButton_ActionPerformed(java.awt.event.ActionEvent actionEven
  * Comment
  */
 public void save_As_GroupMenuItem_ActionPerformed() {
-	JFileChooser chooser = getfileChooser();
+	ComboBoxFileChooser chooserDialog = getComboBoxFileChooser();
+	JFileChooser chooser = chooserDialog.getJFileChooser();
+
 	UniversalFileFilter filter = new UniversalFileFilter(
 		new String[] {"db", "vdb"}, "EPICS DB files");
 	chooser.resetChoosableFileFilters();
 	chooser.addChoosableFileFilter(filter);
-	chooser.setDialogTitle("Save Group as...");
-	chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+	chooserDialog.setTitle("Save Group as...");
+ 	chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+	chooser.setDialogType(JFileChooser.SAVE_DIALOG);
+	chooserDialog.getJCheckBoxAbsoluteDBD().setSelected(Group.getAbsoluteDBDs());
 
 	boolean jFileChooserConfirmed = false;
     java.io.File theFile = null;
 
 	while(!jFileChooserConfirmed)
 	{
-		int retval = chooser.showSaveDialog(this);
-
+		int retval = chooserDialog.showDialog(); 
+		
 		if(retval == JFileChooser.CANCEL_OPTION)
 			return;
 
@@ -6259,6 +6267,7 @@ public void save_As_GroupMenuItem_ActionPerformed() {
 	    GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
 		try
 		{
+			Group.setAbsoluteDBDs(chooserDialog.getJCheckBoxAbsoluteDBD().isSelected());
 		    cmd.getGUIMenuInterface().saveAsGroup(theFile);
 		}
 		catch(java.io.IOException e)
@@ -6330,21 +6339,25 @@ public void generateAsGroupMenuItem_ActionPerformed() {
  * Comment
  */
 public void save_AsMenuItem_ActionPerformed() {
-	JFileChooser chooser = getfileChooser();
+	ComboBoxFileChooser chooserDialog  = getComboBoxFileChooser();
+	JFileChooser chooser = chooserDialog.getJFileChooser();
+
 	UniversalFileFilter filter = new UniversalFileFilter(
 		new String[] {"db", "vdb"}, "EPICS DB files");
 	chooser.resetChoosableFileFilters();
 	chooser.addChoosableFileFilter(filter);
-	chooser.setDialogTitle("Save as...");
+	chooserDialog.setTitle("Save as...");
 	chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+	chooser.setDialogType(JFileChooser.SAVE_DIALOG);
+	chooserDialog.getJCheckBoxAbsoluteDBD().setSelected(Group.getAbsoluteDBDs());
 
 	boolean jFileChooserConfirmed = false;
     java.io.File theFile = null;
 
 	while(!jFileChooserConfirmed)
 	{
-		int retval = chooser.showSaveDialog(this);
-
+		int retval = chooserDialog.showDialog();
+				
 		if(retval == JFileChooser.CANCEL_OPTION)
 			return;
 			
@@ -6375,6 +6388,7 @@ public void save_AsMenuItem_ActionPerformed() {
 	    GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
 		try
 		{
+			Group.setAbsoluteDBDs(chooserDialog.getJCheckBoxAbsoluteDBD().isSelected());
 		    cmd.getGUIMenuInterface().save(theFile);
 		    openedFile = theFile;
 		}
@@ -6390,20 +6404,22 @@ public void save_AsMenuItem_ActionPerformed() {
  * Comment
  */
 public void saveAsTemplateMenuItem_ActionPerformed() {
-	JFileChooser chooser = getfileChooser();
+	ComboBoxFileChooser chooserDialog = getComboBoxFileChooser();
+	JFileChooser chooser = chooserDialog.getJFileChooser();
 	UniversalFileFilter filter = new UniversalFileFilter(
 		new String[] {"db", "vdb"}, "EPICS DB files");
 	chooser.resetChoosableFileFilters();
 	chooser.addChoosableFileFilter(filter);
 	chooser.setDialogTitle("Save as Template");
 	chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+	chooser.setDialogType(JFileChooser.SAVE_DIALOG);
 
 	boolean jFileChooserConfirmed = false;
     java.io.File theFile = null;
 
 	while(!jFileChooserConfirmed)
 	{
-		int retval = chooser.showSaveDialog(this);
+		int retval = chooserDialog.showDialog();
 
 		if(retval == JFileChooser.CANCEL_OPTION)
 			return;
@@ -6571,6 +6587,7 @@ public void setDefaultDirectory(String dir) {
 	if (directory.exists() && directory.isDirectory()) {
 		Settings.setDefaultDir(directory.toString());
 		getfileChooser().setCurrentDirectory(directory);
+		getComboBoxFileChooser().getJFileChooser().setCurrentDirectory(directory);
 	}
 }
 /**
@@ -6877,6 +6894,15 @@ public void updateLoadLabel() {
 	public RecentFilesMenu getRecentFilesMenu()
 	{
 		return ivjRecentFilesMenuItem;
+	}
+
+	/**
+	 * @return
+	 */
+	public ComboBoxFileChooser getComboBoxFileChooser() {
+		if (comboBoxFileChooser == null) 
+			comboBoxFileChooser = new ComboBoxFileChooser(this, true);
+		return comboBoxFileChooser;
 	}
 
 }

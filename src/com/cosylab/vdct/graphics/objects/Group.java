@@ -73,6 +73,8 @@ public class Group
 	// contains DB structure (entry (include, path, addpath statements), record, expand)
 	protected Vector structure = null; 
 	
+	private static boolean absoluteDBDs = false; 
+	
 /**
  * Group constructor comment.
  * @param parent com.cosylab.vdct.graphics.objects.ContainerObject
@@ -1479,7 +1481,11 @@ private static void writeUsedDBDs(File dbFile, DataOutputStream stream) throws I
 			try
 			{
 				// make path relative to <dbFile> path
-				dbdFile = PathSpecification.getRelativeName(dbdFile, dbFile);
+				
+				if (Group.getAbsoluteDBDs()) 
+					dbdFile = dbdFile.getAbsoluteFile();
+				else 
+					dbdFile = PathSpecification.getRelativeName(dbdFile, dbFile);
 			}
 			catch (Exception ex)
 			{
@@ -1829,5 +1835,19 @@ public void generateMacros(HashMap macros, boolean deep) {
 			((Group)obj).generateMacros(macros, deep);
 	}
 }
+
+	/**
+	 * @return
+	 */
+	public static boolean getAbsoluteDBDs() {
+		return absoluteDBDs;
+	}
+
+	/**
+	 * @param b
+	 */
+	public static void setAbsoluteDBDs(boolean b) {
+		absoluteDBDs = b;
+	}
 
 }

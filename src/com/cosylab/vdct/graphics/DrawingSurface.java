@@ -1480,6 +1480,9 @@ public void checkForIncodedDBDs(File file) throws IOException
 	
 	Vector dbds = com.cosylab.vdct.DataProvider.getInstance().getDBDs();
 	String[] dbd = DBResolver.resolveIncodedDBDs(file.getAbsolutePath());
+	
+	if (dbd!=null && dbd.length>0) Group.setAbsoluteDBDs(false);
+	
 	if (dbd!=null)
 	for (int i=0; i<dbd.length; i++)
 	{
@@ -1488,6 +1491,7 @@ public void checkForIncodedDBDs(File file) throws IOException
 		// if not absolute, make relatove to DB file
 		if (!f.isAbsolute())
 			f = new File(relativeTo, dbd[i]);
+		else Group.setAbsoluteDBDs(true);
 			
 		// try to cannonize to make if more beautiful printout
 		try
