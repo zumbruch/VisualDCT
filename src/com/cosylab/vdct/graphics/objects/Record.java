@@ -908,7 +908,7 @@ public int getX() {
 public int getY() {
 	int posY = super.getY();
 	if (com.cosylab.vdct.Settings.getInstance().getSnapToGrid())
-		return posY - posY % Constants.GRID_SIZE;
+		return posY - (posY+getHeight()) % Constants.GRID_SIZE;
 	else
 		return posY;
 }
