@@ -18,51 +18,37 @@ import java.io.Serializable;
 
 
 /**
- * <code>Record</code> represents an EPICS record
+ * <code>ArchiverTreeRecord</code> is a tree wrapper for <code>Record</code>.
  *
  * @author <a href="mailto:jaka.bobnar@cosylab.com">Jaka Bobnar</a>
  * @version $Id$
  *
  * @since VERSION
  */
-public class Record implements TreeUserElement, Serializable
+public class ArchiverTreeChannelNode extends ArchiverTreeNode
+	implements Serializable
 {
-	private String name;
+	private Channel channel;
 
 	/**
-	 * Creates a new Record object.
+	 * Creates a new ArchiverTreeRecordNode object.
 	 *
-	 * @param name name of the record
+	 * @param channel <code>Record</code> which is wrapped in the node
 	 */
-	public Record(String name)
+	public ArchiverTreeChannelNode(Channel channel)
 	{
-		this.name = name;
+		super(channel);
+		this.channel = channel;
 	}
 
-	/*
-	 *  (non-Javadoc)
-	 * @see java.lang.Object#toString()
+	/**
+	 * Returns the <code>Record</code> of this node.
+	 *
+	 * @return the records
 	 */
-	public String toString()
+	public Channel getChannel()
 	{
-		return getName();
-	}
-
-	/* (non-Javadoc)
-	 * @see com.cosylab.vdct.archiver.TreeUserElement#setName(java.lang.String)
-	 */
-	public void setName(String name)
-	{
-		this.name = name;
-	}
-
-	/*
-	 *  (non-Javadoc)
-	 * @see com.cosylab.vdct.archiver.TreeUserElement#getName()
-	 */
-	public String getName()
-	{
-		return name;
+		return channel;
 	}
 }
 

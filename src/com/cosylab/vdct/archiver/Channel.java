@@ -15,31 +15,24 @@
 package com.cosylab.vdct.archiver;
 
 /**
- * <code>TreeUserElement</code> should be implemented by the Object which is
- * wrapped as UserObject in the <code>ArchiverTreeNode</code>. This interface
- * provides access to the name of the object and is used by
- * <code>ArchiverTree.CellEditor</code>.
+ * <code>Record</code> represents an EPICS record
  *
  * @author <a href="mailto:jaka.bobnar@cosylab.com">Jaka Bobnar</a>
  * @version $Id$
  *
  * @since VERSION
  */
-public interface TreeUserElement
+public class Channel extends ArchiverTreeElement
 {
 	/**
-	 * Sets new name for the object.
+	 * Creates a new Record object.
 	 *
-	 * @param name new name
+	 * @param name name of the record
 	 */
-	public void setName(String name);
-
-	/**
-	 * Returns the name of the object.
-	 *
-	 * @return name
-	 */
-	public String getName();
+	public Channel(String name)
+	{
+		super(name);
+	}
 }
 
 /* __oOo__ */

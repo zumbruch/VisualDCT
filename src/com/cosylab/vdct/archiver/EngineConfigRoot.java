@@ -14,41 +14,44 @@
 
 package com.cosylab.vdct.archiver;
 
-import java.io.Serializable;
-
-
 /**
- * <code>ArchiverTreeRecord</code> is a tree wrapper for <code>Record</code>.
+ * <code>ArchiverEngineConfigRoot</code> is the root element of for the
+ * <code>ArhiverTree</code>. It holds information about all
+ * <code>ArchiverTreeGroup</code> which paths are connected to this root.
  *
  * @author <a href="mailto:jaka.bobnar@cosylab.com">Jaka Bobnar</a>
  * @version $Id$
  *
  * @since VERSION
  */
-public class ArchiverTreeRecordNode extends ArchiverTreeNode
-	implements Serializable
+public class EngineConfigRoot extends ArchiverTreeElement
 {
-	private Record record;
-
 	/**
-	 * Creates a new ArchiverTreeRecordNode object.
-	 *
-	 * @param record <code>Record</code> which is wrapped in the node
+	 * Creates a new ArchiverEngineConfigRoot object.
 	 */
-	public ArchiverTreeRecordNode(Record record)
+	public EngineConfigRoot()
 	{
-		super(record);
-		this.record = record;
+		super("EngineConfig");
 	}
 
-	/**
-	 * Returns the <code>Record</code> of this node.
-	 *
-	 * @return the records
+	/*
+	 *  (non-Javadoc)
+	 * @see com.cosylab.vdct.archiver.ArchiverTreeElement#getName()
+	 * This method always return "EngineConfig".
 	 */
-	public Record getRecord()
+	public String getName()
 	{
-		return record;
+		return "EngineConfig";
+	}
+
+	/*
+	 *  (non-Javadoc)
+	 * @see com.cosylab.vdct.archiver.TreeUserElement#setName(java.lang.String)
+	 * Renaming the root is not allowed
+	 */
+	public void setName(String name)
+	{
+		//do nothig
 	}
 }
 

@@ -26,9 +26,9 @@ import java.util.Arrays;
 /**
  * <code>RecordTrensferable</code> is an implementation of
  * <code>Transferable</code> interface for transfering
- * <code>ArchiveTreeRecordNodes</code>. <code>RecordTransferable</code>
+ * <code>ArchiveTreeChannelNodes</code>. <code>RecordTransferable</code>
  * supports only one <code>DataFlavor</code> with class representation of
- * <code>ArchiverTreeRecordNode</code> which is described as "EPICS Record".
+ * <code>ArchiverTreeChannelNode</code> which is described as "EPICS Channel".
  *
  * @author <a href="mailto:jaka.bobnar@cosylab.com">Jaka Bobnar</a>
  * @version $Id$
@@ -39,18 +39,18 @@ public class RecordTransferable implements Transferable
 {
 	/** DOCUMENT ME! */
 	public static DataFlavor[] flavors = new DataFlavor[]{
-			new DataFlavor(ArchiverTreeRecordNode.class, "EPICS Record")
+			new DataFlavor(ArchiverTreeChannelNode.class, "EPICS Channel")
 		};
-	private ArchiverTreeRecordNode[] records;
+	private ArchiverTreeChannelNode[] channels;
 
 	/**
 	 * Creates a new RecordTransferable object.
 	 *
-	 * @param records an array of ArchiverTreeRecordNodes to be transferred
+	 * @param channels an array of ArchiverTreeRecordNodes to be transferred
 	 */
-	public RecordTransferable(ArchiverTreeRecordNode[] records)
+	public RecordTransferable(ArchiverTreeChannelNode[] channels)
 	{
-		this.records = records;
+		this.channels = channels;
 
 		//	    recordsList = new ArrayList(Arrays.asList(records));
 	}
@@ -78,7 +78,7 @@ public class RecordTransferable implements Transferable
 		throws UnsupportedFlavorException, IOException
 	{
 		if (isDataFlavorSupported(flavor)) {
-			return records;
+			return channels;
 		} else {
 			throw new UnsupportedFlavorException(flavor);
 		}

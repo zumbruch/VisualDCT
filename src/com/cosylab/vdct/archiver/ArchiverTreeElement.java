@@ -14,8 +14,7 @@
 
 package com.cosylab.vdct.archiver;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.io.Serializable;
 
 
 /**
@@ -30,16 +29,19 @@ import java.util.Collection;
  *
  * @since VERSION
  */
-public abstract class ArchiverTreeElement implements TreeUserElement
+public abstract class ArchiverTreeElement implements Serializable
 {
-	protected static final String ADDED = "Elements added";
-	protected static final String REMOVED = "Elements removed";
-
-	/** DOCUMENT ME! */
-	public static final String PROPERTIES = "Properties";
 	protected String name = "";
-	private ArrayList properties = new ArrayList();
-	private ArrayList elementListeners = new ArrayList();
+
+	/**
+	 * Creates a new ArchiverTreeElement object.
+	 *
+	 * @param name the name of the element
+	 */
+	public ArchiverTreeElement(String name)
+	{
+		setName(name);
+	}
 
 	/*
 	 *  (non-Javadoc)
@@ -57,84 +59,6 @@ public abstract class ArchiverTreeElement implements TreeUserElement
 	public String getName()
 	{
 		return name;
-	}
-
-	/**
-	 * Returns all properties of this element.
-	 *
-	 * @return Collection of properties.
-	 */
-	public Collection getProperties()
-	{
-		return properties;
-	}
-
-	/**
-	 * Removes properties from this element.
-	 *
-	 * @param removedProperties ArrayList of properties to be removed
-	 */
-	public void removeProperties(ArrayList removedProperties)
-	{
-		properties.removeAll(removedProperties);
-		fireTreeUserElementEvent(removedProperties, REMOVED, PROPERTIES);
-	}
-
-	/**
-	 * Adds properties to this element.
-	 *
-	 * @param addedProperties properties to be added
-	 */
-	public void addProperties(ArrayList addedProperties)
-	{
-		properties.addAll(addedProperties);
-		fireTreeUserElementEvent(addedProperties, ADDED, PROPERTIES);
-	}
-
-	/**
-	 * Triggers <code>TreeUserElementEvent</code> and notifies the listeners.
-	 *
-	 * @param elements list of elements that were added/removed
-	 * @param action tha action taken (added/removed)
-	 * @param typeOfElements String representing the type of elements
-	 */
-	protected void fireTreeUserElementEvent(ArrayList elements, String action,
-	    String typeOfElements)
-	{
-		TreeUserElementEvent event = new TreeUserElementEvent(this,
-			    elements.toArray(), typeOfElements);
-
-		if (action.equals(ADDED)) {
-			for (int i = 0; i < elementListeners.size(); i++) {
-				((TreeUserElementListener)elementListeners.get(i))
-				.elementsAdded(event);
-			}
-		} else if (action.equals(REMOVED)) {
-			for (int i = 0; i < elementListeners.size(); i++) {
-				((TreeUserElementListener)elementListeners.get(i))
-				.elementsRemoved(event);
-			}
-		}
-	}
-
-	/**
-	 * Adds <code>TreeUserElementListener</code>.
-	 *
-	 * @param listener new listener
-	 */
-	public void addTreeUserElementListener(TreeUserElementListener listener)
-	{
-		elementListeners.add(listener);
-	}
-
-	/**
-	 * Removes <code>TreeUserElementListener</code>
-	 *
-	 * @param listener listener to be removed
-	 */
-	public void removeTreeUserElementListener(TreeUserElementListener listener)
-	{
-		elementListeners.remove(listener);
 	}
 
 	/*

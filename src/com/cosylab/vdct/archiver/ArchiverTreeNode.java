@@ -27,8 +27,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
  */
 public class ArchiverTreeNode extends DefaultMutableTreeNode
 {
-	private boolean hasValue;
-
 	/**
 	 * Creates a new ArchiverTreeNode object.
 	 */
@@ -43,70 +41,20 @@ public class ArchiverTreeNode extends DefaultMutableTreeNode
 	 * @param userObject <code>TreeUserElement</code> which is wrapped in this
 	 *        node
 	 */
-	public ArchiverTreeNode(TreeUserElement userObject)
+	public ArchiverTreeNode(ArchiverTreeElement userObject)
 	{
-		this(userObject, true, false);
+		super(userObject);
 	}
 
-	/**
-	 * Creates a new ArchiverTreeNode object.
-	 *
-	 * @param userObject <code>TreeUserElement</code> which is wrapped in this
-	 *        node
-	 * @param allowsChildren flag indicating if this node is allowed to have
-	 *        children
-	 * @param hasValue this field indicates if the node has a value which could
-	 *        be adjusted     in tree by editing the nodes
-	 */
-	public ArchiverTreeNode(TreeUserElement userObject, boolean allowsChildren,
-	    boolean hasValue)
-	{
-		super(userObject, allowsChildren);
-		this.hasValue = hasValue;
-	}
-
+	
 	/**
 	 * Returns the <code>TreeUserElement</code> that is wrapped in this node.
 	 *
 	 * @return TreeUserElement
 	 */
-	public TreeUserElement getTreeUserElement()
+	public ArchiverTreeElement getArchiverTreeUserElement()
 	{
-		return (TreeUserElement)userObject;
-	}
-
-	/**
-	 * Returns wheather this node has a value, adjustable in tree or not.
-	 *
-	 * @return true if has value
-	 */
-	public boolean hasValue()
-	{
-		return hasValue;
-	}
-
-	/*
-	public String toString() {
-	    return getTreeUserElement().getName() + ": " + getValue();
-	}*/
-	private String value = "";
-
-	//TODO implement an appropriate solution for adjusting values of the object
-	//TreeNode should not be storage for properties of the userObject
-	//This implementation is only temporarily for test purposes
-	public void setValue(String newValue)
-	{
-		this.value = newValue;
-	}
-
-	/**
-	 * DOCUMENT ME!
-	 *
-	 * @return DOCUMENT ME!
-	 */
-	public String getValue()
-	{
-		return value;
+		return (ArchiverTreeElement)userObject;
 	}
 }
 

@@ -14,6 +14,7 @@
 
 package com.cosylab.vdct.archiver;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -21,19 +22,20 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.tree.DefaultTreeCellEditor;
 
 
 /**
- * <code>EditorComponent</code> is a component with two JTextFields for editing
+ * <code>EditorComponent</code> is a component for editing
  * values in the ArchiverTree. Certain nodes from the tree need to present a
- * special value of  the object that it is holding. This value can be edited
- * with this editor. The name of the object in the node is displayed in the
- * left text field, while the value is displayed in the right text field (both
- * fields are editable). If the node is not obliged to present a special value
- * the value text field is hidden.
+ * special value of the Property that they contain. This value can be edited
+ * with this editor. The name of the property in the node is displayed by a JLabel,
+ * while the value is displayed in the text field on the right.
+ * If the node is not obliged to present a special value
+ * the label is hidden.
  *
  * @author <a href="mailto:jaka.bobnar@cosylab.com">Jaka Bobnar</a>
  * @version $Id$
@@ -42,8 +44,9 @@ import javax.swing.tree.DefaultTreeCellEditor;
  */
 public class EditorComponent extends JPanel
 {
-	private JTextField nameField;
+	private JLabel nameLabel;
 	private JTextField valueField;
+	private Dimension dim = new Dimension(30, 15);
 
 	/**
 	 * Creates a new EditorComponent object.
@@ -58,10 +61,10 @@ public class EditorComponent extends JPanel
 	{
 		this.setLayout(new GridBagLayout());
 
-		nameField = new JTextField();
+		nameLabel = new JLabel();
 		valueField = new JTextField();
 
-		add(nameField,
+		add(nameLabel,
 		    new GridBagConstraints(0, 0, 1, 1, 1, 1, GridBagConstraints.CENTER,
 		        GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 		add(valueField,
@@ -71,53 +74,58 @@ public class EditorComponent extends JPanel
 	}
 
 	/**
-	 * Sets up this component according to the values of node's fields. If node
-	 * hasValue the valueField of this editor is displayed, otherwise it is
-	 * hidden and only nameField is displayed and operative.
+	 * Set up the Editor according to the type of the node that the editor receive.
 	 *
-	 * @param node the node that is being edited
-	 * @param invoker editor that invoked this method
+	 * @param node TreeNode to be edited
+	 * @param invoker Editor that invoked this method
 	 */
 	public void setup(final ArchiverTreeNode node,
 	    final DefaultTreeCellEditor invoker)
 	{
-		boolean hasValue = node.hasValue();
-		valueField.setVisible(true);
-		valueField.setText("");
+		final ArchiverTreeElement element = node.getArchiverTreeUserElement();
+		boolean property = element instanceof Property;
+		boolean hasValue = property ? ((Property)element).hasValue() : false;
 
-		KeyListener[] kl = nameField.getKeyListeners();
+		KeyListener[] kl = valueField.getKeyListeners();
 
 		for (int i = 0; i < kl.length; i++) {
-			nameField.removeKeyListener(kl[i]);
+			valueField.removeKeyListener(kl[i]);
 		}
 
-		KeyListener t = new KeyAdapter() {
-				public void keyPressed(KeyEvent e)
-				{
-					if (e.getKeyCode() == 10) {
-						node.getTreeUserElement().setName(nameField.getText());
-						invoker.stopCellEditing();
+		if (!hasValue) {
+			KeyListener t = new KeyAdapter() {
+					public void keyPressed(KeyEvent e)
+					{
+						if (e.getKeyCode() == 10) {
+							element.setName(valueField.getText());
+							invoker.stopCellEditing();
+						}
 					}
-				}
-			};
-
-		nameField.addKeyListener(t);
-		nameField.setText(node.getTreeUserElement().getName());
-		nameField.selectAll();
-
-		if (hasValue) {
-			kl = valueField.getKeyListeners();
-
-			for (int i = 0; i < kl.length; i++) {
-				valueField.removeKeyListener(kl[i]);
-			}
+				};
 
 			valueField.addKeyListener(t);
-			valueField.setText(node.getValue());
-			valueField.selectAll();
+			valueField.setText(element.getName());
+			valueField.setPreferredSize(null);
+			nameLabel.setVisible(false);
 		} else {
-			valueField.setVisible(false);
+			KeyListener t = new KeyAdapter() {
+					public void keyPressed(KeyEvent e)
+					{
+						if (e.getKeyCode() == 10) {
+							((Property)element).setValue(valueField.getText());
+							invoker.stopCellEditing();
+						}
+					}
+				};
+
+			valueField.addKeyListener(t);
+			valueField.setText(((Property)element).getValue());
+			valueField.setPreferredSize(dim);
+			nameLabel.setText(element.getName());
+			nameLabel.setVisible(true);
 		}
+
+		valueField.selectAll();
 	}
 }
 

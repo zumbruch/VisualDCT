@@ -27,7 +27,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
  *
  * @since VERSION
  */
-public class ArchiverTreeGroup extends ArchiverTreeElement
+public class Group extends ArchiverTreeElement
 {
 	private DefaultMutableTreeNode node;
 
@@ -36,9 +36,9 @@ public class ArchiverTreeGroup extends ArchiverTreeElement
 	 *
 	 * @param name the name of the group
 	 */
-	public ArchiverTreeGroup(String name)
+	public Group(String name)
 	{
-		setName(name);
+		super(name);
 	}
 
 	/**

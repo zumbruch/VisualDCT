@@ -50,7 +50,7 @@ import javax.swing.JList;
  */
 public class ArchiverList extends JList
 {
-	private ArchiverTreeRecordNode[] draggedValues;
+	private ArchiverTreeChannelNode[] draggedValues;
 
 	/**
 	 * Creates a new ArchiverList object.
@@ -127,10 +127,10 @@ public class ArchiverList extends JList
 	 *
 	 * @return selected records
 	 */
-	public ArchiverTreeRecordNode[] getSelectedRecords()
+	public ArchiverTreeChannelNode[] getSelectedRecords()
 	{
 		Object[] objects = getSelectedValues();
-		ArchiverTreeRecordNode[] records = new ArchiverTreeRecordNode[objects.length];
+		ArchiverTreeChannelNode[] records = new ArchiverTreeChannelNode[objects.length];
 		System.arraycopy(objects, 0, records, 0, objects.length);
 
 		return records;
@@ -220,7 +220,7 @@ public class ArchiverList extends JList
 
 				try {
 					if (df.equals(RecordTransferable.flavors[0])) {
-						ArchiverTreeRecordNode[] nodes = (ArchiverTreeRecordNode[])transferable
+						ArchiverTreeChannelNode[] nodes = (ArchiverTreeChannelNode[])transferable
 							.getTransferData(df);
 
 						for (int j = 0; j < nodes.length; j++) {

@@ -36,7 +36,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
 import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -44,6 +46,7 @@ import javax.swing.AbstractCellEditor;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
@@ -54,6 +57,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeCellEditor;
 import javax.swing.tree.TreeCellRenderer;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 
@@ -68,11 +72,10 @@ import javax.swing.tree.TreePath;
  */
 public class ArchiverTree extends JTree
 {
-	private ArchiverEngineConfigRoot root;
 	private JPopupMenu popup;
 	private ArchiverTreeNode rootNode;
 	private CellRenderer cellRenderer;
-	private ArchiverTreeRecordNode[] draggedValues;
+	private ArchiverTreeChannelNode[] draggedValues;
 
 	/**
 	 * Creates a new ArchiverTree object.
@@ -88,41 +91,7 @@ public class ArchiverTree extends JTree
 		new DropTarget(this, new DropTargetTreeHandler());
 		initializeAsDragSource();
 
-		root = new ArchiverEngineConfigRoot();
-		rootNode = new ArchiverTreeNode(root);
-
-		root.addTreeUserElementListener(new TreeUserElementListener() {
-				public void elementsAdded(TreeUserElementEvent e)
-				{
-					if (!e.getType().equals(ArchiverEngineConfigRoot.GROUPS)) {
-						return;
-					}
-
-					Object[] groups = e.getElements();
-
-					for (int i = 0; i < groups.length; i++) {
-						ArchiverTreeNode node = new ArchiverTreeNode((TreeUserElement)groups[i]);
-						((ArchiverTreeGroup)groups[i]).setTreeNode(node);
-						rootNode.add(node);
-					}
-
-					((DefaultTreeModel)getModel()).reload(rootNode);
-					expandRow(0);
-				}
-
-				public void elementsRemoved(TreeUserElementEvent e)
-				{
-					if (!e.getType().equals(ArchiverEngineConfigRoot.GROUPS)) {
-						return;
-					}
-
-					Object[] groups = e.getElements();
-
-					for (int i = 0; i < groups.length; i++) {
-						rootNode.remove(((ArchiverTreeGroup)groups[i]).getNode());
-					}
-				}
-			});
+		rootNode = new ArchiverTreeNode(new EngineConfigRoot());
 
 		DefaultTreeModel model = new DefaultTreeModel(rootNode);
 		setModel(model);
@@ -144,20 +113,70 @@ public class ArchiverTree extends JTree
 		return (DefaultTreeModel)getModel();
 	}
 
+	void setRoot(ArchiverTreeNode root)
+	{
+		this.rootNode = root;
+		getDefaultModel().setRoot(root);
+	}
+
+	void reset()
+	{
+		rootNode = new ArchiverTreeNode(new EngineConfigRoot());
+		getDefaultModel().setRoot(rootNode);
+		getDefaultModel().reload();
+	}
+
 	private JPopupMenu getPopup()
 	{
 		if (popup == null) {
 			popup = new JPopupMenu();
 
-			JMenuItem item = new JMenuItem("AddGroup");
-			item.addActionListener(new ActionListener() {
+			JMenuItem addGRoup = new JMenuItem("Add Group");
+			addGRoup.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e)
 					{
-						root.addArchiverTreeGroup(new ArchiverTreeGroup(
-						        "<new group>"));
+						rootNode.add(new ArchiverTreeNode(
+						        new Group("<new group>")));
+						((DefaultTreeModel)getModel()).reload(rootNode);
 					}
 				});
-			popup.add(item);
+			popup.add(addGRoup);
+
+			//			JMenuItem removeGroup = new JMenuItem("Remove Group");
+			//			removeGroup.addActionListener(new ActionListener() {
+			//					public void actionPerformed(ActionEvent e)
+			//					{
+			//					    ArchiverTreeNode node = (ArchiverTreeNode) getSelectionPath().getLastPathComponent();
+			//					    if (node.getArchiverTreeUserElement() instanceof Group) {
+			//					        rootNode.remove(node);
+			//					    }
+			//					    ((DefaultTreeModel)getModel()).reload(rootNode);
+			//					}
+			//				});
+			//			popup.add(removeGroup);
+			//			popup.addSeparator();
+			//			JMenu addProperties = new JMenu("Add Properties");
+			//			JMenuItem addPeriod = new JMenuItem("Period property");
+			//			
+			//			addProperties.add(addPeriod);
+			//			popup.add(addProperties);
+			JMenuItem removeProperty = new JMenuItem("Remove Group/Property");
+			removeProperty.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e)
+					{
+						ArchiverTreeNode node = (ArchiverTreeNode)getSelectionPath()
+							.getLastPathComponent();
+						ArchiverTreeElement elem = node
+							.getArchiverTreeUserElement();
+
+						if (elem instanceof Property || elem instanceof Group) {
+							TreeNode parent = node.getParent();
+							node.removeFromParent();
+							((DefaultTreeModel)getModel()).reload(parent);
+						}
+					}
+				});
+			popup.add(removeProperty);
 		}
 
 		return popup;
@@ -185,13 +204,14 @@ public class ArchiverTree extends JTree
 						for (int j = 0; j < count; j++) {
 							Object ob = paths[i].getPathComponent(j);
 
-							if (ob instanceof ArchiverTreeRecordNode) {
+							if (ob != null
+							    && ob instanceof ArchiverTreeChannelNode) {
 								values.add(ob);
 							}
 						}
 					}
 
-					draggedValues = new ArchiverTreeRecordNode[values.size()];
+					draggedValues = new ArchiverTreeChannelNode[values.size()];
 					values.toArray(draggedValues);
 
 					Transferable transferable = new RecordTransferable(draggedValues);
@@ -226,7 +246,7 @@ public class ArchiverTree extends JTree
 	 *
 	 * @return array of ArchiverTreeRecordNode.
 	 */
-	public ArchiverTreeRecordNode[] getSelectionRecords()
+	public ArchiverTreeChannelNode[] getSelectionRecords()
 	{
 		ArrayList nodes = new ArrayList();
 		TreePath[] paths = getSelectionPaths();
@@ -235,15 +255,15 @@ public class ArchiverTree extends JTree
 			ArchiverTreeNode lastNode = (ArchiverTreeNode)paths[i]
 				.getLastPathComponent();
 
-			if (lastNode instanceof ArchiverTreeRecordNode) {
+			if (lastNode instanceof ArchiverTreeChannelNode) {
 				nodes.add(lastNode);
 			}
 		}
 
-		ArchiverTreeRecordNode[] recordNode = new ArchiverTreeRecordNode[nodes
+		ArchiverTreeChannelNode[] recordNode = new ArchiverTreeChannelNode[nodes
 			.size()];
 
-		return (ArchiverTreeRecordNode[])nodes.toArray(recordNode);
+		return (ArchiverTreeChannelNode[])nodes.toArray(recordNode);
 	}
 
 	/**
@@ -254,13 +274,13 @@ public class ArchiverTree extends JTree
 	 * @return true if nodes were added, false if the selected path was not an
 	 *         ArchiverTreeNode containing an ArchiverTreeGroup
 	 */
-	boolean addRecords(ArchiverTreeRecordNode[] records)
+	boolean addRecords(ArchiverTreeChannelNode[] records)
 	{
 		ArchiverTreeNode group = findClosestGroupNode(getSelectionPath());
 
 		if (group == null) {
-			JOptionPane.showInternalMessageDialog(this,
-			    "Selection must be positioned inside a group",
+			JOptionPane.showMessageDialog(this,
+			    "En element inside a group has to be selected.",
 			    "Invalid selection", JOptionPane.WARNING_MESSAGE);
 
 			return false;
@@ -277,7 +297,7 @@ public class ArchiverTree extends JTree
 	 * @param children nodes to be added
 	 * @param parent parent node for the children
 	 */
-	void addElements(ArchiverTreeRecordNode[] children, ArchiverTreeNode parent)
+	void addElements(ArchiverTreeChannelNode[] children, ArchiverTreeNode parent)
 	{
 		for (int j = 0; j < children.length; j++) {
 			parent.add(children[j]);
@@ -299,12 +319,14 @@ public class ArchiverTree extends JTree
 		ArchiverTreeNode node;
 		Object object;
 
-		for (int i = 0; i < path.getPathCount(); i++) {
-			node = (ArchiverTreeNode)path.getPathComponent(i);
-			object = node.getUserObject();
+		if (path != null) {
+			for (int i = 0; i < path.getPathCount(); i++) {
+				node = (ArchiverTreeNode)path.getPathComponent(i);
+				object = node.getUserObject();
 
-			if (object instanceof ArchiverTreeGroup) {
-				return node;
+				if (object instanceof Group) {
+					return node;
+				}
 			}
 		}
 
@@ -476,7 +498,7 @@ public class ArchiverTree extends JTree
 
 					try {
 						if (df.equals(RecordTransferable.flavors[0])) {
-						    addElements((ArchiverTreeRecordNode[])transferable
+							addElements((ArchiverTreeChannelNode[])transferable
 							    .getTransferData(df), groupNode);
 						}
 					} catch (UnsupportedFlavorException e) {
@@ -497,14 +519,7 @@ public class ArchiverTree extends JTree
 		}
 	}
 
-	/**
-	 * <code>CellUtilities</code>' methods provide icons for the nodes.
-	 *
-	 * @author <a href="mailto:jaka.bobnar@cosylab.com">Jaka Bobnar</a>
-	 * @version $Id$
-	 *
-	 * @since VERSION
-	 */
+	
 	private static class CellUtilities
 	{
 		static Icon getIcon(ArchiverTreeNode node)
@@ -512,11 +527,11 @@ public class ArchiverTree extends JTree
 			Object object = node.getUserObject();
 			Class type = object.getClass();
 
-			if (Record.class.isAssignableFrom(type)) {
+			if (Channel.class.isAssignableFrom(type)) {
 				return loadIcon("images/record.gif");
-			} else if (ArchiverTreeGroup.class.isAssignableFrom(type)) {
+			} else if (Group.class.isAssignableFrom(type)) {
 				return loadIcon("images/boxn.gif");
-			} else if (ArchiverEngineConfigRoot.class.isAssignableFrom(type)) {
+			} else if (EngineConfigRoot.class.isAssignableFrom(type)) {
 				return loadIcon("images/page.gif");
 			}
 
@@ -552,14 +567,11 @@ public class ArchiverTree extends JTree
 			super.getTreeCellRendererComponent(tree, value, selected, expanded,
 			    leaf, row, hasFocus);
 
-			if (!(value instanceof ArchiverTreeNode)) {
-				return this;
+			if (value instanceof ArchiverTreeNode) {
+				ArchiverTreeNode node = (ArchiverTreeNode)value;
+				this.setText(node.getArchiverTreeUserElement().toString());
+				this.setIcon(CellUtilities.getIcon((ArchiverTreeNode)value));
 			}
-
-			ArchiverTreeNode node = (ArchiverTreeNode)value;
-			this.setText(node.getTreeUserElement().getName()
-			    + (node.hasValue() ? (": " + node.getValue()) : ""));
-			this.setIcon(CellUtilities.getIcon((ArchiverTreeNode)value));
 
 			return this;
 		}
@@ -596,7 +608,8 @@ public class ArchiverTree extends JTree
 		    boolean isSelected, boolean expanded, boolean leaf, int row)
 		{
 			this.value = value;
-		    return editor;
+
+			return editor;
 		}
 
 		/* (non-Javadoc)
@@ -605,7 +618,7 @@ public class ArchiverTree extends JTree
 		public Object getCellEditorValue()
 		{
 			// should never be invoked if there wasn't any interference
-			return value.toString();
+			return value;
 		}
 	}
 
@@ -691,9 +704,9 @@ public class ArchiverTree extends JTree
 				.getUserObject();
 			} catch (Exception e) {
 				//ignore ClassCastException - shouldn't happened if no 3rd party
-			    //objects interfered with the tree
+				//objects interfered with the tree
 			}
-					
+
 			return super.getCellEditorValue();
 		}
 	}
