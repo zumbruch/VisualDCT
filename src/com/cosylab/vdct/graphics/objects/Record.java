@@ -33,6 +33,7 @@ import java.util.*;
 import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.DataProvider;
 import com.cosylab.vdct.graphics.*;
+import com.cosylab.vdct.plugin.debug.PluginDebugManager;
 import com.cosylab.vdct.util.StringUtils;
 import com.cosylab.vdct.vdb.*;
 import com.cosylab.vdct.dbd.DBDConstants;
@@ -74,6 +75,20 @@ public class Record
 	protected Vector outlinks;
 	protected boolean disconnected = false;
 	private boolean right = true;
+
+	private boolean inDebugMode = false;
+
+	// timestamp label
+	protected int timestampX;
+	protected int timestampY;
+	protected String timestamp;
+	protected Font timestampFont = null;
+	
+	// value label
+	protected int valueX;
+	protected int valueY;
+	protected String value;
+	protected Font valueFont = null;
 	
 	private static GUISeparator alphaSeparator = null;
 	private static GUISeparator dbdSeparator = null;
@@ -299,6 +314,7 @@ protected void draw(Graphics g, boolean hilited) {
 					g.setColor(Constants.RECORD_COLOR);
 
 		g.fillRect(rrx, rry, rwidth, rheight);
+
 		if (!hilited)
 			g.setColor(Constants.FRAME_COLOR);
 		else
@@ -309,10 +325,40 @@ protected void draw(Graphics g, boolean hilited) {
 
 		g.drawRect(rrx, rry, rwidth, rheight);
 
+		int recordSize = (int)(Constants.RECORD_HEIGHT * getRscale());
+
 		// middle line
 		int ox = (int) (10 * getRscale());
-		int ly = (int) (rry + Constants.RECORD_HEIGHT * getRscale());
+		int ly = (int) (rry + recordSize);
 		g.drawLine(rrx + ox, ly, rrx + rwidth - ox, ly);
+
+
+
+		// show VAL value and timestamp
+		if (inDebugMode)
+		{
+			// additional middle line has to be drawn
+			ly += recordSize;
+			g.drawLine(rrx + ox, ly, rrx + rwidth - ox, ly);
+
+			// TODO MEDM colors
+			Color col = g.getColor();
+			g.setColor(Color.YELLOW);
+
+			// TODO !!!
+			if (valueFont != null) {
+				g.setFont(getFont());
+				g.drawString(value, rrx + valueX, rry + valueY + recordSize);
+			}
+
+			if (timestampFont != null) {
+				g.setFont(timestampFont);
+				g.drawString(timestamp, rrx + timestampX, rry + timestampY + recordSize);
+			}
+
+			g.setColor(col);
+
+		}
 
 		if (getFont() != null) {
 			g.setFont(getFont());
@@ -338,7 +384,18 @@ protected void draw(Graphics g, boolean hilited) {
 				val = fd.getName() + "=" + fd.getValue();
 				while ((fm.stringWidth(val) + ox) > rwidth)
 					val = val.substring(0, val.length() - 2);
-				g.drawString(val, px, py);
+					
+				// make monitored fields visible
+				if (inDebugMode && fd.getVisibility() == InspectableProperty.ALWAYS_VISIBLE)
+				{
+					Color col = g.getColor();
+					g.setColor(Color.YELLOW);
+					g.drawString(val, px, py);
+					g.setColor(col);
+				}
+				else
+					g.drawString(val, px, py);
+					
 				py = py0 + (int)((++n)*rfieldRowHeight);
 			}
 		}
@@ -1226,11 +1283,47 @@ protected void validate() {
  	  rtypeLabelY = (rheight/2-fm.getHeight())/2+fm.getAscent();
   }
 
- 
  // !!! optimize - static
  
   rfieldRowHeight = (rheight-2*y0)*0.375;
 
+  // increase record size for VAL value and timestamp
+  if (PluginDebugManager.isDebugState())
+  {
+	VDBFieldData fld = getField("VAL");
+	if (fld != null)
+	{
+		// TODO for timestamp this could be optimized
+		timestamp = fld.getDebugValueTimeStamp();
+		timestampFont = FontMetricsBuffer.getInstance().getAppropriateFont(
+					    Constants.DEFAULT_FONT, Font.PLAIN, 
+						timestamp, rwidth-x0, (rheight-y0)/2-y0);
+		if (timestampFont!=null) {
+			FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(timestampFont);
+			timestampX = (rwidth-fm.stringWidth(timestamp))/2;
+			timestampY = rheight/2+(rheight/2-fm.getHeight())/2+fm.getAscent();
+		}
+
+		value = fld.getValue();
+		valueFont = FontMetricsBuffer.getInstance().getAppropriateFont(
+						Constants.DEFAULT_FONT, Font.PLAIN, 
+						value, rwidth-x0, rheight/2+y0);
+
+		if (valueFont!=null) {
+			FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(valueFont);
+			valueX = (rwidth-fm.stringWidth(value))/2;
+			valueY = (rheight/2-fm.getHeight())/2+fm.getAscent();
+		}
+
+		inDebugMode = true;
+		rheight *= 2;
+	}
+	else
+		inDebugMode = false;
+  }
+  else
+	inDebugMode = false;
+	
   if (rwidth<(2*x0)) fieldFont = null;
   else
 	  fieldFont = FontMetricsBuffer.getInstance().getAppropriateFont(
