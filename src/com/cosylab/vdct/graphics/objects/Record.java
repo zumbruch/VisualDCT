@@ -1196,8 +1196,8 @@ public VisibleObject morph(java.lang.String newType) {
 		LinkSource source = (LinkSource)fieldData.elementAt(j);
 		
 		source.setValue(value);
-		if (new LinkProperties(source).getType()==LinkProperties.NOT_VALID)	// verifies the link
-			source.setValue(nullString);
+		
+		// TODO code to validate a link
 	}
 
 	return record;
