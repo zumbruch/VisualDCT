@@ -1,3 +1,5 @@
+package com.cosylab.vdct.graphics.objects;
+
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
  * All rights reserved.
@@ -25,8 +27,6 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-package com.cosylab.vdct.graphics.objects;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -85,12 +85,12 @@ private static Color currentColor = Constants.LINE_COLOR;
 private String getAvailableHashId()
 {
 	int grLineNumber = 0;
-	String testHashId = "TB" + (new Integer(grLineNumber)).toString();
+	String testHashId = "TB" + String.valueOf(grLineNumber);
 	
 	while(getParent().containsObject(testHashId))
 	{
 		grLineNumber++;
-		testHashId = "TB" + (new Integer(grLineNumber)).toString();		
+		testHashId = "TB" + String.valueOf(grLineNumber);		
 	}
 
 	return testHashId;
@@ -117,6 +117,9 @@ public TextBox(ContainerObject parent, TextBoxVertex parStartVertex, TextBoxVert
 
 	startVertex = parStartVertex;
 	endVertex = parEndVertex;
+	
+	startVertex.setTextBox(this);
+	endVertex.setTextBox(this);
 
 	revalidatePosition();
 	
@@ -148,28 +151,112 @@ protected void draw(Graphics g, boolean hilited)
 {
 	ViewState view = ViewState.getInstance();
 
-	int offsetX = view.getRx();
-	int offsetY = view.getRy();
-	
-	int posX = getRx() - offsetX;
-	int posY = getRy() - offsetY;
+	int posX = getRx() - view.getRx();
+	int posY = getRy() - view.getRy();
 	int rwidth = getRwidth();
 	int rheight = getRheight();
 
-	if(hilited)
-		g.setColor(Constants.HILITE_COLOR);
-	else
-		g.setColor(Constants.LINE_COLOR);
-	
 	if(!((posX > view.getViewWidth()) || (posY > view.getViewHeight())
 		|| ((posX + rwidth) < 0) || ((posY + rheight) < 0)))
 	{
+		/*
 		if(hilited)
 			g.setColor(Constants.HILITE_COLOR);
 		else
 			g.setColor(Constants.LINE_COLOR);
 		
 		g.drawRect(posX + 2, posY + 2, rwidth - 4, rheight - 4);
+		*/
+
+		javax.swing.JLabel l = new javax.swing.JLabel() {
+		    public void paint(Graphics g) {
+				Shape clip = g.getClip();
+				g.translate(getX(),getY());
+				g.setClip(0, 0, getWidth(), getHeight());
+				super.paint(g);
+				g.translate(-getX(),-getY());
+				g.setClip(clip);
+		    }
+		};
+	
+//		final String html="<html><font size=+10>Text</font>";	
+		final String html="<p align='center'><i><b><font size='5'>Visual DCT Help</font></b></i></p><div align='center'>  <center>  <table border='0' width='73%' cellspacing='2' height='195' bgcolor='#0000FF'>    <tr>      <td width='100%' colspan='2' height='41' bgcolor='#FFFFFF' align='left'>        <p align='center'><i><font size='3'><b>Mouse events</b></font></i></td>    </tr></table>  </center></div><br>";	
+		l.setVerticalAlignment(JLabel.TOP);
+		l.setText(html);
+		l.setForeground(getColor());
+	
+		l.setBounds(posX + 2, posY + 2, rwidth - 4, rheight - 4);
+		l.paint(g);
+	
+		drawDashedBorder(g, hilited, view, posX, posY, rwidth, rheight);
+		
+	}
+}
+
+public void drawDashedBorder(Graphics g, boolean hilited)
+{
+	ViewState view = ViewState.getInstance();
+
+	int posX = getRx() - view.getRx();
+	int posY = getRy() - view.getRy();
+	int rwidth = getRwidth();
+	int rheight = getRheight();
+
+	drawDashedBorder(g, hilited, view, posX, posY, rwidth, rheight);
+}
+
+private void drawDashedBorder(Graphics g, boolean hilited,
+	ViewState view,
+	int posX,
+	int posY,
+	int rwidth,
+	int rheight)
+{
+	// draw dashed border
+	if (hilited)
+	{
+		
+		g.setColor(Constants.SELECTION_COLOR);
+	
+		double scale = view.getScale();
+	
+		int rw = (int)(Constants.CONNECTOR_WIDTH * scale / 2);
+		int rh = (int)(Constants.CONNECTOR_HEIGHT * scale / 2);
+	
+		int posX2 = posX + rwidth;
+		int posY2 = posY + rheight;
+	
+		if(((posX != posX2) || (posY != posY2)))
+		{
+			int curX = posX;
+			while(curX <= posX2)
+			{
+				int curX2 = curX + Constants.DASHED_LINE_DENSITY;
+				
+				if (curX2 > posX2)
+					curX2 = posX2;
+				
+				g.drawLine(curX, posY, curX2, posY);
+				g.drawLine(curX, posY2, curX2, posY2);
+				
+				curX += 2 * Constants.DASHED_LINE_DENSITY;
+			}
+	
+			int curY = posY;
+			while(curY <= posY2)
+			{
+				int curY2 = curY + Constants.DASHED_LINE_DENSITY;
+				
+				if(curY2 > posY2)
+					curY2 = posY2;
+				
+				g.drawLine(posX, curY, posX, curY2);
+				g.drawLine(posX2, curY, posX2, curY2);
+				
+				curY += 2 * Constants.DASHED_LINE_DENSITY;
+			}
+	
+		}
 	}
 }
 

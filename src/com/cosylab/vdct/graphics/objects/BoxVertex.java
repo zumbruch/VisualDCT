@@ -1,3 +1,5 @@
+package com.cosylab.vdct.graphics.objects;
+
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
  * All rights reserved.
@@ -25,8 +27,6 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-package com.cosylab.vdct.graphics.objects;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -92,15 +92,18 @@ private static final String isDashedString = "Dashed";
 private static Color currentColor = Constants.LINE_COLOR;
 private static boolean currentIsDashed = false;
 
+private static final String hashIdPrefix = "Box";
+
 private String getAvailableHashId()
 {
+	
 	int grLineNumber = 0;
-	String testHashId = "Box" + (new Integer(grLineNumber)).toString();
+	String testHashId = hashIdPrefix + String.valueOf(grLineNumber);
 	
 	while(getParent().containsObject(testHashId))
 	{
 		grLineNumber++;
-		testHashId = "Box" + (new Integer(grLineNumber)).toString();		
+		testHashId = hashIdPrefix + String.valueOf(grLineNumber);		
 	}
 
 	return testHashId;
@@ -182,55 +185,53 @@ protected void draw(Graphics g, boolean hilited)
 	
 	if(partnerVertex.getHashID().compareTo(hashId) < 0)
 	{
-		posX = getRx() + (int)(Constants.CONNECTOR_WIDTH * scale / 2) - offsetX;
-		posY = getRy() + (int)(Constants.CONNECTOR_HEIGHT * scale / 2) - offsetY;
+		int rw = (int)(Constants.CONNECTOR_WIDTH * scale / 2);
+		int rh = (int)(Constants.CONNECTOR_HEIGHT * scale / 2);
 		
-		int posX2 = partnerVertex.getRx() + (int)(Constants.CONNECTOR_WIDTH * scale / 2) - offsetX;
-		int posY2 = partnerVertex.getRy() + (int)(Constants.CONNECTOR_HEIGHT * scale / 2) - offsetY;
+		posX = getRx() + rw - offsetX;
+		posY = getRy() + rh - offsetY;
+		
+		int posX2 = partnerVertex.getRx() + rw - offsetX;
+		int posY2 = partnerVertex.getRy() + rh - offsetY;
+
+		int t;
+		if (posX>posX2)
+			{ t=posX; posX=posX2; posX2=t; }
+		if (posY>posY2)
+			{ t=posY; posY=posY2; posY2=t; }
 		
 		if((isDashed) && ((posX != posX2) || (posY != posY2)))
 		{
-			int dirX = (posX < posX2) ? (1) : (-1);
-			int dirY = (posY < posY2) ? (1) : (-1);
-
 			int curX = posX;
-
-			while((curX * dirX) <= (posX2 * dirX))
+			while(curX <= posX2)
 			{
-				int curX2 = curX + dirX * Constants.DASHED_LINE_DENSITY;
+				int curX2 = curX + Constants.DASHED_LINE_DENSITY;
 				
-				if((curX2 * dirX) > (posX2 * dirX))
+				if (curX2 > posX2)
 					curX2 = posX2;
 				
 				g.drawLine(curX, posY, curX2, posY);
 				g.drawLine(curX, posY2, curX2, posY2);
 				
-				curX += 2 * dirX * Constants.DASHED_LINE_DENSITY;
+				curX += 2 * Constants.DASHED_LINE_DENSITY;
 			}
 
 			int curY = posY;
-
-			while((curY * dirY) <= (posY2 * dirY))
+			while(curY <= posY2)
 			{
-				int curY2 = curY + dirY * Constants.DASHED_LINE_DENSITY;
+				int curY2 = curY + Constants.DASHED_LINE_DENSITY;
 				
-				if((curY2 * dirY) > (posY2 * dirY))
+				if(curY2 > posY2)
 					curY2 = posY2;
 				
 				g.drawLine(posX, curY, posX, curY2);
 				g.drawLine(posX2, curY, posX2, curY2);
 				
-				curY += 2 * dirY * Constants.DASHED_LINE_DENSITY;
+				curY += 2 * Constants.DASHED_LINE_DENSITY;
 			}
 		}
 		else
-		{
-			g.drawLine(posX, posY, posX2, posY);
-			g.drawLine(posX, posY2, posX2, posY2);
-			
-			g.drawLine(posX, posY, posX, posY2);
-			g.drawLine(posX2, posY, posX2, posY2);
-		}
+			g.drawRect(posX, posY, posX2-posX, posY2-posY);
 	}
 }
 
@@ -248,13 +249,15 @@ public Vector getItems()
 {
 	Vector items = new Vector();
 
+	ActionListener al = new PopupMenuHandler();
+
 	JMenuItem colorItem = new JMenuItem(colorString);
-	colorItem.addActionListener(new PopupMenuHandler());
+	colorItem.addActionListener(al);
 	items.addElement(colorItem);
 
 	JCheckBoxMenuItem isDashedItem = new JCheckBoxMenuItem(isDashedString);
 	isDashedItem.setSelected(isDashed);
-	isDashedItem.addActionListener(new PopupMenuHandler());
+	isDashedItem.addActionListener(al);
 	items.addElement(isDashedItem);
 
 	return items;

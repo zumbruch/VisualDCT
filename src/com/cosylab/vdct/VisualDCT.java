@@ -2782,11 +2782,13 @@ private javax.swing.JMenuItem getImport_DBMenuItem() {
 	}
 	return ivjImport_DBMenuItem;
 }
+
 // shp: not final solution
 public static VisualDCT getInstance()
 {
 	return instance;
 }
+
 /**
  * Return the JDialogContentPane property value.
  * @return javax.swing.JPanel

@@ -98,31 +98,5 @@ protected void initialize() {
 
 protected void paintComponent(Graphics g) {
 	getComponent().draw(g);
-/*
-	javax.swing.JLabel l = new javax.swing.JLabel(){
-	    public void paint(Graphics g) {
-			Shape clip = g.getClip();
-			g.translate(getX(),getY());
-			g.setClip(0, 0, getWidth(), getHeight());
-			super.paint(g);
-			g.translate(-getX(),-getY());
-			g.setClip(clip);
-	    }
-	};
-
-	String html="<html>Cosylab is one of the few if not the only company that is specialized in <B>software and hardware development in the field of control systems			for particle accelerators and other large experimental physics facilities</B>. Our team, consisting mainly of excellent young graduates of physics,			electronic engineering, mathematics and computer sciences led by Mark Plesko, has a <B>combined experience of over 40 man-years</B> in this field			with a long record of successful projects.			<br><br>		We are dedicated to provide high quality products and state of the art technology to our customers. Combining research-level know-how,			a professional business approach and our proverbial flexibility, we meet all customers’ demands in terms of system performance, quality,			cost and time-to-market.";	
-	l.setVerticalAlignment(JLabel.TOP);
-	l.setText(html);
-	l.setForeground(java.awt.Color.white);
-
-	int x = 10; int y = 10;
-	int w = 100; int h = 500;
-	l.setBounds(x,y,w,h);
-	l.paint(g);
-
-	System.out.println(l.getLocation().toString());
-	g.setColor(java.awt.Color.white);
-	g.drawRect(x-1, y-1, w+2, h+2);
-*/
 }
 }

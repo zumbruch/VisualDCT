@@ -1,3 +1,5 @@
+package com.cosylab.vdct.graphics.objects;
+
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
  * All rights reserved.
@@ -26,8 +28,6 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.cosylab.vdct.graphics.objects;
-
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
@@ -52,15 +52,18 @@ private boolean isAlwaysDrawn;
 
 private TextBox textBox;
 
+private static final String hashIdPrefix = "TextBox";
+
+
 private String getAvailableHashId()
 {
 	int grLineNumber = 0;
-	String testHashId = "TextBox" + (new Integer(grLineNumber)).toString();
+	String testHashId = hashIdPrefix + String.valueOf(grLineNumber);
 	
 	while(getParent().containsObject(testHashId))
 	{
 		grLineNumber++;
-		testHashId = "TextBox" + (new Integer(grLineNumber)).toString();		
+		testHashId = hashIdPrefix + String.valueOf(grLineNumber);		
 	}
 
 	return testHashId;
@@ -135,64 +138,12 @@ protected void draw(Graphics g, boolean hilited)
 	{
 		g.setColor(Constants.HILITE_COLOR);
 		g.drawRect(posX, posY, rwidth, rheight);
+
+		if (hilited && textBox!=null)
+			textBox.drawDashedBorder(g, true);
 	}
+	
 
-	g.setColor(Constants.SELECTION_COLOR);
-
-	double scale = view.getScale();
-
-	int posX2 = 0;
-	int posY2 = 0;
-
-	if(partnerVertex.getHashID().compareTo(hashId) < 0)
-	{
-		posX = getRx() + (int)(Constants.CONNECTOR_WIDTH * scale / 2) - offsetX;
-		posY = getRy() + (int)(Constants.CONNECTOR_HEIGHT * scale / 2) - offsetY;
-		
-		posX2 = partnerVertex.getRx() + (int)(Constants.CONNECTOR_WIDTH * scale / 2) - offsetX;
-		posY2 = partnerVertex.getRy() + (int)(Constants.CONNECTOR_HEIGHT * scale / 2) - offsetY;
-	}
-	else
-	{
-		posX = partnerVertex.getRx() + (int)(Constants.CONNECTOR_WIDTH * scale / 2) - offsetX;
-		posY = partnerVertex.getRy() + (int)(Constants.CONNECTOR_HEIGHT * scale / 2) - offsetY;
-
-		posX2 = getRx() + (int)(Constants.CONNECTOR_WIDTH * scale / 2) - offsetX;
-		posY2 = getRy() + (int)(Constants.CONNECTOR_HEIGHT * scale / 2) - offsetY;
-	}
-
-	int dirX = (posX < posX2) ? (1) : (-1);
-	int dirY = (posY < posY2) ? (1) : (-1);
-
-	int curX = posX;
-
-	while((curX * dirX) <= (posX2 * dirX))
-	{
-		int curX2 = curX + dirX * Constants.DASHED_LINE_DENSITY;
-				
-		if((curX2 * dirX) > (posX2 * dirX))
-			curX2 = posX2;
-				
-		g.drawLine(curX, posY, curX2, posY);
-		g.drawLine(curX, posY2, curX2, posY2);
-				
-		curX += 2 * dirX * Constants.DASHED_LINE_DENSITY;
-	}
-
-	int curY = posY;
-
-	while((curY * dirY) <= (posY2 * dirY))
-	{
-		int curY2 = curY + dirY * Constants.DASHED_LINE_DENSITY;
-				
-		if((curY2 * dirY) > (posY2 * dirY))
-			curY2 = posY2;
-				
-		g.drawLine(posX, curY, posX, curY2);
-		g.drawLine(posX2, curY, posX2, curY2);
-				
-		curY += 2 * dirY * Constants.DASHED_LINE_DENSITY;
-	}
 }
 
 public String getHashID()

@@ -53,6 +53,8 @@ public class DSGUIInterface implements GUIMenuInterface, VDBInterface {
 	private DrawingSurface drawingSurface;
 
 	private ArrayList pasteNames = null;
+	
+	private static final String nullString = "";
 
 /**
  * Insert the method's description here.
@@ -173,7 +175,7 @@ public BoxVertex createBoxVertex(BoxVertex partnerVertex)
 		(int)((drawingSurface.getPressedX() + view.getRx()) / scale),
 		(int)((drawingSurface.getPressedY() + view.getRy()) / scale), partnerVertex);
 
-	String name = "";
+	String name = nullString;
 
 	String parentName = parentGroup.getAbsoluteName();
 	if(parentName.length() > 0)
@@ -201,7 +203,7 @@ public LineVertex createLineVertex(LineVertex partnerVertex)
 		(int)((drawingSurface.getPressedX() + view.getRx()) / scale),
 		(int)((drawingSurface.getPressedY() + view.getRy()) / scale), partnerVertex);
 
-	String name = "";
+	String name = nullString;
 
 	String parentName = parentGroup.getAbsoluteName();
 	if(parentName.length() > 0)
@@ -222,7 +224,7 @@ public TextBox createTextBox(TextBoxVertex startVertex, TextBoxVertex endVertex)
 
 	TextBox textBox = new TextBox(parentGroup, startVertex, endVertex);
 
-	String name = "";
+	String name = nullString;
 
 	String parentName = parentGroup.getAbsoluteName();
 	if(parentName.length() > 0)
@@ -250,7 +252,7 @@ public TextBoxVertex createTextBoxVertex(TextBoxVertex partnerVertex)
 		(int)((drawingSurface.getPressedX() + view.getRx()) / scale),
 		(int)((drawingSurface.getPressedY() + view.getRy()) / scale), partnerVertex);
 
-	String name = "";
+	String name = nullString;
 
 	String parentName = parentGroup.getAbsoluteName();
 	if(parentName.length() > 0)

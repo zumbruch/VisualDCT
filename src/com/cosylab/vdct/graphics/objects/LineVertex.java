@@ -1,3 +1,5 @@
+package com.cosylab.vdct.graphics.objects;
+
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
  * All rights reserved.
@@ -25,8 +27,6 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-package com.cosylab.vdct.graphics.objects;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -103,15 +103,17 @@ private static Color currentColor = Constants.LINE_COLOR;
 private static boolean currentIsDashed = false;
 private static boolean currentIsArrow = false;
 
+private static final String hashIdPrefix = "Line";
+
 private String getAvailableHashId()
 {
 	int grLineNumber = 0;
-	String testHashId = "Line" + (new Integer(grLineNumber)).toString();
+	String testHashId = hashIdPrefix + String.valueOf(grLineNumber);
 	
 	while(getParent().containsObject(testHashId))
 	{
 		grLineNumber++;
-		testHashId = "Line" + (new Integer(grLineNumber)).toString();		
+		testHashId = hashIdPrefix + String.valueOf(grLineNumber);		
 	}
 
 	return testHashId;
@@ -199,21 +201,26 @@ protected void draw(Graphics g, boolean hilited)
 
 	double scale = view.getScale();
 	
-	posX = getRx() + (int)(Constants.CONNECTOR_WIDTH * scale / 2) - offsetX;
-	posY = getRy() + (int)(Constants.CONNECTOR_HEIGHT * scale / 2) - offsetY;
-		
-	int posX2 = partnerVertex.getRx() + (int)(Constants.CONNECTOR_WIDTH * scale / 2) - offsetX;
-	int posY2 = partnerVertex.getRy() + (int)(Constants.CONNECTOR_HEIGHT * scale / 2) - offsetY;
+	int rw = (int)(Constants.CONNECTOR_WIDTH * scale / 2);
+	int rh = (int)(Constants.CONNECTOR_HEIGHT * scale / 2);
+	
+	posX = getRx() + rw - offsetX;
+	posY = getRy() + rh - offsetY;
+	
+	int posX2 = partnerVertex.getRx() + rw - offsetX;
+	int posY2 = partnerVertex.getRy() + rh - offsetY;
+
+	int dirX = (posX < posX2) ? (1) : (-1);
+	int dirY = (posY < posY2) ? (1) : (-1);
 
 	if(partnerVertex.getHashID().compareTo(hashId) < 0)
 	{
 		if((isDashed) && ((posX != posX2) || (posY != posY2)))
 		{
 			double angle = Math.atan(((double)(Math.abs(posY2 - posY))) / Math.abs(posX2 - posX));
+			double cos = dirX * Math.cos(angle) * Constants.DASHED_LINE_DENSITY;
+			double sin = dirY * Math.sin(angle) * Constants.DASHED_LINE_DENSITY;
 			
-			int dirX = (posX < posX2) ? (1) : (-1);
-			int dirY = (posY < posY2) ? (1) : (-1);
-
 			double curX = posX;
 			double curY = posY;
 
@@ -223,8 +230,8 @@ protected void draw(Graphics g, boolean hilited)
 			{
 				step++;
 
-				double curX2 = posX + Math.cos(angle) * dirX * step * Constants.DASHED_LINE_DENSITY;
-				double curY2 = posY + Math.sin(angle) * dirY * step * Constants.DASHED_LINE_DENSITY;
+				double curX2 = posX + cos * step;
+				double curY2 = posY + sin * step;
 				
 				if(((curX2 * dirX) > (posX2 * dirX)) || ((curY2 * dirY) > (posY2 * dirY)))
 				{			
@@ -235,8 +242,8 @@ protected void draw(Graphics g, boolean hilited)
 				g.drawLine((int)curX, (int)curY, (int)curX2, (int)curY2);
 				step++;
 				
-				curX = posX + Math.cos(angle) * dirX * step * Constants.DASHED_LINE_DENSITY;
-				curY = posY + Math.sin(angle) * dirY * step * Constants.DASHED_LINE_DENSITY;
+				curX = posX + cos * step;
+				curY = posY + sin * step;
 			}
 		}
 		else
@@ -247,9 +254,6 @@ protected void draw(Graphics g, boolean hilited)
 	{
 		double angle = Math.atan(((double)(Math.abs(posY2 - posY))) / Math.abs(posX2 - posX));
 		
-		int dirX = (posX < posX2) ? (1) : (-1);
-		int dirY = (posY < posY2) ? (1) : (-1);
-			
 		int[] vertexX = new int[3];
 		int[] vertexY = new int[3];
 			
@@ -262,11 +266,11 @@ protected void draw(Graphics g, boolean hilited)
 		if(arrowSize > lineLength / 2)
 			arrowSize = lineLength / 2;
 		
-		vertexX[1] = (int)(posX + Math.cos(angle + Constants.ARROW_SHARPNESS) * dirX * arrowSize);
-		vertexY[1] = (int)(posY + Math.sin(angle + Constants.ARROW_SHARPNESS) * dirY * arrowSize);
+		vertexX[1] = (int)(posX + dirX * Math.cos(angle + Constants.ARROW_SHARPNESS) * arrowSize);
+		vertexY[1] = (int)(posY + dirY * Math.sin(angle + Constants.ARROW_SHARPNESS) * arrowSize);
 			
-		vertexX[2] = (int)(posX + Math.cos(angle - Constants.ARROW_SHARPNESS) * dirX * arrowSize);
-		vertexY[2] = (int)(posY + Math.sin(angle - Constants.ARROW_SHARPNESS) * dirY * arrowSize);
+		vertexX[2] = (int)(posX + dirX * Math.cos(angle - Constants.ARROW_SHARPNESS) * arrowSize);
+		vertexY[2] = (int)(posY + dirY * Math.sin(angle - Constants.ARROW_SHARPNESS) * arrowSize);
 
 		g.fillPolygon(vertexX, vertexY, 3);
 	}
@@ -291,18 +295,20 @@ public Vector getItems()
 {
 	Vector items = new Vector();
 
+	ActionListener al = new PopupMenuHandler();
+
 	JMenuItem colorItem = new JMenuItem(colorString);
 	colorItem.addActionListener(new PopupMenuHandler());
 	items.addElement(colorItem);
 
 	JCheckBoxMenuItem isDashedItem = new JCheckBoxMenuItem(isDashedString);
 	isDashedItem.setSelected(isDashed);
-	isDashedItem.addActionListener(new PopupMenuHandler());
+	isDashedItem.addActionListener(al);
 	items.addElement(isDashedItem);
 
 	JCheckBoxMenuItem isArrowItem = new JCheckBoxMenuItem(isArrowString);
 	isArrowItem.setSelected(isArrow);
-	isArrowItem.addActionListener(new PopupMenuHandler());
+	isArrowItem.addActionListener(al);
 	items.addElement(isArrowItem);
 
 	return items;
