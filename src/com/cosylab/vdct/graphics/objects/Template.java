@@ -830,7 +830,7 @@ private void synchronizePortLinkFields()
 		{
 			TemplateEPICSPort tep = null;
 			for (int i=0; i<objs.length; i++)
-//				if (objs[i] instanceof TemplateEPICSPort)
+				if (objs[i] instanceof TemplateEPICSPort)
 				{
 					TemplateEPICSPort t = (TemplateEPICSPort)objs[i];
 					if (t.getFieldData().getName().equals(port.getName()))
@@ -897,7 +897,7 @@ private void synchronizePortLinkFields()
 	// remove ports
 	for (int i=0; i<objs.length; i++)
 	{
-//		if (objs[i] instanceof TemplateEPICSPort)
+		if (objs[i] instanceof TemplateEPICSPort)
 		{
 			TemplateEPICSPort link = (TemplateEPICSPort)objs[i];
 			if (!templateData.getTemplate().getPorts().containsKey(link.getFieldData().getName()))
@@ -930,33 +930,32 @@ private void synchronizePortLinkFields()
  */
 private void synchronizeMacroLinkFields()
 {
-	// TODO implement
-/*
+
 	Object[] objs = new Object[getSubObjectsV().size()];
 	getSubObjectsV().copyInto(objs);
 
-	// add ports
-	Enumeration e = templateData.getTemplate().getPortsV().elements();
+	// add macros
+	Enumeration e = templateData.getTemplate().getMacrosV().elements();
 	while (e.hasMoreElements())
 	{
-		VDBPort port = (VDBPort)e.nextElement();
-		Object obj = getSubObject(port.getName());
+		VDBMacro macro = (VDBMacro)e.nextElement();
+		Object obj = getSubObject(macro.getName());
 		if (obj==null)
 		{
-			TemplateEPICSPort tep = null;
+			TemplateEPICSMacro tem = null;
 			for (int i=0; i<objs.length; i++)
-//				if (objs[i] instanceof TemplateEPICSPort)
+				if (objs[i] instanceof TemplateEPICSMacro)
 				{
-					TemplateEPICSPort t = (TemplateEPICSPort)objs[i];
-					if (t.getFieldData().getName().equals(port.getName()))
+					TemplateEPICSMacro t = (TemplateEPICSMacro)objs[i];
+					if (t.getFieldData().getName().equals(macro.getName()))
 					{
-						tep = t;
+						tem = t;
 						break;
 					}
 				}					
 
 			// renamed
-			if (tep!=null)
+			if (tem!=null)
 			{
 				Object key = null;
 				Enumeration e2 = getSubObjects().keys();
@@ -964,7 +963,7 @@ private void synchronizeMacroLinkFields()
 				{
 					Object key2 = e2.nextElement();
 					Object val = getSubObjects().get(key2);
-					if (val==tep)
+					if (val==tem)
 					{
 						key = key2;
 						break;
@@ -976,50 +975,50 @@ private void synchronizeMacroLinkFields()
 				else
 					System.out.println("Internal error...");
 					
-				addSubObject(tep.getFieldData().getName(), tep);
+				addSubObject(tem.getFieldData().getName(), tem);
 
 				// update lookup table and fix source links 
-				tep.fixTemplateLink();
+				tem.fixTemplateLink();
 								
-				//System.out.println("!! renamed !! "+port.getName());
+				//System.out.println("!! renamed !! "+macro.getName());
 			}
 			else
 			{
-				//System.out.println("!! added !!"+port.getName());
+				//System.out.println("!! added !!"+macro.getName());
 
-				// add port
-				VDBTemplatePort tf = new VDBTemplatePort(getTemplateData(), port);
+				// add macro
+				VDBTemplateMacro tf = new VDBTemplateMacro(getTemplateData(), macro);
 				EPICSLink link = createLinkField(tf);
 				if (link!=null)
 				{
-					link.setRight(true);
+					link.setRight(false);
 					addSubObject(tf.getName(), link);
 				}
 			}
 		}
 		else
 		{
-			// fix port if necessary (result of add+remove action)
-			VDBTemplatePort tpd = ((VDBTemplatePort)((TemplateEPICSPort)obj).getFieldData());
-			if (tpd.getPort()!=port)
+			// fix macro if necessary (result of add+remove action)
+			VDBTemplateMacro tmd = ((VDBTemplateMacro)((TemplateEPICSMacro)obj).getFieldData());
+			if (tmd.getMacro()!=macro)
 			{
-				//System.out.println("!! fixing port !!"+port.getName());
-				tpd.setPort(port);
+				//System.out.println("!! fixing macro !!"+macro.getName());
+				tmd.setMacro(macro);
 			}
 		}
 	}
 
-	// remove ports
+	// remove macros
 	for (int i=0; i<objs.length; i++)
 	{
-//		if (objs[i] instanceof TemplateEPICSPort)
+		if (objs[i] instanceof TemplateEPICSMacro)
 		{
-			TemplateEPICSPort link = (TemplateEPICSPort)objs[i];
-			if (!templateData.getTemplate().getPorts().containsKey(link.getFieldData().getName()))
+			TemplateEPICSMacro link = (TemplateEPICSMacro)objs[i];
+			if (!templateData.getTemplate().getMacros().containsKey(link.getFieldData().getName()))
 			{
 				//System.out.println("!! removed !! "+link.getFieldData().getName());
 
-				// remove port
+				// remove macro
 				link.destroyAndRemove();
 	
 				removeObject(link.getFieldData().getName());
@@ -1027,16 +1026,16 @@ private void synchronizeMacroLinkFields()
 		}
 	}
 	
-	// save ports ID
-	portsID = getTemplateData().getTemplate().getPortsGeneratedID();
+	// save macros ID
+	macrosID = getTemplateData().getTemplate().getMacrosGeneratedID();
 	//com.cosylab.vdct.graphics.DrawingSurface.getInstance().setModified(true);
 
 	// check
-	if (getTemplateData().getTemplate().getPortsV().size()!=getSubObjectsV().size())
+	if (getTemplateData().getTemplate().getMacrosV().size()!=getSubObjectsV().size())
 	{
-		Console.getInstance().println("Failed to synchronize template ports with template instance ports. Save and restart VisualDCT.");
+		Console.getInstance().println("Failed to synchronize template macros with template instance macros. Save and restart VisualDCT.");
 	}
-*/
+
 }
 
 /**
