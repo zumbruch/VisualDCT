@@ -1229,8 +1229,8 @@ public void mouseReleased(MouseEvent e) {
 	int px = e.getX()-view.getX0();
 	int py = e.getY()-view.getY0();
 
-	boolean leftButtonPush = (e.getModifiers() & InputEvent.BUTTON1_MASK) != 0;
-	boolean rightButtonPush  = (e.getModifiers() & InputEvent.BUTTON3_MASK) != 0;
+	//boolean leftButtonPush = (e.getModifiers() & InputEvent.BUTTON1_MASK) != 0;
+	//boolean rightButtonPush  = (e.getModifiers() & InputEvent.BUTTON3_MASK) != 0;
 	//System.out.println("mouseReleased("+leftButtonPush+","+rightButtonPush+")");
 
 	VisibleObject hilitedObject = ViewState.getInstance().getHilitedObject();
@@ -1464,7 +1464,7 @@ public boolean open(File file, boolean importDB) throws IOException {
 		// check is DTYP fields are defined before any DBF_INPUT/DBF_OUTPUT fields...
 		DBData.checkDTYPfield(dbData, dbdData);
 
-		VDBData vdbData = VDBData.generateVDBData(dbdData, dbData);
+		/*VDBData vdbData =*/ VDBData.generateVDBData(dbdData, dbData);
 
 		//applyVisualData(importDB, viewGroup, dbData, vdbData);
 

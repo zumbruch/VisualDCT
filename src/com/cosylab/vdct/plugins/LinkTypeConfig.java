@@ -35,7 +35,6 @@ import java.util.regex.PatternSyntaxException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.cosylab.vdct.plugin.PluginContext;
@@ -111,7 +110,7 @@ public class LinkTypeConfig implements LinkTypeConfigPlugin
 		Hashtable table = new Hashtable();
 						
 		int count = 0;
-		Node node = doc.getElementsByTagName("links").item(0);
+		//Node node = doc.getElementsByTagName("links").item(0);
 		NodeList nodes = doc.getElementsByTagName("link");
 		for (int i=0; i<nodes.getLength(); i++)
 		{

@@ -28,8 +28,6 @@ package com.cosylab.vdct.db;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import com.cosylab.vdct.Console;
-
 /**
  * This type was created in VisualAge.
  */

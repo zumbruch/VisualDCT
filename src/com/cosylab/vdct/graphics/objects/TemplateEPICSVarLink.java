@@ -32,9 +32,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 import com.cosylab.vdct.Constants;
-import com.cosylab.vdct.DataProvider;
 import com.cosylab.vdct.graphics.ViewState;
-import com.cosylab.vdct.vdb.VDBFieldData;
 import com.cosylab.vdct.vdb.VDBTemplateField;
 
 /**

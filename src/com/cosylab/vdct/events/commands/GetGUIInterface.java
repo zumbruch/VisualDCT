@@ -28,7 +28,6 @@ package com.cosylab.vdct.events.commands;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import com.cosylab.vdct.events.Command;
 import com.cosylab.vdct.graphics.*;
 
 /**

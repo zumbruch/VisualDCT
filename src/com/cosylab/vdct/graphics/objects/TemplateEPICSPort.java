@@ -32,18 +32,14 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.Enumeration;
 import java.util.Vector;
-import java.util.regex.Pattern;
 
 import com.cosylab.vdct.Constants;
-import com.cosylab.vdct.DataProvider;
-import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.vdb.GUIHeader;
 import com.cosylab.vdct.vdb.GUISeparator;
 import com.cosylab.vdct.vdb.NameValueInfoProperty;
 import com.cosylab.vdct.vdb.ROProperty;
 import com.cosylab.vdct.vdb.VDBFieldData;
-import com.cosylab.vdct.vdb.VDBTemplateField;
 import com.cosylab.vdct.vdb.VDBTemplatePort;
 
 /**
@@ -150,7 +146,6 @@ protected void draw(Graphics g, boolean hilited) {
 	com.cosylab.vdct.graphics.ViewState view = com.cosylab.vdct.graphics.ViewState.getInstance();
 	boolean isRightSide = isRight();
 
-	int len;
 	int rrx;			// rrx, rry is center
 	if (isRightSide)
 		rrx = getRx()+getRwidth()-view.getRx();

@@ -31,7 +31,6 @@ package com.cosylab.vdct.db;
 import java.io.*;
 import java.util.*;
 import com.cosylab.vdct.Console;
-import com.cosylab.vdct.DataProvider;
 import com.cosylab.vdct.graphics.objects.OutLink;
 import com.cosylab.vdct.util.*;
 import com.cosylab.vdct.util.StringUtils;
@@ -271,7 +270,7 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 	 DBRecordData rd;
 	 DBFieldData fd;
  	 String str, str2, desc; int t, tx, tx2, ty, ty2, t2, t3;
- 	 boolean r1, r2;
+// 	 boolean r1, r2;
 
  	 while ((tokenizer.nextToken() != tokenizer.TT_EOL) &&
 		    (tokenizer.ttype != tokenizer.TT_EOF)) 
@@ -828,13 +827,14 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 
 					// read obj1rotated
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) r1=((int)tokenizer.nval)!=0;
+/*					if (tokenizer.ttype == tokenizer.TT_NUMBER) r1=((int)tokenizer.nval)!=0;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
-
+*/
 					// read obj2rotated
 					tokenizer.nextToken();
-					if (tokenizer.ttype == tokenizer.TT_NUMBER) r2=((int)tokenizer.nval)!=0;
+/*					if (tokenizer.ttype == tokenizer.TT_NUMBER) r2=((int)tokenizer.nval)!=0;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
+*/
 /*
 					// transformation to v2 visual data
 					

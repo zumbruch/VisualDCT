@@ -30,13 +30,11 @@ package com.cosylab.vdct;
 
 import java.awt.*;
 import java.io.File;
-import java.io.IOException;
 
 import javax.swing.*;
 import javax.swing.table.*;
 import javax.swing.event.*;
 
-import com.cosylab.vdct.dbd.DBDData;
 import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.events.commands.GetGUIInterface;
 import com.cosylab.vdct.util.UniversalFileFilter;

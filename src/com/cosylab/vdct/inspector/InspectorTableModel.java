@@ -28,8 +28,6 @@ package com.cosylab.vdct.inspector;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import javax.swing.table.AbstractTableModel;
-
 /**
  * Insert the type's description here.
  * Creation date: (6.1.2001 23:29:20)

@@ -307,7 +307,7 @@ public void accept(Visitor visitor)
 
 public boolean checkMove(int dx, int dy)
 {
-	ViewState view = ViewState.getInstance();
+	//ViewState view = ViewState.getInstance();
 
 	if(startVertex.checkMove(dx, dy) && endVertex.checkMove(dx, dy))
 		return true;
@@ -371,8 +371,8 @@ protected void draw(Graphics g, boolean hilited)
 			g.drawRect(posX - 2, posY - 2, rwidth + 4, rheight + 4);
 		}
 		
-		int size = (int)(getFont().getSize()*getRscale());
-		Font f = FontMetricsBuffer.getInstance().getFont(getFont().getFamily(), size, getFont().getStyle());
+		//int size = (int)(getFont().getSize()*getRscale());
+		//Font f = FontMetricsBuffer.getInstance().getFont(getFont().getFamily(), size, getFont().getStyle());
 		
 		if (htmlMode)
 		{
@@ -445,7 +445,7 @@ private void drawDashedBorder(Graphics g, boolean hilited,
 		g.setColor(c);
 	}
 		
-	double scale = view.getScale();
+	//double scale = view.getScale();
 	
 	int posX2 = posX + rwidth;
 	int posY2 = posY + rheight;
@@ -577,7 +577,7 @@ public boolean moveToGroup(String group)
 	if(group.equalsIgnoreCase(currentParent))
 		return false;
 	
-	String oldName = getName();
+	//String oldName = getName();
 	String newName;
 	if (group.equals(nullString))
 		newName = Group.substractObjectName(getName());

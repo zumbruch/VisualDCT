@@ -29,7 +29,6 @@ package com.cosylab.vdct.vdb;
  */
 
 import com.cosylab.vdct.Constants;
-import com.cosylab.vdct.dbd.DBDConstants;
 import com.cosylab.vdct.graphics.objects.Descriptable;
 import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.objects.Template;

@@ -210,7 +210,7 @@ private javax.swing.JLabel getJLabelSystemOSProperty() {
 	if (JLabelSystemOSProperty == null) {
 		try {
 			JLabelSystemOSProperty = new javax.swing.JLabel();
-			java.util.Properties properties = ((SystemTabModel)model).getSystemProperties();
+			/*java.util.Properties properties =*/ ((SystemTabModel)model).getSystemProperties();
 			JLabelSystemOSProperty.setText("os");
 
 		} catch (Exception e) {

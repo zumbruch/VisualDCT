@@ -90,7 +90,7 @@ public class CosyBeansPlugin implements ContextPopupPlugin, MenuPlugin {
 				return;
 			}
 
-			String channelType = getFieldType(fieldData.getField_type());
+			//String channelType = getFieldType(fieldData.getField_type());
 			
 			// call abeans
 			

@@ -29,7 +29,6 @@ package com.cosylab.vdct;
  */
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.awt.print.*;
 import javax.swing.*;
 import javax.swing.event.*;
@@ -37,8 +36,6 @@ import javax.swing.event.*;
 import com.cosylab.vdct.about.VisualDCTAboutDialogEngine;
 import com.cosylab.vdct.events.*;
 import com.cosylab.vdct.events.commands.*;
-import com.cosylab.vdct.plugin.PluginManager;
-import com.cosylab.vdct.util.StringUtils;
 import com.cosylab.vdct.util.UniversalFileFilter;
 import com.cosylab.vdct.vdb.VDBData;
 import com.cosylab.vdct.graphics.printing.*;

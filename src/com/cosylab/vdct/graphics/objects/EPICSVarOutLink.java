@@ -31,14 +31,10 @@ package com.cosylab.vdct.graphics.objects;
 import java.util.*;
 import java.awt.*;
 import com.cosylab.vdct.Constants;
-import com.cosylab.vdct.DataProvider;
 
 import javax.swing.*;
 import java.awt.event.*;
 import com.cosylab.vdct.vdb.*;
-import com.cosylab.vdct.graphics.*;
-import com.cosylab.vdct.inspector.*;
-import com.cosylab.vdct.graphics.popup.*;
 
 /**
  * Insert the type's description here.

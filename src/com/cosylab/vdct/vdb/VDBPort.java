@@ -356,7 +356,7 @@ public class VDBPort implements InspectableProperty, Descriptable, ChangableVisi
 	 */
 	public void setValue(String value)
 	{
-		String oldValue = target;
+		//String oldValue = target;
 
 		if ((target!=null) && !target.equals(value))
 		{

@@ -29,11 +29,8 @@ package com.cosylab.vdct.util;
  */
 
 import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.border.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.*;
 
 public class FontSelector extends JPanel
 {
@@ -214,7 +211,6 @@ public class FontSelector extends JPanel
 
 		if(fontStylesBox != null)
 		{
-			int counter = 0;
 			int style = parFont.getStyle();
 			
 			if(style == Font.PLAIN)

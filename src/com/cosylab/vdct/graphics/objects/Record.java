@@ -42,11 +42,6 @@ import com.cosylab.vdct.dbd.DBDRecordData;
 import com.cosylab.vdct.inspector.*;
 
 import com.cosylab.vdct.graphics.popup.*;
-import javax.swing.*;
-import java.awt.event.*;
-
-import com.cosylab.vdct.events.*;
-import com.cosylab.vdct.events.commands.*;
 
 /**
  * Insert the type's description here.
@@ -1058,7 +1053,7 @@ public boolean moveToGroup(java.lang.String group) {
 	String currentParent = Group.substractParentName(recordData.getName());
 	if (group.equalsIgnoreCase(currentParent)) return false;
 	
-	String oldName = getName();
+	//String oldName = getName();
 	String newName;
 	if (group.equals(nullString))
 		newName = Group.substractObjectName(recordData.getName());

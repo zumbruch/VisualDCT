@@ -28,7 +28,6 @@ package com.cosylab.vdct.vdb;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.io.*;
 import java.util.*;
 import com.cosylab.vdct.db.*;
 import com.cosylab.vdct.dbd.*;

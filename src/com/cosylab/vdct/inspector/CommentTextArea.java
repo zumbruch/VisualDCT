@@ -29,7 +29,6 @@ package com.cosylab.vdct.inspector;
  */
 
 import javax.swing.*;
-import java.awt.event.FocusListener;
 
 /**
  * Insert the type's description here.

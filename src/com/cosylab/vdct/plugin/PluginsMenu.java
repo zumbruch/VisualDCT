@@ -30,7 +30,6 @@ package com.cosylab.vdct.plugin;
 
 import javax.swing.*;
 
-import java.net.*;
 import java.util.*;
 import java.beans.*;
 import java.awt.event.*;

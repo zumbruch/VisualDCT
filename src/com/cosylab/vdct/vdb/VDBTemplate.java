@@ -30,12 +30,8 @@ package com.cosylab.vdct.vdb;
 
 import java.awt.Component;
 import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.Vector;
 import java.util.regex.Pattern;
@@ -45,16 +41,11 @@ import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
 import com.cosylab.vdct.Console;
-import com.cosylab.vdct.Constants;
-import com.cosylab.vdct.db.DBResolver;
 import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.events.commands.GetGUIInterface;
-import com.cosylab.vdct.graphics.FontMetricsBuffer;
-import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.graphics.objects.Descriptable;
 import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.objects.VisibleObject;
-import com.cosylab.vdct.graphics.popup.Popupable;
 import com.cosylab.vdct.inspector.Inspectable;
 import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.inspector.InspectorManager;
@@ -64,7 +55,6 @@ import com.cosylab.vdct.undo.DeleteTemplatePortAction;
 import com.cosylab.vdct.undo.DescriptionChangeAction;
 import com.cosylab.vdct.undo.RenameTemplatePortAction;
 import com.cosylab.vdct.undo.UndoManager;
-import com.cosylab.vdct.util.StringUtils;
 
 /**
  * Data object representing EPICS DB template.

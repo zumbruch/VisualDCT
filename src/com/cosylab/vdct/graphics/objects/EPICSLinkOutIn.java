@@ -31,7 +31,6 @@ package com.cosylab.vdct.graphics.objects;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.vdb.LinkProperties;
 import com.cosylab.vdct.vdb.VDBFieldData;
 

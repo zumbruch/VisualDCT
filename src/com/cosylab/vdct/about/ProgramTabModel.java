@@ -29,7 +29,6 @@ package com.cosylab.vdct.about;
  */
 
 import java.net.URL;
-import java.util.Properties;
 
 import javax.swing.Icon;
 

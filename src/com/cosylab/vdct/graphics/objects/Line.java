@@ -150,7 +150,7 @@ public void accept(Visitor visitor)
 
 public boolean checkMove(int dx, int dy)
 {
-	ViewState view = ViewState.getInstance();
+	//ViewState view = ViewState.getInstance();
 
 	if(startVertex.checkMove(dx, dy) && endVertex.checkMove(dx, dy))
 		return true;
@@ -224,7 +224,7 @@ protected void draw(Graphics g, boolean hilited)
 			c=Color.black;
 	g.setColor(c);
 
-	double scale = view.getScale();
+	//double scale = view.getScale();
 	
 	posX = startVertex.getRx() - offsetX;
 	posY = startVertex.getRy() - offsetY;
@@ -449,7 +449,7 @@ public boolean moveToGroup(String group)
 	if(group.equalsIgnoreCase(currentParent))
 		return false;
 	
-	String oldName = getName();
+	//String oldName = getName();
 	String newName;
 	if (group.equals(nullString))
 		newName = Group.substractObjectName(getName());

@@ -29,7 +29,6 @@ package com.cosylab.vdct.graphics.objects;
  */
 
 import com.cosylab.vdct.Constants;
-import com.cosylab.vdct.vdb.LinkProperties;
 
 /**
  * Insert the type's description here.

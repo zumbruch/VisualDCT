@@ -377,7 +377,7 @@ public static void drawLink(Graphics g, OutLink out, InLink in, int count, boole
 		double scale = view.getScale();
 		int x1 = (int)(scale*out.getOutX())-view.getRx();
 		int y1 = (int)(scale*out.getOutY())-view.getRy();
-		int r = (int)(LARGE_RECT*scale);
+		//int r = (int)(LARGE_RECT*scale);
 
 		drawIntergroupLink(g, view, x1, y1, in, isRight);
 

@@ -37,7 +37,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
 
 import com.cosylab.vdct.Constants;
-import com.cosylab.vdct.DataProvider;
 import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.events.commands.LinkCommand;
 import com.cosylab.vdct.graphics.ViewState;

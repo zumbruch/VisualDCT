@@ -3,7 +3,6 @@ import java.awt.*;
 import java.awt.image.*;
 import java.io.*;
 import java.text.AttributedCharacterIterator;
-import java.util.*;
 
 /**
  * PSGr is a awt.Graphics subclass that images to PostScript.

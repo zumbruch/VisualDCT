@@ -30,10 +30,6 @@ package com.cosylab.vdct.plugin.menu;
 
 import javax.swing.*;
 
-import java.util.*;
-import java.beans.*;
-import java.awt.event.*;
-
 import com.cosylab.vdct.plugin.*;
 
 /**

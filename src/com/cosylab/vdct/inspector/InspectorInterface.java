@@ -28,9 +28,6 @@ package com.cosylab.vdct.inspector;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import com.cosylab.vdct.dbd.*;
-import com.cosylab.vdct.vdb.*;
-
 /**
  * Insert the type's description here.
  * Creation date: (8.1.2001 17:43:35)

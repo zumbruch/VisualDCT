@@ -41,10 +41,8 @@ import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.vdb.GUIHeader;
 import com.cosylab.vdct.vdb.GUISeparator;
 import com.cosylab.vdct.vdb.LinkProperties;
-import com.cosylab.vdct.vdb.NameValueInfoProperty;
 import com.cosylab.vdct.vdb.PortDescriptionProperty;
 import com.cosylab.vdct.vdb.VDBPort;
-import com.cosylab.vdct.vdb.VDBTemplate;
 
 import javax.swing.*;
 

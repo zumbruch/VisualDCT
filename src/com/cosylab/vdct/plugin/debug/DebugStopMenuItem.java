@@ -31,10 +31,7 @@ package com.cosylab.vdct.plugin.debug;
 import javax.swing.*;
 
 import java.util.*;
-import java.beans.*;
 import java.awt.event.*;
-
-import com.cosylab.vdct.plugin.*;
 
 /**
  * Insert the class' description here.

@@ -32,7 +32,6 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 import com.cosylab.vdct.dbd.*;
-import com.cosylab.vdct.vdb.*;
 import com.cosylab.vdct.graphics.objects.*;
 import com.cosylab.vdct.inspector.*;
 

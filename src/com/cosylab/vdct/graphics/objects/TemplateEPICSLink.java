@@ -28,11 +28,6 @@ package com.cosylab.vdct.graphics.objects;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import com.cosylab.vdct.Constants;
-import com.cosylab.vdct.DataProvider;
-import com.cosylab.vdct.vdb.VDBFieldData;
-import com.cosylab.vdct.vdb.VDBTemplateField;
-
 /**
  * Insert the type's description here.
  * Creation date: (29.1.2001 21:27:30)

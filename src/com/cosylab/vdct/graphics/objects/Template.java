@@ -31,10 +31,8 @@ package com.cosylab.vdct.graphics.objects;
 import java.awt.*;
 import java.io.*;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Vector;
 import java.util.Map;
-import java.util.Hashtable;
 import java.util.Enumeration;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -44,7 +42,6 @@ import javax.swing.*;
 import com.cosylab.vdct.Console;
 import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.db.DBResolver;
-import com.cosylab.vdct.graphics.DrawingSurface;
 import com.cosylab.vdct.graphics.FontMetricsBuffer;
 import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.graphics.popup.Popupable;
@@ -1180,7 +1177,7 @@ public boolean moveToGroup(java.lang.String group) {
 	String currentParent = Group.substractParentName(templateData.getName());
 	if (group.equalsIgnoreCase(currentParent)) return false;
 	
-	String oldName = getName();
+	//String oldName = getName();
 	String newName;
 	if (group.equals(nullString))
 		newName = Group.substractObjectName(templateData.getName());

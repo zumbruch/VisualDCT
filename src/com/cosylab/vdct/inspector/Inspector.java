@@ -35,11 +35,9 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.*;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.*;
 import com.cosylab.vdct.Console;
-import com.cosylab.vdct.vdb.VDBFieldData;
 
 /**
  * Insert the type's description here.

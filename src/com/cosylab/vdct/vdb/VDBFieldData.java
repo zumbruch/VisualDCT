@@ -28,7 +28,6 @@ package com.cosylab.vdct.vdb;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import com.cosylab.vdct.db.DBData;
 import com.cosylab.vdct.dbd.*;
 import com.cosylab.vdct.DataProvider;
 import com.cosylab.vdct.Console;

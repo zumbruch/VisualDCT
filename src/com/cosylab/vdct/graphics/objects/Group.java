@@ -512,7 +512,7 @@ public static boolean hasTokens(String name) {
  */
 public VisibleObject hiliteComponentsCheck(int x, int y) {
 
-	ViewState view = ViewState.getInstance();
+	//ViewState view = ViewState.getInstance();
 	VisibleObject spotted = null;
 	
 	Enumeration e = subObjectsV.elements();
@@ -642,7 +642,7 @@ public boolean move(int dx, int dy) {
 public boolean moveToGroup(java.lang.String group) {
 	if (group.equalsIgnoreCase(getAbsoluteName())) return false; 	// move to itself
 
-	String oldName = getAbsoluteName();
+	//String oldName = getAbsoluteName();
 	String newName;
 	if (group.equals(nullString))
 		newName = getName();
@@ -770,7 +770,7 @@ public Object removeObject(String id) {
  */
 public boolean rename(java.lang.String newName) {
 
-	String oldName = getAbsoluteName();
+	//String oldName = getAbsoluteName();
 	String newObjName = Group.substractObjectName(newName);
 
 	getParent().removeObject(getName());
@@ -1046,7 +1046,6 @@ public static void writeObjects(Vector elements, java.io.DataOutputStream file, 
 
  Object obj;
  String name;
- Group group;
  Template template;
  Record record;
  VDBFieldData fieldData = null;

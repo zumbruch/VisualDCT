@@ -29,10 +29,8 @@ package com.cosylab.vdct.plugin.popup;
  */
 
 import java.util.Vector;
-import java.util.Hashtable;
 
 import com.cosylab.vdct.plugin.Plugin;
-import com.cosylab.vdct.graphics.objects.Group;
 
 /**
  * Insert the type's description here.

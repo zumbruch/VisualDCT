@@ -31,7 +31,6 @@ package com.cosylab.vdct.graphics.objects;
 import java.util.*;
 import java.awt.*;
 import com.cosylab.vdct.Constants;
-import com.cosylab.vdct.DataProvider;
 
 import javax.swing.*;
 import java.awt.event.*;

@@ -35,7 +35,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
 
 import com.cosylab.vdct.Console;
-import com.cosylab.vdct.DataProvider;
 import com.cosylab.vdct.plugin.*;
 
 /**

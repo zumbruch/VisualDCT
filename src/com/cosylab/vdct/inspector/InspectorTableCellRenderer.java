@@ -29,11 +29,9 @@ package com.cosylab.vdct.inspector;
  */
 
 import java.awt.*;
-import java.awt.event.ActionListener;
 
 import javax.swing.*;
 import javax.swing.table.*;
-import javax.swing.border.*;
 
 /**
  * Insert the type's description here.

@@ -29,7 +29,6 @@ package com.cosylab.vdct.graphics;
  */
 
 import java.awt.Graphics;
-import javax.swing.JPanel;
 
 /**
  * PanelDecorator (using Decorator pattern)

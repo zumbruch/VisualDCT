@@ -29,7 +29,6 @@ package com.cosylab.vdct.graphics.printing;
  */
 
 import java.awt.*;
-import java.awt.print.*;
 
 /**
  * Insert the type's description here.

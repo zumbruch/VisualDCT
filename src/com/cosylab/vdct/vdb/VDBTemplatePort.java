@@ -30,13 +30,10 @@ package com.cosylab.vdct.vdb;
 
 import java.util.regex.Pattern;
 
-import com.cosylab.vdct.Constants;
-import com.cosylab.vdct.dbd.DBDConstants;
 import com.cosylab.vdct.graphics.objects.Descriptable;
 import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.objects.Template;
 import com.cosylab.vdct.inspector.ChangableVisibility;
-import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.inspector.InspectorManager;
 
 /**

@@ -28,21 +28,16 @@ package com.cosylab.vdct.inspector;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.text.ParseException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.awt.*;
 import java.awt.event.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 import javax.swing.*;
 import javax.swing.table.*;
 import javax.swing.event.*;
 import javax.swing.tree.*;
-
-import com.cosylab.vdct.dbd.*;
 
 public class InspectorCellEditor implements TableCellEditor, TreeCellEditor {
 

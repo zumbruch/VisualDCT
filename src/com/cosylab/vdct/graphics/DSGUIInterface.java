@@ -36,9 +36,7 @@ import javax.swing.SwingConstants;
 import com.cosylab.vdct.*;
 import com.cosylab.vdct.vdb.*;
 import com.cosylab.vdct.undo.*;
-import com.cosylab.vdct.util.StringUtils;
 import com.cosylab.vdct.graphics.objects.*;
-import com.cosylab.vdct.db.DBResolver;
 import com.cosylab.vdct.events.*;
 import com.cosylab.vdct.events.commands.*;
 
@@ -173,7 +171,7 @@ public Box createBox()
 	int posX = (int)((drawingSurface.getPressedX() + view.getRx()) / scale);
 	int posY = (int)((drawingSurface.getPressedY() + view.getRy()) / scale);
 
-	String parentName = parentGroup.getAbsoluteName();
+	//String parentName = parentGroup.getAbsoluteName();
 	
 	Box grBox = new Box(null, parentGroup, posX, posY, posX, posY);
  	Group.getRoot().addSubObject(grBox.getName(), grBox, true);
@@ -193,7 +191,7 @@ public Line createLine()
 	int posX = (int)((drawingSurface.getPressedX() + view.getRx()) / scale);
 	int posY = (int)((drawingSurface.getPressedY() + view.getRy()) / scale);
 	
-	String parentName = parentGroup.getAbsoluteName();
+	//String parentName = parentGroup.getAbsoluteName();
 	
 	Line grLine = new Line(null, parentGroup, posX, posY, posX, posY);
  	Group.getRoot().addSubObject(grLine.getName(), grLine, true);
@@ -213,7 +211,7 @@ public TextBox createTextBox()
 	int posX = (int)((drawingSurface.getPressedX() + view.getRx()) / scale);
 	int posY = (int)((drawingSurface.getPressedY() + view.getRy()) / scale);
 
-	String parentName = parentGroup.getAbsoluteName();
+	//String parentName = parentGroup.getAbsoluteName();
 
 	TextBox grTextBox = new TextBox(null, parentGroup, posX, posY, posX, posY);
  	Group.getRoot().addSubObject(grTextBox.getName(), grTextBox, true);
@@ -480,7 +478,7 @@ public void paste() {
 	boolean isCopy = pasteNames.size()!=size;
 	ComposedAction composedAction = new ComposedAction();
 
-	Flexible flex; String oldGroup;
+	Flexible flex; 
 	for(int i=0; i<size; i++) {
 		if (objs[i] instanceof Flexible) {
 			flex = (Flexible)objs[i];

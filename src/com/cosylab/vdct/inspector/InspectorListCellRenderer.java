@@ -29,7 +29,7 @@ package com.cosylab.vdct.inspector;
  */
 
 import javax.swing.*;
-import javax.swing.border.*;
+
 /**
  * Insert the type's description here.
  * Creation date: (10.1.2001 15:10:15)

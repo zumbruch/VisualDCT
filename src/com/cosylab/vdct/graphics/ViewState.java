@@ -28,7 +28,6 @@ package com.cosylab.vdct.graphics;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.awt.*;
 import java.util.*;
 import com.cosylab.vdct.graphics.objects.VisibleObject;
 

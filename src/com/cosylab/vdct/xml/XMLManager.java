@@ -30,7 +30,6 @@ package com.cosylab.vdct.xml;
 
 import java.io.*;
 import java.net.*;
-import java.util.*;
 
 import org.w3c.dom.*;
 import org.xml.sax.*;

@@ -140,7 +140,6 @@ public static String getOptions(LinkSource fd) {
 
 	if ((fd.getValue()==null) || fd.getValue().equals(nullString)) return null;
 
-	String options;
 	String value = fd.getValue();
 
 	StringTokenizer tokenizer = new StringTokenizer(value, tokenizerSettings);

@@ -31,7 +31,6 @@ package com.cosylab.vdct.vdb;
 import java.awt.Component;
 import java.util.regex.Pattern;
 
-import com.cosylab.vdct.events.Command;
 import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.util.StringUtils;
 

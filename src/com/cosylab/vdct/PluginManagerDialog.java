@@ -18,9 +18,6 @@ import javax.swing.table.*;
 
 import com.cosylab.vdct.plugin.*;
 import com.cosylab.vdct.util.*;
-import com.cosylab.vdct.xml.*;
-
-import org.w3c.dom.*;
 
 public class PluginManagerDialog extends JDialog implements PluginListener,
 	PropertyChangeListener

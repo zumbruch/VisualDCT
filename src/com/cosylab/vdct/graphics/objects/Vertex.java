@@ -33,9 +33,6 @@ import java.util.*;
 import com.cosylab.vdct.*;
 import com.cosylab.vdct.graphics.*;
 import com.cosylab.vdct.graphics.popup.*;
-import com.cosylab.vdct.undo.DeleteAction;
-import com.cosylab.vdct.undo.UndoManager;
-import com.cosylab.vdct.util.*;
 
 /**
  * @author ssah
@@ -55,7 +52,7 @@ public Vertex(VisibleObject owner, int parX, int parY)
 	//super(parentGroup);
 	super(null);
 	
-	ViewState view = ViewState.getInstance();
+	//ViewState view = ViewState.getInstance();
 
 	setX(parX);
 	setY(parY);

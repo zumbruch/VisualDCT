@@ -32,9 +32,6 @@ import java.awt.*;
 import java.awt.print.*;
 import java.awt.image.*;
 
-import com.cosylab.vdct.events.*;
-import com.cosylab.vdct.events.commands.*;
-
 /**
  * Insert the type's description here.
  * Creation date: (12.5.2001 15:24:22)

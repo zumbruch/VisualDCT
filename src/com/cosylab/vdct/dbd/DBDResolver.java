@@ -29,7 +29,6 @@ package com.cosylab.vdct.dbd;
  */
 
 import java.io.*;
-import java.util.*;
 import com.cosylab.vdct.Console;
 import com.cosylab.vdct.util.PathSpecification;
 

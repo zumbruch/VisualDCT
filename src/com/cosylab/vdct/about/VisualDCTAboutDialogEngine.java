@@ -1,7 +1,6 @@
 package com.cosylab.vdct.about;
 
 import java.awt.Component;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 
 /**
