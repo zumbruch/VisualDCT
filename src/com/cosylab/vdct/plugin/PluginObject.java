@@ -320,7 +320,7 @@ private void loadConfig(Element pluginNode)
  * @param
  * @return
  */
-public static Plugin loadPlugin(String className) throws Exception
+public static Plugin loadPlugin(String className) throws Throwable
 {
 	if (className==null)
 		return null;
@@ -332,11 +332,11 @@ public static Plugin loadPlugin(String className) throws Exception
 		
 		return (Plugin)obj;
 	}
-	catch (Exception e)
+	catch (Throwable t)
 	{
 		//com.cosylab.vdct.Console.getInstance().println("An error occured while loading the class: " + className);
 		//com.cosylab.vdct.Console.getInstance().println(e);
-		throw e;
+		throw t;
 	}
 }
 /**

@@ -93,8 +93,8 @@ public void importPlugins(String fileName, PluginManager pluginManager) throws E
 	Document doc = null;
 	try
 	{
-// shp: importPlugins is now capable of loading xml from jar files
-//		doc = XMLManager.readFileDocument(fileName, DTD_SYMBOL, dtdURL);
+		// shp: importPlugins is now capable of loading xml from jar files
+		//doc = XMLManager.readFileDocument(fileName, DTD_SYMBOL, dtdURL);
 		doc = XMLManager.readResourceDocument(fileName, DTD_SYMBOL, dtdURL);
 	}
 	catch (FileNotFoundException e)
@@ -122,9 +122,10 @@ public void importPlugins(String fileName, PluginManager pluginManager) throws E
 					PluginObject plugin = new PluginObject((Element)node);
 					pluginManager.addPlugin(plugin);
 				}
-				catch (Exception e)
+				catch (Throwable t)
 				{
-					System.out.println("Failed to load/initialize plugin.");
+					com.cosylab.vdct.Console.getInstance().println("Failed to load/initialize plugin: " + t.getMessage());
+					System.err.println("Failed to load/initialize plugin: " + t.getMessage());
 				}
 			}
 		}
