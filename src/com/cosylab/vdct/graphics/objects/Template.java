@@ -938,4 +938,19 @@ public void removeInvalidLink(EPICSLink field)
 	invalidLinks.remove(field);
 }
 
+/**
+ * Insert the method's description here.
+ * Creation date: (30.1.2001 11:59:21)
+ */
+public void destroy() {
+	if (!isDestroyed()) {
+		super.destroy();
+		destroyFields();
+		
+		clear();
+		getParent().removeObject(Group.substractObjectName(getName()));
+	}
+}
+
+
 }

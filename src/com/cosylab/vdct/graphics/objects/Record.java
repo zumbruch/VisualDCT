@@ -241,23 +241,12 @@ public void destroy() {
 				else 
 					outlink.disconnect(this);
 			}
+			outlinks.clear();
 		}
 		
 		clear();
 		getParent().removeObject(Group.substractObjectName(getName()));
 	}
-}
-/**
- * Insert the method's description here.
- * Creation date: (30.1.2001 11:59:54)
- */
-private void destroyFields() {
-
-	Object[] objs = new Object[subObjectsV.size()];
-	subObjectsV.copyInto(objs);
-	for (int i=0; i < objs.length; i++)
-		((VisibleObject)objs[i]).destroy();
-	
 }
 /**
  * Insert the method's description here.

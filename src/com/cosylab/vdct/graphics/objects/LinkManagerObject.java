@@ -466,6 +466,18 @@ private com.cosylab.vdct.graphics.objects.LinkManagerObject.PopupMenuHandler cre
 	return new PopupMenuHandler();
 }
 
+/**
+ * Insert the method's description here.
+ * Creation date: (30.1.2001 11:59:54)
+ */
+protected void destroyFields() {
+
+	Object[] objs = new Object[subObjectsV.size()];
+	subObjectsV.copyInto(objs);
+	for (int i=0; i < objs.length; i++)
+		((VisibleObject)objs[i]).destroy();
+	
+}
 
 
 }

@@ -43,9 +43,6 @@ import com.cosylab.vdct.vdb.VDBTemplateField;
  * @author Matej Sekoranja
  */
 
-	// TBD !!! removal from DataProvider lookup table
-
-
 public class TemplateEPICSVarLink extends EPICSVarLink implements TemplateEPICSLink {
 
  	private String lastUpdatedFullName = null;
@@ -147,5 +144,18 @@ protected void draw(Graphics g, boolean hilited) {
 		g.drawLine(rrx+rwidth, rry, rrx, rry+rheight);
 	}
 }
+
+/**
+ * Insert the method's description here.
+ * Creation date: (30.1.2001 11:59:21)
+ */
+public void destroy() {
+	super.destroy();
+	if (lastUpdatedFullName!=null)
+		DataProvider.getInstance().getLookupTable().remove(getFieldData().getFullName());
+	else
+		((LinkManagerObject)getParent()).removeInvalidLink(this);
+}
+
 
 }
