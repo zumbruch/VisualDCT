@@ -1139,7 +1139,7 @@ public VisibleObject morph(java.lang.String newType) {
 								values.add(port.getData().getValue());
 							} else if (obj instanceof Field) {
 								Field ofield = (Field)obj;
-								System.out.println(">"+ofield+" "+ofield.getFieldData()+" "+ofield.getFieldData().getValue());
+								//System.out.println(">"+ofield+" "+ofield.getFieldData()+" "+ofield.getFieldData().getValue());
 								fieldData.add(ofield.getFieldData());
 								values.add(ofield.getFieldData().getValue());
 							}
