@@ -394,7 +394,8 @@ protected void draw(Graphics g, boolean hilited) {
 
 	}
 
-	paintSubObjects(g, hilited);
+	if (!hilited)
+		paintSubObjects(g, hilited);
 
 }
 /**

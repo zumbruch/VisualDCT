@@ -4474,24 +4474,31 @@ public static void main(java.lang.String[] args) {
 
 		/* Plugins */
 		com.cosylab.vdct.plugin.PluginManager.getInstance().checkAutoStartPlugins();
-		
+	
+		System.out.println();
+			
 		if (args.length==0) {
-			//System.out.println("\no) Usage: java com.cosylab.vdct.VisualDCT [<DBD>]\n");
-			System.out.println("\no) Usage: java com.cosylab.vdct.VisualDCT [<DBD>] [<DB>]\n");
-			aVisualDCT.openDBD(null);
+			System.out.println("\no) Usage: java "+VisualDCT.class.getName()+" [<DBDs>] [<DB>]\n");
+			aVisualDCT.openDBD(null);					// bring up a file dialog
 		}
-		else if (args.length>=1) {
-			aVisualDCT.openDBD(args[0]);
+		else {
+			for (int i=0; i < args.length; i++)
+				if (args[i].toUpperCase().endsWith("DBD"))
+				{
+					System.out.println("Directive to load DBD: '"+args[i]+"'.");
+					aVisualDCT.openDBD(args[i]);
+				}
 		}
 
+		if (!args[args.length-1].toUpperCase().endsWith("DBD"))
+		{
+			System.out.println("Directive to load DB: '"+args[args.length-1]+"'.");
+			aVisualDCT.openDB(args[args.length-1]);
+		}
+		
 		if (DataProvider.getInstance().getDbdDB()==null) {
-			System.out.println("o) No DBD loaded! Exiting...");
+			System.out.println("No DBD loaded! Exiting...");
 			System.exit(1);
-		}
-
-		if (args.length>=2) {
-			/// !!! not right - unsupported feature
-			aVisualDCT.openDB(args[1]);
 		}
 
 		/* Center frame on the screen */
@@ -4655,7 +4662,7 @@ public void openDB(String fileName) {
 									fileName;
 		
 	java.io.File theFile = new java.io.File(fileName);
-	if(theFile != null) {
+	if(theFile != null && theFile.exists()) {
 	    GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
 	    try {	
 		    cmd.getGUIMenuInterface().openDB(theFile);
@@ -4665,6 +4672,12 @@ public void openDB(String fileName) {
 		    Console.getInstance().println(e);
 	    }
 	}
+	else if (!theFile.exists()) 
+	{
+		 Console.getInstance().println("o) Failed to open DB file - file does not exist: '"+theFile.getAbsolutePath()+"'.");
+		 Console.getInstance().println();
+	}
+
 }
 /**
  * Insert the method's description here.
@@ -4690,7 +4703,13 @@ public boolean openDBD(String fileName) {
 	else
 		theFile = new java.io.File(fileName);
 
-	if ((theFile==null) || !theFile.exists()) return false;
+	if (theFile==null)
+		return false;			// canceled dialog
+	else if (!theFile.exists())
+	{
+		 System.out.println("o) Failed to open DBD file - file does not exist: '"+theFile.getAbsolutePath()+"'.");
+		 return false;
+	}
 	
 	GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
 
@@ -4698,8 +4717,9 @@ public boolean openDBD(String fileName) {
 		cmd.getGUIMenuInterface().openDBD(theFile);
 		getStatusMsg1().setText(" "+theFile.getCanonicalFile()+" ");
 	} catch (java.io.IOException e) {
-	    Console.getInstance().println("o) Failed to open DBD file: '"+theFile.toString()+"'");
+	    Console.getInstance().println("o) Failed to open DBD file: '"+theFile.getAbsolutePath()+"'.");
 	    Console.getInstance().println(e);
+	    return false;
 	}
 
 

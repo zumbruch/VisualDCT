@@ -58,6 +58,22 @@ public class DBResolver {
 	private static String VDCTFIELD = "Field";
 	private static String VDCTLINK = "Link";
 	private static String VDCTCONNECTOR = "Connector";
+
+	// incoded DBDs
+ 	// used format:
+ 	// #! DBDSTART
+ 	// #! DBD("DBD filename")
+	// ...
+ 	// #! DBD("DBD filename")
+ 	// #! DBDEND
+	private final static String DBD_START_STR	= "DBDSTART";
+	private final static String DBD_ENTRY_STR	= "DBD";
+	private final static String DBD_END_STR		= "DBDEND";
+
+	public final static String DBD_START	= "#! "+DBD_START_STR+"\n";
+	public final static String DBD_ENTRY	= "#! "+DBD_ENTRY_STR+"(\"";
+	public final static String DBD_END	= "#! "+DBD_END_STR+"\n";
+
 /**
  * This method was created in VisualAge.
  * @return java.io.StreamTokenizer
@@ -578,6 +594,58 @@ public static void processFields(DBRecordData rd, StreamTokenizer tokenizer, Str
 	/***********************************************************/
 
 }
+
+/**
+ * This method was created in VisualAge.
+ * @return Vector
+ * @param fileName java.lang.String
+ */
+public static String[] resolveIncodedDBDs(String fileName) throws IOException {
+	
+	StreamTokenizer tokenizer = getStreamTokenizer(fileName);
+	if (tokenizer==null) return null;
+
+	String[] dbds = null;
+	Vector vec = null;
+	
+	while (tokenizer.nextToken() != tokenizer.TT_EOF)
+		if (tokenizer.ttype == tokenizer.TT_WORD)
+			if (tokenizer.sval.startsWith(DBConstants.layoutDataString))
+			{
+				
+	 	 		while ((tokenizer.nextToken() != tokenizer.TT_EOL) &&
+			    		(tokenizer.ttype != tokenizer.TT_EOF)) 
+					if (tokenizer.ttype == tokenizer.TT_WORD) 
+						if (tokenizer.sval.equalsIgnoreCase(DBD_START_STR))
+							vec = new Vector();
+						else if (tokenizer.sval.equalsIgnoreCase(DBD_ENTRY_STR))
+						{
+							// check for DBD_START_STR 
+							if (vec==null)
+							{
+								vec = new Vector();
+								Console.getInstance().println("Warning: error found in file '"+fileName+"', line "+tokenizer.lineno()+" near token '"+tokenizer.sval+"':\n\t'"+DBD_ENTRY_STR+"' before '"+DBD_END_STR+"'...");
+							}
+
+							// read DBD filename
+							tokenizer.nextToken();
+							if ((tokenizer.ttype == tokenizer.TT_WORD)||
+								(tokenizer.ttype == DBConstants.quoteChar)) vec.addElement(tokenizer.sval);
+							else
+								Console.getInstance().println("Warning: error found in file '"+fileName+"', line "+tokenizer.lineno()+" near token '"+tokenizer.sval+"':\n\tinvalid '"+DBD_ENTRY_STR+"' entry. Quoted DBD filename expected...");
+						}
+						else if (tokenizer.sval.equalsIgnoreCase(DBD_END_STR))
+							break;
+			}
+	
+	if (vec!=null)
+	{
+		dbds = new String[vec.size()];
+		vec.toArray(dbds);
+	}	 
+	return dbds;
+}
+
 /**
  * This method was created in VisualAge.
  * @return Vector

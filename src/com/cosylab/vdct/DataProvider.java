@@ -42,16 +42,25 @@ import com.cosylab.vdct.inspector.*;
  
 public class DataProvider {
 	private static DataProvider instance = null;
+	
+	// DBD
 	private DBDData dbdDB = null;
+	
 	private Vector inspectableListeners = null;
-	private Vector DBDs = null;
+	
+	// list of all loaded DBDs
+	private Vector loadedDBDs = null;
+
+	// list of all loaded DBDs
+	private Vector currentDBDs = null;
 
 /**
  * DataProvider constructor comment.
  */
 protected DataProvider() {
 	inspectableListeners = new Vector();
-	DBDs = new Vector();
+	loadedDBDs = new Vector();
+	currentDBDs = new Vector();
 }
 /**
  * Insert the method's description here.
@@ -156,12 +165,22 @@ public void setDbdDB(com.cosylab.vdct.dbd.DBDData newDbdDB) {
 	dbdDB = newDbdDB;
 }
 	/**
-	 * Returns the dBDs.
+	 * Returns the currentDBDs.
 	 * @return Vector
 	 */
 	public Vector getDBDs()
+	//public Vector getCurrentDBDs()
 	{
-		return DBDs;
+		return currentDBDs;
+	}
+
+	/**
+	 * Returns the loadedDBDs.
+	 * @return Vector
+	 */
+	public Vector getLoadedDBDs()
+	{
+		return loadedDBDs;
 	}
 
 }

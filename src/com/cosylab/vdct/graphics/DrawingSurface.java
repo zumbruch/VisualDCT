@@ -1050,12 +1050,62 @@ public boolean open(File file) throws IOException {
 	return open(file, false);
 }
 /**
+ * jh
+ * Creation date: (6.1.2001 22:35:40)
+ */
+public void checkForIncodedDBDs(File file) throws IOException
+{
+	
+	Console.getInstance().println();
+	
+	Vector dbds = com.cosylab.vdct.DataProvider.getInstance().getDBDs();
+	String[] dbd = DBResolver.resolveIncodedDBDs(file.getAbsolutePath());
+	if (dbd!=null)
+	for (int i=0; i<dbd.length; i++)
+	{
+		File f = new File(dbd[i]);
+		if (f.exists())
+		{
+			// skip if already loaded
+			if (!dbds.contains(f))
+			{
+				Console.getInstance().println("o) Loading DBD file: '"+f.getAbsolutePath()+"'.");
+				openDBD(f, com.cosylab.vdct.DataProvider.getInstance().getDbdDB()!=null);
+			}
+			else
+				Console.getInstance().println("o) DBD file '"+f.getAbsolutePath()+"' is already loaded.");
+		}
+		else 
+		{
+			Console.getInstance().println("o) DBD file not found: '"+f.getAbsolutePath()+"'.");
+			
+			// add anyway
+			if (!dbds.contains(f))
+				dbds.addElement(f);
+		}
+	}
+		
+}
+
+/**
  * SEPARATE DOWN CODE TO METHODS
  * Creation date: (6.1.2001 22:35:40)
  * @param file java.io.File
  */
 public boolean open(File file, boolean importDB) throws IOException {
+
+	// clean list of unexisting DBDs
+	File[] dbds = new File[com.cosylab.vdct.DataProvider.getInstance().getDBDs().size()];
+	com.cosylab.vdct.DataProvider.getInstance().getDBDs().toArray(dbds);
+	for (int i=0; i<dbds.length; i++)
+		if (!dbds[i].exists())
+			com.cosylab.vdct.DataProvider.getInstance().getDBDs().removeElement(dbds[i]);
+
+	// check for in-coded DBDs
+	checkForIncodedDBDs(file);
+
 	DBDData dbdData = com.cosylab.vdct.DataProvider.getInstance().getDbdDB();
+
 	if (dbdData != null) {
 		setCursor(hourCursor);
 
@@ -1296,6 +1346,14 @@ public boolean openDBD(File file) throws IOException {
  * @param file java.io.File
  */
 public boolean openDBD(File file, boolean importDBD) throws IOException {
+
+	if (DataProvider.getInstance().getLoadedDBDs().contains(file))
+	{
+		Console.getInstance().println();
+		Console.getInstance().println("o) DBD file '"+file.getAbsolutePath()+"' is already loaded.");
+		return true;
+	}
+
 	setCursor(hourCursor);
 
 	com.cosylab.vdct.dbd.DBDData dbdData = null;
@@ -1323,6 +1381,7 @@ public boolean openDBD(File file, boolean importDBD) throws IOException {
 	}
 
 	// add to list of DBDs
+	DataProvider.getInstance().getLoadedDBDs().addElement(file.getAbsoluteFile());
 	DataProvider.getInstance().getDBDs().addElement(file.getAbsoluteFile());
 
 	restoreCursor();

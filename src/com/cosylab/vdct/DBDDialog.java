@@ -1,6 +1,37 @@
 package com.cosylab.vdct;
 
+/**
+ * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ *
+ * Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer. 
+ * Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation 
+ * and/or other materials provided with the distribution. 
+ * Neither the name of the Cosylab, Ltd., Control System Laboratory nor the names
+ * of its contributors may be used to endorse or promote products derived 
+ * from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE 
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+
 import javax.swing.*;
 import javax.swing.table.*;
 import javax.swing.event.*;
@@ -36,7 +67,7 @@ class CellRenderer extends DefaultTableCellRenderer {
 public class TableModel extends AbstractTableModel {
 
 	// table header
-	private final String[] columnNames = { "Database Definition File(s)" };
+	private final String[] columnNames = { "Loaded Database Definition File(s)" };
 
 	// table classes
 	private final Class[] columnClasses = { java.io.File.class };
@@ -108,7 +139,38 @@ public boolean isCellEditable(int row, int col) {
 
 public void setValueAt(Object aValue, int row, int column) {
 
-	DataProvider.getInstance().getDBDs().setElementAt(aValue, row);
+	java.util.Vector dbds = DataProvider.getInstance().getDBDs();
+
+	// remove it
+	if (aValue==null || dbds.contains(aValue))
+	{
+		dbds.removeElementAt(row);
+		//update entire table
+		getScrollPaneTable().tableChanged(new TableModelEvent(getScrollPaneTable().getModel()));
+		return;
+	}
+
+
+	Object oldValue = dbds.get(row);
+
+	// no change
+	if (aValue.equals(oldValue))
+		return;
+	
+	dbds.setElementAt(aValue, row);
+	
+	File f = (File)aValue;
+	if (f.exists())
+	{
+	    GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
+	    try {
+  		 	cmd.getGUIMenuInterface().importDBD(f);
+	    } catch (java.io.IOException e) {
+		    Console.getInstance().println();
+		    Console.getInstance().println("o) Failed to load DBD file: '"+f.getAbsolutePath()+"'.");
+		    Console.getInstance().println(e);
+	    }
+	}
 	
 	// generate notification
 	fireTableCellUpdated(row, column);
@@ -190,12 +252,24 @@ public void addDBDButton_ActionPerformed(java.awt.event.ActionEvent actionEvent)
 	if(retval == JFileChooser.APPROVE_OPTION) {
 	    java.io.File theFile = chooser.getSelectedFile();
 	    if(theFile != null) {
+		    
+		    // check if already exists
+		    java.util.Vector dbds = DataProvider.getInstance().getDBDs();
+		    if (dbds.contains(theFile))
+			{
+			    Console.getInstance().println();
+			    Console.getInstance().println("o) Failed to import DBD file: '"+theFile.getAbsolutePath()+"' is already loaded.");
+			    Console.getInstance().println();
+				return;
+			}
+			
 		    GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
 		    try {
 	  		 	cmd.getGUIMenuInterface().importDBD(theFile);
 				getScrollPaneTable().tableChanged(new TableModelEvent(getScrollPaneTable().getModel()));
 		    } catch (java.io.IOException e) {
-			    Console.getInstance().println("o) Failed to import DBD file: '"+theFile.toString()+"'");
+			    Console.getInstance().println();
+			    Console.getInstance().println("o) Failed to import DBD file: '"+theFile.getAbsolutePath()+"'.");
 			    Console.getInstance().println(e);
 		    }
 		}
