@@ -173,8 +173,6 @@ public class PathSpecification
 	 */
 	public static File getRelativeName(File path, File relativeToPath)
 	{
-		System.out.print(path.getAbsolutePath()+" vs. "+relativeToPath.getAbsolutePath()+"\n\t");
-
 		// make both paths absolute
 		if (!path.isAbsolute())
 			path = path.getAbsoluteFile();
