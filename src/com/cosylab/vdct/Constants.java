@@ -122,4 +122,8 @@ public class Constants {
 
     public final static Color GRID_COLOR = Color.lightGray;
 
+    public static final int DASHED_LINE_DENSITY = 8;
+    public static final int ARROW_SIZE = 16;
+    public static final double ARROW_SHARPNESS = Math.PI / 12;
+
 }

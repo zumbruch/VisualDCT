@@ -153,6 +153,10 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 	
 	private static final String newRecordString = "New record...";
 	private static final String newTemplesString = "New template";
+
+	private LineVertex lineVertex = null;
+	private BoxVertex boxVertex = null;
+	private TextBoxVertex textBoxVertex = null;
 	
 /**
  * DrawingSurface constructor comment.
@@ -673,9 +677,10 @@ public void mouseClicked(MouseEvent e) {
 			}
 		}
 		else {
+			pressedX=cx; pressedY=cy;
+
 			if (e.getClickCount()==1 && e.getButton()==MouseEvent.BUTTON3)
 			{
-				pressedX=cx; pressedY=cy;
 				
 				ActionListener al = new ActionListener()
 				{
@@ -713,9 +718,54 @@ public void mouseClicked(MouseEvent e) {
 				popUp.show(getWorkspacePanel(), e.getX(), e.getY());
 				
 			}
-			else if (e.getClickCount()>=2) {
-				pressedX=cx; pressedY=cy;
-				CommandManager.getInstance().execute("ShowNewDialog");
+			else 
+			
+			if((e.getClickCount() >= 1) && (lineVertex != null))
+				lineVertex = null;
+			else if((e.getClickCount() >= 1) && (boxVertex != null))
+				boxVertex = null;
+			else if((e.getClickCount() >= 1) && (textBoxVertex != null))
+			{
+				textBoxVertex.getPartnerVertex().setIsAlwaysDrawn(false);
+				textBoxVertex.setIsAlwaysDrawn(false);
+
+				textBoxVertex = null;
+			}
+			else if (e.getClickCount()>=2)
+			{
+				if(VisualDCT.getInstance().getLineButtonEnabled())
+				{
+					GetVDBManager manager =
+						(GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
+
+					LineVertex startingLineVertex = manager.getManager().createLineVertex(null);
+					lineVertex = manager.getManager().createLineVertex(startingLineVertex);
+					
+					startingLineVertex.setPartnerVertex(lineVertex);
+					lineVertex.setIsArrow(LineVertex.getCurrentIsArrow());
+				}
+				else if(VisualDCT.getInstance().getBoxButtonEnabled())
+				{
+					GetVDBManager manager =
+						(GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
+
+					BoxVertex startingBoxVertex = manager.getManager().createBoxVertex(null);
+					boxVertex = manager.getManager().createBoxVertex(startingBoxVertex);
+					startingBoxVertex.setPartnerVertex(boxVertex);
+				}
+				else if(VisualDCT.getInstance().getTextBoxButtonEnabled())
+				{
+					GetVDBManager manager =
+						(GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
+
+					TextBoxVertex startingTextBoxVertex = manager.getManager().createTextBoxVertex(null);
+					textBoxVertex = manager.getManager().createTextBoxVertex(startingTextBoxVertex);
+					startingTextBoxVertex.setPartnerVertex(textBoxVertex);
+
+					manager.getManager().createTextBox(startingTextBoxVertex, textBoxVertex);
+				}
+				else
+					CommandManager.getInstance().execute("ShowNewDialog");
 			}
 			else if (view.deselectAll()) 
 				repaint();					// deselect all
@@ -866,10 +916,36 @@ public void mouseExited(MouseEvent e) {}
 	 * Invoked when the mouse button has been moved on a component
 	 * (with no buttons no down).
 	 */
-public void mouseMoved(MouseEvent e) {
+public void mouseMoved(MouseEvent e)
+{
 	ViewState view = ViewState.getInstance();
 	int cx = e.getX()-view.getX0();
 	int cy = e.getY()-view.getY0();
+	double scale = view.getScale();
+
+	if(lineVertex != null)
+	{
+		lineVertex.setX((int)((cx + view.getRx()) / scale - Constants.CONNECTOR_WIDTH / 2));
+		lineVertex.setY((int)((cy + view.getRy()) / scale - Constants.CONNECTOR_HEIGHT / 2));
+		
+		repaint();
+	}
+	else if(boxVertex != null)
+	{
+		boxVertex.setX((int)((cx + view.getRx()) / scale - Constants.CONNECTOR_WIDTH / 2));
+		boxVertex.setY((int)((cy + view.getRy()) / scale - Constants.CONNECTOR_HEIGHT / 2));
+		
+		repaint();
+	}
+	else if(textBoxVertex != null)
+	{
+		textBoxVertex.setX((int)((cx + view.getRx()) / scale - Constants.CONNECTOR_WIDTH / 2));
+		textBoxVertex.setY((int)((cy + view.getRy()) / scale - Constants.CONNECTOR_HEIGHT / 2));
+		
+		repaint();
+	}
+	else
+	{
 	if ((cx>0) && (cy>0) && (cx<width) && (cy<height)) {
 		VisibleObject spotted = viewGroup.hiliteComponentsCheck(cx+view.getRx(), cy+view.getRy());
 		if (ViewState.getInstance().setAsHilited(spotted)) {
@@ -877,6 +953,7 @@ public void mouseMoved(MouseEvent e) {
 			repaint();
 		}
 	}
+}
 }
 	/**
 	 * Invoked when a mouse button has been pressed on a component.
@@ -2000,16 +2077,15 @@ public void createTemplateInstance(String name, String type, boolean relative) {
 	VDBTemplateInstance templateInstance = VDBData.generateNewVDBTemplateInstance(name, template);
 
 	ViewState view = ViewState.getInstance();
-	int rx = (int)(view.getRx()/view.getScale());
-	int ry = (int)(view.getRy()/view.getScale());
-
+	double scale = view.getScale();
+	
 	Template templ = new Template(null, templateInstance);
 	Group.getRoot().addSubObject(name, templ, true);
 
 	//templ.setDescription(dbTemplate.getDescription());
 	templ.setDescription(template.getDescription());
-	templ.setX(getPressedX()+rx);
-	templ.setY(getPressedY()+ry);
+	templ.setX((int)((getPressedX() + view.getRx()) / scale));
+	templ.setY((int)((getPressedY() + view.getRy()) / scale));
 
 	UndoManager.getInstance().addAction(new CreateAction(templ));
 
