@@ -60,4 +60,11 @@ OutLink getOutput();
  * @param prevOutput com.cosylab.vdct.graphics.objects.OutLink
  */
 void setOutput(OutLink output, OutLink prevOutput);
+
+int getLeftX();
+
+int getRightX();
+
+boolean isRight();
+
 }

@@ -41,6 +41,8 @@ import com.cosylab.vdct.vdb.*;
  
 public class Field extends VisibleObject {
 	protected VDBFieldData fieldData = null;
+	private int verticalPosition = 0;
+	
 /**
  * Group constructor comment.
  * @param parent com.cosylab.vdct.graphics.objects.ContainerObject
@@ -136,8 +138,8 @@ public void revalidatePosition() {
  * @param nx int
  * @param ny int
  */
-public void revalidatePosition(int nx, int ny) {
-	setX(nx); setY(ny);
+public void revalidatePosition(int nx, int ny, int n) {
+	setX(nx); setY(ny); verticalPosition=n;
 	revalidatePosition();
 }
 /**
@@ -180,4 +182,18 @@ protected void validate() {
   setFont(font);
 
 }
+	/**
+	 * @return
+	 */
+	public int getVerticalPosition() {
+		return verticalPosition;
+	}
+
+	/**
+	 * @param i
+	 */
+	public void setVerticalPosition(int i) {
+		verticalPosition = i;
+	}
+
 }

@@ -79,4 +79,11 @@ void setInput(InLink input);
 int getMode();
 
 void validateLink();
+
+int getLeftX();
+
+int getRightX();
+
+boolean isRight();
+
 }

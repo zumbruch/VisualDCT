@@ -1061,7 +1061,9 @@ public boolean isRight() {
 	else {
 		OutLink first = (OutLink)outlinks.firstElement();
 		if (first.getLayerID().equals(getLayerID()))
-			return (first.getOutX()>(getX()+getWidth()/2));
+			return getRightX()<first.getLeftX()
+			  || (first.getLeftX()<getLeftX() && getLeftX() < first.getRightX() && first.getRightX() < getRightX());
+			//return (first.getOutX()>(getX()+getWidth()/2));
 		else
 			return right;
 	}
@@ -1097,8 +1099,8 @@ public boolean move(int dx, int dy) {
 	if (checkMove(dx, dy)) {
 		setX(super.getX()+dx);
 		setY(super.getY()+dy);
-		moveConnectors(dx, dy);
 		revalidatePosition();
+		moveConnectors(dx, dy);
 		return true;
 	}
 	else 
@@ -1230,7 +1232,7 @@ public boolean rename(java.lang.String newName) {
  */
 public void revalidateFieldsPosition() {
 
-  int nx, ny;
+  int nx, ny, n=0;
   ny = getY()+getHeight();
   Enumeration e = subObjectsV.elements();
   Field field; Object obj;
@@ -1239,8 +1241,9 @@ public void revalidateFieldsPosition() {
 	if (obj instanceof Field) {
 		field = (Field)obj;
 		nx = getX()+(getWidth()-field.getWidth())/2;
-		field.revalidatePosition(nx, ny);
+		field.revalidatePosition(nx, ny, n);
 		ny+=field.getHeight();
+		n++;
 	}
   }
 
@@ -1255,7 +1258,20 @@ public void revalidatePosition() {
 
   // sub-components
   revalidateFieldsPosition();
+  revalidateOutlinkConnectors();
 }
+
+public void revalidateOutlinkConnectors() {
+	Enumeration e = outlinks.elements();
+	while (e.hasMoreElements()) {
+		Object obj = e.nextElement();		
+		if (obj instanceof Connector) {
+			Connector con = (Connector)obj;
+			con.revalidatePosition();
+		}
+	}
+}
+
 /**
  * Insert the method's description here.
  * Creation date: (30.1.2001 16:58:58)
@@ -1385,8 +1401,11 @@ protected void validate() {
   rfieldRowHeight = (rheight-2*y0)*0.375;
 
   // code moves record up, when fields are added and down when deleted 
-  move(0,(int)(rfieldRowHeight*(oldNumOfFields - changedFields.size())+0.5));
-  oldNumOfFields = changedFields.size();
+  if (oldNumOfFields != changedFields.size()) {
+  	int difference = oldNumOfFields - changedFields.size(); 
+	oldNumOfFields = changedFields.size();
+  	move(0,(int)(rfieldRowHeight*difference+0.5));
+  }
   
   // increase record size for VAL value and timestamp
   if (PluginDebugManager.isDebugState())
@@ -1550,6 +1569,19 @@ public void generateMacros(HashMap macros) {
 	Enumeration e = recordData.getFieldsV().elements();
 	while (e.hasMoreElements()) 
 		LinkManagerObject.checkIfMacroCandidate((VDBFieldData)e.nextElement(), macros);
+}
+/* (non-Javadoc)
+ * @see com.cosylab.vdct.graphics.objects.InLink#getMinX()
+ */
+public int getLeftX() {
+	return getX()-(tailSizeOfR+3)*Constants.LINK_RADIOUS;
+}
+
+/* (non-Javadoc)
+ * @see com.cosylab.vdct.graphics.objects.InLink#getMaxX()
+ */
+public int getRightX() {
+	return getX()+getWidth()+(tailSizeOfR+3)*Constants.LINK_RADIOUS;
 }
 
 }

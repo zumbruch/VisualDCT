@@ -105,6 +105,8 @@ public class Constants {
     public static final String DEFAULT_FONT = "sansserif";
 
     public static final int MAX_RECENT_FILES = 10;
+    
+	public final static int LINK_SLOT_WIDTH = 5;
 
 /*
 	// white on black color scheme

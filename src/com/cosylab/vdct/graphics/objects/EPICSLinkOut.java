@@ -331,9 +331,9 @@ public String getName() {
  */
 public int getOutX() {
 	if (isRight())
-		return getX()+getWidth()+Constants.TAIL_LENGTH;
+		return getRightX();
 	else 
-		return getX()-Constants.TAIL_LENGTH;
+		return getLeftX();
 }
 /**
  * Insert the method's description here.
@@ -476,15 +476,22 @@ public boolean isRight() {
 		!inlink.getLayerID().equals(getLayerID())) 
 		return super.isRight();
 	else {
-		if (inlink instanceof Connector) {	
+		return getRightX()<inlink.getLeftX()
+		  || (getLeftX()<inlink.getLeftX() && inlink.getLeftX()<getRightX() && getRightX()<inlink.getRightX());
+		/*if (inlink instanceof Connector) {	
 			return (inlink.getInX()>(getX()+getWidth()/2));
+		}
+		else if (inlink instanceof EPICSLinkOut) {			// not cycling
+			EPICSLinkOut obj = (EPICSLinkOut)inlink;
+			return getMaxX()<obj.getMinX() ||
+				(getMaxX()>obj.getMaxX() && getMinX()<obj.getMaxX());
 		}
 		else if (inlink instanceof VisibleObject) {			// do not cycle !!!
 			VisibleObject obj = (VisibleObject)inlink;
 			return ((obj.getX()+obj.getWidth()/2)>(getX()+getWidth()/2));
 		}
 		else 
-			return super.isRight();
+			return super.isRight();*/
 	}
 }
 /**

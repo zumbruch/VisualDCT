@@ -500,6 +500,8 @@ public boolean move(int dx, int dy) {
 		setY(super.getY()+dy);
 		
 		revalidatePosition();
+		if (inlink instanceof Connector) ((Connector)inlink).revalidatePosition();
+		if (outlink instanceof Connector) ((Connector)outlink).revalidatePosition();
 		return true;
 	}
 	else 
@@ -510,6 +512,13 @@ public boolean move(int dx, int dy) {
  * Creation date: (29.1.2001 20:05:52)
  */
 public void revalidatePosition() {
+  if (inlink!=null && outlink!=null && mode!=INVISIBLE_MODE) {
+	if (getQueueCount()%2==0) 
+		setX((inlink.getInX()+outlink.getOutX())/2);
+    else
+		setY((inlink.getInY()+outlink.getOutY())/2);
+  }
+  
   setRx((int)(getX()*getRscale()));
   setRy((int)(getY()*getRscale()));
 }
@@ -635,5 +644,16 @@ public void validateLink()
 {
 }
 
+public int getLeftX() {
+	return getX();
+}
+
+public int getRightX() {
+	return getX();
+}
+
+public boolean isRight() {
+	return false;
+}
 
 }

@@ -225,9 +225,9 @@ public javax.swing.Icon getIcon() {
  */
 public int getInX() {
 	if (isRight())
-		return getX()+getWidth()+Constants.TAIL_LENGTH;
+		return getRightX();
 	else
-		return getX()-Constants.TAIL_LENGTH;
+		return getLeftX();
 }
 /**
  * Insert the method's description here.
@@ -389,7 +389,9 @@ public boolean isRight() {
 	else {
 		OutLink first = (OutLink)outlinks.firstElement();
 		if (first.getLayerID().equals(getLayerID()))
-			return (first.getOutX()>(getX()+getWidth()/2));
+			return getRightX()<first.getLeftX()
+				|| (first.getLeftX()<getLeftX() && getLeftX() < first.getRightX() && first.getRightX() < getRightX());				
+			//return (first.getOutX()>(getX()+getWidth()/2));
 		else
 			return super.isRight();
 	}
@@ -443,6 +445,22 @@ public ArrayList getModeNames()
  */
 public void fixLinkProperties()
 {
+}
+
+public void revalidatePosition() {
+	super.revalidatePosition();
+	revalidateOutlinkConnectors();
+}
+
+public void revalidateOutlinkConnectors() {
+	Enumeration e = outlinks.elements();
+	while (e.hasMoreElements()) {
+		Object obj = e.nextElement();		
+		if (obj instanceof Connector) {
+			Connector con = (Connector)obj;
+			con.revalidatePosition();
+		}
+	}
 }
 
 }

@@ -318,15 +318,24 @@ private com.cosylab.vdct.graphics.objects.EPICSVarOutLink.PopupMenuHandler creat
 	{
 		if (outlinks.size()==0 && inlink!=null)
 		{
-			if (inlink instanceof Connector) {	
+			return getRightX()<inlink.getLeftX()
+					  || (getLeftX()<inlink.getLeftX() && inlink.getLeftX()<getRightX() && getRightX()<inlink.getRightX());
+		/*	return getMaxX()<inlink.getMinX()
+						  || (inlink.getMinX()<getMinX() && getMinX() < inlink.getMaxX() && inlink.getMaxX() < getMaxX());					  */
+			/*if (inlink instanceof Connector) {	
 				return (inlink.getInX()>(getX()+getWidth()/2));
+			}
+			else if (inlink instanceof EPICSLinkOut) {			// not cycling
+				EPICSLinkOut obj = (EPICSLinkOut)inlink;
+				return getMaxX()<obj.getMinX() ||
+				(getMaxX()>obj.getMaxX() && getMinX()<obj.getMaxX());
 			}
 			else if (inlink instanceof VisibleObject) {			// do not cycle !!!
 				VisibleObject obj = (VisibleObject)inlink;
 				return ((obj.getX()+obj.getWidth()/2)>(getX()+getWidth()/2));
 			}
 			else 
-				return true;
+				return true;*/
 		}
 		else
 			return super.isRight();

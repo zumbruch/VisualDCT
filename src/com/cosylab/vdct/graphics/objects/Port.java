@@ -460,7 +460,9 @@ public boolean isRight() {
 		!inlink.getLayerID().equals(getLayerID())) 
 		return true;
 	else {
-		if (inlink instanceof Connector) {	
+		return getRightX()<inlink.getLeftX() ||
+			(getLeftX()<inlink.getLeftX() && inlink.getLeftX()<getRightX() && getRightX()<inlink.getRightX());
+		/*if (inlink instanceof Connector) {	
 			return (inlink.getInX()>(getX()+getWidth()/2));
 		}
 		else if (inlink instanceof VisibleObject) {			// do not cycle !!!
@@ -468,7 +470,7 @@ public boolean isRight() {
 			return ((obj.getX()+obj.getWidth()/2)>(getX()+getWidth()/2));
 		}
 		else 
-			return true;
+			return true;*/
 	}
 }
 
@@ -955,6 +957,18 @@ public void fixLinkProperties()
  */
 public void validateLink()
 {
+}
+/* (non-Javadoc)
+ * @see com.cosylab.vdct.graphics.objects.OutLink#getMinX()
+ */
+public int getLeftX() {
+	return getX();
+}
+/* (non-Javadoc)
+ * @see com.cosylab.vdct.graphics.objects.OutLink#getMaxX()
+ */
+public int getRightX() {
+	return getX()+getWidth();
 }
 
 }

@@ -397,9 +397,9 @@ public class Template
 	{
 		if (checkMove(dx, dy)) {
 			setX(super.getX()+dx);
-			setY(super.getY()+dy);
-			moveConnectors(dx, dy);
+			setY(super.getY()+dy);			
 			revalidatePosition();
+			moveConnectors(dx, dy);
 			return true;
 		}
 		else 
@@ -764,6 +764,8 @@ public void revalidateFieldsPosition() {
   int rx = getX()+getWidth()/2; 
   int ly = getY()+initY;
   int ry = getY()+initY;
+  int rn = 0;
+  int ln = 0;
   Enumeration e = subObjectsV.elements();
   EPICSLink field; Object obj;
   while (e.hasMoreElements()) {
@@ -773,13 +775,15 @@ public void revalidateFieldsPosition() {
 		if (field.isVisible())
 			if (field.isRight())
 			{
-				field.revalidatePosition(rx, ry);
+				field.revalidatePosition(rx, ry, rn);
 				ry+=field.getHeight();
+				rn++;
 			}
 			else
 			{
-				field.revalidatePosition(lx, ly);
+				field.revalidatePosition(lx, ly, ln);
 				ly+=field.getHeight();
+				ln++;
 			}
 	}
   }

@@ -841,7 +841,9 @@ public boolean isRight() {
 	else {
 		OutLink first = (OutLink)outlinks.firstElement();
 		if (first.getLayerID().equals(getLayerID()))
-			return (first.getOutX()<(getX()+getWidth()/2));
+			return !( getRightX()<first.getLeftX() ||
+						   (first.getLeftX()<getLeftX() && getLeftX()<first.getRightX() && first.getRightX()<getRightX()));										
+			//return (first.getOutX()<(getX()+getWidth()/2));
 		else
 			return true;
 	}
@@ -906,6 +908,19 @@ public void updateTemplateLink()
 		//!!! this should never happen, but...
 		//((LinkManagerObject)getParent()).removeInvalidLink(this);
 	}
+}
+/* (non-Javadoc)
+ * @see com.cosylab.vdct.graphics.objects.InLink#getMinX()
+ */
+public int getLeftX() {
+	return getX()-Constants.LINK_RADIOUS*4;
+}
+
+/* (non-Javadoc)
+ * @see com.cosylab.vdct.graphics.objects.InLink#getMaxX()
+ */
+public int getRightX() {
+	return getX()+getWidth()+Constants.LINK_RADIOUS*4;
 }
 
 }
