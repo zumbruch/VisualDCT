@@ -139,7 +139,8 @@ public class VisualDCT extends JFrame {
 	private JLabel ivjNameLabel = null;
 	private JLabel ivjNameLabel3 = null;
 	private JLabel ivjNameTextLabel = null;
-	private JTextField ivjNameTextField = null;
+	//private JTextField ivjNameTextField = null;
+	private JComboBox ivjNameTextField = null;
 	private JDialog ivjNewRecordDialog = null;
 	private JDialog ivjMorphingDialog = null;
 	private JButton ivjOKButton = null;
@@ -3573,8 +3574,8 @@ private javax.swing.JLabel getNameLabel2() {
 /**
  * Return the NameTextField property value.
  * @return javax.swing.JTextField
- */
-/* WARNING: THIS METHOD WILL BE REGENERATED. */
+ *
+/* WARNING: THIS METHOD WILL BE REGENERATED. 
 private javax.swing.JTextField getNameTextField() {
 	if (ivjNameTextField == null) {
 		try {
@@ -3622,7 +3623,79 @@ private javax.swing.JTextField getNameTextField() {
 		}
 	}
 	return ivjNameTextField;
+}*/
+/**
+ * Return the NameTextField property value.
+ * @return javax.swing.JTextField
+ */
+/* WARNING: THIS METHOD WILL BE REGENERATED. */
+private javax.swing.JComboBox getNameTextField() {
+	if (ivjNameTextField == null) {
+		try {
+			ivjNameTextField = new javax.swing.JComboBox();
+			ivjNameTextField.setName("NameTextField");
+			// user code begin {1}
+
+			ivjNameTextField.setEditable(true);
+
+			ComboBoxEditor editor = ivjNameTextField.getEditor();
+			if (editor.getEditorComponent() instanceof JTextField)
+			{
+				final JTextField comboBoxTextField = (JTextField)editor.getEditorComponent();
+				
+				// register event listener to the text field
+				comboBoxTextField.addActionListener(new ActionListener() {
+				    		public void actionPerformed(ActionEvent e) {
+				    		    oKButton_ActionPerformed(e);
+				    		}
+				        });
+				
+				// add document (on change listener)
+				comboBoxTextField.getDocument().addDocumentListener(
+                            new DocumentListener() {
+                                public void insertUpdate(DocumentEvent e) {
+                                    check(e);
+                                }
+
+                                public void removeUpdate(DocumentEvent e) {
+                                    check(e);
+                                }
+
+                                public void changedUpdate(DocumentEvent e) {
+                                    // we won't ever get this with a PlainDocument
+                                }
+
+                                private void check(DocumentEvent e) {
+                                    GetVDBManager validator = 
+                                        (GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
+                                    String errmsg = validator.getManager().checkRecordName(
+                                            			comboBoxTextField.getText(),
+                                                    	true
+                                                    );
+                                    if (errmsg == null) {
+                                        getOKButton().setEnabled(true);
+                                        getWarningLabel().setText(" ");
+                                    } else if (errmsg.startsWith("WARNING")) {
+                                        getOKButton().setEnabled(true);
+                                        getWarningLabel().setText(errmsg);
+                                    } else {
+                                        getOKButton().setEnabled(false);
+                                        getWarningLabel().setText(errmsg);
+                                    }
+                                }
+                            });
+			}
+			
+			// user code end
+		} catch (java.lang.Throwable ivjExc) {
+			// user code begin {2}
+			// user code end
+			handleException(ivjExc);
+		}
+	}
+	return ivjNameTextField;
 }
+
 /**
  * Return the NavigatorMenuItem property value.
  * @return javax.swing.JCheckBoxMenuItem
@@ -5481,7 +5554,7 @@ private void initConnections() throws java.lang.Exception {
 	getCancelButton().addActionListener(ivjEventHandler);
 	getMorphingOKButton().addActionListener(ivjEventHandler);
 	getMorphingCancelButton().addActionListener(ivjEventHandler);
-	getNameTextField().addActionListener(ivjEventHandler);
+	//getNameTextField().addActionListener(ivjEventHandler);
 	getNewRecordDialog().addWindowListener(ivjEventHandler);
 	getMorphingDialog().addWindowListener(ivjEventHandler);
 	getStatusbarMenuItem().addActionListener(ivjEventHandler);
@@ -5757,14 +5830,16 @@ public void newRecordDialog_WindowOpened(
 			if (!found)
 		    	combo.addItem(names[i]);
 		}
-
-
-			
      }
 
-    getNameTextField().setText("");
+    Object selected = getNameTextField().getSelectedItem();
+    if (selected != null && !selected.toString().endsWith(":"))
+        getNameTextField().setSelectedItem("");
+    //getNameTextField().setText("");
     getWarningLabel().setText(" ");
     getOKButton().setEnabled(false);
+    
+    getNameTextField().requestFocus();
 }
 
 public void morphingDialog_WindowOpened(
@@ -5798,10 +5873,17 @@ public void morphingDialog_WindowOpened(
 public void oKButton_ActionPerformed(java.awt.event.ActionEvent actionEvent) {
 	if (getOKButton().isEnabled()) {
 		GetVDBManager manager = (GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
-		String errmsg = manager.getManager().checkRecordName(getNameTextField().getText(), true);
+		String enteredValue;
+		if (actionEvent.getSource() instanceof JTextField)
+		    enteredValue = ((JTextField)actionEvent.getSource()).getText();
+		else
+			enteredValue = getNameTextField().getSelectedItem().toString();
+		String errmsg = manager.getManager().checkRecordName(enteredValue, true);
 		if (errmsg==null || errmsg.startsWith("WARNING")) {
+		    // this will change value of combo box
+		    updateComboBoxHistory(getNameTextField(), enteredValue);
 			manager.getManager().createRecord(
-				getNameTextField().getText(),
+				enteredValue,
 				getTypeComboBox().getSelectedItem().toString(),
 				true);
 			getNewRecordDialog().dispose();
@@ -5811,6 +5893,50 @@ public void oKButton_ActionPerformed(java.awt.event.ActionEvent actionEvent) {
 			getWarningLabel().setText(errmsg);
 		}
 	}
+}
+
+private static void updateComboBoxHistory(JComboBox cb, Object item)
+{
+		//Object item = cb.getSelectedItem();
+		if (item == null)
+		    return;
+		
+		// search for the already entered qualifier
+		String valueToAdd = item.toString();
+		
+		// retrieve prefix - part of the name before last ':'
+	    int pos = valueToAdd.lastIndexOf(':');
+	    if (pos > 0)
+	        valueToAdd = valueToAdd.substring(0, pos+1);
+	    else {
+	        // do not add if no ":"
+	        return;
+	    }
+		
+		Object qualifier = null;
+		int len = cb.getModel().getSize(); 
+		for (int i = 0; i < len; i++)
+		{
+			Object it = cb.getModel().getElementAt(i); 
+			if (it != item && it.toString().equals(valueToAdd))
+			{
+				qualifier = (Object)it;
+				break;
+			}
+		}
+
+		// new one, create qualifier and select it
+		if (qualifier == null )
+		{
+			qualifier = new StringBuffer(valueToAdd);
+			cb.addItem(qualifier);
+		}
+		
+		// select the qualifier (prefix)
+		cb.setSelectedItem(qualifier);
+		
+		// remove string object
+		cb.removeItem(item);
 }
 
 public void morphingOKButton_ActionPerformed(java.awt.event.ActionEvent actionEvent) {
