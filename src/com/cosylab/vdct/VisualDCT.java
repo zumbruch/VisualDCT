@@ -151,112 +151,127 @@ public class VisualDCT extends JFrame {
 	private com.cosylab.vdct.plugin.debug.DebugStartMenu ivjStartDebugMenuItem = null;
 	private com.cosylab.vdct.plugin.debug.DebugStopMenuItem ivjStopDebugMenuItem = null;
 	private DBDDialog dbdDialog = null;
+	// navigation menuitems
+	private JMenuItem leftMenuItem = null;
+	private JMenuItem rightMenuItem = null;
+	private JMenuItem upMenuItem = null;
+	private JMenuItem downMenuItem = null;
+
 
 class IvjEventHandler implements java.awt.event.ActionListener, java.awt.event.ItemListener, java.awt.event.KeyListener, java.awt.event.MouseListener, java.awt.event.MouseMotionListener, java.awt.event.WindowListener {
 		public void actionPerformed(java.awt.event.ActionEvent e) {
-			if (e.getSource() == VisualDCT.this.getAbout_BoxMenuItem()) 
+			if (e.getSource() == VisualDCT.this.getLeftMenuItem())
+				VisualDCT.this.moveOrigin(SwingConstants.WEST);
+			else if (e.getSource() == VisualDCT.this.getRightMenuItem()) 
+				VisualDCT.this.moveOrigin(SwingConstants.EAST);
+			else if (e.getSource() == VisualDCT.this.getUpMenuItem()) 
+				VisualDCT.this.moveOrigin(SwingConstants.SOUTH);
+			else if (e.getSource() == VisualDCT.this.getDownMenuItem()) 
+				VisualDCT.this.moveOrigin(SwingConstants.NORTH);
+
+			else if (e.getSource() == VisualDCT.this.getAbout_BoxMenuItem()) 
 				connEtoC3(e);
-			if (e.getSource() == VisualDCT.this.getNewMenuItem()) 
+			else if (e.getSource() == VisualDCT.this.getNewMenuItem()) 
 				connEtoC4(e);
-			if (e.getSource() == VisualDCT.this.getOpenMenuItem()) 
+			else if (e.getSource() == VisualDCT.this.getOpenMenuItem()) 
 				connEtoC7(e);
-			if (e.getSource() == VisualDCT.this.getImport_DBMenuItem()) 
+			else if (e.getSource() == VisualDCT.this.getImport_DBMenuItem()) 
 				connEtoC8(e);
-			if (e.getSource() == VisualDCT.this.getImport_DBDMenuItem()) 
+			else if (e.getSource() == VisualDCT.this.getImport_DBDMenuItem()) 
 				connEtoC9(e);
-			if (e.getSource() == VisualDCT.this.getSaveMenuItem()) 
+			else if (e.getSource() == VisualDCT.this.getSaveMenuItem()) 
 				connEtoC10(e);
-			if (e.getSource() == VisualDCT.this.getSave_AsMenuItem()) 
+			else if (e.getSource() == VisualDCT.this.getSave_AsMenuItem()) 
 				connEtoC11(e);
-			if (e.getSource() == VisualDCT.this.getSave_As_GroupMenuItem()) 
+			else if (e.getSource() == VisualDCT.this.getSave_As_GroupMenuItem()) 
 				connEtoC12(e);
-			if (e.getSource() == VisualDCT.this.getPrintMenuItem()) 
+			else if (e.getSource() == VisualDCT.this.getPrintMenuItem()) 
 				connEtoC13(e);
-			if (e.getSource() == VisualDCT.this.getExitMenuItem()) 
+			else if (e.getSource() == VisualDCT.this.getExitMenuItem()) 
 				connEtoC14(e);
-			if (e.getSource() == VisualDCT.this.getUndoMenuItem()) 
+			else if (e.getSource() == VisualDCT.this.getUndoMenuItem()) 
 				connEtoC15(e);
-			if (e.getSource() == VisualDCT.this.getRedoMenuItem()) 
+			else if (e.getSource() == VisualDCT.this.getRedoMenuItem()) 
 				connEtoC16(e);
-			if (e.getSource() == VisualDCT.this.getCutMenuItem()) 
+			else if (e.getSource() == VisualDCT.this.getCutMenuItem()) 
 				connEtoC17(e);
-			if (e.getSource() == VisualDCT.this.getCopyMenuItem()) 
+			else if (e.getSource() == VisualDCT.this.getCopyMenuItem()) 
 				connEtoC18(e);
-			if (e.getSource() == VisualDCT.this.getPasteMenuItem()) 
+			else if (e.getSource() == VisualDCT.this.getPasteMenuItem()) 
 				connEtoC19(e);
-			if (e.getSource() == VisualDCT.this.getMove_RenameMenuItem()) 
+			else if (e.getSource() == VisualDCT.this.getMove_RenameMenuItem()) 
 				connEtoC20(e);
-			if (e.getSource() == VisualDCT.this.getGroupMenuItem()) 
+			else if (e.getSource() == VisualDCT.this.getGroupMenuItem()) 
 				connEtoC21(e);
-			if (e.getSource() == VisualDCT.this.getUngroupMenuItem()) 
+			else if (e.getSource() == VisualDCT.this.getUngroupMenuItem()) 
 				connEtoC22(e);
-			if (e.getSource() == VisualDCT.this.getDeleteMenuItem()) 
+			else if (e.getSource() == VisualDCT.this.getDeleteMenuItem()) 
 				connEtoC23(e);
-			if (e.getSource() == VisualDCT.this.getSelect_AllMenuItem()) 
+			else if (e.getSource() == VisualDCT.this.getSelect_AllMenuItem()) 
 				connEtoC24(e);
-			if (e.getSource() == VisualDCT.this.getHelp_TopicsMenuItem()) 
+			else if (e.getSource() == VisualDCT.this.getHelp_TopicsMenuItem()) 
 				connEtoC26(e);
-			if (e.getSource() == VisualDCT.this.getBooks_OnlineMenuItem()) 
+			else if (e.getSource() == VisualDCT.this.getBooks_OnlineMenuItem()) 
 				connEtoC27(e);
-			if (e.getSource() == VisualDCT.this.getOpenButton()) 
+			else if (e.getSource() == VisualDCT.this.getOpenButton()) 
 				connEtoC28(e);
-			if (e.getSource() == VisualDCT.this.getSaveButton()) 
+			else if (e.getSource() == VisualDCT.this.getSaveButton()) 
 				connEtoC29(e);
-			if (e.getSource() == VisualDCT.this.getUndoButton()) 
+			else if (e.getSource() == VisualDCT.this.getUndoButton()) 
 				connEtoC30(e);
-			if (e.getSource() == VisualDCT.this.getRedoButton()) 
+			else if (e.getSource() == VisualDCT.this.getRedoButton()) 
 				connEtoC31(e);
-			if (e.getSource() == VisualDCT.this.getCutButton()) 
+			else if (e.getSource() == VisualDCT.this.getCutButton()) 
 				connEtoC32(e);
-			if (e.getSource() == VisualDCT.this.getCopyButton()) 
+			else if (e.getSource() == VisualDCT.this.getCopyButton()) 
 				connEtoC33(e);
-			if (e.getSource() == VisualDCT.this.getPasteButton()) 
+			else if (e.getSource() == VisualDCT.this.getPasteButton()) 
 				connEtoC34(e);
-			if (e.getSource() == VisualDCT.this.getLevel_UpMenuItem()) 
+			else if (e.getSource() == VisualDCT.this.getLevel_UpMenuItem()) 
 				connEtoC36(e);
-			if (e.getSource() == VisualDCT.this.getZoom_InMenuItem()) 
+			else if (e.getSource() == VisualDCT.this.getZoom_InMenuItem()) 
 				connEtoC37(e);
-			if (e.getSource() == VisualDCT.this.getZoom_OutMenuItem()) 
+			else if (e.getSource() == VisualDCT.this.getZoom_OutMenuItem()) 
 				connEtoC38(e);
-			if (e.getSource() == VisualDCT.this.getSmart_ZoomMenuItem()) 
+			else if (e.getSource() == VisualDCT.this.getSmart_ZoomMenuItem()) 
 				connEtoC39(e);
-			if (e.getSource() == VisualDCT.this.getBase_ViewMenuItem()) 
+			else if (e.getSource() == VisualDCT.this.getBase_ViewMenuItem()) 
 				connEtoC41(e);
-			if (e.getSource() == VisualDCT.this.getPreferences___MenuItem()) 
+			else if (e.getSource() == VisualDCT.this.getPreferences___MenuItem()) 
 				connEtoC45(e);
-			if (e.getSource() == VisualDCT.this.getOKButton()) 
+			else if (e.getSource() == VisualDCT.this.getOKButton()) 
 				connEtoC47(e);
-			if (e.getSource() == VisualDCT.this.getCancelButton()) 
+			else if (e.getSource() == VisualDCT.this.getCancelButton()) 
 				connEtoM2(e);
-			if (e.getSource() == VisualDCT.this.getNameTextField()) 
+			else if (e.getSource() == VisualDCT.this.getNameTextField()) 
 				connEtoC51(e);
-			if (e.getSource() == VisualDCT.this.getStatusbarMenuItem()) 
+			else if (e.getSource() == VisualDCT.this.getStatusbarMenuItem()) 
 				connEtoC2(e);
-			if (e.getSource() == VisualDCT.this.getStatusbarMenuItem()) 
+			else if (e.getSource() == VisualDCT.this.getStatusbarMenuItem()) 
 				connEtoC43(e);
-			if (e.getSource() == VisualDCT.this.getToolbarMenuItem()) 
+			else if (e.getSource() == VisualDCT.this.getToolbarMenuItem()) 
 				connEtoC1(e);
-			if (e.getSource() == VisualDCT.this.getToolbarMenuItem()) 
+			else if (e.getSource() == VisualDCT.this.getToolbarMenuItem()) 
 				connEtoC42(e);
-			if (e.getSource() == VisualDCT.this.getFlat_ViewMenuItem()) 
+			else if (e.getSource() == VisualDCT.this.getFlat_ViewMenuItem()) 
 				connEtoC35(e);
-			if (e.getSource() == VisualDCT.this.getCancelButton1()) 
+			else if (e.getSource() == VisualDCT.this.getCancelButton1()) 
 				connEtoM1(e);
-			if (e.getSource() == VisualDCT.this.getGroupOKButton()) 
+			else if (e.getSource() == VisualDCT.this.getGroupOKButton()) 
 				connEtoC52(e);
-			if (e.getSource() == VisualDCT.this.getgroupNameTextField()) 
+			else if (e.getSource() == VisualDCT.this.getgroupNameTextField()) 
 				connEtoC53(e);
-			if (e.getSource() == VisualDCT.this.getRenameCancelButton()) 
+			else if (e.getSource() == VisualDCT.this.getRenameCancelButton()) 
 				connEtoM3(e);
-			if (e.getSource() == VisualDCT.this.getRenameOKButton()) 
+			else if (e.getSource() == VisualDCT.this.getRenameOKButton()) 
 				connEtoC55(e);
-			if (e.getSource() == VisualDCT.this.getNewNameTextField()) 
+			else if (e.getSource() == VisualDCT.this.getNewNameTextField()) 
 				connEtoC56(e);
-			if (e.getSource() == VisualDCT.this.getPageSetupMenuItem()) 
+			else if (e.getSource() == VisualDCT.this.getPageSetupMenuItem()) 
 				connEtoC61(e);
-			if (e.getSource() == VisualDCT.this.getPrintPreviewMenuItem()) 
+			else if (e.getSource() == VisualDCT.this.getPrintPreviewMenuItem()) 
 				connEtoC62(e);
-			if (e.getSource() == VisualDCT.this.getPluginManagerMenuItem()) 
+			else if (e.getSource() == VisualDCT.this.getPluginManagerMenuItem()) 
 				connEtoC63(e);
 		};
 		public void itemStateChanged(java.awt.event.ItemEvent e) {
@@ -3808,6 +3823,7 @@ private javax.swing.JToolBar getToolBarPane() {
 			ivjToolBarPane.add(getCopyButton());
 			ivjToolBarPane.add(getPasteButton());
 			// user code begin {1}
+			ivjToolBarPane.setFloatable(false);
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
 			// user code begin {2}
@@ -3982,6 +3998,10 @@ private javax.swing.JMenu getViewMenu() {
 			ivjViewMenu.add(getJSeparator10());
 			ivjViewMenu.add(getPreferences___MenuItem());
 			// user code begin {1}
+			ivjViewMenu.add(getLeftMenuItem());
+			ivjViewMenu.add(getRightMenuItem());
+			ivjViewMenu.add(getUpMenuItem());
+			ivjViewMenu.add(getDownMenuItem());
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
 			// user code begin {2}
@@ -4108,6 +4128,93 @@ private javax.swing.JMenuItem getZoom_OutMenuItem() {
 	}
 	return ivjZoom_OutMenuItem;
 }
+
+/**
+ * Return the LeftMenuItem property value.
+ * @return javax.swing.JMenuItem
+ */
+/* WARNING: THIS METHOD WILL BE REGENERATED. */
+private javax.swing.JMenuItem getLeftMenuItem() {
+	if (leftMenuItem == null) {
+		try {
+			leftMenuItem = new javax.swing.JMenuItem();
+			leftMenuItem.setName("LeftMenuItem");
+			leftMenuItem.setText("Left");
+			leftMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_LEFT,java.awt.event.KeyEvent.CTRL_MASK));
+			leftMenuItem.setVisible(false);
+		} catch (java.lang.Throwable ivjExc) {
+			// user code begin {2}
+			// user code end
+			handleException(ivjExc);
+		}
+	}
+	return leftMenuItem;
+}
+/**
+ * Return the RightMenuItem property value.
+ * @return javax.swing.JMenuItem
+ */
+/* WARNING: THIS METHOD WILL BE REGENERATED. */
+private javax.swing.JMenuItem getRightMenuItem() {
+	if (rightMenuItem == null) {
+		try {
+			rightMenuItem = new javax.swing.JMenuItem();
+			rightMenuItem.setName("RightMenuItem");
+			rightMenuItem.setText("Right");
+			rightMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_RIGHT,java.awt.event.KeyEvent.CTRL_MASK));
+			rightMenuItem.setVisible(false);
+		} catch (java.lang.Throwable ivjExc) {
+			// user code begin {2}
+			// user code end
+			handleException(ivjExc);
+		}
+	}
+	return rightMenuItem;
+}
+/**
+ * Return the UpMenuItem property value.
+ * @return javax.swing.JMenuItem
+ */
+/* WARNING: THIS METHOD WILL BE REGENERATED. */
+private javax.swing.JMenuItem getUpMenuItem() {
+	if (upMenuItem == null) {
+		try {
+			upMenuItem = new javax.swing.JMenuItem();
+			upMenuItem.setName("UpMenuItem");
+			upMenuItem.setText("Up");
+			upMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_UP,java.awt.event.KeyEvent.CTRL_MASK));
+			upMenuItem.setVisible(false);
+		} catch (java.lang.Throwable ivjExc) {
+			// user code begin {2}
+			// user code end
+			handleException(ivjExc);
+		}
+	}
+	return upMenuItem;
+}
+/**
+ * Return the DownMenuItem property value.
+ * @return javax.swing.JMenuItem
+ */
+/* WARNING: THIS METHOD WILL BE REGENERATED. */
+private javax.swing.JMenuItem getDownMenuItem() {
+	if (downMenuItem == null) {
+		try {
+			downMenuItem = new javax.swing.JMenuItem();
+			downMenuItem.setName("DownMenuItem");
+			downMenuItem.setText("Down");
+			downMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_DOWN,java.awt.event.KeyEvent.CTRL_MASK));
+			downMenuItem.setVisible(false);
+		} catch (java.lang.Throwable ivjExc) {
+			// user code begin {2}
+			// user code end
+			handleException(ivjExc);
+		}
+	}
+	return downMenuItem;
+}
+
+
 /**
  * Return the ZoomLabel property value.
  * @return javax.swing.JLabel
@@ -4315,6 +4422,10 @@ public void import_DBMenuItem_ActionPerformed() {
 /* WARNING: THIS METHOD WILL BE REGENERATED. */
 private void initConnections() throws java.lang.Exception {
 	// user code begin {1}
+	getLeftMenuItem().addActionListener(ivjEventHandler);
+	getRightMenuItem().addActionListener(ivjEventHandler);
+	getUpMenuItem().addActionListener(ivjEventHandler);
+	getDownMenuItem().addActionListener(ivjEventHandler);
 	// user code end
 	getAbout_BoxMenuItem().addActionListener(ivjEventHandler);
 	getZoomSlider().addMouseMotionListener(ivjEventHandler);
@@ -5165,5 +5276,12 @@ public void zoomSlider_updateLabel() {
 
     GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
     cmd.getGUIMenuInterface().setScale(getZoomSlider().getValue()/100.0);
+}
+/**
+ * Comment
+ */
+public void moveOrigin(int direction) {
+    GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
+    cmd.getGUIMenuInterface().moveOrigin(direction);
 }
 }

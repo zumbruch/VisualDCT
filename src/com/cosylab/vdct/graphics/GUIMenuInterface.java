@@ -40,6 +40,11 @@ public interface GUIMenuInterface {
  * Insert the method's description here.
  * Creation date: (4.2.2001 15:12:21)
  */
+void moveOrigin(int direction);
+/**
+ * Insert the method's description here.
+ * Creation date: (4.2.2001 15:12:21)
+ */
 void baseView();
 /**
  * Insert the method's description here.

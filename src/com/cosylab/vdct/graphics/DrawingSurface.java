@@ -1548,7 +1548,7 @@ public int print(java.awt.Graphics graphics, java.awt.print.PageFormat pageForma
  * Insert the method's description here.
  * Creation date: (27.12.2000 15:04:17)
  */
-private void recalculateNavigatorPosition() {
+public void recalculateNavigatorPosition() {
 	ViewState view = ViewState.getInstance();
 
 	double ratio = navigatorView.getScale()/view.getScale();

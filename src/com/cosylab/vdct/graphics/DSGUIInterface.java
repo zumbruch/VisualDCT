@@ -30,6 +30,9 @@ package com.cosylab.vdct.graphics;
 
 import java.io.*;
 import java.util.*;
+
+import javax.swing.SwingConstants;
+
 import com.cosylab.vdct.*;
 import com.cosylab.vdct.vdb.*;
 import com.cosylab.vdct.undo.*;
@@ -61,6 +64,39 @@ public DSGUIInterface(DrawingSurface drawingSurface) {
 	this.instance = this;
 	pasteNames = new ArrayList();
 }
+/**
+ * Insert the method's description here.
+ * Creation date: (4.2.2001 15:12:21)
+ */
+public void moveOrigin(int direction)
+{
+	int dx = 0; 
+	int dy = 0;
+	int d = (int)(100*ViewState.getInstance().getScale()); 
+	
+	switch (direction)
+	{
+		case SwingConstants.WEST:
+			dx =- d;
+			break;
+		case SwingConstants.EAST:
+			dx =+ d;
+			break;
+		case SwingConstants.NORTH:
+			dy =+ d;
+			break;
+		case SwingConstants.SOUTH:
+			dy =- d;
+			break;
+	}
+	
+	if (ViewState.getInstance().moveOrigin(dx, dy))
+	 {
+			drawingSurface.recalculateNavigatorPosition();
+			drawingSurface.repaint();
+	 }
+}
+
 /**
  * Insert the method's description here.
  * Creation date: (4.2.2001 15:32:01)
