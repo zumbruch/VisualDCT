@@ -181,7 +181,7 @@ public boolean checkMove(int dx, int dy) {
  * Creation date: (4.2.2001 22:02:39)
  * @param group java.lang.String
  */
-public boolean copyToGroup(java.lang.String group) {
+public Flexible copyToGroup(java.lang.String group) {
 	
 	String newName;
 	String oldName = getAbsoluteName();
@@ -197,12 +197,12 @@ public boolean copyToGroup(java.lang.String group) {
 			newName = StringUtils.incrementName(newName, Constants.COPY_SUFFIX);
 
 	Group g = Group.createGroup(newName);
-	if (group.equals(getNamePrefix()) || group.equals(Constants.CLIPBOARD_NAME)) {
+	/*if (group.equals(getNamePrefix()) || group.equals(Constants.CLIPBOARD_NAME)) {
 		g.setX(getX()+20-view.getRx()); g.setY(getY()+20-view.getRy());
 	}
 	else {
 		g.setX(getX()-view.getRx()); g.setY(getY()-view.getRy());
-	}
+	}*/
 
 	Flexible flexible;
 	Object[] objs = new Object[getSubObjectsV().size()];
@@ -235,7 +235,7 @@ public boolean copyToGroup(java.lang.String group) {
 		com.cosylab.vdct.undo.UndoManager.getInstance().setMonitor(monitoring);
 	}
 	
-	return true;
+	return g;
 
 }
 /**

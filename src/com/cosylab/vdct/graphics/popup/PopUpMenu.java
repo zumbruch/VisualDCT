@@ -28,10 +28,18 @@ package com.cosylab.vdct.graphics.popup;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.*;
 import javax.swing.*;
 
+import com.cosylab.vdct.VisualDCT;
+import com.cosylab.vdct.events.CommandManager;
+import com.cosylab.vdct.events.commands.GetGUIInterface;
 import com.cosylab.vdct.graphics.ViewState;
+import com.cosylab.vdct.graphics.objects.Flexible;
+import com.cosylab.vdct.graphics.objects.Group;
+import com.cosylab.vdct.graphics.objects.VisibleObject;
 import com.cosylab.vdct.plugin.popup.PluginPopupManager;
 
 /**
@@ -44,6 +52,14 @@ public class PopUpMenu extends JPopupMenu {
 	private static final String moreString = "More";
 	private static final int ITEMS_PER_MENU = 10;
 	private static JSeparator separator = null;
+	
+	private static final String cutString = "Cut";
+	private static final String copyString = "Copy";	
+	private static final String moveRenameString = "Move/Rename";
+	private static final String deleteString = "Delete";
+	
+	private static final String groupString = "Group";
+	private static final String ungroupString = "Ungroup";
 /**
  * LinkingPopupMenu constructor comment.
  */
@@ -95,6 +111,50 @@ public static JSeparator getSeparator() {
 	return separator;
 }
 
+class FlexiblePopupMenuHandler implements ActionListener {
+	Flexible f;
+	
+	public FlexiblePopupMenuHandler(Flexible flexible) {	
+		f = flexible;
+	}
+		
+	public void actionPerformed(ActionEvent e) {
+		GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
+		String action = e.getActionCommand();
+		
+		ViewState view = ViewState.getInstance();
+
+		if (action.equals(ungroupString)) {	// we only ungroup one group
+		   view.deselectAll();
+		   view.setAsSelected((VisibleObject)f);
+		   cmd.getGUIMenuInterface().ungroup();
+		   return;
+	   }
+	   
+		if (!view.isSelected(f)) {
+			view.deselectAll();
+			view.setAsSelected((VisibleObject)f);
+		}
+		
+		
+		if (action.equals(cutString)) {			
+			cmd.getGUIMenuInterface().cut();
+		} else if (action.equals(copyString)) {
+			cmd.getGUIMenuInterface().copy();
+		} else if (action.equals(moveRenameString)) {
+			cmd.getGUIMenuInterface().rename();
+		}  else if (action.equals(deleteString)) {
+			cmd.getGUIMenuInterface().delete();
+		}  else if (action.equals(groupString)) {
+			VisualDCT.getInstance().showGroupDialog();
+		}
+	}
+
+	
+}
+
+
+
 /**
  * Insert the method's description here.
  * Creation date: (2.2.2001 20:17:37)
@@ -103,13 +163,72 @@ public static JSeparator getSeparator() {
  * @param x int
  * @param y int
  */
-public void show(Popupable object, JComponent component, int x, int y) {
-	setLabel(object.getLabel());
-	if (getComponentCount()>0) removeAll();
-
+public void show(Object object, JComponent component, int x, int y) {
 	// add object items
-	Vector items = object.getItems();
+	setLabel("");
+	Vector items = new Vector();
+	
+	if (object instanceof Popupable) {
+		items = ((Popupable)object).getItems();
+		setLabel(((Popupable)object).getLabel());	
+		if (items==null) items = new Vector();
+	}		
+
+	if (object instanceof Flexible) 
+		populateWithFlexible((Flexible)object, items);
+
+	populate(items, component, x, y);
+	
+	if (object instanceof Popupable) 
+		addPluginItems(this, (Popupable)object);
+	
+//	show popup menu
+	 show(component, x, y);	
+}
+
+private void populateWithFlexible(Flexible object, Vector items) {
+	// add Flexible items 
+	if (object instanceof VisibleObject) {
+		
+		if (items.size() != 0) items.add(new JSeparator());
+		
+		ActionListener l = new FlexiblePopupMenuHandler((Flexible)object);
+		
+		JMenuItem menuitem = new JMenuItem(cutString);
+		menuitem.addActionListener(l);
+		items.add(menuitem);
+		
+		menuitem = new JMenuItem(copyString);
+		menuitem.addActionListener(l);
+		items.add(menuitem);
+		
+		menuitem = new JMenuItem(moveRenameString);
+		menuitem.addActionListener(l);
+		items.add(menuitem);
+		
+		menuitem = new JMenuItem(deleteString);
+		menuitem.addActionListener(l);
+		items.add(menuitem);
+		
+		items.add(new JSeparator());
+		
+		menuitem = new JMenuItem(groupString);
+		menuitem.addActionListener(l);
+		items.add(menuitem);
+					
+		if (object instanceof Group) {
+			menuitem = new JMenuItem(ungroupString);
+			menuitem.addActionListener(l);
+			items.add(menuitem);
+		}		
+	}
+
+}
+
+private void populate(Vector items, JComponent component, int x, int y) {
 	if ((items==null) || (items.size()==0)) return;
+	
+	if (getComponentCount()>0) removeAll();
 		
 	Object obj;
 	Enumeration e = items.elements();
@@ -121,11 +240,6 @@ public void show(Popupable object, JComponent component, int x, int y) {
 		else if (obj instanceof JSeparator)
 			add((JSeparator)obj);
 	}
-
-	addPluginItems(this, object);
-
-	// show popup menu
-	show(component, x, y);
 }
 
 /**

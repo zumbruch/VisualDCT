@@ -152,10 +152,25 @@ public void copy() {
 	
 	Object obj;
 	Enumeration selected = view.getSelectedObjects().elements();
+	int minx=Integer.MAX_VALUE, miny=Integer.MAX_VALUE;
 	while (selected.hasMoreElements()) {
 		obj = selected.nextElement();
-		if (obj instanceof Flexible)
-			((Flexible)obj).copyToGroup(Constants.CLIPBOARD_NAME);
+		if (obj instanceof VisibleObject) {
+			minx = Math.min(minx, ((VisibleObject)obj).getX());
+			miny = Math.min(miny, ((VisibleObject)obj).getY());
+		}
+	}
+	
+	selected = view.getSelectedObjects().elements();	
+	
+	while (selected.hasMoreElements()) {
+		obj = selected.nextElement();
+		if (obj instanceof Flexible) {
+			Flexible copy = ((Flexible)obj).copyToGroup(Constants.CLIPBOARD_NAME);
+			if (copy instanceof Movable)
+				((Movable)copy).move(-minx, -miny);
+			
+		}
 	}
 	view.deselectAll();
 	drawingSurface.repaint();
@@ -273,6 +288,17 @@ public void cut() {
 	
 	Object obj;
 	Enumeration selected = view.getSelectedObjects().elements();
+	
+	int minx=Integer.MAX_VALUE, miny=Integer.MAX_VALUE;
+	while (selected.hasMoreElements()) {
+		obj = selected.nextElement();
+		if (obj instanceof VisibleObject) {
+			minx = Math.min(minx, ((VisibleObject)obj).getX());
+			miny = Math.min(miny, ((VisibleObject)obj).getY());
+		}
+	}
+	
+	selected = view.getSelectedObjects().elements();
 	while (selected.hasMoreElements()) {
 		obj = selected.nextElement();
 		if (obj instanceof Flexible) {
@@ -282,7 +308,8 @@ public void cut() {
 			{
 				pasteNames.add(oldGroup);
 				if (obj instanceof Movable)
-					((Movable)obj).move(-view.getRx(), -view.getRy());
+					//((Movable)obj).move(-view.getRx(), -view.getRy());
+					((Movable)obj).move(-minx, -miny);
 			}
 		}
 	}
@@ -469,6 +496,10 @@ public void paste() {
 	int size = Group.getClipboard().getSubObjectsV().size();
 	if (size==0) return;
 
+	double scale = view.getScale();
+	int posX = (int)((drawingSurface.getPressedX() + view.getRx()) / scale);
+	int posY = (int)((drawingSurface.getPressedY() + view.getRy()) / scale);
+
 	Object objs[] = new Object[size];
 	Group.getClipboard().getSubObjectsV().copyInto(objs);
 
@@ -495,7 +526,8 @@ public void paste() {
 
 				
 				if (objs[i] instanceof Movable)
-					((Movable)objs[i]).move(view.getRx(), view.getRy());
+					//((Movable)objs[i]).move(view.getRx(), view.getRy());
+				   ((Movable)objs[i]).move(posX, posY);
 			}
 			else
 				view.deselectObject((VisibleObject)objs[i]);

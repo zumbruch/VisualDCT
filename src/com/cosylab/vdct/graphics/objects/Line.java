@@ -158,7 +158,7 @@ public boolean checkMove(int dx, int dy)
 	return false;
 }
 
-public boolean copyToGroup(String group)
+public Flexible copyToGroup(String group)
 {
 	String newName;
 	if(group.equals(nullString))
@@ -177,11 +177,11 @@ public boolean copyToGroup(String group)
 	grLine.setStartArrow(startArrow);
 	grLine.setEndArrow(endArrow);
 
-	ViewState view = ViewState.getInstance();
-	grLine.move(20 - view.getRx(), 20 - view.getRy());
+	//ViewState view = ViewState.getInstance();
+	//grLine.move(20 - view.getRx(), 20 - view.getRy());
 
 	unconditionalValidation();
-	return true;
+	return grLine;
 }
 
 public void destroy()

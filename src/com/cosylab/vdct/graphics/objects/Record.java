@@ -221,7 +221,7 @@ public boolean checkMove(int dx, int dy) {
  * Creation date: (4.2.2001 22:02:29)
  * @param group java.lang.String
  */
-public boolean copyToGroup(java.lang.String group) {
+public Flexible copyToGroup(java.lang.String group) {
 
 	String newName;
 	if (group.equals(nullString))
@@ -242,13 +242,13 @@ public boolean copyToGroup(java.lang.String group) {
 	VDBRecordData theDataCopy = VDBData.copyVDBRecordData(recordData);
 	theDataCopy.setName(newName);
 	Record theRecordCopy = new Record(null, theDataCopy, getX(), getY());
-	theRecordCopy.move(20-view.getRx(), 20-view.getRy());
+	//theRecordCopy.move(20-view.getRx(), 20-view.getRy());
 	Group.getRoot().addSubObject(theDataCopy.getName(), theRecordCopy, true);
 	//theRecordCopy.fixEPICSOutLinks(Group.substractParentName(recordData.getName()), group);
 	theRecordCopy.manageLinks();
 	unconditionalValidation();
 
-	return true;
+	return theRecordCopy;
 }
 /**
  * Insert the method's description here.

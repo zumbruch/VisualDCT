@@ -39,7 +39,7 @@ public interface Flexible {
  * Creation date: (4.2.2001 21:59:44)
  * @param group java.lang.String
  */
-boolean copyToGroup(String group);
+Flexible copyToGroup(String group);
 /**
  * Insert the method's description here.
  * Creation date: (3.5.2001 10:15:48)

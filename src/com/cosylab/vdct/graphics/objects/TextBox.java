@@ -316,7 +316,7 @@ public boolean checkMove(int dx, int dy)
 	return false;
 }
 
-public boolean copyToGroup(String group)
+public Flexible copyToGroup(String group)
 {
 	String newName;
 	if(group.equals(nullString))
@@ -334,11 +334,11 @@ public boolean copyToGroup(String group)
 	grTextBox.setDescription(description);
 	Group.getRoot().addSubObject(newName, grTextBox, true);
 
-	ViewState view = ViewState.getInstance();
-	grTextBox.move(20 - view.getRx(), 20 - view.getRy());
+	//ViewState view = ViewState.getInstance();
+	//grTextBox.move(20 - view.getRx(), 20 - view.getRy());
 
 	unconditionalValidation();
-	return true;
+	return grTextBox;
 }
 
 public void destroy()

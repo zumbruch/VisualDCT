@@ -149,7 +149,7 @@ public boolean checkMove(int dx, int dy)
 	return false;
 }
 
-public boolean copyToGroup(String group)
+public Flexible copyToGroup(String group)
 {
 
 	String newName;
@@ -167,11 +167,11 @@ public boolean copyToGroup(String group)
 						endVertex.getX(), endVertex.getY());
 	Group.getRoot().addSubObject(newName, grBox, true);
 
-	ViewState view = ViewState.getInstance();
-	grBox.move(20 - view.getRx(), 20 - view.getRy());
+	//ViewState view = ViewState.getInstance();
+	//grBox.move(20 - view.getRx(), 20 - view.getRy());
 
 	unconditionalValidation();
-	return true;
+	return grBox;
 }
 
 public void destroy()

@@ -1416,7 +1416,7 @@ public void destroy() {
 /**
  * @see com.cosylab.vdct.graphics.objects.Flexible#copyToGroup(String)
  */
-public boolean copyToGroup(java.lang.String group) {
+public Flexible copyToGroup(java.lang.String group) {
 
 	String newName;
 	if (group.equals(nullString))
@@ -1441,7 +1441,7 @@ public boolean copyToGroup(java.lang.String group) {
 	Group.getRoot().addSubObject(theDataCopy.getName(), theTemplateCopy, true);
 	//theTemplateCopy.setDescription(getTemplateData().getTemplate().getDescription());
 	theTemplateCopy.setX(getX()); theTemplateCopy.setY(getY());
-	theTemplateCopy.move(20-view.getRx(), 20-view.getRy());
+	//theTemplateCopy.move(20-view.getRx(), 20-view.getRy());
 	
 	// apply fields data
 	Enumeration e = subObjectsV.elements();
@@ -1463,7 +1463,7 @@ public boolean copyToGroup(java.lang.String group) {
 		
 	theTemplateCopy.updateTemplateFields();
 	unconditionalValidation();
-	return true;
+	return theTemplateCopy;
 }
 
 /**

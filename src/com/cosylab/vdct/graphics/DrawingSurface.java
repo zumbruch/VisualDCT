@@ -172,6 +172,7 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 	private static final String newBoxString = "New box";
 	private static final String newTextBoxString = "New textbox";
 	private static final String templatePropertiesString = "Template properties...";
+	private static final String pasteString = "Paste";
 	private static final String generateMacrosString = "Generate macros...";
 
 	private Line grLine = null;
@@ -855,6 +856,9 @@ private void showPopup(MouseEvent e)
 				createTextBox();
 			else if (action.equals(templatePropertiesString))
 				InspectorManager.getInstance().requestInspectorFor(Group.getEditingTemplateData());
+			else if (action.equals(pasteString)) {
+				((GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface")).getGUIMenuInterface().paste();
+			}
 			else
 				createTemplateInstance(null, action, true);
 		}
@@ -990,6 +994,14 @@ private void showPopup(MouseEvent e)
 		JMenuItem templatePropertiesMenuItem = new JMenuItem(templatePropertiesString);
 		templatePropertiesMenuItem.addActionListener(al);
 		popUp.add(templatePropertiesMenuItem);
+	}
+	
+	// add paste item
+	if (Group.getClipboard().getSubObjectsV().size() > 0) {
+		popUp.add(new JSeparator());
+		JMenuItem pasteMenuItem = new JMenuItem(pasteString);
+		pasteMenuItem.addActionListener(al);
+		popUp.add(pasteMenuItem);
 	}
 	
 	// add plugin items
@@ -1302,6 +1314,13 @@ public void mousePressed(MouseEvent e) {
 					e.getX(), e.getY()
 				);
 
+			}
+			else  {
+				PopUpMenu.getInstance().show(
+					hilitedObject,
+					getWorkspacePanel(),
+					e.getX(), e.getY()
+				);
 			}
 		}
 	
