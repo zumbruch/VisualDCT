@@ -81,6 +81,7 @@ public class EPICSVarLink extends EPICSLink implements MultiInLink, Popupable, I
 	private static final String moveDownString = "Move Down";
 	private static final String removeString = "Remove Link";
 	private static GUISeparator linkSeparator = null;
+	 
 /**
  * EPICSVarLink constructor comment.
  * @param parent com.cosylab.vdct.graphics.objects.ContainerObject
@@ -234,12 +235,14 @@ public int getInY() {
 public java.util.Vector getItems() {
 	Vector items = new Vector();
 
+	ActionListener al = createPopupmenuHandler();
+
 /*	JMenuItem colorItem = new JMenuItem(colorString);
-	colorItem.addActionListener(createPopupmenuHandler());
+	colorItem.addActionListener(al);
 	items.addElement(colorItem);
 
 	JMenuItem addItem = new JMenuItem(addConnectorString);
-	addItem.addActionListener(createPopupmenuHandler());
+	addItem.addActionListener(al);
 	items.addElement(addItem);
 
 	items.add(new JSeparator());
@@ -252,7 +255,7 @@ public java.util.Vector getItems() {
 	if (!isFirst)
 	{
 		JMenuItem upItem = new JMenuItem(moveUpString);
-		upItem.addActionListener(createPopupmenuHandler());
+		upItem.addActionListener(al);
 		upItem.setIcon(new ImageIcon(getClass().getResource("/images/up.gif")));
 		items.addElement(upItem);
 	}
@@ -260,7 +263,7 @@ public java.util.Vector getItems() {
 	if (!isLast)
 	{
 		JMenuItem downItem = new JMenuItem(moveDownString);
-		downItem.addActionListener(createPopupmenuHandler());
+		downItem.addActionListener(al);
 		downItem.setIcon(new ImageIcon(getClass().getResource("/images/down.gif")));
 		items.addElement(downItem);
 	}
@@ -269,7 +272,7 @@ public java.util.Vector getItems() {
 		items.add(new JSeparator());
 
 	JMenuItem removeItem = new JMenuItem(removeString);
-	removeItem.addActionListener(createPopupmenuHandler());
+	removeItem.addActionListener(al);
 	items.addElement(removeItem);
 
 	return items;

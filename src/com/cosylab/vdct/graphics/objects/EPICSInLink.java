@@ -187,40 +187,42 @@ private com.cosylab.vdct.graphics.objects.EPICSInLink.PopupMenuHandler createPop
 public java.util.Vector getItems() {
 	Vector items = super.getItems();
 
+	ActionListener al = createPopupmenuHandler();
+
 	items.add(new JSeparator());
 
 	JMenu processMenu = new JMenu(processString);
 	items.addElement(processMenu);
 	
 	JMenuItem npp = new JMenuItem(nppString);
-	npp.addActionListener(createPopupmenuHandler());
+	npp.addActionListener(al);
 	processMenu.add(npp);	
 	
 	JMenuItem pp = new JMenuItem(ppString);
-	pp.addActionListener(createPopupmenuHandler());
+	pp.addActionListener(al);
 	processMenu.add(pp);	
 
 	JMenuItem ca = new JMenuItem(caString);
-	ca.addActionListener(createPopupmenuHandler());
+	ca.addActionListener(al);
 	processMenu.add(ca);
 
 	JMenuItem cp = new JMenuItem(cpString);
-	cp.addActionListener(createPopupmenuHandler());
+	cp.addActionListener(al);
 	processMenu.add(cp);
 
 	JMenuItem cpp = new JMenuItem(cppString);
-	cpp.addActionListener(createPopupmenuHandler());
+	cpp.addActionListener(al);
 	processMenu.add(cpp);
 
 	JMenu severityMenu = new JMenu(severityString);
 	items.addElement(severityMenu);
 
 	JMenuItem nms = new JMenuItem(nmsString);
-	nms.addActionListener(createPopupmenuHandler());
+	nms.addActionListener(al);
 	severityMenu.add(nms);
 
 	JMenuItem ms = new JMenuItem(msString);
-	ms.addActionListener(createPopupmenuHandler());
+	ms.addActionListener(al);
 	severityMenu.add(ms);
 
 	return items;
