@@ -239,4 +239,12 @@ public void stopDebugging()
 {
 	destroyed = true;
 }
+
+/**
+ * @see com.cosylab.vdct.plugin.debug.DebugPlugin#getMacroSet()
+ */
+public Map getMacroSet() {
+	return null;
+}
+
 }

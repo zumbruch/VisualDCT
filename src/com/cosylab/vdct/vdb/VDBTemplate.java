@@ -660,8 +660,10 @@ public void addMacro(VDBMacro vdbMacro)
 public void removePort(String name)
 {
 	VDBPort port = (VDBPort)ports.remove(name);
-	if (port!=null)
-		portsV.removeElement(port);
+	if (port==null)
+		return;
+	
+	portsV.removeElement(port);
 
 	ComposedAction ca = new ComposedAction();
 
@@ -692,8 +694,10 @@ public void removePort(String name)
 public void removeMacro(String name)
 {
 	VDBMacro macro = (VDBMacro)macros.remove(name);
-	if (macros!=null)
-		macrosV.removeElement(macro);
+	if (macro==null)
+		return;
+	
+	macrosV.removeElement(macro);
 
 	ComposedAction ca = new ComposedAction();
 

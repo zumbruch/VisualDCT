@@ -147,7 +147,7 @@ public void run()
 			{
 				VDBRecordData rec = ((Record)obj).getRecordData();
 				Enumeration e2 = rec.getFieldsV().elements();
-				while (e2.hasMoreElements() && !progressMonitor.isCanceled())
+				while (e2.hasMoreElements() && !progressMonitor.isCanceled() && PluginDebugManager.isDebugState())
 				{
 					VDBFieldData field = (VDBFieldData)e2.nextElement();
 						
@@ -158,7 +158,7 @@ public void run()
 					}
 				}
 	
-				if (progressMonitor.isCanceled())
+				if (progressMonitor.isCanceled() || !PluginDebugManager.isDebugState())
 					break;
 	
 				// always register VAL field
@@ -180,14 +180,13 @@ public void run()
 	}
 	
 			
-	if (progressMonitor.isCanceled())
+	if (progressMonitor.isCanceled() /*|| !PluginDebugManager.isDebugState()*/)
 	{
 		Console.getInstance().println("Debugging canceled.");
 		debugPlugin.deregisterAll();
 		debugPlugin.stopDebugging();
 		PluginDebugManager.setDebugState(false);
 		PluginDebugManager.setDebugPlugin(null);
-		Group.getRoot().unconditionalValidateSubObjects(false);
 	}
 
 	progressMonitor.close();

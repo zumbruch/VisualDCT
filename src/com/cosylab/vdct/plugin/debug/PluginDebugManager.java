@@ -30,6 +30,11 @@ package com.cosylab.vdct.plugin.debug;
 
 import java.util.*;
 import java.beans.*;
+
+import com.cosylab.vdct.Console;
+import com.cosylab.vdct.VisualDCT;
+import com.cosylab.vdct.graphics.DrawingSurface;
+import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.plugin.*;
 
 /**
@@ -44,6 +49,10 @@ public final class PluginDebugManager implements PluginListener, PropertyChangeL
     
     private static DebugPlugin debugPlugin = null;
     private static boolean debugState = false;
+    
+    private static final String DEBUG_MODE = "Debug Mode";
+	private static final String EDIT_MODE = "Edit Mode";
+    
 /**
  * Insert the method's description here.
  * Creation date: (7.12.2001 14:00:41)
@@ -107,8 +116,8 @@ public void pluginRemoved(PluginObject plugin)
 {
 	if (plugin.getPlugin() instanceof DebugPlugin)
 	{
-		if (plugin.getPlugin()==getDebugPlugin())
-			DebugStopMenuItem.stopDebugging();
+		if (plugin.getPlugin() == getDebugPlugin())
+			stopDebugging();
 		
 		list.remove(plugin);
 		plugin.removePropertyChangeListener(this);
@@ -141,6 +150,11 @@ public void propertyChange(PropertyChangeEvent evt)
  * @param newDebugPlugin com.cosylab.vdct.plugin.debug.DebugPlugin
  */
 public static void setDebugPlugin(DebugPlugin newDebugPlugin) {
+	if (newDebugPlugin != null)
+		VisualDCT.getInstance().setMode(DEBUG_MODE);
+	else
+		VisualDCT.getInstance().setMode(EDIT_MODE);
+	
 	debugPlugin = newDebugPlugin;
 }
 /**
@@ -151,4 +165,45 @@ public static void setDebugPlugin(DebugPlugin newDebugPlugin) {
 public static void setDebugState(boolean newDebugState) {
 	debugState = newDebugState;
 }
+
+/**
+ * Insert the method's description here.
+ * Creation date: (8.12.2001 18:57:13)
+ */
+public static void stopDebugging()
+{
+	DebugPlugin debugPlugin = PluginDebugManager.getDebugPlugin();
+	if (debugPlugin!=null)
+	{
+		Console.getInstance().println("Stopping debugging with '" + debugPlugin.getName() + "'...");
+
+		debugPlugin.deregisterAll();
+		debugPlugin.stopDebugging();
+		PluginDebugManager.setDebugState(false);
+		PluginDebugManager.setDebugPlugin(null);
+
+
+		
+		// update all fields
+		Group group = DrawingSurface.getInstance().getViewGroup();
+		Enumeration e = group.getSubObjectsV().elements();
+		while (e.hasMoreElements())
+		{
+			Object obj = e.nextElement();
+			if (obj instanceof com.cosylab.vdct.graphics.objects.Record)
+			{
+				com.cosylab.vdct.vdb.VDBRecordData rec = ((com.cosylab.vdct.graphics.objects.Record)obj).getRecordData();
+				Enumeration e2 = rec.getFieldsV().elements();
+				while (e2.hasMoreElements())
+					rec.fieldValueChanged((com.cosylab.vdct.vdb.VDBFieldData)e2.nextElement());
+					
+			}
+		}
+
+		Group.getRoot().unconditionalValidateSubObjects(false);
+		DrawingSurface.getInstance().repaint();
+
+	}
+}
+
 }

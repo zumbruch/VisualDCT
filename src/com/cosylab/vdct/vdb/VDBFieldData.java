@@ -29,7 +29,6 @@ package com.cosylab.vdct.vdb;
  */
 
 import com.cosylab.vdct.dbd.*;
-import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.DataProvider;
 import com.cosylab.vdct.Console;
 import com.cosylab.vdct.inspector.ChangableVisibility;
@@ -41,7 +40,6 @@ import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.objects.LinkSource;
 import com.cosylab.vdct.graphics.objects.Record;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -72,7 +70,7 @@ public class VDBFieldData implements InspectableProperty, Debuggable, ChangableV
 		new SimpleDateFormat("HH:mm:ss.SSS");
 	
 	protected String debugValueTimeStamp = "n/a";
-	protected Color debugValueColor = Constants.RECORD_COLOR; 
+	protected short severity;
 	private static final String NAME_VAL = "VAL";
 	
 	protected int visibility = NON_DEFAULT_VISIBLE;
@@ -325,26 +323,7 @@ public void setDebugValue(String newValue, Date timeStamp, short severity)
 	{
 		debugValueTimeStamp = timeFormatter.format(timeStamp);
 		debugValue = newValue; 
-		
-		// select debug color (follows MEDM standard)
-		switch (severity)
-		{
-			// 0 = no alarm
-			case 0 :
-				debugValueColor = Color.WHITE;
-				break;
-			// 1 = minor
-			case 1 :
-				debugValueColor = Color.YELLOW;
-				break;
-			// 2 = major
-			case 2 :
-				debugValueColor = Color.RED;
-				break;
-			// 3 = invalid
-			default :
-				debugValueColor = Color.WHITE;
- 		}
+		this.severity = severity;
 		
 		if (record!=null) record.fieldValueChanged(this);
 	}
@@ -557,11 +536,22 @@ public String getDebugValueTimeStamp() {
 	return debugValueTimeStamp;
 }
 
+
 /**
- * @return
+ * Get last debug value severity.
+ * @return last debug value severity.
  */
-public Color getDebugValueColor() {
-	return debugValueColor;
+public short getSeverity() {
+	return severity;
+}
+
+/**
+ * @see com.cosylab.vdct.graphics.objects.Debuggable#initialize()
+ */
+public void initialize() {
+	debugValue = debugDefault;
+	debugValueTimeStamp = "n/a";
+	severity = 0;
 }
 
 }

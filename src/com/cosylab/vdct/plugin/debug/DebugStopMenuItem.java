@@ -28,14 +28,9 @@ package com.cosylab.vdct.plugin.debug;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import javax.swing.*;
+import java.awt.event.ActionListener;
 
-import com.cosylab.vdct.Console;
-import com.cosylab.vdct.graphics.DrawingSurface;
-import com.cosylab.vdct.graphics.objects.Group;
-
-import java.awt.event.*;
-import java.util.Enumeration;
+import javax.swing.JMenuItem;
 
 /**
  * Insert the class' description here.
@@ -58,45 +53,6 @@ public DebugStopMenuItem()
  */
 public void actionPerformed(java.awt.event.ActionEvent e)
 {
-	stopDebugging();
-}
-/**
- * Insert the method's description here.
- * Creation date: (8.12.2001 18:57:13)
- */
-public static void stopDebugging()
-{
-	DebugPlugin debugPlugin = PluginDebugManager.getDebugPlugin();
-	if (debugPlugin!=null)
-	{
-		Console.getInstance().println("Stopping debugging with '" + debugPlugin.getName() + "'...");
-
-		debugPlugin.deregisterAll();
-		debugPlugin.stopDebugging();
-		PluginDebugManager.setDebugState(false);
-		PluginDebugManager.setDebugPlugin(null);
-
-
-		
-		// update all fields
-		Group group = DrawingSurface.getInstance().getViewGroup();
-		Enumeration e = group.getSubObjectsV().elements();
-		while (e.hasMoreElements())
-		{
-			Object obj = e.nextElement();
-			if (obj instanceof com.cosylab.vdct.graphics.objects.Record)
-			{
-				com.cosylab.vdct.vdb.VDBRecordData rec = ((com.cosylab.vdct.graphics.objects.Record)obj).getRecordData();
-				Enumeration e2 = rec.getFieldsV().elements();
-				while (e2.hasMoreElements())
-					rec.fieldValueChanged((com.cosylab.vdct.vdb.VDBFieldData)e2.nextElement());
-					
-			}
-		}
-
-		Group.getRoot().unconditionalValidateSubObjects(false);
-		DrawingSurface.getInstance().repaint();
-
-	}
+	PluginDebugManager.stopDebugging();
 }
 }
