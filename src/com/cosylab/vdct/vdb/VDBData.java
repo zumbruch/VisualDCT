@@ -123,6 +123,59 @@ public static void copyVDBFieldData(VDBFieldData sourceField, VDBFieldData targe
 }
 /**
  * This method was created in VisualAge.
+ * @return com.cosylab.vdct.vdb.VDBTemplateInstance
+ */
+public static VDBTemplateInstance copyVDBTemplateInstance(VDBTemplateInstance source) {
+
+	VDBTemplateInstance vdbTemplateInstance = new VDBTemplateInstance(source.getName(), source.getTemplate());
+
+	vdbTemplateInstance.setProperties((TreeMap)source.getProperties().clone());
+
+
+	Hashtable ios = new Hashtable();
+	Enumeration keys = source.getOutputs().keys();
+	while (keys.hasMoreElements())
+	{
+		String key = keys.nextElement().toString();
+		
+		VDBFieldData field = (VDBFieldData)source.getTemplate().getOutputs().get(key);
+		VDBTemplateField sourcetf = (VDBTemplateField)source.getOutputs().get(key);
+		
+		VDBTemplateField tf = new VDBTemplateField(key, vdbTemplateInstance, field);
+		tf.setDescription(sourcetf.getDescription());
+		String initVal = sourcetf.getValue();
+		if (initVal!=null)
+			tf.setValueSilently(initVal);
+		ios.put(key, tf);
+	}
+	vdbTemplateInstance.setOutputs(ios);
+
+
+	ios = new Hashtable();
+	keys = source.getInputs().keys();
+	while (keys.hasMoreElements())
+	{
+		String key = keys.nextElement().toString();
+		
+		VDBFieldData field = (VDBFieldData)source.getTemplate().getInputs().get(key);
+		VDBTemplateField sourcetf = (VDBTemplateField)source.getInputs().get(key);
+		
+		VDBTemplateField tf = new VDBTemplateField(key, vdbTemplateInstance, field);
+		tf.setDescription(sourcetf.getDescription());
+		String initVal = sourcetf.getValue();
+		if (initVal!=null)
+			tf.setValueSilently(initVal);
+		ios.put(key, tf);
+	}
+	vdbTemplateInstance.setInputs(ios);
+
+
+
+	return vdbTemplateInstance;
+}
+
+/**
+ * This method was created in VisualAge.
  * @return com.cosylab.vdct.vdb.VDBRecordData
  * @param dbd com.cosylab.vdct.dbd.DBDData
  * @param dbRecord com.cosylab.vdct.db.DBRecordData
@@ -147,6 +200,7 @@ public static VDBRecordData copyVDBRecordData(VDBRecordData source) {
 
 	return vdbRecord;
 }
+
 /**
  * This method was created in VisualAge.
  * @return com.cosylab.vdct.vdb.VDBData
@@ -200,7 +254,7 @@ public static void generateTemplateInstances(DBData db, VDBData vdb)
 			continue;
 		}
 		VDBTemplateInstance vti = new VDBTemplateInstance(dbTemplateInstance.getTemplateID(), t);
-		vti.setProperties(dbTemplateInstance.getProperties());
+		vti.setProperties(new TreeMap(dbTemplateInstance.getProperties()));
 			
 		vti.setInputs(generateTemplateInstanceIOFields(vti, dbTemplateInstance.getValues(), t.getInputs(), t.getInputComments()));
 		vti.setOutputs(generateTemplateInstanceIOFields(vti, dbTemplateInstance.getValues(), t.getOutputs(), t.getOutputComments()));

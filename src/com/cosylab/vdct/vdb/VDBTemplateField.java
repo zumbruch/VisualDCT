@@ -28,6 +28,7 @@ package com.cosylab.vdct.vdb;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.dbd.DBDConstants;
 import com.cosylab.vdct.graphics.objects.Descriptable;
 import com.cosylab.vdct.graphics.objects.Group;
@@ -112,7 +113,15 @@ public class VDBTemplateField extends VDBFieldData implements Descriptable
 		{
 			// optimizie
 			String fullName = getRecord().getName()+com.cosylab.vdct.Constants.FIELD_SEPARATOR+name;
-			return VDBTemplateInstance.applyProperties(fullName, templateInstance.getProperties());
+			fullName = VDBTemplateInstance.applyProperties(fullName, templateInstance.getProperties());
+			
+			// add group prefix
+			String parent = Group.substractParentName(templateInstance.getName());
+			if (parent.length() > 0)
+				fullName = parent + Constants.GROUP_SEPARATOR + fullName;
+	
+			
+			return fullName;
 		}
 	}
 

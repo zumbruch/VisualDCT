@@ -112,10 +112,10 @@ public class VDBTemplateInstance
 	 * Sets the properties.
 	 * @param properties The properties to set
 	 */
-	public void setProperties(Hashtable properties)
+	public void setProperties(TreeMap properties)
 	{
 //		this.properties = properties;
-		this.properties = new TreeMap(properties);
+		this.properties = properties;
 	}
 
 	/**
@@ -137,17 +137,26 @@ public class VDBTemplateInstance
 			String val = properties.get(key).toString();
 			s = s.replaceAll("\\$\\("+key+"\\)", val);
 			s = s.replaceAll("\\$\\{"+key+"\\}", val);
-		}		
+		}
 		return s;
 	}
 
-	/**
-	 * Returns the name.
-	 * @return String
-	 */
-	public String getName()
-	{
-		return name;
-	}
+/**
+ * Returns the name.
+ * @return String
+ */
+public String getName()
+{
+	return name;
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (9.12.2000 18:13:17)
+ * @param newName java.lang.String
+ */
+public void setName(java.lang.String newName) {
+	name = newName;
+}
 
 }

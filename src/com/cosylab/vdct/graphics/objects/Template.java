@@ -53,6 +53,7 @@ import com.cosylab.vdct.vdb.MonitoredActionProperty;
 import com.cosylab.vdct.vdb.MonitoredProperty;
 import com.cosylab.vdct.vdb.MonitoredPropertyListener;
 import com.cosylab.vdct.vdb.NameValueInfoProperty;
+import com.cosylab.vdct.vdb.VDBData;
 import com.cosylab.vdct.vdb.VDBFieldData;
 import com.cosylab.vdct.vdb.VDBTemplateField;
 import com.cosylab.vdct.vdb.VDBTemplateInstance;
@@ -506,35 +507,11 @@ public class Template
 	}
 
 	/**
-	 * @see com.cosylab.vdct.graphics.objects.Flexible#copyToGroup(String)
-	 */
-	public boolean copyToGroup(String group)
-	{
-		return false;
-	}
-
-	/**
 	 * @see com.cosylab.vdct.graphics.objects.Flexible#getFlexibleName()
 	 */
 	public String getFlexibleName()
 	{
 		return templateData.getName();
-	}
-
-	/**
-	 * @see com.cosylab.vdct.graphics.objects.Flexible#moveToGroup(String)
-	 */
-	public boolean moveToGroup(String group)
-	{
-		return false;
-	}
-
-	/**
-	 * @see com.cosylab.vdct.graphics.objects.Flexible#rename(String)
-	 */
-	public boolean rename(String newName)
-	{
-		return false;
 	}
 
 	/**
@@ -951,6 +928,146 @@ public void destroy() {
 		getParent().removeObject(Group.substractObjectName(getName()));
 	}
 }
+
+/**
+ * @see com.cosylab.vdct.graphics.objects.Flexible#copyToGroup(String)
+ */
+public boolean copyToGroup(java.lang.String group) {
+
+	String newName;
+	if (group.equals(nullString))
+		newName = Group.substractObjectName(templateData.getName());
+	else
+		newName = group+Constants.GROUP_SEPARATOR+
+				  Group.substractObjectName(templateData.getName());
+
+	// object with new name already exists, add suffix ///!!!
+	//Object obj;
+	while (Group.getRoot().findObject(newName, true)!=null)
+		newName += Constants.COPY_SUFFIX;
+
+	ViewState view = ViewState.getInstance();
+
+
+	VDBTemplateInstance theDataCopy = VDBData.copyVDBTemplateInstance(templateData);
+	theDataCopy.setName(newName);
+	Template theTemplateCopy = new Template(null, theDataCopy);
+	Group.getRoot().addSubObject(theDataCopy.getName(), theTemplateCopy, true);
+	theTemplateCopy.setDescription(getTemplateData().getTemplate().getDescription());
+	theTemplateCopy.setX(getX()); theTemplateCopy.setY(getY());
+	theTemplateCopy.move(20-view.getRx(), 20-view.getRy());
+	theTemplateCopy.updateTemplateFields();
+	unconditionalValidation();
+	return true;
+}
+
+/**
+ * @see com.cosylab.vdct.graphics.objects.Flexible#moveToGroup(String)
+ */
+public boolean moveToGroup(java.lang.String group) {
+	String currentParent = Group.substractParentName(templateData.getName());
+	if (group.equalsIgnoreCase(currentParent)) return false;
+	
+	String oldName = getName();
+	String newName;
+	if (group.equals(nullString))
+		newName = Group.substractObjectName(templateData.getName());
+	else
+		newName = group+Constants.GROUP_SEPARATOR+
+				  Group.substractObjectName(templateData.getName());;
+
+	// object with new name already exists, add suffix // !!!
+	Object obj;
+	while ((obj=Group.getRoot().findObject(newName, true))!=null)
+	{
+		if (obj==this)	// it's me :) already moved, fix data
+		{
+			templateData.setName(newName);
+			this.updateTemplateFields();
+			fixLinks();
+			return true;
+		}
+		else
+			//return false;
+			newName += Constants.MOVE_SUFFIX;
+			return rename(newName);
+	}
+	
+	getParent().removeObject(Group.substractObjectName(getName()));
+	setParent(null);
+	Group.getRoot().addSubObject(newName, this, true);
+
+	templateData.setName(newName);
+	this.updateTemplateFields();
+	fixLinks();
+	unconditionalValidation();
+
+	return true;
+}
+
+/**
+ * @see com.cosylab.vdct.graphics.objects.Flexible#rename(String)
+ */
+public boolean rename(java.lang.String newName) {
+	
+	String newObjName = Group.substractObjectName(newName);
+	String oldObjName = Group.substractObjectName(getName());
+
+
+	if (!oldObjName.equals(newObjName))
+	{
+		getParent().removeObject(oldObjName);
+		String fullName = com.cosylab.vdct.util.StringUtils.replace(getName(), oldObjName, newObjName);
+		templateData.setName(fullName);
+		getParent().addSubObject(newObjName, this);
+
+		// fix connectors IDs
+		Enumeration e = subObjectsV.elements();
+		Object obj; Connector connector;
+		while (e.hasMoreElements()) {
+			obj = e.nextElement();
+			if (obj instanceof Connector)
+			{
+				connector = (Connector)obj;
+				String id = connector.getID();
+				id = com.cosylab.vdct.util.StringUtils.replace(id, oldObjName, newObjName);
+				connector.setID(id);
+			}
+		}
+	}
+	
+	this.updateTemplateFields();
+
+	// move if needed
+	if (!moveToGroup(Group.substractParentName(newName)))
+		fixLinks();			// fix needed
+
+	return true;
+	
+}
+
+
+/**
+ * Insert the method's description here.
+ * Creation date: (30.1.2001 11:59:54)
+ */
+protected void destroyFields() {
+
+	Object[] objs = new Object[subObjectsV.size()];
+	subObjectsV.copyInto(objs);
+	for (int i=0; i < objs.length; i++)
+	{
+		if (objs[i] instanceof TemplateEPICSLink)
+		{
+			TemplateEPICSLink tel = (TemplateEPICSLink)objs[i];
+			tel.destroyAndRemove();
+		}
+		else
+			((VisibleObject)objs[i]).destroy();
+	}
+}
+
+
 
 
 }

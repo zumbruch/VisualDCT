@@ -47,4 +47,12 @@ public interface TemplateEPICSLink {
  */
 public void updateTemplateLink();
 
+
+/**
+ * Insert the method's description here.
+ * Creation date: (30.1.2001 16:58:58)
+ * @return boolean
+ */
+public void destroyAndRemove();
+
 }
