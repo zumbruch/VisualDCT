@@ -1812,11 +1812,6 @@ public void exportPostScriptFileMenuItem_ActionPerformed()
 		
 			printerJob.setPageable(pi.getPageable());
 
-			ViewState view = ViewState.getInstance();
-			int rx = view.getRx();
-			int ry = view.getRy();
-			double scale = view.getScale();
-
 			boolean showGrid = Settings.getInstance().getShowGrid();
 
 			try
@@ -1880,140 +1875,9 @@ public void exportPostScriptFileMenuItem_ActionPerformed()
 				printerJob.print();
 
 				Settings.getInstance().setShowGrid(showGrid);
-
-				pageFormat = pi.getPageable().getPageFormat(0);
-
-				int pageWidth = (int)pageFormat.getImageableWidth();
-				int pageHeight = (int)pageFormat.getImageableHeight();
-	
-				double screen2printer = 0;
-
-				NullCommand pm =
-					(NullCommand)CommandManager.getInstance().getCommand("NullCommand");
-				Component component = pm.getComponent();
-			
-				switch(Page.getPrintMode())
-				{
-					case Page.TRUE_SCALE:
-						// 1:1 ratio
-						screen2printer =
-							72.0 / component.getToolkit().getScreenResolution();
-						break;
-					case Page.USER_SCALE:
-						screen2printer =
-							72.0 / component.getToolkit().getScreenResolution();
-						screen2printer *= Page.getUserScale();
-						break;
-			
-					case Page.FIT_SCALE:
-						// fit to paper
-						double xscale = pageWidth / (double)view.getViewWidth();
-						double yscale = pageHeight / (double)view.getViewHeight();
-						screen2printer = Math.min(xscale, yscale) * view.getScale();
-						break;
-				}
-	
-				double converter = screen2printer / view.getScale();
-				int w = (int)(view.getViewWidth() * converter);
-				int h = (int)(view.getViewHeight() * converter);
-
-				int nCol = Math.max((int)Math.ceil((double)w / pageWidth), 1);
-				int nRow = Math.max((int)Math.ceil((double)h / pageHeight), 1);
-				int maxNumPage = nCol * nRow;
-
-				String numberOfPages = String.valueOf(maxNumPage);
-
-				StringBuffer stringBuffer = new StringBuffer(byteArrayOutputStream.toString());
-				byteArrayOutputStream = null;
-
-				int stringOffset = stringBuffer.indexOf("%%BeginProlog");
-				stringBuffer.insert(stringOffset, "%%Pages: " + numberOfPages + "\n");
-
-				for(int pageIndex = 0; pageIndex < maxNumPage; pageIndex++)
-				{
-					int iCol = pageIndex % nCol;
-					int iRow = pageIndex / nCol;
-					int x = iCol * pageWidth;
-					int y = iRow * pageHeight;
-
-					int imageWidth = Math.min(pageWidth, w-x);
-					int imageHeight = Math.min(pageHeight, h-y);
-
-					view.setScale(screen2printer);
-	
-					view.setRx((int)(rx*converter+x));
-					view.setRy((int)(ry*converter+y));
-
-					String postScriptGrid = new String();
-	
-					if (Settings.getInstance().getShowGrid())
-					{
-						postScriptGrid += "\n"
-							+ (new Double(Constants.GRID_COLOR.getRed() / 255.0)).toString()
-							+ " " + (new Double(Constants.GRID_COLOR.getGreen()
-							/ 255.0)).toString() + " "
-							+ (new Double(Constants.GRID_COLOR.getBlue() / 255.0)).toString()
-							+ " setrgbcolor\n";
-
-						int gridSize = view.getGridSize();
-						int sx = view.getGridSize() - view.getRx() % gridSize;
-						int y0 = view.getGridSize() - view.getRy() % gridSize;
-						int xsteps = (int)(view.getViewWidth() / gridSize + 1);
-						int ysteps = (int)(view.getViewHeight() / gridSize + 1);
-
-						imageWidth = Math.min(imageWidth, gridSize * xsteps + sx);
-						imageHeight = Math.min(imageHeight, gridSize * ysteps + y0);
-
-						if(gridSize >= 15)
-							postScriptGrid += "/gridshape {posX posY moveto -1 -1 rmoveto "
-								+ "2 2 rlineto 0 -2 rmoveto -2 2 rlineto stroke} def\n";
-						else
-							postScriptGrid += "/gridshape {newpath posX posY moveto "
-								+ "-0.5 -0.5 rmoveto 1 0 rlineto 0 1 rlineto -1 0 rlineto "
-								+ "0 -1 rlineto closepath fill} def\n";
-
-						postScriptGrid += "/posX " + (new Integer(sx)).toString() + " def\n"
-							+ "/posY " + (new Integer(y0)).toString() + " def\n"
-							+ "{\n{\ngridshape\n"
-						
-							+ "/posX posX " + (new Integer(gridSize)).toString() + " add def\n"
-						
-							+ "posX " + (new Integer(imageWidth)).toString()
-							+ " ge {exit} if\n"
-						
-							+ "} loop\n"
-							+ "/posX " + (new Integer(sx)).toString() + " def\n"
-						
-							+ "/posY posY " + (new Integer(gridSize)).toString() + " add def\n"
-						
-							+ "posY " + (new Integer(imageHeight)).toString()
-							+ " ge {exit} if\n} loop\n";
-					}
-
-					stringOffset = stringBuffer.indexOf("%%Page:", stringOffset);
-					int selectionStart = stringBuffer.indexOf("concat", stringOffset) + 6;
-
-					int selectionEnd = stringBuffer.indexOf("gsave", selectionStart);
-					stringOffset = selectionEnd;
-					stringBuffer.insert(stringOffset, "\n");
-
-					String startingColour = stringBuffer.substring(selectionStart,
-						selectionEnd);
-					stringBuffer.delete(selectionStart, selectionEnd);
-					
-					stringOffset = stringBuffer.indexOf("concat", stringOffset) + 6;
-
-					if((startingColour.indexOf("setgray") == -1)
-						&& (startingColour.indexOf("setrgbcolor") == -1))
-					{
-						startingColour = "0.0 setgray\n";	
-					}
-
-					stringBuffer.insert(stringOffset, postScriptGrid + startingColour);
-				}
-
+				
 				fileOutputStream = new FileOutputStream(outputFile);
-				fileOutputStream.write(stringBuffer.toString().getBytes());
+				fileOutputStream.write(printGrid(pi.getPageable().getPageFormat(0), new StringBuffer(byteArrayOutputStream.toString())));
 				fileOutputStream.close();
 			}
 			catch(Exception exception)
@@ -2023,10 +1887,6 @@ public void exportPostScriptFileMenuItem_ActionPerformed()
 			}
 			finally
 			{
-				view.setScale(scale);
-				view.setRx(rx);
-				view.setRy(ry);
-
 				setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
 				Settings.getInstance().setShowGrid(showGrid);
 		
@@ -6202,6 +6062,167 @@ public void preferences___MenuItem_ActionPerformed() {
 	sd.setLocationRelativeTo(this);
 	sd.setVisible(true);
 }
+
+public byte[] printGrid(PageFormat pageFormat, StringBuffer stringBuffer) {
+	ViewState view = ViewState.getInstance();
+	int rx = view.getRx();
+	int ry = view.getRy();
+	double scale = view.getScale();
+	int viewWidth = view.getViewWidth();
+	int viewHeight = view.getViewHeight();
+	
+	try {					
+		int pageWidth = (int)pageFormat.getImageableWidth();
+		int pageHeight = (int)pageFormat.getImageableHeight();
+		
+		NullCommand pm =
+			(NullCommand)CommandManager.getInstance().getCommand("NullCommand");
+		Component component = pm.getComponent();
+	
+		double screen2printer = 0;
+	
+		switch(Page.getPrintMode())
+		{
+			case Page.TRUE_SCALE:
+				// 1:1 ratio
+				screen2printer =
+					72.0 / component.getToolkit().getScreenResolution();
+				break;
+			case Page.USER_SCALE:
+				screen2printer =
+					72.0 / component.getToolkit().getScreenResolution();
+				screen2printer *= Page.getUserScale();
+				break;
+				
+			case Page.FIT_SCALE:
+				// fit to paper
+				double xscale = pageWidth / (double)view.getViewWidth();
+				double yscale = pageHeight / (double)view.getViewHeight();
+				screen2printer = Math.min(xscale, yscale) * view.getScale();
+				break;
+		}
+		
+		double converter = screen2printer / view.getScale();
+		int w = (int)(view.getViewWidth() * converter);
+		int h = (int)(view.getViewHeight() * converter);
+	
+		int nCol = Math.max((int)Math.ceil((double)w / pageWidth), 1);
+		int nRow = Math.max((int)Math.ceil((double)h / pageHeight), 1);
+		int maxNumPage = nCol * nRow;
+	
+		String numberOfPages = String.valueOf(maxNumPage);
+		
+		
+		int stringOffset = stringBuffer.indexOf("%%BeginProlog");
+		stringBuffer.insert(stringOffset, "%%Pages: " + numberOfPages + "\n");
+		
+		for(int pageIndex = 0; pageIndex < maxNumPage; pageIndex++)
+		{
+			int iCol = pageIndex % nCol;
+			int iRow = pageIndex / nCol;
+			int x = iCol * pageWidth;
+			int y = iRow * pageHeight;
+	
+			int imageWidth = Math.min(pageWidth, w-x);
+			int imageHeight = Math.min(pageHeight, h-y);
+	
+			System.out.println("2screen2printer "+screen2printer);
+			//view.setScale(screen2printer);
+			
+			view.setScale(1.0);
+			view.setRx((int)(rx/scale+x));
+			view.setRy((int)(ry/scale+y));
+			view.setViewWidth((int)(imageWidth/screen2printer));
+			view.setViewHeight((int)(imageHeight/screen2printer));
+			
+			/*view.setRx((int)(rx*converter+x));
+			view.setRy((int)(ry*converter+y));*/
+			
+	
+			String postScriptGrid = new String();
+		
+			if (Settings.getInstance().getShowGrid())
+			{
+				postScriptGrid += "\n"
+					+ (new Double(Constants.GRID_COLOR.getRed() / 255.0)).toString()
+					+ " " + (new Double(Constants.GRID_COLOR.getGreen()
+					/ 255.0)).toString() + " "
+					+ (new Double(Constants.GRID_COLOR.getBlue() / 255.0)).toString()
+					+ " setrgbcolor\n";
+	
+				int gridSize = view.getGridSize();
+				int sx = view.getGridSize() - view.getRx() % gridSize;
+				int y0 = view.getGridSize() - view.getRy() % gridSize;
+				int xsteps = (int)(view.getViewWidth() / gridSize + 1);
+				int ysteps = (int)(view.getViewHeight() / gridSize + 1);
+	
+				
+				imageWidth = Math.min(view.getViewWidth(), gridSize * xsteps + sx);
+				imageHeight = Math.min(view.getViewHeight(), gridSize * ysteps + y0);
+	
+				System.out.println(sx+" "+y0+" "+xsteps+" "+ysteps+" "+imageWidth+" "+imageHeight);
+	
+				if(gridSize >= 15)
+					postScriptGrid += "/gridshape {posX posY moveto -1 -1 rmoveto "
+						+ "2 2 rlineto 0 -2 rmoveto -2 2 rlineto stroke} def\n";
+				else
+					postScriptGrid += "/gridshape {newpath posX posY moveto "
+						+ "-0.5 -0.5 rmoveto 1 0 rlineto 0 1 rlineto -1 0 rlineto "
+						+ "0 -1 rlineto closepath fill} def\n";
+	
+				postScriptGrid += "/posX " + String.valueOf(sx) + " def\n"
+					+ "/posY " + String.valueOf(y0) + " def\n"
+					+ "{\n{\ngridshape\n"
+							
+					+ "/posX posX " + String.valueOf(gridSize) + " add def\n"
+							
+					+ "posX " + String.valueOf(imageWidth)
+					+ " ge {exit} if\n"
+							
+					+ "} loop\n"
+					+ "/posX " + String.valueOf(sx) + " def\n"
+							
+					+ "/posY posY " + String.valueOf(gridSize) + " add def\n"
+							
+					+ "posY " + String.valueOf(imageHeight)
+					+ " ge {exit} if\n} loop\n";
+			}
+	
+			stringOffset = stringBuffer.indexOf("%%Page: "+(pageIndex+1), stringOffset);		
+			if (stringOffset == -1) continue;
+			
+			int selectionStart = stringBuffer.indexOf("concat", stringOffset) + 6;
+	
+			int selectionEnd = stringBuffer.indexOf("gsave", selectionStart);
+			stringOffset = selectionEnd;
+			stringBuffer.insert(stringOffset, "\n");
+	
+			String startingColour = stringBuffer.substring(selectionStart,
+				selectionEnd);
+			//stringBuffer.delete(selectionStart, selectionEnd);
+						
+			stringOffset = stringBuffer.indexOf("concat", stringOffset) + 6;
+	
+			if((startingColour.indexOf("setgray") == -1)
+				&& (startingColour.indexOf("setrgbcolor") == -1))
+			{
+				startingColour = "0.0 setgray\n";	
+			}
+	
+			stringBuffer.insert(stringOffset, postScriptGrid + startingColour);
+		}
+			
+	} finally {
+		view.setScale(scale);
+		view.setRx(rx);
+		view.setRy(ry);
+		view.setViewWidth(viewWidth);
+		view.setViewHeight(viewHeight);
+	}
+	
+	return stringBuffer.toString().getBytes();
+}
+
 /**
  * Comment
  */
@@ -6216,10 +6237,6 @@ public void printAsPostScriptMenuItem_ActionPerformed()
 	{
 		public void run()
 		{
-			ViewState view = ViewState.getInstance();
-			int rx = view.getRx();
-			int ry = view.getRy();
-			double scale = view.getScale();
 			boolean showGrid = Settings.getInstance().getShowGrid();
 
 			try
@@ -6303,140 +6320,13 @@ public void printAsPostScriptMenuItem_ActionPerformed()
 					return;
 			    }
 
-				PageFormat pageFormat = pi.getPageable().getPageFormat(0);
+//				print grid
+				ByteArrayInputStream byteArrayInputStream =
+						new ByteArrayInputStream(
+							printGrid(pi.getPageable().getPageFormat(0), new StringBuffer(byteArrayOutputStream.toString())));
 
-				int pageWidth = (int)pageFormat.getImageableWidth();
-				int pageHeight = (int)pageFormat.getImageableHeight();
-	
-				double screen2printer = 0;
-
-				NullCommand pm =
-					(NullCommand)CommandManager.getInstance().getCommand("NullCommand");
-				Component component = pm.getComponent();
-			
-				switch(Page.getPrintMode())
-				{
-					case Page.TRUE_SCALE:
-						// 1:1 ratio
-						screen2printer =
-							72.0 / component.getToolkit().getScreenResolution();
-						break;
-					case Page.USER_SCALE:
-						screen2printer =
-							72.0 / component.getToolkit().getScreenResolution();
-						screen2printer *= Page.getUserScale();
-						break;
-			
-					case Page.FIT_SCALE:
-						// fit to paper
-						double xscale = pageWidth / (double)view.getViewWidth();
-						double yscale = pageHeight / (double)view.getViewHeight();
-						screen2printer = Math.min(xscale, yscale) * view.getScale();
-						break;
-				}
-	
-				double converter = screen2printer / view.getScale();
-				int w = (int)(view.getViewWidth() * converter);
-				int h = (int)(view.getViewHeight() * converter);
-
-				int nCol = Math.max((int)Math.ceil((double)w / pageWidth), 1);
-				int nRow = Math.max((int)Math.ceil((double)h / pageHeight), 1);
-				int maxNumPage = nCol * nRow;
-
-				String numberOfPages = String.valueOf(maxNumPage);
-
-				StringBuffer stringBuffer = new StringBuffer(byteArrayOutputStream.toString());
 				byteArrayOutputStream = null;
 
-				int stringOffset = stringBuffer.indexOf("%%BeginProlog");
-				stringBuffer.insert(stringOffset, "%%Pages: " + numberOfPages + "\n");
-
-				for(int pageIndex = 0; pageIndex < maxNumPage; pageIndex++)
-				{
-					int iCol = pageIndex % nCol;
-					int iRow = pageIndex / nCol;
-					int x = iCol * pageWidth;
-					int y = iRow * pageHeight;
-
-					int imageWidth = Math.min(pageWidth, w-x);
-					int imageHeight = Math.min(pageHeight, h-y);
-
-					view.setScale(screen2printer);
-	
-					view.setRx((int)(rx*converter+x));
-					view.setRy((int)(ry*converter+y));
-
-					String postScriptGrid = new String();
-	
-					if (Settings.getInstance().getShowGrid())
-					{
-						postScriptGrid += "\n"
-							+ (new Double(Constants.GRID_COLOR.getRed() / 255.0)).toString()
-							+ " " + (new Double(Constants.GRID_COLOR.getGreen()
-							/ 255.0)).toString() + " "
-							+ (new Double(Constants.GRID_COLOR.getBlue() / 255.0)).toString()
-							+ " setrgbcolor\n";
-
-						int gridSize = view.getGridSize();
-						int sx = view.getGridSize() - view.getRx() % gridSize;
-						int y0 = view.getGridSize() - view.getRy() % gridSize;
-						int xsteps = (int)(view.getViewWidth() / gridSize + 1);
-						int ysteps = (int)(view.getViewHeight() / gridSize + 1);
-
-						imageWidth = Math.min(imageWidth, gridSize * xsteps + sx);
-						imageHeight = Math.min(imageHeight, gridSize * ysteps + y0);
-
-						if(gridSize >= 15)
-							postScriptGrid += "/gridshape {posX posY moveto -1 -1 rmoveto "
-								+ "2 2 rlineto 0 -2 rmoveto -2 2 rlineto stroke} def\n";
-						else
-							postScriptGrid += "/gridshape {newpath posX posY moveto "
-								+ "-0.5 -0.5 rmoveto 1 0 rlineto 0 1 rlineto -1 0 rlineto "
-								+ "0 -1 rlineto closepath fill} def\n";
-
-						postScriptGrid += "/posX " + String.valueOf(sx) + " def\n"
-							+ "/posY " + String.valueOf(y0) + " def\n"
-							+ "{\n{\ngridshape\n"
-						
-							+ "/posX posX " + String.valueOf(gridSize) + " add def\n"
-						
-							+ "posX " + String.valueOf(imageWidth)
-							+ " ge {exit} if\n"
-						
-							+ "} loop\n"
-							+ "/posX " + String.valueOf(sx) + " def\n"
-						
-							+ "/posY posY " + String.valueOf(gridSize) + " add def\n"
-						
-							+ "posY " + String.valueOf(imageHeight)
-							+ " ge {exit} if\n} loop\n";
-					}
-
-					stringOffset = stringBuffer.indexOf("%%Page:", stringOffset);
-					int selectionStart = stringBuffer.indexOf("concat", stringOffset) + 6;
-
-					int selectionEnd = stringBuffer.indexOf("gsave", selectionStart);
-					stringOffset = selectionEnd;
-					stringBuffer.insert(stringOffset, "\n");
-
-					String startingColour = stringBuffer.substring(selectionStart,
-						selectionEnd);
-					stringBuffer.delete(selectionStart, selectionEnd);
-					
-					stringOffset = stringBuffer.indexOf("concat", stringOffset) + 6;
-
-					if((startingColour.indexOf("setgray") == -1)
-						&& (startingColour.indexOf("setrgbcolor") == -1))
-					{
-						startingColour = "0.0 setgray\n";	
-					}
-
-					stringBuffer.insert(stringOffset, postScriptGrid + startingColour);
-				}
-
-				ByteArrayInputStream byteArrayInputStream =
-					new ByteArrayInputStream(stringBuffer.toString().getBytes());
-				stringBuffer = null;
 
 				DocPrintJob docPrintJob = printerJob.getPrintService().createPrintJob();
 
@@ -6455,10 +6345,6 @@ public void printAsPostScriptMenuItem_ActionPerformed()
 			}
 			finally
 			{
-				view.setScale(scale);
-				view.setRx(rx);
-				view.setRy(ry);
-
 				setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
 				Settings.getInstance().setShowGrid(showGrid);
 

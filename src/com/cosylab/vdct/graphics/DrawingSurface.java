@@ -2216,17 +2216,20 @@ public int print(java.awt.Graphics graphics, java.awt.print.PageFormat pageForma
 	
 	ViewState view = ViewState.getInstance();
 
-	
+	double printScale = 1.0;
+		
 	double screen2printer = 0;
 	switch (Page.getPrintMode()) {
 		case Page.TRUE_SCALE:
 			// 1:1 ratio
 			screen2printer = 72.0/getWorkspacePanel().getToolkit().getScreenResolution();
+			printScale = 1.0;
 			break;
 			
 		case Page.USER_SCALE:
 			screen2printer = 72.0/getWorkspacePanel().getToolkit().getScreenResolution();
 			screen2printer *= Page.getUserScale();
+			printScale = Page.getUserScale();
 			break;
 			
 		case Page.FIT_SCALE:
@@ -2234,6 +2237,8 @@ public int print(java.awt.Graphics graphics, java.awt.print.PageFormat pageForma
 			double xscale = pageWidth/(double)view.getViewWidth();
 			double yscale = pageHeight/(double)view.getViewHeight();
 			screen2printer = Math.min(xscale, yscale)*view.getScale();
+			
+			printScale = screen2printer / 72.0 * getWorkspacePanel().getToolkit().getScreenResolution();
 			break;
 	}
 	
@@ -2280,7 +2285,8 @@ public int print(java.awt.Graphics graphics, java.awt.print.PageFormat pageForma
 	try
 	{
 		((Graphics2D)graphics).scale(screen2printer, screen2printer);
-		
+		System.out.println("1screen2printer "+screen2printer);
+				
 		view.setScale(1.0);
 		view.setRx((int)(rx/scale+x));
 		view.setRy((int)(ry/scale+y));
@@ -2304,6 +2310,8 @@ public int print(java.awt.Graphics graphics, java.awt.print.PageFormat pageForma
 			int y0 = view.getGridSize() - view.getRy() % gridSize;
 			int xsteps = view.getViewWidth() / gridSize + 1;
 			int ysteps = view.getViewHeight() / gridSize + 1;
+	
+			System.out.println(sx+" "+y0+" "+xsteps+" "+ysteps+" "+imageWidth+" "+imageHeight);
 	
 			if (gridSize >= 15)
 			// crosses
@@ -2345,7 +2353,7 @@ public int print(java.awt.Graphics graphics, java.awt.print.PageFormat pageForma
 				view.setViewWidth(viewWidth);
 				view.setViewHeight(viewHeight);
 			}
-			printLegend(graphics, pageWidth, pageHeight, pageIndex+1, maxNumPage);
+			printLegend(graphics, pageWidth, pageHeight, pageIndex+1, maxNumPage, printScale);
 		}
 	
 	}
@@ -2356,6 +2364,10 @@ public int print(java.awt.Graphics graphics, java.awt.print.PageFormat pageForma
 	}
 	finally
 	{
+//		resets clipping
+		((Graphics2D)graphics).setTransform(transf);
+		graphics.setClip(null);
+		
 		view.setScale(scale);
 		view.setRx(rx); view.setRy(ry);
 		view.setViewWidth(viewWidth); view.setViewHeight(viewHeight);
@@ -2376,7 +2388,7 @@ public int print(java.awt.Graphics graphics, java.awt.print.PageFormat pageForma
 /**
  * @param graphics
  */
-private void printLegend(Graphics graphics, int width, int height, int page, int pagenum) {
+private void printLegend(Graphics graphics, int width, int height, int page, int pagenum, double scale) {
 	Settings s = Settings.getInstance();
 	
 	//prepare
@@ -2393,12 +2405,18 @@ private void printLegend(Graphics graphics, int width, int height, int page, int
 	{
 	}
 	int logoWidth = img.getWidth(null), logoHeight = img.getHeight(null)+8;
+	int maxLogo =Math.max(logoWidth,logoHeight);
+	if (maxLogo > 200) {	 
+		logoHeight = logoHeight * 200 / maxLogo; 
+		logoWidth = logoWidth * 200 / maxLogo; 
+	}
+	
 	
 	String label = "";
 	if (VisualDCT.getInstance().getOpenedFile()!=null)
 		label = VisualDCT.getInstance().getOpenedFile().getName()+", ";
 	label+=DateFormat.getDateInstance(DateFormat.SHORT).format(new Date())+", "
-			+(int)(ViewState.getInstance().getScale()*1000+0.5)/10.0+"% scale";
+			+(int)(scale*1000+0.5)/10.0+"% scale";
 	if (s.getLegendVisibility()==1) label+=", "+pagenum+" pages";
 	if (s.getLegendVisibility()==2) label+=", Page "+page+" of "+pagenum;
 			
@@ -2483,12 +2501,9 @@ private void printLegend(Graphics graphics, int width, int height, int page, int
 	graphics.setClip(null);
 	((Graphics2D)graphics).setTransform(transf);
 	
-	if (img!=null)
-		try {
-			graphics.drawImage(img, logoX, logoY, null);
-		} catch (NullPointerException e) {
-			// WORKAROUND when exporting to PS null pointer is thrown here
-		}
+	if (img!=null) {
+		graphics.drawImage(img, logoX, logoY, logoWidth, logoHeight, null);
+	}
 	
 	graphics.setColor(Constants.FRAME_COLOR);
 	graphics.setFont(font);
