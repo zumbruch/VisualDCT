@@ -31,10 +31,13 @@ package com.cosylab.vdct.graphics.objects;
 import java.awt.*;
 import java.util.*;
 import com.cosylab.vdct.Constants;
+import com.cosylab.vdct.DataProvider;
 import com.cosylab.vdct.graphics.*;
 import com.cosylab.vdct.util.StringUtils;
 import com.cosylab.vdct.vdb.*;
 import com.cosylab.vdct.dbd.DBDConstants;
+import com.cosylab.vdct.dbd.DBDFieldData;
+import com.cosylab.vdct.dbd.DBDRecordData;
 
 import com.cosylab.vdct.inspector.*;
 
@@ -681,15 +684,28 @@ public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode) 
 		else
 			all.addElement(getDBDSeparator());
 	
-		Enumeration e = recordData.getFieldsV().elements();
-		while (e.hasMoreElements()) {
-			field = (VDBFieldData)e.nextElement();
-			if (/*(field.getDbdData().getField_type() != com.cosylab.vdct.dbd.DBDConstants.DBF_NOACCESS) &&*/
-				(field.getGUI_type()!=DBDConstants.GUI_UNDEFINED))
-					all.addElement(field);
+		if (mode==DBD_ORDER)
+		{
+			DBDFieldData dbdField;
+		 	Enumeration e = ((DBDRecordData)DataProvider.getInstance().getDbdDB().getDBDRecordData(recordData.getType())).getFieldsV().elements();
+			while (e.hasMoreElements()) {
+				dbdField = (DBDFieldData)e.nextElement();
+				field = (VDBFieldData)recordData.getField(dbdField.getName());
+				if (/*(field.getDbdData().getField_type() != com.cosylab.vdct.dbd.DBDConstants.DBF_NOACCESS) &&*/
+					(field.getGUI_type()!=DBDConstants.GUI_UNDEFINED))
+						all.addElement(field);
 			}
-	
-			
+		}
+		else
+		{
+			Enumeration e = recordData.getFieldsV().elements();
+			while (e.hasMoreElements()) {
+				field = (VDBFieldData)e.nextElement();
+				if (/*(field.getDbdData().getField_type() != com.cosylab.vdct.dbd.DBDConstants.DBF_NOACCESS) &&*/
+					(field.getGUI_type()!=DBDConstants.GUI_UNDEFINED))
+						all.addElement(field);
+				}
+		}				
 		InspectableProperty[] properties = new InspectableProperty[all.size()];
 		all.copyInto(properties);
 	

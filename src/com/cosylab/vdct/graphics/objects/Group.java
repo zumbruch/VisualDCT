@@ -1154,9 +1154,9 @@ private static void writeTemplateIncludes(Vector elements, java.io.DataOutputStr
 	 	}
 	 }
 	 
+	 file.writeBytes("\n");
 	 if (templateFiles.size()>0)
 	 {
-		 file.writeBytes("\n");
 		 et = templateFiles.elements();
 		 while (et.hasMoreElements()) 
 		 {

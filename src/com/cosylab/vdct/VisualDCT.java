@@ -2789,7 +2789,7 @@ private javax.swing.JMenuItem getImport_DBMenuItem() {
 		try {
 			ivjImport_DBMenuItem = new javax.swing.JMenuItem();
 			ivjImport_DBMenuItem.setName("Import_DBMenuItem");
-			ivjImport_DBMenuItem.setText("Import DB");
+			ivjImport_DBMenuItem.setText("Import...");
 			// user code begin {1}
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
@@ -4260,6 +4260,8 @@ private javax.swing.JLabel getStatusMsg1() {
 			ivjStatusMsg1.setBorder(new javax.swing.border.EtchedBorder());
 			ivjStatusMsg1.setText("StatusMsg1    ");
 			// user code begin {1}
+			//Font font = ivjStatusMsg1.getFont();
+			//ivjStatusMsg1.setFont(font.deriveFont(Font.PLAIN));
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
 			// user code begin {2}
@@ -4971,7 +4973,7 @@ public void import_DBDMenuItem_ActionPerformed() {
 public void import_DBMenuItem_ActionPerformed() {
 	JFileChooser chooser = getfileChooser();
 	UniversalFileFilter filter = new UniversalFileFilter(
-		new String("db"), "DB File");
+		new String[] {"db", "template"}, "EPICS DB files");
 	chooser.resetChoosableFileFilters();
 	chooser.addChoosableFileFilter(filter);
 	chooser.setDialogTitle("Import DB");
@@ -5479,7 +5481,7 @@ public void openMenuItem_ActionPerformed() {
 	
 	JFileChooser chooser = getfileChooser();
 	UniversalFileFilter filter = new UniversalFileFilter(
-		new String[] {"db", "template"}, "EPICS DB File");
+		new String[] {"db", "template"}, "EPICS DB files");
 	chooser.resetChoosableFileFilters();
 	chooser.addChoosableFileFilter(filter);
 	chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);

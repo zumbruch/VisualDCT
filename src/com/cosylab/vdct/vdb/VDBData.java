@@ -319,6 +319,13 @@ public static void extractTemplates(DBDData dbd, DBData db, VDBData vdb)
 	e = db.getTemplates().elements();
 	while (e.hasMoreElements()) {
 		dbTemplate = (DBTemplate)(e.nextElement());
+
+		if (vdb.getTemplates().containsKey(dbTemplate.getId()))
+		{
+			VDBTemplate t = (VDBTemplate)vdb.getTemplates().get(dbTemplate.getId());
+			Console.getInstance().println("Template with id '"+dbTemplate.getId()+"' ('"+t.getFileName()+"') already exists in repository. Skipping template from file '"+dbTemplate.getFileName()+"'...");
+			continue;
+		}
 		
 		VDBTemplate vt = new VDBTemplate(dbTemplate.getId(), dbTemplate.getFileName());
 		vt.setDescription(dbTemplate.getDescription());
@@ -495,13 +502,14 @@ public static VDBRecordData generateVDBRecordData(DBDData dbd, DBRecordData dbRe
 	}
 
 	VDBRecordData vdbRecord = new VDBRecordData();
-	//DBFieldData dbField;
+	DBFieldData dbField;
 	DBDFieldData dbdField;
 
 	vdbRecord.setType(dbRecord.getRecord_type());
 	vdbRecord.setName(dbRecord.getName());
 	vdbRecord.setComment(dbRecord.getComment());
-/*	
+
+	// order preservation
 	Enumeration e = dbRecord.getFieldsV().elements();
 	while (e.hasMoreElements()) {
 		dbField = (DBFieldData)(e.nextElement());
@@ -515,14 +523,14 @@ public static VDBRecordData generateVDBRecordData(DBDData dbd, DBRecordData dbRe
 		if (!vdbRecord.getFields().containsKey(dbdField.getName()))
 			vdbRecord.addField(generateVDBFieldData(dbd, dbRecord, vdbRecord, dbdField));
 	}
-*/
 
-	Enumeration e = dbdRecord.getFieldsV().elements();
+/*  //DBD order
+ 	Enumeration e = dbdRecord.getFieldsV().elements();
 	while (e.hasMoreElements()) {
 		dbdField = (DBDFieldData)(e.nextElement());
 		vdbRecord.addField(generateVDBFieldData(dbd, dbRecord, vdbRecord, dbdField));
 	}
-
+*/
 	//vdbRecord.updateDTYP(dbd);
 
 	return vdbRecord;

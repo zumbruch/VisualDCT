@@ -498,7 +498,17 @@ public static DBDData resolveDBD(DBDData data, String fileName) {
 	if (data==null) data = new DBDData();
 
 	StreamTokenizer tokenizer = getStreamTokenizer(fileName);
-	if (tokenizer!=null) processDBD(data, tokenizer, fileName);
+	if (tokenizer!=null) 
+	{
+		try
+		{
+			processDBD(data, tokenizer, fileName);
+		}
+		finally
+		{
+			System.gc();
+		}
+	}
 	else return null;
 	
 	return data;
@@ -525,7 +535,17 @@ public static DBDData resolveDBDasURL(DBDData data, java.net.URL url) {
 		return null;
 	}
 
-	if (tokenizer!=null) processDBD(data, tokenizer, url.toString());
+	if (tokenizer!=null)
+	{
+		try
+		{
+			processDBD(data, tokenizer, url.toString());
+		}
+		finally
+		{
+			System.gc();
+		}
+	}
 	else return null;
 	
 	return data;

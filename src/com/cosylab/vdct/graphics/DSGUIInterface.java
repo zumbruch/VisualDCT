@@ -468,10 +468,6 @@ public void newCmd() {
 	SetWorkspaceFile cmd = (SetWorkspaceFile)CommandManager.getInstance().getCommand("SetFile");
 	cmd.setFile(null);
 	cmd.execute();
-	
-	SetWorkspaceGroup cmd2 = (SetWorkspaceGroup)CommandManager.getInstance().getCommand("SetGroup");
-	cmd2.setGroup(null);
-	cmd2.execute();
 }
 /**
  * Insert the method's description here.
@@ -640,7 +636,8 @@ public void saveAsGroup(java.io.File file) throws IOException {
  */
 public void saveAsTemplate(File file) throws IOException
 {
- 
+	
+ VDBTemplate data = null; 
  Stack stack = drawingSurface.getTemplateStack();
  if (stack.isEmpty())
  {
@@ -657,22 +654,16 @@ public void saveAsTemplate(File file) throws IOException
 		id = StringUtils.incrementName(id, null);
 		
  	// create a new
-	VDBTemplate data = new VDBTemplate(id, file.getAbsolutePath());
+	data = new VDBTemplate(id, file.getAbsolutePath());
 	data.setDescription(data.getId());
 	data.setInputs(new Hashtable());
 	data.setInputComments(new Hashtable());
 	data.setOutputs(new Hashtable());
 	data.setOutputComments(new Hashtable());
+	data.setGroup(Group.getRoot());
  	stack.push(data);
  	
  	Group.setEditingTemplateData(data);
-
- 	// add to list of loaded templates
- 	// what abouts its group
- 	//VDBData.getTemplates().put(data.getId(), data);
- 	
- 	//!!!
- 	//VisualDCT.getInstance().updateLoadLabel();
  }
 
  Group.saveAsTemplate(Group.getRoot(), file);
@@ -681,6 +672,15 @@ public void saveAsTemplate(File file) throws IOException
 
  // show user template mode 
  drawingSurface.updateWorkspaceGroup();
+
+ // new
+ if (data!=null)
+ {
+ 	// add to list of loaded templates
+ 	VDBData.getTemplates().put(data.getId(), data);
+ 	
+ 	VisualDCT.getInstance().updateLoadLabel();
+ }
 
  SetWorkspaceFile cmd = (SetWorkspaceFile)CommandManager.getInstance().getCommand("SetFile");
  cmd.setFile(file.getCanonicalPath());

@@ -990,7 +990,17 @@ public static DBData resolveDB(String fileName) {
 	DBData data = new DBData();
 
 	StreamTokenizer tokenizer = getStreamTokenizer(fileName);
-	if (tokenizer!=null) processDB(data, tokenizer, fileName);
+	if (tokenizer!=null) 
+	{
+		try
+		{
+			processDB(data, tokenizer, fileName);
+		}
+		finally
+		{
+			System.gc();
+		}
+	}
 	else return null;
 	
 	return data;
@@ -1017,7 +1027,18 @@ public static DBData resolveDBasURL(java.net.URL url) {
 		return null;
 	}
 
-	if (tokenizer!=null) processDB(data, tokenizer, url.toString());
+	if (tokenizer!=null) 
+	{
+		try
+		{
+			processDB(data, tokenizer, url.toString());
+		}
+		finally
+		{
+			System.gc();
+		}
+	}
+	
 	else return null;
 	
 	return data;

@@ -557,12 +557,15 @@ public void initializeWorkspace() {
 	
 	UndoManager.getInstance().reset();
 
+	InspectorManager.getInstance().disposeAllInspectors();
+
 	// !!! call all destory() in objects?!
 	if (Group.getRoot()!=null)
 		Group.getRoot().getLookupTable().clear();
 
 	viewStack.clear();
 	templateStack.clear();
+	Group.setEditingTemplateData(null);
 
 	setModified(false);
 	Group group = new Group(null);
@@ -572,7 +575,6 @@ public void initializeWorkspace() {
 	moveToGroup(group);
 	
 	//Console.getInstance().flush();
-	InspectorManager.getInstance().disposeAllInspectors();
 
 	
 	UndoManager.getInstance().setMonitor(true);
@@ -1291,7 +1293,7 @@ public void moveLevelUp() {
 	if (viewGroup.getParent()!=null) {
 		moveToGroup((Group)viewGroup.getParent());
 	}
-	else if (viewStack.size()>0)
+	else if (!viewStack.isEmpty())
 	{
 		ascendFromTemplate();	
 	}
@@ -1426,19 +1428,59 @@ public boolean open(File file, boolean importDB) throws IOException {
 
 		if (!importDB)
 		{
+			// if template file start editing template
+			if (dbData.getRecords().isEmpty() &&
+				dbData.getGroups().isEmpty() &&
+				dbData.getTemplateInstances().isEmpty() &&
+				!dbData.getTemplates().isEmpty())
+			{
+				// find 'first' template defined in this file (not via includes)
+				VDBTemplate template = null;
+				Enumeration te = dbData.getTemplates().keys();
+				while (te.hasMoreElements())
+				{
+					template = (VDBTemplate)VDBData.getTemplates().get(te.nextElement());
+					if (template!=null)
+					{
+						if (template.getFileName().equals(file.getAbsolutePath()))
+							break;
+						else
+							template=null;
+					}		
+				}
+				
+				// found
+				if (template!=null)
+				{
+					Group.setRoot(template.getGroup());
+					Group.setEditingTemplateData(template);
+					templateStack.push(template);
+
+					InspectorManager.getInstance().updateObjectLists();
+					moveToGroup(template.getGroup());
+				}
+			}
+
 			setModified(false);
 			viewGroup.unconditionalValidateSubObjects(isFlat());
 		}
 
 		// !!!
 		VisualDCT.getInstance().updateLoadLabel();	
-
+		//updateWorkspaceGroup();
+		
 		//createNavigatorImage();
 		forceRedraw = true;
 		repaint();
 		restoreCursor();
 
 		UndoManager.getInstance().setMonitor(true);
+
+
+		///!!! put somewhere in try=finally block
+		// free db memory	    
+		dbData = null;
+		System.gc();
 
 		return true;
 	} 
@@ -1935,6 +1977,9 @@ private void redraw(Graphics g) {
 	    if (canvasImage==null) return;
 	    canvasSize = new Dimension(width, height);
 	    canvasGraphics = canvasImage.getGraphics();
+
+		// free old image memory	    
+	    System.gc();
 	}
 
 	int origX = 0;
