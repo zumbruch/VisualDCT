@@ -43,7 +43,7 @@ import com.cosylab.vdct.events.*;
  * To change this generated comment edit the template variable "typecomment":
  * Window>Preferences>Java>Templates.
  */
-public class TextBox extends VisibleObject implements Movable, Selectable, Popupable
+public class TextBox extends VisibleObject implements Movable, Selectable, Popupable, Descriptable
 {
 
 class PopupMenuHandler implements ActionListener
@@ -81,6 +81,11 @@ private static final String colorTitleString = "Comment Color";
 private static final String changeTextString = "Change Text...";
 
 private static Color currentColor = Constants.LINE_COLOR;
+private static final String nullString = "";
+private static final String htmlString = "<html>";
+protected String description = nullString;
+protected JLabel label = null;
+
 
 private String getAvailableHashId()
 {
@@ -123,9 +128,30 @@ public TextBox(ContainerObject parent, TextBoxVertex parStartVertex, TextBoxVert
 
 	revalidatePosition();
 	
+	hashId = getAvailableHashId();
+	
+	label = new javax.swing.JLabel() {
+		    public void paint(Graphics g) {
+				Shape clip = g.getClip();
+				g.translate(getX(),getY());
+				g.setClip(0, 0, getWidth(), getHeight());
+				super.paint(g);
+				g.translate(-getX(),-getY());
+				g.setClip(clip);
+		    }
+		};
+
 	setColor(currentColor);
 	
-	hashId = getAvailableHashId();
+	label.setVerticalAlignment(JLabel.TOP);
+	label.setFont(getFont());
+	setDescription(nullString);
+}
+
+public void setColor(java.awt.Color color)
+{
+	super.setColor(color);
+	label.setForeground(getColor());
 }
 
 public void accept(Visitor visitor)
@@ -168,24 +194,8 @@ protected void draw(Graphics g, boolean hilited)
 		g.drawRect(posX + 2, posY + 2, rwidth - 4, rheight - 4);
 		*/
 
-		javax.swing.JLabel l = new javax.swing.JLabel() {
-		    public void paint(Graphics g) {
-				Shape clip = g.getClip();
-				g.translate(getX(),getY());
-				g.setClip(0, 0, getWidth(), getHeight());
-				super.paint(g);
-				g.translate(-getX(),-getY());
-				g.setClip(clip);
-		    }
-		};
-	
-		final String html="<html><font size=+10>VisualDCT rules</font>";	
-		l.setVerticalAlignment(JLabel.TOP);
-		l.setText(html);
-		l.setForeground(getColor());
-	
-		l.setBounds(posX + 2, posY + 2, rwidth - 4, rheight - 4);
-		l.paint(g);
+		label.setBounds(posX + 2, posY + 2, rwidth - 4, rheight - 4);
+		label.paint(g);
 	
 		drawDashedBorder(g, hilited, view, posX, posY, rwidth, rheight);
 		
@@ -336,4 +346,24 @@ protected void validate()
 	setRheight((int)(getHeight() * rscale));
 }
 	
+	/**
+	 * @see com.cosylab.vdct.graphics.objects.Descriptable#getDescription()
+	 */
+	public String getDescription()
+	{
+		return description;
+	}
+
+	/**
+	 * @see com.cosylab.vdct.graphics.objects.Descriptable#setDescription(String)
+	 */
+	public void setDescription(String description)
+	{
+		this.description = description;
+		if (!description.startsWith(htmlString))
+			description = htmlString + description;
+
+		label.setText(description);
+	}
+
 }

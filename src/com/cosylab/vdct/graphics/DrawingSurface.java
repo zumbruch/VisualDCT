@@ -36,6 +36,7 @@ import java.awt.print.*;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 import javax.swing.event.*;
@@ -809,15 +810,26 @@ private void createTextBox()
 	
 		TextBox textBox = manager.getManager().createTextBox(startingTextBoxVertex, textBoxVertex);
 		UndoManager.getInstance().addAction(new CreateAction(textBox));
-	
+
+	// temp!!!
+		String reply = JOptionPane.showInputDialog( VisualDCT.getInstance(),
+			                           "Description:",
+			                           "Create textbox...",
+			                           JOptionPane.QUESTION_MESSAGE );
+		if (reply!=null)
+				textBox.setDescription(reply);
+		else
+			textBox.setDescription("This is the default text... I am typing something really something stupid...");
 	}
 	catch (Exception ex)
 	{
+		ex.printStackTrace();
 	}
 	finally
 	{
 		UndoManager.getInstance().stopMacroAction();
 	}
+	
 }
 private void createBox()
 {
