@@ -275,8 +275,10 @@ public void draw(Graphics g) {
 	}
 	
 	// fix offset
-	int prevRX = view.getRx(); int prevRY = view.getRy();
-	view.setRx(prevRX-x0); view.setRy(prevRY-y0);
+/*	int prevRX = view.getRx(); int prevRY = view.getRy();
+	view.setRx(prevRX-x0); view.setRy(prevRY-y0);*/
+	double prevDRX = view.getDrx(); double prevDRY = view.getDry();
+	view.setDrx(prevDRX-x0); view.setDry(prevDRY-y0);
 
 	// draw selected
 	Enumeration selected = view.getSelectedObjects().elements();
@@ -313,7 +315,8 @@ public void draw(Graphics g) {
 	}
 
 	// restore offset
-	view.setRx(prevRX); view.setRy(prevRY);
+	view.setDrx(prevDRX); view.setDry(prevDRY);
+	//view.setRx(prevRX); view.setRy(prevRY);
 
 	if (Settings.getInstance().getNavigator())
 		drawNavigator(g);	
@@ -1648,20 +1651,27 @@ public void setModified(boolean newModified) {
  * @param scale double
  */
 public void setScale(double scale) {
-	/// !!!! try to resive with slider (compare grid & records sizes!!!)
-	
+
 	ViewState view = ViewState.getInstance();
 	double oldscale = view.getScale();
 
-	double dx = view.getViewWidth()*(scale-oldscale)/2.0;
-	double dy = view.getViewHeight()*(scale-oldscale)/2.0;
+	double ds = scale/oldscale;
 
-		/// !!!! to be fixed
-	int rx = Math.max(0, (int)(view.getRx()/oldscale*scale+dx));
-	int ry = Math.max(0, (int)(view.getRy()/oldscale*scale+dy));
-		
-	view.setRx(rx);
-	view.setRy(ry);
+	// find center
+	double drx = view.getDrx() + view.getViewWidth()*oldscale/2.0;
+	double dry = view.getDry() + view.getViewHeight()*oldscale/2.0;
+	
+	// transform into new scale
+	drx *= ds;
+	dry *= ds;
+	
+	// find new origin
+	drx += view.getViewWidth()*(ds-1-scale)/2.0;
+	dry += view.getViewHeight()*(ds-1-scale)/2.0;
+
+	view.setDrx(drx);
+	view.setDry(dry);
+
 	view.setScale(scale);
 
 	recalculateNavigatorPosition();
@@ -1721,12 +1731,11 @@ public void zoomArea(int x1, int y1, int x2, int y2) {
 	x1=Math.min(x1, x2);
 	y1=Math.min(y1, y2);
 	
-	int rx = Math.max(0, (int)((x1+view.getRx())*dfscale-dx));
-	int ry = Math.max(0, (int)((y1+view.getRy())*dfscale-dy));
+	dx = Math.max(0, (x1+view.getRx())*dfscale-dx);
+	dy = Math.max(0, (y1+view.getRy())*dfscale-dy);
 	
-
-	view.setRx(rx);
-	view.setRy(ry);
+	view.setDrx(dx);
+	view.setDry(dy);
 	view.setScale(nscale);
 
 	updateWorkspaceScale();

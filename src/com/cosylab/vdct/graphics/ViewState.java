@@ -45,6 +45,9 @@ public class ViewState {
 	protected static int x0 = 0;				// origin
 	protected static int y0 = 0;
 
+	protected double drx = 0.0;				// precise translation (from origin)
+	protected double dry = 0.0;
+
 	protected int rx = 0;				// translation (from origin)
 	protected int ry = 0;
 
@@ -290,7 +293,7 @@ public boolean isSelected(Object object) {
  * @param dy int
  */
 public boolean moveOrigin(int dx, int dy) {
-	int nrx	= rx+dx;
+	int nrx = rx+dx;
 	int nry = ry+dy;
 
 	if (nrx<0) nrx=0;
@@ -300,6 +303,9 @@ public boolean moveOrigin(int dx, int dy) {
 
 	boolean change = (nrx!=rx) || (nry!=ry);
 	rx=nrx; ry=nry;
+
+	drx = rx;
+	dry = ry;
 
 	return change;
 }
@@ -402,6 +408,7 @@ public static void setInstance(ViewState newInstance) {
  */
 public void setRx(int newRx) {
 	rx = newRx;
+	drx = newRx;
 }
 /**
  * Insert the method's description here.
@@ -410,6 +417,7 @@ public void setRx(int newRx) {
  */
 public void setRy(int newRy) {
 	ry = newRy;
+	dry = newRy;
 }
 /**
  * Insert the method's description here.
@@ -461,4 +469,42 @@ public void setX0(int newX0) {
 public void setY0(int newY0) {
 	y0 = newY0;
 }
+	/**
+	 * Returns the drx.
+	 * @return double
+	 */
+	public double getDrx()
+	{
+		return drx;
+	}
+
+	/**
+	 * Returns the dry.
+	 * @return double
+	 */
+	public double getDry()
+	{
+		return dry;
+	}
+
+	/**
+	 * Sets the drx.
+	 * @param drx The drx to set
+	 */
+	public void setDrx(double drx)
+	{
+		this.drx = drx;
+		this.rx = (int)drx;
+	}
+
+	/**
+	 * Sets the dry.
+	 * @param dry The dry to set
+	 */
+	public void setDry(double dry)
+	{
+		this.dry = dry;
+		this.ry = (int)dry;
+	}
+
 }
