@@ -106,8 +106,13 @@ public static String quoteIfMacro(String str) {
 	boolean needsQuotes = false;
 	int len = str.length();
 
-	for (int i=0; (i<len) && !needsQuotes; i++)
-		if (nonMacroChars.indexOf(str.charAt(i))<0) needsQuotes=true;
+	if (len>0 && Character.isDigit(str.charAt(0)))
+	    // special case for VDCT, parser does not handle "<digit(s)><alpha>" as whole word
+	    needsQuotes = true;
+	else {
+	    for (int i=0; (i<len) && !needsQuotes; i++)
+	        if (nonMacroChars.indexOf(str.charAt(i))<0) needsQuotes=true;
+	}
 			
 	if (needsQuotes) return QUOTE+str+QUOTE;
 	else return str;
