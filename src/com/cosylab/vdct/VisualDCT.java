@@ -6296,7 +6296,6 @@ public void generateMenuItem_ActionPerformed() {
 		try
 		{
 		    cmd.getGUIMenuInterface().export(theFile);
-		    openedFile = theFile;
 		}
 		catch (java.io.IOException e)
 		{

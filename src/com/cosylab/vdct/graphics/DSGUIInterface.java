@@ -685,7 +685,7 @@ public void saveAsTemplate(File file) throws IOException
  * @param file java.io.File
  */
 public void export(java.io.File file) throws IOException {
- Group.save(Group.getRoot(), file, true);
+ Group.save(Group.getRoot(), file, true); 
 }
 /**
  * Insert the method's description here.

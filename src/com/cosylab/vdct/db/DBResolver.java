@@ -166,7 +166,8 @@ public static void initializeTokenizer(StreamTokenizer tokenizer) {
 
 
 
-private static String loadTemplate(DBData data, String templateFile, String referencedFromFile, PathSpecification paths, Stack loadStack) throws Exception
+private static String loadTemplate(DBData data, String templateFile, String referencedFromFile,
+									 PathSpecification paths, Stack loadStack, ArrayList loadList) throws Exception
 {
 
 	File file = paths.search4File(templateFile);
@@ -174,21 +175,29 @@ private static String loadTemplate(DBData data, String templateFile, String refe
 
 	// check if file already loaded
 	boolean alreadyLoaded = false;
-	Enumeration enum = VDBData.getTemplates().elements();
-	while (enum.hasMoreElements())
+	
+	// check this load session DB repository
+	alreadyLoaded = loadList.contains(templateToResolve);
+	
+	// check central VDB repository
+	if (!alreadyLoaded)
 	{
-		VDBTemplate t = (VDBTemplate)enum.nextElement();
-		if (t.getFileName().equals(templateToResolve))
+		Enumeration enum = VDBData.getTemplates().elements();
+		while (enum.hasMoreElements())
 		{
-			alreadyLoaded = true;
-			break;
+			VDBTemplate t = (VDBTemplate)enum.nextElement();
+			if (t.getFileName().equals(templateToResolve))
+			{
+				alreadyLoaded = true;
+				break;
+			}
 		}
 	}
-	
+		
 	//if(DataProvider.getInstance().getLoadedDBs().contains(templateToResolve))
 	if (alreadyLoaded)
 	{
-		Console.getInstance().println("Template \""+templateFile+"\" already loaded...");
+		//Console.getInstance().println("Template \""+templateFile+"\" already loaded...");
 		
 		// extract id (not a prefect solution)
 		// id is name
@@ -197,11 +206,13 @@ private static String loadTemplate(DBData data, String templateFile, String refe
 
 	Console.getInstance().println("Loading template \""+templateFile+"\"...");
 
-	DBData templateData = resolveDB(templateToResolve, loadStack);
+	DBData templateData = resolveDB(templateToResolve, loadStack, loadList);
 	if (templateData==null)
 		throw new DBException("Failed to load template: '"+templateFile+"'");
 	templateData.getTemplateData().setData(templateData);
 	data.addTemplate(templateData.getTemplateData());
+
+	loadList.add(templateToResolve);
 	
 	// add to loaded list
 	//DataProvider.getInstance().getLoadedDBs().addElement(templateData.getTemplateData().getFileName());
@@ -890,7 +901,8 @@ public static void skipLines(int linesToSkip, StreamTokenizer tokenizer, String 
  * @param rootData com.cosylab.vdct.db.DBData
  * @param tokenizer java.io.StreamTokenizer
  */
-public static void processDB(DBData data, StreamTokenizer tokenizer, String fileName, PathSpecification paths, Stack loadStack) throws Exception
+public static void processDB(DBData data, StreamTokenizer tokenizer, String fileName,
+							   PathSpecification paths, Stack loadStack, ArrayList loadList) throws Exception
 {
 	
 	String comment = nullString;
@@ -1012,7 +1024,7 @@ public static void processDB(DBData data, StreamTokenizer tokenizer, String file
 							(tokenizer.ttype == DBConstants.quoteChar)) str2 = tokenizer.sval;
 						else throw (new DBParseException("Invalid expand template instance name...", tokenizer, fileName));
 	
-						String loadedTemplateId = loadTemplate(data, str, fileName, paths, loadStack);
+						String loadedTemplateId = loadTemplate(data, str, fileName, paths, loadStack, loadList);
 	
 						//System.out.println("expand(\""+str+"\", "+str2+")\n{");
 	
@@ -1041,7 +1053,7 @@ public static void processDB(DBData data, StreamTokenizer tokenizer, String file
 	
 						File file = paths.search4File(include_filename);
 						inctokenizer = getStreamTokenizer(file.getAbsolutePath());
-						if (inctokenizer!=null) processDB(data, inctokenizer, include_filename, new PathSpecification(file.getParentFile().getAbsolutePath()), loadStack);
+						if (inctokenizer!=null) processDB(data, inctokenizer, include_filename, new PathSpecification(file.getParentFile().getAbsolutePath()), loadStack, loadList);
 					}
 				
 					/****************** path ********************/
@@ -1335,7 +1347,7 @@ public static String[] resolveIncodedDBDs(String fileName) throws IOException {
  * @return Vector
  * @param fileName java.lang.String
  */
-public static DBData resolveDB(String fileName, Stack loadStack) {
+public static DBData resolveDB(String fileName, Stack loadStack, ArrayList loadList) {
 	
 	DBData data = null; 
 	
@@ -1350,7 +1362,7 @@ public static DBData resolveDB(String fileName, Stack loadStack) {
 			PathSpecification paths = new PathSpecification(file.getParentFile().getAbsolutePath());
 			data = new DBData(file.getName(), file.getAbsolutePath());
 
-			processDB(data, tokenizer, fileName, paths, loadStack);
+			processDB(data, tokenizer, fileName, paths, loadStack, loadList);
 		}
 		catch (Exception e)
 		{
@@ -1373,7 +1385,8 @@ public static DBData resolveDB(String fileName, Stack loadStack) {
  */
 public static DBData resolveDB(String fileName) throws Exception {
 	Stack loadStack = new Stack();
-	return resolveDB(fileName, loadStack);
+	ArrayList loadList = new ArrayList();
+	return resolveDB(fileName, loadStack, loadList);
 }
 
 
