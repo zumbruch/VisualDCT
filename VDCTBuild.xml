@@ -230,6 +230,7 @@
 	
 	<target name="web" depends="doc">
 		<copy file="${dir.src}/runScript" todir="${dir.dist}"/>
+		<copy file="${dir.src}/flatdb" todir="${dir.dist}"/>
 		<webdoc dir="${dir.dist}" targetProject="${project.name}" version="${build.version}" type="${build.type}"/>
 		<styler>
 			<transform file="${web.xsl}"/>
