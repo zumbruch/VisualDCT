@@ -782,7 +782,10 @@ public void mouseClicked(MouseEvent e) {
 			if (leftButtonPush)
 			{
 				if (e.isControlDown() || (e.getClickCount()==1)) {
-					if (!e.isControlDown()) view.deselectAll();			// deselect all
+					if (!e.isControlDown()) {
+					    view.deselectAll();			// deselect all
+						repaint();
+					}
 					if (hilited instanceof Selectable) {				// invert selection
 						if (view.isSelected(hilited))
 							view.deselectObject(hilited);
