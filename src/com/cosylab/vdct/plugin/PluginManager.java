@@ -59,7 +59,9 @@ protected PluginManager()
 	load();
 }
 
-// shp: new
+/**
+ * @return
+ */
 public PluginSerializer getPluginSerializer()
 {
 	return pluginSerializer;
@@ -76,8 +78,10 @@ public void addPlugin(PluginObject plugin)
 	if(plugins.contains(plugin))
 		return;
 
+	// moved to here to have plugin serialized
 	plugins.add(plugin);
 	plugin.init();
+	//plugins.add(plugin);
 
 	for(int i=0; i<pluginListeners.size(); i++)
 		((PluginListener)pluginListeners.get(i)).pluginAdded(plugin);
@@ -206,9 +210,9 @@ public void removePlugin(PluginObject plugin)
 	if(!plugins.contains(plugin))
 		return;
 
+	plugins.remove(plugin);
 	plugin.stop();
 	plugin.destroy();
-	plugins.remove(plugin);
 
 	for( int i=0; i<pluginListeners.size(); i++ )
 		((PluginListener)pluginListeners.get(i)).pluginRemoved(plugin);
