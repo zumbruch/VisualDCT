@@ -390,7 +390,8 @@ public static InLink getTarget(LinkProperties link) {
 	InLink templateLink = (InLink)Group.getRoot().getLookupTable().get(link.getTarget());
 	if (templateLink!=null)
 	{
-		((TemplateEPICSVarLink)templateLink).setDestroyed(false);
+//		((TemplateEPICSVarLink/TemplateEPICSPort)templateLink).setDestroyed(false);
+		((VisibleObject)templateLink).setDestroyed(false);
 		return templateLink;
 	}
 	

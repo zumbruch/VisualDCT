@@ -35,6 +35,7 @@ import java.util.*;
 import javax.swing.*;
 
 import com.cosylab.vdct.Constants;
+import com.cosylab.vdct.db.DBPort;
 import com.cosylab.vdct.db.DBResolver;
 import com.cosylab.vdct.graphics.FontMetricsBuffer;
 import com.cosylab.vdct.graphics.ViewState;
@@ -78,8 +79,11 @@ public class Template
 	protected int rlinkY;
 
 	private static GUISeparator templateSeparator = null;
-	private static GUISeparator inputsSeparator = null;
-	private static GUISeparator outputsSeparator = null;
+	//private static GUISeparator inputsSeparator = null;
+	//private static GUISeparator outputsSeparator = null;
+
+	private static GUISeparator portsSeparator = null;
+
 	private static GUISeparator templateInstanceSeparator = null;
 	private static GUISeparator propertiesSeparator = null;
 	private final static String fieldMaxStr = "01234567890123456789012345";
@@ -234,7 +238,8 @@ public class Template
 
 		  // fields
 
-		  int fieldRows = Math.max(templateData.getInputs().size(), templateData.getOutputs().size());
+//int fieldRows = Math.max(templateData.getInputs().size(), templateData.getOutputs().size());
+int fieldRows = templateData.getTemplate().getPorts().size();
 		  height += fieldRows * Constants.FIELD_HEIGHT;
 		 // height = Math.max(height, Constants.TEMPLATE_MIN_HEIGHT);
 		  int frheight = (int)(scale*height);
@@ -291,7 +296,8 @@ public class Template
 
 		  // id label
 		  
-		  idlabel = templateData.getTemplate().getId();
+		  // idlabel = templateData.getTemplate().getId();
+		  idlabel = templateData.getName();
 		  if (rwidth<(2*x0)) idFont = null;
 		  else
 			  idFont = FontMetricsBuffer.getInstance().getAppropriateFont(
@@ -402,7 +408,7 @@ public class Template
 	 * Creation date: (3.2.2001 13:07:04)
 	 * @return com.cosylab.vdct.vdb.GUISeparator
 	 */
-	public static com.cosylab.vdct.vdb.GUISeparator getInputsSeparator() {
+/*	public static com.cosylab.vdct.vdb.GUISeparator getInputsSeparator() {
 		if (inputsSeparator==null) inputsSeparator = new GUISeparator("Inputs");
 		return inputsSeparator;
 	}
@@ -412,9 +418,19 @@ public class Template
 	 * Creation date: (3.2.2001 13:07:04)
 	 * @return com.cosylab.vdct.vdb.GUISeparator
 	 */
-	public static com.cosylab.vdct.vdb.GUISeparator getOutputsSeparator() {
+/*	public static com.cosylab.vdct.vdb.GUISeparator getOutputsSeparator() {
 		if (outputsSeparator==null) outputsSeparator = new GUISeparator("Outputs");
 		return outputsSeparator;
+	}
+
+	/**
+	 * Insert the method's description here.
+	 * Creation date: (3.2.2001 13:07:04)
+	 * @return com.cosylab.vdct.vdb.GUISeparator
+	 */
+	public static com.cosylab.vdct.vdb.GUISeparator getPortsSeparator() {
+		if (portsSeparator==null) portsSeparator = new GUISeparator("Ports");
+		return portsSeparator;
 	}
 
 	/**
@@ -435,11 +451,11 @@ public class Template
 		Vector items = new Vector();
 
 		items.addElement(getTemplateSeparator());
-		items.addElement(new NameValueInfoProperty("Class", templateData.getTemplate().getId()));
+		items.addElement(new NameValueInfoProperty("Template", templateData.getTemplate().getId()));
 		items.addElement(new NameValueInfoProperty("FileName", templateData.getTemplate().getFileName()));
 
 		items.addElement(getTemplateInstanceSeparator());
-
+/*
 		items.addElement(getInputsSeparator());
 		Enumeration e = templateData.getInputs().elements();
 		while (e.hasMoreElements())
@@ -449,7 +465,10 @@ public class Template
 		e = templateData.getOutputs().elements();
 		while (e.hasMoreElements())
 			items.addElement(e.nextElement());
-		
+*/		
+
+		items.addElement(getPortsSeparator());
+
 		items.addElement(getPropertiesSeparator());
 
 /*
@@ -692,7 +711,9 @@ public void updateTemplateFields() {
  */
 private EPICSLink createLinkField(VDBFieldData field)
 {
+	
 	EPICSLink link = null;	
+/*
 	int type = LinkProperties.getType(field);
 	switch (type) {
 		case LinkProperties.INLINK_FIELD:
@@ -707,7 +728,8 @@ private EPICSLink createLinkField(VDBFieldData field)
 		case LinkProperties.VARIABLE_FIELD:
 			link = new TemplateEPICSVarLink(this, field);
 			break;
-	}
+	}*/
+	link = new TemplateEPICSPort(this, field);
 	return link;
 }
 
@@ -718,7 +740,7 @@ private EPICSLink createLinkField(VDBFieldData field)
 private void initializeLinkFields()
 {
 	clear();
-
+/*
 	// inputs
 	Enumeration e = templateData.getInputs().elements();
 	while (e.hasMoreElements())
@@ -740,6 +762,21 @@ private void initializeLinkFields()
 		if (link!=null)
 			addSubObject(tf.getAlias(), link);
 	}
+*/
+	// ports
+	Enumeration e = templateData.getTemplate().getPortsV().elements();
+	while (e.hasMoreElements())
+	{
+		DBPort port = (DBPort)e.nextElement();
+		VDBTemplatePort tf = new VDBTemplatePort(getTemplateData(), port);
+
+		EPICSLink link = createLinkField(tf);
+		link.setRight(true);
+		if (link!=null)
+			addSubObject(tf.getName(), link);
+	}
+
+
 }
 
 
@@ -750,6 +787,7 @@ private void initializeLinkFields()
  */
 public void manageLinks() {
 	// inputs
+/*
 	Enumeration e = templateData.getInputs().elements();
 	while (e.hasMoreElements())
 	{
@@ -764,6 +802,7 @@ public void manageLinks() {
 		VDBTemplateField tf = (VDBTemplateField)e.nextElement();
 		manageLink(tf);
 	}
+*/
 }
 
 
@@ -802,10 +841,13 @@ public void fieldChanged(VDBFieldData field) {
 /**
  */
 public VDBFieldData getField(String name) {
+/*
 	VDBFieldData field = (VDBFieldData)templateData.getInputs().get(name);
 	if (field==null)
 		field = (VDBFieldData)templateData.getOutputs().get(name);
 	return field;
+*/
+return null;
 }
 
 

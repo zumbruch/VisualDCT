@@ -1468,6 +1468,9 @@ public boolean open(File file, boolean importDB) throws IOException {
  */
 public static void applyVisualData(boolean importDB, Group group, DBData dbData, VDBData vdbData)
 {
+	if (vdbData==null)
+		return;
+	
 	// apply visual-data && generate visual object, group hierarchy
 	try {
 

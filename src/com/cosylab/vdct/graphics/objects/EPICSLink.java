@@ -81,7 +81,7 @@ public String getDescription() {
  * @return java.lang.String
  */
 public String getID() {
-	return fieldData.getFullName();
+	return getFieldData().getFullName();
 }
 /**
  * Insert the method's description here.
