@@ -4488,13 +4488,15 @@ public static void main(java.lang.String[] args) {
 					System.out.println("Directive to load DBD: '"+args[i]+"'.");
 					aVisualDCT.openDBD(args[i]);
 				}
+
+			if (!args[args.length-1].toUpperCase().endsWith("DBD"))
+			{
+				System.out.println("Directive to load DB: '"+args[args.length-1]+"'.");
+				aVisualDCT.openDB(args[args.length-1]);
+			}
+
 		}
 
-		if (!args[args.length-1].toUpperCase().endsWith("DBD"))
-		{
-			System.out.println("Directive to load DB: '"+args[args.length-1]+"'.");
-			aVisualDCT.openDB(args[args.length-1]);
-		}
 		
 		if (DataProvider.getInstance().getDbdDB()==null) {
 			System.out.println("No DBD loaded! Exiting...");
