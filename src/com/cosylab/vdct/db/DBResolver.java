@@ -41,6 +41,7 @@ public class DBResolver {
 
 	private static String nullString = "";
 
+	// DB definitions
 	private static String FIELD   = "field";
 	private static String RECORD  = "record";
 	private static String GRECORD = "grecord";
@@ -52,7 +53,8 @@ public class DBResolver {
 	private static String ENDSTR = "}";
 	private static String SPACE = " ";
 	private static String NL = "\n";
-
+	
+	// visual data
 	private static String VDCTRECORD = "Record";
 	private static String VDCTGROUP = "Group";
 	private static String VDCTFIELD = "Field";
@@ -73,6 +75,29 @@ public class DBResolver {
 	public final static String DBD_START	= "#! "+DBD_START_STR+"\n";
 	public final static String DBD_ENTRY	= "#! "+DBD_ENTRY_STR+"(\"";
 	public final static String DBD_END	= "#! "+DBD_END_STR+"\n";
+
+	// templates
+	// used format:
+	// #! TEMPLATESTART
+ 	// #! TemplateDescription("description")
+ 	// #! TemplateInput("alias", "field")
+ 	// ...
+ 	// #! TemplateOutput("alias", "field")
+ 	// ...
+	// #! TEMPLATEEND
+	
+	// resets all template data && generates template name
+	private static String TEMPLATE_START = "TEMPLATESTART";
+
+	private static String TEMPLATE_DESC = "TemplateDescription";
+	private static String TEMPLATE_INPUT = "TemplateInput";
+	private static String TEMPLATE_OUTPUT = "TemplateOutput";
+	
+	// automatically auto-triggered at EOF (stores template data && resets all current template data)
+	private static String TEMPLATE_END = "TEMPLATEEND";
+	
+	// template
+	private static DBTemplate templateData = null;
 
 /**
  * This method was created in VisualAge.
@@ -320,6 +345,77 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 					data.addGroup(new DBGroupData(str, tx, ty, StringUtils.int2color(t), desc));
 
 				}
+				else if (tokenizer.sval.equalsIgnoreCase(TEMPLATE_START)) {
+
+					// nested tempaltes
+					if (templateData!=null)
+						throw (new DBGParseException("Nested template definitions!", tokenizer, fileName));
+						
+					templateData = new DBTemplate();
+
+					// generate template id from fileName
+					File file = new File(fileName);
+					String id = file.getName();
+					
+					// remove spaces and extension
+					id = id.replace(' ', '_');
+					int pos = id.lastIndexOf('.');
+					if (pos>0)
+						id = id.substring(0, pos);
+					
+					// set data
+					templateData.setId(id);
+					templateData.setDescription(id);		// default
+					templateData.setFileName(fileName);
+				}
+				else if (templateData!=null && tokenizer.sval.equalsIgnoreCase(TEMPLATE_DESC)) {
+
+					// read description
+					tokenizer.nextToken();
+					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+						(tokenizer.ttype == DBConstants.quoteChar)) str=tokenizer.sval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					// set data
+					templateData.setDescription(str);
+				}
+				else if (templateData!=null && tokenizer.sval.equalsIgnoreCase(TEMPLATE_INPUT)) {
+
+					// read alias
+					tokenizer.nextToken();
+					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+						(tokenizer.ttype == DBConstants.quoteChar)) str=tokenizer.sval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+					
+					// read field name
+					tokenizer.nextToken();
+					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+						(tokenizer.ttype == DBConstants.quoteChar)) str2=tokenizer.sval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					// set data
+					templateData.getInputs().put(str, str2);
+				}
+				else if (templateData!=null && tokenizer.sval.equalsIgnoreCase(TEMPLATE_OUTPUT)) {
+
+					// read alias
+					tokenizer.nextToken();
+					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+						(tokenizer.ttype == DBConstants.quoteChar)) str=tokenizer.sval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+					
+					// read field name
+					tokenizer.nextToken();
+					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+						(tokenizer.ttype == DBConstants.quoteChar)) str2=tokenizer.sval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					// set data
+					templateData.getOutputs().put(str, str2);
+				}
+				else if (templateData!=null && tokenizer.sval.equalsIgnoreCase(TEMPLATE_END)) {
+					templateEnd();
+				}
 
 				/***************************************************/
 				/************* Version v1.0 support ****************/
@@ -458,6 +554,16 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 		return nullString;
   }
 }
+
+private static void templateEnd()
+{
+	System.out.println("Template end");
+	// store templateData
+	///!!!
+
+	templateData = null;
+}
+
 /**
  * This method was created in VisualAge.
  * @param data com.cosylab.vdct.db.DBData
@@ -533,8 +639,11 @@ public static void processDB(DBData data, StreamTokenizer tokenizer, String file
 		Console.getInstance().println("\n"+e);
 	}	
 	
-
+	// automatically trigger TEMPLATEEND
+	if (templateData!=null && templateData.getFileName().equals(fileName))
+		templateEnd();
 }
+
 /**
  * This method was created in VisualAge.
  * @param rd com.cosylab.vdct.db.DBRecordData
