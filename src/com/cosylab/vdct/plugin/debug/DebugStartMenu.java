@@ -34,7 +34,12 @@ import java.util.*;
 import java.beans.*;
 import java.awt.event.*;
 
+import com.cosylab.vdct.graphics.objects.Debuggable;
+import com.cosylab.vdct.graphics.objects.Record;
+import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.plugin.*;
+import com.cosylab.vdct.vdb.VDBFieldData;
+import com.cosylab.vdct.vdb.VDBRecordData;
 
 /**
  * Insert the class' description here.
@@ -69,9 +74,12 @@ public void actionPerformed(ActionEvent event)
 		PluginDebugManager.setDebugState(true);
 		debugPlugin.startDebugging();
 
-		/// !!! to be reimplemented
-		/// for the time being ALL (only VAL) fields in the current group are registered
+		/// for the time being fields in the current group are registered
 		/// all new (or deleted) filed are not updated
+		// if field has InspectableProperty.ALWAYS_VISIBLE visibility then is is monitored
+		// (otherwise only remote value is retrieved) - it took to mich time
+		// VAL fields is always registered
+		final String valFieldName = "VAL";
 		com.cosylab.vdct.graphics.objects.Group group = com.cosylab.vdct.graphics.DrawingSurface.getInstance().getViewGroup();
 		Enumeration e = group.getSubObjectsV().elements();
 		while (e.hasMoreElements())
@@ -79,14 +87,28 @@ public void actionPerformed(ActionEvent event)
 			Object obj = e.nextElement();
 			if (obj instanceof com.cosylab.vdct.graphics.objects.Record)
 			{
-				/*com.cosylab.vdct.vdb.VDBFieldData field = ((com.cosylab.vdct.graphics.objects.Record)obj).getRecordData().getField("VAL");
-				if (field!=null)
-					debugPlugin.registerMonitor(field);*/
-
-				com.cosylab.vdct.vdb.VDBRecordData rec = ((com.cosylab.vdct.graphics.objects.Record)obj).getRecordData();
+				VDBRecordData rec = ((Record)obj).getRecordData();
 				Enumeration e2 = rec.getFieldsV().elements();
 				while (e2.hasMoreElements())
-					debugPlugin.registerMonitor((com.cosylab.vdct.graphics.objects.Debuggable)e2.nextElement());
+				{
+					VDBFieldData field = (VDBFieldData)e2.nextElement();
+					//if (!field.equals(valFieldName))
+						if (field.getVisibility() == InspectableProperty.ALWAYS_VISIBLE && !field.equals(valFieldName))
+							debugPlugin.registerMonitor(field);
+							
+						/*
+						{
+							String debugValue = debugPlugin.getValue(field.getFullName());
+							if (debugValue != null)
+								field.setDebugValue(debugValue);
+						}
+						*/
+				}
+
+				// always register VAL field
+				Debuggable valField = (Debuggable)rec.getField(valFieldName);
+				if (valField != null)
+					debugPlugin.registerMonitor(valField);
 					
 			}
 		}
