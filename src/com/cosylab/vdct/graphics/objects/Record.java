@@ -1139,6 +1139,7 @@ public VisibleObject morph(java.lang.String newType) {
 								values.add(port.getData().getValue());
 							} else if (obj instanceof Field) {
 								Field ofield = (Field)obj;
+								System.out.println(">"+ofield+" "+ofield.getFieldData()+" "+ofield.getFieldData().getValue());
 								fieldData.add(ofield.getFieldData());
 								values.add(ofield.getFieldData().getValue());
 							}
@@ -1195,9 +1196,14 @@ public VisibleObject morph(java.lang.String newType) {
 		String value = (String)values.elementAt(j);
 		LinkSource source = (LinkSource)fieldData.elementAt(j);
 		
-		source.setValue(value);
+		//test
+		String oldValue = source.getValue();
+		source.setValueSilently(value);
+		LinkProperties properties = new LinkProperties(source);
+		InLink varlink = EPICSLinkOut.getTarget(properties);
+		source.setValueSilently(oldValue);
 		
-		// TODO code to validate a link
+		if (varlink!=null) source.setValue(value);
 	}
 
 	return record;
