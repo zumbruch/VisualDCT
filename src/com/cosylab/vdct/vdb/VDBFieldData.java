@@ -502,6 +502,15 @@ public int getVisibility()
  */
 public void setVisibility(int visibility)
 {
+	// debug plugin support
+	if (visibility != this.visibility)
+		if (PluginDebugManager.isDebugState())
+			if (visibility == InspectableProperty.ALWAYS_VISIBLE)
+				PluginDebugManager.getDebugPlugin().registerMonitor(this);
+			else if (this.visibility == InspectableProperty.ALWAYS_VISIBLE)
+				PluginDebugManager.getDebugPlugin().deregisterMonitor(this);
+
+
 	this.visibility = visibility;
 	if (record!=null) record.fieldValueChanged(this);
 	//updateInspector();
