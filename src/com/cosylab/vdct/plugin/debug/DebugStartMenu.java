@@ -91,7 +91,10 @@ public void actionPerformed(ActionEvent event)
 	}
 }
 
-
+/**
+ * Thread worker connecting to the PVs.
+ * @see java.lang.Runnable#run()
+ */
 public void run()
 {
 
