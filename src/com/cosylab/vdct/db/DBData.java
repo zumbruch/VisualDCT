@@ -181,14 +181,13 @@ public void addTemplate(DBTemplate t) {
 }
 
 /**
- * Check is DTYP fields are defined before any DBF_INPUT/DBF_OUTPUT fields...
+ * Check is DTYP field is defined before INP and OUT fields...
  * Insert the method's description here.
  * Creation date: (18.11.1999 18:26:27)
  */
 
 public static void checkDTYPfield(DBData db, DBDData dbd) {
 
- DBDFieldData dbdField;
  DBDRecordData dbdRecord;
 
  DBRecordData dbRecord;
@@ -205,15 +204,14 @@ public static void checkDTYPfield(DBData db, DBDData dbd) {
 			e2 = dbRecord.getFieldsV().elements();
 			dbField2 = (DBFieldData)e2.nextElement();
 			while (dbField!=dbField2) {
-				dbdField = dbdRecord.getDBDFieldData(dbField2.getName());
-				if ((dbdField.getField_type()==DBDConstants.DBF_INLINK) ||
-					(dbdField.getField_type()==DBDConstants.DBF_OUTLINK)) break;
+				if (dbField2.getName().equals("INP") || dbField2.getName().equals("OUT")) 
+					break;
 				else
 					dbField2 = (DBFieldData)e2.nextElement();
 			}
 
 			if (dbField!=dbField2) 
-				Console.getInstance().println("Warning: "+dbRecord.name+" -> DTYP field must be defined before any DBF_INPUT/DBF_OUTPUT fields...");
+				Console.getInstance().println("Warning: "+dbRecord.name+" -> DTYP field needs to be defined before two fields INP and OUT...");
 		}
 
 	}
