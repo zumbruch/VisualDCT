@@ -1629,7 +1629,7 @@ public void writeObjects(DataOutputStream file, NamingContext context, boolean e
  	 // export (generate, flatten) DB option
 	 //
 	 //String templateName = namer.getResolvedName(getName());
-	 String templateName = getName();
+	 String templateName = context.matchAndReplace(getName());
 
 
 

@@ -321,7 +321,7 @@ public class NamingContext {
 
 	/**
 	 * Finds $() and $(.) in strings and replaces them.
-	 * TODO currently it doesn't handle something like $($()).
+	 * TODO currently it doesn't handle something like $($()) very well.
 	 * I don't think this is a simple problem, which could be done with regex.
 	 * Hierarchy prevents it. 
 	 * @param value
@@ -336,7 +336,8 @@ public class NamingContext {
 		//Pattern macrop = Pattern.compile("$\\(([a-zA-Z0-9_:-]+)\\)");
 		//Pattern portp = Pattern.compile("$\\(([a-zA-Z0-9_:-]+)\\.([a-zA-Z0-9_:-]+)\\)");
 		Pattern macrop = Pattern.compile("\\$\\(([^\\.\\$]+)\\)");
-		Pattern portp = Pattern.compile("\\$\\(([^\\.\\$]+)\\.([^\\.\\$]+)\\)");
+		//Pattern portp = Pattern.compile("\\$\\(([^\\.\\$]+)\\.([^\\.\\$]+)\\)");
+		Pattern portp = Pattern.compile("\\$\\(([^\\.]+)\\.([^\\.]+)\\)");
 		
 		Matcher port = portp.matcher(value);
 		StringBuffer result = new StringBuffer();
