@@ -587,8 +587,13 @@ public void save(java.io.File file) throws IOException {
  	// create a new
  	// id = basename
 	data = new VDBTemplate(file.getName(), file.getAbsolutePath());
+	
 	data.setPorts(new Hashtable());
 	data.setPortsV(new Vector());
+
+	data.setMacros(new Hashtable());
+	data.setMacrosV(new Vector());
+	
 	data.setGroup(Group.getRoot());
 	
 	Group.setEditingTemplateData(data);

@@ -77,8 +77,12 @@ public class Macro extends VisibleObject implements Descriptable, Movable, InLin
 			*/
 			else if (action.equals(removeMacroString))
 			{
-				//destroy();
-				//com.cosylab.vdct.undo.UndoManager.getInstance().addAction(new com.cosylab.vdct.undo.DeleteAction(Macro.this));
+				destroy();
+				com.cosylab.vdct.undo.UndoManager.getInstance().addAction(new com.cosylab.vdct.undo.DeleteAction(Macro.this));
+				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+			}
+			else if (action.equals(removeMacroDefString))
+			{
 				data.getTemplate().removeMacro(getName());
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
@@ -100,8 +104,9 @@ public class Macro extends VisibleObject implements Descriptable, Movable, InLin
 	private static final String selectTitle = "Select link color...";
 	private static final String addConnectorString = "Add connector";
 	private static final String colorString = "Color...";
-	//private static final String removeLinkString = "Remove Link";
-	private static final String removeMacroString = "Remove Macro";
+	private static final String removeLinkString = "Remove Link";
+	private static final String removeMacroString = "Hide Macro";
+	private static final String removeMacroDefString = "Remove Macro";
 
 	private static final String modeString = "Macro Mode";
 	private static final String inputString = "INPUT";
@@ -396,10 +401,10 @@ public java.util.Vector getItems() {
 	addItem.setEnabled(!isDisconnected());
 	addItem.addActionListener(al);
 	items.addElement(addItem);
-	*/
 	
 	// modes
 	items.addElement(new JSeparator());
+	*/
 	
 	JMenu modeMenu = new JMenu(modeString);
 	items.addElement(modeMenu);
@@ -424,13 +429,23 @@ public java.util.Vector getItems() {
 	items.addElement(descItem);
 	*/
 	
-	/*	
 	items.add(new JSeparator());
 
+	/*
+	if (!isDisconnected())
+	{
+		JMenuItem removeLinkItem = new JMenuItem(removeLinkString);
+		removeLinkItem.addActionListener(al);
+		items.addElement(removeLinkItem);
+	}
+	*/
 	JMenuItem removeMacroItem = new JMenuItem(removeMacroString);
 	removeMacroItem.addActionListener(al);
 	items.addElement(removeMacroItem);
-	*/
+
+	JMenuItem removeMacroDefItem = new JMenuItem(removeMacroDefString);
+	removeMacroDefItem.addActionListener(al);
+	items.addElement(removeMacroDefItem);
 	
 	return items;
 }
@@ -768,6 +783,12 @@ public void rename(String oldName, String newName)
 {
 	getParent().removeObject(oldName);
 	getParent().addSubObject(newName, this);
+
+	// fix lookup table
+	updateTemplateLink();
+	
+	// fix source links
+	LinkManagerObject.fixMacroLink(this);
 
 	unconditionalValidation();
 	com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");

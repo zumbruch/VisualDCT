@@ -248,6 +248,48 @@ public static void fixLink(EPICSVarLink varlink)
 	}
 }
 
+/**
+ * !!!! duplication
+ * @param macro
+ */
+public static void fixMacroLink(Macro macro)
+{
+	LinkSource data = null;
+	String targetName = macro.getData().getFullName();
+	
+	Enumeration e2 = macro.getStartPoints().elements();
+	while (e2.hasMoreElements())
+	{
+		Object unknownField = e2.nextElement();
+		if (unknownField instanceof OutLink) 
+		{
+			if (unknownField instanceof EPICSLink)
+				data = ((EPICSLink)unknownField).getFieldData();
+			else if (unknownField instanceof Port)
+				data = ((Port)unknownField).getData();
+		}
+		else
+			continue;	// nothing to fix
+	
+		// now I got source and target, compare values
+		String oldTarget = LinkProperties.getTarget(data);
+		if (!oldTarget.equalsIgnoreCase(targetName))
+		{
+			// not the same, fix it gently as a doctor :)
+			String value = data.getValue();
+			// value = targetName + link properties
+			value = targetName + com.cosylab.vdct.util.StringUtils.removeBegining(value, oldTarget);
+			data.setValueSilently(value);
+			
+			// !!!!
+			if (unknownField instanceof EPICSLink)
+				((EPICSLink)unknownField).fixLinkProperties();
+			else if (unknownField instanceof Port)
+				((Port)unknownField).fixLinkProperties();
+		}
+	}
+}
+
 public static void fixLink(EPICSLinkOutIn linkoutin)
 {
 	LinkSource data = null;

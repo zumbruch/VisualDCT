@@ -30,14 +30,13 @@ package com.cosylab.vdct.vdb;
 
 import java.awt.Component;
 import java.util.regex.Pattern;
-/*
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
-*/
 
 import com.cosylab.vdct.db.DBMacro;
 import com.cosylab.vdct.dbd.DBDConstants;
@@ -308,7 +307,7 @@ public class VDBMacro implements InspectableProperty, Descriptable, ChangableVis
 	 */
 	public void popupEvent(Component component, int x, int y)
 	{
-/*
+
 		ActionListener al = new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e) {
@@ -334,7 +333,7 @@ public class VDBMacro implements InspectableProperty, Descriptable, ChangableVis
 		popup.add(mi);
 	
 		popup.show(component, x, y);
-*/
+
 	}
 
 	/**

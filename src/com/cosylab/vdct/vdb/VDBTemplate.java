@@ -853,7 +853,7 @@ public void removeMacro(String name)
 {
 	VDBMacro macro = (VDBMacro)macros.remove(name);
 	if (macros!=null)
-		macrosV.removeElement(macros);
+		macrosV.removeElement(macro);
 
 	ComposedAction ca = new ComposedAction();
 
@@ -1089,9 +1089,10 @@ public void propertyChanged(InspectableProperty property)
  */
 public void removeProperty(InspectableProperty property)
 {
-	//!!! what if macro (if impl.)
-	
-	removePort(property.getName());
+	if (property instanceof VDBPort)
+		removePort(property.getName());
+	else if (property instanceof VDBMacro)
+		removeMacro(property.getName());
 }
 
 /**
@@ -1099,16 +1100,25 @@ public void removeProperty(InspectableProperty property)
  */
 public void renameProperty(InspectableProperty property)
 {
-	//!!! what if macro (if impl.)
-	
+	if (property instanceof VDBPort)
+		renamePortProperty(property);
+	else if (property instanceof VDBMacro)
+		renameMacroProperty(property);
+}
+
+/**
+ * @see com.cosylab.vdct.vdb.MonitoredPropertyListener#renameProperty(InspectableProperty)
+ */
+public void renamePortProperty(InspectableProperty property)
+{
 	String message = "Enter new port name of '"+property.getName()+"':";
 	int type = JOptionPane.QUESTION_MESSAGE;
 	while (true)
 	{
 		String reply = JOptionPane.showInputDialog( null,
-			                           message,
-			                           "Rename port...",
-			                            type);
+									   message,
+									   "Rename port...",
+										type);
 		if (reply!=null)
 		{
 
@@ -1142,6 +1152,51 @@ public void renameProperty(InspectableProperty property)
 	}
 }
 
+/**
+ * @see com.cosylab.vdct.vdb.MonitoredPropertyListener#renameProperty(InspectableProperty)
+ */
+public void renameMacroProperty(InspectableProperty property)
+{
+	String message = "Enter new macro name of '"+property.getName()+"':";
+	int type = JOptionPane.QUESTION_MESSAGE;
+	while (true)
+	{
+		String reply = JOptionPane.showInputDialog( null,
+									   message,
+									   "Rename macro...",
+										type);
+		if (reply!=null)
+		{
+
+			// check name
+			if (reply.trim().length()==0)
+			{
+				message = "Empty name! Enter valid name:";
+				type = JOptionPane.WARNING_MESSAGE;
+				continue;
+			}
+			else if (reply.indexOf(' ')!=-1)
+			{
+				message = "No spaces allowed! Enter valid name:";
+				type = JOptionPane.WARNING_MESSAGE;
+				continue;
+			}
+			else if (!macros.containsKey(reply))
+			{
+				renameMacro((VDBMacro)property, reply);
+			}
+			else
+			{
+				message = "Macro '"+reply+"' already exists. Enter other name:";
+				type = JOptionPane.WARNING_MESSAGE;
+				continue;
+			}
+
+		}
+		
+		break;
+	}
+}
 	
 	/**
 	 * Sets the fileName.

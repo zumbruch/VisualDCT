@@ -161,8 +161,9 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 	private static final String newRecordString = "New record...";
 	private static final String newTemplesString = "New template instance";
 	private static final String addPortString = "Show port";
+	private static final String addMacroString = "Show macro";
 	private static final String newPortString = "Create port...";
-	private static final String newMacroString = "New macro...";
+	private static final String newMacroString = "Create macro...";
 	private static final String newLineString = "New line";
 	private static final String newBoxString = "New box";
 	private static final String newTextBoxString = "New textbox";
@@ -837,6 +838,15 @@ private void showPopup(MouseEvent e)
 	
 	};
 
+	ActionListener al3 = new ActionListener()
+	{
+		public void actionPerformed(ActionEvent e) {
+			String action = e.getActionCommand();
+			createMacro((VDBMacro)Group.getEditingTemplateData().getMacros().get(action));			
+		}
+	
+	};
+
 	JPopupMenu popUp = new JPopupMenu();
 	
 	JMenuItem item = new JMenuItem(newRecordString);
@@ -889,12 +899,32 @@ private void showPopup(MouseEvent e)
 		if (addPortMenu.getItemCount()==0)
 			addPortMenu.setEnabled(false);
 	
+
+		// generate visual MACRO
+		JMenu addMacroMenu = new JMenu(addMacroString);
+		popUp.add(addMacroMenu);
+		
+		// add templates
+		Enumeration macros = Group.getEditingTemplateData().getMacrosV().elements();
+		while (macros.hasMoreElements())
+		{
+			VDBMacro macro = (VDBMacro)macros.nextElement();
+			if (macro.getVisibleObject()!=null) continue; // do not add macros with already visible rep.
+			JMenuItem item2 = new JMenuItem(macro.getName());
+			item2.setActionCommand(macro.getName());
+			item2.addActionListener(al3);
+			addMacroMenu.add(item2);
+		}
+		
+		if (addMacroMenu.getItemCount()==0)
+			addMacroMenu.setEnabled(false);
 	
-		// add port
+		// create port
 		JMenuItem portMenuItem = new JMenuItem(newPortString);
 		portMenuItem.addActionListener(al);
 		popUp.add(portMenuItem);
 	
+		// create macro
 		JMenuItem macroMenuItem = new JMenuItem(newMacroString);
 		macroMenuItem.addActionListener(al);
 		popUp.add(macroMenuItem);
