@@ -297,9 +297,9 @@ public boolean moveOrigin(int dx, int dy) {
 	int nry = ry+dy;
 
 	if (nrx<0) nrx=0;
-	else nrx=Math.min(nrx, (int)((width-viewWidth)*scale));
+	else nrx=Math.min(nrx, (int)(width*scale-viewWidth));
 	if (nry<0) nry=0;
-	else nry=Math.min(nry, (int)((height-viewHeight)*scale));
+	else nry=Math.min(nry, (int)(height*scale-viewHeight));
 
 	boolean change = (nrx!=rx) || (nry!=ry);
 	rx=nrx; ry=nry;

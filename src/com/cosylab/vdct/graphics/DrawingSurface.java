@@ -1577,18 +1577,50 @@ private void redraw(Graphics g) {
 	    canvasGraphics = canvasImage.getGraphics();
 	}
 
+	int origX = 0;
+	int origY = 0;
+	int w = width;
+	int h = height;
+
+	canvasGraphics.setColor(Color.gray);
+	if (view.getRx()<0)
+	{
+		origX = -view.getRx();
+		canvasGraphics.fillRect(0, 0, origX, height);
+	}
+	
+	if (view.getRy()<0)
+	{
+		origY = -view.getRy();
+		canvasGraphics.fillRect(origX, 0, width, origY);
+	}
+		
+	if ((view.getRx()+view.getViewWidth())>(int)(view.getScale()*view.getWidth()))
+	{
+		w += (int)(view.getScale()*view.getWidth()) - view.getRx() - view.getViewWidth();
+		canvasGraphics.fillRect(w, origY, width, height);
+	}
+	
+	if ((view.getRy()+view.getViewHeight())>(int)(view.getScale()*view.getHeight()))
+	{
+		h += (int)(view.getScale()*view.getHeight()) - view.getRy() - view.getViewHeight();
+		canvasGraphics.fillRect(origX, h, width, height);
+	}
+
 	canvasGraphics.setColor(Constants.BACKGROUND_COLOR);
-	canvasGraphics.fillRect(0, 0, width, height);
+	canvasGraphics.fillRect(origX, origY, w, h);
 
 	if (Settings.getInstance().getShowGrid())
 	{
 
 		canvasGraphics.setColor(Constants.GRID_COLOR);
 		int gridSize = view.getGridSize();
-		int sx = view.getGridSize() - view.getRx() % gridSize;
-		int y0 = view.getGridSize() - view.getRy() % gridSize;
-		int xsteps = view.getViewWidth() / gridSize + 1;
-		int ysteps = view.getViewHeight() / gridSize + 1;
+		int sx = origX + (view.getGridSize() - view.getRx()) % gridSize;
+		int y0 = origY + (view.getGridSize() - view.getRy()) % gridSize;
+//		int xsteps = view.getViewWidth() / gridSize + 1;
+//		int ysteps = view.getViewHeight() / gridSize + 1;
+		int xsteps = (w-origX+1) / gridSize + 1;
+		int ysteps = (h-origY+1) / gridSize + 1;
 
 		if (gridSize >= 15)
 		// crosses
