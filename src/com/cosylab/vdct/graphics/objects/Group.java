@@ -38,7 +38,10 @@ import com.cosylab.vdct.graphics.*;
 import com.cosylab.vdct.inspector.InspectableProperty;
 
 import com.cosylab.vdct.vdb.*;
+import com.cosylab.vdct.db.DBDataEntry;
+import com.cosylab.vdct.db.DBEntry;
 import com.cosylab.vdct.db.DBResolver;
+import com.cosylab.vdct.db.DBTemplateEntry;
 import com.cosylab.vdct.dbd.DBDConstants;
 import com.cosylab.vdct.util.*;
 
@@ -49,7 +52,7 @@ import com.cosylab.vdct.util.*;
  */
 public class Group
 	extends ContainerObject
-	implements Clipboardable, Descriptable, Flexible, Movable, SaveInterface, Selectable
+	implements Clipboardable, Descriptable, Flexible, Movable, SaveInterface, Selectable, SaveObject
 {
 
 	private static Group clipboard = null;
@@ -63,6 +66,9 @@ public class Group
 	// template instances fields lookuptable 
 	private Hashtable lookupTable = null;
 	private static VDBTemplate editingTemplateData = null;
+
+	// contains DB structure (entry (include, path, addpath statements), record, expand)
+	protected Vector structure = null; 
 	
 /**
  * Group constructor comment.
@@ -73,6 +79,8 @@ public Group(ContainerObject parent) {
 	setColor(Color.black);
 	setWidth(Constants.GROUP_WIDTH);
 	setHeight(Constants.GROUP_HEIGHT);
+
+	structure = new Vector();
 }
 /**
  * Insert the method's description here.
@@ -90,6 +98,14 @@ public void accept(Visitor visitor) {
  */
 public void addSubObject(String id, VisibleObject object) {
 	super.addSubObject(id, object);
+
+	// records, group, template
+	Vector structure = Group.getRoot().getStructure();
+	if (object instanceof SaveObject)
+	{
+		if (!structure.contains(object))
+			structure.addElement(object);
+	}
 /*
 	com.cosylab.vdct.undo.UndoManager.getInstance().addAction(
 		new com.cosylab.vdct.undo.CreateAction(object)
@@ -720,6 +736,7 @@ public void paintComponents(Graphics g, boolean hilited, boolean flatten) {
 	}
 	
 }
+
 /**
  * Insert the method's description here.
  * Creation date: (21.12.2000 20:32:49)
@@ -733,6 +750,9 @@ public Object removeObject(String id) {
 		new com.cosylab.vdct.undo.DeleteAction((VisibleObject)object)
 	);
 */	
+	if (object instanceof SaveObject)
+		structure.remove(object);
+
 	if (object instanceof com.cosylab.vdct.inspector.Inspectable)
 		com.cosylab.vdct.DataProvider.getInstance().fireInspectableObjectRemoved((com.cosylab.vdct.inspector.Inspectable)object);
 	return object;
@@ -1001,7 +1021,8 @@ public void validateSubObjects() {
  * @exception java.io.IOException The exception description.
  */
 public void writeObjects(java.io.DataOutputStream file, NameManipulator namer, boolean export) throws java.io.IOException {
-	writeObjects(getSubObjectsV(), file, namer, export);
+	//writeObjects(getSubObjectsV(), file, namer, export);
+	writeObjects(Group.getRoot().getStructure(), file, namer, export);
 }
 
 /**
@@ -1024,6 +1045,11 @@ public static void writeObjects(Vector elements, java.io.DataOutputStream file, 
  int pos;
  VDBFieldData dtypFieldData;
  
+ final String comma = ", ";
+ final String nl = "\n";
+ final String recordStart = nl+DBResolver.RECORD+"("; 
+ final String fieldStart = "  "+DBResolver.FIELD+"("; 
+ 
  Enumeration e = elements.elements();
  while (e.hasMoreElements()) 
  	{
@@ -1039,10 +1065,10 @@ public static void writeObjects(Vector elements, java.io.DataOutputStream file, 
 
 			 	// write comment
 			 	if (recordData.getComment()!=null)
-			 		file.writeBytes("\n"+recordData.getComment());
+			 		file.writeBytes(nl+recordData.getComment());
 			 		
 				// write "record" block
-		 		file.writeBytes("\nrecord("+recordData.getType()+","+name+") {\n");
+		 		file.writeBytes(recordStart+recordData.getType()+comma+name+") {"+nl);
 
 
 		 		// locate DTYP field
@@ -1079,7 +1105,7 @@ public static void writeObjects(Vector elements, java.io.DataOutputStream file, 
 
 						// write comment
 						if (fieldData.getComment()!=null)
-							file.writeBytes(fieldData.getComment()+"\n");
+							file.writeBytes(fieldData.getComment()+nl);
 							
 						String value = fieldData.getValue();
 						if (namer.getSubstitutions()!=null && value!=null)
@@ -1095,7 +1121,7 @@ public static void writeObjects(Vector elements, java.io.DataOutputStream file, 
 								    && !value.startsWith(Constants.HARDWARE_LINK))
 								  value = namer.getResolvedName(value);
 								
-								file.writeBytes("  field("+fieldData.getName()+",\""+value+"\")\n");
+								file.writeBytes(fieldStart+fieldData.getName()+comma+"\""+value+"\")"+nl);
 				    
 		 				}
 						// write field value if has a comment
@@ -1105,7 +1131,7 @@ public static void writeObjects(Vector elements, java.io.DataOutputStream file, 
 							if (value.equals(nullString))
 								// comment it out if it has null value
 				 				file.writeBytes("  "+com.cosylab.vdct.db.DBConstants.commentString+
-					 							  "field("+fieldData.getName()+",\""+value+"\")\n");
+					 							DBResolver.FIELD+"("+fieldData.getName()+comma+"\""+value+"\")"+nl);
 							else
 							{
 			    				// write field value
@@ -1115,22 +1141,38 @@ public static void writeObjects(Vector elements, java.io.DataOutputStream file, 
 								    && !value.startsWith(Constants.HARDWARE_LINK))
 								  value = namer.getResolvedName(value);
 
-								file.writeBytes("  field("+fieldData.getName()+",\""+value+"\")\n");
+								file.writeBytes(fieldStart+fieldData.getName()+comma+"\""+value+"\")"+nl);
 							}								
 			 			}
 	 				}
 	
-					file.writeBytes("}\n");
+					file.writeBytes("}"+nl);
  			 }
- 	 	else if (obj instanceof Group)
+		/*else if (obj instanceof Group)
  	 		{
 			 	 group = (Group)obj;
 			 	 group.writeObjects(file, namer, export);
-	 		}
- 	    else if (obj instanceof Template)
+	 		}*/
+		else if (obj instanceof Template)
  	 		{
 			 	 template = (Template)obj;
 			 	 template.writeObjects(file, namer, export);
+	 		}
+		else if (!export && obj instanceof DBTemplateEntry)
+			{
+				writeTemplateData(file);
+				// !!! TBD multiple templates support
+			}	 		
+		else if (obj instanceof DBDataEntry)
+ 	 		{
+			 	 DBDataEntry entry = (DBDataEntry)obj;
+			 	
+			 	// write comment
+			 	if (entry.getComment()!=null)
+			 		file.writeBytes(entry.getComment()+nl);
+			 	
+			 	//write data
+			 	file.writeBytes(entry.getData()+nl);
 	 		}
   }
 
@@ -1193,7 +1235,6 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
  final String TEXTBOX_START = "#! "+DBResolver.VDCTTEXTBOX+"(";
 
  final String TEMPLATE_START  = "#! "+DBResolver.TEMPLATE_INSTANCE+"(";
- final String TEMPLATE_PROPERTY_START  = "#! "+DBResolver.TEMPLATE_PROPERTY+"(";
  final String TEMPLATE_VALUE_START     = "#! "+DBResolver.TEMPLATE_VALUE+"(";
  	
  Enumeration e = elements.elements();
@@ -1349,24 +1390,11 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 			     file.writeBytes(nl);
 			 	 file.writeBytes(TEMPLATE_START+
  					 quote + templateName + quote +
- 					 comma + quote + template.getTemplateData().getTemplate().getId() + quote +
 		 			 comma + template.getX() + comma + template.getY() + 
 				 	 comma + StringUtils.color2string(template.getColor()) +
 					 comma + quote /*+ template.getDescription()*/ + quote +
 					 ending);
 					 
-				 TreeMap properties = template.getTemplateData().getProperties();
-				 Iterator i = properties.keySet().iterator();
-				 while (i.hasNext())
-				 {
-					 String name = i.next().toString();
-					 String value = (String)properties.get(name);
-				 	 file.writeBytes(TEMPLATE_PROPERTY_START+
-	 					 quote + templateName + quote +
-	 					 comma + quote + name + quote +
-						 comma + quote + value + quote +
-						 ending);
-				 }					 
 
 	 			e2 = template.getSubObjectsV().elements();
 	 			while (e2.hasMoreElements())
@@ -1435,19 +1463,23 @@ private static void writeTemplateData(DataOutputStream stream) throws IOExceptio
 {
 	final String nl = "\n";
 	
-	final String comma = ",";
+	final String comma = ", ";
 	final String quote = "\"";
 	final String ending = ")"+nl;
 
 	VDBTemplate data = Group.getEditingTemplateData();
 	
+ 	// write comment (even if not template definition is needed)
+ 	if (data.getComment()!=null)
+ 		stream.writeBytes(nl+data.getComment());
+
 	// template block not needed
 	if ((data.getRealDescription()==null || data.getRealDescription().length()==0) && 
 		 data.getInputs().isEmpty() && data.getOutputs().isEmpty())
 		return;
 	
 	// template start
-	stream.writeBytes(DBResolver.TEMPLATE+"(");
+	stream.writeBytes(nl+DBResolver.TEMPLATE+"(");
 	
 	if (data.getDescription()!=null)
 		stream.writeBytes(quote + data.getRealDescription() + quote);
@@ -1456,7 +1488,7 @@ private static void writeTemplateData(DataOutputStream stream) throws IOExceptio
 
 	// ports
 	// !!! test
-	stream.writeBytes("#! "+DBResolver.PORT+"("+
+	stream.writeBytes("#"+DBResolver.PORT+"("+
 		"name" +
 		comma + quote + "value" + quote +
 		comma + quote + "description" + quote + ending);
@@ -1524,7 +1556,17 @@ public static void save(Group group2save, File file, NameManipulator namer, bool
 	}
 	
 	writeIncludes(stream);
-	writeTemplateData(stream);
+	
+	// if not already present
+	// optimize !!!
+	boolean found = false;
+	Iterator i = Group.getRoot().getStructure().iterator();
+	while (i.hasNext() && !found)
+		if (i.next() instanceof DBTemplateEntry)
+			found = true;
+	
+	if (!found)
+		Group.getRoot().getStructure().addElement(new DBTemplateEntry());
 
 	group2save.writeObjects(stream, namer, export);
 
@@ -1574,5 +1616,14 @@ public static void setEditingTemplateData(VDBTemplate editingTemplateData)
 {
 	Group.editingTemplateData = editingTemplateData;
 }
+
+	/**
+	 * Returns the structure.
+	 * @return Vector
+	 */
+	public Vector getStructure()
+	{
+		return structure;
+	}
 
 }

@@ -39,7 +39,7 @@ import com.cosylab.vdct.inspector.Inspectable;
  * This type was created in VisualAge.
  */
 
-public class VDBRecordData {
+public class VDBRecordData implements Commentable {
 	protected String record_type;
 	protected String name;
 	protected Hashtable fields = null;

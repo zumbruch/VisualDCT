@@ -34,12 +34,11 @@ import java.util.Hashtable;
 /**
  * @author Matej
  */
-public class DBTemplate
+public class DBTemplate extends DBComment
 {
 	protected String id;
 	protected String fileName;
 	protected String description;
-	protected String comment;
 	protected Hashtable inputs = null;
 	protected Hashtable inputComments = null;
 	protected Hashtable outputs = null;
@@ -189,24 +188,6 @@ public class DBTemplate
 	public Hashtable getOutputComments()
 	{
 		return outputComments;
-	}
-
-	/**
-	 * Returns the comment.
-	 * @return String
-	 */
-	public String getComment()
-	{
-		return comment;
-	}
-
-	/**
-	 * Sets the comment.
-	 * @param comment The comment to set
-	 */
-	public void setComment(String comment)
-	{
-		this.comment = comment;
 	}
 
 	/**

@@ -1486,6 +1486,310 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 		Record record;
 		DBRecordData dbRec = null;
 		VDBRecordData vdbRec = null;
+
+		// not all inter-template links were created (not all fields were loaded in the lookup table)
+		ArrayList tobeUpdated = new ArrayList();
+		// add template instances and apply their visual data
+		VDBTemplateInstance vdbTemplate;
+		DBTemplateInstance dbTemplate;
+
+
+
+		// add records, template instances and entries
+		Enumeration e = vdbData.getStructure().elements();
+		while (e.hasMoreElements())
+		{
+			Object obj = e.nextElement();
+			if (obj instanceof VDBRecordData)
+			{
+
+				vdbRec = (VDBRecordData)obj;
+				dbRec = (DBRecordData) dbData.getRecords().get(vdbRec.getName());
+				// check if record already exists
+				if ((record = (Record) rootGroup.findObject(vdbRec.getName(), true))
+					!= null) {
+					Console.getInstance().println(
+						"Record "
+							+ vdbRec.getName()
+							+ " already exists - this definition will be ignored.");
+					blackList.add(record);
+					continue;
+				}
+	
+				record = new Record(null, vdbRec, dbRec.getX(), dbRec.getY());
+				record.setRight(dbRec.isRotated());
+				record.setColor(dbRec.getColor());
+				record.setDescription(dbRec.getDescription());
+	
+				// add fields
+				e2 = dbRec.getFieldsV().elements();
+				while (e2.hasMoreElements()) {
+					dbField = (DBFieldData) (e2.nextElement());
+					if (dbField.isHasAdditionalData()) {
+						field = record.initializeLinkField(vdbRec.getField(dbField.getName()));
+						field.setColor(dbField.getColor());
+						field.setRight(dbField.isRotated());
+						field.setDescription(dbField.getDescription());
+					}
+				}
+	
+				group.addSubObject(vdbRec.getName(), record, true);
+
+			}
+			else if (obj instanceof VDBTemplateInstance)
+			{
+				vdbTemplate = (VDBTemplateInstance)obj;
+				
+				dbTemplate = (DBTemplateInstance)dbData.getTemplateInstances().get(vdbTemplate.getName());
+	
+				VDBTemplate template = (VDBTemplate)vdbData.getTemplates().get(dbTemplate.getTemplateId());
+				if (template==null)
+				{
+					/*// already issued
+					Console.getInstance().println(
+						"Template instance "+dbTemplate.getTemplateID()+" cannot be created since "
+							+ dbTemplate.getTemplateClassID()
+							+ " does not exist - this definition will be ignored.");*/
+					continue;
+				}			
+				
+				VDBTemplateInstance templateInstance = (VDBTemplateInstance)vdbData.getTemplateInstances().get(dbTemplate.getTemplateInstanceId());
+				if (templateInstance==null)
+				{
+					Console.getInstance().println(
+						"Template instance "+dbTemplate.getTemplateInstanceId()+" does not exist - this definition will be ignored.");
+					continue;
+				}			
+	
+				Template templ = new Template(null, templateInstance);
+				group.addSubObject(dbTemplate.getTemplateInstanceId(), templ, true);
+	
+				//templ.setDescription(dbTemplate.getDescription());
+				//templ.setDescription(template.getDescription());
+				templ.setColor(dbTemplate.getColor());
+				templ.move(dbTemplate.getX(), dbTemplate.getY());
+				//templ.forceValidation();
+				
+				tobeUpdated.add(templ);
+			}
+			else if (obj instanceof DBEntry)
+			{
+				group.getStructure().addElement(obj);
+			}
+			
+		}
+
+		// add groups (if not already created) and apply visual data
+
+		Group grp;
+		DBGroupData dbGrp;
+		e = dbData.getGroups().elements();
+		while (e.hasMoreElements()) {
+			dbGrp = (DBGroupData) (e.nextElement());
+			grp = (Group) rootGroup.findObject(dbGrp.getName(), true);
+			if (importDB && (grp != null)) {
+				Console.getInstance().println(
+					"Group "
+						+ dbGrp.getName()
+						+ " already exists - this definition will be ignored.");
+				continue;
+			}
+			if (grp == null)
+				grp = rootGroup.createGroup(dbGrp.getName());
+			grp.setColor(dbGrp.getColor());
+			grp.setDescription(dbGrp.getDescription());
+			grp.setX(dbGrp.getX()); grp.setY(dbGrp.getY());
+		}
+
+
+		// update template instances links
+		Iterator i = tobeUpdated.iterator();
+		while (i.hasNext())
+			((Template)i.next()).manageLinks();
+
+		// add links, connectors
+		
+		// !!!! fix templates links, connectors
+
+		int pos;
+		String recordName;
+		String fieldName;
+		String target;
+
+		OutLink outlink;
+		InLink inlink;
+		Connector connector;
+		DBConnectorData connectorData;
+		DBLinkData dbLink;
+		e = dbData.getLinks().elements();
+		while (e.hasMoreElements()) {
+			dbLink = (DBLinkData) (e.nextElement());
+
+			pos = dbLink.getFieldName().lastIndexOf(Constants.FIELD_SEPARATOR);
+			recordName = dbLink.getFieldName().substring(0, pos);
+			fieldName = dbLink.getFieldName().substring(pos + 1);
+
+			record = (Record) rootGroup.findObject(recordName, true);
+			if (record != null) {
+				if (importDB) {
+					if (blackList.contains(record)) {
+						Console.getInstance().println(
+							"Link "
+								+ dbLink.getFieldName()
+								+ " already exists - this definition will be ignored.");
+						continue;
+					}
+				}
+
+				Object unknownTarget = record.getSubObjects().get(fieldName);
+				if (unknownTarget instanceof OutLink)
+				{
+					outlink = (OutLink) unknownTarget;
+
+					target = dbLink.getTargetID();
+					pos = target.lastIndexOf(EPICSLinkOut.LINK_SEPARATOR);
+					if (pos >= 0) // connectors
+						{
+						while ((connectorData = (DBConnectorData) dbData.getConnectors().get(target))!= null) {
+							connector = new Connector(target, record, null, null);
+							connector.setColor(connectorData.getColor());
+							connector.setDescription(connectorData.getDescription());
+							connector.setX(connectorData.getX());
+							connector.setY(connectorData.getY());
+							record.addSubObject(connector.getID(), connector);
+							connector.setOutput(outlink, null);
+							outlink.setInput(connector);
+
+							outlink = connector;
+							target = connectorData.getTargetID();
+						}
+					}
+
+					// final target
+					pos = target.lastIndexOf(Constants.FIELD_SEPARATOR);
+					if (pos >= 0) {
+						recordName = target.substring(0, pos);
+						fieldName = target.substring(pos + 1);
+
+						// remove process
+						pos = fieldName.indexOf(' ');
+						if (pos>0)
+							fieldName = fieldName.substring(0, pos);
+
+						record = (Record) rootGroup.findObject(recordName, true);
+						if (record != null) {
+							Object unknown = record.getSubObjects().get(fieldName);
+							if (unknown instanceof InLink) {
+								inlink = (InLink)unknown;
+								inlink.setOutput(outlink, null);
+								outlink.setInput(inlink);
+							}
+						}
+					} else {
+						Record targetRecord = null;
+						if ((targetRecord = (Record) rootGroup.findObject(target, true)) != null)
+						{
+							// VAL or forward link
+							VDBFieldData fieldData = (VDBFieldData) record.getRecordData().getField(fieldName);		// existance already checked
+							if (fieldData.getType() == DBDConstants.DBF_FWDLINK) {
+								// forward link
+								targetRecord.setOutput(outlink, null);
+								outlink.setInput(targetRecord);
+							} 
+							else
+							{
+								// VAL
+								inlink = (InLink) record.getSubObjects().get("VAL");
+								if (inlink != null) {
+									inlink.setOutput(outlink, null);
+									outlink.setInput(inlink);
+								}
+
+							}
+
+						}
+					}
+
+				}
+			}
+
+			// lines 
+			DBLine dbLine;
+			e = dbData.getLines().elements();
+			while (e.hasMoreElements())
+			{
+				dbLine = (DBLine)e.nextElement();
+				Line line = new Line(dbLine.getName(), null, dbLine.getX(), dbLine.getY(), dbLine.getX2(), dbLine.getY2());
+				line.setDashed(dbLine.isDashed());
+				line.setStartArrow(dbLine.isStartArrow());
+				line.setEndArrow(dbLine.isEndArrow());
+				line.setColor(dbLine.getColor());
+				rootGroup.addSubObject(line.getName(), line, true);
+			}
+
+			// boxes 
+			DBBox dbBox;
+			e = dbData.getBoxes().elements();
+			while (e.hasMoreElements())
+			{
+				dbBox = (DBBox)e.nextElement();
+				Box box = new Box(dbBox.getName(), null, dbBox.getX(), dbBox.getY(), dbBox.getX2(), dbBox.getY2());
+				box.setIsDashed(dbBox.isDashed());
+				box.setColor(dbBox.getColor());
+				rootGroup.addSubObject(box.getName(), box, true);
+			}
+
+			// textboxes 
+			DBTextBox dbTextBox;
+			e = dbData.getTextboxes().elements();
+			while (e.hasMoreElements())
+			{
+				dbTextBox = (DBTextBox)e.nextElement();
+				TextBox textbox = new TextBox(dbTextBox.getName(), null, dbTextBox.getX(), dbTextBox.getY(), dbTextBox.getX2(), dbTextBox.getY2());
+				textbox.setBorder(dbTextBox.getBorder());
+				
+				Font font = FontMetricsBuffer.getInstance().getFont(dbTextBox.getFontName(), dbTextBox.getFontSize(), dbTextBox.getFontStyle());
+				textbox.setFont(font);
+				
+				textbox.setDescription(dbTextBox.getDescription());
+				textbox.setColor(dbTextBox.getColor());
+				rootGroup.addSubObject(textbox.getName(), textbox, true);
+			}
+
+		}
+
+	} catch (Exception e) {
+		Console.getInstance().println("Error occured while applying visual data!");
+		e.printStackTrace();
+	}
+
+	group.initializeLayout();
+	group.manageLinks(true);
+}
+
+/**
+ * Insert the method's description here.
+ */
+public static void _applyVisualData(boolean importDB, Group group, DBData dbData, VDBData vdbData)
+{
+	// apply visual-data && generate visual object, group hierarchy
+	try {
+
+		Group rootGroup = Group.getRoot();
+
+		ArrayList blackList = null;
+		if (importDB)
+			blackList = new ArrayList();
+
+		// add records
+
+		EPICSLink field;
+		DBFieldData dbField;
+		Enumeration e2;
+
+		Record record;
+		DBRecordData dbRec = null;
+		VDBRecordData vdbRec = null;
 		Enumeration e = vdbData.getRecords().elements();
 		while (e.hasMoreElements()) {
 			vdbRec = (VDBRecordData) (e.nextElement());
@@ -1747,6 +2051,8 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 	group.initializeLayout();
 	group.manageLinks(true);
 }
+
+
 
 /**
  * Insert the method's description here.

@@ -31,6 +31,7 @@ package com.cosylab.vdct.vdb;
 import java.awt.Component;
 import java.util.regex.Pattern;
 
+import com.cosylab.vdct.events.Command;
 import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.util.StringUtils;
 
@@ -40,12 +41,12 @@ import com.cosylab.vdct.util.StringUtils;
  * @author 
  */
 public class CommentProperty implements com.cosylab.vdct.inspector.InspectableProperty {
-	VDBRecordData record;
+	Commentable record;
 	private static String helpString = "\""+com.cosylab.vdct.db.DBConstants.commentString+"\" will be added automatically";
 /**
  * CommentProperty constructor comment.
  */
-public CommentProperty(VDBRecordData record) {
+public CommentProperty(Commentable record) {
 	this.record=record;
 }
 /**

@@ -34,14 +34,12 @@ import java.util.Hashtable;
 /**
  * @author Matej
  */
-public class DBTemplateInstance
+public class DBTemplateInstance extends DBComment
 {
 	protected String templateInstanceId;
 	protected String templateId;
 	protected Hashtable properties = null;
 	protected Hashtable values = null;
-
-	protected String comment = null;
 
 	protected int x = -1;			// used for layout
 	protected int y = -1;
@@ -165,24 +163,6 @@ public class DBTemplateInstance
 	public String getTemplateInstanceId()
 	{
 		return templateInstanceId;
-	}
-
-	/**
-	 * Returns the comment.
-	 * @return String
-	 */
-	public String getComment()
-	{
-		return comment;
-	}
-
-	/**
-	 * Sets the comment.
-	 * @param comment The comment to set
-	 */
-	public void setComment(String comment)
-	{
-		this.comment = comment;
 	}
 
 }

@@ -119,11 +119,9 @@ public class DBResolver {
 	
 	// template 'instatiation'
 	// used format:
- 	// #! TemplateInstance("templateid", x, y, color, "desc")
- 	// #! TemplateProperty("templateid", "name", "value")
- 	// #! TemplateFieldValue("templateid", "alias", "value")
+ 	// #! TemplateInstance("template instance id", x, y, color, "desc")
+ 	// #! TemplateFieldValue("template instance id", "alias", "value")
 	public static final String TEMPLATE_INSTANCE = "TemplateInstance";
-	public static final String TEMPLATE_PROPERTY = "TemplateProperty";
 	public static final String TEMPLATE_VALUE ="TemplateFieldValue";
 
 /**
@@ -455,30 +453,6 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 						ti.setX(tx); ti.setY(ty); ti.setColor(StringUtils.int2color(t));
 						ti.setDescription(desc);
 					}
-				}
-				else if (tokenizer.sval.equalsIgnoreCase(TEMPLATE_PROPERTY)) {
-					// read template id
-					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD)||
-						(tokenizer.ttype == DBConstants.quoteChar)) str=tokenizer.sval;
-					else throw (new DBGParseException(errorString, tokenizer, fileName));
-					
-					// read name
-					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD)||
-						(tokenizer.ttype == DBConstants.quoteChar)) str2=tokenizer.sval;
-					else throw (new DBGParseException(errorString, tokenizer, fileName));
-
-					// read value
-					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD)||
-						(tokenizer.ttype == DBConstants.quoteChar)) desc=tokenizer.sval;
-					else throw (new DBGParseException(errorString, tokenizer, fileName));
-
-					DBTemplateInstance ti = (DBTemplateInstance)data.getTemplateInstances().get(str);
-					if (ti!=null)
-						ti.getProperties().put(str2, desc);
-					
 				}
 				else if (tokenizer.sval.equalsIgnoreCase(TEMPLATE_VALUE)) {
 					// read template id
@@ -958,12 +932,19 @@ System.out.println("template(\""+str+"\")\n{");
 					if (!templateData.isInitialized())
 					{
 						templateData.setInitialized(true);
-						templateData.setComment(comment); 
+						templateData.setComment(comment); comment = defaultComment;
 						templateData.setDescription(str);
+
+						DBTemplateEntry entry = new DBTemplateEntry();
+						data.addEntry(entry);
+
 					}
 					else
-						comment = defaultComment;			// !!! what to do with comment
-
+					{
+				// !!! TBD multiple templates support
+						comment = defaultComment;
+					}
+					
 					processPorts(templateData, tokenizer, fileName);
 					
 System.out.println("}");
@@ -1010,6 +991,10 @@ System.out.println("}");
 					if (tokenizer.ttype == DBConstants.quoteChar) include_filename=tokenizer.sval;
 					else throw (new DBParseException("Invalid include filename...", tokenizer, fileName));
 
+					DBDataEntry entry = new DBDataEntry(INCLUDE+" \""+include_filename+"\"");
+					entry.setComment(comment);	comment = defaultComment;
+					data.addEntry(entry);
+
 					// if not absulute fileName, do not use relative path
 					if (!(include_filename.charAt(0)=='/' || include_filename.charAt(0)=='\\' || (include_filename.length()>1 && include_filename.charAt(1)==':')))
 						include_filename = com.cosylab.vdct.util.StringUtils.replaceFileName(fileName, include_filename);
@@ -1020,10 +1005,36 @@ System.out.println("}");
 			
 				/****************** path ********************/
 
-				 else if (tokenizer.sval.equalsIgnoreCase(PATH) ||
-  						  tokenizer.sval.equalsIgnoreCase(ADDPATH))
-					Console.getInstance().println("Warning: 'path' and 'addpath' commands are not supported...");
+				 else if (tokenizer.sval.equalsIgnoreCase(PATH))
+  				{
+					// read paths
+					tokenizer.nextToken();
+					if (tokenizer.ttype == DBConstants.quoteChar) str=tokenizer.sval;
+					else throw (new DBParseException("Invalid path...", tokenizer, fileName));
+
+					DBDataEntry entry = new DBDataEntry(PATH+" \""+str+"\"");
+					entry.setComment(comment);	comment = defaultComment;
+					data.addEntry(entry);
+
+					Console.getInstance().println("Warning: 'path' command is not supported...");
+  				}
 				
+				/****************** addpath ********************/
+
+				 else if (tokenizer.sval.equalsIgnoreCase(ADDPATH))
+  				{
+					// read add paths
+					tokenizer.nextToken();
+					if (tokenizer.ttype == DBConstants.quoteChar) str=tokenizer.sval;
+					else throw (new DBParseException("Invalid addpath...", tokenizer, fileName));
+
+					DBDataEntry entry = new DBDataEntry(ADDPATH+" \""+str+"\"");
+					entry.setComment(comment);	comment = defaultComment;
+					data.addEntry(entry);
+
+					Console.getInstance().println("Warning: 'addpath' command is not supported...");
+  				}
+
 	} catch (Exception e) {
 		Console.getInstance().println("\n"+e);
 	}	

@@ -136,17 +136,7 @@ public java.util.Hashtable getSubObjects() {
 public java.util.Vector getSubObjectsV() {
 	return subObjectsV;
 }
-/**
- * Insert the method's description here.
- * Creation date: (29.1.2001 22:49:30)
- * @param object java.lang.Object
- */
-public void removeObject(Object object) throws Exception {
-	if (!useHashtable) subObjectsV.removeElement(object);
-	else {
-		throw new Exception("ContainerObject uses Hashtable!");
-	}
-}
+
 /**
  * Insert the method's description here.
  * Creation date: (21.12.2000 20:32:49)

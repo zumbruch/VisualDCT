@@ -47,6 +47,9 @@ public class VDBData {
 	private static Hashtable templates = new Hashtable();
 	private Hashtable templateInstances = null;
 	private Vector templateInstancesV = null;
+
+	private Vector structure = null;
+
 /**
  * DBDData constructor comment.
  */
@@ -55,6 +58,8 @@ public VDBData() {
 	//templates = new Hashtable();
 	templateInstances = new Hashtable();
 	templateInstancesV = new Vector();
+
+	structure = new Vector();
 }
 /**
  * This method was created in VisualAge.
@@ -65,7 +70,19 @@ public void addRecord(VDBRecordData rd) {
 //	if (!records.containsKey(rd.name))
 //		records.put(rd.name, rd);
 	if (!records.contains(rd))
+	{
 		records.addElement(rd);
+		structure.addElement(rd);
+	}
+}
+
+/**
+ * This method was created in VisualAge.
+ * @param 
+ */
+public void addEntry(DBEntry ed) {
+	if (!structure.contains(ed))
+		structure.addElement(ed);
 }
 
 /**
@@ -88,6 +105,7 @@ public void addTemplateInstance(VDBTemplateInstance ti) {
 		{
 			templateInstancesV.addElement(ti);
 			templateInstances.put(ti.getName(), ti);
+			structure.addElement(ti);
 		}
 }
 
@@ -237,15 +255,32 @@ private static VDBData generateVDBDataInternal(DBDData dbd, DBData db) {
 		// extract templates
 		extractTemplates(dbd, db, vdb);
 		
-		// generate records
-		generateRecords(dbd, db, vdb);
-		
-		// generate template instances
-		generateTemplateInstances(db, vdb);
+		// add records, template instances and entries
+		Enumeration e = db.getStructure().elements();
+		while (e.hasMoreElements())
+		{
+			Object obj = e.nextElement();
+			if (obj instanceof DBRecordData)
+			{
+				DBRecordData dbRecord = (DBRecordData)obj;
+				vdb.addRecord(generateVDBRecordData(dbd, dbRecord));
+			}
+			else if (obj instanceof DBTemplateInstance)
+			{
+				DBTemplateInstance dbTemplateInstance = (DBTemplateInstance)obj;
+				VDBTemplateInstance vti = generateVDBTemplateInstance(dbTemplateInstance);
+				if (vti!=null)
+					vdb.addTemplateInstance(vti);
+			}
+			else if (obj instanceof DBEntry)
+			{
+				vdb.addEntry((DBEntry)obj);	
+			}
+			
+		}
 
 	}
-
-	
+		
 	return vdb;
 }
 
@@ -273,23 +308,36 @@ public static void generateTemplateInstances(DBData db, VDBData vdb)
 	e = db.getTemplateInstances().elements();
 	while (e.hasMoreElements()) {
 		dbTemplateInstance = (DBTemplateInstance)(e.nextElement());
-		VDBTemplate t = (VDBTemplate)vdb.getTemplates().get(dbTemplateInstance.getTemplateId());
-		if (t==null)
-		{
-			Console.getInstance().println(
-				"Template instance "+dbTemplateInstance.getTemplateInstanceId()+" cannot be created since "
-					+ dbTemplateInstance.getTemplateInstanceId()
-					+ " does not exist - this definition will be ignored.");
-			continue;
-		}
-		VDBTemplateInstance vti = new VDBTemplateInstance(dbTemplateInstance.getTemplateInstanceId(), t);
-		vti.setProperties(new TreeMap(dbTemplateInstance.getProperties()));
-			
-		vti.setInputs(generateTemplateInstanceIOFields(vti, dbTemplateInstance.getValues(), t.getInputs(), t.getInputComments()));
-		vti.setOutputs(generateTemplateInstanceIOFields(vti, dbTemplateInstance.getValues(), t.getOutputs(), t.getOutputComments()));
-	
-		vdb.addTemplateInstance(vti);
+		VDBTemplateInstance vti = generateVDBTemplateInstance(dbTemplateInstance);
+		if (vti!=null)
+			vdb.addTemplateInstance(vti);
 	}
+}
+
+
+/**
+ * 
+ */
+public static VDBTemplateInstance generateVDBTemplateInstance(DBTemplateInstance dbTemplateInstance)
+{
+	VDBTemplate t = (VDBTemplate)VDBData.getTemplates().get(dbTemplateInstance.getTemplateId());
+	if (t==null)
+	{
+		Console.getInstance().println(
+			"Template instance "+dbTemplateInstance.getTemplateInstanceId()+" cannot be created since "
+				+ dbTemplateInstance.getTemplateInstanceId()
+				+ " does not exist - this definition will be ignored.");
+		return null;
+	}
+	VDBTemplateInstance vti = new VDBTemplateInstance(dbTemplateInstance.getTemplateInstanceId(), t);
+	vti.setComment(dbTemplateInstance.getComment());	
+
+	vti.setProperties(new TreeMap(dbTemplateInstance.getProperties()));
+		
+	vti.setInputs(generateTemplateInstanceIOFields(vti, dbTemplateInstance.getValues(), t.getInputs(), t.getInputComments()));
+	vti.setOutputs(generateTemplateInstanceIOFields(vti, dbTemplateInstance.getValues(), t.getOutputs(), t.getOutputComments()));
+	
+	return vti;
 }
 
 /**
@@ -367,6 +415,7 @@ public static void extractTemplates(DBDData dbd, DBData db, VDBData vdb)
 private static VDBData generateTemplate(DBDData dbd, DBTemplate dbTemplate)
 {
 	VDBTemplate vt = new VDBTemplate(dbTemplate.getId(), dbTemplate.getFileName());
+	vt.setComment(dbTemplate.getComment());	
 	vt.setDescription(dbTemplate.getDescription());
 	
 	// generate vt.group / VDB data
@@ -710,5 +759,14 @@ public void removeTemplateInstance(VDBTemplateInstance templateInstance) {
 	templateInstancesV.remove(templateInstance);
 	templateInstances.remove(templateInstance);
 }
+
+	/**
+	 * Returns the structure.
+	 * @return Vector
+	 */
+	public Vector getStructure()
+	{
+		return structure;
+	}
 
 }

@@ -52,13 +52,15 @@ import com.cosylab.vdct.vdb.*;
  */
 public class Template
 	extends LinkManagerObject
-	implements /*Descriptable,*/ Movable, Inspectable, Popupable, Flexible, Selectable, Clipboardable, Hub, MonitoredPropertyListener, SaveInterface
+	implements /*Descriptable,*/ Movable, Inspectable, Popupable, Flexible, Selectable, Clipboardable, Hub, MonitoredPropertyListener, SaveInterface, SaveObject
 {
 
 	VDBTemplateInstance templateData = null;
 	//String description = null;
 
 	private static ImageIcon icon = null;
+
+	private CommentProperty commentProperty = null;
 
 	// properties field
 	protected int rfieldLabelX;
@@ -356,7 +358,9 @@ public class Template
 	 */
 	public InspectableProperty getCommentProperty()
 	{
-		return null;
+		if (commentProperty==null)
+			commentProperty = new CommentProperty(templateData);
+		return commentProperty;
 	}
 
 	/**
@@ -1122,10 +1126,40 @@ public void writeObjects(DataOutputStream file, NameManipulator namer, boolean e
 	throws IOException
 {
 	// do not generate template data if not is export mode
+	// but write expand block
 	if (!export)
-		return;
+	{
+		
+		final String nl = "\n";
+		final String comma = ", ";
+		final String quote = "\"";
+		final String macro = "  "+DBResolver.MACRO+"(";
+		final String ending = ")"+nl;
+		
+	 	// write comment
+	 	if (getTemplateData().getComment()!=null)
+	 		file.writeBytes(nl+getTemplateData().getComment());
+		
+		// expand start
+		file.writeBytes(nl+DBResolver.EXPAND+"(\""+getTemplateData().getTemplate().getId()+"\""+
+						comma + getTemplateData().getName() + ") {"+nl);
 	
-	// export DB option
+		// macros
+		Map macros = getTemplateData().getProperties();
+		Iterator i = macros.keySet().iterator();
+		while (i.hasNext())
+		{
+			String name = i.next().toString();
+			file.writeBytes(macro + name + comma + quote + macros.get(name).toString() + quote + ending);
+		}
+			
+		// export end
+		file.writeBytes("}"+nl);
+
+		return;
+	}
+	
+	// export (generate, flatten) DB option
 	
 	 String templateName = namer.getResolvedName(getName());
  	

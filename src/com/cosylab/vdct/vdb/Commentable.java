@@ -1,4 +1,4 @@
-package com.cosylab.vdct.db;
+package com.cosylab.vdct.vdb;
 
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
@@ -28,31 +28,22 @@ package com.cosylab.vdct.db;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/**
- * Insert the type's description here.
- * Creation date: (23/8/99 14:06:31)
- * @author Matej Sekoranja
- */
-public class DBComment {
-	protected String comment;
+public interface Commentable {
+	/**
+	 * Returns the name.
+	 * @return String
+	 */
+	String getName();
 
-	final static String nullString = "";
+	/**
+	 * Returns the comment.
+	 * @return String
+	 */
+	String getComment();
 	
-/**
- * Insert the method's description here.
- * Creation date: (23/8/99 14:08:34)
- * @return java.lang.String
- */
-public String getComment() {
-	return comment;
-}
-/**
- * Insert the method's description here.
- * Creation date: (23/8/99 14:03:42)
- * @param comment java.lang.String
- */
-public void setComment(String comment) {
-	comment = comment.trim();
-	if (!comment.equals(nullString)) this.comment=comment;
-}
+	/**
+	 * Sets the comment.
+	 * @param comment The comment to set
+	 */
+	void setComment(String comment);
 }

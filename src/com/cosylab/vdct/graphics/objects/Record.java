@@ -55,7 +55,7 @@ import com.cosylab.vdct.events.commands.*;
  */
 public class Record 
 	extends LinkManagerObject
-	implements Clipboardable, Descriptable, Flexible, Hub, Morphable, Movable, MultiInLink, Rotatable, Selectable, Popupable, Inspectable
+	implements Clipboardable, Descriptable, Flexible, Hub, Morphable, Movable, MultiInLink, Rotatable, Selectable, Popupable, Inspectable, SaveObject
 {
 
 	//private final static String nullString = "";
@@ -63,6 +63,7 @@ public class Record
 	private final static int tailSizeOfR = 4;
 	private static javax.swing.ImageIcon icon = null;
 	protected VDBRecordData recordData = null;
+	private CommentProperty commentProperty = null;
 	// type label
 	protected int rtypeLabelX;
 	protected int rtypeLabelY;
@@ -487,7 +488,9 @@ public void fixLinks() {
  * @return com.cosylab.vdct.inspector.InspectableProperty
  */
 public com.cosylab.vdct.inspector.InspectableProperty getCommentProperty() {
-	return new CommentProperty(recordData);
+	if (commentProperty==null)
+		commentProperty = new CommentProperty(recordData);
+	return commentProperty;
 }
 /**
  * Insert the method's description here.

@@ -54,7 +54,7 @@ import com.cosylab.vdct.inspector.InspectorManager;
  * @author Matej
  */
 
-public class VDBTemplate implements Inspectable
+public class VDBTemplate implements Inspectable, Commentable
 {
 	
 	protected String id = null;
@@ -66,6 +66,9 @@ public class VDBTemplate implements Inspectable
 	protected Hashtable outputComments = null;
 	protected Group group = null;
 	
+	private String comment = null;
+	private CommentProperty commentProperty = null;
+
 	private static ImageIcon icon = null;
 
 	private static GUISeparator templateSeparator = null;
@@ -403,7 +406,9 @@ public class VDBTemplate implements Inspectable
 	 */
 	public InspectableProperty getCommentProperty()
 	{
-		return null;
+		if (commentProperty==null)
+			commentProperty = new CommentProperty(this);
+		return commentProperty;
 	}
 
 	/**
@@ -504,6 +509,24 @@ public class VDBTemplate implements Inspectable
 	 */
 	public String toString() {
 		return "Template: " + description + " [" + id + "]";
+	}
+
+	/**
+	 * Returns the comment.
+	 * @return String
+	 */
+	public String getComment()
+	{
+		return comment;
+	}
+
+	/**
+	 * Sets the comment.
+	 * @param comment The comment to set
+	 */
+	public void setComment(String comment)
+	{
+		this.comment = comment;
 	}
 
 }

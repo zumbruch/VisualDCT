@@ -39,14 +39,16 @@ import com.cosylab.vdct.util.StringUtils;
 /**
  * @author Matej
  */
-public class VDBTemplateInstance
+public class VDBTemplateInstance implements Commentable
 {
-	String name = null;
-	VDBTemplate template = null;
-//	Hashtable properties = null;
-	TreeMap properties = null;
-	Hashtable inputs = null;
-	Hashtable outputs = null;
+	protected String name = null;
+	protected VDBTemplate template = null;
+	//protected Hashtable properties = null;
+	protected TreeMap properties = null;
+	protected Hashtable inputs = null;
+	protected Hashtable outputs = null;
+
+	private String comment = null;
 	
 	/**
 	 * Constructor.
@@ -159,5 +161,23 @@ public String getName()
 public void setName(java.lang.String newName) {
 	name = newName;
 }
+
+	/**
+	 * Returns the comment.
+	 * @return String
+	 */
+	public String getComment()
+	{
+		return comment;
+	}
+
+	/**
+	 * Sets the comment.
+	 * @param comment The comment to set
+	 */
+	public void setComment(String comment)
+	{
+		this.comment = comment;
+	}
 
 }

@@ -51,12 +51,18 @@ public class DBData {
 	protected Hashtable connectors = null;
 	protected Hashtable templates = null;		// templates loaded by the way
 	protected Hashtable templateInstances = null;
+	
+	// contains DB structure (entry (include, path, addpath statements), record, expand)
+	protected Vector structure = null; 
+	
 /**
  * DBDData constructor comment.
  */
 public DBData(String id, String fileName) {
 	
 	templateData = new DBTemplate(id, fileName);
+
+	structure = new Vector();
 	
 	records = new Hashtable();
 	recordsV = new Vector();
@@ -106,6 +112,15 @@ public void addLine(DBLine ld) {
 
 /**
  * This method was created in VisualAge.
+ * @param ld com.cosylab.vdct.db.DBEntry
+ */
+public void addEntry(DBEntry ed) {
+	if (!structure.contains(ed))
+		structure.addElement(ed);
+}
+
+/**
+ * This method was created in VisualAge.
  * @param ld com.cosylab.vdct.db.DBBox
  */
 public void addBox(DBBox bd) {
@@ -130,6 +145,7 @@ public void addRecord(DBRecordData rd) {
 	if (!records.containsKey(rd.getName())) {
 		records.put(rd.getName(), rd);
 		recordsV.addElement(rd);
+		structure.addElement(rd);		// add entry
 	}
 	else
 		Console.getInstance().println("Warning: Record with name '"+rd.getName()+"' already exists, skiping...");
@@ -141,6 +157,7 @@ public void addRecord(DBRecordData rd) {
 public void addTemplateInstance(DBTemplateInstance ti) {
 	if (!templateInstances.containsKey(ti.getTemplateInstanceId())) {
 		templateInstances.put(ti.getTemplateInstanceId(), ti);
+		structure.addElement(ti);		// add entry
 	}
 	else
 		Console.getInstance().println("Warning: Template instance of '"+ti.getTemplateInstanceId()+"' already exists, skiping...");
@@ -290,6 +307,15 @@ public Hashtable getTemplates()
 	public DBTemplate getTemplateData()
 	{
 		return templateData;
+	}
+
+	/**
+	 * Returns the structure.
+	 * @return Vector
+	 */
+	public Vector getStructure()
+	{
+		return structure;
 	}
 
 }
