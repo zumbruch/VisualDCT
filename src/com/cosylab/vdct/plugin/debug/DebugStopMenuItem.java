@@ -30,6 +30,7 @@ package com.cosylab.vdct.plugin.debug;
 
 import javax.swing.*;
 
+import com.cosylab.vdct.Console;
 import com.cosylab.vdct.graphics.DrawingSurface;
 import com.cosylab.vdct.graphics.objects.Group;
 
@@ -68,6 +69,8 @@ public static void stopDebugging()
 	DebugPlugin debugPlugin = PluginDebugManager.getDebugPlugin();
 	if (debugPlugin!=null)
 	{
+		Console.getInstance().println("Stopping debugging with '" + debugPlugin.getName() + "'...");
+
 		debugPlugin.deregisterAll();
 		debugPlugin.stopDebugging();
 		PluginDebugManager.setDebugState(false);

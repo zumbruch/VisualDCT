@@ -79,9 +79,13 @@ public void actionPerformed(ActionEvent event)
 		}
 		
 		DebugPlugin debugPlugin = (DebugPlugin)plugin.getPlugin();
+
+		Console.getInstance().println("Starting debugging with '" + debugPlugin.getName()+ "'...");
+
 		PluginDebugManager.setDebugPlugin(debugPlugin);
 		PluginDebugManager.setDebugState(true);
 		debugPlugin.startDebugging();
+
 	
 		new Thread(this).start();
 	}
