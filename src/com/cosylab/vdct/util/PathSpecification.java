@@ -33,6 +33,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Matej
@@ -237,6 +239,88 @@ public class PathSpecification
 		resultingRelativePath.append(strPath.substring(commonLength));
 	
 		return new File(resultingRelativePath.substring(1));
+	}
+	
+	public static File getRelativeNameNoStepdowns(File path, File relativeToPath)
+	{
+		// make both paths absolute
+		if (!path.isAbsolute())
+			path = path.getAbsoluteFile();
+		if (!relativeToPath.isAbsolute())
+			relativeToPath = relativeToPath.getAbsoluteFile();
+			
+		// make both cannonical
+		try
+		{
+			path = path.getCanonicalFile();
+			relativeToPath = relativeToPath.getCanonicalFile();
+		}
+		catch (IOException ioe)
+		{
+			return null;
+		}
+		
+		// make relativeToPath directory
+		if (!relativeToPath.isDirectory())
+			relativeToPath = relativeToPath.getParentFile();
+			
+		String strPath;
+		if (path.isDirectory())
+			strPath = path.getAbsolutePath()+File.separator;
+		else
+			strPath = path.getAbsolutePath();
+		String strRelativeToPath = relativeToPath.getAbsolutePath()+File.separator;
+		
+		// get common part of path
+		int commonLength = 0;
+		int minLength = Math.min(strPath.length(), strRelativeToPath.length());
+		while (commonLength < minLength && 
+			   strPath.charAt(commonLength) == strRelativeToPath.charAt(commonLength))
+			commonLength++;
+			
+		// if none, return entire path
+		if (commonLength == 0)
+			return null;
+			
+		// strip off common part to separator
+		// there should be no separator in commonLength
+		commonLength = strPath.lastIndexOf(File.separatorChar, commonLength-1);
+			
+		// if none, return entire path
+		if (commonLength == 0)
+			return null;
+
+		String commonPath = strPath.substring(0, commonLength);
+		StringBuffer resultingRelativePath = new StringBuffer();
+		
+		
+		//calculcate "step downs"
+		final String stepDown = File.separator+"..";
+		if (relativeToPath.getParent()!=null &&		// needed to handle "<driveLetter>:" to "<driveLetter>:/" comparison  
+			   !relativeToPath.getAbsolutePath().equals(commonPath))
+		return null;
+		
+		// move up to path
+		resultingRelativePath.append(strPath.substring(commonLength));
+	
+		return new File(resultingRelativePath.substring(1));
+	}		
+	
+	public static String matchAndReplace(String value) {
+		if (value==null || value.indexOf('$')<0) return value;
+		
+		Pattern macrop = Pattern.compile("\\$\\(([^\\.\\$]+)\\)");
+		
+		Matcher macro = macrop.matcher(value);
+		StringBuffer result=new StringBuffer();
+		while (macro.find()) {
+			String macron=macro.group(1);
+			macro.appendReplacement(result, System.getProperty(macron).replaceAll("\\$","\\\\\\$"));
+		}
+		
+		macro.appendTail(result);
+		
+		return result.toString();
 	}
 
 /*	

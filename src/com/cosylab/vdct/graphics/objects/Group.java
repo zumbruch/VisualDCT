@@ -1484,8 +1484,12 @@ private static void writeUsedDBDs(File dbFile, DataOutputStream stream) throws I
 				
 				if (Group.getAbsoluteDBDs()) 
 					dbdFile = dbdFile.getAbsoluteFile();
-				else 
-					dbdFile = PathSpecification.getRelativeName(dbdFile, dbFile);
+				else {
+					File epicsDbdFile = PathSpecification.getRelativeNameNoStepdowns(dbdFile, new File(System.getProperty("EPICS_BASE")));
+					if  (epicsDbdFile!=null) 
+						dbdFile = new File("$(EPICS_BASE)/"+epicsDbdFile);
+					else dbdFile = PathSpecification.getRelativeName(dbdFile, dbFile);
+				}
 			}
 			catch (Exception ex)
 			{

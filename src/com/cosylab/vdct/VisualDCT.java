@@ -6607,6 +6607,8 @@ public void save_As_GroupMenuItem_ActionPerformed() {
 
 	    theFile = chooser.getSelectedFile();
 
+		if (theFile == null) theFile = new File("");
+
 		// fix ending
 		if (chooser.getFileFilter().getDescription().startsWith("EPICS") &&
 			!theFile.getName().endsWith(".db") &&
@@ -6726,6 +6728,8 @@ public void save_AsMenuItem_ActionPerformed() {
 			return;
 			
 	    theFile = chooser.getSelectedFile();
+
+		if (theFile == null) theFile = new File("");
 
 		// fix ending
 		if (chooser.getFileFilter().getDescription().startsWith("EPICS") &&

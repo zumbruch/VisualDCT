@@ -46,6 +46,7 @@ import com.cosylab.vdct.db.*;
 import com.cosylab.vdct.dbd.*;
 import com.cosylab.vdct.vdb.*;
 import com.cosylab.vdct.undo.*;
+import com.cosylab.vdct.util.PathSpecification;
 import com.cosylab.vdct.util.StringUtils;
 import com.cosylab.vdct.events.*;
 import com.cosylab.vdct.events.commands.*;
@@ -1486,12 +1487,14 @@ public void checkForIncodedDBDs(File file) throws IOException
 	if (dbd!=null)
 	for (int i=0; i<dbd.length; i++)
 	{
-		File f = new File(dbd[i]);
+		File f = new File( PathSpecification.matchAndReplace(dbd[i]) );
+		
+		if (f.isAbsolute() && dbd[i].indexOf('$')==-1) Group.setAbsoluteDBDs(true);
 		
 		// if not absolute, make relatove to DB file
-		if (!f.isAbsolute())
-			f = new File(relativeTo, dbd[i]);
-		else Group.setAbsoluteDBDs(true);
+		if (!f.isAbsolute()) f = new File(relativeTo, dbd[i]);
+		
+		
 			
 		// try to cannonize to make if more beautiful printout
 		try
