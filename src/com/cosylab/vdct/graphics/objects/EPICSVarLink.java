@@ -155,7 +155,8 @@ protected void draw(Graphics g, boolean hilited) {
 	else 
 		rrx = getRx()-r-view.getRx();
 
-	int rry = getRy()+getRheight()/2-view.getRy();
+	//int rry = getRy()+getRheight()/2-view.getRy();
+	int rry = (int)(getRscale()*getInY()- view.getRy());
 	
 	if (!hilited) g.setColor(Constants.FRAME_COLOR);
 	else g.setColor((this==view.getHilitedObject()) ? 

@@ -1441,6 +1441,7 @@ protected void validate() {
   double scale = getRscale();
   int rwidth = (int)(getWidth()*scale);
   int rheight = (int)(Constants.RECORD_HEIGHT*scale);
+
   setRheight(rheight);
   setRwidth(rwidth);
 
@@ -1493,8 +1494,11 @@ protected void validate() {
   }
 
   rheight += y0+rfieldRowHeight*changedFields.size()+ascent;
-  setRheight(rheight);
   setHeight((int)(rheight/scale));
+
+  // round fix
+  rheight = (int)((getY()+getHeight())*scale)-(int)(getY()*scale);
+  setRheight(rheight);
 
   // sub-components
   revalidatePosition();		// rec's height can be different

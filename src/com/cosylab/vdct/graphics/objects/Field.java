@@ -150,7 +150,9 @@ protected void validate() {
 	
   double scale = getRscale();
   int rwidth = (int)(getWidth()*scale);
-  int rheight = (int)(getHeight()*scale);
+  //int rheight = (int)(getHeight()*scale);
+  int rheight = (int)((getY()+getHeight())*scale)-getRy();
+
   setRwidth(rwidth);
   setRheight(rheight);
 

@@ -66,7 +66,8 @@ protected void draw(Graphics g, boolean hilited) {
 	else 
 		rrx = getRx()-view.getRx()-arrowLength;
 
-	int rry = getRy()+getRheight()/2-view.getRy();
+	//int rry = getRy()+getRheight()/2-view.getRy();
+	int rry = (int)(getRscale()*getOutY()- view.getRy());
 	
 	if (!hilited) g.setColor(Constants.FRAME_COLOR);
 	else g.setColor((this==view.getHilitedObject()) ? 
