@@ -293,7 +293,7 @@ private javax.swing.JTextField getGroupingSeparatorTextField() {
 			ivjGroupingSeparatorTextField.setOpaque(false);
 			ivjGroupingSeparatorTextField.setBorder(javax.swing.BorderFactory.createLineBorder(java.awt.Color.black));
 			ivjGroupingSeparatorTextField.setText("");
-			ivjGroupingSeparatorTextField.setColumns(1);
+			ivjGroupingSeparatorTextField.setColumns(/*1 linux needs more space*/3);
 			ivjGroupingSeparatorTextField.setHorizontalAlignment(javax.swing.JLabel.CENTER);
 			ivjGroupingSeparatorTextField.setMargin(new java.awt.Insets(0, 2, 0, 1));
 			// user code begin {1}
