@@ -99,6 +99,16 @@ public void updateTemplateLink()
 }
 
 /**
+ * e.g. for rename
+ * updates lookup table and fixes source
+ */
+public void fixTemplateLink()
+{
+	updateTemplateLink();
+	LinkManagerObject.fixLink(this);
+}
+
+/**
  * Insert the method's description here.
  * Creation date: (30.1.2001 16:58:58)
  */

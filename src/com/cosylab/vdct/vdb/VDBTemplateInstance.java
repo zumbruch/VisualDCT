@@ -230,4 +230,13 @@ public void setName(java.lang.String newName) {
 		this.comment = comment;
 	}
 
+	/**
+	 * Sets the template.
+	 * @param template The template to set
+	 */
+	public void setTemplate(VDBTemplate template)
+	{
+		this.template = template;
+	}
+
 }

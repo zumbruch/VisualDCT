@@ -41,8 +41,10 @@ import java.util.Iterator;
 
 import javax.swing.*;
 
+import com.cosylab.vdct.Console;
 import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.db.DBResolver;
+import com.cosylab.vdct.graphics.DrawingSurface;
 import com.cosylab.vdct.graphics.FontMetricsBuffer;
 import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.graphics.popup.Popupable;
@@ -91,6 +93,8 @@ public class Template
 	private static GUISeparator templateInstanceSeparator = null;
 	private static GUISeparator propertiesSeparator = null;
 	private final static String fieldMaxStr = "01234567890123456789012345";
+
+	protected long portsID = -1;
 
 	protected Vector invalidLinks = null;
 	
@@ -225,6 +229,20 @@ public class Template
 	 */
 	protected void validate()
 	{
+		
+		  // template change check
+		  VDBTemplate tmpl = (VDBTemplate)VDBData.getTemplates().get(getTemplateData().getTemplate().getId());		
+		  if (tmpl!=getTemplateData().getTemplate())
+		  {
+		  	getTemplateData().setTemplate(tmpl);
+			synchronizeLinkFields();
+		  }
+		  else
+		  {
+		  	if (getTemplateData().getTemplate().getPortsGeneratedID()!=portsID)
+				synchronizeLinkFields();
+		  }
+		
 		  revalidatePosition();
 
 		  double scale = getRscale();
@@ -718,9 +736,11 @@ private void initializeLinkFields()
 	{
 		VDBTemplateField tf = (VDBTemplateField)e.nextElement();
 		EPICSLink link = createLinkField(tf);
-		link.setRight(false);
 		if (link!=null)
+		{
+			link.setRight(false);
 			addSubObject(tf.getAlias(), link);
+		}
 	}
 
 	// outputs
@@ -729,9 +749,11 @@ private void initializeLinkFields()
 	{
 		VDBTemplateField tf = (VDBTemplateField)e.nextElement();
 		EPICSLink link = createLinkField(tf);
-		link.setRight(true);
 		if (link!=null)
+		{
+			link.setRight(true);
 			addSubObject(tf.getAlias(), link);
+		}
 	}
 */
 	// ports
@@ -742,14 +764,128 @@ private void initializeLinkFields()
 		VDBTemplatePort tf = new VDBTemplatePort(getTemplateData(), port);
 
 		EPICSLink link = createLinkField(tf);
-		link.setRight(true);
 		if (link!=null)
+		{
+			link.setRight(true);
 			addSubObject(tf.getName(), link);
+		}
 	}
 
-
+	portsID = getTemplateData().getTemplate().getPortsGeneratedID();
+	
 }
 
+/**
+ * Insert the method's description here.
+ * Creation date: (26.1.2001 17:19:47)
+ */
+private void synchronizeLinkFields()
+{
+	Object[] objs = new Object[getSubObjectsV().size()];
+	getSubObjectsV().copyInto(objs);
+
+	// add ports
+	Enumeration e = templateData.getTemplate().getPortsV().elements();
+	while (e.hasMoreElements())
+	{
+		VDBPort port = (VDBPort)e.nextElement();
+		Object obj = getSubObject(port.getName());
+		if (obj==null)
+		{
+			TemplateEPICSPort tep = null;
+			for (int i=0; i<objs.length; i++)
+//				if (objs[i] instanceof TemplateEPICSPort)
+				{
+					TemplateEPICSPort t = (TemplateEPICSPort)objs[i];
+					if (t.getFieldData().getName().equals(port.getName()))
+					{
+						tep = t;
+						break;
+					}
+				}					
+
+			// renamed
+			if (tep!=null)
+			{
+				Object key = null;
+				Enumeration e2 = getSubObjects().keys();
+				while (e2.hasMoreElements())
+				{
+					Object key2 = e2.nextElement();
+					Object val = getSubObjects().get(key2);
+					if (val==tep)
+					{
+						key = key2;
+						break;
+					}
+				}
+				
+				if (key!=null)
+					removeObject(key.toString());
+				else
+					System.out.println("Internal error...");
+					
+				addSubObject(tep.getFieldData().getName(), tep);
+
+				// update lookup table and fix source links 
+				tep.fixTemplateLink();
+								
+				//System.out.println("!! renamed !! "+port.getName());
+			}
+			else
+			{
+				//System.out.println("!! added !!"+port.getName());
+
+				// add port
+				VDBTemplatePort tf = new VDBTemplatePort(getTemplateData(), port);
+				EPICSLink link = createLinkField(tf);
+				if (link!=null)
+				{
+					link.setRight(true);
+					addSubObject(tf.getName(), link);
+				}
+			}
+		}
+		else
+		{
+			// fix port if necessary (result of add+remove action)
+			VDBTemplatePort tpd = ((VDBTemplatePort)((TemplateEPICSPort)obj).getFieldData());
+			if (tpd.getPort()!=port)
+			{
+				//System.out.println("!! fixing port !!"+port.getName());
+				tpd.setPort(port);
+			}
+		}
+	}
+
+	// remove ports
+	for (int i=0; i<objs.length; i++)
+	{
+//		if (objs[i] instanceof TemplateEPICSPort)
+		{
+			TemplateEPICSPort link = (TemplateEPICSPort)objs[i];
+			if (!templateData.getTemplate().getPorts().containsKey(link.getFieldData().getName()))
+			{
+				//System.out.println("!! removed !! "+link.getFieldData().getName());
+
+				// remove port
+				link.destroyAndRemove();
+	
+				removeObject(link.getFieldData().getName());
+			}
+		}
+	}
+	
+	// save ports ID
+	portsID = getTemplateData().getTemplate().getPortsGeneratedID();
+	//com.cosylab.vdct.graphics.DrawingSurface.getInstance().setModified(true);
+
+	// check
+	if (getTemplateData().getTemplate().getPortsV().size()!=getSubObjectsV().size())
+	{
+		Console.getInstance().println("Failed to synchronize template ports with template instance ports. Save and restart VisualDCT.");
+	}
+}
 
 
 /**
@@ -928,7 +1064,20 @@ public void renameProperty(InspectableProperty property)
 			                            type);
 		if (reply!=null)
 		{
-			if (!templateData.getProperties().containsKey(reply))
+			// check name
+			if (reply.trim().length()==0)
+			{
+				message = "Empty name! Enter valid name:";
+				type = JOptionPane.WARNING_MESSAGE;
+				continue;
+			}
+			else if (reply.indexOf(' ')!=-1)
+			{
+				message = "No spaces allowed! Enter valid name:";
+				type = JOptionPane.WARNING_MESSAGE;
+				continue;
+			}
+			else if (!templateData.getProperties().containsKey(reply))
 			{
 				com.cosylab.vdct.undo.ComposedAction composedAction = 
 												new com.cosylab.vdct.undo.ComposedAction();

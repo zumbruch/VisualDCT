@@ -36,6 +36,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
@@ -71,7 +72,7 @@ import com.cosylab.vdct.util.StringUtils;
 
 public class VDBTemplate implements Inspectable, Commentable, Descriptable, MonitoredPropertyListener
 {
-	
+
 	protected String id = null;
 	protected String fileName = null;
 	protected String description = null;
@@ -100,7 +101,16 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 	private static final String nullString = "";
 
 	private String tempDescription = null;
+	
+	private long portsGeneratedID = 0;
+	protected static Random random = null;
 
+	static
+	{
+		if (random==null)
+			random = new Random();
+	}
+	
 	class DescriptionProperty implements InspectableProperty
 	{
 		private static final String defaultDescription = "";
@@ -379,6 +389,7 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 	{
 		this.id = id;
 		this.fileName = fileName;
+		regeneratePortsID();
 		updateDescription();			
 	}
 
@@ -735,6 +746,7 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 	 */
 	public void setPorts(Hashtable ports)
 	{
+		regeneratePortsID();
 		this.ports = ports;
 	}
 	
@@ -745,6 +757,13 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 	public void setPortsV(Vector portsV)
 	{
 		this.portsV = portsV;
+	}
+
+	/**
+	 */
+	private void regeneratePortsID()
+	{
+		portsGeneratedID = random.nextLong();
 	}
 
 	/**
@@ -808,6 +827,7 @@ public VDBPort addPort(String name)
 	com.cosylab.vdct.undo.UndoManager.getInstance().addAction(
 			new CreateTemplatePortAction(this, vdbPort));
 
+	regeneratePortsID();
 	InspectorManager.getInstance().updateObject(this);
 /*
 	updateTemplateFields();
@@ -824,6 +844,7 @@ public void addPort(VDBPort vdbPort)
 	ports.put(vdbPort.getName(), vdbPort);
 	portsV.addElement(vdbPort);
 
+	regeneratePortsID();
 	InspectorManager.getInstance().updateObject(this);
 /*
 	updateTemplateFields();
@@ -843,6 +864,7 @@ public void removePort(String name)
 	com.cosylab.vdct.undo.UndoManager.getInstance().addAction(
 			new DeleteTemplatePortAction(this, port));
 	
+	regeneratePortsID();
 	InspectorManager.getInstance().updateObject(this);
 /*
 	updateTemplateFields();
@@ -858,6 +880,7 @@ public void removePort(VDBPort port)
 	ports.remove(port);
 	portsV.removeElement(port);
 
+	regeneratePortsID();
 	InspectorManager.getInstance().updateObject(this);
 /*
 	updateTemplateFields();
@@ -872,13 +895,14 @@ public void renamePort(VDBPort port, String newName)
 {
 	String oldName = port.getName();
 	
+	ports.remove(oldName);
 	port.setName(newName);
-	ports.remove(port.getName());
 	ports.put(port.getName(), port);
 
 	com.cosylab.vdct.undo.UndoManager.getInstance().addAction(
 			new RenameTemplatePortAction(this, port, oldName, newName));
 
+	regeneratePortsID();
 	InspectorManager.getInstance().updateObject(this);
 /*
 	updateTemplateFields();
@@ -971,7 +995,20 @@ public void renameProperty(InspectableProperty property)
 		if (reply!=null)
 		{
 
-			if (!ports.containsKey(reply))
+			// check name
+			if (reply.trim().length()==0)
+			{
+				message = "Empty name! Enter valid name:";
+				type = JOptionPane.WARNING_MESSAGE;
+				continue;
+			}
+			else if (reply.indexOf(' ')!=-1)
+			{
+				message = "No spaces allowed! Enter valid name:";
+				type = JOptionPane.WARNING_MESSAGE;
+				continue;
+			}
+			else if (!ports.containsKey(reply))
 			{
 				renamePort((VDBPort)property, reply);
 			}
@@ -1012,6 +1049,15 @@ public void renameProperty(InspectableProperty property)
 		}
 		else
 			VDBData.addTemplate(this);
+	}
+
+	/**
+	 * Returns the portsGeneratedID.
+	 * @return long
+	 */
+	public long getPortsGeneratedID()
+	{
+		return portsGeneratedID;
 	}
 
 }

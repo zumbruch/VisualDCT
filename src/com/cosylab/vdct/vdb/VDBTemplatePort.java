@@ -185,4 +185,22 @@ public class VDBTemplatePort extends VDBFieldData implements Descriptable
 		InspectorManager.getInstance().updateProperty(visualTemplate, this);
 	}
 
+	/**
+	 * Returns the port.
+	 * @return VDBPort
+	 */
+	public VDBPort getPort()
+	{
+		return port;
+	}
+
+	/**
+	 * Sets the port.
+	 * @param port The port to set
+	 */
+	public void setPort(VDBPort port)
+	{
+		this.port = port;
+	}
+
 }

@@ -1521,8 +1521,8 @@ private static void writeTemplateData(DataOutputStream stream) throws IOExceptio
 		stream.writeBytes(portStart+
 			port.getName() +
 			comma + quote + port.getTarget() + quote);
-		if (port.getDescription()!=null)
-			stream.writeBytes(comma + quote + "description" + quote);
+		if (port.getRealDescription()!=null && port.getRealDescription().length()>0)
+			stream.writeBytes(comma + quote + port.getRealDescription() + quote);
 		stream.writeBytes(ending);
 	}	
 	

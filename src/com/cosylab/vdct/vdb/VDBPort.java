@@ -54,6 +54,8 @@ public class VDBPort implements InspectableProperty, Descriptable
 	protected String description = null;
 	protected String comment = null;
 
+	protected static String defaultDescription = "";
+
 	private static final String removeString = "Remove";
 	private static final String renameString = "Rename";
 	
@@ -133,6 +135,18 @@ public class VDBPort implements InspectableProperty, Descriptable
 	 * @return String
 	 */
 	public String getDescription()
+	{
+		if (description==null)
+			return defaultDescription;
+		else
+			return description;
+	}
+
+	/**
+	 * Returns the description.
+	 * @return String
+	 */
+	public String getRealDescription()
 	{
 		return description;
 	}
@@ -329,6 +343,24 @@ public class VDBPort implements InspectableProperty, Descriptable
 			target = value;
 			template.propertyChanged(this);
 		}
+	}
+
+	/**
+	 * Returns the template.
+	 * @return VDBTemplate
+	 */
+	public VDBTemplate getTemplate()
+	{
+		return template;
+	}
+
+	/**
+	 * Sets the template.
+	 * @param template The template to set
+	 */
+	public void setTemplate(VDBTemplate template)
+	{
+		this.template = template;
 	}
 
 }
