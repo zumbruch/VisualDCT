@@ -849,6 +849,9 @@ private void showPopup(MouseEvent e)
 		popUp.add(templatePropertiesMenuItem);
 	}
 	
+	// add plugin items
+	PopUpMenu.addPluginItems(popUp, null);
+
 	popUp.show(getWorkspacePanel(), e.getX(), e.getY());
 }
 

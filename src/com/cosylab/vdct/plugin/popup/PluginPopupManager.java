@@ -93,7 +93,7 @@ public void pluginAdded(PluginObject plugin)
  */
 public void pluginRemoved(PluginObject plugin)
 {
-	if (plugin instanceof ContextPopupPlugin)
+	if (plugin.getPlugin() instanceof ContextPopupPlugin)
 	{
 		list.remove(plugin);
 		plugin.removePropertyChangeListener(this);
@@ -126,7 +126,7 @@ public void propertyChange(PropertyChangeEvent evt)
  * PluginPopupManager then queries all popup plugins, asking them to return list of menus
  * or menu items to be added to the default list of popup items.
  * Creation date: (8.12.2001 12:45:31)
- * @return java.util.Vector list of <code>javax.swing.JMenuItems</code> 
+ * @return java.util.Vector list of <code>javax.swing.JMenuItems</code>. This method never returns null.
  */
 public Vector getAllPluginItems(Vector selectedObjects)
 {
@@ -136,7 +136,7 @@ public Vector getAllPluginItems(Vector selectedObjects)
 	Iterator iter = list.iterator();
 	while (iter.hasNext())
 	{
-		plugin = (ContextPopupPlugin)iter.next();
+		plugin = (ContextPopupPlugin)((PluginObject)iter.next()).getPlugin();
 		
 		// protect yourself from buggy plugins
 		try

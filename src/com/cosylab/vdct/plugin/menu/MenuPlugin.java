@@ -1,4 +1,4 @@
-package com.cosylab.vdct.plugin.popup;
+package com.cosylab.vdct.plugin.menu;
 
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
@@ -28,40 +28,22 @@ package com.cosylab.vdct.plugin.popup;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.util.Vector;
-import java.util.Hashtable;
+import javax.swing.JMenu;
 
 import com.cosylab.vdct.plugin.Plugin;
-import com.cosylab.vdct.graphics.objects.Group;
 
 /**
  * Insert the type's description here.
  * Creation date: (8.12.2001 12:43:54)
  * @author Matej Sekoranja 
  */
-public interface ContextPopupPlugin extends Plugin {
-
+public interface MenuPlugin extends Plugin {
 /**
- * 
- * This metod is called each time request of popup menu is gived to VisualDCT.
- * PluginPopupManager then queries all popup plugins, asking them to return list of menus
- * or menu items to be added to the default list of popup items.
- * Plugin can also return null value, if there is no action available to the
- * given list of selected objects.
+ * Returns menu to be added to the VisualDCT tools menu
+ * Plugin should return always the same object.
+ * PluginMenuManager will take care or enabled/disabled status
  * Creation date: (8.12.2001 12:45:31)
- * @param selectedObjects List of selected elements. All elements inhereit from
- * 						   com.cosylab.vdct.graphics.objects.Selectable interface. Typical there are objects:
- * <ul>
- * 	<li><b>com.cosylab.vdct.graphics.objects.Group</b> - group
- * 	<li><b>com.cosylab.vdct.graphics.objects.Record</b> - record
- * 	<li><b>com.cosylab.vdct.graphics.objects.Template</b> - template instance
- * 	<li><b>com.cosylab.vdct.graphics.objects.Connector</b> - connector
- * 	<li><b>...</b>
- * </ul>
- * If list is <code>null</code>, then popup over empty workspace is issued.
- * @return java.util.Vector list of <code>javax.swing.JMenuItems</code> and/or <code>javax.swing.JMenu</code> and/or <code>javax.swing.JSeparator</code> objects
- * 							 to be added to the default list of popup items. Can also be null.
+ * @return javax.swing.JMenu
  */
-public Vector getItems(Vector selectedObjects);
-
+public JMenu getMenu();
 }

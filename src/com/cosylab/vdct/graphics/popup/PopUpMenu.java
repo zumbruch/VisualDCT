@@ -122,33 +122,44 @@ public void show(Popupable object, JComponent component, int x, int y) {
 			add((JSeparator)obj);
 	}
 
-	// get list of all selected object if this object is also selected
-	// otherwise only give this object
-	Vector selectedItems = new Vector();
-	if (ViewState.getInstance().isSelected(object))
-	{
-		// make a copy of vector to allows plugins to play with it
-		selectedItems.addAll(ViewState.getInstance().getSelectedObjects());
-	}
-	else
-		selectedItems.addElement(object);
-	
-	items = PluginPopupManager.getInstance().getAllPluginItems(selectedItems);
-	
-	if (items.size()>0)
-		add(getSeparator());
-	
-	e = items.elements();
-	while (e.hasMoreElements())
-	{
-		obj = e.nextElement();
-		if (obj instanceof JMenuItem)
-			add((JMenuItem)obj);
-		else if (obj instanceof JSeparator)
-			add((JSeparator)obj);
-	}
+	addPluginItems(this, object);
 
 	// show popup menu
 	show(component, x, y);
+}
+
+/**
+ * Helper method which adds plugin items
+ */
+public static void addPluginItems(JPopupMenu menu, Popupable object)
+{
+	// get list of all selected object if this object is also selected
+	// otherwise only give this object
+	// if selected items vector is null, we have popup over empty workspace
+	Vector selectedItems = null;
+	if (object!=null)
+	{
+		selectedItems = new Vector();
+		if (ViewState.getInstance().isSelected(object))
+			// make a copy of vector to allows plugins to play with it
+			selectedItems.addAll(ViewState.getInstance().getSelectedObjects());
+		else
+			selectedItems.addElement(object);
+	}
+	
+	Vector items = PluginPopupManager.getInstance().getAllPluginItems(selectedItems);
+	
+	if (items.size() > 0)
+		menu.add(getSeparator());
+	
+	Enumeration e = items.elements();
+	while (e.hasMoreElements())
+	{
+		Object obj = e.nextElement();
+		if (obj instanceof JMenuItem)
+			menu.add((JMenuItem) obj);
+		else if (obj instanceof JSeparator)
+			menu.add((JSeparator) obj);
+	}
 }
 }

@@ -164,6 +164,7 @@ public class VisualDCT extends JFrame {
 	private com.cosylab.vdct.plugin.PluginsMenu ivjPluginsMenu = null;
 	private JSeparator ivjJSeparator7 = null;
 	private com.cosylab.vdct.plugin.export.ExportMenu ivjExportMenuItem = null;
+	private com.cosylab.vdct.plugin.menu.ToolsMenu ivjToolsMenu = null;
 	private JSeparator ivjJSeparator11 = null;
 	private JMenu ivjDebugMenu = null;
 	private com.cosylab.vdct.plugin.debug.DebugStartMenu ivjStartDebugMenuItem = null;
@@ -2412,6 +2413,28 @@ private com.cosylab.vdct.plugin.export.ExportMenu getExportMenuItem() {
 		}
 	}
 	return ivjExportMenuItem;
+}
+/**
+ * Return the ExportMenuItem property value.
+ * @return com.cosylab.vdct.plugin.export.ExportMenu
+ */
+/* WARNING: THIS METHOD WILL BE REGENERATED. */
+private com.cosylab.vdct.plugin.menu.ToolsMenu getToolsMenu() {
+	if (ivjToolsMenu == null) {
+		try {
+			ivjToolsMenu = new com.cosylab.vdct.plugin.menu.ToolsMenu();
+			ivjToolsMenu.setName("ToolsMenu");
+			ivjToolsMenu.setText("Tools");
+			// user code begin {1}
+			ivjToolsMenu.init();
+			// user code end
+		} catch (java.lang.Throwable ivjExc) {
+			// user code begin {2}
+			// user code end
+			handleException(ivjExc);
+		}
+	}
+	return ivjToolsMenu;
 }
 /**
  * Return the ExportPostScriptFileMenuItem property value.
@@ -4671,6 +4694,7 @@ private javax.swing.JMenuBar getVisualDCTJMenuBar() {
 			ivjVisualDCTJMenuBar.add(getViewMenu());
 			ivjVisualDCTJMenuBar.add(getPluginsMenu());
 			ivjVisualDCTJMenuBar.add(getDebugMenu());
+			ivjVisualDCTJMenuBar.add(getToolsMenu());
 			ivjVisualDCTJMenuBar.add(getHelpMenu());
 			// user code begin {1}
 			// user code end

@@ -149,7 +149,7 @@ public static PluginManager getInstance() {
 		com.cosylab.vdct.plugin.debug.PluginDebugManager.getInstance();
 		com.cosylab.vdct.plugin.export.PluginExportManager.getInstance();
 		com.cosylab.vdct.plugin.popup.PluginPopupManager.getInstance();
-		//com.cosylab.vdct.plugin.popup.PluginMenuManager.getInstance();
+		com.cosylab.vdct.plugin.menu.PluginMenuManager.getInstance();
 	}
 		
 	return instance;

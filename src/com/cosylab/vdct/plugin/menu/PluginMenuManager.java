@@ -1,4 +1,4 @@
-package com.cosylab.vdct.plugin.export;
+package com.cosylab.vdct.plugin.menu;
 
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
@@ -30,6 +30,9 @@ package com.cosylab.vdct.plugin.export;
 
 import java.util.*;
 import java.beans.*;
+
+import javax.swing.JMenu;
+
 import com.cosylab.vdct.plugin.*;
 
 /**
@@ -37,16 +40,16 @@ import com.cosylab.vdct.plugin.*;
  * Creation date: (7.12.2001 13:57:49)
  * @author Matej Sekoranja
  */
-public final class PluginExportManager implements PluginListener, PropertyChangeListener
+public final class PluginMenuManager implements PluginListener, PropertyChangeListener
 {
-    private static PluginExportManager instance = null;
+    private static PluginMenuManager instance = null;
 
     private LinkedList list = null;
 /**
  * Insert the method's description here.
  * Creation date: (7.12.2001 14:00:41)
  */
-protected PluginExportManager()
+protected PluginMenuManager()
 {
 	list = new LinkedList();
 		
@@ -57,8 +60,8 @@ protected PluginExportManager()
  * Creation date: (7.12.2001 14:01:03)
  * @return com.cosylab.vdct.plugin.PluginExportManager
  */
-public static PluginExportManager getInstance() {
-	if (instance==null) instance = new PluginExportManager();
+public static PluginMenuManager getInstance() {
+	if (instance==null) instance = new PluginMenuManager();
 	return instance;
 }
 /**
@@ -69,7 +72,7 @@ public static PluginExportManager getInstance() {
  */
 public void pluginAdded(PluginObject plugin)
 {
-	if (plugin.getPlugin() instanceof ExportPlugin)
+	if (plugin.getPlugin() instanceof MenuPlugin)
 	{
 		if (!list.contains(plugin))
 		{
@@ -87,7 +90,7 @@ public void pluginAdded(PluginObject plugin)
  */
 public void pluginRemoved(PluginObject plugin)
 {
-	if (plugin.getPlugin() instanceof ExportPlugin)
+	if (plugin.getPlugin() instanceof MenuPlugin)
 	{
 		list.remove(plugin);
 		plugin.removePropertyChangeListener(this);
@@ -108,9 +111,13 @@ public void propertyChange(PropertyChangeEvent evt)
 	{
 		if (plugin.getStatus() == PluginObject.PLUGIN_STARTED)
 		{
+			JMenu menuItem = ((MenuPlugin)(plugin.getPlugin())).getMenu();
+			menuItem.setEnabled(true);
 		}
 		else if (plugin.getStatus() == PluginObject.PLUGIN_STOPPED)
 		{
+			JMenu menuItem = ((MenuPlugin)(plugin.getPlugin())).getMenu();
+			menuItem.setEnabled(false);
 		}
 	}
 }

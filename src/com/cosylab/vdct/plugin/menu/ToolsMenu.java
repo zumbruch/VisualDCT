@@ -1,4 +1,4 @@
-package com.cosylab.vdct.plugin.export;
+package com.cosylab.vdct.plugin.menu;
 
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
@@ -28,89 +28,81 @@ package com.cosylab.vdct.plugin.export;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import javax.swing.*;
+
 import java.util.*;
 import java.beans.*;
+import java.awt.event.*;
+
 import com.cosylab.vdct.plugin.*;
 
 /**
- * CURRENTLY NOT NEEDED
- * Creation date: (7.12.2001 13:57:49)
+ * Insert the class' description here.
+ * Creation date: (7.12.2001 17:15:12)
  * @author Matej Sekoranja
  */
-public final class PluginExportManager implements PluginListener, PropertyChangeListener
+public class ToolsMenu extends JMenu implements PluginListener
 {
-    private static PluginExportManager instance = null;
 
-    private LinkedList list = null;
 /**
  * Insert the method's description here.
- * Creation date: (7.12.2001 14:00:41)
- */
-protected PluginExportManager()
-{
-	list = new LinkedList();
-		
-	PluginManager.getInstance().addPluginListener(this);
-}
-/**
- * Insert the method's description here.
- * Creation date: (7.12.2001 14:01:03)
- * @return com.cosylab.vdct.plugin.PluginExportManager
- */
-public static PluginExportManager getInstance() {
-	if (instance==null) instance = new PluginExportManager();
-	return instance;
-}
-/**
- * Insert the method's description here.
- * Creation date: (6.12.2001 22:23:57)
+ * Creation date: (7.12.2001 17:08:53)
  * @param
- * @return
+ */
+public ToolsMenu()
+{
+}
+/**
+ * Insert the method's description here.
+ * Needed to add plugins after possible other menu items
+ * Creation date: (7.12.2001 17:55:14)
+ */
+public void init()
+{
+	PluginManager.getInstance().addPluginListener(this);
+	if (getItemCount()==0)
+		setEnabled(false);
+
+}
+/**
+ * Insert the method's description here.
+ * Creation date: (7.12.2001 17:09:23)
+ * @param
  */
 public void pluginAdded(PluginObject plugin)
 {
-	if (plugin.getPlugin() instanceof ExportPlugin)
+	if (plugin.getPlugin() instanceof MenuPlugin)
 	{
-		if (!list.contains(plugin))
-		{
-			list.add(plugin);
-			plugin.addPropertyChangeListener(this);
-			com.cosylab.vdct.Console.getInstance().println(plugin.getName()+" is registered as export plugin.");
-		}
+		if( plugin.getStatus()==PluginObject.PLUGIN_NOT_LOADED ||
+		    plugin.getStatus()==PluginObject.PLUGIN_INVALID )
+			    return;
+			    
+		JMenu menuItem = ((MenuPlugin)(plugin.getPlugin())).getMenu();
+		
+		add(menuItem);
+
+		if (getItemCount()>0)
+			setEnabled(true);
 	}
+
 }
 /**
  * Insert the method's description here.
- * Creation date: (6.12.2001 22:23:57)
+ * Creation date: (7.12.2001 17:10:37)
  * @param
- * @return
  */
 public void pluginRemoved(PluginObject plugin)
 {
-	if (plugin.getPlugin() instanceof ExportPlugin)
+	if (plugin.getPlugin() instanceof MenuPlugin)
 	{
-		list.remove(plugin);
-		plugin.removePropertyChangeListener(this);
-	}
-}
-/**
- * Not implemented
- * Creation date: (6.12.2001 22:23:57)
- * @param
- * @return
- */
-public void propertyChange(PropertyChangeEvent evt)
-{
-	PluginObject plugin = (PluginObject)evt.getSource();
-	String propertyName = evt.getPropertyName();
+		JMenu menuItem = ((MenuPlugin)(plugin.getPlugin())).getMenu();
 
-	if (propertyName.equals("Status"))
-	{
-		if (plugin.getStatus() == PluginObject.PLUGIN_STARTED)
+		if (menuItem!=null)
 		{
-		}
-		else if (plugin.getStatus() == PluginObject.PLUGIN_STOPPED)
-		{
+			remove(menuItem);
+
+			if (getItemCount()==0)
+				setEnabled(false);
 		}
 	}
 }

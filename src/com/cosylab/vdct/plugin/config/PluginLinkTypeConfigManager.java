@@ -93,7 +93,7 @@ public void pluginAdded(PluginObject plugin)
  */
 public void pluginRemoved(PluginObject plugin)
 {
-	if (plugin instanceof LinkTypeConfigPlugin)
+	if (plugin.getPlugin() instanceof LinkTypeConfigPlugin)
 	{
 		list.remove(plugin);
 		plugin.removePropertyChangeListener(this);
