@@ -135,4 +135,5 @@ public class Constants {
     public static final int ARROW_SIZE = 16;
     public static final double ARROW_SHARPNESS = Math.PI / 12;
 
+    public static final boolean WIRE_CROSSING_AVOIDIANCE = true;
 }

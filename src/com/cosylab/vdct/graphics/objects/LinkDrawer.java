@@ -348,9 +348,7 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 	}
 */	
 
-	final boolean SMART_CONNECTORS = true;
-	
-	if (SMART_CONNECTORS)
+	if (Constants.WIRE_CROSSING_AVOIDIANCE)		// smart connectors
 	{
 		int vx = firstHorizontal ? x2 : x1;
 		

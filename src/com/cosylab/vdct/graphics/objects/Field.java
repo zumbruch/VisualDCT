@@ -186,7 +186,7 @@ protected void validate() {
 	 * @return
 	 */
 	public int getVerticalPosition() {
-		return verticalPosition;
+	    return Constants.WIRE_CROSSING_AVOIDIANCE ? verticalPosition : 0;
 	}
 
 	/**
