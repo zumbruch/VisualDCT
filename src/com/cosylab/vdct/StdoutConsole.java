@@ -54,9 +54,9 @@ public void println(String text) {
 public void println(Throwable thr) {
 	System.out.println(thr.toString()+"\n");
 	
-	// !!! some debug info in development phase
+	// some debug info in development phase
 	System.err.println();
-	thr.printStackTrace();
+	thr.printStackTrace(System.err);
 	System.err.println();
 }
 

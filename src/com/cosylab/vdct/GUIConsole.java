@@ -273,11 +273,17 @@ public void println(String text) {
  * @param thr java.lang.Throwable
  */
 public void println(Throwable thr) {
-	getTextPane().append(thr.toString()+"\n\n");
+	StringBuffer exceptionTrace = new StringBuffer(300);
+    StackTraceElement[] trace = thr.getStackTrace();
+    if (trace != null)
+	    for (int i=0; i < trace.length; i++)
+	        exceptionTrace.append("\tat " + trace[i]).append('\n');
+
+    getTextPane().append(thr.toString()+"\n"+exceptionTrace.toString()+"\n");
 	
-	// !!! some debug info in development phase
+	// some debug info in development phase
 	System.err.println();
-	thr.printStackTrace();
+	thr.printStackTrace(System.err);
 	System.err.println();
 
 	getTextPane().setCaretPosition(getTextPane().getText().length());
