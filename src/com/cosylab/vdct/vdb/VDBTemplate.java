@@ -72,8 +72,11 @@ public class VDBTemplate implements Inspectable
 	private static GUISeparator inputsSeparator = null;
 	private static GUISeparator outputsSeparator = null;
 
+	private String tempDescription = null;
+
 	class DescriptionProperty implements InspectableProperty
 	{
+		private static final String defaultDescription = "";
 		private static final String name = "Description";
 		private static final String helpString = "Template description";
 		
@@ -138,7 +141,11 @@ public class VDBTemplate implements Inspectable
 		 */
 		public String getValue()
 		{
-			return getDescription();
+			String val = getRealDescription();
+			if (val==null)
+				return defaultDescription;
+			else
+				return val;
 		}
 
 		/**
@@ -204,6 +211,7 @@ public class VDBTemplate implements Inspectable
 	{
 		this.id = id;
 		this.fileName = fileName;
+		updateDescription();			
 		
 		Console.getInstance().println("Template '"+id+"' loaded, file '"+fileName+"'.");
 		
@@ -214,6 +222,20 @@ public class VDBTemplate implements Inspectable
 	 * @return String
 	 */
 	public String getDescription()
+	{
+		if (tempDescription!=null)
+		{
+			return tempDescription;
+		}
+		else
+			return description;
+	}
+
+	/**
+	 * Returns the description.
+	 * @return String
+	 */
+	public String getRealDescription()
 	{
 		return description;
 	}
@@ -252,10 +274,18 @@ public class VDBTemplate implements Inspectable
 	public void setDescription(String description)
 	{
 		boolean update = false;
-		if (this.description!=null && !this.description.equals(description))
-			update=true;
-			
-		this.description = description;
+		if (this.description==null || description==null ||		// one null
+		    !this.description.equals(description))					// not equals equals	
+		{
+			// both null
+			if (this.description!=description)
+			{
+				update=true;
+				this.description = description;
+			}
+		}
+
+		updateDescription();			
 
 		if (update)
 		{
@@ -267,6 +297,26 @@ public class VDBTemplate implements Inspectable
 		}
 	}
 
+
+	/**
+	 * Sets the description.
+	 * @param description The description to set
+	 */
+	private void updateDescription()
+	{
+		if (this.description==null || this.description.length()==0)
+		{
+			// remove extension
+			int pos = id.lastIndexOf('.');
+			if (pos>0)
+				tempDescription = id.substring(0, pos);
+			else
+				tempDescription = id;
+		}
+		else
+			tempDescription = null;
+	}
+	
 	/**
 	 * Sets the group.
 	 * @param group The group to set

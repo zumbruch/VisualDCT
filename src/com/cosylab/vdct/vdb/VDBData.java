@@ -72,7 +72,7 @@ public void addRecord(VDBRecordData rd) {
  * This method was created in VisualAge.
  * @param 
  */
-public void addTemplate(VDBTemplate templ) {
+public static void addTemplate(VDBTemplate templ) {
 	if (templ!=null)
 		if (!templates.containsKey(templ.getId()))
 			templates.put(templ.getId(), templ);
@@ -210,29 +210,57 @@ public static VDBRecordData copyVDBRecordData(VDBRecordData source) {
  */
 public static VDBData generateVDBData(DBDData dbd, DBData db) {
 	
+
+	if (dbd!=null && db!=null) {
+
+		// generate itself
+		db.getTemplateData().setData(db);
+		return generateTemplate(dbd, db.getTemplateData());
+
+	}
+	else
+		return null;
+}
+
+/**
+ * This method was created in VisualAge.
+ * @return com.cosylab.vdct.vdb.VDBData
+ * @param dbd com.cosylab.vdct.dbd.DBDData
+ * @param db com.cosylab.vdct.db.DBData
+ */
+private static VDBData generateVDBDataInternal(DBDData dbd, DBData db) {
+	
 	VDBData vdb = new VDBData();
 
-	if (db!=null) {
-
-		// add records
-		DBRecordData dbRecord;
-		Enumeration e = db.getRecordsV().elements();
-		while (e.hasMoreElements()) {
-			dbRecord = (DBRecordData)(e.nextElement());
-			vdb.addRecord(generateVDBRecordData(dbd, dbRecord));
-		}
+	if (dbd!=null && db!=null) {
 
 		// extract templates
 		extractTemplates(dbd, db, vdb);
 		
+		// generate records
+		generateRecords(dbd, db, vdb);
 		
-		// add template instances
+		// generate template instances
 		generateTemplateInstances(db, vdb);
 
 	}
 
 	
 	return vdb;
+}
+
+/**
+ * 
+ */
+private static void generateRecords(DBDData dbd, DBData db, VDBData vdb)
+{
+	// add records
+	DBRecordData dbRecord;
+	Enumeration e = db.getRecordsV().elements();
+	while (e.hasMoreElements()) {
+		dbRecord = (DBRecordData)(e.nextElement());
+		vdb.addRecord(generateVDBRecordData(dbd, dbRecord));
+	}
 }
 
 /**
@@ -327,47 +355,59 @@ public static void extractTemplates(DBDData dbd, DBData db, VDBData vdb)
 			continue;
 		}
 		
-		VDBTemplate vt = new VDBTemplate(dbTemplate.getId(), dbTemplate.getFileName());
-		vt.setDescription(dbTemplate.getDescription());
-		
-		// generate vt.group / VDB data
-		Group root = Group.getRoot();
-	
-		try
-		{
-		
-			vt.setGroup(new Group(null));
-			vt.getGroup().setAbsoluteName("");
-			vt.getGroup().setLookupTable(new Hashtable());
-		
-			Group.setRoot(vt.getGroup());
-		
-			VDBData vdbData = VDBData.generateVDBData(dbd, dbTemplate.getData());
-			DrawingSurface.applyVisualData(false, vt.getGroup(), dbTemplate.getData(), vdbData);
-			vt.getGroup().unconditionalValidateSubObjects(false);
-			
-			vt.setInputs(generateTemplateIOFields(dbTemplate, dbTemplate.getInputs(), "input"));
-			vt.setOutputs(generateTemplateIOFields(dbTemplate, dbTemplate.getOutputs(), "output"));
-
-			vt.setInputComments(dbTemplate.getInputComments());
-			vt.setOutputComments(dbTemplate.getOutputComments());
-			
-			vdb.addTemplate(vt);
-		}
-		catch (Exception ex)
-		{
-			Console.getInstance().println();
-			Console.getInstance().println("Exception caught while generating '"+dbTemplate.getId()+"' template.");
-			Console.getInstance().println(ex);
-			Console.getInstance().println();
-		}
-		finally
-		{
-			Group.setRoot(root); 
-		}
+		generateTemplate(dbd, dbTemplate);
 	}
 
 
+}
+
+/**
+ * 
+ */
+private static VDBData generateTemplate(DBDData dbd, DBTemplate dbTemplate)
+{
+	VDBTemplate vt = new VDBTemplate(dbTemplate.getId(), dbTemplate.getFileName());
+	vt.setDescription(dbTemplate.getDescription());
+	
+	// generate vt.group / VDB data
+	Group root = Group.getRoot();
+	
+	try
+	{
+	
+		vt.setGroup(new Group(null));
+		vt.getGroup().setAbsoluteName("");
+		vt.getGroup().setLookupTable(new Hashtable());
+	
+		Group.setRoot(vt.getGroup());
+	
+		VDBData vdbData = VDBData.generateVDBDataInternal(dbd, dbTemplate.getData());
+		DrawingSurface.applyVisualData(false, vt.getGroup(), dbTemplate.getData(), vdbData);
+		vt.getGroup().unconditionalValidateSubObjects(false);
+		
+		vt.setInputs(generateTemplateIOFields(dbTemplate, dbTemplate.getInputs(), "input"));
+		vt.setOutputs(generateTemplateIOFields(dbTemplate, dbTemplate.getOutputs(), "output"));
+	
+		vt.setInputComments(dbTemplate.getInputComments());
+		vt.setOutputComments(dbTemplate.getOutputComments());
+		
+		VDBData.addTemplate(vt);
+		
+		return vdbData;
+	}
+	catch (Exception ex)
+	{
+		Console.getInstance().println();
+		Console.getInstance().println("Exception caught while generating '"+dbTemplate.getId()+"' template.");
+		Console.getInstance().println(ex);
+		Console.getInstance().println();
+	}
+	finally
+	{
+		Group.setRoot(root); 
+	}
+	
+	return null;
 }
 /**
  * 

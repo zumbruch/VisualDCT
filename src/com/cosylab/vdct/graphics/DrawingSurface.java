@@ -159,7 +159,7 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 	private ComposedAction undoAction = null;
 	
 	private static final String newRecordString = "New record...";
-	private static final String newTemplesString = "New template";
+	private static final String newTemplesString = "New template instance";
 	private static final String newLineString = "New line";
 	private static final String newBoxString = "New box";
 	private static final String newTextBoxString = "New textbox";
@@ -836,7 +836,8 @@ private void showPopup(MouseEvent e)
 	textboxMenuItem.addActionListener(al);
 	popUp.add(textboxMenuItem);
 
-	if (isTemplateMode())
+	// every file is a template
+	//if (isTemplateMode())
 	{
 		popUp.add(new JSeparator());
 		JMenuItem templatePropertiesMenuItem = new JMenuItem(templatePropertiesString);
@@ -1382,6 +1383,10 @@ public boolean open(File file, boolean importDB) throws IOException {
 
 		if (!importDB)
 		{
+			// every file is a template
+			
+			
+			/*
 			// if template file start editing template
 			if (dbData.getRecords().isEmpty() &&
 				dbData.getGroups().isEmpty() &&
@@ -1414,7 +1419,22 @@ public boolean open(File file, boolean importDB) throws IOException {
 					moveToGroup(template.getGroup());
 				}
 			}
+			*/
+			
+				// find 'first' template defined in this file (not via includes)
+				VDBTemplate template = (VDBTemplate)VDBData.getTemplates().get(dbData.getTemplateData().getId());
+				
+				// found
+				if (template!=null)
+				{
+					Group.setRoot(template.getGroup());
+					Group.setEditingTemplateData(template);
+					//templateStack.push(template);
 
+					InspectorManager.getInstance().updateObjectLists();
+					moveToGroup(template.getGroup());
+				}
+			
 			setModified(false);
 			viewGroup.unconditionalValidateSubObjects(isFlat());
 		}
@@ -1432,7 +1452,7 @@ public boolean open(File file, boolean importDB) throws IOException {
 		UndoManager.getInstance().setMonitor(true);
 
 
-		///!!! put somewhere in try=finally block
+		///!!! put somewhere in try-finally block
 		// free db memory	    
 		dbData = null;
 		System.gc();
@@ -1556,7 +1576,7 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 			group.addSubObject(dbTemplate.getTemplateInstanceId(), templ, true);
 
 			//templ.setDescription(dbTemplate.getDescription());
-			templ.setDescription(template.getDescription());
+			//templ.setDescription(template.getDescription());
 			templ.setColor(dbTemplate.getColor());
 			templ.move(dbTemplate.getX(), dbTemplate.getY());
 			//templ.forceValidation();
@@ -2315,7 +2335,7 @@ public void createTemplateInstance(String name, String type, boolean relative) {
 	Group.getRoot().addSubObject(name, templ, true);
 
 	//templ.setDescription(dbTemplate.getDescription());
-	templ.setDescription(template.getDescription());
+	//templ.setDescription(template.getDescription());
 	templ.setX((int)((getPressedX() + view.getRx()) / scale));
 	templ.setY((int)((getPressedY() + view.getRy()) / scale));
 

@@ -2461,7 +2461,7 @@ private javax.swing.JMenu getFileMenu() {
 			ivjFileMenu.add(getSaveMenuItem());
 			ivjFileMenu.add(getSave_AsMenuItem());
 			ivjFileMenu.add(getSave_As_GroupMenuItem());
-			ivjFileMenu.add(getSaveAsTemplateMenuItem());
+			//ivjFileMenu.add(getSaveAsTemplateMenuItem());
 			ivjFileMenu.add(getJSeparator11a());
 			ivjFileMenu.add(getGenerateMenuItem());
 			ivjFileMenu.add(getGenerateAsGroupMenuItem());

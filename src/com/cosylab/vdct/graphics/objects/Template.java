@@ -52,11 +52,11 @@ import com.cosylab.vdct.vdb.*;
  */
 public class Template
 	extends LinkManagerObject
-	implements Descriptable, Movable, Inspectable, Popupable, Flexible, Selectable, Clipboardable, Hub, MonitoredPropertyListener, SaveInterface
+	implements /*Descriptable,*/ Movable, Inspectable, Popupable, Flexible, Selectable, Clipboardable, Hub, MonitoredPropertyListener, SaveInterface
 {
 
 	VDBTemplateInstance templateData = null;
-	String description = null;
+	//String description = null;
 
 	private static ImageIcon icon = null;
 
@@ -524,18 +524,21 @@ public class Template
 	 */
 	public String getDescription()
 	{
-		return description;
+		return templateData.getTemplate().getDescription();
+		//return description;
 	}
 
 	/**
 	 * Sets the description.
 	 * @param description The description to set
 	 */
+	/*
 	public void setDescription(String description)
 	{
 		this.description = description;
 	}
-
+	*/
+	
 	/**
 	 * Insert the method's description here.
 	 * Creation date: (25.4.2001 22:13:55)
@@ -990,7 +993,7 @@ public boolean copyToGroup(java.lang.String group) {
 	theDataCopy.setName(newName);
 	Template theTemplateCopy = new Template(null, theDataCopy);
 	Group.getRoot().addSubObject(theDataCopy.getName(), theTemplateCopy, true);
-	theTemplateCopy.setDescription(getTemplateData().getTemplate().getDescription());
+	//theTemplateCopy.setDescription(getTemplateData().getTemplate().getDescription());
 	theTemplateCopy.setX(getX()); theTemplateCopy.setY(getY());
 	theTemplateCopy.move(20-view.getRx(), 20-view.getRy());
 	theTemplateCopy.updateTemplateFields();
@@ -1138,6 +1141,7 @@ public void writeObjects(DataOutputStream file, NameManipulator namer, boolean e
 	 	properties.putAll(templateData.getProperties());
 	 }
 */
+
 	 // Note:
  	 // the macro values given in an expand(){} statement should not be
 	 // automatically passed down into any templates that are expanded within the

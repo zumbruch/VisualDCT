@@ -564,13 +564,13 @@ public void rename(java.lang.String oldName, java.lang.String newName) {
  * @param file java.io.File
  */
 public void save(java.io.File file) throws IOException {
-
+/*
  if (drawingSurface.isTemplateMode())
  {
  	saveAsTemplate(file);
  	return;
  }
- 
+*/ 
  Group.save(Group.getRoot(), file, false);
  
  // if ok
@@ -595,7 +595,7 @@ public void saveAsGroup(java.io.File file) throws IOException {
  */
 public void saveAsTemplate(File file) throws IOException
 {
-	
+/*	
  VDBTemplate data = null; 
  Stack stack = drawingSurface.getTemplateStack();
  if (stack.isEmpty())
@@ -644,7 +644,9 @@ public void saveAsTemplate(File file) throws IOException
  SetWorkspaceFile cmd = (SetWorkspaceFile)CommandManager.getInstance().getCommand("SetFile");
  cmd.setFile(file.getCanonicalPath());
  cmd.execute();
+*/
 }
+
 /**
  * Insert the method's description here.
  * Creation date: (4.2.2001 15:48:27)

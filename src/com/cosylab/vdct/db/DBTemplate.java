@@ -56,7 +56,6 @@ public class DBTemplate
 	public DBTemplate(String id, String fileName)
 	{
 		this.id=id;
-		this.description=id;		// default description
 		this.fileName=fileName;
 		reset();
 	}
@@ -67,7 +66,7 @@ public class DBTemplate
 	 */
 	public void reset()
 	{
-		description = id;
+		description = null;
 		comment = null;
 		initialized = false;
 		data = null;
