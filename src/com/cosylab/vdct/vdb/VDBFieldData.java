@@ -34,12 +34,14 @@ import com.cosylab.vdct.Console;
 import com.cosylab.vdct.inspector.ChangableVisibility;
 import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.inspector.InspectorManager;
+import com.cosylab.vdct.plugin.debug.PluginDebugManager;
 import com.cosylab.vdct.graphics.objects.Debuggable;
 import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.objects.LinkSource;
 import com.cosylab.vdct.graphics.objects.Record;
 
 import java.awt.Component;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -59,6 +61,16 @@ public class VDBFieldData implements InspectableProperty, Debuggable, ChangableV
 
 	private static final String debugDefault = "###";
 	protected String debugValue = debugDefault;
+	
+	/**
+	 * ISO 8601 date formatter.
+	 */
+	private static final SimpleDateFormat timeFormatter =
+	//	new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+		new SimpleDateFormat("HH:mm:ss.SSS");
+	
+	protected String debugValueTimeStamp = "n/a"; 
+	private static final String NAME_VAL = "VAL";
 	
 	protected int visibility = NON_DEFAULT_VISIBLE;
 
@@ -214,10 +226,16 @@ public int getType() {
  * @return java.lang.String
  */
 public java.lang.String getValue() {
-	if (!com.cosylab.vdct.plugin.debug.PluginDebugManager.isDebugState())
+	if (!PluginDebugManager.isDebugState())
 		return value;
 	else
-		return debugValue;
+	{
+		if (visibility == InspectableProperty.ALWAYS_VISIBLE || name.equals(NAME_VAL))
+			return debugValue;
+		else
+			return value;	// if it is not monitored return non-debug value
+	}
+	
 }
 /**
  * Insert the method's description here.
@@ -303,6 +321,7 @@ public void setDebugValue(String newValue)
 {
 	if (com.cosylab.vdct.plugin.debug.PluginDebugManager.isDebugState())
 	{
+		debugValueTimeStamp = timeFormatter.format(new Date());
 		debugValue = newValue; 
 		if (record!=null) record.fieldValueChanged(this);
 	}
@@ -496,6 +515,14 @@ public void setVisibility(int visibility)
  */
 public void popupEvent(Component component, int x, int y)
 {
+}
+
+/**
+ * Returns stringified timestamp of the last debug value update.
+ * @return  stringified timestamp of the last debug value update.
+ */
+public String getDebugValueTimeStamp() {
+	return debugValueTimeStamp;
 }
 
 }
