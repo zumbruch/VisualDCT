@@ -51,6 +51,7 @@ public class Settings {
 	private boolean grouping = false;
 	private boolean globalMacros = false;
 	private boolean hierarhicalNames = false;
+	private boolean windowsPan = false;
 	
 /**
  * Settings constructor comment.
@@ -69,6 +70,7 @@ protected Settings() {
 	grouping = prefs.getBoolean("Grouping", grouping);
 	globalMacros = prefs.getBoolean("GlobalMacros", globalMacros);
 	hierarhicalNames = prefs.getBoolean("HierarhicalNames", hierarhicalNames);
+	windowsPan = prefs.getBoolean("WindowsPan", windowsPan);
 
 	if (grouping)
 	{
@@ -384,6 +386,22 @@ public void loadRecentFiles()
 	public void setHierarhicalNames(boolean b) {
 		hierarhicalNames = b;
 		prefs.putBoolean("HierarhicalNames", b);
+		sync();
+	}
+
+	/**
+	 * @return
+	 */
+	public boolean getWindowsPan() {
+		return windowsPan;
+	}
+
+	/**
+	 * @param b
+	 */
+	public void setWindowsPan(boolean b) {
+		windowsPan = b;
+		prefs.putBoolean("WindowsPan", b);
 		sync();
 	}
 

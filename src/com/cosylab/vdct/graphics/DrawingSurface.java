@@ -1060,8 +1060,9 @@ public void mouseDragged(MouseEvent e) {
 				break;
 			case ORIGIN_MOVE : {
 //System.out.println("Dragged: ORIGIN_MOVE");
-				int dx = px-pressedX;
-				int dy = py-pressedY;
+				int f = Settings.getInstance().getWindowsPan() ? -1 : 1;
+				int dx = f*(px-pressedX);
+				int dy = f*(py-pressedY);
 				if (view.moveOrigin(dx, dy)) {
 					recalculateNavigatorPosition();
 					blockNavigatorRedrawOnce = true;

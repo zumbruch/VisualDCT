@@ -128,6 +128,7 @@ public class VisualDCT extends JFrame {
 	private com.cosylab.vdct.graphics.DrawingSurface ivjcanvas = null;
 	private JFileChooser ivjfileChooser = null;
 	private JCheckBoxMenuItem ivjSnapToGridMenuItem = null;
+	private JCheckBoxMenuItem ivjWindowsPanMenuItem = null;
 	private JPanel ivjButtonPanel = null;
 	private JPanel ivjJDialogContentPane = null;
 	private JLabel ivjNameLabel = null;
@@ -332,6 +333,8 @@ class IvjEventHandler implements java.awt.event.ActionListener, java.awt.event.I
 				connEtoC44(e);
 			if (e.getSource() == VisualDCT.this.getSnapToGridMenuItem()) 
 				connEtoC46(e);
+			if (e.getSource() == VisualDCT.this.getWindowsPanMenuItem()) 
+				connEtoCWindowsPan(e);				
 			if (e.getSource() == VisualDCT.this.getNavigatorMenuItem()) 
 				connEtoC25(e);
 		};
@@ -1125,6 +1128,20 @@ private void connEtoC46(java.awt.event.ItemEvent arg1) {
 		// user code begin {1}
 		// user code end
 		this.snapToGridMenuItem_ItemStateChanged(arg1);
+		// user code begin {2}
+		// user code end
+	} catch (java.lang.Throwable ivjExc) {
+		// user code begin {3}
+		// user code end
+		handleException(ivjExc);
+	}
+}
+
+private void connEtoCWindowsPan(java.awt.event.ItemEvent arg1) {
+	try {
+		// user code begin {1}
+		// user code end
+		this.windowsPanMenuItem_ItemStateChanged(arg1);
 		// user code begin {2}
 		// user code end
 	} catch (java.lang.Throwable ivjExc) {
@@ -4347,6 +4364,25 @@ private javax.swing.JCheckBoxMenuItem getSnapToGridMenuItem() {
 	}
 	return ivjSnapToGridMenuItem;
 }
+
+private javax.swing.JCheckBoxMenuItem getWindowsPanMenuItem() {
+	if (ivjWindowsPanMenuItem == null) {
+		try {
+			ivjWindowsPanMenuItem = new javax.swing.JCheckBoxMenuItem();
+			ivjWindowsPanMenuItem.setName("WindowsPanMenuItem");
+			ivjWindowsPanMenuItem.setMnemonic('r');
+			ivjWindowsPanMenuItem.setText("Windows Pan Direction");
+			// user code begin {1}
+			ivjWindowsPanMenuItem.setSelected(Settings.getInstance().getWindowsPan());
+			// user code end
+		} catch (java.lang.Throwable ivjExc) {
+			// user code begin {2}
+			// user code end
+			handleException(ivjExc);
+		}
+	}
+	return ivjWindowsPanMenuItem;
+}
 /**
  * Return the StartDebugMenuItem property value.
  * @return com.cosylab.vdct.plugin.debug.DebugStartMenu
@@ -4788,6 +4824,7 @@ private javax.swing.JMenu getViewMenu() {
 			ivjViewMenu.add(getJSeparator9());
 			ivjViewMenu.add(getShow_PointsMenuItem());
 			ivjViewMenu.add(getSnapToGridMenuItem());
+			ivjViewMenu.add(getWindowsPanMenuItem());
 			ivjViewMenu.add(getJSeparator10());
 			ivjViewMenu.add(getPreferences___MenuItem());
 			// user code begin {1}
@@ -5252,6 +5289,7 @@ private void initConnections() throws java.lang.Exception {
 	getPreferences___MenuItem().addActionListener(ivjEventHandler);
 	getShow_PointsMenuItem().addItemListener(ivjEventHandler);
 	getSnapToGridMenuItem().addItemListener(ivjEventHandler);
+	getWindowsPanMenuItem().addItemListener(ivjEventHandler);
 	getOKButton().addActionListener(ivjEventHandler);
 	getCancelButton().addActionListener(ivjEventHandler);
 	getNameTextField().addActionListener(ivjEventHandler);
@@ -5466,8 +5504,15 @@ public void move_RenameMenuItem_ActionPerformed() {
 public void navigatorMenuItem_ItemStateChanged(java.awt.event.ItemEvent itemEvent) {
 	GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
 	if (cmd!=null)
-		cmd.getGUIMenuInterface().showNavigator(getSnapToGridMenuItem().isSelected());
+		cmd.getGUIMenuInterface().showNavigator(getNavigatorMenuItem().isSelected());
 	Settings.getInstance().setNavigator(getNavigatorMenuItem().isSelected());
+}
+
+public void windowsPanMenuItem_ItemStateChanged(java.awt.event.ItemEvent itemEvent) {
+	GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
+	/*if (cmd!=null)
+		cmd.getGUIMenuInterface().???(getWindowsPanMenuItem().isSelected());*/
+	Settings.getInstance().setWindowsPan(getWindowsPanMenuItem().isSelected());
 }
 /**
  * Insert the method's description here.
