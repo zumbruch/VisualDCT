@@ -15,6 +15,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.util.Enumeration;
 
 import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.JFileChooser;
@@ -24,6 +25,10 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.MouseInputAdapter;
 
+import com.cosylab.vdct.graphics.DrawingSurface;
+import com.cosylab.vdct.graphics.objects.ContainerObject;
+import com.cosylab.vdct.graphics.objects.Group;
+import com.cosylab.vdct.graphics.objects.Record;
 import com.cosylab.vdct.util.DoubleClickProxy;
 import com.cosylab.vdct.util.UniversalFileFilter;
 
@@ -177,9 +182,15 @@ public class SettingsDialog extends javax.swing.JDialog {
 		jCheckBoxGlobalMacros.setSelected(s.getGlobalMacros());
 		jCheckBoxCapFast.setSelected(s.getHierarhicalNames());
 		
+		jSpinnerWidth.setValue(new Integer(s.getCanvasWidth()));
+		jSpinnerHeight.setValue(new Integer(s.getCanvasHeight()));
+		
 		// double click is global
 		DoubleClickProxy.update();
 		jCheckBoxSilhouetteMoving.setSelected(s.getFastMove());
+		
+		jCheckBoxDefaultVisiblity.setSelected(s.isDefaultVisibility());
+		jCheckBoxLinksVisibility.setSelected(s.isHideLinks());
 		
 		//legend
 		jTextFieldLogo.setText(s.getLegendLogo());
@@ -210,6 +221,10 @@ public class SettingsDialog extends javax.swing.JDialog {
 		s.setGlobalMacros(jCheckBoxGlobalMacros.isSelected());
 		s.setHierarhicalNames(jCheckBoxCapFast.isSelected());
 		
+		s.setCanvasWidth(((Number)jSpinnerWidth.getValue()).intValue());
+		s.setCanvasHeight(((Number)jSpinnerHeight.getValue()).intValue());
+		DrawingSurface.getInstance().reset();
+		
 		// double click is global
 		s.setDoubleClickSpeed(jSliderDoubleClickSpeed.getValue());
 		s.setDoubleClickSmudge(jSliderDoubleClickSmudge.getValue());
@@ -217,11 +232,33 @@ public class SettingsDialog extends javax.swing.JDialog {
 		
 		s.setFastMove(jCheckBoxSilhouetteMoving.isSelected());
 		
+		s.setDefaultVisibility(jCheckBoxDefaultVisiblity.isSelected());
+		s.setHideLinks(jCheckBoxLinksVisibility.isSelected());
+		updateFields();
+		
+		// legend
 		s.setLegendLogo(jTextFieldLogo.getText());
 		s.setLegendVisibility(Integer.parseInt(buttonGroupVisibility.getSelection().getActionCommand()));
 		s.setLegendPosition(Integer.parseInt(buttonGroupLocation.getSelection().getActionCommand()));
 	}
 
+
+	/**
+	 * 
+	 */
+	private void updateFields() {
+		updateFields(Group.getRoot());
+	}
+	
+	private void updateFields(ContainerObject obj) {
+		Enumeration e = obj.getSubObjectsV().elements();
+		while (e.hasMoreElements()) {
+			Object o = e.nextElement();
+			if (o instanceof Record) ((Record)o).fieldsChanged();
+			else if (o instanceof ContainerObject) updateFields((ContainerObject)o);
+			
+		}
+	}
 
 	/** This method is called from within the constructor to
      * initialize the form.
@@ -249,6 +286,11 @@ public class SettingsDialog extends javax.swing.JDialog {
         jPanel4 = new javax.swing.JPanel();
         jCheckBoxGlobalMacros = new javax.swing.JCheckBox();
         jCheckBoxCapFast = new javax.swing.JCheckBox();
+        jPanel9 = new javax.swing.JPanel();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
+        jSpinnerHeight = new javax.swing.JSpinner();
+        jSpinnerWidth = new javax.swing.JSpinner();
         jPanelVisual = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jLabel8 = new javax.swing.JLabel();
@@ -261,6 +303,8 @@ public class SettingsDialog extends javax.swing.JDialog {
         jPanel6 = new javax.swing.JPanel();
         jCheckBoxSilhouetteMoving = new javax.swing.JCheckBox();
         jPanel8 = new javax.swing.JPanel();
+        jCheckBoxDefaultVisiblity = new javax.swing.JCheckBox();
+        jCheckBoxLinksVisibility = new javax.swing.JCheckBox();
         jPanelPrint = new javax.swing.JPanel();
         jPanelLegend = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -317,17 +361,17 @@ public class SettingsDialog extends javax.swing.JDialog {
         jLabel5.setText("Record name length limit: ");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weighty = 1.0;
         jPanel1.add(jLabel5, gridBagConstraints);
 
         jSpinnerRecordNameLength.setMinimumSize(new java.awt.Dimension(60, 20));
         jSpinnerRecordNameLength.setPreferredSize(new java.awt.Dimension(60, 20));
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(8, 0, 7, 7);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 1.0;
         jPanel1.add(jSpinnerRecordNameLength, gridBagConstraints);
 
         jPanelDatabase.add(jPanel1);
@@ -409,6 +453,48 @@ public class SettingsDialog extends javax.swing.JDialog {
         jPanel4.add(jCheckBoxCapFast, gridBagConstraints);
 
         jPanelDatabase.add(jPanel4);
+
+        jPanel9.setLayout(new java.awt.GridBagLayout());
+
+        jPanel9.setBorder(new javax.swing.border.TitledBorder("Drawing surface size"));
+        jLabel6.setText("Width:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        jPanel9.add(jLabel6, gridBagConstraints);
+
+        jLabel11.setText("Height:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.insets = new java.awt.Insets(0, 8, 8, 8);
+        jPanel9.add(jLabel11, gridBagConstraints);
+
+        jSpinnerHeight.setMinimumSize(new java.awt.Dimension(60, 20));
+        jSpinnerHeight.setPreferredSize(new java.awt.Dimension(60, 20));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 8, 8);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        jPanel9.add(jSpinnerHeight, gridBagConstraints);
+
+        jSpinnerWidth.setMinimumSize(new java.awt.Dimension(60, 20));
+        jSpinnerWidth.setPreferredSize(new java.awt.Dimension(60, 20));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(8, 0, 8, 8);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        jPanel9.add(jSpinnerWidth, gridBagConstraints);
+
+        jPanelDatabase.add(jPanel9);
 
         jTabbedPanel.addTab("Database", jPanelDatabase);
 
@@ -508,6 +594,27 @@ public class SettingsDialog extends javax.swing.JDialog {
         jPanelVisual.add(jPanel6);
 
         jPanel8.setLayout(new java.awt.GridBagLayout());
+
+        jPanel8.setBorder(new javax.swing.border.TitledBorder("Field Visibility"));
+        jCheckBoxDefaultVisiblity.setSelected(true);
+        jCheckBoxDefaultVisiblity.setText("Show value of fields when it is not default");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        jPanel8.add(jCheckBoxDefaultVisiblity, gridBagConstraints);
+
+        jCheckBoxLinksVisibility.setText("Hide value of valid links");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(0, 8, 8, 8);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        jPanel8.add(jCheckBoxLinksVisibility, gridBagConstraints);
 
         jPanelVisual.add(jPanel8);
 
@@ -682,12 +789,12 @@ public class SettingsDialog extends javax.swing.JDialog {
         jPanel7.setBorder(new javax.swing.border.EtchedBorder());
         jPanel7.setMinimumSize(new java.awt.Dimension(128, 128));
         jPanel7.setPreferredSize(new java.awt.Dimension(128, 128));
-        //jPanel7.add(jLabelImage);
+        jPanel7.add(jLabelImage);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridheight = 6;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
         jPanelLegend.add(jPanel7, gridBagConstraints);
 
         jPanelPrint.add(jPanelLegend);
@@ -738,15 +845,19 @@ public class SettingsDialog extends javax.swing.JDialog {
     private javax.swing.JButton jButtonCancel;
     private javax.swing.JButton jButtonOk;
     private javax.swing.JCheckBox jCheckBoxCapFast;
+    private javax.swing.JCheckBox jCheckBoxDefaultVisiblity;
     private javax.swing.JCheckBox jCheckBoxEnableGrouping;
     private javax.swing.JCheckBox jCheckBoxGlobalMacros;
+    private javax.swing.JCheckBox jCheckBoxLinksVisibility;
     private javax.swing.JCheckBox jCheckBoxSilhouetteMoving;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
@@ -762,6 +873,7 @@ public class SettingsDialog extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JPanel jPanelButtons;
     private javax.swing.JPanel jPanelDatabase;
     private javax.swing.JPanel jPanelLegend;
@@ -773,7 +885,9 @@ public class SettingsDialog extends javax.swing.JDialog {
     private javax.swing.JRadioButton jRadioButton3;
     private javax.swing.JSlider jSliderDoubleClickSmudge;
     private javax.swing.JSlider jSliderDoubleClickSpeed;
+    private javax.swing.JSpinner jSpinnerHeight;
     private javax.swing.JSpinner jSpinnerRecordNameLength;
+    private javax.swing.JSpinner jSpinnerWidth;
     private javax.swing.JTabbedPane jTabbedPanel;
     private javax.swing.JTextField jTextFieldGroupingSeparator;
     private javax.swing.JTextField jTextFieldLogo;
