@@ -1383,5 +1383,15 @@ private static ArrayList getModes()
 	return modes;
 }
 
+/**
+ * @param linkableMacros
+ * @param macros
+ * @param deep
+ */
+public void generateMacros(HashMap macros) {
+	Enumeration e = recordData.getFieldsV().elements();
+	while (e.hasMoreElements()) 
+		LinkManagerObject.checkIfMacroCandidate((VDBFieldData)e.nextElement(), macros);
+}
 
 }

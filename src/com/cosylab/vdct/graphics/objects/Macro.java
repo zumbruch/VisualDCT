@@ -100,11 +100,11 @@ public class Macro extends VisibleObject implements Descriptable, Movable, InLin
 	
 	protected boolean disconnected = true;
 
-	private static final String descriptionString = "Description";
-	private static final String selectTitle = "Select link color...";
+	//private static final String descriptionString = "Description";
+	//private static final String selectTitle = "Select link color...";
 	private static final String addConnectorString = "Add connector";
-	private static final String colorString = "Color...";
-	private static final String removeLinkString = "Remove Link";
+	//private static final String colorString = "Color...";
+	//private static final String removeLinkString = "Remove Link";
 //	private static final String removeMacroString = "Hide Macro";
 //	private static final String removeMacroDefString = "Remove Macro";
 	private static final String removeMacroString = "Remove Macro";
@@ -114,7 +114,7 @@ public class Macro extends VisibleObject implements Descriptable, Movable, InLin
 	private static final String inputString = "INPUT";
 	private static final String outputString = "OUTPUT";
 
-	private static final String nullString = "";
+	//private static final String nullString = "";
 
 	private int mode = InLink.INPUT_MACRO_MODE;
 

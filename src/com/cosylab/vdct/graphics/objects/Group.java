@@ -615,7 +615,6 @@ public void manageLinks(boolean deep) {
 		else if (deep && (obj instanceof Group))
 			((Group)obj).manageLinks(deep);
 	}
-
 }
 /**
  * Insert the method's description here.
@@ -1798,5 +1797,25 @@ public static void setEditingTemplateData(VDBTemplate editingTemplateData)
 	{
 		return structure;
 	}
+
+/**
+ * @param linkableMacros
+ * @param macros
+ * @param deep
+ */
+public void generateMacros(HashMap macros, boolean deep) {
+
+	Enumeration e = subObjectsV.elements();
+	Object obj;
+	while (e.hasMoreElements()) {
+		obj = e.nextElement();
+		if (obj instanceof Record)
+			((Record)obj).generateMacros(macros);
+		if (obj instanceof Template)
+			((Template)obj).generateMacros(macros);
+		else if (deep && (obj instanceof Group))
+			((Group)obj).generateMacros(macros, deep);
+	}
+}
 
 }

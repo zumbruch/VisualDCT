@@ -156,7 +156,7 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 	private LinkSource tmplink = null;
 	private Hiliter hiliter;
 	
-	private ComposedAction undoAction = null;
+	//private ComposedAction undoAction = null;
 	
 	private static final String newRecordString = "New record...";
 	private static final String newTemplesString = "New template instance";
@@ -168,6 +168,7 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 	private static final String newBoxString = "New box";
 	private static final String newTextBoxString = "New textbox";
 	private static final String templatePropertiesString = "Template properties...";
+	private static final String generateMacrosString = "Generate macros...";
 
 	private Line grLine = null;
 	private Box grBox = null;
@@ -815,6 +816,8 @@ private void showPopup(MouseEvent e)
 				createPort(null);
 			else if (action.equals(newMacroString))
 				createMacro(null);
+			else if (action.equals(generateMacrosString))
+				generateMacros();
 			else if (action.equals(newLineString))
 				createLine();
 			else if (action.equals(newBoxString))
@@ -933,6 +936,12 @@ private void showPopup(MouseEvent e)
 
 	popUp.add(new JSeparator());
 	
+	JMenuItem generateMacrosMenuItem = new JMenuItem(generateMacrosString);
+	generateMacrosMenuItem.addActionListener(al);
+	popUp.add(generateMacrosMenuItem);
+
+	popUp.add(new JSeparator());
+
 	JMenuItem lineMenuItem = new JMenuItem(newLineString);
 	lineMenuItem.addActionListener(al);
 	popUp.add(lineMenuItem);
@@ -2844,6 +2853,26 @@ public void createMacro(VDBMacro vdbMacro) {
 
 	//drawingSurface.setModified(true);
 	repaint();
+}
+
+/**
+ * Searches for undefined macros
+ */
+public void generateMacros()
+{
+	// iterate through all the records
+		// for each record iterate through all the fields
+			// if fields contains template string $(<nameWithoutDot>) the it is macro
+				// if string start this this string then propose visible macro
+				// otherwise non-visible (link cannot be drawn in this case)
+				
+	HashMap macros = new HashMap();
+	
+	Group.getRoot().generateMacros(macros, true);
+	
+	System.out.println("Macros: " + macros);
+
+	// TODO gui
 }
 
 }

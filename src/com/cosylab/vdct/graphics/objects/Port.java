@@ -113,7 +113,7 @@ public class Port extends VisibleObject implements Descriptable, Movable, OutLin
 	protected LinkProperties properties = null;
 	private boolean hasEndpoint = false;
 
-	private static final String descriptionString = "Description";
+	//private static final String descriptionString = "Description";
 	private static final String selectTitle = "Select link color...";
 	private static final String addConnectorString = "Add connector";
 	private static final String colorString = "Color...";

@@ -1515,4 +1515,21 @@ public ArrayList getModeNames()
 	return null;
 }
 
+/**
+ * @param linkableMacros
+ * @param macros
+ * @param deep
+ */
+public void generateMacros(HashMap macros) {
+	Object obj;
+	Enumeration e = subObjectsV.elements();
+	while (e.hasMoreElements())
+	{
+		obj = e.nextElement();
+		// TODO only macro fields!!!
+		if (obj instanceof Field)
+			LinkManagerObject.checkIfMacroCandidate(((Field)obj).getFieldData(), macros);
+	}
+}
+
 }

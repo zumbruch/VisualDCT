@@ -763,4 +763,57 @@ protected void destroyFields() {
 		this.targetLink = targetLink;
 	}
 
+/**
+ * @param linkableMacros
+ * @param macros
+ * @param deep
+ */
+public static void checkIfMacroCandidate(VDBFieldData field, HashMap macros) {
+
+	String value = field.getValue();
+	final String macroStart = "$(";
+
+	int startMacroPos = 0;
+	while ((startMacroPos = value.indexOf(macroStart, startMacroPos)) != -1)
+	{
+		// search string is 2 chars long and this will not cause out of bounds error
+		// if match is at very end of the string
+		startMacroPos++;
+		
+		// find end of macro reference
+		int endMacroPos = value.indexOf(')', startMacroPos);
+		
+		// invalid reference
+		if (endMacroPos == -1 || endMacroPos == startMacroPos+1)
+			continue;
+		 
+		// check if not port
+		int dotPos = value.indexOf('.', startMacroPos);
+		if (dotPos != -1 && dotPos < endMacroPos)
+			continue;
+			
+		// "composed macros" are not supported !!!
+		dotPos = value.indexOf('$', startMacroPos);
+		if (dotPos != -1 && dotPos < endMacroPos)
+			continue;
+
+		// check if not already defined
+		String macroName = value.substring(startMacroPos-1, endMacroPos+1);
+		if (Group.getRoot().getLookupTable().get(macroName)!=null)
+			continue;
+		
+		// we have got undefined macro, add it to the list
+		ArrayList list = (ArrayList)macros.get(macroName);
+		if (list == null)
+		{
+			list = new ArrayList();
+			macros.put(macroName, list);
+		}
+		if (!list.contains(field))
+			list.add(field);
+			
+	}
+
+}
+
 }
