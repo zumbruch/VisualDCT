@@ -153,6 +153,7 @@ public static void initializeTokenizer(StreamTokenizer tokenizer) {
 	tokenizer.whitespaceChars(0, 32);
 	tokenizer.wordChars(33, 255);			// reset
 	tokenizer.eolIsSignificant(true);
+	tokenizer.parseNumbers();
 	tokenizer.quoteChar(DBConstants.quoteChar);
 	tokenizer.whitespaceChars(',', ',');
 	tokenizer.whitespaceChars('{', '{');
@@ -162,14 +163,13 @@ public static void initializeTokenizer(StreamTokenizer tokenizer) {
 
 
 
-private static String loadTemplate(DBData data, String templateFile, String referencedFromFile, DBPathSpecification paths) throws FileNotFoundException
+private static String loadTemplate(DBData data, String templateFile, String referencedFromFile, DBPathSpecification paths) throws Exception
 {
 
 	File file = paths.search4File(templateFile);
 	String templateToResolve = file.getAbsolutePath();
 
 	// check if file already loaded
-	// !!!
 	if(DataProvider.getInstance().getLoadedDBs().contains(templateToResolve))
 	{
 		Console.getInstance().println("Template \""+templateFile+"\" already loaded...");
@@ -179,7 +179,7 @@ private static String loadTemplate(DBData data, String templateFile, String refe
 		return file.getName();
 	}
 
-	// cyclic reference check
+	// cyclic reference check !!!
 	{
 	}
 	
@@ -867,7 +867,8 @@ public static void skipLines(int linesToSkip, StreamTokenizer tokenizer, String 
  * @param rootData com.cosylab.vdct.db.DBData
  * @param tokenizer java.io.StreamTokenizer
  */
-public static void processDB(DBData data, StreamTokenizer tokenizer, String fileName, DBPathSpecification paths) {
+public static void processDB(DBData data, StreamTokenizer tokenizer, String fileName, DBPathSpecification paths) throws Exception
+{
 	
 	String comment = nullString;
 	String str, str2;
@@ -1039,6 +1040,7 @@ public static void processDB(DBData data, StreamTokenizer tokenizer, String file
 
 	} catch (Exception e) {
 		Console.getInstance().println("\n"+e);
+		throw e;
 	}	
 	
 }
@@ -1312,6 +1314,10 @@ public static DBData resolveDB(String fileName) {
 
 			processDB(data, tokenizer, fileName, paths);
 		}
+		catch (Exception e)
+		{
+			data = null;
+		}
 		finally
 		{
 			System.gc();
@@ -1353,7 +1359,7 @@ public static DBData resolveDBasURL(java.net.URL url) {
 
 			// !!! TDB not supported yet 
 			
-			processDB(data, tokenizer, url.toString(), null);
+			//processDB(data, tokenizer, url.toString(), null);
 		}
 		finally
 		{
