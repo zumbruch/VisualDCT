@@ -143,6 +143,7 @@ public class GenerateFlatDatabase
 
 			default:
 				System.err.println("Too many parameters.");
+				printHelp();
 
 				return false;
 			}
@@ -150,7 +151,8 @@ public class GenerateFlatDatabase
 
 		if (state != 3) {
 			System.err.println("Missing parameters.");
-
+			printHelp();
+			
 			return false;
 		}
 
