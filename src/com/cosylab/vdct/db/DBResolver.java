@@ -98,7 +98,7 @@ public class DBResolver {
 
 	// template 'instatiation'
 	// used format:
- 	// #! TemplateInstance("templateid", x, y, color, "desc")
+ 	// #! TemplateInstance("templateid", "templateClassID", x, y, color, "desc")
  	// #! TemplateProperty("templateid", "name", "value")
 	private static String TEMPLATE_INSTANCE = "TemplateInstance";
 	private static String TEMPLATE_PROPERTY= "TemplateProperty";
@@ -383,6 +383,12 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 						(tokenizer.ttype == DBConstants.quoteChar)) str=tokenizer.sval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 					
+					// read template class id
+					tokenizer.nextToken();
+					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+						(tokenizer.ttype == DBConstants.quoteChar)) str2=tokenizer.sval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
 					// read x pos
 					tokenizer.nextToken();
 					if (tokenizer.ttype == tokenizer.TT_NUMBER) tx=(int)tokenizer.nval;
@@ -404,7 +410,7 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 						(tokenizer.ttype == DBConstants.quoteChar)) desc=tokenizer.sval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
-					data.addTemplateInstance(new DBTemplateInstance(str, tx, ty, StringUtils.int2color(t), desc));
+					data.addTemplateInstance(new DBTemplateInstance(str, str2, tx, ty, StringUtils.int2color(t), desc));
 				}
 				else if (tokenizer.sval.equalsIgnoreCase(TEMPLATE_PROPERTY)) {
 					// read template id
@@ -426,7 +432,7 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 					DBTemplateInstance ti = (DBTemplateInstance)data.getTemplateInstances().get(str);
-					if (ti==null)
+					if (ti!=null)
 						ti.getProperties().put(str2, desc);
 					
 				}
@@ -476,7 +482,7 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 					templateData.getOutputs().put(str, str2);
 				}
 				else if (templateData!=null && tokenizer.sval.equalsIgnoreCase(TEMPLATE_END)) {
-					templateEnd();
+					templateEnd(data);
 				}
 
 				/***************************************************/
@@ -617,12 +623,14 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
   }
 }
 
-private static void templateEnd()
+private static void templateEnd(DBData data)
 {
 	// store templateData
-	///!!!
-
-	templateData = null;
+	if (templateData!=null)
+	{
+		data.getTemplates().put(templateData.getId(), templateData);
+		templateData = null;
+	}
 }
 
 /**
@@ -702,7 +710,7 @@ public static void processDB(DBData data, StreamTokenizer tokenizer, String file
 	
 	// automatically trigger TEMPLATEEND
 	if (templateData!=null && templateData.getFileName().equals(fileName))
-		templateEnd();
+		templateEnd(data);
 }
 
 /**

@@ -37,6 +37,7 @@ import java.util.Hashtable;
 public class DBTemplateInstance
 {
 	String templateID;
+	String templateClassID;
 	Hashtable properties = null;
 
 	protected int x = -1;			// used for layout
@@ -47,10 +48,11 @@ public class DBTemplateInstance
 	/**
 	 * Constructor.
 	 */
-	public DBTemplateInstance(String templateID, int x, int y, java.awt.Color color, String description)
+	public DBTemplateInstance(String templateID, String templateClassID, int x, int y, java.awt.Color color, String description)
 	{
 		properties = new Hashtable();
 		this.templateID = templateID;
+		this.templateClassID = templateClassID;
 		this.x=x; this.y=y;
 		this.color=color;
 		this.description=description;
@@ -162,6 +164,24 @@ public class DBTemplateInstance
 	public void setY(int y)
 	{
 		this.y = y;
+	}
+
+	/**
+	 * Returns the templateClassID.
+	 * @return String
+	 */
+	public String getTemplateClassID()
+	{
+		return templateClassID;
+	}
+
+	/**
+	 * Sets the templateClassID.
+	 * @param templateClassID The templateClassID to set
+	 */
+	public void setTemplateClassID(String templateClassID)
+	{
+		this.templateClassID = templateClassID;
 	}
 
 }

@@ -41,6 +41,7 @@ public class DBData {
 	protected Hashtable groups = null;
 	protected Hashtable links = null;
 	protected Hashtable connectors = null;
+	protected Hashtable templates = null;		// !!! temp
 	protected Hashtable templateInstances = null;
 /**
  * DBDData constructor comment.
@@ -51,6 +52,7 @@ public DBData() {
 	groups = new Hashtable();
 	links = new Hashtable();
 	connectors = new Hashtable();
+	templates = new Hashtable();
 	templateInstances = new Hashtable();
 }
 /**
@@ -188,5 +190,14 @@ public Hashtable getTemplateInstances()
 {
 	return templateInstances;
 }
+
+	/**
+	 * Returns the templates.
+	 * @return Hashtable
+	 */
+	public Hashtable getTemplates()
+	{
+		return templates;
+	}
 
 }
