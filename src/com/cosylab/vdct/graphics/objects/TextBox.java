@@ -376,14 +376,31 @@ protected void draw(Graphics g, boolean hilited)
 		
 		if (htmlMode)
 		{
+			Color tmp = label.getForeground();
+			Color c = tmp;
+			if (c==Constants.BACKGROUND_COLOR)
+				if (c==Color.black)
+					c=Color.white;
+				else
+					c=Color.black;
+			label.setForeground(c);
 			label.setBounds(posX + 2, posY + 2, rwidth - 4, rheight - 4);
 			label.paint(g);
+			label.setForeground(tmp);
 		}
 		else
 		{
 			Shape clip = g.getClip();
 			g.setClip(posX, posY, rwidth, rheight);
-			g.setColor(getColor());
+
+			Color c = getColor();
+			if (c==Constants.BACKGROUND_COLOR)
+				if (c==Color.black)
+					c=Color.white;
+				else
+					c=Color.black;
+			g.setColor(c);
+
 			drawMultiLineText(g, posX+2, posY+2, rwidth-4);	
 			g.setClip(clip);
 		}
@@ -418,7 +435,15 @@ private void drawDashedBorder(Graphics g, boolean hilited,
 	if (hilited)
 		g.setColor(Constants.SELECTION_COLOR);
 	else
-		g.setColor(getColor());
+	{
+		Color c = getColor();
+		if (c==Constants.BACKGROUND_COLOR)
+			if (c==Color.black)
+				c=Color.white;
+			else
+				c=Color.black;
+		g.setColor(c);
+	}
 		
 	double scale = view.getScale();
 	

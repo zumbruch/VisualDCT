@@ -216,7 +216,13 @@ protected void draw(Graphics g, boolean hilited)
 		g.drawRect(posX, posY, rwidth, rheight);
 	}
 
-	g.setColor(getColor());
+	Color c = getColor();
+	if (c==Constants.BACKGROUND_COLOR)
+		if (c==Color.black)
+			c=Color.white;
+		else
+			c=Color.black;
+	g.setColor(c);
 
 	double scale = view.getScale();
 	
