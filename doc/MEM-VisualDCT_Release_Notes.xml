@@ -26,6 +26,10 @@
 			<section>Package B release candidate.</section>
 		</modification>
 
+		<modification version="2.4.1244" by="msekoranja" date="2003-07-18">
+			<section>Package C (full graphical hierarchy support) release candidate.</section>
+		</modification>
+
 		<scope>
 			This document is contains release notes of the current build.
 		</scope>
@@ -45,15 +49,17 @@
 			   title="VisualDCT latest build"
 			   href="http://visualdct.cosylab.com/builds/VisualDCT/"
 			   author="Matej Sekoranja"
-			   date="2002"
+			   date="2003"
 			   publisher="Cosylab, Ltd."
-			   revision="2.3.1237"/>
+			   revision="2.4.1244"/>
 
 	</head>
 	
 	<body>
 		<section id="noted" title="Release Notes">
 			<p>
+			Current version has been added full graphical hierarchy support. Also some useful features like recent file list,
+			last DB workspace view, relative DBD paths, etc., where implemented.
 			Current build has the following disabilities:
 			<ul>
 			  <li><kwd>include</kwd> statement is implemented, but saving files containing <kwd>include</kwd> statements 
@@ -65,8 +71,7 @@
 			<p>
 			Still there are quite a lot of ideas and nice features to be implemeted in the next releases:
 			<ul>
-			  <li>all Package C items</li>
-			  <li>recently used files list</li>
+			  <li>all Package D items</li>
 			  <li>search for objects</li>
 			  <li>record morphing</li>
 			  <li>pop-up menu for commonly used commands on objects</li>

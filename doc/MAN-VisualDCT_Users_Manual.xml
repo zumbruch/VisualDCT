@@ -22,8 +22,12 @@
 			<section>Created.</section>
 		</modification>
 		<release version="1.1" by="msekoranja" date="2002-10-22">
-
 		</release>
+
+		<modification version="1.2" by="msekoranja" date="2003-07-18">
+			<section>Updated hierarchy related sections of manual.</section>
+		</modification>
+
 
 		<scope>
 			This document is a users manual of how to use VisualDCT and also contains some tips and ticks.
@@ -37,16 +41,16 @@
 			   title="VisualDCT Project"
 			   href="http://visualdct.cosylab.com/"
 			   author="Matej Sekoranja"
-			   date="2002"
+			   date="2003"
 			   publisher="Cosylab, Ltd."/>
 			   
 		<reference id="visualdct_latest"
 			   title="VisualDCT latest build"
 			   href="http://visualdct.cosylab.com/builds/VisualDCT/"
 			   author="Matej Sekoranja"
-			   date="2002"
+			   date="2003"
 			   publisher="Cosylab, Ltd."
-			   revision="2.3.1237"/>
+			   revision="2.4.1244"/>
 
 		<reference id="vdct_installation"
 			   title="Java Installation and Build Process of VisualDCT"
@@ -60,6 +64,13 @@
 			   href="DES-VisualDCT_EPICS_Databases_Hierarchy_Support.html"
 			   author="Matej Sekoranja"
 			   date="2002"
+			   publisher="Cosylab, Ltd."/>
+
+		<reference id="vdct_hierarchy_additions"
+			   title="VisualDCT Hierarchy Additions"
+			   href="SPE-VisualDCT_Hierarchy_Additions.html"
+			   author="Matej Sekoranja"
+			   date="2003"
 			   publisher="Cosylab, Ltd."/>
 
 		<reference id="plugins"
@@ -81,7 +92,7 @@
 				easier to understand. VisualDCT has a powerful DB parser, which allows importing existing DB and DBD files.
 				Output file is also DB file, all comments and record order is preserved and visual data saved as comment,
 				which allows DBs to be edited in other tools or manually.<br/>
-				This manual describes the VisualDCT version 2.3 build 1237.
+				This manual describes the VisualDCT version 2.4 build 1244.
 			</p>
 		</section>
 		
@@ -149,14 +160,15 @@
 			<p>
 				<kwd>VDCT_DIR</kwd> environment variable is used to define the default working directory.<br/>
 				For saving configuration data Java Preferences API is used. This means configuration is kept in
-				a system depended configuration storage, e.g. registry when using Windows OS.
+				a system depended configuration storage, e.g. registry when using Windows OS, <f>~/.java</f> (user) and <f>/etc/java</f> (system) on UNIX/Linux systems..
 			</p>
 		</section>
 
 		<section id="hierarchies" title="Hierarchy support">
 			<p>
 				VisualDCT also supports hierarchical design of EPICS databases. For detailed information about it
-				refer to <a aref="hierarchies">VisualDCT EPICS Databases Hierarchy Support</a> document.
+				refer to <a aref="hierarchies">VisualDCT EPICS Databases Hierarchy Support</a> and
+				<a aref="vdct_hierarchy_additions">VisualDCT Hierarchy Additions</a> documents.
 			</p>
 		</section>
 
@@ -270,7 +282,8 @@ expand("slideMotor.vdb", slmot1) {
 				<section id="templateInstance" title="Template Instance">
 					<figure id="template.png">Template Instance</figure>
 					<p>
-					Template instance is represented as a larger write square. It its body it contains: name (id) at right at the top, template description below, template ports (values to be passed out of the template) and template instance properties (macro definitions to be passed inside the template).<br/>
+					Template instance is represented as a larger write square. It its body it contains: name (id) at right at the top, template description below, template ports (values to be passed out of the template) and template macors (macro definitions to be passed inside the template).
+					Those template fields can be reordered just by dragging them, but default (and recommended) order implies input fields on the left and output fields on the right side.<br/>
 					To change template instance properties double click over it and use <a aref="inspector">Inspector tool</a> or <k>Shift</k> + double click to descent into it.
 					</p>
 				</section>
@@ -282,7 +295,7 @@ expand("slideMotor.vdb", slmot1) {
 					<ul>
 					  <li><font color="green"><b>oridnary</b></font> - normal link. Like for any other link type, link wire can be freely broken using connectors.</li>
 					  <li><font color="yellow"><b>invisible</b></font> - link with incomplete wire (to make complex databases more cleaner). To create it add connector, left button click over it and choose <m>Mode</m>-<m>Invisible</m>.</li>
-					  <li><b>inter-group</b> - link between objects which are not in the same group.</li>
+					  <li><b>inter-group</b> - link between objects which are not in the same group or link to invisible template field.</li>
 					  <li><font color="red"><b>external input</b></font> - link which target is an external object (invalid link for VisualDCT). To create it enter target, add connector to field, left button click over connectgor and choose <m>Mode</m>-<m>External INPUT</m>.</li>
 					  <li><font color="blue"><b>external output</b></font> - link which target is an external object (invalid link for VisualDCT). To create it enter target, add connector, left button click over connector and choose <m>Mode</m>-<m>External OUPUT</m>.</li>
 					  <li><font color="magenta"><b>invalid</b></font> - link for which VisualDCT did not found its target.</li>
@@ -318,6 +331,7 @@ expand("slideMotor.vdb", slmot1) {
 					  </li>
 					</ul>
 				</p>
+				<comment by="msekoranja">VisualDCT uses the following rule: linking destintation is the object which value contains target name (e.g. ao001.INP (target) field contains "ai001.VAL" value (destination)).</comment>
 			</section>
 
 			<section id="grouping" title="Grouping">
@@ -433,7 +447,8 @@ expand("slideMotor.vdb", slmot1) {
 						  <li><b>Print</b> - print the current visible area of the database.</li>
 						  <li><b>Print as PostScript</b> - print the current visible area of database as PostScript.</li>
 						  <li><b>Print Preview</b> - display a view of the active database as it will be printed.</li>
-						  <li><b>Page Setup</b> - change the printer page options.</li>
+						  <li><b>Exit</b> - exit the VisualDCT.</li>
+						  <li><b>Recent files...</b> - list of recently used files (choosing a file opens it).</li>
 						  <li><b>Exit</b> - exit the VisualDCT.</li>
 						</ul>
 					</section>
@@ -512,7 +527,7 @@ expand("slideMotor.vdb", slmot1) {
 					  <tr>			       <td align="center">drag</td><td>blank workspace</td><td>Select record, groups, templates</td></tr>
 					  <tr><td rowspan="4" align="center">right</td><td rowspan="2" align="center">click</td><td>object, blank workspace</td><td>Popup object specific menu</td></tr>
 					  <tr>											<td>left navigator column of a field</td><td>Change field visibility</td></tr>
-					  <tr>			       <td align="center"><k>Shift</k> + click</td><td>field with more than one link</td><td>Rotate link</td></tr>
+					  <tr>			       <td align="center"><k>Shift</k> + click</td><td>field with more than one link or template field</td><td>Rotate link</td></tr>
 					  <tr>			       <td align="center">drag</td><td>blank workspace</td><td>Zoom in selection</td></tr>
 					  <desc>Mouse command reference</desc>
 					</table>
