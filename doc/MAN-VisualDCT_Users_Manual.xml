@@ -331,7 +331,7 @@ expand("slideMotor.vdb", slmot1) {
 					  </li>
 					</ul>
 				</p>
-				<comment by="msekoranja">VisualDCT uses the following rule: linking destintation is the object which value contains target name (e.g. ao001.INP (target) field contains "ai001.VAL" value (destination)).</comment>
+				<comment by="msekoranja">VisualDCT uses the following rule: linking destintation is the object which value contains target name, e.g. ao001.INP (source) field contains "ao002.VAL" value (target).</comment>
 			</section>
 
 			<section id="grouping" title="Grouping">
