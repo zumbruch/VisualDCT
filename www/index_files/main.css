@@ -1,0 +1,75 @@
+BODY {
+	BACKGROUND-COLOR: #ffffff; COLOR: #000000; FONT-FAMILY: Verdana, Arial, Helvetica, Sans-serif; FONT-SIZE: 12pt; MARGIN: 0px
+}
+P {
+	BACKGROUND-COLOR: #ffffff; COLOR: #000000; FONT-FAMILY: Verdana, Arial, Helvetica, Sans-serif; FONT-SIZE: 12pt; MARGIN: 0px
+}
+TD {
+	FONT-FAMILY: Verdana, Arial, Helvetica, Sans-serif; FONT-SIZE: 13px
+}
+A {
+	FONT-FAMILY: Verdana, Arial, Helvetica, Sans-serif; FONT-SIZE: 12px; FONT-WEIGHT: bold; TEXT-DECORATION: none
+}
+A:link {
+	COLOR: #003c8c
+}
+A:visited {
+	COLOR: #003c8c
+}
+A:active {
+	COLOR: #003c8c
+}
+A:hover {
+	COLOR: #ce2b25
+}
+H1 {
+	FONT-FAMILY: Verdana, Arial, Helvetica; FONT-WEIGHT: bold
+}
+H2 {
+	FONT-FAMILY: Verdana, Arial, Helvetica; FONT-WEIGHT: normal
+}
+H3 {
+	FONT-FAMILY: Verdana, Arial, Helvetica; FONT-WEIGHT: bold
+}
+H4 {
+	FONT-FAMILY: Verdana, Arial, Helvetica; FONT-WEIGHT: bold
+}
+H4 B {
+	FONT-FAMILY: Verdana, Arial, Helvetica
+}
+H5 {
+	FONT-FAMILY: Verdana, Arial, Helvetica; FONT-WEIGHT: bold
+}
+H6 {
+	FONT-FAMILY: Verdana, Arial, Helvetica; FONT-WEIGHT: bold
+}
+H9 {
+	FONT-FAMILY: Verdana, Arial, Helvetica; FONT-WEIGHT: normal
+}
+H1 {
+	COLOR: #ce2b25; FONT-SIZE: 18px
+}
+H2 {
+	COLOR: #5a5b6c; FONT-SIZE: 18px
+}
+H3 {
+	COLOR: #ce2b25; FONT-SIZE: 16px
+}
+H4 {
+	COLOR: #5a5b6c; FONT-SIZE: 14px
+}
+H5 {
+	COLOR: #5a5b6c; FONT-SIZE: 12px
+}
+H6 {
+	COLOR: #5a5b6c; FONT-SIZE: 12px
+}
+H7 {
+	COLOR: #000000; FONT-SIZE: 11px
+}
+H8 {
+	COLOR: #000000; FONT-SIZE: 11px
+}
+H9 {
+	COLOR: #5a5b6c; FONT-SIZE: 10px
+}

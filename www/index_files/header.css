@@ -1,0 +1,51 @@
+.footer {
+	FONT-FAMILY: Verdana, Arial, Helvetica, Sans-serif; FONT-SIZE: 10px; TEXT-ALIGN: center
+}
+.border {
+	BACKGROUND-COLOR: #5a5b6c; MARGIN: 0px; PADDING-BOTTOM: 0px; PADDING-LEFT: 0px; PADDING-RIGHT: 0px; PADDING-TOP: 0px; SPACING-LEFT: 0px; SPACING-TOP: 0px; SPACING-BOTTOM: 0px; SPACING-RIGHT: 0px; SPACING: 0
+}
+.dropdown-title {
+	BACKGROUND-COLOR: #787996; MARGIN: 0px; PADDING-BOTTOM: 0px; PADDING-LEFT: 0px; PADDING-RIGHT: 0px; PADDING-TOP: 3px
+}
+.dropdown-title-selected {
+	BACKGROUND-COLOR: #5a5b6c; MARGIN: 0px; PADDING-BOTTOM: 0px; PADDING-LEFT: 0px; PADDING-RIGHT: 0px; PADDING-TOP: 3px
+}
+A.dropdown-title-link:link {
+	COLOR: #ffffff; FONT-FAMILY: Verdana, Arial, Helvetica, Sans-serif; FONT-SIZE: 10px; FONT-WEIGHT: bold; TEXT-DECORATION: none
+}
+A.dropdown-title-link:visited {
+	COLOR: #ffffff; FONT-FAMILY: Verdana, Arial, Helvetica, Sans-serif; FONT-SIZE: 10px; FONT-WEIGHT: bold; TEXT-DECORATION: none
+}
+A.dropdown-title-link:hover {
+	COLOR: #ffffff; FONT-FAMILY: Verdana, Arial, Helvetica, Sans-serif; FONT-SIZE: 10px; FONT-WEIGHT: bold; TEXT-DECORATION: none
+}
+.dropdown {
+	BACKGROUND-COLOR: #787996; BORDER-BOTTOM: #cacad4 2px solid; MARGIN: 0px; PADDING-BOTTOM: 0px; PADDING-LEFT: 0px; PADDING-RIGHT: 0px; PADDING-TOP: 0px
+}
+.dropdown-selected {
+	BACKGROUND-COLOR: #5a5b6c; BORDER-BOTTOM: #cacad4 2px solid; MARGIN: 0px; PADDING-BOTTOM: 0px; PADDING-LEFT: 0px; PADDING-RIGHT: 0px; PADDING-TOP: 0px
+}
+A.dropdown-link {
+	COLOR: #ffffff; FONT-WEIGHT: normal
+}
+A.dropdown-link:link {
+	COLOR: #ffffff; FONT-FAMILY: Verdana, Arial, Helvetica, Sans-serif; FONT-SIZE: 10px; FONT-WEIGHT: normal
+}
+A.dropdown-link:visited {
+	COLOR: #ffffff; FONT-FAMILY: Verdana, Arial, Helvetica, Sans-serif; FONT-SIZE: 10px
+}
+A.dropdown-link:hover {
+	COLOR: #ffffff; FONT-FAMILY: Verdana, Arial, Helvetica, Sans-serif; FONT-SIZE: 10px; FONT-WEIGHT: normal; TEXT-DECORATION: none
+}
+.dropdown-title-nojs {
+	BACKGROUND-COLOR: #787996; COLOR: #000000; MARGIN: 0px; PADDING-BOTTOM: 0px; PADDING-LEFT: 0px; PADDING-RIGHT: 0px; PADDING-TOP: 0px; SPACING: 0
+}
+A.dropdown-title-nojs:link {
+	COLOR: #000000; FONT-FAMILY: Verdana, Arial, Helvetica, Sans-serif; FONT-SIZE: 10px; FONT-WEIGHT: bold
+}
+A.dropdown-title-nojs:visited {
+	COLOR: #000000; FONT-FAMILY: Verdana, Arial, Helvetica, Sans-serif; FONT-SIZE: 10px; FONT-WEIGHT: bold
+}
+A.dropdown-title-nojs:hover {
+	COLOR: #000000; FONT-FAMILY: Verdana, Arial, Helvetica, Sans-serif; FONT-SIZE: 10px; FONT-WEIGHT: bold
+}

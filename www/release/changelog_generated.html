@@ -1,0 +1,126 @@
+<HTML>
+<HEAD>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-16">
+<TITLE>ChangeLog: VisualDCT - Visual Database Configuration Tool</TITLE>
+</HEAD>
+<BODY>
+<font size="+2"><b>VisualDCT</b></font><br>Visual Database Configuration Tool<p><font size="-1">See a
+          <a href="#developer-list">list of developers/initials.</a></font></p>
+<hr>
+<table border="0" width="100%" cellspacing="2" cellpadding="3" bgcolor="#000000">
+<tr bgcolor="#bbbbff">
+<td align="right" width="10%">
+<font size="+2">
+							v2.1</font>
+</td>
+<td width="5%" align="center"><a href="#personref-ms">ms</a></td>
+<td>
+<font size="+2">
+    	   					build 1226,
+	        	  			released 2001-12-09</font>
+</td>
+</tr>
+<tr bgcolor="#bbffbb">
+<td align="right">fix</td>
+<td align="center"><a href="#personref-"></a></td>
+<td>Not all fields are available as link destinations</td>
+</tr>
+<tr bgcolor="#ffffff">
+<td align="right">comment</td>
+<td align="center"><a href="#personref-"></a></td>
+<td>Need a better plan? Suggestion: Define field order in DBDs prioritized by usage.</td>
+</tr>
+<tr bgcolor="#bbffbb">
+<td align="right">fix</td>
+<td align="center"><a href="#personref-"></a></td>
+<td>Print Preview doesn't erase previous preview.</td>
+</tr>
+<tr bgcolor="#bbffbb">
+<td align="right">fix</td>
+<td align="center"><a href="#personref-"></a></td>
+<td>Links having process options.</td>
+</tr>
+<tr bgcolor="#bbffff">
+<td align="right">enhancement</td>
+<td align="center"><a href="#personref-"></a></td>
+<td>Pan when the cursor hits the edge of the drawing (while dragging).</td>
+</tr>
+<tr bgcolor="#bbffff">
+<td align="right">enhancement</td>
+<td align="center"><a href="#personref-"></a></td>
+<td>Usage of JAXP 1.1 compilant Apache Crimson XML parser.</td>
+</tr>
+<tr bgcolor="#bbffff">
+<td align="right">enhancement</td>
+<td align="center"><a href="#personref-"></a></td>
+<td>All setting files are now stored in VDCT_DIR/config directory, where VDCT_DIR is environment variable (current directory if not specified or invalid).</td>
+</tr>
+<tr bgcolor="#bbffff">
+<td align="right">enhancement</td>
+<td align="center"><a href="#personref-"></a></td>
+<td>Plugins (alpha state - currently DebugPlugin and ExportPlugin are supported). Configuration file is config/plugins.xml.</td>
+</tr>
+<tr bgcolor="#ffffff">
+<td align="right">comment</td>
+<td align="center"><a href="#personref-"></a></td>
+<td>The "One Up Level" button in javax.swing.FileChooser is part of JRE implementation. No problems noticed on Windows platform.</td>
+</tr>
+<tr bgcolor="#ffffff">
+<td align="right">comment</td>
+<td align="center"><a href="#personref-"></a></td>
+<td>For proper font scaling fonts have to be "flexible" (bitmap fonts are not recommended). No problems noticed on Windows, Linux (XFree86 4.0.3) platform.</td>
+</tr>
+<tr bgcolor="#ffbbbb">
+<td align="right">bug</td>
+<td><a align="center" href="#personref-"></a></td>
+<td>Process options shown by link fields are not properly centered, they can be overdrawn by a link line (large zoom in).</td>
+</tr>
+<tr bgcolor="#ffffff">
+<td align="right">comment</td>
+<td align="center"><a href="#personref-"></a></td>
+<td>VisualDCT does not handle invalid DBs having unquoted substitution variables as record names (see EPICS IOC Application Developers Guide, R3.13, June 18, page 35).</td>
+</tr>
+<tr bgcolor="#ffffff">
+<td align="right">comment</td>
+<td align="center"><a href="#personref-"></a></td>
+<td>Should connectors be drawn always over other objects? Anyway connectors can be easily accessed (hilited, clicked, dragged) even if they are under other object.</td>
+</tr>
+</table>
+<hr>
+<table border="0" width="100%" cellspacing="2" cellpadding="3" bgcolor="#000000">
+<tr bgcolor="#bbbbff">
+<td align="right" width="10%">
+<font size="+2">
+							v2.0</font>
+</td>
+<td width="5%" align="center"><a href="#personref-ms">ms</a></td>
+<td>
+<font size="+2">
+    	   					build 1207,
+	        	  			released 2001-05-05</font>
+</td>
+</tr>
+<tr bgcolor="#ffffff">
+<td align="right">comment</td>
+<td align="center"><a href="#personref-"></a></td>
+<td>Presented at ICALEPCS '01 EPICS workshop.</td>
+</tr>
+<tr bgcolor="#ffffff">
+<td align="right">comment</td>
+<td align="center"><a href="#personref-jfm">jfm</a></td>
+<td>Agreed to act as requirements coordinator and quality control point of contact between JSI and EPICS community.</td>
+</tr>
+</table>
+<hr>
+<H3><a name="developer-list">Developers:</a></H3>
+<p>A list of some of people currently working on working on VisualDCT:</p>
+<ul>
+<li><a href="mailto:matej.sekoranja@ijs.si">Matej Sekoranja</a><a name="personref-ms"> (ms)</a><BR>
+			Lead developer on VisualDCT.
+  		<BR><BR></li>
+<li><a href="mailto:jfm@aps.anl.gov">John F. Maclean</a><a name="personref-jfm"> (jfm)</a><BR>
+			Requirements coordinator and quality control point of contact between JSI and EPICS community.
+  		<BR><BR></li>
+</ul>
+</BODY>
+</HTML>

@@ -1,0 +1,1 @@
+java -cp visualdct1.226withJAXP.jar -DVDCT_DIR=. com.cosylab.vdct.VisualDCT 
