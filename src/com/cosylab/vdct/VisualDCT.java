@@ -2621,13 +2621,20 @@ private javax.swing.JTextField getgroupNameTextField() {
 			    private void check(DocumentEvent e) {
 					GetVDBManager validator = (GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
 					String errmsg = validator.getManager().checkGroupName(ivjgroupNameTextField.getText(), true);
-					if (errmsg!=null) {
-						getGroupOKButton().setEnabled(false);
-						getGroupWarningLabel().setText(errmsg);
-					}
-					else {
+					if (errmsg==null)
+					{
 						getGroupOKButton().setEnabled(true);
 						getGroupWarningLabel().setText(" ");
+					}
+					else if (errmsg.startsWith("WARNING"))
+					{
+						getGroupOKButton().setEnabled(true);
+						getGroupWarningLabel().setText(errmsg);
+					}
+					else
+					{
+						getGroupOKButton().setEnabled(false);
+						getGroupWarningLabel().setText(errmsg);
 					}
 			    }
 			});
@@ -3378,13 +3385,20 @@ private javax.swing.JTextField getNameTextField() {
 			    private void check(DocumentEvent e) {
 					GetVDBManager validator = (GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
 					String errmsg = validator.getManager().checkRecordName(ivjNameTextField.getText(), true);
-					if (errmsg!=null) {
-						getOKButton().setEnabled(false);
-						getWarningLabel().setText(errmsg);
-					}
-					else {
+					if (errmsg==null)
+					{
 						getOKButton().setEnabled(true);
 						getWarningLabel().setText(" ");
+					}
+					else if (errmsg.startsWith("WARNING"))
+					{
+						getOKButton().setEnabled(true);
+						getWarningLabel().setText(errmsg);
+					}
+					else
+					{
+						getOKButton().setEnabled(false);
+						getWarningLabel().setText(errmsg);
 					}
 			    }
 			});
@@ -3469,13 +3483,19 @@ private javax.swing.JTextField getNewNameTextField() {
 			    private void check(DocumentEvent e) {
 					GetVDBManager validator = (GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
 					String errmsg = validator.getManager().checkRecordName(ivjNewNameTextField.getText(), true);
-					if (errmsg!=null) {
-						getRenameOKButton().setEnabled(false);
-						getRenameWarningLabel().setText(errmsg);
-					}
-					else {
+					if (errmsg==null) {
 						getRenameOKButton().setEnabled(true);
 						getRenameWarningLabel().setText(" ");
+					}
+					else if (errmsg.startsWith("WARNING"))
+					{
+						getRenameOKButton().setEnabled(true);
+						getRenameWarningLabel().setText(errmsg);
+					}
+					else
+					{
+						getRenameOKButton().setEnabled(false);
+						getRenameWarningLabel().setText(errmsg);
 					}
 			    }
 			});
@@ -4929,7 +4949,7 @@ public void groupOKButton_ActionPerformed(java.awt.event.ActionEvent actionEvent
 	if (getGroupOKButton().isEnabled()) {
 		GetVDBManager manager = (GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
 		String errmsg = manager.getManager().checkGroupName(getgroupNameTextField().getText(), true);
-		if (errmsg==null) {
+		if (errmsg==null || errmsg.startsWith("WARNING")) {
 			GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
 		 	cmd.getGUIMenuInterface().group(getgroupNameTextField().getText());
 			getGroupDialog().dispose();
@@ -5333,7 +5353,7 @@ public void oKButton_ActionPerformed(java.awt.event.ActionEvent actionEvent) {
 	if (getOKButton().isEnabled()) {
 		GetVDBManager manager = (GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
 		String errmsg = manager.getManager().checkRecordName(getNameTextField().getText(), true);
-		if (errmsg==null) {
+		if (errmsg==null || errmsg.startsWith("WARNING")) {
 			manager.getManager().createRecord(
 				getNameTextField().getText(),
 				getTypeComboBox().getSelectedItem().toString(),
@@ -5852,7 +5872,7 @@ public void renameOKButton_ActionPerformed(java.awt.event.ActionEvent actionEven
 	if (getRenameOKButton().isEnabled()) {
 		GetVDBManager manager = (GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
 		String errmsg = manager.getManager().checkRecordName(getNewNameTextField().getText(), true);
-		if (errmsg==null) {
+		if (errmsg==null || errmsg.startsWith("WARNING")) {
 			GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
 		 	cmd.getGUIMenuInterface().rename(getOldNameLabel().getText(), getNewNameTextField().getText());
 			getRenameDialog().dispose();

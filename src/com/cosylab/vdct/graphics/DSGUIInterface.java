@@ -128,16 +128,15 @@ public java.lang.String checkRecordName(String name, boolean relative) {
 	if (name.trim().length()==0) {
 		return "Empty name!";
 	}	
-	else if (name.length()>Constants.MAX_RECORD_NAME_LENGTH) {
-		return "Name is too long: "+name.length()+" (max. "+
-				Constants.MAX_RECORD_NAME_LENGTH+") characters!";
-	}
 	else if (name.indexOf(' ')!=-1) return "No spaces allowed!";
 
 	else if (!relative && (Group.getRoot().findObject(name, true)!=null)) 
 		return "Name already exists!";
 	else if (relative && (drawingSurface.getViewGroup().findObject(name, true)!=null)) 
 		return "Name already exists!";
+	else if (name.length()>Constants.WARNING_RECORD_NAME_LENGTH) {
+		return "WARNING: Name length is "+name.length()+" characters!";
+	}
 	else
 		return null;
 		
