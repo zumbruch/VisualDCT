@@ -30,9 +30,12 @@ package com.cosylab.vdct.vdb;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import com.cosylab.vdct.db.DBPort;
 import com.cosylab.vdct.util.StringUtils;
 
 /**
@@ -157,7 +160,7 @@ public class VDBTemplateInstance implements Commentable
 	 */
 	public static String applyProperties(String s, Map properties)
 	{
-		java.util.Iterator e = properties.keySet().iterator();
+		Iterator e = properties.keySet().iterator();
 		while (s.indexOf('$')>=0 && e.hasNext())
 		{
 			String key = e.next().toString();
@@ -169,6 +172,28 @@ public class VDBTemplateInstance implements Commentable
 		}
 		return s;
 	}
+
+	/**
+	 * Make port substitutions on a string using port table.
+	 * @param s The string to be applied
+	 * @param ports The ports to use
+	 * @return String  
+	 */
+	public static String applyPorts(String value, Map ports)
+	{
+		Iterator i = ports.keySet().iterator();
+		while (value.indexOf('$')>=0 && i.hasNext())
+		{
+			String key = i.next().toString();
+			String val = ports.get(key).toString();
+
+			value = StringUtils.replace(value, key, val);
+
+		}
+		return value;
+	}
+
+
 
 /**
  * Returns the name.

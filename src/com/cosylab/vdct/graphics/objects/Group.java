@@ -1101,7 +1101,6 @@ public static void writeObjects(Vector elements, java.io.DataOutputStream file, 
 				 		}
  					}
 
-
 				// write fields	 			
 		 		e2 = recordData.getFieldsV().elements();
 				while (e2.hasMoreElements())
@@ -1113,9 +1112,15 @@ public static void writeObjects(Vector elements, java.io.DataOutputStream file, 
 							file.writeBytes(fieldData.getComment()+nl);
 							
 						String value = fieldData.getValue();
+						
+						// apply ports
+						if (namer.getPorts()!=null && value!=null)
+							 value = VDBTemplateInstance.applyPorts(value, namer.getPorts());
+
+						// apply macro substitutions
 						if (namer.getSubstitutions()!=null && value!=null)
 							 value = VDBTemplateInstance.applyProperties(value, namer.getSubstitutions());
-							
+						
 						// if value is different from init value
 						if (!fieldData.hasDefaultValue())
 						{
@@ -1558,7 +1563,7 @@ public static void save(Group group2save, File file, boolean export) throws IOEx
 	if (!path2remove.equals(nullString)) path2remove+=Constants.GROUP_SEPARATOR;
 	else path2remove = null;
 	
-	NameManipulator namer = new DefaultNamer(file, path2remove, null, null);
+	NameManipulator namer = new DefaultNamer(file, path2remove, null, null, Template.preparePorts(group2save, null));
 	save(group2save, file, namer, export);
 }
 

@@ -30,7 +30,14 @@ package com.cosylab.vdct.graphics.objects;
 
 import java.awt.*;
 import java.io.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Vector;
+import java.util.Map;
+import java.util.Hashtable;
+import java.util.Enumeration;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.swing.*;
 
@@ -1190,44 +1197,20 @@ public void writeObjects(DataOutputStream file, NameManipulator namer, boolean e
 		return;
 	}
 	
-	// export (generate, flatten) DB option
 	
+	 //	
+ 	 // export (generate, flatten) DB option
+	 //
 	 String templateName = namer.getResolvedName(getName());
- 	
-/*
-	 // merge all marcos
-	 Map properties = null;
-	 if (namer.getSubstitutions()==null)
-	 	properties = templateData.getProperties();
-	 else
-	 {
-	 	// add this template substitutions (override existing one)
-	 	properties = (Map)namer.getSubstitutions().clone();
-	 	properties.putAll(templateData.getProperties());
-	 }
-*/
 
-	 // Note:
- 	 // the macro values given in an expand(){} statement should not be
-	 // automatically passed down into any templates that are expanded within the
-	 // lower level file unless they are explicitly named as macros there too. 
-	 Map properties = null;
-	 if (namer.getSubstitutions()==null)
-	 	properties = templateData.getProperties();
-	 else
-	 {
-	 	properties = (Map)templateData.getProperties().clone();
-		
-		// update values
-	 	Iterator i = properties.keySet().iterator();
-	 	while (i.hasNext())
-	 	{
-	 		Object key = i.next();
-		 	properties.put(key, VDBTemplateInstance.applyProperties(properties.get(key).toString(), namer.getSubstitutions()));
-	 	}
-	 }
-	
-		 
+
+
+	 // new ports
+	 Map ports = preparePorts(getTemplateData().getTemplate().getGroup(), namer.getSubstitutions());
+
+	 // new macros
+	 Map properties = prepareSubstitutions(getTemplateData(), namer.getSubstitutions());
+
 	 // new removedPrefix
 	 String removedPrefix = namer.getRemovedPrefix();
 	 
@@ -1253,7 +1236,7 @@ public void writeObjects(DataOutputStream file, NameManipulator namer, boolean e
 	 		addedPrefix = addedPrefix + Constants.GROUP_SEPARATOR;
 	 }
 	 
-	 NameManipulator newNamer = new DefaultNamer(namer.getFile(), removedPrefix, addedPrefix, properties);
+	 NameManipulator newNamer = new DefaultNamer(namer.getFile(), removedPrefix, addedPrefix, properties, ports);
 
 	 file.writeBytes("\n# expand(\""+getTemplateData().getTemplate().getFileName()+"\", "+templateName+")\n");
 
@@ -1269,6 +1252,105 @@ public void writeObjects(DataOutputStream file, NameManipulator namer, boolean e
 	 }
 	 file.writeBytes("\n# end("+templateName+")\n");
 	 
+}
+
+/**
+ * Insert the method's description here.
+ * @param substitutions <code>group</code> current substitutions
+ */
+public static Map prepareSubstitutions(VDBTemplateInstance templateData, Map substitutions)
+{
+	 // Note:
+ 	 // the macro values given in an expand(){} statement should not be
+	 // automatically passed down into any templates that are expanded within the
+	 // lower level file unless they are explicitly named as macros there too. 
+	 Map properties = null;
+	 if (substitutions==null)
+	 	properties = templateData.getProperties();
+	 else
+	 {
+	 	properties = (Map)templateData.getProperties().clone();
+		
+		// update values
+	 	Iterator i = properties.keySet().iterator();
+	 	while (i.hasNext())
+	 	{
+	 		Object key = i.next();
+		 	properties.put(key, VDBTemplateInstance.applyProperties(properties.get(key).toString(), substitutions));
+	 	}
+	 }
+
+	return properties;
+}
+
+/**
+ * Insert the method's description here
+ * @param substitutions <code>group</code> current substitutions
+ */
+public static Map preparePorts(Group group, Map substitutions)
+{
+	HashMap map = new HashMap();
+	
+	Iterator i = group.getStructure().iterator();
+	while (i.hasNext())
+	{
+		Object obj = i.next();
+		if (obj instanceof Template)
+		{
+			Template t = (Template)obj;			
+
+			Iterator i2 = t.getTemplateData().getTemplate().getPortsV().iterator();
+			while (i2.hasNext())
+			{
+				DBPort port = (DBPort)i2.next();
+				
+				String target = port.getTarget();
+
+				// new macros
+				// !!! this is done twice - optimize with buffering
+	 			Map newSubstitutions = prepareSubstitutions(t.getTemplateData(), substitutions);
+
+				target = VDBTemplateInstance.applyProperties(target, newSubstitutions);
+				
+				// if target is a contains a port definition it might be defined in lover levels
+				// try to resolve it
+				int pos = target.indexOf('$');
+				int posStart = 0;  // '(' char
+				int posMiddle = 0; // '.' char
+				int posEnd = 0;	// ')' char
+				if (pos>=0)
+				{
+					
+					System.out.println("Recursive: "+target);
+					
+				/*	posStart = target.indexOf('(', pos);
+					if (posStart>=0)
+					{
+						posMiddle = target.indexOf('.', posStart);
+						if (posMiddle>=0)
+						{
+							posEnd = target.indexOf(')', posStart);
+							// possible port definition
+							// we have sequence od '(' .. '.' .. ')'
+							if (posEnd>posMiddle)
+							{
+							}
+						}
+					}
+					*/
+				fix this
+					Map lowerLevelPorts = preparePorts(t.getTemplateData().getTemplate().getGroup(), newSubstitutions);
+					target = VDBTemplateInstance.applyPorts(target, lowerLevelPorts);
+
+				}
+				
+				
+				map.put(port.getPortDefinition(t.getTemplateData().getName()), target);			
+			}
+		}
+	}
+	
+	return map;
 }
 
 /**

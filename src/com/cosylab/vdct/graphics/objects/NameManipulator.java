@@ -62,7 +62,11 @@ public interface NameManipulator {
 	 */	
 	public Map getSubstitutions();
 	/**
-
+	 * Insert the type's description here.
+	 * Creation date: (27.12.2000 11:47:12)
+	 */	
+	public Map getPorts();
+	/**
 	 * Insert the type's description here.
 	 * Creation date: (27.12.2000 11:47:12)
 	 */	

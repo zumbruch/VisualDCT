@@ -80,19 +80,11 @@ public class VDBTemplatePort extends VDBFieldData implements Descriptable
 	 */
 	public String getFullName() {
 		if (templateInstance==null)
-			return "(undefined)"+com.cosylab.vdct.Constants.FIELD_SEPARATOR+name;
+			return "(undefined)"+com.cosylab.vdct.Constants.FIELD_SEPARATOR+port.getName();
 		else
 		{
-			// optimizie
-			StringBuffer fullName = new StringBuffer();
-			fullName.append("$(");
-			fullName.append(templateInstance.getName());
-			fullName.append(com.cosylab.vdct.Constants.FIELD_SEPARATOR);
-			fullName.append(port.getName());
-			fullName.append(")");
-
-			String fn = VDBTemplateInstance.applyProperties(fullName.toString(), templateInstance.getProperties());
-			return fn;
+			return VDBTemplateInstance.applyProperties(port.getPortDefinition(templateInstance.getName()),
+														templateInstance.getProperties());
 		}
 	}
 

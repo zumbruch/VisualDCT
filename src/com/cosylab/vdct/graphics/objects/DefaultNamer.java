@@ -45,16 +45,18 @@ public class DefaultNamer implements NameManipulator {
 	protected String removedPrefix;
 	protected String addedPrefix;
 	protected Map properties;
+	protected Map ports;
 
 	/**
 	 *
 	 */
-	public DefaultNamer(File file, String removedPrefix, String addedPrefix, Map properties)
+	public DefaultNamer(File file, String removedPrefix, String addedPrefix, Map properties, Map ports)
 	{
 		this.file=file;
 		this.removedPrefix=removedPrefix;
 		this.addedPrefix=addedPrefix;
 		this.properties=properties;
+		this.ports=ports;
 	} 
 
 	/**
@@ -101,6 +103,14 @@ public class DefaultNamer implements NameManipulator {
 	public File getFile()
 	{
 		return file;
+	}
+
+	/**
+	 * @see com.cosylab.vdct.graphics.objects.NameManipulator#getPorts()
+	 */
+	public Map getPorts()
+	{
+		return ports;
 	}
 
 }
