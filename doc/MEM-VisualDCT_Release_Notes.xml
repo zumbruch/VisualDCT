@@ -34,6 +34,10 @@
 			<section>Minor bugfixes.</section>
 		</modification>
 
+		<modification version="2.4.1249" by="msekoranja" date="2004-03-30">
+			<section>CapFast interoperability, minor bugfixes.</section>
+		</modification>
+
 		<scope>
 			This document is contains release notes of the current build.
 		</scope>
@@ -53,9 +57,9 @@
 			   title="VisualDCT latest build"
 			   href="http://visualdct.cosylab.com/builds/VisualDCT/"
 			   author="Matej Sekoranja"
-			   date="2003"
+			   date="2004"
 			   publisher="Cosylab, Ltd."
-			   revision="2.4.1247"/>
+			   revision="2.4.1249"/>
 
 	</head>
 	
@@ -64,20 +68,12 @@
 			<p>
 			Changes in current version:
 			<ul>
-			  <li>An invalid link can be displayed as a link because VDCT appears
-				  to be case-insensitive even though EPICS requires field names to be
-				  upper-case</li>
-			  <li>A minor problem: VME_IO I/O fields are required to
-				  have a trailing <kwd>@</kwd> parameter according to VDCT. e.g. it demands
-				  an address <kwd>#C0 S0 @</kwd> rather than <kwd>#C0 S0</kwd>.</li>
-			  <li><kwd>VAL</kwd> field is always shown in inspector (some DBD do not have prompt_gui defined).</li>
-			  <li>This is really important - novices can easily overwrite a
-				  <kwd>.dbd</kwd> file because VDCT always seems to take the last used file extension
-				  as the default. So the first save operation of your new <kwd>.db</kwd> file will
-				  attempt to overwrite the <kwd>.dbd</kwd> file you have just opened, by default.</li>
-			  <li>fixed VAL -> VAL linking - should not be possible</li>
-			  <li>links starting with digits are not assumed to be constant links anymore,
-				  only if records does not exists</li>
+			  <li>CapFast interoperability.</li>
+			  <li>Local/global macro property.</li>
+			  <li>Create command line tool for flatterning hierarchical databases.</li>
+			  <li>Meaningful template instance name.</li>
+			  <li>Macros should not applied on template instance names.</li>
+			  <li>Macros aren't always substituted.</li>
 			</ul>
 			</p>
 			<p>
