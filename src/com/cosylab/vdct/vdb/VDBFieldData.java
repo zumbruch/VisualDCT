@@ -212,11 +212,30 @@ public java.lang.String getValue() {
 }
 /**
  * Insert the method's description here.
+ * Creation date: (11.1.2001 21:29:48)
+ * @return java.lang.String
+ */
+public String getInitValue()
+{
+	if ((dbdData.getField_type()==DBDConstants.DBF_INLINK) ||
+		(dbdData.getField_type()==DBDConstants.DBF_OUTLINK))
+	{
+		// if not software
+		String linkType = record.getDTYPLinkType();
+		if (linkType!=null)
+			return DataProvider.getInstance().getEditInitialValueLinkType(linkType);
+		else
+			return getInit_value();
+	}
+	else
+		return getInit_value();
+}
+/**
+ * Insert the method's description here.
  * Creation date: (27.1.2001 16:08:45)
  * @return boolean
  */
 public boolean hasDefaultValue() {
-	// !!! is this true, also for MENU, DEVICE
 	if (dbdData.getField_type()==DBDConstants.DBF_MENU ||
 		dbdData.getField_type()==DBDConstants.DBF_DEVICE)
 	{
@@ -358,7 +377,7 @@ public String getToolTipText()
 		{
 			Pattern pattern = DataProvider.getInstance().getEditPatternLinkType(linkType);
 			if (pattern!=null)
-				type = type+" ["+pattern.pattern()+"]";
+				type = type+" ["+DataProvider.getInstance().getEditDescriptionLinkType(linkType)+"]";
 		}
 	}
 	

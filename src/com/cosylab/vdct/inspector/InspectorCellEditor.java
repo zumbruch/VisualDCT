@@ -414,7 +414,7 @@ public InspectorCellEditor(InspectorTableModel tableModel) {
 	public Component getTableCellEditorComponent(JTable table, Object value,
 						 boolean isSelected, int row, int column) {
 		if (intelliEditor) setAppropriateComponent4Table(table, row, column);
-		delegate.setValue(value);
+		//delegate.setValue(value);
 		return editorComponent;
 	}
 	// implements javax.swing.tree.TreeCellEditor
@@ -474,7 +474,16 @@ private void setAppropriateComponent4Table(JTable table, int row, int column) {
 				//formatter.setPattern(pattern);
 				this.pattern = pattern;
 
-				//intelliFormattedTextField.setText(property.getValue());
+				String val = property.getValue();
+				if (val!=null && val.length()>0)
+					intelliFormattedTextField.setText(val);
+				else
+				{	val = property.getInitValue();
+					if (val!=null)
+						intelliFormattedTextField.setText(val);
+					else
+						intelliFormattedTextField.setText(property.getValue());
+				}
 				intelliFormattedTextField.setToolTipText(property.getToolTipText());
 			}
 			else
@@ -482,7 +491,7 @@ private void setAppropriateComponent4Table(JTable table, int row, int column) {
 				editorComponent = intelliTextField;
 				delegate = textfieldDelegate;
 
-				//intelliTextField.setText(property.getValue());
+				intelliTextField.setText(property.getValue());
 				intelliTextField.setToolTipText(property.getToolTipText());
 			}
 	}

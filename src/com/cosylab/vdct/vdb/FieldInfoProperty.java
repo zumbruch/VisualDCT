@@ -92,6 +92,15 @@ public String getValue() {
 }
 /**
  * Insert the method's description here.
+ * Creation date: (11.1.2001 21:29:48)
+ * @return java.lang.String
+ */
+public String getInitValue()
+{
+	return null;
+}
+/**
+ * Insert the method's description here.
  * Creation date: (1.2.2001 22:49:33)
  * @return boolean
  */

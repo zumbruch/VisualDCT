@@ -68,6 +68,12 @@ public String[] getSelectableValues();
 public String getValue();
 /**
  * Insert the method's description here.
+ * Creation date: (11.1.2001 21:29:48)
+ * @return java.lang.String
+ */
+public String getInitValue();
+/**
+ * Insert the method's description here.
  * Creation date: (11.1.2001 21:28:51)
  * @return boolean
  */

@@ -73,11 +73,29 @@ protected DataProvider() {
 /**
  * Insert the method's description here.
  * Creation date: (8.1.2001 22:03:39)
- * @return java.lang.String
+ * @return java.util.regex.Pattern
  */
 public Pattern getEditPatternLinkType(String linkType)
 {
-	return (Pattern)editMaskTable.get(linkType);
+	return (Pattern)((Object[])editMaskTable.get(linkType))[0];
+}
+/**
+ * Insert the method's description here.
+ * Creation date: (8.1.2001 22:03:39)
+ * @return java.lang.String
+ */
+public String getEditInitialValueLinkType(String linkType)
+{
+	return (String)((Object[])editMaskTable.get(linkType))[1];
+}
+/**
+ * Insert the method's description here.
+ * Creation date: (8.1.2001 22:03:39)
+ * @return java.lang.String
+ */
+public String getEditDescriptionLinkType(String linkType)
+{
+	return (String)((Object[])editMaskTable.get(linkType))[2];
 }
 /**
  * Insert the method's description here.
@@ -85,17 +103,18 @@ public Pattern getEditPatternLinkType(String linkType)
  */
 private void loadDefaultEditMasks()
 {
-	editMaskTable.put("CONSTANT", Pattern.compile(".*"));
-	editMaskTable.put("PV_LINK", Pattern.compile(".*"));
-	editMaskTable.put("VME_IO", Pattern.compile("#C\\d+ S\\d+ @.*"));
-	editMaskTable.put("CAMAC_IO", Pattern.compile("#B\\d+ C\\d+ N\\d+ A\\d+ F\\d+ @.*"));
-	editMaskTable.put("AB_IO", Pattern.compile("#L\\d+ A\\d+ C\\d+ S\\d+ @.*"));
-	editMaskTable.put("GPIB_IO", Pattern.compile("#L\\d+ A\\d+ @.*"));
-	editMaskTable.put("BITBUS_IO", Pattern.compile("#L\\d+ N\\d+ P\\d+ S\\d+ @.*"));
-	editMaskTable.put("INST_IO", Pattern.compile("@.*"));
-	editMaskTable.put("BBGPIB_IO", Pattern.compile("#L\\d+ B\\d+ G\\d+ @.*"));
-	editMaskTable.put("RF_IO", Pattern.compile("#R\\d+ M\\d+ D\\d+ E\\d+ @.*"));
-	editMaskTable.put("VXI_IO", Pattern.compile("#V\\d+ (C\\d+)?+  S\\d+ @.*"));
+	// pattern, default value, description
+	editMaskTable.put("CONSTANT", new Object[] { Pattern.compile(".*"), "", "CONSTANT" });
+	editMaskTable.put("PV_LINK", new Object[] { Pattern.compile(".*"), "", "PV_LINK" } );
+	editMaskTable.put("VME_IO", new Object[] { Pattern.compile("#C\\d+ S\\d+ @.*"), "#C0 S0 @", "VME_IO - #Ccard Ssignal @parm" });
+	editMaskTable.put("CAMAC_IO", new Object[] { Pattern.compile("#B\\d+ C\\d+ N\\d+ A\\d+ F\\d+ @.*"), "CAMAC_IO - #B0 C0 N0 A0 F0 @", "#Bbranch Ccrate Nstation Asubaddress Ffunction @parm" });
+	editMaskTable.put("AB_IO", new Object[] { Pattern.compile("#L\\d+ A\\d+ C\\d+ S\\d+ @.*"), "#L0 A0 C0 S0 @", "AB_IO - #Llink Aadapter Ccard Ssignal @parm" });
+	editMaskTable.put("GPIB_IO", new Object[] { Pattern.compile("#L\\d+ A\\d+ @.*"), "#L0 A0 @", "GPIB_IO - #Llink Aaddr @parm" });
+	editMaskTable.put("BITBUS_IO", new Object[] { Pattern.compile("#L\\d+ N\\d+ P\\d+ S\\d+ @.*"), "BITBUS_IO - @L0 N0 P0 S0 @", "#Llink Nnode Pport Ssignal @parm" });
+	editMaskTable.put("INST_IO", new Object[] { Pattern.compile("@.*"), "@", "INST_IO - @" });
+	editMaskTable.put("BBGPIB_IO", new Object[] { Pattern.compile("#L\\d+ B\\d+ G\\d+ @.*"), "#L0 B0 G0 @", "BBGPIB_IO - #Llink Bbbaddr Ggpibaddr @parm" });
+	editMaskTable.put("RF_IO", new Object[] { Pattern.compile("#R\\d+ M\\d+ D\\d+ E\\d+ @.*"), "#R0 M0 D0 E0 @", "RF_IO - #Rcryo Mmicro Ddataset Eelement" });
+	editMaskTable.put("VXI_IO", new Object[] { Pattern.compile("#V\\d+ (C\\d+)?+  S\\d+ @.*"), "#V0 C0 S0 @", "VXI_IO - #Vframe Cslot Ssignal @parm" });
 }
 /**
  * Insert the method's description here.
