@@ -41,13 +41,14 @@ public class Constants {
     public final static int VDCT_WIDTH = 1000;
     public final static int VDCT_HEIGHT = 770;
 
-    public final static String COPY_SUFFIX = "_copy";
-    public final static String MOVE_SUFFIX = "_2";
+//    public final static String COPY_SUFFIX = "_copy";
+//    public final static String MOVE_SUFFIX = "_2";
+    public final static String COPY_SUFFIX = "2";
+    public final static String MOVE_SUFFIX = "2";
 
  	public final static String VDCT_PLUGINS_FILE = "VDCT_PLUGINS_FILE";
  	
-    public /*final*/
-    static char GROUP_SEPARATOR = ':';
+    public /*final*/ static char GROUP_SEPARATOR = ':';
     public final static char FIELD_SEPARATOR = '.';
     public final static String HARDWARE_LINK = "#";
 

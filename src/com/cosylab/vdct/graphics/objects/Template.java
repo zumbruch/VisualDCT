@@ -47,6 +47,7 @@ import com.cosylab.vdct.graphics.popup.Popupable;
 import com.cosylab.vdct.inspector.Inspectable;
 import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.inspector.InspectorManager;
+import com.cosylab.vdct.util.StringUtils;
 import com.cosylab.vdct.vdb.GUISeparator;
 import com.cosylab.vdct.vdb.LinkProperties;
 import com.cosylab.vdct.vdb.MonitoredActionProperty;
@@ -57,6 +58,7 @@ import com.cosylab.vdct.vdb.VDBData;
 import com.cosylab.vdct.vdb.VDBFieldData;
 import com.cosylab.vdct.vdb.VDBTemplateField;
 import com.cosylab.vdct.vdb.VDBTemplateInstance;
+import com.sun.corba.se.internal.core.Constant;
 
 /**
  * Graphical representation of templates.
@@ -943,11 +945,13 @@ public boolean copyToGroup(java.lang.String group) {
 
 	// object with new name already exists, add suffix ///!!!
 	//Object obj;
+
 	while (Group.getRoot().findObject(newName, true)!=null)
-		newName += Constants.COPY_SUFFIX;
+//		newName += Constants.COPY_SUFFIX;
+			newName = StringUtils.incrementName(newName, Constants.COPY_SUFFIX);
 
+	
 	ViewState view = ViewState.getInstance();
-
 
 	VDBTemplateInstance theDataCopy = VDBData.copyVDBTemplateInstance(templateData);
 	theDataCopy.setName(newName);
@@ -988,9 +992,11 @@ public boolean moveToGroup(java.lang.String group) {
 			return true;
 		}
 		else
-			//return false;
-			newName += Constants.MOVE_SUFFIX;
+		{
+			//newName += Constants.MOVE_SUFFIX;
+			newName = StringUtils.incrementName(newName, Constants.MOVE_SUFFIX);
 			return rename(newName);
+		}
 	}
 	
 	getParent().removeObject(Group.substractObjectName(getName()));

@@ -43,7 +43,8 @@ import com.cosylab.vdct.Constants;
  */
 public class VDBData {
 	private Vector records = null;
-	private Hashtable templates = null;
+	//private Hashtable templates = null;
+	private static Hashtable templates = new Hashtable();
 	private Hashtable templateInstances = null;
 	private Vector templateInstancesV = null;
 /**
@@ -51,7 +52,7 @@ public class VDBData {
  */
 public VDBData() {
 	records = new Vector();
-	templates = new Hashtable();
+	//templates = new Hashtable();
 	templateInstances = new Hashtable();
 	templateInstancesV = new Vector();
 }
@@ -266,9 +267,28 @@ public static void generateTemplateInstances(DBData db, VDBData vdb)
 /**
  * 
  */
+public static VDBTemplateInstance generateNewVDBTemplateInstance(String name, VDBTemplate t)
+{
+	VDBTemplateInstance vti = new VDBTemplateInstance(name, t);
+	vti.setProperties(new TreeMap());		// empty properties
+		
+	Hashtable hm = new Hashtable();
+	vti.setInputs(generateTemplateInstanceIOFields(vti, hm, t.getInputs(), t.getInputComments()));
+	vti.setOutputs(generateTemplateInstanceIOFields(vti, hm, t.getOutputs(), t.getOutputComments()));
+
+	return vti;
+}
+
+/**
+ * 
+ */
 private static Hashtable generateTemplateInstanceIOFields(VDBTemplateInstance vti, Hashtable values,
 															Hashtable table, Hashtable descTable)
 {
+
+	boolean monitor = com.cosylab.vdct.undo.UndoManager.getInstance().isMonitor();
+	com.cosylab.vdct.undo.UndoManager.getInstance().setMonitor(false);
+
 	Hashtable ios = new Hashtable();
 	Enumeration keys = table.keys();
 	while (keys.hasMoreElements())
@@ -282,6 +302,9 @@ private static Hashtable generateTemplateInstanceIOFields(VDBTemplateInstance vt
 			tf.setValueSilently(initVal);
 		ios.put(key, tf);
 	}
+	
+	com.cosylab.vdct.undo.UndoManager.getInstance().setMonitor(monitor);
+	
 	return ios;
 }
 
@@ -616,7 +639,7 @@ public Vector getTemplateInstancesV()
  * Returns the templates.
  * @return Hashtable
  */
-public Hashtable getTemplates()
+public static Hashtable getTemplates()
 {
 	return templates;
 }
@@ -626,7 +649,7 @@ public Hashtable getTemplates()
  * Creation date: (10.1.2001 14:44:44)
  * @param record com.cosylab.vdct.vdb.VDBTemplate
  */
-public void removeTemplate(VDBTemplate template) {
+public static void removeTemplate(VDBTemplate template) {
 	templates.remove(template);
 }
 /**

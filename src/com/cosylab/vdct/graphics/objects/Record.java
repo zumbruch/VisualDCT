@@ -32,6 +32,7 @@ import java.awt.*;
 import java.util.*;
 import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.graphics.*;
+import com.cosylab.vdct.util.StringUtils;
 import com.cosylab.vdct.vdb.*;
 import com.cosylab.vdct.dbd.DBDConstants;
 
@@ -202,7 +203,8 @@ public boolean copyToGroup(java.lang.String group) {
 	// object with new name already exists, add suffix ///!!!
 	//Object obj;
 	while (Group.getRoot().findObject(newName, true)!=null)
-		newName += Constants.COPY_SUFFIX;
+//		newName += Constants.COPY_SUFFIX;
+			newName = StringUtils.incrementName(newName, Constants.COPY_SUFFIX);
 
 	ViewState view = ViewState.getInstance();
 
@@ -1004,7 +1006,8 @@ public boolean moveToGroup(java.lang.String group) {
 		}
 		else
 			//return false;
-			newName += Constants.MOVE_SUFFIX;
+			//newName += Constants.MOVE_SUFFIX;
+			newName = StringUtils.incrementName(newName, Constants.MOVE_SUFFIX);
 			return rename(newName);
 	}
 	

@@ -165,7 +165,8 @@ public boolean copyToGroup(java.lang.String group) {
 	ViewState view = ViewState.getInstance();
 		
 	while (Group.getRoot().findObject(newName, true)!=null)
-		newName += Constants.COPY_SUFFIX;
+//		newName += Constants.COPY_SUFFIX;
+			newName = StringUtils.incrementName(newName, Constants.COPY_SUFFIX);
 
 	Group g = getRoot().createGroup(newName);
 	if (group.equals(getNamePrefix()) || group.equals(Constants.CLIPBOARD_NAME)) {
@@ -613,7 +614,8 @@ public boolean moveToGroup(java.lang.String group) {
 	Object obj = Group.getRoot().findObject(newName, true);
 	while (obj!=null && obj!=this)
 	{
-		newName += Constants.MOVE_SUFFIX;
+		//newName += Constants.MOVE_SUFFIX;
+		newName = StringUtils.incrementName(newName, Constants.MOVE_SUFFIX);
 		obj = Group.getRoot().findObject(newName, true);
 	}
 	

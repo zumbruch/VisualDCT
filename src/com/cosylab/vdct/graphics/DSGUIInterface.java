@@ -167,6 +167,11 @@ public void copy() {
  * @param relative boolean
  */
 public void createRecord(String name, String type, boolean relative) {
+
+createTemplateInstance(name, type, relative);
+if (true)
+	return;
+
 	if (relative)
 	{
 		String parentName = drawingSurface.getViewGroup().getAbsoluteName();
@@ -197,6 +202,54 @@ public void createRecord(String name, String type, boolean relative) {
 	//drawingSurface.setModified(true);
 	drawingSurface.repaint();
 }
+/**
+ * Insert the method's description here.
+ * Creation date: (3.2.2001 23:27:30)
+ * @param name java.lang.String
+ * @param type java.lang.String
+ * @param relative boolean
+ */
+public void createTemplateInstance(String name, String type, boolean relative) {
+
+type = "test"; // !!!
+
+	if (relative)
+	{
+		String parentName = drawingSurface.getViewGroup().getAbsoluteName();
+		if (parentName.length()>0)
+			name = parentName + Constants.GROUP_SEPARATOR + name;
+	}
+	
+	VDBTemplate template = (VDBTemplate)VDBData.getTemplates().get(type);
+	if (template==null)
+	{
+		Console.getInstance().println(
+			"Template instance "+name+" cannot be created since "
+				+ type
+				+ " does not exist.");
+		return;
+	}			
+
+	VDBTemplateInstance templateInstance = VDBData.generateNewVDBTemplateInstance(name, template);
+
+	ViewState view = ViewState.getInstance();
+	int rx = (int)(view.getRx()/view.getScale());
+	int ry = (int)(view.getRy()/view.getScale());
+
+	Template templ = new Template(null, templateInstance);
+	Group.getRoot().addSubObject(name, templ, true);
+
+	//templ.setDescription(dbTemplate.getDescription());
+	templ.setDescription(template.getDescription());
+	templ.setX(drawingSurface.getPressedX()+rx);
+	templ.setY(drawingSurface.getPressedY()+ry);
+
+	UndoManager.getInstance().addAction(new CreateAction(templ));
+
+	//drawingSurface.setModified(true);
+	drawingSurface.repaint();
+}
+
 /**
  * Insert the method's description here.
  * Creation date: (4.2.2001 15:32:01)

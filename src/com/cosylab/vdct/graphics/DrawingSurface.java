@@ -664,7 +664,12 @@ public void mouseClicked(MouseEvent e) {
 			}
 		}
 		else {
-			if (e.getClickCount()>=2) {
+			if (e.getClickCount()==1 && e.getButton()==MouseEvent.BUTTON3)
+			{
+				pressedX=cx; pressedY=cy;
+				CommandManager.getInstance().execute("ShowNewDialog");
+			}
+			else if (e.getClickCount()>=2) {
 				pressedX=cx; pressedY=cy;
 				CommandManager.getInstance().execute("ShowNewDialog");
 			}

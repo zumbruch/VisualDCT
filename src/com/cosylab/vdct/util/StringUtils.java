@@ -179,4 +179,41 @@ public static java.awt.Color string2color(String str) {
 	}
 	
 }
+/**
+ * Insert the method's description here.
+ * Creation date: (23.4.2001 18:52:04)
+ * @return java.awt.Color
+ * @param str java.lang.String
+ */
+public static String incrementName(String newName, String suffix)
+{
+	String snum = nullString;
+	int i = newName.length()-1;
+	for (; i>=0 && Character.isDigit(newName.charAt(i)); i--)
+		snum = newName.charAt(i) + snum;
+	i++;
+	if (snum!=nullString)
+	{
+		// skip leading zeros
+		for (; i<(newName.length()-1) && newName.charAt(i)=='0'; i++);
+
+		int len = String.valueOf(Integer.parseInt(snum)).length();
+		snum = String.valueOf(Integer.parseInt(snum)+1);
+		
+		// preserve number of digits
+		if (snum.length()>len && i>0 && newName.charAt(i-1)=='0')
+			i--;
+	}
+	else
+		snum = suffix;
+
+	if (i==0)
+		newName = snum;
+	else
+		newName = newName.substring(0, i) + snum;
+
+	return newName;
+}
+
+
 }
