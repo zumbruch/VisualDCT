@@ -32,6 +32,7 @@ import java.io.*;
 import java.util.*;
 import com.cosylab.vdct.Console;
 import com.cosylab.vdct.DataProvider;
+import com.cosylab.vdct.graphics.objects.OutLink;
 import com.cosylab.vdct.util.*;
 import com.cosylab.vdct.util.StringUtils;
 import com.cosylab.vdct.vdb.VDBData;
@@ -885,6 +886,102 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 
 /**
  * VisualDCT layout data is also processed here
+ * @param rootData com.cosylab.vdct.db.DBData
+ * @param tokenizer java.io.StreamTokenizer
+ */
+public static String processTemplateComment(DBTemplate template, StreamTokenizer tokenizer, String fileName) throws Exception {
+  
+ if ((template==null) || !tokenizer.sval.equals(DBConstants.layoutDataString)) {	// comment
+	 String comment = tokenizer.sval;
+	 
+	// initialize tokenizer for comments
+	tokenizer.resetSyntax();
+	tokenizer.whitespaceChars(0, 31);
+	tokenizer.wordChars(32, 255);		
+	tokenizer.wordChars('\t', '\t');
+	tokenizer.eolIsSignificant(true);
+
+	while ((tokenizer.nextToken() != tokenizer.TT_EOL) &&						// read till EOL
+		    (tokenizer.ttype != tokenizer.TT_EOF))
+	 	if (tokenizer.ttype == tokenizer.TT_NUMBER) {
+		 	//if (!comment.equals(nullString)) comment+=SPACE;
+	 		comment=comment+tokenizer.nval;
+	 	}
+		else {
+		 	//if (!comment.equals(nullString)) comment+=SPACE;
+			comment=comment+tokenizer.sval;
+		}
+
+	 // reinitialzie it back
+	 initializeTokenizer(tokenizer);
+
+	 return comment+NL;
+
+ }
+ else {																		// graphics layout data
+	
+ 	 String str, str2; int t, tx, tx2, ty, ty2, t2, t3;
+
+ 	 while ((tokenizer.nextToken() != tokenizer.TT_EOL) &&
+		    (tokenizer.ttype != tokenizer.TT_EOF)) 
+		if (tokenizer.ttype == tokenizer.TT_WORD) 
+
+				if (tokenizer.sval.equalsIgnoreCase(VDCT_CONSTANT_PORT) ||
+					tokenizer.sval.equalsIgnoreCase(VDCT_INPUT_PORT) ||
+					tokenizer.sval.equalsIgnoreCase(VDCT_OUTPUT_PORT)) {
+
+					int mode;
+					if (tokenizer.sval.equalsIgnoreCase(VDCT_CONSTANT_PORT))
+						mode = OutLink.CONSTANT_PORT_MODE;
+					else if (tokenizer.sval.equalsIgnoreCase(VDCT_INPUT_PORT))
+						mode = OutLink.INPUT_PORT_MODE;
+					else /*if (tokenizer.sval.equalsIgnoreCase(VDCT_OUTPUT_PORT))*/
+						mode = OutLink.OUTPUT_PORT_MODE;
+						
+					// read port name
+					tokenizer.nextToken();
+					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+						(tokenizer.ttype == DBConstants.quoteChar)) str=tokenizer.sval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					DBPort port = (DBPort)(template.getPorts().get(str));
+					if (port!=null)
+					{
+						port.setMode(mode);
+						
+						// read port inlink
+						tokenizer.nextToken();
+						if ((tokenizer.ttype == tokenizer.TT_WORD)||
+							(tokenizer.ttype == DBConstants.quoteChar)) port.setInLinkID(tokenizer.sval);
+						else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+						// read x pos
+						tokenizer.nextToken();
+						if (tokenizer.ttype == tokenizer.TT_NUMBER) port.setX((int)tokenizer.nval);
+						else throw (new DBGParseException(errorString, tokenizer, fileName));
+					
+						// read y pos
+						tokenizer.nextToken();
+						if (tokenizer.ttype == tokenizer.TT_NUMBER) port.setY((int)tokenizer.nval);
+						else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+						// read color
+						tokenizer.nextToken();
+						if (tokenizer.ttype == tokenizer.TT_NUMBER) port.setColor(StringUtils.int2color((int)tokenizer.nval));
+						else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+						port.setHasVisual(true);
+					}
+				}
+
+		return nullString;
+  }
+}
+
+
+
+/**
+ * VisualDCT layout data is also processed here
  * @param tokenizer java.io.StreamTokenizer
  */
 public static void skipLines(int linesToSkip, StreamTokenizer tokenizer, String fileName) throws Exception {
@@ -1188,7 +1285,7 @@ public static void processPorts(DBTemplate template, StreamTokenizer tokenizer, 
 		if (tokenizer.ttype == tokenizer.TT_WORD) 
 			if (tokenizer.sval.equals(ENDSTR)) break;
 			else if (tokenizer.sval.startsWith(DBConstants.commentString)) 
-				comment+=processComment(null, tokenizer, fileName);
+				comment+=processTemplateComment(template, tokenizer, fileName);
 			else if (tokenizer.sval.equalsIgnoreCase(PORT)) {
 
 				// read name

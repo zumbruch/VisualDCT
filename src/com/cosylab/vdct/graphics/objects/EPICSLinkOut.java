@@ -154,8 +154,8 @@ public void destroy() {
  * @param link first inlink of the out
  * @param out source of the link
  */
-public static void  destroyChain(Linkable link, OutLink out) {
-	while (link instanceof OutLink) {
+public static void destroyChain(Linkable link, OutLink out) {
+	while (link instanceof OutLink && !(link instanceof EPICSLinkOut)) {
 		out = (OutLink)link;
 		link = out.getInput();
 		if (out instanceof Connector)
@@ -224,6 +224,7 @@ public com.cosylab.vdct.inspector.InspectableProperty getCommentProperty() {
  * @param link com.cosylab.vdct.graphics.objects.Linkable
  */
 public static InLink getEndPoint(Linkable link) {
+	//!!!
 	while (link instanceof OutLink)
 		link = ((OutLink)link).getInput();
 	return (InLink)link;

@@ -178,8 +178,11 @@ public void setValue(String value) {
 	String newValue = addCommentChars(value);
 
 	if ((record.getComment()==null) || !record.getComment().equals(newValue))
-		com.cosylab.vdct.undo.UndoManager.getInstance().addAction(
-			new com.cosylab.vdct.undo.CommentChangeAction(this, record.getComment(), newValue)
+	
+		// do not store undo for <null> -> ""
+		if (!(record.getComment()==null && (newValue==null || newValue.length()==0)))
+			com.cosylab.vdct.undo.UndoManager.getInstance().addAction(
+				new com.cosylab.vdct.undo.CommentChangeAction(this, record.getComment(), newValue)
 		);
 
 	record.setComment(newValue);

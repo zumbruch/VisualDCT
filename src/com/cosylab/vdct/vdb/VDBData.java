@@ -34,6 +34,7 @@ import com.cosylab.vdct.db.*;
 import com.cosylab.vdct.dbd.*;
 import com.cosylab.vdct.graphics.DrawingSurface;
 import com.cosylab.vdct.graphics.objects.Group;
+import com.cosylab.vdct.graphics.objects.Port;
 import com.cosylab.vdct.graphics.objects.Record;
 import com.cosylab.vdct.Console;
 import com.cosylab.vdct.Constants;
@@ -455,12 +456,24 @@ private static VDBData generateTemplate(DBDData dbd, DBTemplate dbTemplate)
 			Object key = keys.nextElement();
 			DBPort port = (DBPort)dbTemplate.getPorts().get(key);
 			VDBPort vdbPort = new VDBPort(vt, port);	
+
+			// has visual
+			if (port.isHasVisual())
+			{
+				Port visualPort = new Port(vdbPort, Group.getRoot(),
+									  port.getX(), port.getY());
+				visualPort.setColor(port.getColor());
+				visualPort.setMode(port.getMode());
+			
+				Group.getRoot().addSubObject(vdbPort.getName(), visualPort);
+			}
+
 			ports.put(key, vdbPort);
 			portsV.addElement(vdbPort);
 		}
 		vt.setPorts(ports);
 		vt.setPortsV(portsV);
-	
+
 		VDBData.addTemplate(vt);
 		
 		return vdbData;

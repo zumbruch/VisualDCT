@@ -56,7 +56,7 @@ public CommentChangeAction(com.cosylab.vdct.vdb.CommentProperty commentProperty,
  * @return java.lang.String
  */
 public java.lang.String getDescription() {
-	return "Record comment value change ["+commentProperty.getName()+"](\""+oldValue+"\" to \""+newValue+"\")";
+	return "Comment value change ["+commentProperty.getName()+"](\""+oldValue+"\" to \""+newValue+"\")";
 }
 /**
  * This method was created in VisualAge.

@@ -1,5 +1,7 @@
 package com.cosylab.vdct.db;
 
+import com.cosylab.vdct.graphics.objects.OutLink;
+
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
  * All rights reserved.
@@ -36,6 +38,13 @@ public class DBPort extends DBComment
 	protected String name = null;
 	protected String target = null;
 	protected String description = null;
+
+	protected boolean hasVisual = false;
+	protected int x = -1;			// used for layout
+	protected int y = -1;
+	protected int mode = OutLink.CONSTANT_PORT_MODE;
+	protected java.awt.Color color = java.awt.Color.black;
+	protected String inLinkID = null;
 	
 	/**
 	 * Insert the method's description here.
@@ -101,4 +110,112 @@ public class DBPort extends DBComment
 		this.description = description;
 	}
 	
+	/**
+	 * Returns the color.
+	 * @return java.awt.Color
+	 */
+	public java.awt.Color getColor()
+	{
+		return color;
+	}
+
+	/**
+	 * Returns the hasVisual.
+	 * @return boolean
+	 */
+	public boolean isHasVisual()
+	{
+		return hasVisual;
+	}
+
+	/**
+	 * Returns the x.
+	 * @return int
+	 */
+	public int getX()
+	{
+		return x;
+	}
+
+	/**
+	 * Returns the y.
+	 * @return int
+	 */
+	public int getY()
+	{
+		return y;
+	}
+
+	/**
+	 * Sets the color.
+	 * @param color The color to set
+	 */
+	public void setColor(java.awt.Color color)
+	{
+		this.color = color;
+	}
+
+	/**
+	 * Sets the hasVisual.
+	 * @param hasVisual The hasVisual to set
+	 */
+	public void setHasVisual(boolean hasVisual)
+	{
+		this.hasVisual = hasVisual;
+	}
+
+	/**
+	 * Sets the x.
+	 * @param x The x to set
+	 */
+	public void setX(int x)
+	{
+		this.x = x;
+	}
+
+	/**
+	 * Sets the y.
+	 * @param y The y to set
+	 */
+	public void setY(int y)
+	{
+		this.y = y;
+	}
+
+	/**
+	 * Returns the inLinkID.
+	 * @return String
+	 */
+	public String getInLinkID()
+	{
+		return inLinkID;
+	}
+
+	/**
+	 * Sets the inLinkID.
+	 * @param inLinkID The inLinkID to set
+	 */
+	public void setInLinkID(String inLinkID)
+	{
+		this.inLinkID = inLinkID;
+	}
+
+	/**
+	 * Returns the mode.
+	 * @return int
+	 */
+	public int getMode()
+	{
+		return mode;
+	}
+
+	/**
+	 * Sets the mode.
+	 * @param mode The mode to set
+	 */
+	public void setMode(int mode)
+	{
+		this.mode = mode;
+	}
+
 }
