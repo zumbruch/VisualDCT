@@ -103,6 +103,18 @@ public Component getTableCellRendererComponent(JTable table, Object value, boole
 		super.setHorizontalAlignment(JLabel.CENTER);
 		super.setBackground(sectionbgColor);
 		super.setForeground(sectionfgColor);
+		if (column==0)
+		{
+			switch (property.getVisibility())
+			{
+				case InspectableProperty.ALWAYS_VISIBLE:
+					setIcon(eyeIcon);
+					break;
+				case InspectableProperty.NEVER_VISIBLE:
+					setIcon(noeyeIcon);
+					break;
+			}
+		}
 	}
 	else {
 		super.setHorizontalAlignment(JLabel.LEFT);

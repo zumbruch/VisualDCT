@@ -38,6 +38,7 @@ import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.DataProvider;
 import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.inspector.InspectableProperty;
+import com.cosylab.vdct.vdb.GUIHeader;
 import com.cosylab.vdct.vdb.GUISeparator;
 import com.cosylab.vdct.vdb.NameValueInfoProperty;
 import com.cosylab.vdct.vdb.VDBFieldData;
@@ -231,13 +232,14 @@ public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode) 
 		if (out instanceof EPICSLinkOut) starts.addElement(out);
 	}
 
-	InspectableProperty[] properties = new InspectableProperty[3+2*starts.size()];
+	InspectableProperty[] properties = new InspectableProperty[1+3+2*starts.size()];
 
-	properties[0]=getPortSeparator();
-	properties[1]=new NameValueInfoProperty("Value", getFieldData().getValue());
-	properties[2]=new NameValueInfoProperty("Description", getFieldData().getHelp());
+	properties[0]=GUIHeader.getDefaultHeader();
+	properties[1]=getPortSeparator();
+	properties[2]=new NameValueInfoProperty("Value", getFieldData().getValue());
+	properties[3]=new NameValueInfoProperty("Description", getFieldData().getHelp());
 
-	int i = 3;
+	int i = 4;
 	VDBFieldData fieldData;
 	e = starts.elements();
 	while (e.hasMoreElements())

@@ -446,6 +446,7 @@ public class Template
 	public InspectableProperty[] getProperties(int mode)
 	{
 		Vector items = new Vector();
+		items.addElement(GUIHeader.getDefaultHeader());
 
 		items.addElement(getTemplateSeparator());
 		items.addElement(new NameValueInfoProperty("Template", templateData.getTemplate().getId()));

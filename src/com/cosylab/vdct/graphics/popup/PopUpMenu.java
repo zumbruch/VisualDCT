@@ -31,6 +31,9 @@ package com.cosylab.vdct.graphics.popup;
 import java.util.*;
 import javax.swing.*;
 
+import com.cosylab.vdct.graphics.ViewState;
+import com.cosylab.vdct.plugin.popup.PluginPopupManager;
+
 /**
  * Insert the type's description here.
  * Creation date: (27.1.2001 17:30:55)
@@ -40,6 +43,7 @@ public class PopUpMenu extends JPopupMenu {
 	private static PopUpMenu instance = null;
 	private static final String moreString = "More";
 	private static final int ITEMS_PER_MENU = 10;
+	private static JSeparator separator = null;
 /**
  * LinkingPopupMenu constructor comment.
  */
@@ -80,6 +84,17 @@ public static PopUpMenu getInstance() {
 	if (instance==null) instance = new PopUpMenu();
 	return instance;
 }
+
+/**
+ * Insert the method's description here.
+ * Creation date: (2.2.2001 20:18:55)
+ * @return javax.swing.JSeparator
+ */
+public static JSeparator getSeparator() {
+	if (separator==null) separator = new JSeparator();
+	return separator;
+}
+
 /**
  * Insert the method's description here.
  * Creation date: (2.2.2001 20:17:37)
@@ -91,6 +106,8 @@ public static PopUpMenu getInstance() {
 public void show(Popupable object, JComponent component, int x, int y) {
 	setLabel(object.getLabel());
 	if (getComponentCount()>0) removeAll();
+
+	// add object items
 	Vector items = object.getItems();
 	if ((items==null) || (items.size()==0)) return;
 		
@@ -104,6 +121,34 @@ public void show(Popupable object, JComponent component, int x, int y) {
 		else if (obj instanceof JSeparator)
 			add((JSeparator)obj);
 	}
+
+	// get list of all selected object if this object is also selected
+	// otherwise only give this object
+	Vector selectedItems = new Vector();
+	if (ViewState.getInstance().isSelected(object))
+	{
+		// make a copy of vector to allows plugins to play with it
+		selectedItems.addAll(ViewState.getInstance().getSelectedObjects());
+	}
+	else
+		selectedItems.addElement(object);
+	
+	items = PluginPopupManager.getInstance().getAllPluginItems(selectedItems);
+	
+	if (items.size()>0)
+		add(getSeparator());
+	
+	e = items.elements();
+	while (e.hasMoreElements())
+	{
+		obj = e.nextElement();
+		if (obj instanceof JMenuItem)
+			add((JMenuItem)obj);
+		else if (obj instanceof JSeparator)
+			add((JSeparator)obj);
+	}
+
+	// show popup menu
 	show(component, x, y);
 }
 }

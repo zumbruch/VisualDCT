@@ -1,4 +1,4 @@
-package com.cosylab.vdct.vdb;
+package com.cosylab.vdct.plugin.popup;
 
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
@@ -28,18 +28,30 @@ package com.cosylab.vdct.vdb;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import com.cosylab.vdct.inspector.*;
+import java.util.Vector;
+import java.util.Hashtable;
+
+import com.cosylab.vdct.plugin.Plugin;
+import com.cosylab.vdct.graphics.objects.Group;
+
 /**
  * Insert the type's description here.
- * Creation date: (12.1.2001 22:40:34)
- * @author 
+ * Creation date: (8.12.2001 12:43:54)
+ * @author Matej Sekoranja 
  */
-public class GUISeparator extends GUIHeader {
-	private String title;
+public interface ContextPopupPlugin extends Plugin {
+
 /**
- * GUISeparator constructor comment.
+ * 
+ * This metod is called each time request of popup menu is gived to VisualDCT.
+ * PluginPopupManager then queries all popup plugins, asking them to return list of menus
+ * or menu items to be added to the default list of popup items.
+ * Plugin can also return null value, if there is no action available to the
+ * given list of selected objects.
+ * Creation date: (8.12.2001 12:45:31)
+ * @return java.util.Vector list of <code>javax.swing.JMenuItems</code> and/or <code>javax.swing.JMenu</code> and/or <code>javax.swing.JSeparator</code> objects
+ * 							 to be added to the default list of popup items. Can also be null.
  */
-public GUISeparator(String title) {
-	super(title, title, InspectableProperty.UNDEFINED_VISIBILITY);
-}
+public Vector getItems(Vector selectedObjects);
+
 }

@@ -199,7 +199,7 @@ public Object getValueAt(int row, int column)
 	switch(column)
 	{
 		case(0):
-			return Boolean.valueOf(plugin.isAutoStart());
+			return new Boolean(plugin.isAutoStart());
 		case(1):
 		{
 			int status = plugin.getStatus();

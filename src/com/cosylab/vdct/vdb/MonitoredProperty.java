@@ -36,7 +36,6 @@ import java.util.regex.Pattern;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
-import javax.swing.Popup;
 
 import com.cosylab.vdct.inspector.*;
 

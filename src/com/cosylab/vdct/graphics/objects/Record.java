@@ -665,6 +665,7 @@ public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode) 
 		grps = new com.cosylab.vdct.util.IntegerQuickSort().sortEnumeration(groups.keys());
 	
 		Vector all = new Vector();
+		all.addElement(GUIHeader.getDefaultHeader());
 		
 		Vector items; int grp;
 		for (int gn=0; gn < grps.length; gn++) {
@@ -683,12 +684,14 @@ public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode) 
 
 		VDBFieldData field;
 		Vector all = new Vector();
+	
+		all.addElement(GUIHeader.getDefaultHeader());
 
 		if (mode == SORT_ORDER)
 			all.addElement(getAlphaSeparator());
 		else
 			all.addElement(getDBDSeparator());
-	
+			
 		if (mode==DBD_ORDER)
 		{
 			DBDFieldData dbdField;
@@ -715,8 +718,8 @@ public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode) 
 		all.copyInto(properties);
 	
 		if (mode == SORT_ORDER)
-			if (properties.length>1)
-				new com.cosylab.vdct.util.StringQuickSort().sort(properties, 1, properties.length-1);
+			if (properties.length>2)
+				new com.cosylab.vdct.util.StringQuickSort().sort(properties, 2, properties.length-1);
 	
 		return properties;
 	}

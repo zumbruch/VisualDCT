@@ -652,6 +652,7 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 	public InspectableProperty[] getProperties(int mode)
 	{
 		Vector items = new Vector();
+		items.addElement(GUIHeader.getDefaultHeader());
 
 		items.addElement(getTemplateSeparator());
 		items.addElement(new NameValueInfoProperty("Class", id));

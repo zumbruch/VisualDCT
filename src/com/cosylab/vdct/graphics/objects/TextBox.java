@@ -221,10 +221,10 @@ public TextBox(String parName, Group parentGroup, int posX, int posY, int posX2,
 	label = new javax.swing.JLabel() {
 		    public void paint(Graphics g) {
 				Shape clip = g.getClip();
-				g.translate(getX(),getY());
+				g.translate(this.getX(),this.getY());
 				g.setClip(0, 0, getWidth(), getHeight());
 				super.paint(g);
-				g.translate(-getX(),-getY());
+				g.translate(-this.getX(),-this.getY());
 				g.setClip(clip);
 		    }
 		};

@@ -29,34 +29,38 @@ package com.cosylab.vdct.vdb;
  */
 
 import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.regex.Pattern;
 
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-
 import com.cosylab.vdct.inspector.*;
-
 /**
  * Insert the type's description here.
- * Creation date: (1.2.2001 22:49:33)
- * @author Matej Sekoranja
+ * Creation date: (12.1.2001 22:40:34)
+ * @author 
  */
-public class MonitoredActionProperty implements InspectableProperty {
-	private String value;
-	private MonitoredPropertyListener listener = null;
-	private static final String nullString = "";
+public class GUIHeader implements InspectableProperty {
+	protected String title;
+	protected String name;
+	protected int visibility;
+	
+	protected static GUIHeader defaultHeader = new GUIHeader("Name", "Value", InspectableProperty.ALWAYS_VISIBLE);
+
 /**
- * DTYPInfoProperty constructor comment.
+ * GUISeparator constructor comment.
  */
-public MonitoredActionProperty(String value, MonitoredPropertyListener listener) {
-	this.value=value;
-	this.listener=listener;
+public GUIHeader(String title, String name) {
+	this(title, name, InspectableProperty.UNDEFINED_VISIBILITY);
+}
+/**
+ * GUISeparator constructor comment.
+ */
+public GUIHeader(String title, String name, int visibility) {
+	this.title=title;
+	this.name=name;
+	this.visibility=visibility;
 }
 /**
  * Insert the method's description here.
- * Creation date: (1.2.2001 22:49:33)
+ * Creation date: (12.1.2001 22:40:34)
  * @return boolean
  */
 public boolean allowsOtherValues() {
@@ -64,23 +68,23 @@ public boolean allowsOtherValues() {
 }
 /**
  * Insert the method's description here.
- * Creation date: (1.2.2001 22:49:33)
+ * Creation date: (26.1.2001 15:02:40)
  * @return java.lang.String
  */
-public String getHelp() {
+public java.lang.String getHelp() {
 	return null;
 }
 /**
  * Insert the method's description here.
- * Creation date: (1.2.2001 22:49:33)
+ * Creation date: (12.1.2001 22:40:34)
  * @return java.lang.String
  */
 public String getName() {
-	return nullString;
+	return name;
 }
 /**
  * Insert the method's description here.
- * Creation date: (1.2.2001 22:49:33)
+ * Creation date: (12.1.2001 22:40:34)
  * @return java.lang.String[]
  */
 public java.lang.String[] getSelectableValues() {
@@ -88,11 +92,11 @@ public java.lang.String[] getSelectableValues() {
 }
 /**
  * Insert the method's description here.
- * Creation date: (1.2.2001 22:49:33)
+ * Creation date: (12.1.2001 22:40:34)
  * @return java.lang.String
  */
 public String getValue() {
-	return value;
+	return title;
 }
 /**
  * Insert the method's description here.
@@ -105,7 +109,7 @@ public String getInitValue()
 }
 /**
  * Insert the method's description here.
- * Creation date: (1.2.2001 22:49:33)
+ * Creation date: (12.1.2001 22:40:34)
  * @return boolean
  */
 public boolean isEditable() {
@@ -113,7 +117,7 @@ public boolean isEditable() {
 }
 /**
  * Insert the method's description here.
- * Creation date: (1.2.2001 22:49:33)
+ * Creation date: (12.1.2001 22:40:34)
  * @return boolean
  */
 public boolean isSepatator() {
@@ -121,12 +125,10 @@ public boolean isSepatator() {
 }
 /**
  * Insert the method's description here.
- * Creation date: (1.2.2001 22:49:33)
+ * Creation date: (12.1.2001 22:40:34)
  * @param value java.lang.String
  */
-public void setValue(String value) {
-	this.value=value;
-}
+public void setValue(String value) {}
 /**
  * Insert the method's description here.
  * Creation date: (24/8/99 15:29:04)
@@ -161,7 +163,7 @@ public boolean isValid()
  */
 public int getVisibility()
 {
-	return InspectableProperty.UNDEFINED_VISIBILITY;
+	return visibility;
 }
 /**
  * Insert the method's description here.
@@ -172,7 +174,15 @@ public int getVisibility()
  */
 public void popupEvent(Component component, int x, int y)
 {
-	listener.addProperty();
+}
+
+/**
+ * Returns the defaultHeader.
+ * @return GUIHeader
+ */
+public static GUIHeader getDefaultHeader()
+{
+	return defaultHeader;
 }
 
 }

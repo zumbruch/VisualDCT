@@ -341,11 +341,12 @@ public int getOutY() {
  * @return com.cosylab.vdct.inspector.InspectableProperty[]
  */
 public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode) {
-	InspectableProperty[] properties = new InspectableProperty[4];
-	properties[0]=getRecordSeparator();
-	properties[1]=new FieldInfoProperty(fieldData.getRecord().getField("DTYP"));
-	properties[2]=getFieldSeparator();
-	properties[3]=fieldData;
+	InspectableProperty[] properties = new InspectableProperty[1+4];
+	properties[0]=GUIHeader.getDefaultHeader();
+	properties[1]=getRecordSeparator();
+	properties[2]=new FieldInfoProperty(fieldData.getRecord().getField("DTYP"));
+	properties[3]=getFieldSeparator();
+	properties[4]=fieldData;
 	return properties;
 }
 /**
