@@ -145,7 +145,7 @@ private FontData getFontData(String name, int size, int style) {
  * @return java.awt.FontMetrics
  */
 public FontMetrics getFontMetrics(Font font) {
-	if (graphics==null) return null;
+	if (graphics==null || font==null) return null;
 	String id = getID(font);
 	FontData fd = (FontData)(fonts.get(id));
 	if (fd==null) {
