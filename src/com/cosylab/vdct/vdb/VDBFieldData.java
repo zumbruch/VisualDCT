@@ -29,6 +29,7 @@ package com.cosylab.vdct.vdb;
  */
 
 import com.cosylab.vdct.dbd.*;
+import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.DataProvider;
 import com.cosylab.vdct.Console;
 import com.cosylab.vdct.inspector.ChangableVisibility;
@@ -40,6 +41,7 @@ import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.objects.LinkSource;
 import com.cosylab.vdct.graphics.objects.Record;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -69,7 +71,8 @@ public class VDBFieldData implements InspectableProperty, Debuggable, ChangableV
 	//	new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
 		new SimpleDateFormat("HH:mm:ss.SSS");
 	
-	protected String debugValueTimeStamp = "n/a"; 
+	protected String debugValueTimeStamp = "n/a";
+	protected Color debugValueColor = Constants.RECORD_COLOR; 
 	private static final String NAME_VAL = "VAL";
 	
 	protected int visibility = NON_DEFAULT_VISIBLE;
@@ -312,17 +315,37 @@ public void setComment(java.lang.String newComment) {
 public void setDbdData(com.cosylab.vdct.dbd.DBDFieldData newDbdData) {
 	dbdData = newDbdData;
 }
+
 /**
- * Insert the method's description here.
- * Creation date: (7.12.2001 19:13:20)
- * @param value java.lang.String
+ * @see com.cosylab.vdct.graphics.objects.Debuggable#setDebugValue(java.lang.String, java.util.Date, short)
  */
-public void setDebugValue(String newValue)
+public void setDebugValue(String newValue, Date timeStamp, short severity)
 {
 	if (com.cosylab.vdct.plugin.debug.PluginDebugManager.isDebugState())
 	{
-		debugValueTimeStamp = timeFormatter.format(new Date());
+		debugValueTimeStamp = timeFormatter.format(timeStamp);
 		debugValue = newValue; 
+		
+		// select debug color (follows MEDM standard)
+		switch (severity)
+		{
+			// 0 = no alarm
+			case 0 :
+				debugValueColor = Color.WHITE;
+				break;
+			// 1 = minor
+			case 1 :
+				debugValueColor = Color.YELLOW;
+				break;
+			// 2 = major
+			case 2 :
+				debugValueColor = Color.RED;
+				break;
+			// 3 = invalid
+			default :
+				debugValueColor = Color.WHITE;
+ 		}
+		
 		if (record!=null) record.fieldValueChanged(this);
 	}
 }
@@ -532,6 +555,13 @@ public void popupEvent(Component component, int x, int y)
  */
 public String getDebugValueTimeStamp() {
 	return debugValueTimeStamp;
+}
+
+/**
+ * @return
+ */
+public Color getDebugValueColor() {
+	return debugValueColor;
 }
 
 }

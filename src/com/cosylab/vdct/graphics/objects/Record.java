@@ -77,7 +77,9 @@ public class Record
 	private boolean right = true;
 
 	private boolean inDebugMode = false;
-
+	
+	protected Color debugValueColor = null; 
+	
 	// timestamp label
 	protected int timestampX;
 	protected int timestampY;
@@ -343,11 +345,9 @@ protected void draw(Graphics g, boolean hilited) {
 			ly += recordSize;
 			g.drawLine(rrx + ox, ly, rrx + rwidth - ox, ly);
 
-			// TODO MEDM colors
 			Color col = g.getColor();
-			g.setColor(Color.YELLOW);
+			g.setColor(debugValueColor);
 
-			// TODO !!!
 			if (valueFont != null) {
 				g.setFont(getFont());
 				g.drawString(value, rrx + valueX, rry + valueY + recordSize);
@@ -1356,6 +1356,8 @@ private void validateDebug(VDBFieldData valField)
 	// set appropriate font size
 	int x0 = (int)(8*scale);		// insets
 	int y0 = (int)(4*scale);
+
+	debugValueColor = valField.getDebugValueColor();
 
 	// TODO for timestamp this could be optimized
 	timestamp = valField.getDebugValueTimeStamp();

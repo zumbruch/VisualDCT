@@ -1,5 +1,7 @@
 package com.cosylab.vdct.graphics.objects;
 
+import java.util.Date;
+
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
  * All rights reserved.
@@ -45,5 +47,5 @@ String getFullName();
  * Creation date: (7.12.2001 19:10:57)
  * @param value java.lang.String
  */
-void setDebugValue(String value);
+void setDebugValue(String value, Date timeStamp, short severity);
 }

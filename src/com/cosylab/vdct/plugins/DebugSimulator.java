@@ -184,12 +184,13 @@ public void run()
 	java.util.Random rand = new java.util.Random();
 	while (!destroyed)
 	{
-
+		Date timeStamp = new Date();
+		
 		Enumeration enum = list.elements();
 		while (enum.hasMoreElements())
 		{
 			int num = minVal + rand.nextInt(maxVal-minVal+1);
-			((Debuggable)enum.nextElement()).setDebugValue(String.valueOf(num));
+			((Debuggable)enum.nextElement()).setDebugValue(String.valueOf(num), timeStamp, (short)0);
 		}
 
 		try
