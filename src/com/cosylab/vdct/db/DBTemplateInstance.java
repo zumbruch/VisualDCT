@@ -46,6 +46,7 @@ public class DBTemplateInstance extends DBComment
 	protected java.awt.Color color = java.awt.Color.black;
 	protected String description = null;
 
+	protected Vector templateFields = null;
 	/**
 	 * Constructor.
 	 */
@@ -53,6 +54,7 @@ public class DBTemplateInstance extends DBComment
 	{
 		properties = new Hashtable();
 		propertiesV = new Vector();
+		templateFields = new Vector();
 		this.templateInstanceId = templateInstanceId;
 		this.templateId = templateId;
 	}
@@ -176,6 +178,13 @@ public class DBTemplateInstance extends DBComment
 	public String getTemplateInstanceId()
 	{
 		return templateInstanceId;
+	}
+
+	/**
+	 * @return
+	 */
+	public Vector getTemplateFields() {
+		return templateFields;
 	}
 
 }

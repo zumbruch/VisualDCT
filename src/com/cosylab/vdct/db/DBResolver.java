@@ -128,7 +128,9 @@ public class DBResolver {
 	// template 'instatiation'
 	// used format:
  	// #! TemplateInstance("template instance id", x, y, color, "desc")
+	// #! TemplateField("template instance id", "fieldName", color, isRight, visibility)
 	public static final String TEMPLATE_INSTANCE = "TemplateInstance";
+	public static final String TEMPLATE_FIELD = "TemplateField";
 
 /**
  * This method was created in VisualAge.
@@ -515,6 +517,40 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 						ti.setX(tx); ti.setY(ty); ti.setColor(StringUtils.int2color(t));
 						ti.setDescription(desc);
 					}
+				}
+				else if (tokenizer.sval.equalsIgnoreCase(TEMPLATE_FIELD)) {
+			
+					// read template instance id
+					tokenizer.nextToken();
+					if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
+						(tokenizer.ttype == DBConstants.quoteChar)) str=tokenizer.sval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+								
+					// read template instance field id
+					tokenizer.nextToken();
+					if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
+						(tokenizer.ttype == DBConstants.quoteChar)) str2=tokenizer.sval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					// read color
+					tokenizer.nextToken();
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) t=(int)tokenizer.nval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+			
+					// read isRight
+					boolean isRight = false;
+					tokenizer.nextToken();
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) isRight=((int)tokenizer.nval)!=0;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					// read visibility 
+					tokenizer.nextToken();
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) t2=(int)tokenizer.nval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					DBTemplateInstance ti = (DBTemplateInstance)data.getTemplateInstances().get(str);
+					if (ti!=null)
+						ti.getTemplateFields().addElement(new DBTemplateField(str2, StringUtils.int2color(t), isRight, t2));
 				}
 				else if (tokenizer.sval.equalsIgnoreCase(VDCTLINE)) {
 					// read template name

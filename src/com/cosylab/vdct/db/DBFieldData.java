@@ -1,7 +1,5 @@
 package com.cosylab.vdct.db;
 
-import com.cosylab.vdct.inspector.InspectableProperty;
-
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
  * All rights reserved.
@@ -29,6 +27,8 @@ import com.cosylab.vdct.inspector.InspectableProperty;
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+import com.cosylab.vdct.inspector.InspectableProperty;
 
 /**
  * This type was created in VisualAge.

@@ -1254,6 +1254,8 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
  final String TEXTBOX_START = "#! "+DBResolver.VDCTTEXTBOX+"(";
 
  final String TEMPLATE_INSTANCE_START  = "#! "+DBResolver.TEMPLATE_INSTANCE+"(";
+ final String TEMPLATE_FIELD_START  = "#! "+DBResolver.TEMPLATE_FIELD+"(";
+
  final String NULL  = "null";
  	
  Enumeration e = elements.elements();
@@ -1418,8 +1420,8 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 				 	 comma + StringUtils.color2string(template.getColor()) +
 					 comma + quote /*+ template.getDescription()*/ + quote +
 					 ending);
-					 
-/*
+
+				// write fields (preserve order)
 	 			e2 = template.getSubObjectsV().elements();
 	 			while (e2.hasMoreElements())
 	 			{
@@ -1430,28 +1432,17 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 			 			field = (EPICSLink)obj;
 
 		 				String name = field.getFieldData().getName();
-				 		String value = field.getFieldData().getValue();
-	
-						VDBFieldData fd = null;
-						fd = (VDBFieldData)template.getTemplateData().getTemplate().getInputs().get(name);
-						if (fd==null) 
-							fd = (VDBFieldData)template.getTemplateData().getTemplate().getOutputs().get(name);
-						if (fd==null)
-						{
-							System.out.println("Internar error: field '"+name+"' not found in template definition of '"+template.getTemplateData().getTemplate().getId()+
-											   "' of template instance '"+templateName+"'. Skipping...");
-							continue;
-						}
 						
-						if (!value.equals(fd.getValue()))
-						 	file.writeBytes(TEMPLATE_VALUE_START+
-			 					 quote + templateName + quote +
-			 					 comma + quote + name + quote +
-								 comma + quote + value + quote +
-								 ending);
+					 	file.writeBytes(TEMPLATE_FIELD_START+
+		 					 quote + templateName + quote +
+		 					 comma + quote + name + quote +
+							 comma + StringUtils.color2string(field.getColor()) +
+							 comma + StringUtils.boolean2str(field.isRight()) +
+							 comma + field.getFieldData().getVisibility() +
+							 ending);
 		 			 }
 				 }					 
-*/
+
 			     file.writeBytes(nl);
 	 		}
 
