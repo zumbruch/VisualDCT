@@ -316,7 +316,7 @@ public void draw(Graphics g) {
 	ViewState view = ViewState.getInstance();
 
 	// forceReadraw does not force really
-	if (fastDrawing || /*fastDrawingOnce ||*/ drawOnlyHilitedOnce || !forceRedraw) {
+	if ((fastDrawing && !forceRedraw) || /*fastDrawingOnce ||*/ drawOnlyHilitedOnce || !forceRedraw) {
 		// copy devices buffer
 		copyCanvasImage(g);
 		//fastDrawingOnce=false;
@@ -1226,7 +1226,7 @@ public void mouseDragged(MouseEvent e) {
 			}
 
 			forceRedraw=true;
-			fastDrawing = false;
+	//		fastDrawing = false;
 			
 			recalculateNavigatorPosition();
 			blockNavigatorRedrawOnce = true;
