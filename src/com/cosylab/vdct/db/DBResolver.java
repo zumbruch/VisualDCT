@@ -333,32 +333,31 @@ public static String processComment(DBData data, EnhancedStreamTokenizer tokeniz
 					if (rd!=null)
 					{
 						fd=(DBFieldData)rd.getFields().get(str2);
-					 /*if (fd==null)
+					    if (fd==null)
 						{
 							// default or null (-> default will be set when converted to VDB) value to be set
+							// this code has to be here to preserve field order
 							fd = new DBFieldData(str2, null);
 							rd.addField(fd);
-						}*/
-						//this code is more error prone
-						if (fd!=null) {  
-							// read color
-							tokenizer.nextToken();
-							if (tokenizer.ttype == EnhancedStreamTokenizer.TT_NUMBER) fd.setColor(StringUtils.int2color((int)tokenizer.nval));
-							else throw (new DBGParseException(errorString, tokenizer, fileName));
-		
-							// read rotation
-							tokenizer.nextToken();
-							if (tokenizer.ttype == EnhancedStreamTokenizer.TT_NUMBER) fd.setRotated(((int)tokenizer.nval)!=0);
-							else throw (new DBGParseException(errorString, tokenizer, fileName));
-							
-							// read description
-							tokenizer.nextToken();
-							if ((tokenizer.ttype == EnhancedStreamTokenizer.TT_WORD)||
-								(tokenizer.ttype == DBConstants.quoteChar)) fd.setDescription(tokenizer.sval);
-							else throw (new DBGParseException(errorString, tokenizer, fileName));
-		
-							rd.addVisualField(fd);
 						}
+						
+						// read color
+						tokenizer.nextToken();
+						if (tokenizer.ttype == EnhancedStreamTokenizer.TT_NUMBER) fd.setColor(StringUtils.int2color((int)tokenizer.nval));
+						else throw (new DBGParseException(errorString, tokenizer, fileName));
+		
+						// read rotation
+						tokenizer.nextToken();
+						if (tokenizer.ttype == EnhancedStreamTokenizer.TT_NUMBER) fd.setRotated(((int)tokenizer.nval)!=0);
+						else throw (new DBGParseException(errorString, tokenizer, fileName));
+							
+						// read description
+						tokenizer.nextToken();
+						if ((tokenizer.ttype == EnhancedStreamTokenizer.TT_WORD)||
+							(tokenizer.ttype == DBConstants.quoteChar)) fd.setDescription(tokenizer.sval);
+						else throw (new DBGParseException(errorString, tokenizer, fileName));
+		
+						rd.addVisualField(fd);
 					}
 				}
 				
@@ -396,17 +395,17 @@ public static String processComment(DBData data, EnhancedStreamTokenizer tokeniz
 					if (rd!=null)
 					{
 						fd=(DBFieldData)rd.getFields().get(str2);
-						/*if (fd==null)
+						if (fd==null)
 						{
 							// default or null (-> default will be set when converted to VDB) value to be set
+							// this code has to be here to preserve field order
 							fd = new DBFieldData(str2, null);
 							rd.addField(fd);
-						}*/
-						if (fd!=null) {
-							tokenizer.nextToken();
-							if (tokenizer.ttype == EnhancedStreamTokenizer.TT_NUMBER) fd.setVisibility((int)tokenizer.nval);
-							else throw (new DBGParseException(errorString, tokenizer, fileName));
-						}
+						} 
+						
+						tokenizer.nextToken();
+						if (tokenizer.ttype == EnhancedStreamTokenizer.TT_NUMBER) fd.setVisibility((int)tokenizer.nval);
+						else throw (new DBGParseException(errorString, tokenizer, fileName));
 					}
 				}
 
