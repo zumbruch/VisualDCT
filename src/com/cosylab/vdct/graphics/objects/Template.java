@@ -61,7 +61,6 @@ import com.cosylab.vdct.vdb.*;
  * @author Matej
  */
 // TODO template - undo after destroy
-// TODO save fields positions, visibility (overriden value), colours 
 // TODO do not show hidden macros (with fields?) in properties or not?!
 // TODO make serialization of macro w/o vis. rep. work, but macro is defined only as visible object?!
 public class Template
@@ -83,6 +82,8 @@ public class Template
 	private static ImageIcon icon = null;
 
 	private CommentProperty commentProperty = null;
+
+	private boolean initialized = false; 
 
 	// properties field
 	protected int rfieldLabelX;
@@ -120,12 +121,20 @@ public class Template
 	protected int rightFields = 0;
 	
 	/**
+	 * @param parent
+	 * @param templateData
+	 */
+	public Template(ContainerObject parent, VDBTemplateInstance templateData) {
+		this(parent, templateData, true);
+	}
+
+	/**
 	 * Insert the method's description here.
 	 * Creation date: (21.12.2000 20:40:53)
 	 * @param parent com.cosylab.vdct.graphics.objects.ContainerObject
 	 * @param templateData The templateData to set
 	 */
-	public Template(ContainerObject parent, VDBTemplateInstance templateData) {
+	public Template(ContainerObject parent, VDBTemplateInstance templateData, boolean initializeFields) {
 		super(parent);
 		this.templateData = templateData;
 
@@ -135,7 +144,9 @@ public class Template
 		setWidth(Constants.TEMPLATE_WIDTH);
 		setHeight(Constants.TEMPLATE_INITIAL_HEIGHT);
 		
-		initializeLinkFields();		
+		if (initializeFields)
+			initializeLinkFields();
+					
 		//forceValidation();
 
 	}
@@ -856,24 +867,15 @@ private EPICSLink createLinkField(VDBFieldData field)
  * Insert the method's description here.
  * Creation date: (26.1.2001 17:19:47)
  */
-private void initializeLinkFields()
+public void initializeLinkFields()
 {
-	clear();
-
+	// set this flag before...
+	initialized = true;
+	
 	// ports
 	Enumeration e = templateData.getTemplate().getPortsV().elements();
 	while (e.hasMoreElements())
-	{
-		VDBPort port = (VDBPort)e.nextElement();
-		VDBTemplatePort tf = new VDBTemplatePort(getTemplateData(), port);
-
-		EPICSLink link = createLinkField(tf);
-		if (link!=null)
-		{
-			//link.setRight(true);
-			addSubObject(tf.getName(), link);
-		}
-	}
+		addPortField((VDBPort)e.nextElement());
 
 	portsID = getTemplateData().getTemplate().getPortsGeneratedID();
 
@@ -881,25 +883,50 @@ private void initializeLinkFields()
 	// macros
 	e = templateData.getTemplate().getMacrosV().elements();
 	while (e.hasMoreElements())
+		addMacroField((VDBMacro)e.nextElement());
+
+	macrosID = getTemplateData().getTemplate().getMacrosGeneratedID();
+	
+}
+
+/**
+ * @param port
+ */
+public EPICSLink addPortField(VDBPort port) {
+	// check if not already added (order preservation)
+	EPICSLink link = (EPICSLink)getSubObject(port.getName()); 
+	if (link==null)
 	{
-		VDBMacro macro = (VDBMacro)e.nextElement();
+		VDBTemplatePort tf = new VDBTemplatePort(getTemplateData(), port);
+	
+		link = createLinkField(tf);
+		if (link!=null)
+			addSubObject(tf.getName(), link);
+	}
+	return link;
+}
+
+/**
+ * @param macro
+ */
+public EPICSLink addMacroField(VDBMacro macro) {
+	// check if not already added (order preservation)
+	EPICSLink link = (EPICSLink)getSubObject(macro.getName()); 
+	if (link==null)
+	{
 		VDBTemplateMacro tf = new VDBTemplateMacro(getTemplateData(), macro);
 		
+		link = createLinkField(tf);
+		if (link!=null)
+			addSubObject(tf.getName(), link);
+
 		// transfer value from properties
 		String value = (String)templateData.getProperties().get(tf.getName());
 		if (value != null)
 			tf.setValue(value);
-		
-		EPICSLink link = createLinkField(tf);
-		if (link!=null)
-		{
-			//link.setRight(false);
-			addSubObject(tf.getName(), link);
-		}
+			
 	}
-
-	macrosID = getTemplateData().getTemplate().getMacrosGeneratedID();
-	
+	return link;
 }
 
 /**
@@ -977,10 +1004,7 @@ private void synchronizePortLinkFields()
 				VDBTemplatePort tf = new VDBTemplatePort(getTemplateData(), port);
 				EPICSLink link = createLinkField(tf);
 				if (link!=null)
-				{
-					link.setRight(true);
 					addSubObject(tf.getName(), link);
-				}
 			}
 		}
 		else
@@ -1103,10 +1127,7 @@ private void synchronizeMacroLinkFields()
 				VDBTemplateMacro tf = new VDBTemplateMacro(getTemplateData(), macro);
 				EPICSLink link = createLinkField(tf);
 				if (link!=null)
-				{
-					link.setRight(false);
 					addSubObject(tf.getName(), link);
-				}
 			}
 		}
 		else
@@ -1192,7 +1213,7 @@ public void fieldChanged(VDBFieldData field) {
 		templateData.getProperties().get(field.getName())!=null)
 			repaint=true;
 	
-	if (repaint) {
+	if (repaint && initialized) {
 		unconditionalValidation();
 		com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 	}
@@ -1801,6 +1822,7 @@ private Template.PopupMenuHandler createPopupmenuHandler() {
  */
 public void fieldSideChange(EPICSLink link, boolean isRight)
 {
+	System.out.println(link+": isRight="+isRight);
 	if (isRight)
 	{
 		leftFields--; rightFields++;
@@ -1810,8 +1832,11 @@ public void fieldSideChange(EPICSLink link, boolean isRight)
 		leftFields++; rightFields--;
 	}
 	
-	unconditionalValidation();
-	com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+	if (initialized)
+	{
+		unconditionalValidation();
+		com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+	}
 }
 
 /**
@@ -1838,14 +1863,17 @@ public void fieldVisibilityChange(VDBFieldData fieldData, boolean newVisible)
 			leftFields--;
 	}
 	
-	// dummy solution !!!
-	if (link instanceof TemplateEPICSMacro)
-		((TemplateEPICSMacro)link).visilibityChanged(newVisible);
-	else if (link instanceof TemplateEPICSPort)
-		((TemplateEPICSPort)link).visilibityChanged(newVisible);
+	// manageLinks will be called later
+	if (initialized)
+	{
+		if (link instanceof TemplateEPICSMacro)
+			((TemplateEPICSMacro)link).visilibityChanged(newVisible);
+		else if (link instanceof TemplateEPICSPort)
+			((TemplateEPICSPort)link).visilibityChanged(newVisible);
 		
-	unconditionalValidation();
-	com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+		unconditionalValidation();
+		com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+	}
 	
 }
 

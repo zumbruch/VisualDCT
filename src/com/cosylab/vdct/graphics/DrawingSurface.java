@@ -1714,9 +1714,45 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 					continue;
 				}			
 	
-				Template templ = new Template(null, templateInstance);
+				Template templ = new Template(null, templateInstance, false);
 				group.addSubObject(dbTemplate.getTemplateInstanceId(), templ, true);
 	
+				// add fields (to preserve order)
+				e2 = dbTemplate.getTemplateFields().elements();
+				while (e2.hasMoreElements())
+				{
+					DBTemplateField dtf = (DBTemplateField)e2.nextElement();
+					
+					// is it macro?
+					EPICSLink templateLink = null;
+					VDBMacro macro = (VDBMacro)templ.getTemplateData().getTemplate().getMacros().get(dtf.getName());
+					if (macro!=null)
+					{
+						templateLink = templ.addMacroField(macro);
+						continue;
+					}
+					
+					// is it port?
+					VDBPort port = (VDBPort)templ.getTemplateData().getTemplate().getPorts().get(dtf.getName());
+					if (port!=null)
+					{
+						templateLink = templ.addPortField(port);
+						continue;
+					}
+					
+					// apply GUI data
+					if (templateLink != null)
+					{
+						templateLink.setColor(dtf.getColor());
+						templateLink.setRight(dtf.isRight());
+						templateLink.getFieldData().setVisibility(dtf.getVisibility());
+					}
+
+				}
+				
+				// initialize rest fields (if any)
+				templ.initializeLinkFields();
+
 				//templ.setDescription(dbTemplate.getDescription());
 				//templ.setDescription(template.getDescription());
 				templ.setColor(dbTemplate.getColor());
@@ -1724,6 +1760,7 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 				//templ.forceValidation();
 				
 				tobeUpdated.add(templ);
+				
 			}
 			else if (obj instanceof DBEntry)
 			{
