@@ -82,14 +82,14 @@ public class DBDEntry {
 	public static String matchAndReplace(String value) {
 		if (value==null || value.indexOf('$')<0) return value;
 		
-		Pattern macrop = Pattern.compile("\\$\\(([^\\.\\$]+)\\)");
+		Pattern macrop = Pattern.compile("\\$\\(([^\\$]+)\\)");
 		
 		Matcher macro = macrop.matcher(value);
 		StringBuffer result=new StringBuffer();
 		while (macro.find()) {
 			String macron=macro.group(1);
 			
-			String replacement1 = (String)getProperties().get(macron);
+			String replacement1 = getProperties().getProperty(macron);
 			if (replacement1 == null) {
 				macro.appendReplacement(result, macron.replaceAll("\\$","\\\\\\$"));
 				continue;
@@ -98,7 +98,7 @@ public class DBDEntry {
 			
 			getProperties().remove(macron);  // to avoid infinite loop
 			String replacement2 = matchAndReplace(replacement1);
-			getProperties().put(macron, replacement2); // to speedup lookups
+			getProperties().setProperty(macron, replacement2); // to speedup lookups
 			
 			macro.appendReplacement(result, replacement2.replaceAll("\\$","\\\\\\$"));
 		}
@@ -137,7 +137,7 @@ public class DBDEntry {
 
 	public static Properties getProperties() {
 		if (properties==null) {
-			properties = System.getProperties();
+			properties = new Properties(System.getProperties());
 			
 			// imoport from epics release file
 			File f = new File(properties.getProperty("EPICS_BASE")+"/configure/RELEASE");

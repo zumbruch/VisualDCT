@@ -30,6 +30,7 @@ package com.cosylab.vdct;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Frame;
 import java.io.File;
 import java.util.Vector;
 
@@ -37,11 +38,11 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JViewport;
+import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -51,6 +52,7 @@ import com.cosylab.vdct.events.commands.GetGUIInterface;
 import com.cosylab.vdct.util.ComboBoxFileChooser;
 import com.cosylab.vdct.util.DBDEntry;
 import com.cosylab.vdct.util.PathSpecification;
+import com.cosylab.vdct.util.StringWriterDialog;
 import com.cosylab.vdct.util.UniversalFileFilter;
 
 /**
@@ -309,7 +311,8 @@ public void addDBDButton_ActionPerformed(java.awt.event.ActionEvent actionEvent)
 }
 
 public void addStringButton_ActionPerformed(java.awt.event.ActionEvent actionEvent) {
-	String str = JOptionPane.showInputDialog(this, "Enter string:");
+	Frame frame = (Frame)SwingUtilities.getAncestorOfClass(Frame.class, this);
+	String str = new StringWriterDialog(frame, true).showDialog();
 	if (str!=null) {
 					GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
 					try {
