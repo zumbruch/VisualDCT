@@ -31,6 +31,7 @@ package com.cosylab.vdct.db;
 import java.io.*;
 import java.util.*;
 import com.cosylab.vdct.Console;
+import com.cosylab.vdct.DataProvider;
 import com.cosylab.vdct.util.StringUtils;
 
 /**
@@ -160,22 +161,41 @@ public static void initializeTokenizer(StreamTokenizer tokenizer) {
 
 
 
-private static DBTemplate loadTemplate(DBData data, String templateFile, String referencedFromFile)
+private static String loadTemplate(DBData data, String templateFile, String referencedFromFile)
 {
-	/// !!! check if already loaded and cyclic ...
-		/// !! temp
+
+	/// !!! temp
 	String templateToResolve = com.cosylab.vdct.util.StringUtils.replaceFileName(referencedFromFile, templateFile);
 
+
+	// check if file already loaded
+	// !!!
+	if(DataProvider.getInstance().getLoadedDBs().contains(templateToResolve))
+	{
+		Console.getInstance().println("Template \""+templateFile+"\" already loaded...");
+		
+		// extract id (not a prefect solution)
+		// id is name
+		File file = new File(templateToResolve);
+		return file.getName();
+	}
+
+	// cyclic reference check
+	{
+	}
+	
 	Console.getInstance().println("Loading template \""+templateFile+"\"...");
 
 	DBData templateData = resolveDB(templateToResolve);
 	templateData.getTemplateData().setData(templateData);
 	data.addTemplate(templateData.getTemplateData());
+	
+	// add to loaded list
+	DataProvider.getInstance().getLoadedDBs().addElement(templateData.getTemplateData().getFileName());
 
 	Console.getInstance().println("Template \""+templateFile+"\" loaded.");
 
-
-	return templateData.getTemplateData();
+	return templateData.getTemplateData().getId();
 }
 
 
@@ -946,11 +966,11 @@ public static void processDB(DBData data, StreamTokenizer tokenizer, String file
 						(tokenizer.ttype == DBConstants.quoteChar)) str2 = tokenizer.sval;
 					else throw (new DBParseException("Invalid expand template instance name...", tokenizer, fileName));
 
-					DBTemplate loadedTemplate = loadTemplate(data, str, fileName);
+					String loadedTemplateId = loadTemplate(data, str, fileName);
 
 					//System.out.println("expand(\""+str+"\", "+str2+")\n{");
 
-					DBTemplateInstance ti = new DBTemplateInstance(str2, loadedTemplate.getId());
+					DBTemplateInstance ti = new DBTemplateInstance(str2, loadedTemplateId);
 					ti.setComment(comment);	comment = nullString;
 
 					processMacros(ti, tokenizer, fileName);
@@ -994,7 +1014,7 @@ public static void processDB(DBData data, StreamTokenizer tokenizer, String file
 					entry.setComment(comment);	comment = nullString;
 					data.addEntry(entry);
 
-					Console.getInstance().println("Warning: 'path' command is not supported...");
+					Console.getInstance().println("Warning: 'path' command is not yet supported...");
   				}
 				
 				/****************** addpath ********************/
@@ -1010,7 +1030,7 @@ public static void processDB(DBData data, StreamTokenizer tokenizer, String file
 					entry.setComment(comment);	comment = nullString;
 					data.addEntry(entry);
 
-					Console.getInstance().println("Warning: 'addpath' command is not supported...");
+					Console.getInstance().println("Warning: 'addpath' command is not yet supported...");
   				}
 
 	} catch (Exception e) {

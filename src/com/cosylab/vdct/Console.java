@@ -267,6 +267,7 @@ public void println() {
  */
 public void println(String text) {
 	getTextPane().append(text+"\n");
+	getTextPane().setCaretPosition(getTextPane().getText().length());
 	if (!isVisible()) setVisible(true);
 }
 /**
@@ -281,7 +282,8 @@ public void println(Throwable thr) {
 	System.err.println();
 	thr.printStackTrace();
 	System.err.println();
-	
+
+	getTextPane().setCaretPosition(getTextPane().getText().length());
 	if (!isVisible()) setVisible(true);
 }
 /**

@@ -752,9 +752,12 @@ public Object removeObject(String id) {
 		new com.cosylab.vdct.undo.DeleteAction((VisibleObject)object)
 	);
 */	
+	Vector structure = Group.getRoot().getStructure();
 	if (object instanceof SaveObject)
+	{
 		structure.remove(object);
-
+	}
+	
 	if (object instanceof com.cosylab.vdct.inspector.Inspectable)
 		com.cosylab.vdct.DataProvider.getInstance().fireInspectableObjectRemoved((com.cosylab.vdct.inspector.Inspectable)object);
 	return object;
@@ -1470,6 +1473,10 @@ private static void writeTemplateData(DataOutputStream stream) throws IOExceptio
 
 	VDBTemplate data = Group.getEditingTemplateData();
 	
+	// does not have template data (new template case)
+	if (data==null)
+		return; 
+	
  	// write comment (even if not template definition is needed)
  	if (data.getComment()!=null)
  		stream.writeBytes(nl+data.getComment());
@@ -1580,7 +1587,14 @@ public static void save(Group group2save, File file, NameManipulator namer, bool
 			found = true;
 	
 	if (!found)
-		Group.getRoot().getStructure().addElement(new DBTemplateEntry());
+	{
+		// put it after all DBEntry objects
+		int pos = 0;
+		i = Group.getRoot().getStructure().iterator();
+		while (i.hasNext() && (i.next() instanceof DBEntry))
+			pos++;
+		Group.getRoot().getStructure().insertElementAt(new DBTemplateEntry(), pos);
+	}
 
 	group2save.writeObjects(stream, namer, export);
 

@@ -145,6 +145,10 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 	int y2 = (int)(scale*in.getInY())-view.getRy();
 
 
+	// 
+	// !!! temporary "solution"
+	//
+
 	// inivsible mode
 	if (out.getMode() == OutLink.INVISIBLE_MODE)
 	{
@@ -164,6 +168,57 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 			g.drawLine(x2-s, y2, x2+s, y2);
 			g.drawLine(x2, y2-s, x2, y2+s);
 		}
+		
+		
+		Linkable descPoint = out;			
+		int r = (int)(LARGE_RECT*view.getScale());
+		int dx = tailLenOfR*r;
+			
+		String label = null;
+		validateFont(view);
+		if (font!=null) {
+			g.setFont(font);
+			Linkable target = null;
+			//else if (descPoint instanceof OutLink)
+			{
+				target = EPICSLinkOut.getStartPoint(descPoint);
+				// any special threatment ??
+				if (target instanceof Descriptable)
+					label = ((Descriptable)target).getDescription();
+			}
+				
+			if (label!=null) {
+				/*if (isRight) dx = 3*r; 
+				else*/ dx = -(fontMetrics.stringWidth(label)+2*r);
+				g.drawString(label, x1+dx, y1+dy);
+			}
+		}
+	
+	
+		descPoint = in;			
+		r = (int)(LARGE_RECT*view.getScale());
+		dx = tailLenOfR*r;
+			
+		if (font!=null) {
+			g.setFont(font);
+			Linkable target = null;
+	
+			//if (descPoint instanceof InLink)
+			{
+				target = EPICSLinkOut.getEndPoint(descPoint);
+				// any special threatment ??
+				if (target instanceof Descriptable)
+					label = ((Descriptable)target).getDescription();
+			}
+				
+			if (label!=null) {
+				/*if (isRight) dx = 3*r; 
+				else*/ dx = -(fontMetrics.stringWidth(label)+2*r);
+				g.drawString(label, x2+dx, y2+dy);
+			}
+		}
+		
+		
 		return;
 	}
 

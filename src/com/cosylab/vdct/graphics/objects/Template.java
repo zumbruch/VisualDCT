@@ -1160,7 +1160,7 @@ public void writeObjects(DataOutputStream file, NameManipulator namer, boolean e
 	 else
 	 {
 	 	// add this template substitutions (override existing one)
-	 	properties = namer.getSubstitutions();
+	 	properties = (Map)namer.getSubstitutions().clone();
 	 	properties.putAll(templateData.getProperties());
 	 }
 */
@@ -1174,7 +1174,7 @@ public void writeObjects(DataOutputStream file, NameManipulator namer, boolean e
 	 	properties = templateData.getProperties();
 	 else
 	 {
-	 	properties = templateData.getProperties();
+	 	properties = (Map)templateData.getProperties().clone();
 		
 		// update values
 	 	Iterator i = properties.keySet().iterator();
@@ -1215,8 +1215,16 @@ public void writeObjects(DataOutputStream file, NameManipulator namer, boolean e
 
 	 file.writeBytes("\n# expand(\""+getTemplateData().getTemplate().getFileName()+"\", "+templateName+")\n");
 
-	 getTemplateData().getTemplate().getGroup().writeObjects(file, newNamer, export);
-
+	 Group currentRoot = Group.getRoot();
+	 try
+	 {
+	 	Group.setRoot(getTemplateData().getTemplate().getGroup());
+	 	getTemplateData().getTemplate().getGroup().writeObjects(file, newNamer, export);
+	 }
+	 finally
+	 {
+	 	Group.setRoot(currentRoot);	
+	 }
 	 file.writeBytes("\n# end("+templateName+")\n");
 	 
 }

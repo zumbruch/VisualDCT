@@ -572,6 +572,19 @@ public void save(java.io.File file) throws IOException {
  }
 */ 
  Group.save(Group.getRoot(), file, false);
+
+ VDBTemplate data = Group.getEditingTemplateData();
+ if (data==null)
+ {
+ 	// create a new
+	data = new VDBTemplate(file.getName(), file.getAbsolutePath());
+	data.setPorts(new Hashtable());
+	data.setPortsV(new Vector());
+	data.setGroup(Group.getRoot());
+
+	
+	 Group.setEditingTemplateData(data);
+ } 
  
  // if ok
  drawingSurface.setModified(false);

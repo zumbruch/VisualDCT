@@ -59,6 +59,9 @@ public class DataProvider {
 	// edit masks
 	private Hashtable linkTypeConfigTable = null;
 	
+	// list of all loaded DBs
+	private Vector loadedDBs = null;
+	
 /**
  * DataProvider constructor comment.
  */
@@ -66,6 +69,8 @@ protected DataProvider() {
 	inspectableListeners = new Vector();
 	loadedDBDs = new Vector();
 	currentDBDs = new Vector();
+
+	loadedDBs = new Vector();
 
 	linkTypeConfigTable = new Hashtable();
 	loadDefaultLinkTypeConfig();
@@ -255,6 +260,15 @@ public Vector getDBDs()
 public Vector getLoadedDBDs()
 {
 	return loadedDBDs;
+}
+
+/**
+ * Returns the loadedDBs.
+ * @return Vector
+ */
+public Vector getLoadedDBs()
+{
+	return loadedDBs;
 }
 
 }

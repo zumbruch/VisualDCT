@@ -322,7 +322,7 @@ public static void processDBD(DBDData data, StreamTokenizer tokenizer, String fi
 				/****************** path ********************/
 				else if (tokenizer.sval.equalsIgnoreCase(PATH) ||
  						 tokenizer.sval.equalsIgnoreCase(ADDPATH))
-					Console.getInstance().println("Warning: 'path' and 'addpath' commands are not supported...");
+					Console.getInstance().println("Warning: 'path' and 'addpath' commands are not yet supported...");
 						
 				// driver, breaktable not read
 
