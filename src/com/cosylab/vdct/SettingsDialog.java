@@ -440,7 +440,8 @@ public void groupingCheckBox_ActionPerformed(java.awt.event.ActionEvent actionEv
  * Comment
  */
 public void groupingSeparatorTextField_KeyTyped(java.awt.event.KeyEvent keyEvent) {
-	if (getGroupingSeparatorTextField().getText().length()>=1)
+	if ((keyEvent.getKeyChar()!=8 && getGroupingSeparatorTextField().getText().length()>=1) &&
+		((getGroupingSeparatorTextField().getSelectedText()==null) || (getGroupingSeparatorTextField().getSelectedText().length()==0)))
 		keyEvent.setKeyChar('\0');
 	return;
 }
