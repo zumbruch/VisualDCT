@@ -33,6 +33,10 @@
 			<section>Added section about command line tool for generating flat databases.</section>
 		</modification>
 
+		<modification version="1.4" by="msekoranja" date="2004-11-16">
+			<section>Added details on VDCT configuration to running section.</section>
+		</modification>
+
 		<scope>
 			This document is a users manual of how to use VisualDCT and also contains some tips and ticks.
 		</scope>
@@ -52,9 +56,9 @@
 			   title="VisualDCT latest build"
 			   href="http://visualdct.cosylab.com/builds/VisualDCT/"
 			   author="Matej Sekoranja"
-			   date="2003"
+			   date="2004"
 			   publisher="Cosylab, Ltd."
-			   revision="2.4.1244"/>
+			   revision="2.4.1254"/>
 
 		<reference id="vdct_installation"
 			   title="Java Installation and Build Process of VisualDCT"
@@ -166,6 +170,14 @@
 				For saving configuration data Java Preferences API is used. This means configuration is kept in
 				a system depended configuration storage, e.g. registry when using Windows OS, <f>~/.java</f> (user) and <f>/etc/java</f> (system) on UNIX/Linux systems..
 			</p>
+			<p>
+				VisualDCT searches for plugins configuration in users home directory. If there is none, it looks into the
+				<kwd>VDCT_CONFIG_DIR</kwd> directory, where <kwd>VDCT_CONFIG_DIR</kwd> is an environment variable is used to define the default plugins configuration directory.
+				Default value of <kwd>VDCT_CONFIG_DIR</kwd> is <file>/etc/vdct</file>.
+			</p>
+			<code language="command line" id="cmdln">
+			  java -jar VisualDCT.jar -DVDCT_CONFIG_DIR=/users/devl/config/vdct test.dbd test.db<desc>An example of overriding default plugins configuration directory.</desc>
+			</code>
 		</section>
 
 		<section id="flatdb" title="Command Line Tool for Generating Flat Databases">
