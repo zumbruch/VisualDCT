@@ -28,10 +28,102 @@ package com.cosylab.vdct.vdb;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.util.ArrayList;
+import com.cosylab.vdct.graphics.objects.Group;
+
 /**
+ * Data object representing EPICS DB template.
+ * All data is obtained from DB (.template) file.
+ * <code>Group</code> contains template structure.
+ * The name of the group is "<name>.template". 
  * @author Matej
  */
 
 public class VDBTemplate
 {
+	
+	String description = null;
+	ArrayList inputs = null;
+	ArrayList outputs = null;
+	Group group = null;
+	
+	/**
+	 * Constructor for VDBTemplate.
+	 */
+	public VDBTemplate()
+	{
+	}
+
+	/**
+	 * Returns the description.
+	 * @return String
+	 */
+	public String getDescription()
+	{
+		return description;
+	}
+
+	/**
+	 * Returns the group.
+	 * @return Group
+	 */
+	public Group getGroup()
+	{
+		return group;
+	}
+
+	/**
+	 * Returns the inputs.
+	 * @return ArrayList
+	 */
+	public ArrayList getInputs()
+	{
+		return inputs;
+	}
+
+	/**
+	 * Returns the outputs.
+	 * @return ArrayList
+	 */
+	public ArrayList getOutputs()
+	{
+		return outputs;
+	}
+
+	/**
+	 * Sets the description.
+	 * @param description The description to set
+	 */
+	public void setDescription(String description)
+	{
+		this.description = description;
+	}
+
+	/**
+	 * Sets the group.
+	 * @param group The group to set
+	 */
+	public void setGroup(Group group)
+	{
+		this.group = group;
+	}
+
+	/**
+	 * Sets the inputs.
+	 * @param inputs The inputs to set
+	 */
+	public void setInputs(ArrayList inputs)
+	{
+		this.inputs = inputs;
+	}
+
+	/**
+	 * Sets the outputs.
+	 * @param outputs The outputs to set
+	 */
+	public void setOutputs(ArrayList outputs)
+	{
+		this.outputs = outputs;
+	}
+
 }

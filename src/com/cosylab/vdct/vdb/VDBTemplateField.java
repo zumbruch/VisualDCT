@@ -33,5 +33,12 @@ package com.cosylab.vdct.vdb;
  */
 public class VDBTemplateField extends VDBFieldData
 {
-
+	/**
+	 * Insert the method's description here.
+	 * Creation date: (1.2.2001 12:11:29)
+	 * @return java.lang.String
+	 */
+	public String getFullName() {
+		return super.getFullName();
+	}
 }

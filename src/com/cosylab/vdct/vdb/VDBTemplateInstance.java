@@ -28,10 +28,88 @@ package com.cosylab.vdct.vdb;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.util.ArrayList;
+import java.util.Hashtable;
+
 /**
  * @author Matej
  */
 public class VDBTemplateInstance
 {
+	VDBTemplate template = null;
+	Hashtable properties = null;
+	ArrayList inputs = null;
+	ArrayList outputs = null;
+	
+	/**
+	 * Constructor.
+	 */
+	public VDBTemplateInstance(VDBTemplate template)
+	{
+		this.template = template;
+	}
+		/**
+	 * Returns the inputs.
+	 * @return ArrayList
+	 */
+	public ArrayList getInputs()
+	{
+		return inputs;
+	}
+
+	/**
+	 * Returns the outputs.
+	 * @return ArrayList
+	 */
+	public ArrayList getOutputs()
+	{
+		return outputs;
+	}
+
+	/**
+	 * Returns the properties.
+	 * @return Hashtable
+	 */
+	public Hashtable getProperties()
+	{
+		return properties;
+	}
+
+	/**
+	 * Returns the template.
+	 * @return VDBTemplate
+	 */
+	public VDBTemplate getTemplate()
+	{
+		return template;
+	}
+
+	/**
+	 * Sets the inputs.
+	 * @param inputs The inputs to set
+	 */
+	public void setInputs(ArrayList inputs)
+	{
+		this.inputs = inputs;
+	}
+
+	/**
+	 * Sets the outputs.
+	 * @param outputs The outputs to set
+	 */
+	public void setOutputs(ArrayList outputs)
+	{
+		this.outputs = outputs;
+	}
+
+	/**
+	 * Sets the properties.
+	 * @param properties The properties to set
+	 */
+	public void setProperties(Hashtable properties)
+	{
+		this.properties = properties;
+	}
+
 
 }
