@@ -1520,8 +1520,7 @@ private static void writeTemplateData(DataOutputStream stream, NameManipulator n
 
 	// template block not needed
 	if ((data.getRealDescription()==null || data.getRealDescription().length()==0) && 
-		  data.getPorts().isEmpty())
-		 //data.getInputs().isEmpty() && data.getOutputs().isEmpty())
+		  data.getPorts().isEmpty() && data.getMacros().isEmpty())
 		return;
 	
 	// template start
