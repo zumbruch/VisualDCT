@@ -42,7 +42,7 @@ import java.awt.event.*;
  * Creation date: (29.1.2001 20:05:51)
  * @author Matej Sekoranja
  */
-public class Connector extends VisibleObject implements Descriptable, InLink, Movable, OutLink, Popupable {
+public class Connector extends VisibleObject implements Descriptable, InLink, Movable, OutLink, Popupable, Selectable {
 	private static final String modeString = "Mode";
 	private static final String normalString = "Normal";
 	private static final String invisibleString = "Invisible";
@@ -247,9 +247,16 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 						Constants.HILITE_COLOR : getColor());
 		*/
 		
+		if (view.isSelected(this))
+		{
+			g.setColor(Constants.PICK_COLOR);
+			g.fillRect(rrx, rry, rwidth, rheight);
+		}
+
 		Color c = getColor();
 		if (hilited)
 			c = (this==view.getHilitedObject()) ? Constants.HILITE_COLOR : c;
+
 		if (c==Constants.BACKGROUND_COLOR)
 			if (c==Color.black)
 				c=Color.white;

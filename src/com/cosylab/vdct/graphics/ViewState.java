@@ -142,6 +142,7 @@ public java.util.Vector getBlinkingObjects() {
  * Creation date: (27.4.2001 18:37:09)
  * @return int
  */
+
 public int getGridSize() {
 	return gridSize;
 }

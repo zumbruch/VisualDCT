@@ -49,7 +49,8 @@ public class Constants {
  	public final static String VDCT_PLUGINS_FILE = "VDCT_PLUGINS_FILE";
  	public final static String PLUGINS_FILE_NAME = ".vdctplugins.xml";
  	
-    public /*final*/ static char GROUP_SEPARATOR = ':';
+    public /*final*/ static char GROUP_SEPARATOR = '\0';
+    //public /*final*/ static char GROUP_SEPARATOR = ':';
     public final static char FIELD_SEPARATOR = '.';
     public final static String HARDWARE_LINK = "#";
 

@@ -302,6 +302,8 @@ public void moveConnectors(int dx, int dy) {
 	obj = e.nextElement();
 	if (obj instanceof Connector) {
 		con = (Connector)obj;
+		if (view.isSelected(con))
+			continue;	// will move by itself
 		InLink endpoint = EPICSLinkOut.getEndPoint(con);
 		/*OutLink startpoint = EPICSLinkOut.getStartPoint(con);
 		EPICSLinkOut lo = null;

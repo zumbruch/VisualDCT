@@ -42,10 +42,11 @@ public class Settings {
 	// preferences API class
 	private Preferences prefs;
 	
-	// caching
+	// caching (defaults)
 	private boolean snapToGrid = true;
 	private boolean showGrid = true;
 	private boolean navigator = true;
+	private boolean grouping = false;
 	
 /**
  * Settings constructor comment.
@@ -58,14 +59,17 @@ protected Settings() {
 	// Console.getInstance().println("o) No settings file loaded. Using defaults...");
 
 	// initialize buffered properties
-	snapToGrid = prefs.getBoolean("SnapToGrid", true);
-	showGrid = prefs.getBoolean("ShowGrid", true);
-	navigator = prefs.getBoolean("Navigator", true);
+	snapToGrid = prefs.getBoolean("SnapToGrid", snapToGrid);
+	showGrid = prefs.getBoolean("ShowGrid", showGrid);
+	navigator = prefs.getBoolean("Navigator", navigator);
+	grouping = prefs.getBoolean("Grouping", grouping);
 
-	String separator = prefs.get("GroupSeparator", null);
-	if (separator!=null && separator.length()>0)
-		Constants.GROUP_SEPARATOR = separator.charAt(0);
-		
+	if (grouping)
+	{
+		Constants.GROUP_SEPARATOR = (char)prefs.getInt("GroupSeparator", 0);
+		if (Constants.GROUP_SEPARATOR=='\0')
+			grouping = false;
+	}		
 }
 /**
  * Insert the method's description here.
@@ -81,7 +85,7 @@ public static java.lang.String getDefaultDir() {
  * Creation date: (27.4.2001 18:48:59)
  * @return int
  */
-public int getGridSize() {
+/*public int getGridSize() {
 	return prefs.getInt("GridSize", Constants.GRID_SIZE);
 }
 /**
@@ -100,6 +104,14 @@ public static Settings getInstance() {
  */
 public boolean getNavigator() {
 	return navigator;
+}
+/**
+ * Insert the method's description here.
+ * Creation date: (27.4.2001 18:50:50)
+ * @return boolean
+ */
+public boolean getGrouping() {
+	return grouping;
 }
 /**
  * Insert the method's description here.
@@ -175,6 +187,19 @@ public void setNavigator(boolean state) {
 }
 /**
  * Insert the method's description here.
+ * Creation date: (27.4.2001 18:46:17)
+ * @param state boolean
+ */
+public void setGrouping(boolean state) {
+	grouping = state;
+	prefs.putBoolean("Grouping", state);
+	sync();
+	
+	if (!grouping && Constants.GROUP_SEPARATOR!='\0')
+		setGroupSeparator('\0');
+}
+/**
+ * Insert the method's description here.
  * Creation date: (4.2.2001 11:59:58)
  * @param key java.lang.String
  * @param value java.lang.String
@@ -223,15 +248,31 @@ public void setToolbar(boolean state) {
 }
 /**
  * Insert the method's description here.
+ * Creation date: (27.4.2001 18:46:17)
+ * @param char group separator character
+ */
+public void setGroupSeparator(char sep) {
+	if (!grouping)
+		if (Constants.GROUP_SEPARATOR=='\0')
+			return;
+		else
+			sep = '\0';
+	
+	prefs.putInt("GroupSeparator", (int)(Constants.GROUP_SEPARATOR));
+	Constants.GROUP_SEPARATOR = sep;
+	sync();
+
+	if (grouping && Constants.GROUP_SEPARATOR=='\0')
+		setGrouping(false);
+}
+/**
+ * Insert the method's description here.
  * Creation date: (4.2.2001 11:32:36)
  * @return boolean
  */
 public boolean save() {
 	try
 	{
-		// save
-		prefs.put("GroupSeparator", String.valueOf(Constants.GROUP_SEPARATOR));
-
 		prefs.flush();
 		return true;
 	}

@@ -291,9 +291,10 @@ private javax.swing.JTextField getGroupingSeparatorTextField() {
 			ivjGroupingSeparatorTextField = new javax.swing.JTextField();
 			ivjGroupingSeparatorTextField.setName("GroupingSeparatorTextField");
 			ivjGroupingSeparatorTextField.setOpaque(false);
-			ivjGroupingSeparatorTextField.setBorder(javax.swing.BorderFactory.createEmptyBorder());
-			ivjGroupingSeparatorTextField.setText(":");
+			ivjGroupingSeparatorTextField.setBorder(javax.swing.BorderFactory.createLineBorder(java.awt.Color.black));
+			ivjGroupingSeparatorTextField.setText("");
 			ivjGroupingSeparatorTextField.setColumns(1);
+			ivjGroupingSeparatorTextField.setHorizontalAlignment(javax.swing.JLabel.CENTER);
 			ivjGroupingSeparatorTextField.setMargin(new java.awt.Insets(0, 2, 0, 1));
 			// user code begin {1}
 			// user code end
@@ -462,11 +463,11 @@ private void handleException(java.lang.Throwable exception) {
 /* WARNING: THIS METHOD WILL BE REGENERATED. */
 private void initConnections() throws java.lang.Exception {
 	// user code begin {1}
-	getGroupingCheckBox().setSelected(Constants.GROUP_SEPARATOR!='\0');
-	if (Constants.GROUP_SEPARATOR!='\0')
-		getGroupingSeparatorTextField().setText(String.valueOf(Constants.GROUP_SEPARATOR));
-	else
+	getGroupingCheckBox().setSelected(Settings.getInstance().getGrouping());
+	if (Constants.GROUP_SEPARATOR=='\0')
 		getGroupingSeparatorTextField().setText("");
+	else
+		getGroupingSeparatorTextField().setText(String.valueOf((char)Constants.GROUP_SEPARATOR));
 	// user code end
 	getJButton2().addActionListener(ivjEventHandler);
 	getGroupingCheckBox().addActionListener(ivjEventHandler);
@@ -522,11 +523,17 @@ public static void main(java.lang.String[] args) {
  * Comment
  */
 public void oKButton_ActionPerformed(java.awt.event.ActionEvent actionEvent) {
-	if (getGroupingCheckBox().isSelected() &&
-		getGroupingSeparatorTextField().getText().length()>0)
-		Constants.GROUP_SEPARATOR = getGroupingSeparatorTextField().getText().charAt(0);
+	Settings.getInstance().setGrouping(getGroupingCheckBox().isSelected());
+	
+	if (getGroupingSeparatorTextField().getText().length()>0)
+	{
+		Settings.getInstance().setGroupSeparator(getGroupingSeparatorTextField().getText().charAt(0));
+	}
 	else
-		Constants.GROUP_SEPARATOR = '\0';
+	{
+		Settings.getInstance().setGroupSeparator('\0');
+	}
+
 	dispose();
 }
 }

@@ -55,7 +55,8 @@ import com.cosylab.vdct.events.commands.*;
  */
 public class Record 
 	extends LinkManagerObject
-	implements Clipboardable, Descriptable, Flexible, Hub, Morphable, Movable, MultiInLink, Rotatable, Selectable, Popupable, Inspectable, SaveObject
+	implements Clipboardable, Descriptable, Flexible, Hub, Morphable, Movable,
+				MultiInLink, Rotatable, Selectable, Popupable, Inspectable, SaveObject, SelectableComponents
 {
 
 	//private final static String nullString = "";
@@ -853,6 +854,44 @@ public VisibleObject intersects(int px, int py) {
 		spotted = this;
 	return spotted;
 }
+
+/**
+ * Returned value inicates change
+ * Creation date: (21.12.2000 22:21:12)
+ * @return boolean anyNew
+ * @param x1 int
+ * @param y1 int
+ * @param x2 int
+ * @param y2 int
+ */
+public boolean selectComponentsCheck(int x1, int y1, int x2, int y2) {
+
+	int t;
+	if (x1>x2)
+		{ t=x1; x1=x2; x2=t; }
+	if (y1>y2)
+		{ t=y1; y1=y2; y2=t; }
+
+	ViewState view = ViewState.getInstance();
+	boolean anyNew = false;
+	
+	Enumeration e = subObjectsV.elements();
+	VisibleObject vo;
+	while (e.hasMoreElements()) {
+		vo = (VisibleObject)(e.nextElement());
+		if ((vo instanceof Selectable) && 
+			 (vo.intersects(x1, y1, x2, y2)!=null)) {
+				if (view.setAsSelected(vo)) anyNew = true;
+		}
+
+		//if (vo instanceof SelectableComponents) {
+		//	if (((SelectableComponents)vo).selectComponentsCheck(x1, y1, x2, y2)) anyNew = true;
+		//}
+	}
+
+	return anyNew;
+}
+
 /**
  * Insert the method's description here.
  * Creation date: (30.1.2001 11:47:53)

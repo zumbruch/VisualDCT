@@ -820,16 +820,16 @@ public boolean selectAllComponents() {
 
 	return anyNew;
 }
+
 /**
  * Returned value inicates change
  * Creation date: (21.12.2000 22:21:12)
- * @return boolean
+ * @return boolean anyNew
  * @param x1 int
  * @param y1 int
  * @param x2 int
  * @param y2 int
  */
- 
 public boolean selectComponentsCheck(int x1, int y1, int x2, int y2) {
 
 	int t;
@@ -849,10 +849,15 @@ public boolean selectComponentsCheck(int x1, int y1, int x2, int y2) {
 			 (vo.intersects(x1, y1, x2, y2)!=null)) {
 				if (view.setAsSelected(vo)) anyNew = true;
 		}
+
+		if (vo instanceof SelectableComponents) {
+			if (((SelectableComponents)vo).selectComponentsCheck(x1, y1, x2, y2)) anyNew = true;
+		}
 	}
 
 	return anyNew;
 }
+
 /**
  * Insert the method's description here.
  * Creation date: (28.1.2001 11:43:27)
