@@ -22,6 +22,10 @@
 			<section>Created.</section>
 		</modification>
 
+		<modification version="1.0" by="msekoranja" date="2003-07-18">
+			<section>Added hierarchy related data.</section>
+		</modification>
+
 		<scope>
 			This document specifies how VisualDCT stores its visual data about graphics layout.
 		</scope>
@@ -76,13 +80,6 @@
 				</code>
 			</section>
 
-			<section id="template" title="Template">
-				<code language="VisualDCT" id="templateRef">
-				  <desc>Template visual data</desc><![CDATA[
-			#! TemplateInstance("id", x, y, color, "desc")]]>
-				</code>
-			</section>
-
 			<section id="group" title="Group">
 				<code language="VisualDCT" id="groupRef">
 				  <desc>Group visual data</desc><![CDATA[
@@ -119,6 +116,37 @@
 				<code language="VisualDCT" id="connectorRef">
 				  <desc>Connector visual data</desc><![CDATA[
 			#! Connector("inLinkID", outLinkID, xpos, ypos, color, "description")]]>
+				</code>
+			</section>
+
+			<section id="template" title="Template">
+				<code language="VisualDCT" id="templateRef">
+				  <desc>Template visual data</desc><![CDATA[
+			#! TemplateInstance("id", x, y, color, "desc")]]>
+				</code>
+			</section>
+
+			<section id="templateField" title="Template Field">
+				<code language="VisualDCT" id="templateFieldRef">
+				  <desc>Template field visual data</desc><![CDATA[
+			#! TemplateField("template instance id", "fieldName", color, isRight, visibility)]]>
+				</code>
+			</section>
+
+			<section id="ports" title="Ports">
+				<code language="VisualDCT" id="portsRef">
+				  <desc>Ports field visual data</desc><![CDATA[
+			#! ConstantPort(portname, inLinkID, xpos, ypos, color, defaultVisibility)
+			#! InputPort(portname, inLinkID, xpos, ypos, color, defaultVisibility)
+			#! OutputPort(portname, inLinkID, xpos, ypos, color, defaultVisibility)]]>
+				</code>
+			</section>
+
+			<section id="macros" title="Macros">
+				<code language="VisualDCT" id="macrosRef">
+				  <desc>Macros field visual data</desc><![CDATA[
+			#! InputMacro(macroname, description, xpos, ypos, color, defaultVisibility)
+			#! OutputMacro(macroname, description, xpos, ypos, color, defaultVisibility)]]>
 				</code>
 			</section>
 
@@ -177,6 +205,13 @@
 				</code>
 			</section>
 	
+			<section id="view" title="View">
+				<code language="VisualDCT" id="viewRef">
+				  <desc>Workspace view</desc><![CDATA[
+			#! View(xoffset, yoffset, scale)]]>
+				</code>
+			</section>
+
 		   </section>
 
 
