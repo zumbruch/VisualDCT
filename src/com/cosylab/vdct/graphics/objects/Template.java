@@ -275,7 +275,7 @@ public class Template
 
 		  // fields
 
-		// TODO we do not have only ports anymore...
+		// TODO this will have to change
 		 int fieldRows = Math.max(templateData.getTemplate().getPorts().size(),
 		 						  templateData.getTemplate().getMacros().size());
 		  height += fieldRows * Constants.FIELD_HEIGHT;
@@ -827,7 +827,12 @@ private void initializeLinkFields()
 	{
 		VDBMacro macro = (VDBMacro)e.nextElement();
 		VDBTemplateMacro tf = new VDBTemplateMacro(getTemplateData(), macro);
-
+		
+		// transfer value from properties
+		String value = (String)templateData.getProperties().get(tf.getName());
+		if (value != null)
+			tf.setValue(value);
+		
 		EPICSLink link = createLinkField(tf);
 		if (link!=null)
 		{
@@ -1005,11 +1010,26 @@ private void synchronizeMacroLinkFields()
 				}
 				
 				if (key!=null)
+				{
 					removeObject(key.toString());
+					
+					// remove from properties
+					String keyStr = key.toString();
+					Iterator it = templateData.getProperties().keySet().iterator();
+					while (it.hasNext())
+					{
+						// !!! not perfect solution
+						String propertyName = it.next().toString();
+						if (propertyName.equalsIgnoreCase(keyStr))
+							templateData.removeProperty(propertyName);
+					}
+				}
 				else
 					System.out.println("Internal error...");
 					
 				addSubObject(tem.getFieldData().getName(), tem);
+				// add to properties
+				templateData.addProperty(tem.getFieldData().getName(), tem.getFieldData().getValue());
 
 				// update lookup table and fix source links 
 				tem.fixTemplateLink();
@@ -1056,6 +1076,9 @@ private void synchronizeMacroLinkFields()
 				link.destroyAndRemove();
 	
 				removeObject(link.getFieldData().getName());
+				
+				// remove from properties
+				templateData.removeProperty(link.getFieldData().getName());
 			}
 		}
 	}
@@ -1478,7 +1501,7 @@ public void writeObjects(DataOutputStream file, NameManipulator namer, boolean e
 							StringUtils.quoteIfMacro(getTemplateData().getName())
 						 + ") {"+nl);
 	
-		// macros
+		// macros (properties)
 		Map macros = getTemplateData().getProperties();
 		Iterator i = getTemplateData().getPropertiesV().iterator();
 		while (i.hasNext())

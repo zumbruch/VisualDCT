@@ -249,7 +249,16 @@ public boolean hasDefaultValue() {
  */
 public void setValue(java.lang.String newValue) {
 
+	// buffer value
 	super.setValue(newValue);
+
+	// mapping to properties 
+	if (hasDefaultValue())
+		templateInstance.removeProperty(macro.getName());
+	else if (!templateInstance.properties.containsKey(macro.getName()))
+		templateInstance.addProperty(macro.getName(), newValue);
+	else
+		templateInstance.getProperties().put(macro.getName(), newValue);
 
 	// field changed
 	Template visualTemplate = (Template)Group.getRoot().findObject(templateInstance.getName(), true);
@@ -262,6 +271,18 @@ public void setValue(java.lang.String newValue) {
 		InspectorManager.getInstance().updateProperty(visualTemplate, this);
 	}
 
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (9.12.2000 18:11:46)
+ * @return java.lang.String
+ */
+public java.lang.String getValue() {
+	if (!com.cosylab.vdct.plugin.debug.PluginDebugManager.isDebugState())
+		return value;
+	else
+		return debugValue;
 }
 
 }
