@@ -316,7 +316,7 @@ public static void extractTemplates(DBDData dbd, DBData db, VDBData vdb)
 {
 	Enumeration e;
 	DBTemplate dbTemplate;
-	e = db.getTemplates().elements();
+	e = db.getTemplatesV().elements();
 	while (e.hasMoreElements()) {
 		dbTemplate = (DBTemplate)(e.nextElement());
 

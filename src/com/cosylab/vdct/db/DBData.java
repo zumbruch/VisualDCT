@@ -50,6 +50,7 @@ public class DBData {
 	protected Hashtable links = null;
 	protected Hashtable connectors = null;
 	protected Hashtable templates = null;		// templates loaded by the way
+	protected Vector templatesV = null;		// templates loaded by the way
 	protected Hashtable templateInstances = null;
 	
 	protected DBView view = null;
@@ -72,6 +73,7 @@ public DBData(String id, String fileName) {
 	links = new Hashtable();
 	connectors = new Hashtable();
 	templates = new Hashtable();
+	templatesV = new Vector();
 	templateInstances = new Hashtable();
 	lines = new Hashtable();
 	boxes = new Hashtable();
@@ -172,6 +174,7 @@ public void addTemplateInstance(DBTemplateInstance ti) {
 public void addTemplate(DBTemplate t) {
 	if (!templates.containsKey(t.getId())) {
 		templates.put(t.getId(), t);
+		templatesV.addElement(t);
 	}
 	else
 		Console.getInstance().println("Warning: Template of '"+t.getId()+"' already exists, skiping...");
@@ -273,6 +276,15 @@ public Hashtable getTemplateInstances()
 public Hashtable getTemplates()
 {
 	return templates;
+}
+
+/**
+ * Returns the templates.
+ * @return Hashtable
+ */
+public Vector getTemplatesV()
+{
+	return templatesV;
 }
 
 	/**
