@@ -30,6 +30,7 @@ package com.cosylab.vdct.dbd;
 
 import java.util.*;
 import com.cosylab.vdct.Console;
+import com.cosylab.vdct.ConsoleInterface;
 
 /**
  * This type was created in VisualAge.
@@ -87,7 +88,7 @@ public void addRecord(DBDRecordData rd) {
 public boolean consistencyCheck(com.cosylab.vdct.db.DBData db) {
 	String illegalString;
 	
-	Console console = Console.getInstance();
+	ConsoleInterface console = Console.getInstance();
 	
 	console.println();
 	console.print("o) Checking consistency with DBD file...");

@@ -5383,7 +5383,7 @@ public static void main(java.lang.String[] args) {
 		else aVisualDCT.setDefaultDirectory(".");		// current dir
 		
 		/* Parameters */
-		Console console = Console.getInstance();
+		ConsoleInterface console = Console.getInstance();
 		console.silent("Loading VisualDCT v"+Version.VERSION+" build "+Version.BUILD+"...\n");
 
 		/* Recent files */

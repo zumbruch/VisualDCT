@@ -29,30 +29,39 @@ package com.cosylab.vdct;
  */
 
 /**
- * This is a factory design model.
- * 
- * @author ilist
- */
-public class Console {
+ *  This class is consequently extended from JFrame
+ * A better solution would be creating abstract Console and two descendants. 
+ */  
+public class StdoutConsole implements ConsoleInterface {
 
-	protected static ConsoleInterface instance = null;
+public void flush() {
+	// can't flush stdout in the same way
+	System.out.flush();
+}
 
-/**
- * Insert the method's description here.
- * Creation date: (9.12.2000 16:39:46)
- * @return com.cosylab.vdct.Console
- */
-public static ConsoleInterface getInstance() {
-	if (instance==null)
-		instance = new GUIConsole();
-	return instance;
+public void print(String text) {
+	System.out.print(text);
 }
-/**
- * This is a small trick to replace the default console.
- * 
- * @param instance instance that is used throughout the aplication
- */
-public static void setInstance(ConsoleInterface instance) {
-	Console.instance = instance;
+
+public void println() {
+	System.out.println();
 }
+
+public void println(String text) {
+	System.out.println(text);
+}
+
+public void println(Throwable thr) {
+	System.out.println(thr.toString()+"\n");
+	
+	// !!! some debug info in development phase
+	System.err.println();
+	thr.printStackTrace();
+	System.err.println();
+}
+
+public void silent(String string) {
+	System.out.print(string);
+}
+
 }
