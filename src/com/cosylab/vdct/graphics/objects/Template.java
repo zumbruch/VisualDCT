@@ -1634,8 +1634,9 @@ public void writeObjects(DataOutputStream file, NameManipulator namer, boolean e
 	 Map ports = preparePorts(getTemplateData().getTemplate().getGroup(), namer.getSubstitutions());
 
 	 // new macros
-	 Map properties = prepareSubstitutions(getTemplateData(), namer.getSubstitutions());
-
+	 // macros have to be made out of macros and ports (^^^ it's probably same with ports) 
+	 Map properties = prepareSubstitutions(getTemplateData(), namer.getSubstitutions(), namer.getPorts());
+	
 	 // new removedPrefix
 	 String removedPrefix = namer.getRemovedPrefix();
 	 
@@ -1688,14 +1689,15 @@ public void writeObjects(DataOutputStream file, NameManipulator namer, boolean e
  * Insert the method's description here.
  * @param substitutions <code>group</code> current substitutions
  */
-public static Map prepareSubstitutions(VDBTemplateInstance templateData, Map substitutions)
+public static Map prepareSubstitutions(VDBTemplateInstance templateData, Map substitutions, Map ports)
 {
 	 // Note:
  	 // the macro values given in an expand(){} statement should not be
 	 // automatically passed down into any templates that are expanded within the
 	 // lower level file unless they are explicitly named as macros there too. 
 	 Map properties = null;
-	 if (substitutions==null)
+			
+	 if (substitutions==null && ports==null)
 	 	properties = templateData.getProperties();
 	 else
 	 {
@@ -1706,7 +1708,10 @@ public static Map prepareSubstitutions(VDBTemplateInstance templateData, Map sub
 	 	while (i.hasNext())
 	 	{
 	 		Object key = i.next();
-		 	properties.put(key, VDBTemplateInstance.applyProperties(properties.get(key).toString(), substitutions));
+	 		String value = properties.get(key).toString();
+			if (substitutions != null) value = VDBTemplateInstance.applyProperties(value, substitutions);
+			if (ports != null) value = VDBTemplateInstance.applyPorts(value, ports);			
+		 	properties.put(key, value);
 	 	}
 	 }
 
@@ -1738,7 +1743,7 @@ public static Map preparePorts(Group group, Map substitutions)
 
 				// new macros
 				// !!! this is done twice - optimize with buffering
-	 			Map newSubstitutions = prepareSubstitutions(t.getTemplateData(), substitutions);
+	 			Map newSubstitutions = prepareSubstitutions(t.getTemplateData(), substitutions, null);
 
 				target = VDBTemplateInstance.applyProperties(target, newSubstitutions);
 				
