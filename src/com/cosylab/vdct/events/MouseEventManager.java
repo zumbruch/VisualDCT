@@ -31,6 +31,8 @@ package com.cosylab.vdct.events;
 import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
 
+import com.cosylab.vdct.util.DoubleClickProxy;
+
 /**
  * Insert the type's description here.
  * Creation date: (18.12.2000 16:23:24)
@@ -66,8 +68,9 @@ public void registerSubscreiber(String id, JComponent component) {
 public void subscribe(String subscriberID, MouseInputListener listener) {
 	JComponent comp = (JComponent)getSubscreiber().get(subscriberID);
 	if (comp!=null) {
-		comp.addMouseListener(listener);
-		comp.addMouseMotionListener(listener);
+		DoubleClickProxy proxy = new DoubleClickProxy(listener);
+		comp.addMouseListener(proxy);
+		comp.addMouseMotionListener(proxy);
 	}
 }
 /**

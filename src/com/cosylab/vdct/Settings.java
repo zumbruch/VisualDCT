@@ -28,6 +28,7 @@ package com.cosylab.vdct;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.awt.Toolkit;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.prefs.*;
@@ -53,6 +54,9 @@ public class Settings {
 	private boolean hierarhicalNames = false;
 	private boolean windowsPan = false;
 	
+	private int doubleClickSpeed = -1;
+	private int doubleClickSmudge = 4;
+	
 /**
  * Settings constructor comment.
  */
@@ -72,6 +76,9 @@ protected Settings() {
 	hierarhicalNames = prefs.getBoolean("HierarhicalNames", hierarhicalNames);
 	windowsPan = prefs.getBoolean("WindowsPan", windowsPan);
 
+	doubleClickSpeed = prefs.getInt("DoubleClickSpeed", -1);
+	doubleClickSmudge = prefs.getInt("DoubleClickSmudge", 4);
+	
 	if (grouping)
 	{
 		Constants.GROUP_SEPARATOR = (char)prefs.getInt("GroupSeparator", 0);
@@ -404,5 +411,50 @@ public void loadRecentFiles()
 		prefs.putBoolean("WindowsPan", b);
 		sync();
 	}
+
+	/**
+	 * @return
+	 */
+	public int getDoubleClickSmudge() {
+		return doubleClickSmudge;
+	}
+
+	/**
+	 * @return
+	 */
+	public int getDoubleClickSpeed() {
+		if (doubleClickSpeed == -1) {
+			doubleClickSpeed = 200;
+
+			try {
+				Integer multiclick = (Integer) Toolkit.getDefaultToolkit()
+				  .getDesktopProperty("awt.multiClickInterval");
+
+				if (multiclick != null) doubleClickSpeed = multiclick.intValue();
+						
+			} catch (Exception e) {
+			}
+		}
+
+		return doubleClickSpeed;
+	}
+
+	/**
+	 * @param i
+	 */
+	public void setDoubleClickSmudge(int i) {
+		doubleClickSmudge = i;
+		prefs.putInt("DoubleClickSmudge", doubleClickSmudge);
+		sync();
+	}
+
+	/**
+	 * @param i
+	 */
+	public void setDoubleClickSpeed(int i) {
+			doubleClickSpeed = i;
+			prefs.putInt("DoubleClickSpeed", doubleClickSpeed);
+			sync();
+	}	
 
 }
