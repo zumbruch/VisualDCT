@@ -2619,7 +2619,7 @@ private javax.swing.JCheckBoxMenuItem getFlat_ViewMenuItem() {
 private javax.swing.JDialog getGroupDialog() {
 	if (ivjGroupDialog == null) {
 		try {
-			ivjGroupDialog = new javax.swing.JDialog();
+			ivjGroupDialog = new javax.swing.JDialog(this);
 			ivjGroupDialog.setName("GroupDialog");
 			ivjGroupDialog.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 			ivjGroupDialog.setResizable(false);
@@ -3801,7 +3801,7 @@ private javax.swing.JTextField getNewNameTextField() {
 private javax.swing.JDialog getNewRecordDialog() {
 	if (ivjNewRecordDialog == null) {
 		try {
-			ivjNewRecordDialog = new javax.swing.JDialog();
+			ivjNewRecordDialog = new javax.swing.JDialog(this);
 			ivjNewRecordDialog.setName("NewRecordDialog");
 			ivjNewRecordDialog.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 			ivjNewRecordDialog.setResizable(false);
@@ -3823,7 +3823,7 @@ private javax.swing.JDialog getNewRecordDialog() {
 private javax.swing.JDialog getMorphingDialog() {
 	if (ivjMorphingDialog == null) {
 		try {
-			ivjMorphingDialog = new javax.swing.JDialog();
+			ivjMorphingDialog = new javax.swing.JDialog(this);
 			ivjMorphingDialog.setName("MorphingDialog");
 			ivjMorphingDialog.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 			ivjMorphingDialog.setResizable(false);
@@ -4234,7 +4234,7 @@ private javax.swing.JButton getRenameCancelButton() {
 private javax.swing.JDialog getRenameDialog() {
 	if (ivjRenameDialog == null) {
 		try {
-			ivjRenameDialog = new javax.swing.JDialog();
+			ivjRenameDialog = new javax.swing.JDialog(this);
 			ivjRenameDialog.setName("RenameDialog");
 			ivjRenameDialog.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 			ivjRenameDialog.setResizable(false);
