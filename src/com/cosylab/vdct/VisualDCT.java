@@ -5513,7 +5513,7 @@ public void navigatorMenuItem_ItemStateChanged(java.awt.event.ItemEvent itemEven
 }
 
 public void windowsPanMenuItem_ItemStateChanged(java.awt.event.ItemEvent itemEvent) {
-	GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
+	/*GetGUIInterface cmd = (GetGUIInterface)*/CommandManager.getInstance().getCommand("GetGUIMenuInterface");
 	/*if (cmd!=null)
 		cmd.getGUIMenuInterface().???(getWindowsPanMenuItem().isSelected());*/
 	Settings.getInstance().setWindowsPan(getWindowsPanMenuItem().isSelected());
