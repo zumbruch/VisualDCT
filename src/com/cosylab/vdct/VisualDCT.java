@@ -5542,6 +5542,12 @@ public boolean openDBD(String fileName, boolean allowDB) {
 	java.io.File theFile = null;
 	if (fileName==null) {
 		JFileChooser chooser = getfileChooser();
+
+		// SLS request
+		UniversalFileFilter filter2 = new UniversalFileFilter(
+			new String[] { "template" }, "EPICS template file");
+		chooser.addChoosableFileFilter(filter2);
+
 		String[] set;
 		String desc;
 		if (allowDB)
@@ -5558,6 +5564,7 @@ public boolean openDBD(String fileName, boolean allowDB) {
 		}
 		UniversalFileFilter filter = new UniversalFileFilter(set, desc);
 		chooser.addChoosableFileFilter(filter);
+
 		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		int retval = chooser.showOpenDialog(this);
 		if(retval == JFileChooser.APPROVE_OPTION)
@@ -5605,10 +5612,17 @@ public void openMenuItem_ActionPerformed() {
 	}
 	
 	JFileChooser chooser = getfileChooser();
+	chooser.resetChoosableFileFilters();
+
+	// SLS request
+	UniversalFileFilter filter2 = new UniversalFileFilter(
+		new String[] { "template" }, "EPICS template file");
+	chooser.addChoosableFileFilter(filter2);
+
 	UniversalFileFilter filter = new UniversalFileFilter(
 		new String[] {"db", "vdb"}, "EPICS DB files");
-	chooser.resetChoosableFileFilters();
 	chooser.addChoosableFileFilter(filter);
+	
 	chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 	chooser.setDialogTitle("Open DB");
 	int retval = chooser.showOpenDialog(this);
