@@ -33,6 +33,7 @@
   <news date="2003-07-18" developer="msekoranja" title="Package C (full graphical hierarchy support) release candidate."/>
   <news date="2003-09-27" developer="msekoranja" title="Minor bugfixes, debug plugin support."/>
   <news date="2004-03-30" developer="msekoranja" title="CapFast interoperability, minor bugfixes."/>
+  <news date="2004-08-30" developer="msekoranja" title="Package D1 release candidate."/>
  
   <!-- additional documentation -->
   <document url="http://visualdct.cosylab.com" comment="VisualDCT homepage where you can find all related manuals, articles and presentations." title="VisualDCT homepage"/>

@@ -38,6 +38,10 @@
 			<section>CapFast interoperability, minor bugfixes.</section>
 		</modification>
 
+		<modification version="2.4.1250" by="msekoranja" date="2004-08-30">
+			<section>Package D1 release candidate.</section>
+		</modification>
+
 		<scope>
 			This document is contains release notes of the current build.
 		</scope>
@@ -59,7 +63,7 @@
 			   author="Matej Sekoranja"
 			   date="2004"
 			   publisher="Cosylab, Ltd."
-			   revision="2.4.1249"/>
+			   revision="2.4.1250"/>
 
 	</head>
 	
@@ -68,12 +72,25 @@
 			<p>
 			Changes in current version:
 			<ul>
-			  <li>CapFast interoperability.</li>
-			  <li>Local/global macro property.</li>
+			  <li>Morphing.</li>
+			  <li>DrawingSurface canvas size.</li>
+			  <li>Popup for common actions.</li>
+			  <li>Linking bugfix.</li>
 			  <li>Create command line tool for flatterning hierarchical databases.</li>
-			  <li>Meaningful template instance name.</li>
-			  <li>Macros should not applied on template instance names.</li>
+			  <li>User settable screen pan direction.</li>
+			  <li>Local/global macro property.</li>
+			  <li>Resize (move record up) record text area and not move link area.</li>
 			  <li>Macros aren't always substituted.</li>
+			  <li>Produce hierarchical names like Capfast.</li>
+			  <li>Storing DBD path names.</li>
+			  <li>Allow option on record name lenght limit.</li>
+			  <li>Double-click problem.</li>
+			  <li>Printing large databases at a small zoom (text readability problem).</li>
+			  <li>Connectors undo managing.</li>
+			  <li>Link Highlighting.</li>
+			  <li>Speed up move.</li>
+			  <li>External links have wrong description.</li>
+			  <li>... and bugfixes.</li>
 			</ul>
 			</p>
 			<p>
@@ -89,8 +106,8 @@
 			Still there are quite a lot of ideas and nice features to be implemeted in the next releases:
 			<ul>
 			  <li>search for objects</li>
-			  <li>record morphing</li>
-			  <li>pop-up menu for commonly used commands on objects</li>
+			  <li>better printing support</li>
+			  <li>pure Java CA debugging plug-in</li>
 			  <li>...</li>
 			</ul>
 			</p>
