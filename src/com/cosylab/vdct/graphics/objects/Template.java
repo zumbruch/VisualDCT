@@ -64,7 +64,6 @@ import com.cosylab.vdct.vdb.*;
 // TODO save fields positions
 // TODO do not show hidden macros (with fields?) in properties or not?!
 // TODO make serialization of macro w/o vis. rep. work, but macro is defined only as visible object?!
-// TODO if macro/port is not visible, do not draw/show the link
 public class Template
 	extends LinkManagerObject
 	implements /*Descriptable,*/ Movable, Inspectable, Popupable, Flexible, Selectable, Clipboardable, Hub, MonitoredPropertyListener, SaveInterface, SaveObject

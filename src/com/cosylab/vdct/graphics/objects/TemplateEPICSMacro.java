@@ -461,9 +461,9 @@ public void valueChanged() {
 /**
  * @param visibile
  */
-public void visilibityChanged(boolean visibile)
+public void visilibityChanged(boolean visible)
 {
-	if (visibile)
+	if (visible)
 		((Template)getParent()).manageLink(getFieldData());
 	else
 	{

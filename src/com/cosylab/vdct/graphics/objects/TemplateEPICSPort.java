@@ -54,7 +54,7 @@ public class TemplateEPICSPort extends EPICSVarLink implements TemplateEPICSLink
  	private String lastUpdatedFullName = null;
 	private static GUISeparator portSeparator = null;
 	private static javax.swing.ImageIcon icon = null;
-
+	private static final String hiddenString = "<hidden>";
 /**
  * EPICSVarLink constructor comment.
  * @param parent com.cosylab.vdct.graphics.objects.ContainerObject
@@ -315,20 +315,9 @@ public String getDescription() {
 /**
  * @param visibile
  */
-public void visilibityChanged(boolean visibile)
+public void visilibityChanged(boolean visible)
 {
-/*
-	if (visibile)
-		((Template)getParent()).manageLink(getFieldData());
-	else
-	{
-		disconnected = true;
-		EPICSLinkOut.destroyChain(inlink, this);
-		setInput(null);
-		properties.setRecord(null);
-		properties.setVarName(null);
-	}
-*/
+	// superb solution using getLayerID()
 }
 
 /**
@@ -416,5 +405,16 @@ public boolean move(int dx, int dy) {
 	return moved;
 		
 }
+
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.graphics.objects.Linkable#getLayerID()
+	 */
+	public String getLayerID()
+	{
+		if (!isVisible())
+			return hiddenString;
+		else
+			return super.getLayerID();
+	}
 
 }
