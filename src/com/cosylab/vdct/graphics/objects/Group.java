@@ -29,9 +29,11 @@ package com.cosylab.vdct.graphics.objects;
  */
 
 import java.awt.*;
+import java.io.*;
 import java.util.*;
 import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.DataProvider;
+import com.cosylab.vdct.Version;
 import com.cosylab.vdct.graphics.*;
 import com.cosylab.vdct.inspector.InspectableProperty;
 
@@ -979,7 +981,17 @@ public void validateSubObjects() {
  * @param path2remove java.lang.String
  * @exception java.io.IOException The exception description.
  */
-public void writeObjects(java.io.DataOutputStream file, java.lang.String path2remove) throws java.io.IOException {
+public void writeObjects(java.io.DataOutputStream file, NameManipulator namer) throws java.io.IOException {
+	writeObjects(getSubObjectsV(), file, namer);
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (22.4.2001 21:51:25)
+ * @param file java.io.DataOutputStream
+ * @exception java.io.IOException The exception description.
+ */
+public static void writeObjects(Vector elements, java.io.DataOutputStream file, NameManipulator namer) throws java.io.IOException {
 
  Object obj;
  String name;
@@ -993,8 +1005,7 @@ public void writeObjects(java.io.DataOutputStream file, java.lang.String path2re
  int pos;
  VDBFieldData dtypFieldData;
  
- 	
- Enumeration e = getSubObjectsV().elements();
+ Enumeration e = elements.elements();
  while (e.hasMoreElements()) 
  	{
 	 	obj = e.nextElement();
@@ -1005,9 +1016,7 @@ public void writeObjects(java.io.DataOutputStream file, java.lang.String path2re
 			 	record = (Record)obj;
 	 			recordData = record.getRecordData();
 
-			 	name = StringUtils.quoteIfMacro(
-				 		StringUtils.removeBegining(recordData.getName(), path2remove)
-				 		);
+			 	name = StringUtils.quoteIfMacro(namer.getResolvedName(recordData.getName()));
 
 			 	// write comment
 			 	if (recordData.getComment()!=null)
@@ -1065,7 +1074,7 @@ public void writeObjects(java.io.DataOutputStream file, java.lang.String path2re
 								if ((fieldData.getType()==DBDConstants.DBF_INLINK) ||
 								    (fieldData.getType()==DBDConstants.DBF_OUTLINK) ||
 								    (fieldData.getType()==DBDConstants.DBF_FWDLINK))
-									file.writeBytes("  field("+fieldData.getName()+",\""+StringUtils.removeBegining(fieldData.getValue(), path2remove)+"\")\n");
+									file.writeBytes("  field("+fieldData.getName()+",\""+namer.getResolvedName(fieldData.getValue())+"\")\n");
 						 		 else
 	 								file.writeBytes("  field("+fieldData.getName()+",\""+fieldData.getValue()+"\")\n");
 				    
@@ -1095,16 +1104,51 @@ public void writeObjects(java.io.DataOutputStream file, java.lang.String path2re
  	 	else if (obj instanceof Group)
  	 		{
 			 	 group = (Group)obj;
-			 	 group.writeObjects(file, path2remove);
+			 	 group.writeObjects(file, namer);
 	 		}
  	    else if (obj instanceof Template)
  	 		{
 			 	 template = (Template)obj;
-			 	 template.writeObjects(file, path2remove);
+			 	 template.writeObjects(file, namer);
 	 		}
   }
 
 }
+
+/**
+ * Insert the method's description here.
+ */
+private static void writeTemplateIncludes(Vector elements, java.io.DataOutputStream file) throws IOException
+{
+	Object obj;
+	Template template;
+	 Vector templateFiles = new Vector();
+	 Enumeration et = elements.elements();
+	 while (et.hasMoreElements()) 
+	 {
+	 	obj = et.nextElement();
+	 	if (obj instanceof Template)
+	 	{
+	 		template = (Template)obj;
+	 		String tf = template.getTemplateData().getTemplate().getFileName();
+	 		if (!templateFiles.contains(tf))
+	 			templateFiles.addElement(tf);
+	 	}
+	 }
+	 
+	 if (templateFiles.size()>0)
+	 {
+		 file.writeBytes("\n");
+		 et = templateFiles.elements();
+		 while (et.hasMoreElements()) 
+		 {
+	 		 String fn = et.nextElement().toString().replace('\\', '/');
+		  	 file.writeBytes(DBResolver.INCLUDE+" \""+fn+"\"\n");
+		 }
+		 file.writeBytes("\n");
+	 }
+}
+
 /**
  * Insert the method's description here.
  * Creation date: (22.4.2001 21:51:25)
@@ -1112,7 +1156,18 @@ public void writeObjects(java.io.DataOutputStream file, java.lang.String path2re
  * @param path2remove java.lang.String
  * @exception java.io.IOException The exception description.
  */
-public void writeVDCTData(java.io.DataOutputStream file, java.lang.String path2remove) throws java.io.IOException {
+public void writeVDCTData(java.io.DataOutputStream file, NameManipulator namer) throws java.io.IOException {
+	writeVDCTData(getSubObjectsV(), file, namer);
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (22.4.2001 21:51:25)
+ * @param file java.io.DataOutputStream
+ * @param path2remove java.lang.String
+ * @exception java.io.IOException The exception description.
+ */
+public static void writeVDCTData(Vector elements, java.io.DataOutputStream file, NameManipulator namer) throws java.io.IOException {
 
  // write layout data
  // used format #! Record(recordname, xpos, ypos, color, rotated, "description")
@@ -1150,7 +1205,7 @@ public void writeVDCTData(java.io.DataOutputStream file, java.lang.String path2r
  final String TEMPLATE_PROPERTY_START  = "#! "+DBResolver.TEMPLATE_PROPERTY+"(";
  final String TEMPLATE_VALUE_START     = "#! "+DBResolver.TEMPLATE_VALUE+"(";
  	
- Enumeration e = getSubObjectsV().elements();
+ Enumeration e = elements.elements();
  while (e.hasMoreElements()) 
  	{
 	 	obj = e.nextElement();
@@ -1161,12 +1216,12 @@ public void writeVDCTData(java.io.DataOutputStream file, java.lang.String path2r
 
 	 			file.writeBytes(RECORD_START+
 			 		StringUtils.quoteIfMacro(
-				 		StringUtils.removeBegining(record.getRecordData().getName(), path2remove)
+				 		namer.getResolvedName(record.getRecordData().getName())
 				 	) + comma + record.getX() + comma + record.getY() + 
 				 	comma + StringUtils.color2string(record.getColor()) +
 				 	comma + StringUtils.boolean2str(record.isRight()) +
 					comma + quote + 
-					StringUtils.removeBegining(record.getDescription(), path2remove) + 
+					namer.getResolvedName(record.getDescription()) + 
 					quote +	")\n");
 
 	 			e2 = record.getSubObjectsV().elements();
@@ -1179,10 +1234,10 @@ public void writeVDCTData(java.io.DataOutputStream file, java.lang.String path2r
 
 			 			file.writeBytes(CONNECTOR_START+
 					 		StringUtils.quoteIfMacro(
-						 		StringUtils.removeBegining(connector.getID(), path2remove)
+						 		namer.getResolvedName(connector.getID())
 						 	) + comma +  
 					 		StringUtils.quoteIfMacro(
-						 		StringUtils.removeBegining(connector.getInput().getID(), path2remove)
+						 		namer.getResolvedName(connector.getInput().getID())
 						 	) + comma + connector.getX() + comma + connector.getY() + 
 						 	comma + StringUtils.color2string(connector.getColor()) +
 							comma + quote + /*!!!+ StringUtils.removeBegining(connector.getDescription(), path2remove) +*/ quote +
@@ -1196,11 +1251,11 @@ public void writeVDCTData(java.io.DataOutputStream file, java.lang.String path2r
 	
 				 			file.writeBytes(FIELD_START+
 						 		StringUtils.quoteIfMacro(
-							 		StringUtils.removeBegining(field.getFieldData().getFullName(), path2remove)
+							 		namer.getResolvedName(field.getFieldData().getFullName())
 							 	) + 
 							 	comma + StringUtils.color2string(field.getColor()) +
 							 	comma + StringUtils.boolean2str(field.isRight()) +
-								comma + quote + StringUtils.removeBegining(field.getDescription(), path2remove) + quote + 
+								comma + quote + namer.getResolvedName(field.getDescription()) + quote + 
 								ending);
 
 			 			 }
@@ -1210,10 +1265,10 @@ public void writeVDCTData(java.io.DataOutputStream file, java.lang.String path2r
 				 			if (link.getInput()!=null)
 				 				file.writeBytes(LINK_START+
 						 			StringUtils.quoteIfMacro(
-							 			StringUtils.removeBegining(link.getFieldData().getFullName(), path2remove)
+							 			namer.getResolvedName(link.getFieldData().getFullName())
 							 		) + comma + 
 					 				StringUtils.quoteIfMacro(
-						 				StringUtils.removeBegining(link.getInput().getID(), path2remove)
+						 				namer.getResolvedName(link.getInput().getID())
 							 		) +
 									ending);
 			 			 }
@@ -1228,7 +1283,7 @@ public void writeVDCTData(java.io.DataOutputStream file, java.lang.String path2r
 					if (vfd.getVisibility()!=InspectableProperty.NON_DEFAULT_VISIBLE)
 		 				file.writeBytes(VISIBILITY_START+
 				 			StringUtils.quoteIfMacro(
-					 			StringUtils.removeBegining(vfd.getFullName(), path2remove)
+					 			namer.getResolvedName(vfd.getFullName())
 					 		) + comma +
 					 		String.valueOf(vfd.getVisibility()) +
 							ending);
@@ -1241,18 +1296,18 @@ public void writeVDCTData(java.io.DataOutputStream file, java.lang.String path2r
 			 	 group = (Group)obj;
 			 	 file.writeBytes(GROUP_START+
  					StringUtils.quoteIfMacro(
-	 					StringUtils.removeBegining(group.getAbsoluteName(), path2remove)
+	 					namer.getResolvedName(group.getAbsoluteName())
 		 			 ) + comma + group.getX() + comma + group.getY() + 
 				 	 comma + StringUtils.color2string(group.getColor()) +
 					 comma + quote /*+ connector.getDescription() */+ quote +
 					 ending);
-			 	 group.writeVDCTData(file, path2remove);
+			 	 group.writeVDCTData(file, namer);
 	 		}
 
  	 	else if (obj instanceof Template)
  	 		{
 			 	 template = (Template)obj;
-				 String templateName = StringUtils.removeBegining(template.getName(), path2remove);
+				 String templateName = namer.getResolvedName(template.getName());
 
 			     file.writeBytes(nl);
 			 	 file.writeBytes(TEMPLATE_START+
@@ -1316,4 +1371,60 @@ public void writeVDCTData(java.io.DataOutputStream file, java.lang.String path2r
 
 
 }
+
+
+/**
+ * Insert the method's description here.
+ */
+private static void writeUsedDBDs(DataOutputStream stream) throws IOException
+{
+	 // write used DBDs
+	 stream.writeBytes(DBResolver.DBD_START);
+	 Enumeration edbd = DataProvider.getInstance().getDBDs().elements();
+	 while (edbd.hasMoreElements())
+	 {
+	 		String file = ((File)edbd.nextElement()).getAbsolutePath();
+	 		file = file.replace('\\', '/');
+			stream.writeBytes(DBResolver.DBD_ENTRY+file+"\")\n");
+	 }
+	 stream.writeBytes(DBResolver.DBD_END);
+}
+
+/**
+ * Insert the method's description here.
+ */
+public static void save(Group group2save, File file) throws IOException
+{
+	// create new namer	 
+	String path2remove = group2save.getAbsoluteName();
+	if (!path2remove.equals(nullString)) path2remove+=Constants.GROUP_SEPARATOR;
+	else path2remove = null;
+	
+	NameManipulator namer = new DefaultNamer(file, path2remove, null, null);
+	save(group2save, file, namer);
+}
+
+/**
+ * Insert the method's description here.
+ */
+public static void save(Group group2save, File file, NameManipulator namer) throws IOException
+{
+	DataOutputStream stream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
+	
+	stream.writeBytes("#! Generated by VisualDCT v"+Version.VERSION+"\n");
+	
+	writeUsedDBDs(stream);
+	writeTemplateIncludes(group2save.getSubObjectsV(), stream);
+
+	group2save.writeObjects(stream, namer);
+	
+	stream.writeBytes("\n#! Further lines contain data used by VisualDCT\n\n");
+	group2save.writeVDCTData(stream, namer);
+	
+	stream.flush();
+	stream.close();
+}
+
+
+
 }

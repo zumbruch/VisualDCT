@@ -827,7 +827,9 @@ public static void processDB(DBData rootData, StreamTokenizer tokenizer, String 
 					if (tokenizer.ttype == DBConstants.quoteChar) include_filename=tokenizer.sval;
 					else throw (new DBParseException("Invalid include_filename...", tokenizer, fileName));
 
-					include_filename = com.cosylab.vdct.util.StringUtils.replaceFileName(fileName, include_filename);
+					// if not absulute fileName, do not use relative path
+					if (!(include_filename.charAt(0)=='/' || include_filename.charAt(0)=='\\' || (include_filename.length()>1 && include_filename.charAt(1)==':')))
+						include_filename = com.cosylab.vdct.util.StringUtils.replaceFileName(fileName, include_filename);
 					
 					inctokenizer = getStreamTokenizer(include_filename);
 					if (inctokenizer!=null) processDB(data, inctokenizer, include_filename);
@@ -898,7 +900,9 @@ public static void processFields(DBRecordData rd, StreamTokenizer tokenizer, Str
 				if (tokenizer.ttype == DBConstants.quoteChar) include_filename=tokenizer.sval;
 				else throw (new DBParseException("Invalid include_filename...", tokenizer, fileName));
 
-				include_filename = com.cosylab.vdct.util.StringUtils.replaceFileName(fileName, include_filename);
+				// if not absulute fileName, do not use relative path
+				if (!(include_filename.charAt(0)=='/' || include_filename.charAt(0)=='\\' || (include_filename.length()>1 && include_filename.charAt(1)==':')))
+					include_filename = com.cosylab.vdct.util.StringUtils.replaceFileName(fileName, include_filename);
 
 				inctokenizer = getStreamTokenizer(include_filename);
 				if (inctokenizer!=null) processFields(rd, inctokenizer, include_filename);

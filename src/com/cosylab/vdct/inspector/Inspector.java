@@ -64,11 +64,11 @@ public class Inspector extends JDialog implements InspectableObjectsListener, In
 	private Inspectable toRemove = null;
 	private JTabbedPane ivjViewTabbedPane = null;
 
-	public final static int GUI_GROUP_ORDER = 0;  
-	public final static int SORT_ORDER = 1;
-	public final static int DBD_ORDER = 2;
+	private ArrayList currentTabs = null;
 
-	private int mode = GUI_GROUP_ORDER;
+	private static final String defaultString = "Default";
+
+	private int mode = 0;
 
 class IvjEventHandler implements java.awt.event.ItemListener {
 		public void itemStateChanged(java.awt.event.ItemEvent e) {
@@ -290,9 +290,10 @@ private javax.swing.JTabbedPane getViewTabbedPane() {
 			ivjViewTabbedPane.setName("ViewTabbedPane");
 			ivjViewTabbedPane.setTabPlacement(javax.swing.JTabbedPane.TOP);
 			// user code begin {1}
-			ivjViewTabbedPane.addTab("Group", null);
-			ivjViewTabbedPane.addTab("Alphabetical", null);
-			ivjViewTabbedPane.addTab("DBD Order", null);
+			ivjViewTabbedPane.addTab(defaultString, null);		
+		//	ivjViewTabbedPane.addTab("Group", null);
+		//	ivjViewTabbedPane.addTab("Alphabetical", null);
+		//	ivjViewTabbedPane.addTab("DBD Order", null);
 			
 			//show only tabbs
 			getViewTabbedPane().setMinimumSize(new Dimension(1, 24));
@@ -601,14 +602,17 @@ public void inspectObject(Inspectable object, boolean raise) {
 	if (isOutsider)
 		toRemove = object;
 	
-	
 	//com.cosylab.vdct.Console.getInstance().println("Inspecting: "+object);
 
 	setTitle("Inspector - "+inspectedObject.getName());
 	tableModel.setDataObject(inspectedObject);
 
 	getCommentTextArea().setProperty(inspectedObject.getCommentProperty());
+	getCommentTextArea().setCaretPosition(0);
 
+	// setup tabs
+	initializeTabs(object.getModeNames());
+	
 	if (raise) setVisible(true);
 }
 /**
@@ -784,10 +788,10 @@ private void mouseEvent(MouseEvent event, int row, int col)
 		// change visibility
 		if (col==0 && event.isPopupTrigger())
 		{
-			if (property!=null && property instanceof VDBFieldData)  ///!!! define interface
+			if (property!=null && property instanceof VDBFieldData)  ///!!! define interface!!
 			{
 				int visibility = property.getVisibility();
-				visibility = (visibility+1) % 3;
+				visibility = (visibility+1) % 3;						/// !!! who said there are only three modes?!
 				((VDBFieldData)property).setVisibility(visibility);
 				
 				getScrollPaneTable().tableChanged(new TableModelEvent(tableModel, row, row, col));
@@ -803,4 +807,26 @@ private void mouseEvent(MouseEvent event, int row, int col)
 	}
 }
 
+/**
+ */
+private void initializeTabs(ArrayList tabs)
+{
+	if (tabs!=currentTabs)			// is object is using flyweight pattern, this is a good optimization
+	{
+		currentTabs = tabs;
+		
+		getViewTabbedPane().removeAll();
+		if (currentTabs==null)
+			getViewTabbedPane().addTab(defaultString, null);		
+		else
+		{
+			Iterator i = currentTabs.iterator();
+			while (i.hasNext())
+				getViewTabbedPane().addTab(i.next().toString(), null);		
+		}
+		// TBD: set the last mode of the object (now it will always switch to the first one) !!!
+	}
 }
+
+}
+

@@ -31,6 +31,7 @@ package com.cosylab.vdct.vdb;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.TreeMap;
 
 /**
@@ -125,7 +126,7 @@ public class VDBTemplateInstance
 	 * @return String  
 	 */
 //	public static String applyProperties(String s, Hashtable properties)
-	public static String applyProperties(String s, TreeMap properties)
+	public static String applyProperties(String s, Map properties)
 	{
 		java.util.Iterator e = properties.keySet().iterator();
 //		Enumeration e = properties.keys();

@@ -1,4 +1,4 @@
-package com.cosylab.vdct.inspector;
+package com.cosylab.vdct.graphics.objects;
 
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
@@ -28,47 +28,38 @@ package com.cosylab.vdct.inspector;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import javax.swing.*;
+import java.util.Map;
+
+// StringUtils.removeBegining(name, path2remove);
 
 /**
  * Insert the type's description here.
- * Creation date: (10.1.2001 14:47:33)
+ * Creation date: (27.12.2000 11:47:12)
  * @author Matej Sekoranja
  */
-public interface Inspectable {
-/**
- * 
- * @return com.cosylab.vdct.inspector.InspectableProperty
- */
-InspectableProperty getCommentProperty();
-/**
- * Insert the method's description here.
- * Creation date: (10.1.2001 15:14:56)
- * @return javax.swing.Icon
- */
-public Icon getIcon();
-/**
- * Insert the method's description here.
- * Creation date: (10.1.2001 14:47:43)
- * @return java.lang.String
- */
-public String getName();
-/**
- * 
- * @return com.cosylab.vdct.inspector.InspectableProperty[]
- */
-com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode);
-/**
- * Obtains list of all mode names for this particular property.
- * Modes are numbered from 0-n.
- * Creation date: (11.1.2001 21:30:04)
- * @return java.util.ArrayList array of mode names - obtained using toString().
- */
-public java.util.ArrayList getModeNames();
-/**
- * Insert the method's description here.
- * Creation date: (10.1.2001 14:48:10)
- * @return java.lang.String
- */
-public String toString();
+public interface NameManipulator {
+
+	/**
+	 * Insert the type's description here.
+	 * Creation date: (27.12.2000 11:47:12)
+	 */	
+	public String getResolvedName(String name);
+	
+	/**
+	 * Insert the type's description here.
+	 * Creation date: (27.12.2000 11:47:12)
+	 */	
+	public String getAddedPrefix();
+
+	/**
+	 * Insert the type's description here.
+	 * Creation date: (27.12.2000 11:47:12)
+	 */	
+	public String getRemovedPrefix();
+
+	/**
+	 * Insert the type's description here.
+	 * Creation date: (27.12.2000 11:47:12)
+	 */	
+	public Map getSubstitutions();
 }

@@ -424,4 +424,14 @@ public void validateLink() {
 	if (outlinks.size()==0)
 		destroy();
 }
+
+/**
+ * @see com.cosylab.vdct.inspector.Inspectable#getModeNames()
+ */
+public ArrayList getModeNames()
+{
+	return null;
+}
+
+
 }

@@ -40,16 +40,16 @@ public interface SaveInterface {
  * Insert the method's description here.
  * Creation date: (22.4.2001 21:46:41)
  * @param file java.io.DataOutputStream
- * @param path2remove java.lang.String
+ * @param namer NameManipulator
  * @exception java.io.IOException The exception description.
  */
-void writeObjects(DataOutputStream file, String path2remove) throws java.io.IOException;
+void writeObjects(DataOutputStream file, NameManipulator namer) throws java.io.IOException;
 /**
  * Insert the method's description here.
  * Creation date: (22.4.2001 21:47:00)
  * @param file java.io.DataOutputStream
- * @param path2remove java.lang.String
+ * @param namer NameManipulator
  * @exception java.io.IOException The exception description.
  */
-void writeVDCTData(DataOutputStream file, String path2remove) throws java.io.IOException;
+void writeVDCTData(DataOutputStream file, NameManipulator namer) throws java.io.IOException;
 }

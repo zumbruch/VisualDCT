@@ -29,6 +29,8 @@ package com.cosylab.vdct.vdb;
  */
 
 import java.util.Hashtable;
+
+import com.cosylab.vdct.Console;
 import com.cosylab.vdct.graphics.objects.Group;
 
 /**
@@ -58,6 +60,9 @@ public class VDBTemplate
 	{
 		this.id = id;
 		this.fileName = fileName;
+		
+		Console.getInstance().println("Template '"+id+"' loaded, file '"+fileName+"'.");
+		
 	}
 
 	/**

@@ -28,19 +28,11 @@ package com.cosylab.vdct.graphics.objects;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Vector;
+import java.awt.*;
+import java.io.*;
+import java.util.*;
 
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 
 import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.db.DBResolver;
@@ -50,20 +42,9 @@ import com.cosylab.vdct.graphics.popup.Popupable;
 import com.cosylab.vdct.inspector.Inspectable;
 import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.inspector.InspectorManager;
-import com.cosylab.vdct.undo.ChangeTemplatePropertyAction;
-import com.cosylab.vdct.undo.CreateTemplatePropertyAction;
-import com.cosylab.vdct.undo.DeleteTemplatePropertyAction;
+import com.cosylab.vdct.undo.*;
 import com.cosylab.vdct.util.StringUtils;
-import com.cosylab.vdct.vdb.GUISeparator;
-import com.cosylab.vdct.vdb.LinkProperties;
-import com.cosylab.vdct.vdb.MonitoredActionProperty;
-import com.cosylab.vdct.vdb.MonitoredProperty;
-import com.cosylab.vdct.vdb.MonitoredPropertyListener;
-import com.cosylab.vdct.vdb.NameValueInfoProperty;
-import com.cosylab.vdct.vdb.VDBData;
-import com.cosylab.vdct.vdb.VDBFieldData;
-import com.cosylab.vdct.vdb.VDBTemplateField;
-import com.cosylab.vdct.vdb.VDBTemplateInstance;
+import com.cosylab.vdct.vdb.*;
 
 /**
  * Graphical representation of templates.
@@ -1104,21 +1085,40 @@ protected void destroyFields() {
 /**
  * @see com.cosylab.vdct.graphics.objects.SaveInterface#writeObjects(DataOutputStream, String)
  */
-public void writeObjects(DataOutputStream file, String path2remove)
+public void writeObjects(DataOutputStream file, NameManipulator namer)
 	throws IOException
 {
-	 String templateName = StringUtils.removeBegining(getName(), path2remove);
+	 String templateName = namer.getResolvedName(getName());
+ 	
+ 	 String fn = templateName.replace('\\', '_').replace(':', '_')+".db";
+
  	 file.writeBytes("\n#! "+DBResolver.VDCTSKIP+"\n");
- 	 file.writeBytes(DBResolver.INCLUDE+" \""+templateName+".db\"\n");
+ 	 file.writeBytes(DBResolver.INCLUDE+" \""+fn+"\"\n");
+
+	// meergre properties!!!!
+	
+	 fn = "D:/"+fn; // !!!
+	 File newFile = new File(fn);
+	 NameManipulator newNamer = new DefaultNamer(newFile, namer.getRemovedPrefix(), namer.getAddedPrefix(), templateData.getProperties());
+
+	 Group.save(getTemplateData().getTemplate().getGroup(), newFile, newNamer);
 }
 
 /**
  * @see com.cosylab.vdct.graphics.objects.SaveInterface#writeVDCTData(DataOutputStream, String)
  */
-public void writeVDCTData(DataOutputStream file, String path2remove)
+public void writeVDCTData(DataOutputStream file, NameManipulator namer)
 	throws IOException
 {
-	System.out.println("Template.writeVDCTData");
+	// No-op (done by writeObjects() method).
+}
+
+/**
+ * @see com.cosylab.vdct.inspector.Inspectable#getModeNames()
+ */
+public ArrayList getModeNames()
+{
+	return null;
 }
 
 }

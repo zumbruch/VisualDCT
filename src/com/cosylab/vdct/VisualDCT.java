@@ -3238,6 +3238,7 @@ private javax.swing.JButton getLineButton() {
 			lineButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
 			lineButton.setIcon(
 					new javax.swing.ImageIcon(getClass().getResource("/images/linen.gif")));
+			//lineButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
 			lineButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
 		} catch (java.lang.Throwable ivjExc) {
 			handleException(ivjExc);
@@ -4279,6 +4280,14 @@ private javax.swing.JToolBar getToolBarPane() {
 			ivjToolBarPane.add(getCutButton());
 			ivjToolBarPane.add(getCopyButton());
 			ivjToolBarPane.add(getPasteButton());
+			
+			JSeparator sep = new JSeparator();
+			//sep.setOrientation(JSeparator.VERTICAL);
+			Dimension dim = new Dimension(8, 0);
+			sep.setMaximumSize(dim);
+			sep.setMinimumSize(dim);
+			sep.setPreferredSize(dim);
+			ivjToolBarPane.add(sep);
 			ivjToolBarPane.add(getLineButton());
 			ivjToolBarPane.add(getBoxButton());
 			ivjToolBarPane.add(getTextBoxButton());

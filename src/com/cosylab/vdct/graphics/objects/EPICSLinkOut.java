@@ -537,4 +537,14 @@ public void validate() {
 public void valueChanged() {
 	updateLink();
 }
+
+/**
+ * @see com.cosylab.vdct.inspector.Inspectable#getModeNames()
+ */
+public ArrayList getModeNames()
+{
+	return null;
+}
+
+
 }

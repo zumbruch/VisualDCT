@@ -1493,7 +1493,7 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 				grp = rootGroup.createGroup(dbGrp.getName());
 			grp.setColor(dbGrp.getColor());
 			grp.setDescription(dbGrp.getDescription());
-			grp.move(dbGrp.getX(), dbGrp.getY());
+			grp.setX(dbGrp.getX()); grp.setY(dbGrp.getY());
 		}
 
 

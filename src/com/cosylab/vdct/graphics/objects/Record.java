@@ -77,7 +77,13 @@ public class Record
 	
 	private static GUISeparator alphaSeparator = null;
 	private static GUISeparator dbdSeparator = null;
-	
+
+	private static ArrayList modes = null;
+
+	public final static int GUI_GROUP_ORDER = 0;  
+	public final static int SORT_ORDER = 1;
+	public final static int DBD_ORDER = 2;
+
 /**
  * Group constructor comment.
  * @param parent com.cosylab.vdct.graphics.objects.ContainerObject
@@ -620,7 +626,7 @@ public OutLink getOutput() {
  */
 public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode) {
 	
-	if (mode == Inspector.GUI_GROUP_ORDER)
+	if (mode == GUI_GROUP_ORDER)
 	{
 		int size = 0;
 		VDBFieldData field;	Integer key;
@@ -664,13 +670,13 @@ public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode) 
 		all.copyInto(properties);
 		return properties;
 	}
-	else if ((mode == Inspector.SORT_ORDER) ||
-	 		  (mode == Inspector.DBD_ORDER)) {
+	else if ((mode == SORT_ORDER) ||
+	 		  (mode == DBD_ORDER)) {
 
 		VDBFieldData field;
 		Vector all = new Vector();
 
-		if (mode == Inspector.SORT_ORDER)
+		if (mode == SORT_ORDER)
 			all.addElement(getAlphaSeparator());
 		else
 			all.addElement(getDBDSeparator());
@@ -687,7 +693,7 @@ public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode) 
 		InspectableProperty[] properties = new InspectableProperty[all.size()];
 		all.copyInto(properties);
 	
-		if (mode == Inspector.SORT_ORDER)
+		if (mode == SORT_ORDER)
 			if (properties.length>1)
 				new com.cosylab.vdct.util.StringQuickSort().sort(properties, 1, properties.length-1);
 	
@@ -1284,5 +1290,26 @@ private void validateFields() {
 public VDBFieldData getField(String name) {
 	return recordData.getField(name);
 }
+
+/**
+ * @see com.cosylab.vdct.inspector.Inspectable#getModeNames()
+ */
+public ArrayList getModeNames()
+{
+	return this.getModes();
+}
+
+private static ArrayList getModes()
+{
+	if (modes==null)
+	{
+		modes = new ArrayList();
+		modes.add("Group");
+		modes.add("Alphabetical");
+		modes.add("DBD Order");
+	}
+	return modes;
+}
+
 
 }

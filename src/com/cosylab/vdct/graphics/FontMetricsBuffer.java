@@ -87,7 +87,7 @@ public static void createInstance(Graphics g) {
  */
 public Font getAppropriateFont(String fontName, int style, String str, int maxWidth, int maxHeight) {
   if (graphics==null) return null;
-  int size = MIN_SIZE;
+  int size = MIN_SIZE;				// find better starting point !!!
   FontData fl = null;
   FontData fd = getFontData(fontName, size, style);
   while ((size<=MAX_SIZE) &&
@@ -172,7 +172,7 @@ private String getID(Font font) {
  * @param style int
  */
 private String getID(String name, int size, int style) {
-	return name+"_"+size+"_"+style;
+	return name+"_"+size+"_"+style;		//!!!
 }
 /**
  * Must be initialized with createInstance(java.awt.Graphics)

@@ -1,4 +1,4 @@
-package com.cosylab.vdct.inspector;
+package com.cosylab.vdct.graphics.objects;
 
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
@@ -28,47 +28,71 @@ package com.cosylab.vdct.inspector;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import javax.swing.*;
+import java.io.File;
+import java.util.Map;
+
+import com.cosylab.vdct.util.StringUtils;
+import com.cosylab.vdct.vdb.VDBTemplateInstance;
 
 /**
  * Insert the type's description here.
- * Creation date: (10.1.2001 14:47:33)
+ * Creation date: (27.12.2000 11:47:12)
  * @author Matej Sekoranja
  */
-public interface Inspectable {
-/**
- * 
- * @return com.cosylab.vdct.inspector.InspectableProperty
- */
-InspectableProperty getCommentProperty();
-/**
- * Insert the method's description here.
- * Creation date: (10.1.2001 15:14:56)
- * @return javax.swing.Icon
- */
-public Icon getIcon();
-/**
- * Insert the method's description here.
- * Creation date: (10.1.2001 14:47:43)
- * @return java.lang.String
- */
-public String getName();
-/**
- * 
- * @return com.cosylab.vdct.inspector.InspectableProperty[]
- */
-com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode);
-/**
- * Obtains list of all mode names for this particular property.
- * Modes are numbered from 0-n.
- * Creation date: (11.1.2001 21:30:04)
- * @return java.util.ArrayList array of mode names - obtained using toString().
- */
-public java.util.ArrayList getModeNames();
-/**
- * Insert the method's description here.
- * Creation date: (10.1.2001 14:48:10)
- * @return java.lang.String
- */
-public String toString();
+public class DefaultNamer implements NameManipulator {
+
+	protected File file;
+	protected String removedPrefix;
+	protected String addedPrefix;
+	protected Map properties;
+
+	/**
+	 *
+	 */
+	public DefaultNamer(File file, String removedPrefix, String addedPrefix, Map properties)
+	{
+		this.file=file;
+		this.removedPrefix=removedPrefix;
+		this.addedPrefix=addedPrefix;
+		this.properties=properties;
+	} 
+
+	/**
+	 * @see com.cosylab.vdct.graphics.objects.NameManipulator#getAddedPrefix()
+	 */
+	public String getAddedPrefix()
+	{
+		return addedPrefix;
+	}
+
+	/**
+	 * @see com.cosylab.vdct.graphics.objects.NameManipulator#getRemovedPrefix()
+	 */
+	public String getRemovedPrefix()
+	{
+		return removedPrefix;
+	}
+
+	/**
+	 * @see com.cosylab.vdct.graphics.objects.NameManipulator#getResolvedName(String)
+	 */
+	public String getResolvedName(String name)
+	{
+		if (removedPrefix!=null)
+			name = StringUtils.removeBegining(name, removedPrefix); 
+		if (addedPrefix!=null)
+			name = addedPrefix + name;
+		if (properties!=null)
+			name = VDBTemplateInstance.applyProperties(name, properties);
+		return name;
+	}
+
+	/**
+	 * @see com.cosylab.vdct.graphics.objects.NameManipulator#getSubstitutions()
+	 */
+	public Map getSubstitutions()
+	{
+		return properties;
+	}
+
 }
