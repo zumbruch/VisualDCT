@@ -3936,7 +3936,7 @@ private javax.swing.JMenuItem getSave_As_GroupMenuItem() {
 		try {
 			ivjSave_As_GroupMenuItem = new javax.swing.JMenuItem();
 			ivjSave_As_GroupMenuItem.setName("Save_As_GroupMenuItem");
-			ivjSave_As_GroupMenuItem.setText("Save as Group...");
+			ivjSave_As_GroupMenuItem.setText("Save Group as...");
 			// user code begin {1}
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
@@ -4071,7 +4071,7 @@ private javax.swing.JMenuItem getGenerateAsGroupMenuItem() {
 		try {
 			ivjGenerateAsGroupMenuItem = new javax.swing.JMenuItem();
 			ivjGenerateAsGroupMenuItem.setName("GenerateAsGroupMenuItem");
-			ivjGenerateAsGroupMenuItem.setText("Generate as Group...");
+			ivjGenerateAsGroupMenuItem.setText("Generate Group as...");
 			// user code begin {1}
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
@@ -5726,21 +5726,21 @@ public void printAsPostScriptMenuItem_ActionPerformed()
 								+ "-0.5 -0.5 rmoveto 1 0 rlineto 0 1 rlineto -1 0 rlineto "
 								+ "0 -1 rlineto closepath fill} def\n";
 
-						postScriptGrid += "/posX " + (new Integer(sx)).toString() + " def\n"
-							+ "/posY " + (new Integer(y0)).toString() + " def\n"
+						postScriptGrid += "/posX " + String.valueOf(sx) + " def\n"
+							+ "/posY " + String.valueOf(y0) + " def\n"
 							+ "{\n{\ngridshape\n"
 						
-							+ "/posX posX " + (new Integer(gridSize)).toString() + " add def\n"
+							+ "/posX posX " + String.valueOf(gridSize) + " add def\n"
 						
-							+ "posX " + (new Integer(imageWidth)).toString()
+							+ "posX " + String.valueOf(imageWidth)
 							+ " ge {exit} if\n"
 						
 							+ "} loop\n"
-							+ "/posX " + (new Integer(sx)).toString() + " def\n"
+							+ "/posX " + String.valueOf(sx) + " def\n"
 						
-							+ "/posY posY " + (new Integer(gridSize)).toString() + " add def\n"
+							+ "/posY posY " + String.valueOf(gridSize) + " add def\n"
 						
-							+ "posY " + (new Integer(imageHeight)).toString()
+							+ "posY " + String.valueOf(imageHeight)
 							+ " ge {exit} if\n} loop\n";
 					}
 
@@ -5883,7 +5883,7 @@ public void save_As_GroupMenuItem_ActionPerformed() {
 		new String("db"), "DB File");
 	chooser.resetChoosableFileFilters();
 	chooser.addChoosableFileFilter(filter);
-	chooser.setDialogTitle("Save As Group");
+	chooser.setDialogTitle("Save Group as...");
 	chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
 	boolean jFileChooserConfirmed = false;
@@ -5935,7 +5935,7 @@ public void generateAsGroupMenuItem_ActionPerformed() {
 		new String("db"), "DB File");
 	chooser.resetChoosableFileFilters();
 	chooser.addChoosableFileFilter(filter);
-	chooser.setDialogTitle("Generate As Group");
+	chooser.setDialogTitle("Generate Group as...");
 	chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
 	boolean jFileChooserConfirmed = false;
@@ -5987,7 +5987,7 @@ public void save_AsMenuItem_ActionPerformed() {
 		new String("db"), "DB File");
 	chooser.resetChoosableFileFilters();
 	chooser.addChoosableFileFilter(filter);
-	chooser.setDialogTitle("Save As");
+	chooser.setDialogTitle("Save as...");
 	chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
 	boolean jFileChooserConfirmed = false;
@@ -6043,10 +6043,10 @@ public void save_AsMenuItem_ActionPerformed() {
 public void saveAsTemplateMenuItem_ActionPerformed() {
 	JFileChooser chooser = getfileChooser();
 	UniversalFileFilter filter = new UniversalFileFilter(
-		new String("db"), "DB File");
+		new String("template"), "Template File");
 	chooser.resetChoosableFileFilters();
 	chooser.addChoosableFileFilter(filter);
-	chooser.setDialogTitle("Save As");
+	chooser.setDialogTitle("Save as Template");
 	chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
 	boolean jFileChooserConfirmed = false;

@@ -220,4 +220,9 @@ void undo();
  * Creation date: (4.2.2001 15:08:21)
  */
 void ungroup();
+/**
+ * Insert the method's description here.
+ * Creation date: (4.2.2001 15:08:21)
+ */
+void updateGroupLabel();
 }

@@ -28,10 +28,23 @@ package com.cosylab.vdct.vdb;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.awt.Component;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Vector;
+import java.util.regex.Pattern;
+
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 
 import com.cosylab.vdct.Console;
+import com.cosylab.vdct.events.CommandManager;
+import com.cosylab.vdct.events.commands.GetGUIInterface;
 import com.cosylab.vdct.graphics.objects.Group;
+import com.cosylab.vdct.inspector.Inspectable;
+import com.cosylab.vdct.inspector.InspectableProperty;
+import com.cosylab.vdct.inspector.InspectorManager;
 
 /**
  * Data object representing EPICS DB template.
@@ -41,18 +54,149 @@ import com.cosylab.vdct.graphics.objects.Group;
  * @author Matej
  */
 
-public class VDBTemplate
+public class VDBTemplate implements Inspectable
 {
 	
-	String id = null;
-	String fileName = null;
-	String description = null;
-	Hashtable inputs = null;
-	Hashtable outputs = null;
-	Hashtable inputComments = null;
-	Hashtable outputComments = null;
-	Group group = null;
+	protected String id = null;
+	protected String fileName = null;
+	protected String description = null;
+	protected Hashtable inputs = null;
+	protected Hashtable outputs = null;
+	protected Hashtable inputComments = null;
+	protected Hashtable outputComments = null;
+	protected Group group = null;
 	
+	private static ImageIcon icon = null;
+
+	private static GUISeparator templateSeparator = null;
+	private static GUISeparator inputsSeparator = null;
+	private static GUISeparator outputsSeparator = null;
+
+	class DescriptionProperty implements InspectableProperty
+	{
+		private static final String name = "Description";
+		private static final String helpString = "Template description";
+		
+		/**
+		 * @see com.cosylab.vdct.inspector.InspectableProperty#allowsOtherValues()
+		 */
+		public boolean allowsOtherValues()
+		{
+			return false;
+		}
+
+		/**
+		 * @see com.cosylab.vdct.inspector.InspectableProperty#getEditPattern()
+		 */
+		public Pattern getEditPattern()
+		{
+			return null;
+		}
+
+		/**
+		 * @see com.cosylab.vdct.inspector.InspectableProperty#getHelp()
+		 */
+		public String getHelp()
+		{
+			return helpString;
+		}
+
+		/**
+		 * @see com.cosylab.vdct.inspector.InspectableProperty#getInitValue()
+		 */
+		public String getInitValue()
+		{
+			return null;
+		}
+
+		/**
+		 * @see com.cosylab.vdct.inspector.InspectableProperty#getName()
+		 */
+		public String getName()
+		{
+			return name;
+		}
+
+		/**
+		 * @see com.cosylab.vdct.inspector.InspectableProperty#getSelectableValues()
+		 */
+		public String[] getSelectableValues()
+		{
+			return null;
+		}
+
+		/**
+		 * @see com.cosylab.vdct.inspector.InspectableProperty#getToolTipText()
+		 */
+		public String getToolTipText()
+		{
+			return null;
+		}
+
+		/**
+		 * @see com.cosylab.vdct.inspector.InspectableProperty#getValue()
+		 */
+		public String getValue()
+		{
+			return getDescription();
+		}
+
+		/**
+		 * @see com.cosylab.vdct.inspector.InspectableProperty#getVisibility()
+		 */
+		public int getVisibility()
+		{
+			return InspectableProperty.UNDEFINED_VISIBILITY;
+		}
+
+		/**
+		 * @see com.cosylab.vdct.inspector.InspectableProperty#isEditable()
+		 */
+		public boolean isEditable()
+		{
+			return true;
+		}
+
+		/**
+		 * @see com.cosylab.vdct.inspector.InspectableProperty#isSepatator()
+		 */
+		public boolean isSepatator()
+		{
+			return false;
+		}
+
+		/**
+		 * @see com.cosylab.vdct.inspector.InspectableProperty#isValid()
+		 */
+		public boolean isValid()
+		{
+			return true;
+		}
+
+		/**
+		 * @see com.cosylab.vdct.inspector.InspectableProperty#popupEvent(Component, int, int)
+		 */
+		public void popupEvent(Component component, int x, int y)
+		{
+		}
+
+		/**
+		 * @see com.cosylab.vdct.inspector.InspectableProperty#setValue(String)
+		 */
+		public void setValue(String value)
+		{
+			setDescription(value);
+		}
+
+		/**
+		 * @see com.cosylab.vdct.inspector.InspectableProperty#toString(String)
+		 */
+		public String toString()
+		{
+			return name;
+		}
+	}
+
 	/**
 	 * Constructor for VDBTemplate.
 	 */
@@ -107,7 +251,20 @@ public class VDBTemplate
 	 */
 	public void setDescription(String description)
 	{
+		boolean update = false;
+		if (this.description!=null && !this.description.equals(description))
+			update=true;
+			
 		this.description = description;
+
+		if (update)
+		{
+			InspectorManager.getInstance().updateObject(this);
+			/// !!!
+			com.cosylab.vdct.VisualDCT.getInstance().updateLoadLabel();			
+		    GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
+		    cmd.getGUIMenuInterface().updateGroupLabel();
+		}
 	}
 
 	/**
@@ -189,6 +346,114 @@ public class VDBTemplate
 	public void setOutputComments(Hashtable outputComments)
 	{
 		this.outputComments = outputComments;
+	}
+
+	/**
+	 * @see com.cosylab.vdct.inspector.Inspectable#getCommentProperty()
+	 */
+	public InspectableProperty getCommentProperty()
+	{
+		return null;
+	}
+
+	/**
+	 * @see com.cosylab.vdct.inspector.Inspectable#getIcon()
+	 */
+	public Icon getIcon()
+	{
+		if (icon==null)
+			icon = new javax.swing.ImageIcon(getClass().getResource("/images/template.gif"));
+		return icon;
+	}
+
+	/**
+	 * @see com.cosylab.vdct.inspector.Inspectable#getModeNames()
+	 */
+	public ArrayList getModeNames()
+	{
+		return null;
+	}
+
+	/**
+	 * @see com.cosylab.vdct.inspector.Inspectable#getName()
+	 */
+	public String getName()
+	{
+		return id;
+	}
+
+	/**
+	 * Insert the method's description here.
+	 * Creation date: (3.2.2001 13:07:04)
+	 * @return com.cosylab.vdct.vdb.GUISeparator
+	 */
+	public static com.cosylab.vdct.vdb.GUISeparator getTemplateSeparator() {
+		if (templateSeparator==null) templateSeparator = new GUISeparator("Template");
+		return templateSeparator;
+	}
+	
+	/**
+	 * Insert the method's description here.
+	 * Creation date: (3.2.2001 13:07:04)
+	 * @return com.cosylab.vdct.vdb.GUISeparator
+	 */
+	public static com.cosylab.vdct.vdb.GUISeparator getInputsSeparator() {
+		if (inputsSeparator==null) inputsSeparator = new GUISeparator("Inputs");
+		return inputsSeparator;
+	}
+	
+	/**
+	 * Insert the method's description here.
+	 * Creation date: (3.2.2001 13:07:04)
+	 * @return com.cosylab.vdct.vdb.GUISeparator
+	 */
+	public static com.cosylab.vdct.vdb.GUISeparator getOutputsSeparator() {
+		if (outputsSeparator==null) outputsSeparator = new GUISeparator("Outputs");
+		return outputsSeparator;
+	}
+
+
+	/**
+	 * @see com.cosylab.vdct.inspector.Inspectable#getProperties(int)
+	 */
+	public InspectableProperty[] getProperties(int mode)
+	{
+		Vector items = new Vector();
+
+		items.addElement(getTemplateSeparator());
+		items.addElement(new NameValueInfoProperty("Class", id));
+		items.addElement(new NameValueInfoProperty("FileName", fileName));
+		items.addElement(new DescriptionProperty());
+
+		items.addElement(getInputsSeparator());
+		Enumeration e = getInputs().keys();
+		while (e.hasMoreElements())
+		{
+			String key = e.nextElement().toString();
+			VDBFieldData data = (VDBFieldData)getInputs().get(key);
+			items.addElement(new NameValueInfoProperty(key, data.getFullName()));
+		}
+		
+		items.addElement(getOutputsSeparator());
+		e = getOutputs().keys();
+		while (e.hasMoreElements())
+		{
+			String key = e.nextElement().toString();
+			VDBFieldData data = (VDBFieldData)getOutputs().get(key);
+			items.addElement(new NameValueInfoProperty(key, data.getFullName()));
+		}
+		
+		InspectableProperty[] properties = new InspectableProperty[items.size()];
+		items.copyInto(properties);
+		return properties;
+	}
+
+	/**
+	 * Insert the method's description here.
+	 * Creation date: (10.1.2001 14:49:50)
+	 */
+	public String toString() {
+		return "Template: " + description + " [" + id + "]";
 	}
 
 }

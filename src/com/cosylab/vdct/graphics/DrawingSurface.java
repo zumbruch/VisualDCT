@@ -159,6 +159,7 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 	private static final String newLineString = "New line";
 	private static final String newBoxString = "New box";
 	private static final String newTextBoxString = "New textbox";
+	private static final String templatePropertiesString = "Template properties...";
 
 	private LineVertex lineVertex = null;
 	private BoxVertex boxVertex = null;
@@ -166,7 +167,7 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 
 	private Stack viewStack = null;	
 	private Stack templateStack = null;	
-
+	
 /**
  * DrawingSurface constructor comment.
  */
@@ -560,6 +561,9 @@ public void initializeWorkspace() {
 	if (Group.getRoot()!=null)
 		Group.getRoot().getLookupTable().clear();
 
+	viewStack.clear();
+	templateStack.clear();
+
 	setModified(false);
 	Group group = new Group(null);
 	group.setAbsoluteName("");
@@ -716,64 +720,7 @@ public void mouseClicked(MouseEvent e) {
 			}
 			else if (e.getClickCount()==1 && e.getButton()==MouseEvent.BUTTON3)
 			{
-				
-				ActionListener al = new ActionListener()
-				{
-					public void actionPerformed(ActionEvent e) {
-						String action = e.getActionCommand();
-						if (action.equals(newRecordString))
-							CommandManager.getInstance().execute("ShowNewDialog");
-						else if (action.equals(newLineString))
-							createLine();
-						else if (action.equals(newBoxString))
-							createBox();
-						else if (action.equals(newTextBoxString))
-							createTextBox();
-						else
-							createTemplateInstance(null, action, true);
-					}
-			
-				};
-								
-				JPopupMenu popUp = new JPopupMenu();
-				
-				JMenuItem item = new JMenuItem(newRecordString);
-				item.addActionListener(al);
-				popUp.add(item);
-				
-				JMenu templatesMenu = new JMenu(newTemplesString);
-				popUp.add(templatesMenu);
-				
-				// add templates
-				Enumeration templates = VDBData.getTemplates().keys();
-				while (templates.hasMoreElements())
-				{
-					String key = templates.nextElement().toString();
-					JMenuItem item2 = new JMenuItem(((VDBTemplate)VDBData.getTemplates().get(key)).getDescription());
-					item2.setActionCommand(key);
-					item2.addActionListener(al);
-					templatesMenu.add(item2);
-				}	
-
-				if (templatesMenu.getItemCount()==0)
-					templatesMenu.setEnabled(false);
-
-				popUp.add(new JSeparator());
-
-				JMenuItem lineMenuItem = new JMenuItem(newLineString);
-				lineMenuItem.addActionListener(al);
-				popUp.add(lineMenuItem);
-
-				JMenuItem boxMenuItem = new JMenuItem(newBoxString);
-				boxMenuItem.addActionListener(al);
-				popUp.add(boxMenuItem);
-				
-				JMenuItem textboxMenuItem = new JMenuItem(newTextBoxString);
-				textboxMenuItem.addActionListener(al);
-				popUp.add(textboxMenuItem);
-
-				popUp.show(getWorkspacePanel(), e.getX(), e.getY());
-				
+				showPopup(e);
 			}
 			else if (e.getClickCount()>=2)
 			{
@@ -796,6 +743,86 @@ public void mouseClicked(MouseEvent e) {
 			
 	}
 }
+
+/**
+ * Insert the method's description here.
+ * Creation date: (1.5.2001 17:51:29)
+ */
+private void showPopup(MouseEvent e)
+{
+	ActionListener al = new ActionListener()
+	{
+		public void actionPerformed(ActionEvent e) {
+			String action = e.getActionCommand();
+			if (action.equals(newRecordString))
+				CommandManager.getInstance().execute("ShowNewDialog");
+			else if (action.equals(newLineString))
+				createLine();
+			else if (action.equals(newBoxString))
+				createBox();
+			else if (action.equals(newTextBoxString))
+				createTextBox();
+			else if (action.equals(templatePropertiesString))
+				InspectorManager.getInstance().requestInspectorFor(Group.getEditingTemplateData());
+			else
+				createTemplateInstance(null, action, true);
+		}
+	
+	};
+					
+	JPopupMenu popUp = new JPopupMenu();
+	
+	JMenuItem item = new JMenuItem(newRecordString);
+	item.addActionListener(al);
+	popUp.add(item);
+	
+	JMenu templatesMenu = new JMenu(newTemplesString);
+	popUp.add(templatesMenu);
+	
+	// add templates
+	Enumeration templates = VDBData.getTemplates().keys();
+	while (templates.hasMoreElements())
+	{
+		String key = templates.nextElement().toString();
+		VDBTemplate t = (VDBTemplate)VDBData.getTemplates().get(key);
+		JMenuItem item2 = new JMenuItem(t.getDescription());
+		item2.setActionCommand(key);
+		item2.addActionListener(al);
+		templatesMenu.add(item2);
+	
+		// do not allow circular dependencies
+		if (!templateStack.isEmpty() && templateStack.contains(t))
+			item2.setEnabled(false);
+	}	
+	
+	if (templatesMenu.getItemCount()==0)
+		templatesMenu.setEnabled(false);
+	
+	popUp.add(new JSeparator());
+	
+	JMenuItem lineMenuItem = new JMenuItem(newLineString);
+	lineMenuItem.addActionListener(al);
+	popUp.add(lineMenuItem);
+	
+	JMenuItem boxMenuItem = new JMenuItem(newBoxString);
+	boxMenuItem.addActionListener(al);
+	popUp.add(boxMenuItem);
+	
+	JMenuItem textboxMenuItem = new JMenuItem(newTextBoxString);
+	textboxMenuItem.addActionListener(al);
+	popUp.add(textboxMenuItem);
+
+	if (isTemplateMode())
+	{
+		popUp.add(new JSeparator());
+		JMenuItem templatePropertiesMenuItem = new JMenuItem(templatePropertiesString);
+		templatePropertiesMenuItem.addActionListener(al);
+		popUp.add(templatePropertiesMenuItem);
+	}
+	
+	popUp.show(getWorkspacePanel(), e.getX(), e.getY());
+}
+
 private void createTextBox()
 {
 	try
@@ -2231,10 +2258,14 @@ public void createTemplateInstance(String name, String type, boolean relative) {
 public void descendIntoTemplate(Template template)
 {
 	viewStack.push(viewGroup);
-	templateStack.push(template);
-
+	templateStack.push(template.getTemplateData().getTemplate());
+	
 	Group group = template.getTemplateData().getTemplate().getGroup();
 	Group.setRoot(group);
+
+	Group.setEditingTemplateData(template.getTemplateData().getTemplate());
+	
+	InspectorManager.getInstance().updateObjectLists();
 
 	moveToGroup(group);
 }
@@ -2249,11 +2280,16 @@ public void ascendFromTemplate()
 	viewGroup = (Group)viewStack.pop();
 	
 	templateStack.pop();
+	
+	if (!templateStack.isEmpty())
+		Group.setEditingTemplateData((VDBTemplate)templateStack.peek());
 		
 	Group grp = viewGroup;
 	while (grp.getParent()!=null)
 		grp = (Group)grp.getParent();
 	Group.setRoot(grp);
+
+	InspectorManager.getInstance().updateObjectLists();
 	
 	moveToGroup(grp);	
 }
@@ -2270,16 +2306,7 @@ public void moveToGroup(Group group)
 	//createNavigatorImage();
 	viewGroup.unconditionalValidateSubObjects(isFlat());
 
-	SetWorkspaceGroup cmd = (SetWorkspaceGroup)CommandManager.getInstance().getCommand("SetGroup");
-
-	String name = viewGroup.getAbsoluteName();
-	if (name.length()==0)
-		name = Constants.MAIN_GROUP;
-
-	if (isTemplateMode()) 
-		name = Constants.TEMPLATE_GROUP + " [" + ((Template)templateStack.peek()).getDescription() + "]: "+ name;
-	cmd.setGroup(name);
-	cmd.execute();
+	updateWorkspaceGroup();
 
 	updateWorkspaceScale();
 	
@@ -2291,9 +2318,37 @@ public void moveToGroup(Group group)
  * Insert the method's description here.
  * Creation date: (22.4.2001 18:44:03)
  */
+public void updateWorkspaceGroup()
+{
+	SetWorkspaceGroup cmd = (SetWorkspaceGroup)CommandManager.getInstance().getCommand("SetGroup");
+	
+	String name = viewGroup.getAbsoluteName();
+	if (name.length()==0)
+		name = Constants.MAIN_GROUP;
+	
+	if (isTemplateMode()) 
+		name = Constants.TEMPLATE_GROUP + " [" + ((VDBTemplate)templateStack.peek()).getDescription() + "]: "+ name;
+	cmd.setGroup(name);
+	cmd.execute();
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (22.4.2001 18:44:03)
+ */
 public boolean isTemplateMode()
 {
 	return templateStack.size()>0;
+}
+
+
+/**
+ * Returns the templateStack.
+ * @return Stack
+ */
+public Stack getTemplateStack()
+{
+	return templateStack;
 }
 
 }

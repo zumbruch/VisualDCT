@@ -36,6 +36,7 @@ import javax.swing.SwingConstants;
 import com.cosylab.vdct.*;
 import com.cosylab.vdct.vdb.*;
 import com.cosylab.vdct.undo.*;
+import com.cosylab.vdct.util.StringUtils;
 import com.cosylab.vdct.graphics.objects.*;
 import com.cosylab.vdct.db.DBResolver;
 import com.cosylab.vdct.events.*;
@@ -608,6 +609,13 @@ public void rename(java.lang.String oldName, java.lang.String newName) {
  * @param file java.io.File
  */
 public void save(java.io.File file) throws IOException {
+
+ if (drawingSurface.isTemplateMode())
+ {
+ 	saveAsTemplate(file);
+ 	return;
+ }
+ 
  Group.save(Group.getRoot(), file, false);
  
  // if ok
@@ -632,7 +640,51 @@ public void saveAsGroup(java.io.File file) throws IOException {
  */
 public void saveAsTemplate(File file) throws IOException
 {
- System.out.println("Save As template");
+ 
+ Stack stack = drawingSurface.getTemplateStack();
+ if (stack.isEmpty())
+ {
+
+	String id = file.getName();
+	// remove spaces and extension
+	id = id.replace(' ', '_');
+	int pos = id.lastIndexOf('.');
+	if (pos>0)
+		id = id.substring(0, pos);
+	
+	// generate first free
+	while (VDBData.getTemplates().containsKey(id))
+		id = StringUtils.incrementName(id, null);
+		
+ 	// create a new
+	VDBTemplate data = new VDBTemplate(id, file.getAbsolutePath());
+	data.setDescription(data.getId());
+	data.setInputs(new Hashtable());
+	data.setInputComments(new Hashtable());
+	data.setOutputs(new Hashtable());
+	data.setOutputComments(new Hashtable());
+ 	stack.push(data);
+ 	
+ 	Group.setEditingTemplateData(data);
+
+ 	// add to list of loaded templates
+ 	// what abouts its group
+ 	//VDBData.getTemplates().put(data.getId(), data);
+ 	
+ 	//!!!
+ 	//VisualDCT.getInstance().updateLoadLabel();
+ }
+
+ Group.saveAsTemplate(Group.getRoot(), file);
+
+ drawingSurface.setModified(false);
+
+ // show user template mode 
+ drawingSurface.updateWorkspaceGroup();
+
+ SetWorkspaceFile cmd = (SetWorkspaceFile)CommandManager.getInstance().getCommand("SetFile");
+ cmd.setFile(file.getCanonicalPath());
+ cmd.execute();
 }
 /**
  * Insert the method's description here.
@@ -807,6 +859,14 @@ public void updateMenuItems() {
 	SetUndoMenuItemState cmd2 = (SetUndoMenuItemState)CommandManager.getInstance().getCommand("SetUndoMenuItemState");
 	cmd2.setState(UndoManager.getInstance().actions2undo()>0);
 	cmd2.execute();
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (22.4.2001 18:12:34)
+ */
+public void updateGroupLabel() {
+	drawingSurface.updateWorkspaceGroup();
 }
 
 }
