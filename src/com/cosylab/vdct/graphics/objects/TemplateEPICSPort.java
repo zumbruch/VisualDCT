@@ -169,6 +169,9 @@ protected void draw(Graphics g, boolean hilited) {
 		// input link
 		int arrowLength = 2*r;
 
+		if (!isRightSide)
+			rrx -= arrowLength;
+
 		// draw arrow
 		g.drawLine(rrx, rry-r, rrx+arrowLength, rry-r);
 		g.drawLine(rrx, rry+r, rrx+arrowLength, rry+r);
@@ -185,6 +188,9 @@ protected void draw(Graphics g, boolean hilited) {
 	{
 		// output link	
 		int arrowLength = 3*r;
+
+		if (!isRightSide)
+			rrx -= arrowLength;
 
 		// draw arrow
 		g.drawLine(rrx, rry-r, rrx+arrowLength, rry-r);

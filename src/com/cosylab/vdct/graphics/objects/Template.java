@@ -29,6 +29,8 @@ package com.cosylab.vdct.graphics.objects;
  */
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Vector;
@@ -39,11 +41,13 @@ import java.util.Iterator;
 
 import javax.swing.*;
 
-import com.cosylab.vdct.Console;
 import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.db.DBResolver;
+import com.cosylab.vdct.events.CommandManager;
+import com.cosylab.vdct.events.commands.LinkCommand;
 import com.cosylab.vdct.graphics.FontMetricsBuffer;
 import com.cosylab.vdct.graphics.ViewState;
+import com.cosylab.vdct.graphics.popup.PopUpMenu;
 import com.cosylab.vdct.graphics.popup.Popupable;
 import com.cosylab.vdct.inspector.Inspectable;
 import com.cosylab.vdct.inspector.InspectableProperty;
@@ -60,6 +64,14 @@ public class Template
 	extends LinkManagerObject
 	implements /*Descriptable,*/ Movable, Inspectable, Popupable, Flexible, Selectable, Clipboardable, Hub, MonitoredPropertyListener, SaveInterface, SaveObject
 {
+
+	class PopupMenuHandler implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+			LinkCommand cmd = (LinkCommand)CommandManager.getInstance().getCommand("LinkCommand");
+			cmd.setData(Template.this, Template.this.getField(e.getActionCommand()));
+			cmd.execute();
+		}
+	}
 
 	VDBTemplateInstance templateData = null;
 	//String description = null;
@@ -534,7 +546,34 @@ public class Template
 	 */
 	public Vector getItems()
 	{
-		return null;
+		ActionListener l = createPopupmenuHandler();
+
+		JMenu macros = new JMenu("MACRO");
+		int macroItems = 0;
+		
+		Object obj;
+		Enumeration e = subObjectsV.elements();
+		while (e.hasMoreElements())
+		{
+			obj = e.nextElement();
+			if (obj instanceof TemplateEPICSMacro)
+			{
+				JMenuItem menuitem = new JMenuItem(((TemplateEPICSMacro)obj).getFieldData().getName());
+				menuitem.addActionListener(l);
+				macros = PopUpMenu.addItem(menuitem, macros, macroItems); 
+				macroItems++;
+			}
+		}
+		
+		if (macros.getItemCount() > 0)
+		{
+			Vector items = new Vector();
+			items.addElement(macros);
+			return items;
+		}
+		else
+			return null;
+			
 	}
 
 	/**
@@ -849,7 +888,7 @@ private void synchronizePortLinkFields()
 				{
 					Object key2 = e2.nextElement();
 					Object val = getSubObjects().get(key2);
-					if (val==tep)
+					if (val instanceof TemplateEPICSPort && val==tep)
 					{
 						key = key2;
 						break;
@@ -916,11 +955,6 @@ private void synchronizePortLinkFields()
 	portsID = getTemplateData().getTemplate().getPortsGeneratedID();
 	//com.cosylab.vdct.graphics.DrawingSurface.getInstance().setModified(true);
 
-	// check
-	if (getTemplateData().getTemplate().getPortsV().size()!=getSubObjectsV().size())
-	{
-		Console.getInstance().println("Failed to synchronize template ports with template instance ports. Save and restart VisualDCT.");
-	}
 }
 
 
@@ -963,7 +997,7 @@ private void synchronizeMacroLinkFields()
 				{
 					Object key2 = e2.nextElement();
 					Object val = getSubObjects().get(key2);
-					if (val==tem)
+					if (val instanceof TemplateEPICSMacro && val==tem)
 					{
 						key = key2;
 						break;
@@ -1030,12 +1064,6 @@ private void synchronizeMacroLinkFields()
 	macrosID = getTemplateData().getTemplate().getMacrosGeneratedID();
 	//com.cosylab.vdct.graphics.DrawingSurface.getInstance().setModified(true);
 
-	// check
-	if (getTemplateData().getTemplate().getMacrosV().size()!=getSubObjectsV().size())
-	{
-		Console.getInstance().println("Failed to synchronize template macros with template instance macros. Save and restart VisualDCT.");
-	}
-
 }
 
 /**
@@ -1087,7 +1115,11 @@ public void fieldChanged(VDBFieldData field) {
 /**
  */
 public VDBFieldData getField(String name) {
-	return null;
+	TemplateEPICSMacro tem = (TemplateEPICSMacro)getSubObject(name);
+	if (tem!=null)
+		return tem.getFieldData();
+	else
+		return null;
 }
 
 
@@ -1664,6 +1696,15 @@ public void generateMacros(HashMap macros) {
 		if (obj instanceof TemplateEPICSMacro)
 			LinkManagerObject.checkIfMacroCandidate(((Field)obj).getFieldData(), macros);
 	}
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (2.2.2001 23:00:51)
+ * @return com.cosylab.vdct.graphics.objects.LinkManagerObject.PopupMenuHandler
+ */
+private Template.PopupMenuHandler createPopupmenuHandler() {
+	return new PopupMenuHandler();
 }
 
 }

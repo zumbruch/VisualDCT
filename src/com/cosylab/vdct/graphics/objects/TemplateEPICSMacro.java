@@ -30,8 +30,17 @@ package com.cosylab.vdct.graphics.objects;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Vector;
+
+import javax.swing.JMenuItem;
+import javax.swing.JSeparator;
 
 import com.cosylab.vdct.Constants;
+import com.cosylab.vdct.events.CommandManager;
+import com.cosylab.vdct.events.commands.LinkCommand;
+import com.cosylab.vdct.graphics.ColorChooser;
 import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.vdb.GUIHeader;
 import com.cosylab.vdct.vdb.GUISeparator;
@@ -50,6 +59,14 @@ public class TemplateEPICSMacro extends EPICSOutLink implements TemplateEPICSLin
  	private String lastUpdatedFullName = null;
 	private static GUISeparator macroSeparator = null;
 	private static javax.swing.ImageIcon icon = null;
+
+	private static final String selectTitle = "Select link color...";
+	private static final String startLinkingString = "Start linking...";
+	private static final String addConnectorString = "Add connector";
+	private static final String colorString = "Color...";
+	private static final String moveUpString = "Move Up";
+	private static final String moveDownString = "Move Down";
+	private static final String removeString = "Remove Link";
 
 /**
  * EPICSVarLink constructor comment.
@@ -165,6 +182,9 @@ protected void draw(Graphics g, boolean hilited) {
 	{
 		// input link
 		int arrowLength = 2*r;
+		
+		if (!isRightSide)
+			rrx -= arrowLength;
 
 		// draw arrow
 		g.drawLine(rrx, rry-r, rrx+arrowLength, rry-r);
@@ -182,6 +202,9 @@ protected void draw(Graphics g, boolean hilited) {
 	{
 		// output link	
 		int arrowLength = 3*r;
+
+		if (!isRightSide)
+			rrx -= arrowLength;
 
 		// draw arrow
 		g.drawLine(rrx, rry-r, rrx+arrowLength, rry-r);
@@ -308,6 +331,111 @@ public javax.swing.Icon getIcon() {
  */
 public String getDescription() {
 	return ((VDBTemplateMacro)fieldData).getDescription();
+}
+
+class PopupMenuHandler implements ActionListener {
+	public void actionPerformed(ActionEvent e) {
+		String action = e.getActionCommand();
+		if (action.equals(colorString))
+		{			
+			Color newColor = ColorChooser.getColor(selectTitle, getColor());
+			if (newColor!=null)
+				setColor(newColor);
+			com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+		}
+		else if (action.equals(addConnectorString))
+		{
+			addConnector();
+			com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+		}
+		else if (action.equals(moveUpString))
+		{
+		}
+		else if (action.equals(moveDownString))
+		{
+		}
+		else if (action.equals(startLinkingString))
+		{
+			LinkCommand cmd = (LinkCommand)CommandManager.getInstance().getCommand("LinkCommand");
+			cmd.setData((Template)TemplateEPICSMacro.this.getParent(), TemplateEPICSMacro.this.getFieldData());
+			cmd.execute();
+		}
+		else if (action.equals(removeString))
+		{
+			destroy();
+		}
+			
+	}
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (2.2.2001 23:00:51)
+ * @return com.cosylab.vdct.graphics.objects.EPICSLinkOut.PopupMenuHandler
+ */
+private TemplateEPICSMacro.PopupMenuHandler createPopupmenuHandler() {
+	return new PopupMenuHandler();
+}
+
+
+/**
+ * Insert the method's description here.
+ * Creation date: (3.2.2001 11:23:59)
+ * @return java.util.Vector
+ */
+public java.util.Vector getItems() {
+	Vector items = new Vector();
+
+	ActionListener al = createPopupmenuHandler();
+
+	JMenuItem colorItem = new JMenuItem(colorString);
+	colorItem.addActionListener(al);
+	items.addElement(colorItem);
+
+	JMenuItem addItem = new JMenuItem(addConnectorString);
+	addItem.addActionListener(al);
+	items.addElement(addItem);
+
+	items.add(new JSeparator());
+
+//TODO
+/*
+	if (getParent() instanceof Record)
+	{
+		Record parRec = (Record)getParent();
+		boolean isFirst = parRec.isFirstField(this);
+		boolean isLast = parRec.isLastField(this);
+		
+	
+		if (!isFirst)
+		{
+			JMenuItem upItem = new JMenuItem(moveUpString);
+			upItem.addActionListener(al);
+			upItem.setIcon(new ImageIcon(getClass().getResource("/images/up.gif")));
+			items.addElement(upItem);
+		}
+	
+		if (!isLast)
+		{
+			JMenuItem downItem = new JMenuItem(moveDownString);
+			downItem.addActionListener(al);
+			downItem.setIcon(new ImageIcon(getClass().getResource("/images/down.gif")));
+			items.addElement(downItem);
+		}
+	
+		if (!(isFirst && isLast))
+			items.add(new JSeparator());
+	}
+*/	
+	JMenuItem linkItem = new JMenuItem(startLinkingString);
+	linkItem.addActionListener(al);
+	items.addElement(linkItem);
+
+	JMenuItem removeItem = new JMenuItem(removeString);
+	removeItem.addActionListener(al);
+	items.addElement(removeItem);
+
+	return items;
 }
 
 }

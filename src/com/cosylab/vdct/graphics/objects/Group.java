@@ -612,6 +612,8 @@ public void manageLinks(boolean deep) {
 		obj = e.nextElement();
 		if (obj instanceof Record)
 			((Record)obj).manageLinks();
+		else if (obj instanceof Template)
+			((Template)obj).manageLinks();
 		else if (deep && (obj instanceof Group))
 			((Group)obj).manageLinks(deep);
 	}
