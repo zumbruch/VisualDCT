@@ -4,13 +4,13 @@
   
   <title>VisualDCT project info XML</title>
   
-  <audience>All Cosylab VisualDCT developers (Matej, I, me and myself).</audience>
+  <audience>All users and developers interesting in VisualDCT, mainly EPICS community.</audience>
   
-  <scope>This project contains ANT build scripts and task sources.</scope>
+  <scope>This project page contains all distribution files, sources, documentation and any other VisualDCT resources.</scope>
   
-  <info file="project" url="http://vidualdct.cosylab.com/builds/VisualDCT/" class="project" />
+  <info file="project" url="http://visualdct.cosylab.com/builds/VisualDCT/" class="project" />
   
-  <modification by="Matej Sekoranja" date="2002-07-06">Created.</modification>
+  <modification by="Matej Sekoranja" date="2002-07-10">Created.</modification>
   
   <developer id="msekoranja" name="Matej Sekoranja" email="matej.sekoranja@cosylab.com" responsibility="implementator" />
 
@@ -18,20 +18,18 @@
  	<keyword id="87"/>
    </rt>
 
-  <testlog url="test/testlog.txt"/>
+  <!--testlog url="test/testlog.txt"/-->
 
+  <dependency type="3rdparty" name="JavaTM 2 Platform, Standard Edition" version="1.4" url="http://java.sun.com/j2se/1.4/download.html" />
   <dependency type="3rdparty" name="JUnit Testing Framework" version="3.7" url="http://sourceforge.net/projects/junit/" />
   <dependency type="3rdparty" name="Styler ANT Task" version="1.0" url="http://www.langdale.com.au/styler/" />
   <dependency type="3rdparty" name="MySQL JDBC driver" version="2.0.11" url="http://sourceforge.net/projects/mmmysql/" />
+  <dependency type="3rdparty" name="VisualDCT-Common" version="1.0" url="http://visualdct.cosylab.com/builds/VisualDCT-Common/" />
 
-  <!--dependency type="3rdparty" name="JUnit Testing Framework" version="3.7" url="http://sourceforge.net/projects/junit/" archive="./3rdParty/Common/junit-3.7/lib/junit.jar" />
-  <dependency type="3rdparty" name="Styler ANT Task" version="1.0" url="http://www.langdale.com.au/styler/" archive="./3rdParty/Common/styler-1.0/lib/styler.jar" />
-  <dependency type="3rdparty" name="MySQL JDBC driver" version="2.0.11" url="http://sourceforge.net/projects/mmmysql/" archive="./3rdParty/Common/mmmysql-2.0.11/lib/mmmysql-2.0.11-bin.jar" /-->
-
-  <news date="2002-07-08" developer="msekoranja" title="VisualDCT-Common ANT build">VisualDCT ANT build created.</news>
+  <news date="2002-07-10" developer="msekoranja" title="VisualDCT ported to Eclipse and Ant builds."/>
  
   <!-- additional documentation -->
-  <!--document url="" comment="" title=""/-->
+  <document url="http://visualdct.cosylab.com" comment="VisualDCT homepage where you can find all related manuals, articles and presentations." title="VisualDCT homepage"/>
 
 </cosydoc>
 

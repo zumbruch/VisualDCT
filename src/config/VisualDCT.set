@@ -1,0 +1,9 @@
+#VisualDCT v2.1 settings file
+#Wed Jul 10 11:16:35 CEST 2002
+Navigator=true
+GridSize=20
+Statusbar=true
+Toolbar=true
+GroupSeparator=\:
+SnapToGrid=true
+ShowGrid=true

@@ -101,7 +101,7 @@ private javax.swing.JLabel getJLabel1() {
 		try {
 			ivjJLabel1 = new javax.swing.JLabel();
 			ivjJLabel1.setName("JLabel1");
-			ivjJLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/splash.gif")));
+			ivjJLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/splash.gif")));
 			ivjJLabel1.setText("");
 			ivjJLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 			ivjJLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);

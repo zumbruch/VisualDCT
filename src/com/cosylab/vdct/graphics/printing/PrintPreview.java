@@ -324,7 +324,7 @@ private javax.swing.JButton getJToolBarButton1() {
 			ivjJToolBarButton1.setMaximumSize(new java.awt.Dimension(83, 30));
 			ivjJToolBarButton1.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
 			ivjJToolBarButton1.setVerticalTextPosition(javax.swing.SwingConstants.CENTER);
-			ivjJToolBarButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cancel.gif")));
+			ivjJToolBarButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/cancel.gif")));
 			ivjJToolBarButton1.setPreferredSize(new java.awt.Dimension(83, 30));
 			ivjJToolBarButton1.setMargin(new java.awt.Insets(0, 4, 0, 4));
 			ivjJToolBarButton1.setMinimumSize(new java.awt.Dimension(83, 30));
@@ -447,7 +447,7 @@ private javax.swing.JButton getPrintToolBarButton() {
 			ivjPrintToolBarButton.setMaximumSize(new java.awt.Dimension(72, 30));
 			ivjPrintToolBarButton.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
 			ivjPrintToolBarButton.setVerticalTextPosition(javax.swing.SwingConstants.CENTER);
-			ivjPrintToolBarButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/print.gif")));
+			ivjPrintToolBarButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/print.gif")));
 			ivjPrintToolBarButton.setPreferredSize(new java.awt.Dimension(72, 30));
 			ivjPrintToolBarButton.setMargin(new java.awt.Insets(0, 4, 0, 4));
 			ivjPrintToolBarButton.setMinimumSize(new java.awt.Dimension(72, 30));
@@ -476,7 +476,7 @@ private javax.swing.JButton getPrintToolBarButton1() {
 			ivjPrintToolBarButton1.setMaximumSize(new java.awt.Dimension(110, 30));
 			ivjPrintToolBarButton1.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
 			ivjPrintToolBarButton1.setVerticalTextPosition(javax.swing.SwingConstants.CENTER);
-			ivjPrintToolBarButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/page.gif")));
+			ivjPrintToolBarButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/page.gif")));
 			ivjPrintToolBarButton1.setPreferredSize(new java.awt.Dimension(68, 30));
 			ivjPrintToolBarButton1.setMargin(new java.awt.Insets(0, 4, 0, 4));
 			ivjPrintToolBarButton1.setMinimumSize(new java.awt.Dimension(68, 30));

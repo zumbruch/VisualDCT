@@ -111,12 +111,20 @@
 		<javac srcdir="${dir.src}/src" destdir="${dir.temp}" classpathref="build.classpath" source="1.4">
 			<classpath refid="build.classpath"/>
 		</javac>
-		<available file="${dir.src}/resources" type="dir" property="test-compileresources"/>
 	</target>
 	
-	<target name="copyresources" depends="compile" if="test-compileresources">
-		<copy todir="${dir.temp}/resources">
-			<fileset dir="${dir.src}/src/resources"/>
+	<target name="copyresources" depends="compile">
+		<mkdir dir="${dir.temp}/docs"/>
+		<copy todir="${dir.temp}/docs">
+			<fileset dir="${dir.src}/src/docs"/>
+		</copy>
+		<mkdir dir="${dir.temp}/images"/>
+		<copy todir="${dir.temp}/images">
+			<fileset dir="${dir.src}/src/images"/>
+		</copy>
+		<mkdir dir="${dir.temp}/config"/>
+		<copy todir="${dir.temp}/config">
+			<fileset dir="${dir.src}/src/config"/>
 		</copy>
 	</target>
 	
@@ -136,7 +144,7 @@
 		</junitreport>
 	</target>
 	
-	<target name="jar" depends="manifest">
+	<target name="jar" depends="manifest, copyresources">
 		<mkdir dir="${dir.dist}"/>
 		<jar jarfile="${dir.dist}/${project.name}.jar">
 			<fileset dir="${dir.temp}"/>
@@ -146,7 +154,7 @@
 	<target name="srcjar" depends="test">
 		<mkdir dir="${dir.dist}"/>
 		<jar jarfile="${dir.dist}/${project.name}-src-${build.version}.jar">
-			<fileset dir="${dir.src}/src" excludes="**/*.class"/>
+			<fileset dir="${dir.src}" includes="src/**,VDCTBuild.xml,build.xml" excludes="**/*.class"/>
 		</jar>
 	</target>
 

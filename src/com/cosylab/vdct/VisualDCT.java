@@ -1863,7 +1863,7 @@ private javax.swing.JButton getCopyButton() {
 			ivjCopyButton.setText("");
 			ivjCopyButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 			ivjCopyButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-			ivjCopyButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/copy.gif")));
+			ivjCopyButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/copy.gif")));
 			ivjCopyButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
 			// user code begin {1}
 			// user code end
@@ -1912,7 +1912,7 @@ private javax.swing.JButton getCutButton() {
 			ivjCutButton.setText("");
 			ivjCutButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 			ivjCutButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-			ivjCutButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/cut.gif")));
+			ivjCutButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/cut.gif")));
 			ivjCutButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
 			// user code begin {1}
 			// user code end
@@ -2147,7 +2147,7 @@ private javax.swing.JButton getFind_ReplaceButton() {
 			ivjFind_ReplaceButton.setText("");
 			ivjFind_ReplaceButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 			ivjFind_ReplaceButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-			ivjFind_ReplaceButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/find.gif")));
+			ivjFind_ReplaceButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/find.gif")));
 			ivjFind_ReplaceButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
 			ivjFind_ReplaceButton.setEnabled(false);
 			// user code begin {1}
@@ -3076,7 +3076,7 @@ private javax.swing.JButton getOpenButton() {
 			ivjOpenButton.setText("");
 			ivjOpenButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 			ivjOpenButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-			ivjOpenButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/open.gif")));
+			ivjOpenButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/open.gif")));
 			ivjOpenButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
 			// user code begin {1}
 			// user code end
@@ -3145,7 +3145,7 @@ private javax.swing.JButton getPasteButton() {
 			ivjPasteButton.setText("");
 			ivjPasteButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 			ivjPasteButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-			ivjPasteButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/paste.gif")));
+			ivjPasteButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/paste.gif")));
 			ivjPasteButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
 			// user code begin {1}
 			// user code end
@@ -3310,7 +3310,7 @@ public javax.swing.JButton getRedoButton() {
 			ivjRedoButton.setText("");
 			ivjRedoButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 			ivjRedoButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-			ivjRedoButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/redo.gif")));
+			ivjRedoButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/redo.gif")));
 			ivjRedoButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
 			ivjRedoButton.setEnabled(false);
 			// user code begin {1}
@@ -3495,7 +3495,7 @@ private javax.swing.JButton getSaveButton() {
 			ivjSaveButton.setText("");
 			ivjSaveButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 			ivjSaveButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-			ivjSaveButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/save.gif")));
+			ivjSaveButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save.gif")));
 			ivjSaveButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
 			// user code begin {1}
 			// user code end
@@ -3895,7 +3895,7 @@ public javax.swing.JButton getUndoButton() {
 			ivjUndoButton.setText("");
 			ivjUndoButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 			ivjUndoButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-			ivjUndoButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/undo.gif")));
+			ivjUndoButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/undo.gif")));
 			ivjUndoButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
 			ivjUndoButton.setEnabled(false);
 			// user code begin {1}
