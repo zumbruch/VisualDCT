@@ -111,6 +111,7 @@ public class GenerateFlatDatabase
 						}
 
 						dbdFile = new File(args[i]);
+						continue;
 					} else if (args[i].equals("-h") || args[i].equals("--help")) {
 						printHelp();
 

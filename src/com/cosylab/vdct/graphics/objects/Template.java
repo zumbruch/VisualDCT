@@ -33,6 +33,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Vector;
 import java.util.Map;
 import java.util.Enumeration;
@@ -42,6 +43,7 @@ import java.util.Iterator;
 import javax.swing.*;
 
 import com.cosylab.vdct.Constants;
+import com.cosylab.vdct.Settings;
 import com.cosylab.vdct.db.DBResolver;
 import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.events.commands.LinkCommand;
@@ -1630,12 +1632,16 @@ public void writeObjects(DataOutputStream file, NameManipulator namer, boolean e
 
 
 
-	 // new ports
+	 /*// new ports
 	 Map ports = preparePorts(getTemplateData().getTemplate().getGroup(), namer.getSubstitutions());
 
 	 // new macros
 	 // macros have to be made out of macros and ports (^^^ it's probably same with ports) 
 	 Map properties = prepareSubstitutions(getTemplateData(), namer.getSubstitutions(), namer.getPorts());
+	*/
+	Map properties = prepareSubstitutions(getTemplateData(), namer.getSubstitutions(), namer.getPorts());
+	Map ports = preparePorts(getTemplateData().getTemplate().getGroup(), properties);
+	// TODO !!! some strange path could break this code 
 	
 	 // new removedPrefix
 	 String removedPrefix = namer.getRemovedPrefix();
@@ -1695,14 +1701,16 @@ public static Map prepareSubstitutions(VDBTemplateInstance templateData, Map sub
  	 // the macro values given in an expand(){} statement should not be
 	 // automatically passed down into any templates that are expanded within the
 	 // lower level file unless they are explicitly named as macros there too. 
-	 Map properties = null;
-			
-	 if (substitutions==null && ports==null)
-	 	properties = templateData.getProperties();
-	 else
-	 {
-	 	properties = (Map)templateData.getProperties().clone();
+	 Map properties = new Hashtable();
+	 
+	 if (Settings.getInstance().getGlobalMacros() && substitutions!=null) {
+	 	properties.putAll(substitutions);
+	 }
 		
+	properties.putAll(templateData.getProperties());		
+			
+	 if (substitutions!=null || ports!=null)
+	 {
 		// update values
 	 	Iterator i = properties.keySet().iterator();
 	 	while (i.hasNext())
@@ -1745,7 +1753,7 @@ public static Map preparePorts(Group group, Map substitutions)
 				// !!! this is done twice - optimize with buffering
 	 			Map newSubstitutions = prepareSubstitutions(t.getTemplateData(), substitutions, null);
 
-				target = VDBTemplateInstance.applyProperties(target, newSubstitutions);
+				target = VDBTemplateInstance.applyProperties(target, newSubstitutions);				
 				
 				// if target is a contains a port definition it might be defined in lower levels
 				// try to resolve it
@@ -1789,7 +1797,8 @@ public static Map preparePorts(Group group, Map substitutions)
 					pos = target.indexOf('$', pos+1);		// no problems if pos == length	
 				}
 				
-				//System.out.println(port.getPortDefinition(t.getTemplateData().getName())+"="+target);	
+				//if (target.indexOf('$')>=0) 
+					//System.out.println(port.getPortDefinition(t.getTemplateData().getName())+"="+target+"<map>:"+newSubstitutions+"<map>:"+substitutions);	
 				map.put(port.getPortDefinition(t.getTemplateData().getName()), target);			
 			}
 

@@ -114,7 +114,7 @@ public Font getFont(String name, int size, int style) {
 	if (fd==null) {
 		Font font = new Font(name, style, size);
 		if (font==null) return null;
- 		fd = new FontData(font, graphics.getFontMetrics(font));
+ 		fd = new FontData(font, graphics==null?null:graphics.getFontMetrics(font));
 		fonts.put(id, fd);
 	}
 	return fd.getFont();

@@ -49,6 +49,7 @@ public class Settings {
 	private boolean showGrid = true;
 	private boolean navigator = true;
 	private boolean grouping = false;
+	private boolean globalMacros = false;
 	
 /**
  * Settings constructor comment.
@@ -65,6 +66,7 @@ protected Settings() {
 	showGrid = prefs.getBoolean("ShowGrid", showGrid);
 	navigator = prefs.getBoolean("Navigator", navigator);
 	grouping = prefs.getBoolean("Grouping", grouping);
+	globalMacros = prefs.getBoolean("GlobalMacros", globalMacros);
 
 	if (grouping)
 	{
@@ -350,5 +352,21 @@ public void loadRecentFiles()
 			break;
 	}
 }
+
+	/**
+	 * @return
+	 */
+	public boolean getGlobalMacros() {
+		return globalMacros;
+	}
+
+	/**
+	 * @param b
+	 */
+	public void setGlobalMacros(boolean b) {
+		globalMacros = b;
+		prefs.putBoolean("GlobalMacros", b);
+		sync();
+	}
 
 }

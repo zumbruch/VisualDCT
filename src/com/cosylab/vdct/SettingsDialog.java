@@ -45,7 +45,10 @@ public class SettingsDialog extends javax.swing.JDialog {
 	private javax.swing.JButton ivjOKButton = null;
 	IvjEventHandler ivjEventHandler = new IvjEventHandler();
 	private javax.swing.JLabel ivjWarningLabel = null;
-
+	
+	private javax.swing.JCheckBox GlobalMacrosCheckBox = null; 
+	private javax.swing.JPanel MacrosPanel = null;
+	
 class IvjEventHandler implements java.awt.event.ActionListener, java.awt.event.KeyListener {
 		public void actionPerformed(java.awt.event.ActionEvent e) {
 			if (e.getSource() == SettingsDialog.this.getJButton2()) 
@@ -68,6 +71,7 @@ class IvjEventHandler implements java.awt.event.ActionListener, java.awt.event.K
 public SettingsDialog() {
 	super();
 	initialize();
+	initializeMacros();
 }
 /**
  * SettingsDialog constructor comment.
@@ -76,6 +80,7 @@ public SettingsDialog() {
 public SettingsDialog(java.awt.Frame owner) {
 	super(owner);
 	initialize();
+	initializeMacros();	
 }
 /**
  * SettingsDialog constructor comment.
@@ -85,6 +90,7 @@ public SettingsDialog(java.awt.Frame owner) {
 public SettingsDialog(java.awt.Frame owner, boolean modal) {
 	super(owner, modal);
 	initialize();
+	initializeMacros();	
 }
 /**
  * connEtoC1:  (GroupingCheckBox.action.actionPerformed(java.awt.event.ActionEvent) --> SettingsDialog.groupingCheckBox_ActionPerformed(Ljava.awt.event.ActionEvent;)V)
@@ -212,6 +218,21 @@ private javax.swing.JCheckBox getGroupingCheckBox() {
 	}
 	return ivjGroupingCheckBox;
 }
+
+private javax.swing.JCheckBox getGlobalMacrosCheckBox() {
+	if (GlobalMacrosCheckBox == null) {
+		try {
+			GlobalMacrosCheckBox = new javax.swing.JCheckBox();
+			GlobalMacrosCheckBox.setName("GlobalMacrosCheckBox");
+			GlobalMacrosCheckBox.setSelected(false);
+			GlobalMacrosCheckBox.setText("Enable global macros evaluation");			
+		} catch (java.lang.Throwable ivjExc) {
+			handleException(ivjExc);
+		}
+	}
+	return GlobalMacrosCheckBox;
+}
+
 /**
  * Return the GroupingPanel property value.
  * @return javax.swing.JPanel
@@ -259,6 +280,31 @@ private javax.swing.JPanel getGroupingPanel() {
 	}
 	return ivjGroupingPanel;
 }
+
+private javax.swing.JPanel getMacrosPanel() {
+	if (MacrosPanel == null) {
+		try {
+			MacrosPanel = new javax.swing.JPanel();
+			MacrosPanel.setName("MacrosPanel");
+			MacrosPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(" Macros evaluation "));
+			MacrosPanel.setLayout(new java.awt.GridBagLayout());
+
+			java.awt.GridBagConstraints constraintsGlobalMacrosCheckBox = new java.awt.GridBagConstraints();
+			constraintsGlobalMacrosCheckBox.gridx = 0; constraintsGlobalMacrosCheckBox.gridy = 0;
+			constraintsGlobalMacrosCheckBox.anchor = java.awt.GridBagConstraints.WEST;
+			constraintsGlobalMacrosCheckBox.weightx = 1.0;
+			constraintsGlobalMacrosCheckBox.weighty = 1.0;
+			constraintsGlobalMacrosCheckBox.insets = new java.awt.Insets(4, 4, 4, 4);
+			getMacrosPanel().add(getGlobalMacrosCheckBox(), constraintsGlobalMacrosCheckBox);
+
+		} catch (java.lang.Throwable ivjExc) {
+							
+			handleException(ivjExc);
+		}
+	}
+	return MacrosPanel;
+}
+
 /**
  * Return the GroupingSeparatorLabel property value.
  * @return javax.swing.JLabel
@@ -339,8 +385,9 @@ private javax.swing.JPanel getJDialogContentPane() {
 			ivjJDialogContentPane = new javax.swing.JPanel();
 			ivjJDialogContentPane.setName("JDialogContentPane");
 			ivjJDialogContentPane.setLayout(new java.awt.BorderLayout());
-			getJDialogContentPane().add(getJPanel1(), "South");
-			getJDialogContentPane().add(getGroupingPanel(), "Center");
+			getJDialogContentPane().add(getGroupingPanel(), "North");
+			getJDialogContentPane().add(getMacrosPanel(), "Center");
+			getJDialogContentPane().add(getJPanel1(), "South");			
 			// user code begin {1}
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
@@ -486,7 +533,7 @@ private void initialize() {
 		// user code end
 		setName("SettingsDialog");
 		setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-		setSize(475, 197);
+		setSize(475, 197+30);
 		setTitle("Visual DCT Settings");
 		setContentPane(getJDialogContentPane());
 		initConnections();
@@ -495,6 +542,10 @@ private void initialize() {
 	}
 	// user code begin {2}
 	// user code end
+}
+
+private void initializeMacros() {
+	getGlobalMacrosCheckBox().setSelected(Settings.getInstance().getGlobalMacros());
 }
 /**
  * main entrypoint - starts the part when it is run as an application
@@ -533,6 +584,8 @@ public void oKButton_ActionPerformed(java.awt.event.ActionEvent actionEvent) {
 	{
 		Settings.getInstance().setGroupSeparator('\0');
 	}
+
+	Settings.getInstance().setGlobalMacros(getGlobalMacrosCheckBox().isSelected());
 
 	dispose();
 }

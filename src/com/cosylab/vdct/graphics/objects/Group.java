@@ -1122,12 +1122,13 @@ public static void writeObjects(Vector elements, java.io.DataOutputStream file, 
 						if (export)
 						{
 							// apply ports
-							if (namer.getPorts()!=null && value!=null)
-								 value = VDBTemplateInstance.applyPorts(value, namer.getPorts());
-	
+							if (namer.getPorts()!=null && value!=null) 
+								value = VDBTemplateInstance.applyPorts(value, namer.getPorts());
+							
 							// apply macro substitutions
-							if (namer.getSubstitutions()!=null && value!=null)
+							if (namer.getSubstitutions()!=null && value!=null) 								
 								 value = VDBTemplateInstance.applyProperties(value, namer.getSubstitutions());
+							  	 
 						}
 												
 						// if value is different from init value
