@@ -73,14 +73,14 @@ public class Macro extends VisibleObject implements Descriptable, Movable, InLin
 				removeLink();
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
-			else */if (action.equals(removeMacroString))
+			else if (action.equals(removeMacroString))
 			{
 				destroy();
 				ViewState.getInstance().deselectObject(Macro.this);
 				com.cosylab.vdct.undo.UndoManager.getInstance().addAction(new com.cosylab.vdct.undo.DeleteAction(Macro.this));
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
-			else if (action.equals(removeMacroDefString))
+			else*/ if (action.equals(removeMacroDefString))
 			{
 				data.getTemplate().removeMacro(getName());
 				ViewState.getInstance().deselectObject(Macro.this);
@@ -107,8 +107,9 @@ public class Macro extends VisibleObject implements Descriptable, Movable, InLin
 	//private static final String removeLinkString = "Remove Link";
 //	private static final String removeMacroString = "Hide Macro";
 //	private static final String removeMacroDefString = "Remove Macro";
-	private static final String removeMacroString = "Remove Macro";
-	private static final String removeMacroDefString = "Remove Macro w/ definition";
+
+//	private static final String removeMacroString = "Remove Macro";
+	private static final String removeMacroDefString = "Remove Macro";
 
 	private static final String modeString = "Macro Mode";
 	private static final String inputString = "INPUT";
@@ -222,6 +223,11 @@ public void destroy() {
 
 		data.setVisibleObject(null);
 		getParent().removeObject(getName());
+
+		// also remove macro definition
+		data.getTemplate().removeMacro(getName());
+
+
 		
 	}
 	
@@ -441,10 +447,10 @@ public java.util.Vector getItems() {
 		removeLinkItem.addActionListener(al);
 		items.addElement(removeLinkItem);
 	}
-	*/
 	JMenuItem removeMacroItem = new JMenuItem(removeMacroString);
 	removeMacroItem.addActionListener(al);
 	items.addElement(removeMacroItem);
+	*/
 
 	JMenuItem removeMacroDefItem = new JMenuItem(removeMacroDefString);
 	removeMacroDefItem.addActionListener(al);
