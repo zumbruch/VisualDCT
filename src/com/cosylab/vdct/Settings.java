@@ -54,6 +54,7 @@ public class Settings {
 	private boolean hierarhicalNames = false;
 	private boolean windowsPan = false;
 	private int recordLength = 40;
+	private boolean fastMove = false;
 	
 	private int doubleClickSpeed = -1;
 	private int doubleClickSmudge = 4;
@@ -76,10 +77,11 @@ protected Settings() {
 	globalMacros = prefs.getBoolean("GlobalMacros", globalMacros);
 	hierarhicalNames = prefs.getBoolean("HierarhicalNames", hierarhicalNames);
 	windowsPan = prefs.getBoolean("WindowsPan", windowsPan);
-	recordLength = prefs.getInt("RecordLength", 40);
+	recordLength = prefs.getInt("RecordLength", recordLength);
+	fastMove = prefs.getBoolean("FastMove", fastMove);
 	
-	doubleClickSpeed = prefs.getInt("DoubleClickSpeed", -1);
-	doubleClickSmudge = prefs.getInt("DoubleClickSmudge", 4);
+	doubleClickSpeed = prefs.getInt("DoubleClickSpeed", doubleClickSpeed);
+	doubleClickSmudge = prefs.getInt("DoubleClickSmudge", doubleClickSmudge);
 	
 	if (grouping)
 	{
@@ -482,6 +484,22 @@ public void loadRecentFiles()
 	public void setRecordLength(int i) {
 		recordLength = i;
 		prefs.putInt("RecordLength", recordLength);
+		sync();
+	}
+
+	/**
+	 * @return
+	 */
+	public boolean getFastMove() {
+		return fastMove;
+	}
+
+	/**
+	 * @param b
+	 */
+	public void setFastMove(boolean b) {
+		fastMove = b;
+		prefs.putBoolean("FastMove", fastMove);
 		sync();
 	}
 

@@ -55,6 +55,7 @@ public class SettingsDialog extends javax.swing.JDialog {
 	private javax.swing.JPanel ivjJDialogContentPane = null;
 	private javax.swing.JPanel ivjJPanel1 = null;
 	private javax.swing.JCheckBox ivjGroupingCheckBox = null;
+	private javax.swing.JCheckBox ivjFastMoveCheckBox = null;
 	private javax.swing.JPanel ivjGroupingPanel = null;
 	private javax.swing.JLabel ivjGroupingSeparatorLabel = null;
 	private javax.swing.JTextField ivjGroupingSeparatorTextField = null;
@@ -241,6 +242,25 @@ private javax.swing.JCheckBox getGroupingCheckBox() {
 	return ivjGroupingCheckBox;
 }
 
+private javax.swing.JCheckBox getFastMoveCheckBox() {
+	if (ivjFastMoveCheckBox == null) {
+		try {
+			ivjFastMoveCheckBox = new javax.swing.JCheckBox();
+			ivjFastMoveCheckBox.setName("FastMoveCheckBox");
+			ivjFastMoveCheckBox.setSelected(true);
+			ivjFastMoveCheckBox.setText("Silhouette when moving a record");
+			// user code begin {1}
+			// user code end
+		} catch (java.lang.Throwable ivjExc) {
+			// user code begin {2}
+			// user code end
+			handleException(ivjExc);
+		}
+	}
+	return ivjFastMoveCheckBox;
+}
+
+
 private javax.swing.JCheckBox getGlobalMacrosCheckBox() {
 	if (GlobalMacrosCheckBox == null) {
 		try {
@@ -364,7 +384,7 @@ private javax.swing.JPanel getDoubleClickPanel() {
 		try {
 			DoubleClickPanel = new javax.swing.JPanel();
 			DoubleClickPanel.setName("DoubleClickPanel");
-			DoubleClickPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(" Double Click Settings "));
+			DoubleClickPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(" Visual Settings "));
 			DoubleClickPanel.setLayout(new java.awt.GridBagLayout());
 
 			java.awt.GridBagConstraints gridBagConstraints;
@@ -410,12 +430,9 @@ private javax.swing.JPanel getDoubleClickPanel() {
 
 			final JPanel testPanel = new JPanel();
 			final JLabel testLabel = new JLabel("0");
-			
 			testLabel.setHorizontalAlignment(JLabel.CENTER);
 			testPanel.setLayout(new BorderLayout());						
-			
 			testPanel.add(testLabel, BorderLayout.CENTER);
-			
 			testPanel.setMinimumSize(new Dimension(64,64));
 			testPanel.setPreferredSize(new Dimension(64,64));
 			
@@ -455,6 +472,14 @@ private javax.swing.JPanel getDoubleClickPanel() {
 		//	gridBagConstraints.fill = GridBagConstraints.BOTH;
 			gridBagConstraints.insets = new java.awt.Insets(4, 4, 14, 14);
 			getDoubleClickPanel().add(testPanel, gridBagConstraints);
+
+			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints.gridx = 0;
+			gridBagConstraints.gridy = 4;
+			gridBagConstraints.anchor = GridBagConstraints.WEST;
+			gridBagConstraints.weightx = 1.0;
+			gridBagConstraints.insets = new java.awt.Insets(4, 14, 4, 4);
+			getDoubleClickPanel().add(getFastMoveCheckBox(), gridBagConstraints);
 
 		} catch (java.lang.Throwable ivjExc) {
 							
@@ -857,6 +882,7 @@ private void initialize() {
 
 private void initializeMacros() {
 	getJSpinnerRecordLength().setValue(new Integer(Settings.getInstance().getRecordLength()));
+	getFastMoveCheckBox().setSelected(Settings.getInstance().getFastMove());
 	getGlobalMacrosCheckBox().setSelected(Settings.getInstance().getGlobalMacros());
 	getHierarhicalNamesCheckBox().setSelected(Settings.getInstance().getHierarhicalNames());
 }
@@ -905,6 +931,7 @@ public void oKButton_ActionPerformed(java.awt.event.ActionEvent actionEvent) {
 
 	Settings.getInstance().setDoubleClickSpeed(getJSliderDoubleClickSpeed().getValue());
 	Settings.getInstance().setDoubleClickSmudge(getJSliderDoubleClickSmudge().getValue());
+	Settings.getInstance().setFastMove(getFastMoveCheckBox().isSelected());
 	DoubleClickProxy.update();
 	
 	dispose();

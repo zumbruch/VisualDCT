@@ -157,7 +157,8 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 	// linking
 	private LinkSource tmplink = null;
 	private Hiliter hiliter;
-	
+
+	private boolean fastMove = false;	
 	// see run()
 	private boolean redrawRequest = false;
 	
@@ -331,11 +332,13 @@ public void draw(Graphics g) {
 	double prevDRX = view.getDrx(); double prevDRY = view.getDry();
 	view.setDrx(prevDRX-x0); view.setDry(prevDRY-y0);
 
-	// draw selected
-	Enumeration selected = view.getSelectedObjects().elements();
-	while (selected.hasMoreElements())
-		((VisibleObject)selected.nextElement()).paint(g, true);	
-
+	if (!fastDrawing) {
+		// draw selected
+		Enumeration selected = view.getSelectedObjects().elements();
+		while (selected.hasMoreElements())
+			((VisibleObject)selected.nextElement()).paint(g, true);	
+	}
+	
 	// draw selected
 	if (view.isBlinkState()) {
 		Enumeration blinking = view.getBlinkingObjects().elements();
@@ -343,6 +346,39 @@ public void draw(Graphics g) {
 			((VisibleObject)blinking.nextElement()).paint(g, true);	
 	}
 		
+	
+	if (mouseOperation==OBJECT_MOVE && fastMove)  {  //fast move
+		Movable hilitedObject = (Movable)view.getHilitedObject();
+		g.setColor(Constants.GRID_COLOR);
+		
+		if (view.isSelected(hilitedObject)) {
+			boolean ok = true;
+			int dx = draggedX-pressedX;
+			int dy = draggedY-pressedY;
+
+			Enumeration selected = view.getSelectedObjects().elements();
+			while (selected.hasMoreElements()) {
+				VisibleObject vo = (VisibleObject)selected.nextElement();
+				int rrx = vo.getRx() - view.getRx();
+				int rry = vo.getRy() - view.getRy();
+
+				int rwidth = vo.getRwidth();
+				int rheight = vo.getRheight();
+			
+				g.drawRect(rrx+draggedX-pressedX, rry+draggedY-pressedY, rwidth, rheight);			
+			}	
+		}else {
+				VisibleObject vo = (VisibleObject)hilitedObject;
+				
+				int rrx = vo.getRx() - view.getRx();
+				int rry = vo.getRy() - view.getRy();
+
+				int rwidth = vo.getRwidth();
+				int rheight = vo.getRheight();
+				
+				g.drawRect(rrx+draggedX-pressedX, rry+draggedY-pressedY, rwidth, rheight);
+			}
+	}
 	
 	if ((mouseOperation==ZOOM_SELECTION) ||
 		(mouseOperation==OBJECT_SELECTION)) {
@@ -367,8 +403,10 @@ public void draw(Graphics g) {
 	*/
 
 	// hilite object
-	VisibleObject vo = view.getHilitedObject();
-	if (vo!=null && !view.getBlinkingObjects().contains(vo)) vo.paint(g, true);
+	if (!fastDrawing) {
+		VisibleObject vo = view.getHilitedObject();
+		if (vo!=null && !view.getBlinkingObjects().contains(vo)) vo.paint(g, true);
+	}
 
 	drawOnlyHilitedOnce=alsoDrawHilitedOnce=false;
 
@@ -1093,6 +1131,12 @@ public void mouseDragged(MouseEvent e) {
 				int dx = (int)(rdx/view.getScale()); 
 				int dy = (int)(rdy/view.getScale());
 
+				if (fastMove) { //fast move
+					draggedX=px; draggedY=py;
+					repaint();
+					break;			
+				} 
+				
 				Movable hilitedObject = (Movable)view.getHilitedObject();
 				
 				if (view.isSelected(hilitedObject)) {
@@ -1153,25 +1197,31 @@ public void mouseDragged(MouseEvent e) {
 				int mdx = (int)(dx/view.getScale()); 
 				int mdy = (int)(dy/view.getScale());
 				
-				Movable hilitedObject = (Movable)view.getHilitedObject();
-				if (view.isSelected(hilitedObject))
-				{
-					moveSelection(mdx, mdy);
+				if (!Settings.getInstance().getFastMove()) {
+					Movable hilitedObject = (Movable)view.getHilitedObject();
+					if (view.isSelected(hilitedObject))
+					{
+						moveSelection(mdx, mdy);
+					}
+					else
+					{
+						hilitedObject.move(mdx, mdy);
+						alsoDrawHilitedOnce=true;
+					}
+					pressedX+=dx; pressedY+=dy;
+				} else {
+					pressedX-=dx; pressedY-=dy;
 				}
-				else
-				{
-					hilitedObject.move(mdx, mdy);
-					alsoDrawHilitedOnce=true;
-				}
-				pressedX+=dx; pressedY+=dy;
+				
 			}
 			else /*if ((mouseOperation==OBJECT_SELECTION) ||
 					(mouseOperation==ZOOM_SELECTION))*/
 			{
 				pressedX-=dx; pressedY-=dy;
-				forceRedraw=true;
-				fastDrawing = false;
 			}
+
+			forceRedraw=true;
+			fastDrawing = false;
 			
 			recalculateNavigatorPosition();
 			blockNavigatorRedrawOnce = true;
@@ -1281,6 +1331,13 @@ public void mousePressed(MouseEvent e) {
 				mouseOperation = OBJECT_MOVE;
 				pressedX=draggedX=px; 
 				pressedY=draggedY=py;
+				if (Settings.getInstance().getFastMove() && (hilitedObject instanceof Record
+						|| hilitedObject instanceof Template
+						|| view.getSelectedObjects().size()>1)) {
+					fastDrawing=true;
+					fastMove = true;
+				}
+					 
 			}
 			
 		}
@@ -1357,6 +1414,11 @@ public void mouseReleased(MouseEvent e) {
 
 			int dx = px-draggedX;
 			int dy = py-draggedY;
+			if (fastMove) {
+				dx = draggedX-pressedX;
+				dy = draggedY-pressedY;
+				fastMove=false;
+			}
 			dx = (int)(dx/view.getScale()); 
 			dy = (int)(dy/view.getScale());
 
@@ -1385,7 +1447,8 @@ public void mouseReleased(MouseEvent e) {
 			int cx = e.getX()-view.getX0();
 			int cy = e.getY()-view.getY0();
 			if (viewGroup.hiliteComponentsCheck(cx+view.getRx(), cy+view.getRy()))*/
-
+			
+			fastDrawing=false;
 			forceRedraw=true;
 			//alsoDrawHilitedOnce=true;
 			repaint();
