@@ -693,8 +693,10 @@ public void mouseClicked(MouseEvent e) {
 
 		if (hilited!=null) {			
 
+			boolean leftButtonPush = (e.getModifiers() & InputEvent.BUTTON1_MASK) != 0;
+
 			// linking support
-			if (tmplink!=null) {
+			if (tmplink!=null && leftButtonPush) {
 				if (hilited instanceof Record) {
 					linkCommand(hilited, null);
 					return;
@@ -722,7 +724,6 @@ public void mouseClicked(MouseEvent e) {
 				}
 			}
 			
-			boolean leftButtonPush = (e.getModifiers() & InputEvent.BUTTON1_MASK) != 0;
 			if (leftButtonPush)
 			{
 				if (e.isControlDown() || (e.getClickCount()==1)) {
