@@ -165,7 +165,7 @@ protected void draw(Graphics g, boolean hilited) {
 			if (c==Color.black)
 				c=Color.white;
 			else
-				c=Color.white;
+				c=Color.black;
 		g.setColor(c);
 
 		LinkDrawer.drawLink(g, this, inlink, getQueueCount(), rightSide);

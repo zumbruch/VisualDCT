@@ -716,13 +716,15 @@ private void updateText()
 		    paragraphEnd = paragraph.getEndIndex();
 	
 			int i = 1;
-		    for (char c = paragraph.first(); c != paragraph.DONE; c = paragraph.next())
+			char c = paragraph.first();		// skip first char
+		    for (paragraph.next(); c != paragraph.DONE; c = paragraph.next())
 		         if (c == '\n')
 		         	i++;
 		    breaks = new int[i];
 	
 			i = 0;
-		    for (char c = paragraph.first(); c != paragraph.DONE; c = paragraph.next())
+			c = paragraph.first();				// skip first char
+		    for (paragraph.next(); c != paragraph.DONE; c = paragraph.next())
 		         if (c == '\n')
 		         	breaks[i++]=paragraph.getIndex();
 			breaks[i] = paragraphEnd;

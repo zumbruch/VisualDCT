@@ -103,30 +103,30 @@ public class Constants {
     public static final String DEFAULT_FONT = "sansserif";
 
 /*
-	// VDCT mode
-    public final static Color BACKGROUND_COLOR = Color.white;
-    public final static Color PICK_COLOR = Color.pink;
-    public final static Color FRAME_COLOR = Color.black;
-    public final static Color HILITE_COLOR = Color.red;
-    public final static Color LINE_COLOR = Color.black;
-    public final static Color RECORD_COLOR = Color.white;
-    public final static Color SELECTION_COLOR = Color.pink;
-    public final static Color LINK_COLOR = Color.white;
+	// white on black color scheme
+    public static Color BACKGROUND_COLOR = Color.white;
+    public static Color PICK_COLOR = Color.pink;
+    public static Color FRAME_COLOR = Color.black;
+    public static Color HILITE_COLOR = Color.red;
+    public static Color LINE_COLOR = Color.black;
+    public static Color RECORD_COLOR = Color.white;
+    public static Color SELECTION_COLOR = Color.pink;
+    public static Color LINK_COLOR = Color.white;
 
     public final static Color GRID_COLOR = Color.lightGray;
 */
 
-	// Capfast mode
-    public final static Color BACKGROUND_COLOR = Color.black;
-    public final static Color PICK_COLOR = Color.red;
-    public final static Color FRAME_COLOR = Color.white;
-    public final static Color HILITE_COLOR = Color.yellow;
-    public final static Color LINE_COLOR = Color.white;
-    public final static Color RECORD_COLOR = Color.black;
-    public final static Color SELECTION_COLOR = Color.red;
-    public final static Color LINK_COLOR = Color.white;
+	// black on white color scheme
+    public static Color BACKGROUND_COLOR = Color.black;
+    public static Color PICK_COLOR = Color.red;
+    public static Color FRAME_COLOR = Color.white;
+    public static Color HILITE_COLOR = Color.yellow;
+    public static Color LINE_COLOR = Color.white;
+    public static Color RECORD_COLOR = Color.black;
+    public static Color SELECTION_COLOR = Color.red;
+    public static Color LINK_COLOR = Color.white;
 
-    public final static Color GRID_COLOR = Color.lightGray;
+    public static Color GRID_COLOR = Color.lightGray;
 
     public static final int DASHED_LINE_DENSITY = 8;
     public static final int ARROW_SIZE = 16;

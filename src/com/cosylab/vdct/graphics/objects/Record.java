@@ -359,7 +359,7 @@ protected void draw(Graphics g, boolean hilited) {
 				if (linkColor==Color.black)
 					linkColor=Color.white;
 				else
-					linkColor=Color.white;
+					linkColor=Color.black;
 
 			// draw link and its tail
 			boolean isRightSide = isRight();

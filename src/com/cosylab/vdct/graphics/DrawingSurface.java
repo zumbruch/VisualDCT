@@ -1302,15 +1302,15 @@ public void checkForIncodedDBDs(File file) throws IOException
 			// skip if already loaded
 			if (!dbds.contains(f))
 			{
-				Console.getInstance().println("o) Loading DBD file: '"+f.getAbsolutePath()+"'.");
+				Console.getInstance().println("Loading DBD file: '"+f.getAbsolutePath()+"'.");
 				openDBD(f, com.cosylab.vdct.DataProvider.getInstance().getDbdDB()!=null);
 			}
 			else
-				Console.getInstance().println("o) DBD file '"+f.getAbsolutePath()+"' is already loaded.");
+				Console.getInstance().println("DBD file '"+f.getAbsolutePath()+"' is already loaded.");
 		}
 		else 
 		{
-			Console.getInstance().println("o) DBD file not found: '"+f.getAbsolutePath()+"'.");
+			Console.getInstance().println("DBD file not found: '"+f.getAbsolutePath()+"'.");
 			
 			// add anyway
 			if (!dbds.contains(f))
@@ -2250,7 +2250,15 @@ public int print(java.awt.Graphics graphics, java.awt.print.PageFormat pageForma
 			}
 		}
 
+
+		// change color sheme 
+		loadBlackOnWhiteColorScheme();
+
 		viewGroup.paintComponents(graphics, false, isFlat());
+
+		// restore color sheme 
+		loadWhiteOnBlackColorScheme();
+		
 	}
 	catch (Exception e)
 	{
@@ -2752,13 +2760,48 @@ public Stack getTemplateStack()
 	return templateStack;
 }
 
-	/**
-	 * Sets the blockNavigatorRedrawOnce.
-	 * @param blockNavigatorRedrawOnce The blockNavigatorRedrawOnce to set
-	 */
-	public void setBlockNavigatorRedrawOnce(boolean blockNavigatorRedrawOnce)
-	{
-		this.blockNavigatorRedrawOnce = blockNavigatorRedrawOnce;
-	}
+/**
+ * Sets the blockNavigatorRedrawOnce.
+ * @param blockNavigatorRedrawOnce The blockNavigatorRedrawOnce to set
+ */
+public void setBlockNavigatorRedrawOnce(boolean blockNavigatorRedrawOnce)
+{
+	this.blockNavigatorRedrawOnce = blockNavigatorRedrawOnce;
+}
+
+/**
+ * Loads white on black color cheme
+ */
+public static void loadWhiteOnBlackColorScheme()
+{
+	// black on white color scheme
+    Constants.BACKGROUND_COLOR = Color.black;
+    Constants.PICK_COLOR = Color.red;
+    Constants.FRAME_COLOR = Color.white;
+    Constants.HILITE_COLOR = Color.yellow;
+    Constants.LINE_COLOR = Color.white;
+    Constants.RECORD_COLOR = Color.black;
+    Constants.SELECTION_COLOR = Color.red;
+    Constants.LINK_COLOR = Color.white;
+
+    Constants.GRID_COLOR = Color.lightGray;}
+
+/**
+ * Loads black on white color cheme
+ */
+public static void loadBlackOnWhiteColorScheme()
+{
+	// white on black color scheme
+    Constants.BACKGROUND_COLOR = Color.white;
+    Constants.PICK_COLOR = Color.pink;
+    Constants.FRAME_COLOR = Color.black;
+    Constants.HILITE_COLOR = Color.red;
+    Constants.LINE_COLOR = Color.black;
+    Constants.RECORD_COLOR = Color.white;
+    Constants.SELECTION_COLOR = Color.pink;
+    Constants.LINK_COLOR = Color.white;
+
+    Constants.GRID_COLOR = Color.lightGray;
+}
 
 }

@@ -254,7 +254,7 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 			if (c==Color.black)
 				c=Color.white;
 			else
-				c=Color.white;
+				c=Color.black;
 		g.setColor(c);
 		
 		if (inlink!=null) 
@@ -273,7 +273,7 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 			if (c==Color.black)
 				c=Color.white;
 			else
-				c=Color.white;
+				c=Color.black;
 		g.setColor(c);
 		LinkDrawer.drawLink(g, this, inlink, getQueueCount(), 
 							getOutX()<inlink.getInX());

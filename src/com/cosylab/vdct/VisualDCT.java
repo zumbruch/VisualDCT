@@ -1675,7 +1675,8 @@ public void exportPostScriptFileMenuItem_ActionPerformed()
 
 			if(streamPrintServiceFactory.length == 0)
 			{
-				System.err.println("Printing error: no suitable PostScript factory found.");
+				JOptionPane.showMessageDialog(VisualDCT.this, "Printing error", "No suitable PostScript factory found.", JOptionPane.ERROR_MESSAGE); 
+				//System.err.println("Printing error: no suitable PostScript factory found.");
 				return;
 			}
 
@@ -1794,7 +1795,7 @@ public void exportPostScriptFileMenuItem_ActionPerformed()
 				int nRow = Math.max((int)Math.ceil((double)h / pageHeight), 1);
 				int maxNumPage = nCol * nRow;
 
-				String numberOfPages = new Integer(maxNumPage).toString();
+				String numberOfPages = String.valueOf(maxNumPage);
 
 				StringBuffer stringBuffer = new StringBuffer(byteArrayOutputStream.toString());
 				byteArrayOutputStream = null;
@@ -1901,6 +1902,8 @@ public void exportPostScriptFileMenuItem_ActionPerformed()
 				view.setRy(ry);
 
 				setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
+		
+				CommandManager.getInstance().execute("RepaintWorkspace");
 			}
 		}
 	}.start();
@@ -5602,8 +5605,8 @@ public void printAsPostScriptMenuItem_ActionPerformed()
 
 			    if(!printerJob.getPrintService().isDocFlavorSupported(postScriptFlavor))
 			    {
-					System.err.println("Printing error: PostScript not supported on selected "
-						+ "printer.");
+			    	JOptionPane.showMessageDialog(VisualDCT.this, "Printing error", "PostScript not supported on selected printer.", JOptionPane.ERROR_MESSAGE); 
+					//System.err.println("Printing error: PostScript not supported on selected printer.");
 					return;
 			    }
 
@@ -5647,7 +5650,7 @@ public void printAsPostScriptMenuItem_ActionPerformed()
 				int nRow = Math.max((int)Math.ceil((double)h / pageHeight), 1);
 				int maxNumPage = nCol * nRow;
 
-				String numberOfPages = new Integer(maxNumPage).toString();
+				String numberOfPages = String.valueOf(maxNumPage);
 
 				StringBuffer stringBuffer = new StringBuffer(byteArrayOutputStream.toString());
 				byteArrayOutputStream = null;
@@ -5764,6 +5767,8 @@ public void printAsPostScriptMenuItem_ActionPerformed()
 				view.setRy(ry);
 
 				setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
+
+				CommandManager.getInstance().execute("RepaintWorkspace");
 			}
 		}
 	}.start();

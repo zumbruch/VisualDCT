@@ -327,7 +327,9 @@ protected void draw(Graphics g, boolean hilited) {
  * @param deep boolean
  */
 public Object findObject(String objectName, boolean deep) {
-	
+	if (objectName.length()==0 && Group.getRoot()==this)
+		return this;
+		
 	String relName = Group.substractRelativeName(getAbsoluteName(), 
 												 objectName);
 	
