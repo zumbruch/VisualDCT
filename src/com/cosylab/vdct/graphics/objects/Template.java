@@ -1090,17 +1090,49 @@ public void writeObjects(DataOutputStream file, NameManipulator namer)
 {
 	 String templateName = namer.getResolvedName(getName());
  	
+	 // new fileName
  	 String fn = templateName.replace('\\', '_').replace(':', '_')+".db";
+
+	 fn = "D:/"+fn; // !!!
+	 File newFile = new File(fn);
+
 
  	 file.writeBytes("\n#! "+DBResolver.VDCTSKIP+"\n");
  	 file.writeBytes(DBResolver.INCLUDE+" \""+fn+"\"\n");
 
-	// meergre properties!!!!
-	
-	 fn = "D:/"+fn; // !!!
-	 File newFile = new File(fn);
-	 NameManipulator newNamer = new DefaultNamer(newFile, namer.getRemovedPrefix(), namer.getAddedPrefix(), templateData.getProperties());
+	 // new substitutions 
+	 Map properties = null;
+	 if (namer.getSubstitutions()==null)
+	 	properties = templateData.getProperties();
+	 else
+	 {
+	 	// add this template substitutions (override existing one)
+	 	properties = namer.getSubstitutions();
+	 	properties.putAll(templateData.getProperties());
+	 }
+	 
+	 // new removedPrefix
+	 String removedPrefix = namer.getRemovedPrefix();
+	 
+	 // new addedPrefix
+	 String addedPrefix = null;
+	 if (getParent()==null)
+	 	addedPrefix = namer.getAddedPrefix();
+	 else
+	 {
+	 	// resolve parent group name - this is then addedPrefix
+	 	// there is a secial case: removedPrefix is 'parentName:", but parentName is 'parentName'
+	 	String parentName = ((Group)getParent()).getAbsoluteName();
+	 
+	 	addedPrefix = namer.getResolvedName(parentName+Constants.GROUP_SEPARATOR);
 
+	 	if (addedPrefix.length()==0 || 
+	 		(addedPrefix.length()==1 && addedPrefix.charAt(0)==Constants.GROUP_SEPARATOR))
+	 		addedPrefix = null;
+	 }
+	 
+	 
+	 NameManipulator newNamer = new DefaultNamer(newFile, removedPrefix, addedPrefix, properties);
 	 Group.save(getTemplateData().getTemplate().getGroup(), newFile, newNamer);
 }
 

@@ -28,9 +28,8 @@ package com.cosylab.vdct.graphics.objects;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.io.File;
 import java.util.Map;
-
-// StringUtils.removeBegining(name, path2remove);
 
 /**
  * Insert the type's description here.
@@ -62,4 +61,10 @@ public interface NameManipulator {
 	 * Creation date: (27.12.2000 11:47:12)
 	 */	
 	public Map getSubstitutions();
+	/**
+
+	 * Insert the type's description here.
+	 * Creation date: (27.12.2000 11:47:12)
+	 */	
+	public File getFile();
 }

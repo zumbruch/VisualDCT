@@ -95,4 +95,12 @@ public class DefaultNamer implements NameManipulator {
 		return properties;
 	}
 
+	/**
+	 * @see com.cosylab.vdct.graphics.objects.NameManipulator#getFile()
+	 */
+	public File getFile()
+	{
+		return file;
+	}
+
 }
