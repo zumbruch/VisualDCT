@@ -52,7 +52,7 @@ public abstract class EPICSLinkOut extends EPICSLink implements OutLink, Popupab
 			String action = e.getActionCommand();
 			if (action.equals(colorString))
 			{			
-				Color newColor = JColorChooser.showDialog(null, selectTitle, getColor());
+				Color newColor = ColorChooser.getColor(selectTitle, getColor());
 				if (newColor!=null)
 					setColor(newColor);
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");

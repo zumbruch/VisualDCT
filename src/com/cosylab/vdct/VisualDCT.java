@@ -3275,6 +3275,7 @@ private javax.swing.JMenuItem getMove_RenameMenuItem() {
 			ivjMove_RenameMenuItem.setName("Move_RenameMenuItem");
 			ivjMove_RenameMenuItem.setMnemonic('M');
 			ivjMove_RenameMenuItem.setText("Move/Rename");
+			ivjMove_RenameMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R,java.awt.Event.CTRL_MASK));
 			// user code begin {1}
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {

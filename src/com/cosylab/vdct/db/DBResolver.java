@@ -334,6 +334,8 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 						if ((tokenizer.ttype == tokenizer.TT_WORD)||
 							(tokenizer.ttype == DBConstants.quoteChar)) fd.setDescription(tokenizer.sval);
 						else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+						rd.addVisualField(fd);
 							
 					}
 				}

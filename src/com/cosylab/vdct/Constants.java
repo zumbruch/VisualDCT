@@ -92,7 +92,7 @@ public class Constants {
 
     public static final int INVISIBLE_CROSS_SIZE = 10;
 
-    public static final int LINK_STUB_SIZE = 20;
+    public static final int LINK_STUB_SIZE = FIELD_HEIGHT - 4;
 
     public static final int CONNECTOR_WIDTH = 6;
     public static final int CONNECTOR_HEIGHT = 6;

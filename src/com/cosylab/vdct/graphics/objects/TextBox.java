@@ -96,7 +96,7 @@ public void actionPerformed(ActionEvent event)
 	}
 	else if(action.equals(colorString))
 	{
-		Color newColor = JColorChooser.showDialog(null, colorTitleString, getColor());
+		Color newColor = ColorChooser.getColor(colorTitleString, getColor());
 		
 		if(newColor != null)
 		{

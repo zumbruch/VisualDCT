@@ -186,7 +186,7 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 			Linkable target = null;
 			//else if (descPoint instanceof OutLink)
 			{
-				target = EPICSLinkOut.getStartPoint(descPoint);
+				target = EPICSLinkOut.getEndPoint(descPoint);
 				// any special threatment ??
 				if (target instanceof Descriptable)
 					label = ((Descriptable)target).getDescription();
@@ -200,6 +200,7 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 		}
 	
 	
+		label = null;
 		descPoint = in;			
 		r = (int)(LARGE_RECT*view.getScale());
 		dx = tailLenOfR*r;
@@ -210,7 +211,7 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 	
 			//if (descPoint instanceof InLink)
 			{
-				target = EPICSLinkOut.getEndPoint(descPoint);
+				target = EPICSLinkOut.getStartPoint(descPoint);
 				// any special threatment ??
 				if (target instanceof Descriptable)
 					label = ((Descriptable)target).getDescription();
@@ -228,7 +229,7 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 	}
 
 	// only test here
-	else if (out.getMode() == OutLink.EXTERNAL_INPUT_MODE)
+	else if (out.getMode() == OutLink.EXTERNAL_OUTPUT_MODE)
 	{
 		// horizontal
 		
@@ -272,7 +273,7 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 
 		return;
 	}
-	else if (out.getMode() == OutLink.EXTERNAL_OUTPUT_MODE)
+	else if (out.getMode() == OutLink.EXTERNAL_INPUT_MODE)
 	{
 		// horizontal
 		

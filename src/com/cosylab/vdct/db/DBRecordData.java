@@ -39,6 +39,7 @@ public class DBRecordData extends DBComment {
 	protected String name;
 	protected Hashtable fields = null;
 	protected Vector fieldsV = null;
+	protected Vector visualFieldsV = null;
 
 	protected int x = -1;			// used for layout
 	protected int y = -1;
@@ -52,6 +53,7 @@ public class DBRecordData extends DBComment {
 public DBRecordData() {
 	fields = new Hashtable();
 	fieldsV = new Vector();
+	visualFieldsV = new Vector();
 }
 /**
  * This method was created in VisualAge.
@@ -63,6 +65,17 @@ public void addField(DBFieldData fd) {
 		fieldsV.addElement(fd);
 	}
 }
+
+/**
+ * This method was created in VisualAge.
+ * @param fd VisualDCTPackage.FieldData
+ */
+public void addVisualField(DBFieldData fd) {
+	if (!visualFieldsV.contains(fd)) {
+		visualFieldsV.addElement(fd);
+	}
+}
+
 /**
  * Insert the method's description here.
  * Creation date: (23.4.2001 17:22:37)
@@ -94,6 +107,14 @@ public Hashtable getFields() {
  */
 public Vector getFieldsV() {
 	return fieldsV;
+}
+/**
+ * Returs ordered (as read) list
+ * Creation date: (6.1.2001 20:39:27)
+ * @return java.util.Vector
+ */
+public Vector getVisualFieldsV() {
+	return visualFieldsV;
 }
 /**
  * Insert the method's description here.

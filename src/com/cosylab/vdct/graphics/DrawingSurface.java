@@ -1538,8 +1538,8 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 				record.setColor(dbRec.getColor());
 				record.setDescription(dbRec.getDescription());
 	
-				// add fields
-				e2 = dbRec.getFieldsV().elements();
+				// add fields (preserve visual order)
+				e2 = dbRec.getVisualFieldsV().elements();
 				while (e2.hasMoreElements()) {
 					dbField = (DBFieldData) (e2.nextElement());
 					if (dbField.isHasAdditionalData()) {

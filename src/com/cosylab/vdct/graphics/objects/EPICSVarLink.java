@@ -49,8 +49,9 @@ public class EPICSVarLink extends EPICSLink implements MultiInLink, Popupable, I
 			String action = e.getActionCommand();
 /*			if (action.equals(colorString))
 			{			
-				Color newColor = JColorChooser.showDialog(null, selectTitle, getColor());
-				setColor(newColor);
+				Color newColor = ColorChooser.getColor(selectTitle, getColor());
+				if (newColor!=null)
+					setColor(newColor);
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
 			else if (action.equals(addConnectorString))
