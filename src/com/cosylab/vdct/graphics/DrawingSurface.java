@@ -842,81 +842,29 @@ private void showPopup(MouseEvent e)
 
 private void createTextBox()
 {
-	try
-	{
-	
-		UndoManager.getInstance().startMacroAction();
-	
-		GetVDBManager manager =
-			(GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
-	
-		grTextBox = manager.getManager().createTextBox();
-		UndoManager.getInstance().addAction(new CreateAction(grTextBox));
+	GetVDBManager manager =
+		(GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
 
-// shp: old
-/*
-
-	// temp!!!
-		String reply = JOptionPane.showInputDialog( VisualDCT.getInstance(),
-			                           "Description:",
-			                           "Create textbox...",
-			                           JOptionPane.QUESTION_MESSAGE );
-		if(reply != null)
-			grTextBox.setDescription(reply);
-		else
-			grTextBox.setDescription("This is the default text... I am typing something really stupid...");
-*/
-	}
-	catch (Exception ex)
-	{
-		ex.printStackTrace();
-	}
-	finally
-	{
-		UndoManager.getInstance().stopMacroAction();
-	}
-	
+	grTextBox = manager.getManager().createTextBox();
+	UndoManager.getInstance().addAction(new CreateAction(grTextBox));
 }
+
 private void createBox()
 {
-	try
-	{
-		UndoManager.getInstance().startMacroAction();
-	
-		GetVDBManager manager =
-			(GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
-	
-		grBox = manager.getManager().createBox();
-		UndoManager.getInstance().addAction(new CreateAction(grBox));
-	}
-	catch (Exception ex)
-	{
-	}
-	finally
-	{
-		UndoManager.getInstance().stopMacroAction();
-	}
+	GetVDBManager manager =
+		(GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
+
+	grBox = manager.getManager().createBox();
+	UndoManager.getInstance().addAction(new CreateAction(grBox));
 }
+
 private void createLine()
 {
-	try
-	{
-	
-		UndoManager.getInstance().startMacroAction();
-	
-		GetVDBManager manager =
-			(GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
-	
-		grLine = manager.getManager().createLine();
-		UndoManager.getInstance().addAction(new CreateAction(grLine));
-	}
-	catch (Exception ex)
-	{
-	}
-	finally
-	{
-		UndoManager.getInstance().stopMacroAction();
-	}
+	GetVDBManager manager =
+		(GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
+
+	grLine = manager.getManager().createLine();
+	UndoManager.getInstance().addAction(new CreateAction(grLine));
 }
 	/**
 	 * Invoked when a mouse button is pressed on a component and then 

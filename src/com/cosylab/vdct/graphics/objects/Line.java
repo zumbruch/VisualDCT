@@ -112,13 +112,12 @@ private static boolean currentEndArrow = false;
 
 private static final String hashIdPrefix = "Line";
 
-public Line(String parName, ContainerObject parentGroup, String parentName, Vertex parStartVertex,
-	Vertex parEndVertex)
+public Line(String parName, Group parentGroup, int posX, int posY, int posX2, int posY2)
 {
 	super(parentGroup);
 
-	startVertex = parStartVertex;
-	endVertex = parEndVertex;
+	startVertex = new Vertex(this, posX, posY);
+	endVertex = new Vertex(this, posX2, posY2);
 	
 	revalidatePosition();
 
@@ -134,8 +133,8 @@ public Line(String parName, ContainerObject parentGroup, String parentName, Vert
 	{
 		hashId = getAvailableHashId();
 	
-		if(parentName.length() > 0)
-			name = parentName + Constants.GROUP_SEPARATOR + hashId;
+		if(parentGroup.getAbsoluteName().length() > 0)
+			name = parentGroup.getAbsoluteName() + Constants.GROUP_SEPARATOR + hashId;
 		else
 			name = hashId;
 	}
@@ -160,9 +159,6 @@ public boolean checkMove(int dx, int dy)
 
 public boolean copyToGroup(String group)
 {
-	Vertex newStartVertex = startVertex.copyToGroup(group);
-	Vertex newEndVertex = endVertex.copyToGroup(group);
-
 	String newName;
 	if(group.equals(nullString))
 		newName = Group.substractObjectName(getName());
@@ -173,13 +169,12 @@ public boolean copyToGroup(String group)
 	while(Group.getRoot().findObject(newName, true) != null)
 		newName = StringUtils.incrementName(newName, Constants.COPY_SUFFIX);
 
-	Line grLine = new Line(newName, null, null, newStartVertex, newEndVertex);
+	Line grLine = new Line(newName, null, 
+							startVertex.getX(), startVertex.getY(),
+							endVertex.getX(), endVertex.getY());
 	Group.getRoot().addSubObject(newName, grLine, true);
 	grLine.setStartArrow(startArrow);
 	grLine.setEndArrow(endArrow);
-	
-	newStartVertex.setOwner(grLine);
-	newEndVertex.setOwner(grLine);
 
 	ViewState view = ViewState.getInstance();
 	grLine.move(20 - view.getRx(), 20 - view.getRy());
@@ -378,31 +373,22 @@ public Vector getItems()
 	isDashedItem.addActionListener(al);
 	items.addElement(isDashedItem);
 
-	return items;
-}
-
-public Vector getItems(Vertex origin)
-{
-	Vector items = getItems();
-	
-	ActionListener al = new PopupMenuHandler();
-
-	if(origin == startVertex)
+	if(startVertex.isHilited())
 	{
 		JCheckBoxMenuItem startArrowItem = new JCheckBoxMenuItem(startArrowString);
 		startArrowItem.setSelected(startArrow);
 		startArrowItem.addActionListener(al);
 		items.addElement(startArrowItem);
 	}
-	else if(origin == endVertex)
+	else if(endVertex.isHilited())
 	{
 		JCheckBoxMenuItem endArrowItem = new JCheckBoxMenuItem(endArrowString);
 		endArrowItem.setSelected(endArrow);
 		endArrowItem.addActionListener(al);
 		items.addElement(endArrowItem);
 	}
-	
-	return items;	
+
+	return items;
 }
 
 public String getName()
@@ -457,9 +443,6 @@ public boolean move(int dx, int dy)
 
 public boolean moveToGroup(String group)
 {
-	startVertex.moveToGroup(group);
-	endVertex.moveToGroup(group);
-	
 	String currentParent = Group.substractParentName(getName());
 	if(group.equalsIgnoreCase(currentParent))
 		return false;
@@ -471,7 +454,7 @@ public boolean moveToGroup(String group)
 	else
 		newName = group + Constants.GROUP_SEPARATOR + Group.substractObjectName(getName());
 
-// object with new name already exists, add suffix // !!!
+    // object with new name already exists, add suffix // !!!
 	Object obj;
 	while((obj = Group.getRoot().findObject(newName, true)) != null)
 	{
@@ -481,9 +464,10 @@ public boolean moveToGroup(String group)
 			return true;
 		}
 		else
+		{
 			newName = StringUtils.incrementName(newName, Constants.MOVE_SUFFIX);
-			
-		return rename(newName);
+			return rename(newName);
+		}
 	}
 	
 	getParent().removeObject(Group.substractObjectName(getName()));
@@ -504,12 +488,12 @@ public boolean rename(String newName)
 	if(!oldObjName.equals(newObjName))
 	{
 		getParent().removeObject(oldObjName);
-		String fullName = StringUtils.replace(getName(), oldObjName, newObjName);
+		String fullName = StringUtils.replaceEnding(getName(), oldObjName, newObjName);
 		name = fullName;
 		getParent().addSubObject(newObjName, this);
 	}
 	
-// move if needed
+    // move if needed
 	moveToGroup(Group.substractParentName(newName));
 
 	return true;
@@ -549,6 +533,43 @@ protected void validate()
 
 	setRwidth((int)(getWidth() * rscale));
 	setRheight((int)(getHeight() * rscale));
+}
+
+
+/**
+ * Returned value inicates change
+ * Creation date: (21.12.2000 22:21:12)
+ * @return com.cosylab.visible.objects.VisibleObject
+ * @param x int
+ * @param y int
+ */
+public VisibleObject hiliteComponentsCheck(int x, int y) {
+
+	if (startVertex.intersects(x, y)!=null)
+		return startVertex;
+	if (endVertex.intersects(x, y)!=null)
+		return endVertex;
+	return null;
+}
+
+
+/**
+ * Default impmlementation for square (must be rescaled)
+ * Creation date: (19.12.2000 20:20:20)
+ * @return com.cosylab.visible.objects.VisibleObject
+ * @param px int
+ * @param py int
+ */
+public VisibleObject intersects(int px, int py) {
+
+	// first check on small sub-objects like connectors
+	VisibleObject spotted = hiliteComponentsCheck(px, py);
+  	if ((spotted==null) &&
+  		(getRx()<=px) && (getRy()<=py) && 
+		((getRx()+getRwidth())>=px) && 
+		((getRy()+getRheight())>=py))
+		spotted = this;
+	return spotted;
 }
 	
 }

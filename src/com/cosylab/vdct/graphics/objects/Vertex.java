@@ -46,31 +46,15 @@ import com.cosylab.vdct.util.*;
 public class Vertex extends VisibleObject implements Movable, Popupable
 {
 	
-private String hashId;
-private String name;
 private VisibleObject owner;
-
 private static final String nullString = "";
-private static final String hashIdPrefix = "Vertex";
+private boolean hilited = false;
 
-private String getAvailableHashId()
+public Vertex(VisibleObject owner, int parX, int parY)
 {
-	int number = 0;
-	String testHashId = hashIdPrefix + String.valueOf(number);
+	//super(parentGroup);
+	super(null);
 	
-	while(getParent().containsObject(testHashId))
-	{
-		number++;
-		testHashId = hashIdPrefix + String.valueOf(number);		
-	}
-
-	return testHashId;
-}
-
-public Vertex(String parName, ContainerObject parentGroup, String parentName, int parX, int parY)
-{
-	super(parentGroup);
-
 	ViewState view = ViewState.getInstance();
 
 	setX(parX - Constants.CONNECTOR_WIDTH / 2);
@@ -78,17 +62,8 @@ public Vertex(String parName, ContainerObject parentGroup, String parentName, in
 	setWidth(Constants.CONNECTOR_WIDTH);
 	setHeight(Constants.CONNECTOR_HEIGHT);
 
-	if(parName == null)
-	{
-		hashId = getAvailableHashId();
-	
-		if(parentName.length() > 0)
-			name = parentName + Constants.GROUP_SEPARATOR + hashId;
-		else
-			name = hashId;
-	}
-	else
-		name = parName;	
+	this.owner = owner;
+
 }
 
 public void accept(Visitor visitor)
@@ -108,38 +83,6 @@ public boolean checkMove(int dx, int dy)
 	}
 	
 	return true;
-}
-
-public Vertex copyToGroup(String group)
-{
-	String newName;
-	if(group.equals(nullString))
-		newName = Group.substractObjectName(getName());
-	else
-		newName = group + Constants.GROUP_SEPARATOR + Group.substractObjectName(getName());
-
-// object with new name already exists, add suffix ///!!!
-	while(Group.getRoot().findObject(newName, true) != null)
-		newName = StringUtils.incrementName(newName, Constants.COPY_SUFFIX);
-
-	Vertex grVertex = new Vertex(newName, null, null, super.getX(), super.getY());
-
-	Group.getRoot().addSubObject(newName, grVertex, true);
-
-	grVertex.move(20, 20);
-
-	unconditionalValidation();
-	return grVertex;
-}
-
-public void destroy()
-{
-	super.destroy();
-	if(getParent() != null)
-		getParent().removeObject(Group.substractObjectName(name));
-	
-	UndoManager.getInstance().addAction(new DeleteAction(this));
-
 }
 
 protected void draw(Graphics g, boolean hilited)
@@ -167,23 +110,22 @@ protected void draw(Graphics g, boolean hilited)
 
 public String getHashID()
 {
-	return hashId;
+	return null;
 }
 
 public Vector getItems()
 {
-	if(owner instanceof Box)
-		return ((Box)(owner)).getItems();
-		
-	if(owner instanceof Line)
-		return ((Line)(owner)).getItems(this);
-	
+	try
+	{
+		hilited = true;
+		if(owner instanceof Popupable)
+			return ((Popupable)owner).getItems();
+	}
+	finally
+	{
+		hilited = false;
+	}	
 	return null;
-}
-
-public String getName()
-{
-	return name;
 }
 
 public int getX()
@@ -220,74 +162,12 @@ public boolean move(int dx, int dy)
 	return false;
 }
 
-public boolean moveToGroup(String group)
-{
-	String currentParent = Group.substractParentName(getName());
-	if(group.equalsIgnoreCase(currentParent))
-		return false;
-	
-	String oldName = getName();
-	String newName;
-	if (group.equals(nullString))
-		newName = Group.substractObjectName(getName());
-	else
-		newName = group + Constants.GROUP_SEPARATOR + Group.substractObjectName(getName());
-
-// object with new name already exists, add suffix // !!!
-	Object obj;
-	while((obj = Group.getRoot().findObject(newName, true)) != null)
-	{
-		if(obj == this)	// it's me :) already moved, fix data
-		{
-			name = newName;
-			return true;
-		}
-		else
-			newName = StringUtils.incrementName(newName, Constants.MOVE_SUFFIX);
-			
-		return rename(newName);
-	}
-	
-	getParent().removeObject(Group.substractObjectName(getName()));
-	setParent(null);
-	Group.getRoot().addSubObject(newName, this, true);
-
-	name = newName;
-	unconditionalValidation();
-
-	return true;
-}
-
-public boolean rename(String newName)
-{
-	String newObjName = Group.substractObjectName(newName);
-	String oldObjName = Group.substractObjectName(getName());
-
-	if(!oldObjName.equals(newObjName))
-	{
-		getParent().removeObject(oldObjName);
-		String fullName = StringUtils.replace(getName(), oldObjName, newObjName);
-		name = fullName;
-		getParent().addSubObject(newObjName, this);
-	}
-	
-// move if needed
-	moveToGroup(Group.substractParentName(newName));
-
-	return true;
-}
-	
 public void revalidatePosition()
 {
 	double rscale = getRscale();
 
 	setRx((int)(getX() * rscale));
 	setRy((int)(getY() * rscale));
-}
-
-public void setOwner(VisibleObject parOwner)
-{
-	owner = parOwner;	
 }
 
 public void setX(int parX)
@@ -316,4 +196,13 @@ protected void validate()
 	setRheight((int)(getHeight() * rscale));
 }
 	
+/**
+ * Returns the hilited.
+ * @return boolean
+ */
+public boolean isHilited()
+{
+	return hilited;
+}
+
 }

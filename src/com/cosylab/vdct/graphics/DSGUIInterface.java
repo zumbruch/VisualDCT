@@ -175,17 +175,8 @@ public Box createBox()
 
 	String parentName = parentGroup.getAbsoluteName();
 	
-	Vertex startVertex = new Vertex(null, parentGroup, parentName, posX, posY);
- 	Group.getRoot().addSubObject(startVertex.getName(), startVertex, true);
-
-	Vertex endVertex = new Vertex(null, parentGroup, parentName, posX, posY);
- 	Group.getRoot().addSubObject(endVertex.getName(), endVertex, true);
-
-	Box grBox = new Box(null, parentGroup, parentName, startVertex, endVertex);
+	Box grBox = new Box(null, parentGroup, posX, posY, posX, posY);
  	Group.getRoot().addSubObject(grBox.getName(), grBox, true);
-
-	startVertex.setOwner(grBox);
-	endVertex.setOwner(grBox);
 
 	drawingSurface.repaint();
 	
@@ -204,17 +195,8 @@ public Line createLine()
 	
 	String parentName = parentGroup.getAbsoluteName();
 	
-	Vertex startVertex = new Vertex(null, parentGroup, parentName, posX, posY);
- 	Group.getRoot().addSubObject(startVertex.getName(), startVertex, true);
-
-	Vertex endVertex = new Vertex(null, parentGroup, parentName, posX, posY);
- 	Group.getRoot().addSubObject(endVertex.getName(), endVertex, true);
-
-	Line grLine = new Line(null, parentGroup, parentName, startVertex, endVertex);
+	Line grLine = new Line(null, parentGroup, posX, posY, posX, posY);
  	Group.getRoot().addSubObject(grLine.getName(), grLine, true);
-
-	startVertex.setOwner(grLine);
-	endVertex.setOwner(grLine);
 
 	drawingSurface.repaint();
 	
@@ -233,19 +215,10 @@ public TextBox createTextBox()
 
 	String parentName = parentGroup.getAbsoluteName();
 
-	Vertex startVertex = new Vertex(null, parentGroup, parentName, posX, posY);
- 	Group.getRoot().addSubObject(startVertex.getName(), startVertex, true);
-
-	Vertex endVertex = new Vertex(null, parentGroup, parentName, posX, posY);
- 	Group.getRoot().addSubObject(endVertex.getName(), endVertex, true);
-
-	TextBox grTextBox = new TextBox(null, parentGroup, parentName, startVertex, endVertex);
+	TextBox grTextBox = new TextBox(null, parentGroup, posX, posY, posX, posY);
  	Group.getRoot().addSubObject(grTextBox.getName(), grTextBox, true);
 
 	grTextBox.setBorder(true);
-
-	startVertex.setOwner(grTextBox);
-	endVertex.setOwner(grTextBox);
 
 	drawingSurface.repaint();
 	
