@@ -225,6 +225,7 @@ public boolean manageLink(VDBFieldData field) {
 			// existing link
 			EPICSLinkOut link = (EPICSLinkOut)getSubObject(field.getName());
 			link.valueChanged();
+			link.setDestroyed(false);
 			return true;
 			
 		}

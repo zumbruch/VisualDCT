@@ -135,6 +135,7 @@ public void destroy() {
 		destroyChain();
 		setInput(null);
 		getFieldData().setValue(nullString);
+		properties = new LinkProperties(fieldData);
 	}
 }
 /**
@@ -387,8 +388,11 @@ public static InLink getTarget(LinkProperties link) {
 
 	InLink templateLink = (InLink)DataProvider.getInstance().getLookupTable().get(link.getTarget());
 	if (templateLink!=null)
+	{
+		((TemplateEPICSVarLink)templateLink).setDestroyed(false);
 		return templateLink;
-
+	}
+	
 	Record record = (Record)Group.getRoot().findObject(recName, true);
 	if (record==null) return null;
 	else if (link.getType()==link.FWDLINK_FIELD) {

@@ -28,8 +28,16 @@ package com.cosylab.vdct.graphics.objects;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JMenuItem;
+import javax.swing.JSeparator;
+
 import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.DataProvider;
+import com.cosylab.vdct.events.CommandManager;
+import com.cosylab.vdct.events.commands.LinkCommand;
 import com.cosylab.vdct.vdb.VDBTemplateField;
 
 /**
@@ -38,6 +46,8 @@ import com.cosylab.vdct.vdb.VDBTemplateField;
  * @author Matej Sekoranja 
  */
 public class TemplateEPICSOutLink extends EPICSOutLink {
+
+	private static final String linkString = "Link";
 
 /**
  * EPICSOutLink constructor comment.
@@ -80,5 +90,49 @@ public boolean isRight()
 	// super.super.isRigth() is the right solution, but ...
 	return isStaticRight();
 }	
+
+class PopupMenuHandler implements ActionListener {
+	public void actionPerformed(ActionEvent e) {
+	    LinkCommand cmd = (LinkCommand)CommandManager.getInstance().getCommand("LinkCommand");
+	    cmd.setData((LinkManagerObject)TemplateEPICSOutLink.this.getParent(), TemplateEPICSOutLink.this.getFieldData());
+ 		cmd.execute();
+	}
+}
+
+
+/**
+ * Insert the method's description here.
+ * Creation date: (2.2.2001 23:00:51)
+ * @return com.cosylab.vdct.graphics.objects.TemplateEPICSOutLink.PopupMenuHandler
+ */
+private com.cosylab.vdct.graphics.objects.TemplateEPICSOutLink.PopupMenuHandler createPopupmenuHandler() {
+	return new PopupMenuHandler();
+}
+
+
+/**
+ * Insert the method's description here.
+ * Creation date: (3.2.2001 11:23:59)
+ * @return java.util.Vector
+ */
+public java.util.Vector getItems() {
+	java.util.Vector items = super.getItems();
+
+	if (isDisconnected())
+	{
+		ActionListener al = createPopupmenuHandler();
+		
+		items.add(new JSeparator());
+		
+		JMenuItem link = new JMenuItem(linkString);
+		link.addActionListener(al);
+		items.addElement(link);	
+		
+	}
+
+	return items;
+}
+
+
 
 }

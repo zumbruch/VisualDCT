@@ -64,4 +64,5 @@ public String getLabel() {
 	return ((VDBTemplateField)getFieldData()).getAlias();
 }
 
+
 }

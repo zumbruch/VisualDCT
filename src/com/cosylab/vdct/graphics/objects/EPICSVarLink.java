@@ -119,6 +119,7 @@ public void destroy() {
 				else 
 					outlink.disconnect(this);
 			}
+			outlinks.clear();
 		}
 	}
 	
@@ -241,6 +242,9 @@ public int getInY() {
  * @return java.util.Vector
  */
 public java.util.Vector getItems() {
+	
+	if (getLinkCount()==0) return null;
+	
 	Vector items = new Vector();
 
 	ActionListener al = createPopupmenuHandler();

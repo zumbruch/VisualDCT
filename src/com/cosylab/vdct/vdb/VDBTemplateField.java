@@ -53,10 +53,9 @@ public class VDBTemplateField extends VDBFieldData implements Descriptable
 		this.alias=alias;
 		this.templateInstance = templateInstance;
 			
-		// copy (is this good - what about delegation...?!!!)
 		this.setType(field.getType());
 		this.setName(field.getName());
-		this.setValue(field.getInit_value());
+		this.setValue(field.getValue());
 		this.setInit_value(field.getInit_value());
 		this.setGUI_type(field.getGUI_type());
 		this.setDbdData(field.getDbdData());
@@ -271,7 +270,5 @@ public class VDBTemplateField extends VDBFieldData implements Descriptable
 	
 		InspectorManager.getInstance().updateProperty(visualTemplate, this);
 	}
-
-
 
 }
