@@ -28,6 +28,9 @@ package com.cosylab.vdct.undo;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import com.cosylab.vdct.graphics.objects.LinkManagerObject;
+
+
 /**
  * Insert the type's description here.
  * Creation date: (5.5.2001 12:07:47)
@@ -35,7 +38,7 @@ package com.cosylab.vdct.undo;
  */
 public class MoveFieldUpAction extends ActionObject {
 	protected com.cosylab.vdct.graphics.objects.Field field;
-	protected com.cosylab.vdct.graphics.objects.Record record;
+	protected LinkManagerObject parentObject;
 /**
  * Insert the method's description here.
  * Creation date: (5.5.2001 12:08:29)
@@ -43,7 +46,7 @@ public class MoveFieldUpAction extends ActionObject {
  */
 public MoveFieldUpAction(com.cosylab.vdct.graphics.objects.Field field) {
 	this.field=field;
-	this.record = (com.cosylab.vdct.graphics.objects.Record)field.getParent();
+	this.parentObject = (LinkManagerObject)field.getParent();
 }
 /**
  * Insert the method's description here.
@@ -57,12 +60,12 @@ public String getDescription() {
  * This method was created in VisualAge.
  */
 protected void redoAction() {
-	record.moveFieldUp(field);
+	parentObject.moveFieldUp(field);
 }
 /**
  * This method was created in VisualAge.
  */
 protected void undoAction() {
-	record.moveFieldDown(field);
+	parentObject.moveFieldDown(field);
 }
 }

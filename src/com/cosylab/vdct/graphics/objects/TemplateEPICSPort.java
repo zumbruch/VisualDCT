@@ -47,7 +47,6 @@ import com.cosylab.vdct.vdb.VDBTemplatePort;
  * Creation date: (29.1.2001 21:27:30)
  * @author Matej Sekoranja
  */
-
 public class TemplateEPICSPort extends EPICSVarLink implements TemplateEPICSLink {
 
  	private String lastUpdatedFullName = null;

@@ -62,7 +62,8 @@ import com.cosylab.vdct.vdb.*;
  */
 // TODO template - undo after destroy
 // TODO save fields positions
-// TODO do not show hidden macros in properties
+// TODO do not show hidden macros (with fields?) in properties or not?!
+// TODO make serialization of macro w/o vis. rep. work, but macro is defined only as visible object?!
 public class Template
 	extends LinkManagerObject
 	implements /*Descriptable,*/ Movable, Inspectable, Popupable, Flexible, Selectable, Clipboardable, Hub, MonitoredPropertyListener, SaveInterface, SaveObject
@@ -114,6 +115,7 @@ public class Template
 
 	protected Vector invalidLinks = null;
 	
+	protected int fields = 0;
 	protected int leftFields = 0;
 	protected int rightFields = 0;
 	
@@ -744,7 +746,7 @@ public VisibleObject intersects(int px, int py) {
  * Insert the method's description here.
  * Creation date: (26.1.2001 17:18:51)
  */
-private void revalidateFieldsPosition() {
+public void revalidateFieldsPosition() {
 
   int lx = getX();
   int rx = getX()+getWidth()/2; 
@@ -837,6 +839,7 @@ private EPICSLink createLinkField(VDBFieldData field)
 	else if (field instanceof VDBTemplateMacro)
 		link = new TemplateEPICSMacro(this, field);
 
+	fields++;
 	if (link!=null)
 	{
 		if (link.isVisible())
@@ -1005,6 +1008,8 @@ private void synchronizePortLinkFields()
 				// remove port
 				link.destroyAndRemove();
 	
+				fields--;
+
 				removeObject(link.getFieldData().getName());
 			}
 		}
@@ -1130,6 +1135,8 @@ private void synchronizeMacroLinkFields()
 				link.destroyAndRemove();
 	
 				removeObject(link.getFieldData().getName());
+				
+				fields--;
 				
 				// remove from properties
 				templateData.removeProperty(link.getFieldData().getName());
@@ -1833,5 +1840,127 @@ public void fieldVisibilityChange(VDBFieldData fieldData, boolean newVisible)
 	com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 	
 }
+
+/**
+ * Insert the method's description here.
+ * Creation date: (3.5.2001 22:54:43)
+ * @return boolean
+ * @param field com.cosylab.vdct.graphics.objects.Field
+ */
+public boolean isFirstField(Field field) {
+	// find first field on the same side and compare
+		
+	EPICSLink ef = (EPICSLink)field;
+	
+	Enumeration e = subObjectsV.elements();
+	Object obj;
+	while (e.hasMoreElements()) {
+		obj = e.nextElement();
+		if (obj instanceof EPICSLink)
+		{
+			EPICSLink tel = (EPICSLink)obj;
+			// same side
+			if (tel.isVisible() && tel.isRight()==ef.isRight())
+				if (tel==ef)
+					return true;
+				else
+					return false;
+		}
+	}
+	
+	return false;
+}
+/**
+ * Insert the method's description here.
+ * Creation date: (3.5.2001 22:53:47)
+ * @param field com.cosylab.vdct.graphics.objects.Field
+ */
+public boolean isLastField(Field field) {
+	EPICSLink ef = (EPICSLink)field;
+
+	for (int i= subObjectsV.size()-1; i>=0; i--)
+		if (subObjectsV.elementAt(i) instanceof EPICSLink)
+		{
+			EPICSLink tel = (EPICSLink)subObjectsV.elementAt(i);
+			// same side
+			if (tel.isVisible() && tel.isRight()==ef.isRight())
+				if (tel==ef)
+					return true;
+				else
+					return false;
+		}
+	return false;
+	
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (3.5.2001 22:36:11)
+ * @param field com.cosylab.vdct.graphics.objects.Field
+ */
+public void moveFieldDown(Field field) {
+	// move visual field
+	EPICSLink ef = (EPICSLink)field;
+
+	Vector fields = getSubObjectsV();
+	int pos = fields.indexOf(ef);
+
+	pos++;
+	while (pos<fields.size())
+	{
+		EPICSLink elo;
+		Object obj = fields.elementAt(pos);
+		if ((obj instanceof EPICSLink) &&
+			(elo=((EPICSLink)obj)).isRight() == ef.isRight() &&
+			elo.isVisible())
+			break;
+		else
+			pos++;
+	}
+
+	if (pos<fields.size()) {
+		fields.removeElement(ef);
+		fields.insertElementAt(ef, pos);
+		revalidateFieldsPosition();
+	}
+	com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+	com.cosylab.vdct.undo.UndoManager.getInstance().addAction(new com.cosylab.vdct.undo.MoveFieldDownAction(ef));
+	//InspectorManager.getInstance().updateObject(this);
+}
+/**
+ * Insert the method's description here.
+ * Creation date: (3.5.2001 22:36:11)
+ * @param field com.cosylab.vdct.graphics.objects.Field
+ */
+public void moveFieldUp(Field field) {
+	// move visual field
+	EPICSLink ef = (EPICSLink)field;
+
+	Vector fields = getSubObjectsV();
+	int pos = fields.indexOf(ef);
+	pos--;
+	while (pos>=0)
+	{
+		EPICSLink elo;
+		Object obj = fields.elementAt(pos); 			
+		if ((obj instanceof EPICSLink) &&
+			(elo=((EPICSLink)obj)).isRight() == ef.isRight() &&
+			elo.isVisible())
+			break;
+		else
+			pos--;
+	}
+
+	if (pos>=0) {
+		fields.removeElement(ef);
+		fields.insertElementAt(ef, pos);
+		revalidateFieldsPosition();
+	}
+	
+	com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+	com.cosylab.vdct.undo.UndoManager.getInstance().addAction(new com.cosylab.vdct.undo.MoveFieldUpAction(ef));
+	//InspectorManager.getInstance().updateObject(this);
+}
+
 
 }

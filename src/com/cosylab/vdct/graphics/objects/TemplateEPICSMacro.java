@@ -34,6 +34,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Vector;
 
+import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
 
@@ -331,9 +332,11 @@ class PopupMenuHandler implements ActionListener {
 		}
 		else if (action.equals(moveUpString))
 		{
+			((Template)getParent()).moveFieldUp(TemplateEPICSMacro.this);
 		}
 		else if (action.equals(moveDownString))
 		{
+			((Template)getParent()).moveFieldDown(TemplateEPICSMacro.this);
 		}
 		else if (action.equals(startLinkingString))
 		{
@@ -379,35 +382,29 @@ public java.util.Vector getItems() {
 
 	items.add(new JSeparator());
 
-//TODO moving fields
-/*
-	if (getParent() instanceof Record)
+	Template parTem = (Template)getParent();
+	boolean isFirst = parTem.isFirstField(this);
+	boolean isLast = parTem.isLastField(this);
+
+	if (!isFirst)
 	{
-		Record parRec = (Record)getParent();
-		boolean isFirst = parRec.isFirstField(this);
-		boolean isLast = parRec.isLastField(this);
-		
-	
-		if (!isFirst)
-		{
-			JMenuItem upItem = new JMenuItem(moveUpString);
-			upItem.addActionListener(al);
-			upItem.setIcon(new ImageIcon(getClass().getResource("/images/up.gif")));
-			items.addElement(upItem);
-		}
-	
-		if (!isLast)
-		{
-			JMenuItem downItem = new JMenuItem(moveDownString);
-			downItem.addActionListener(al);
-			downItem.setIcon(new ImageIcon(getClass().getResource("/images/down.gif")));
-			items.addElement(downItem);
-		}
-	
-		if (!(isFirst && isLast))
-			items.add(new JSeparator());
+		JMenuItem upItem = new JMenuItem(moveUpString);
+		upItem.addActionListener(al);
+		upItem.setIcon(new ImageIcon(getClass().getResource("/images/up.gif")));
+		items.addElement(upItem);
 	}
-*/	
+
+	if (!isLast)
+	{
+		JMenuItem downItem = new JMenuItem(moveDownString);
+		downItem.addActionListener(al);
+		downItem.setIcon(new ImageIcon(getClass().getResource("/images/down.gif")));
+		items.addElement(downItem);
+	}
+
+	if (!(isFirst && isLast))
+		items.add(new JSeparator());
+	
 	JMenuItem linkItem = new JMenuItem(startLinkingString);
 	linkItem.addActionListener(al);
 	items.addElement(linkItem);

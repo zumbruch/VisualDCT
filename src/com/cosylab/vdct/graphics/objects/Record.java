@@ -911,43 +911,6 @@ public boolean isDisconnected() {
 }
 /**
  * Insert the method's description here.
- * Creation date: (3.5.2001 22:54:43)
- * @return boolean
- * @param field com.cosylab.vdct.graphics.objects.Field
- */
-public boolean isFirstField(Field field) {
-	// find first field and compare
-		
-	Enumeration e = subObjectsV.elements();
-	Object obj;
-	while (e.hasMoreElements()) {
-		obj = e.nextElement();
-		if (obj instanceof Field)
-			if (obj==field)
-				return true;
-			else
-				return false;
-	}
-	
-	return false;
-}
-/**
- * Insert the method's description here.
- * Creation date: (3.5.2001 22:53:47)
- * @param field com.cosylab.vdct.graphics.objects.Field
- */
-public boolean isLastField(Field field) {
-	for (int i= subObjectsV.size()-1; i>=0; i--)
-		if (subObjectsV.elementAt(i) instanceof Field)
-			if (subObjectsV.elementAt(i)==field)
-				return true;
-			else
-				return false;
-	return false;
-	
-}
-/**
- * Insert the method's description here.
  * Creation date: (30.1.2001 16:58:58)
  * @return boolean
  */
@@ -999,50 +962,6 @@ public boolean move(int dx, int dy) {
 	}
 	else 
 		return false;
-}
-/**
- * Insert the method's description here.
- * Creation date: (3.5.2001 22:36:11)
- * @param field com.cosylab.vdct.graphics.objects.Field
- */
-public void moveFieldDown(Field field) {
-	// move visual field
-	Vector fields = getSubObjectsV();
-	int pos = fields.indexOf(field);
-
-	pos++;
-	while (pos<fields.size() && !(fields.elementAt(pos) instanceof Field))
-		pos++;
-
-	if (pos<fields.size()) {
-		fields.removeElement(field);
-		fields.insertElementAt(field, pos);
-		revalidateFieldsPosition();
-	}
-	com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
-	com.cosylab.vdct.undo.UndoManager.getInstance().addAction(new com.cosylab.vdct.undo.MoveFieldDownAction(field));
-}
-/**
- * Insert the method's description here.
- * Creation date: (3.5.2001 22:36:11)
- * @param field com.cosylab.vdct.graphics.objects.Field
- */
-public void moveFieldUp(Field field) {
-	// move visual field
-	Vector fields = getSubObjectsV();
-	int pos = fields.indexOf(field);
-	pos--;
-	while (pos>=0 && !(fields.elementAt(pos) instanceof Field))
-		pos--;
-
-	if (pos>=0) {
-		fields.removeElement(field);
-		fields.insertElementAt(field, pos);
-		revalidateFieldsPosition();
-	}
-	
-	com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
-	com.cosylab.vdct.undo.UndoManager.getInstance().addAction(new com.cosylab.vdct.undo.MoveFieldUpAction(field));
 }
 /**
  * Insert the method's description here.
@@ -1168,7 +1087,7 @@ public boolean rename(java.lang.String newName) {
  * Insert the method's description here.
  * Creation date: (26.1.2001 17:18:51)
  */
-private void revalidateFieldsPosition() {
+public void revalidateFieldsPosition() {
 
   int nx, ny;
   ny = getY()+getHeight();

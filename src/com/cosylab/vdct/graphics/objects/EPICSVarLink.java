@@ -61,11 +61,11 @@ public class EPICSVarLink extends EPICSLink implements MultiInLink, Popupable, I
 			}
 			else*/ if (action.equals(moveUpString))
 			{
-				((Record)getParent()).moveFieldUp(EPICSVarLink.this);
+				((LinkManagerObject)getParent()).moveFieldUp(EPICSVarLink.this);
 			}
 			else if (action.equals(moveDownString))
 			{
-				((Record)getParent()).moveFieldDown(EPICSVarLink.this);
+				((LinkManagerObject)getParent()).moveFieldDown(EPICSVarLink.this);
 			}
 			else if (action.equals(removeString))
 			{
@@ -244,8 +244,6 @@ public int getInY() {
  */
 public java.util.Vector getItems() {
 	
-	if (getLinkCount()==0) return null;
-	
 	Vector items = new Vector();
 
 	ActionListener al = createPopupmenuHandler();
@@ -260,11 +258,11 @@ public java.util.Vector getItems() {
 
 	items.add(new JSeparator());
 */
-	if (getParent() instanceof Record)
+	if (getParent() instanceof LinkManagerObject)
 	{
-		Record parRec = (Record)getParent();
-		boolean isFirst = parRec.isFirstField(this);
-		boolean isLast = parRec.isLastField(this);
+		LinkManagerObject parObj = (LinkManagerObject)getParent();
+		boolean isFirst = parObj.isFirstField(this);
+		boolean isLast = parObj.isLastField(this);
 		
 	
 		if (!isFirst)
@@ -283,14 +281,17 @@ public java.util.Vector getItems() {
 			items.addElement(downItem);
 		}
 	
-		if (!(isFirst && isLast))
+		if (!(isFirst && isLast) && getLinkCount()>0)
 			items.add(new JSeparator());
 	}
 	
-	JMenuItem removeItem = new JMenuItem(removeString);
-	removeItem.addActionListener(al);
-	items.addElement(removeItem);
-
+	if (getLinkCount()>0)
+	{
+		JMenuItem removeItem = new JMenuItem(removeString);
+		removeItem.addActionListener(al);
+		items.addElement(removeItem);
+	}
+	
 	return items;
 }
 /**
