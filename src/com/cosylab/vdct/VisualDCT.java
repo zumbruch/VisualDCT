@@ -6125,19 +6125,12 @@ public byte[] printGrid(PageFormat pageFormat, StringBuffer stringBuffer) {
 	
 			int imageWidth = Math.min(pageWidth, w-x);
 			int imageHeight = Math.min(pageHeight, h-y);
-	
-			System.out.println("2screen2printer "+screen2printer);
-			//view.setScale(screen2printer);
 			
 			view.setScale(1.0);
 			view.setRx((int)(rx/scale+x));
 			view.setRy((int)(ry/scale+y));
 			view.setViewWidth((int)(imageWidth/screen2printer));
 			view.setViewHeight((int)(imageHeight/screen2printer));
-			
-			/*view.setRx((int)(rx*converter+x));
-			view.setRy((int)(ry*converter+y));*/
-			
 	
 			String postScriptGrid = new String();
 		

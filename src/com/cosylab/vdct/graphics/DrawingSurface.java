@@ -2285,7 +2285,6 @@ public int print(java.awt.Graphics graphics, java.awt.print.PageFormat pageForma
 	try
 	{
 		((Graphics2D)graphics).scale(screen2printer, screen2printer);
-		System.out.println("1screen2printer "+screen2printer);
 				
 		view.setScale(1.0);
 		view.setRx((int)(rx/scale+x));
@@ -2310,8 +2309,6 @@ public int print(java.awt.Graphics graphics, java.awt.print.PageFormat pageForma
 			int y0 = view.getGridSize() - view.getRy() % gridSize;
 			int xsteps = view.getViewWidth() / gridSize + 1;
 			int ysteps = view.getViewHeight() / gridSize + 1;
-	
-			System.out.println(sx+" "+y0+" "+xsteps+" "+ysteps+" "+imageWidth+" "+imageHeight);
 	
 			if (gridSize >= 15)
 			// crosses
