@@ -106,7 +106,9 @@ public void addSubObject(String id, VisibleObject object) {
  * @param create boolean
  */
 public void addSubObject(String id, VisibleObject object, boolean create) {
-	if (!Group.hasTokens(id)) addSubObject(id, object);
+	if (id.length()==0 || id.charAt(0)==Constants.GROUP_SEPARATOR)
+		com.cosylab.vdct.Console.getInstance().println("Invalid name object name '"+id+"'. Skipping...");
+	else if (!Group.hasTokens(id)) addSubObject(id, object);
 	else {
 		Group parent = null;
 		String parentName = Group.substractParentName(id);
@@ -311,13 +313,22 @@ public Object findObject(String objectName, boolean deep) {
 	
 	String relName = Group.substractRelativeName(getAbsoluteName(), 
 												 objectName);
-	if (relName==null) return null; 	
-	else if (Group.hasTokens(relName)) {
+	
+	if (relName==null)
+		return null; 	
+	else if (relName.length()==0 || relName.charAt(0)==Constants.GROUP_SEPARATOR)
+	{
+		com.cosylab.vdct.Console.getInstance().println("Invalid name '"+objectName+"'.");
+		return null; 	
+	}
+	else if (Group.hasTokens(relName))
+	{
 		if (!deep) return null;
 		String parentName = Group.substractToken(relName);
 		// !!! check if parent is always Group object
 		Group parent = (Group)getSubObject(parentName);
-		if (parent==null) {
+		if (parent==null)
+		{
 			//com.cosylab.vdct.Console.getInstance().println("o) Internal error: no parent found / no such object");
 			//com.cosylab.vdct.Console.getInstance().println("\t objectName="+objectName+", current group="+getAbsoluteName());
 			return null;
@@ -1073,11 +1084,11 @@ public static void writeObjects(Vector elements, java.io.DataOutputStream file, 
 							   (fieldData.getType()==DBDConstants.DBF_DEVICE)) && 
 							  fieldData.getValue().equals(com.cosylab.vdct.Constants.NONE) && menu...)*/)
 							{
-								
 			    				// write field value
-								if ((fieldData.getType()==DBDConstants.DBF_INLINK) ||
+								if (((fieldData.getType()==DBDConstants.DBF_INLINK) ||
 								    (fieldData.getType()==DBDConstants.DBF_OUTLINK) ||
 								    (fieldData.getType()==DBDConstants.DBF_FWDLINK))
+								    && !fieldData.getValue().startsWith(Constants.HARDWARE_LINK))
 									file.writeBytes("  field("+fieldData.getName()+",\""+namer.getResolvedName(fieldData.getValue())+"\")\n");
 						 		 else
 	 								file.writeBytes("  field("+fieldData.getName()+",\""+fieldData.getValue()+"\")\n");

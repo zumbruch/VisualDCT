@@ -641,14 +641,6 @@ public void saveAsTemplate(File file) throws IOException
  */
 public void export(java.io.File file) throws IOException {
  Group.save(Group.getRoot(), file, true);
- 
- // if ok
- drawingSurface.setModified(false);
-
- SetWorkspaceFile cmd = (SetWorkspaceFile)CommandManager.getInstance().getCommand("SetFile");
- cmd.setFile(file.getCanonicalPath());
- cmd.execute();
-
 }
 /**
  * Insert the method's description here.
@@ -657,7 +649,6 @@ public void export(java.io.File file) throws IOException {
  */
 public void exportAsGroup(java.io.File file) throws IOException {
  Group.save(drawingSurface.getViewGroup(), file, true);
-
 }
 /**
  * Insert the method's description here.

@@ -274,7 +274,7 @@ private void initialize() {
 		setName("AboutDialog");
 		setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 		setResizable(false);
-		setSize(551, 381);
+		setSize(551, 400);
 		setTitle("About");
 		setContentPane(getJDialogContentPane());
 		initConnections();

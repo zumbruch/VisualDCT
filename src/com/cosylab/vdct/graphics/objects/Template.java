@@ -1182,14 +1182,18 @@ public void writeObjects(DataOutputStream file, NameManipulator namer, boolean e
 	 	// resolve parent group name - this is then addedPrefix
 	 	// there is a secial case: removedPrefix is 'parentName:", but parentName is 'parentName'
 	 	String parentName = ((Group)getParent()).getAbsoluteName();
-	 
-	 	addedPrefix = namer.getResolvedName(parentName+Constants.GROUP_SEPARATOR);
 
-	 	if (addedPrefix.length()==0 || 
-	 		(addedPrefix.length()==1 && addedPrefix.charAt(0)==Constants.GROUP_SEPARATOR))
+		if (parentName.equals(namer.getRemovedPrefix()+Constants.GROUP_SEPARATOR))
+			addedPrefix = namer.getResolvedName(parentName+Constants.GROUP_SEPARATOR);
+		else
+	 		addedPrefix = namer.getResolvedName(parentName);
+
+		int len = addedPrefix.length();
+	 	if (len==0)
 	 		addedPrefix = null;
+	 	else if (addedPrefix.charAt(len-1)!=Constants.GROUP_SEPARATOR)
+	 		addedPrefix = addedPrefix + Constants.GROUP_SEPARATOR;
 	 }
-	 
 	 
 //	 NameManipulator newNamer = new DefaultNamer(newFile, removedPrefix, addedPrefix, properties);
 	 // always pass root file name
