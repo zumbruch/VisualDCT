@@ -30,8 +30,12 @@ package com.cosylab.vdct.events.commands;
 
 import com.cosylab.vdct.events.Command;
 import com.cosylab.vdct.graphics.DrawingSurface;
-import com.cosylab.vdct.vdb.VDBFieldData;
-import com.cosylab.vdct.graphics.objects.LinkManagerObject;
+import com.cosylab.vdct.graphics.objects.LinkSource;
+import com.cosylab.vdct.graphics.objects.VisibleObject;
+
+/**
+ * Insert the class' description here.
+ * Creation 
 
 /**
  * Insert the class' description here.
@@ -41,8 +45,8 @@ import com.cosylab.vdct.graphics.objects.LinkManagerObject;
  
 public class LinkCommand extends com.cosylab.vdct.events.Command {
 	private DrawingSurface drawingSurface;
-	private VDBFieldData field = null;
-	private LinkManagerObject obj = null;
+	private LinkSource field = null;
+	private VisibleObject obj = null;
 /**
  * Insert the method's description here.
  * Creation date: (21.12.2000 22:43:26)
@@ -61,11 +65,12 @@ public void execute() {
 /**
  * Insert the method's description here.
  * Creation date: (3.2.2001 13:29:40)
- * @param record com.cosylab.vdct.graphics.objects.Record
- * @param field com.cosylab.vdct.vdb.VDBFieldData
+ * @param record com.cosylab.vdct.graphics.objects.VisibleObject
+ * @param field com.cosylab.vdct.graphics.objects.LinkSource
  */
-public void setData(LinkManagerObject obj, VDBFieldData field) {
+public void setData(VisibleObject obj, LinkSource field) {
 	this.field=field;
 	this.obj=obj;
 }
+
 }

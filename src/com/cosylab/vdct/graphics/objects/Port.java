@@ -31,6 +31,8 @@ package com.cosylab.vdct.graphics.objects;
 import java.awt.*;
 import java.util.*;
 import com.cosylab.vdct.Constants;
+import com.cosylab.vdct.events.CommandManager;
+import com.cosylab.vdct.events.commands.LinkCommand;
 import com.cosylab.vdct.graphics.*;
 
 import com.cosylab.vdct.graphics.popup.*;
@@ -72,6 +74,10 @@ public class Port extends VisibleObject implements Descriptable, Movable, OutLin
 			}
 			else if (action.equals(removeLinkString))
 			{
+				removeLink();
+			}
+			else if (action.equals(removePortString))
+			{
 				destroy();
 			}
 			else if (action.equals(constantString)) {
@@ -86,12 +92,18 @@ public class Port extends VisibleObject implements Descriptable, Movable, OutLin
 				setMode(OutLink.OUTPUT_PORT_MODE);
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
+			else if (action.equals(startLinkingString))
+			{
+			    LinkCommand cmd = (LinkCommand)CommandManager.getInstance().getCommand("LinkCommand");
+			    cmd.setData(Port.this, data);
+		 		cmd.execute();
+			}
 			
 		}
 	}
 	
 	protected InLink inlink = null;
-	protected boolean disconnected = false;
+	protected boolean disconnected = true;
 	protected LinkProperties properties = null;
 	private boolean hasEndpoint = false;
 
@@ -100,6 +112,7 @@ public class Port extends VisibleObject implements Descriptable, Movable, OutLin
 	private static final String addConnectorString = "Add connector";
 	private static final String colorString = "Color...";
 	private static final String removeLinkString = "Remove Link";
+	private static final String startLinkingString = "Start linking...";
 	private static final String removePortString = "Remove Port";
 
 	private static final String modeString = "Port Mode";
@@ -135,9 +148,8 @@ public Port(VDBPort data, ContainerObject parent, int x, int y) {
 	setWidth(Constants.LINK_STUB_SIZE);
 	setHeight(Constants.LINK_STUB_SIZE);
 
-	setColor(Color.black);
 	setX(x); setY(y);
-
+	
 	properties = new LinkProperties(data);
 		
 	data.setVisibleObject(this);
@@ -185,15 +197,27 @@ private com.cosylab.vdct.graphics.objects.Port.PopupMenuHandler createPopupmenuH
 public void destroy() {
 	if (!isDestroyed()) {
 		super.destroy();
+		removeLink();
+		data.setVisibleObject(null);
+		getParent().removeObject(getName());
+	}
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (1.2.2001 16:40:51)
+ */
+public void removeLink() {
+	if (!isDestroyed()) {
 		disconnected = true;
 		EPICSLinkOut.destroyChain(inlink, this);
 		setInput(null);
 		data.setValue(nullString);
 		properties = new LinkProperties(data);
-		//getParent().removeObject(getID());
-		setDestroyed(false); ///?!!!
 	}
 }
+
+
 /**
  * ...
  * Creation date: (29.1.2001 20:05:51)
@@ -216,31 +240,32 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 	int rrx = getRx() - view.getRx();
 	int rry = getRy() - view.getRy();
 
-	int rwidth = getRwidth()/2;
+	int rwidth = getRwidth();
 	int rheight = getRheight();
 
-	boolean rightSide = isRight();
-
-	Polygon poly = null;
-	if (rightSide)
-	{
-		poly = rightPoly;
-		poly.translate(rrx-rightXtranslation, rry-rightYtranslation);
-		rightXtranslation = rrx; rightYtranslation = rry;
-	}
-	else
-	{
-		poly = leftPoly;
-		poly.translate(rrx-leftXtranslation, rry-leftYtranslation);
-		leftXtranslation = rrx; leftYtranslation = rry;
-	}
-	
 	// clipping
 	if (!((rrx > view.getViewWidth())
 		|| (rry > view.getViewHeight())
 		|| ((rrx + rwidth) < 0)
 		|| ((rry + rheight) < 0))) {
 
+		boolean rightSide = isRight();
+	
+		Polygon poly = null;
+		if (rightSide)
+		{
+			poly = rightPoly;
+			poly.translate(rrx-rightXtranslation, rry-rightYtranslation);
+			rightXtranslation = rrx; rightYtranslation = rry;
+		}
+		else
+		{
+			poly = leftPoly;
+			poly.translate(rrx-leftXtranslation, rry-leftYtranslation);
+			leftXtranslation = rrx; leftYtranslation = rry;
+		}
+		
+	
 		if (!hilited)
 			g.setColor(Constants.RECORD_COLOR);
 		else
@@ -254,14 +279,16 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 	
 		g.fillPolygon(poly);
 
+		Color drawColor;
 		if (!hilited)
-			g.setColor(Constants.FRAME_COLOR);
+			drawColor = Constants.FRAME_COLOR;
 		else
-			g.setColor(
+			drawColor =
 				(this == view.getHilitedObject())
 					? Constants.HILITE_COLOR
-					: Constants.FRAME_COLOR);
+					: Constants.FRAME_COLOR;
 
+		g.setColor(drawColor);
 		g.drawPolygon(poly);
 		
 
@@ -280,6 +307,11 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 			LinkDrawer.drawLink(g, this, inlink, getQueueCount(), rightSide);
 		}
 
+		if (getFont()!=null) {
+			g.setColor(drawColor);
+			g.setFont(getFont());
+			g.drawString(getLabel(), rrx+getRlabelX(), rry+getRlabelY());
+		}
 	}
 		
 }
@@ -329,11 +361,14 @@ public java.util.Vector getItems() {
 	colorItem.addActionListener(al);
 	items.addElement(colorItem);
 
+	// no connectors for ports yet
+	/*
 	JMenuItem addItem = new JMenuItem(addConnectorString);
 	addItem.setEnabled(!isDisconnected());
 	addItem.addActionListener(al);
 	items.addElement(addItem);
-
+	*/
+	
 	// modes
 	items.addElement(new JSeparator());
 	
@@ -364,12 +399,20 @@ public java.util.Vector getItems() {
 	
 	items.add(new JSeparator());
 
-	JMenuItem removeLinkItem = new JMenuItem(removeLinkString);
-	removeLinkItem.addActionListener(al);
-	items.addElement(removeLinkItem);
-
+	if (isDisconnected())
+	{
+		JMenuItem linkItem = new JMenuItem(startLinkingString);
+		linkItem.addActionListener(al);
+		items.addElement(linkItem);
+	}
+	else
+	{
+		JMenuItem removeLinkItem = new JMenuItem(removeLinkString);
+		removeLinkItem.addActionListener(al);
+		items.addElement(removeLinkItem);
+	}
+	
 	JMenuItem removePortItem = new JMenuItem(removePortString);
-	removePortItem.setEnabled(false); //!!!
 	removePortItem.addActionListener(al);
 	items.addElement(removePortItem);
 
@@ -412,11 +455,12 @@ public boolean isRight() {
  * @return int
  */
 public int getOutX() {
-	boolean right = !isRight();
-	/* ??? what is nicer
-	 boolean right = isRight();
-     if (getMode()==OutLink.CONSTANT_PORT_MODE) right=!right
-    */
+	// ??? what is nicer
+	//boolean right = !isRight();
+	
+	boolean right = isRight();
+	if (getMode()==OutLink.CONSTANT_PORT_MODE) right=!right;
+	 
 	if (right)
 		return getX();
 	else 
@@ -538,14 +582,17 @@ protected void validate() {
   leftXtranslation = 0; leftYtranslation = 0;
   rightXtranslation = 0; rightYtranslation = 0;
   
+  int rwidth = 0;
+  int rheight = 0;
+  
   if (getMode() == OutLink.OUTPUT_PORT_MODE)
   {
 	  setWidth(Constants.LINK_STUB_SIZE);
 	  setHeight(Constants.LINK_STUB_SIZE);
 
 	  // to make it nice, do /2)*2
-	  int rwidth = (int)(getWidth()*getRscale()/2)*2;
-	  int rheight = (int)(getHeight()*getRscale()/2)*2;
+	  rwidth = (int)(getWidth()*getRscale()/2)*2;
+	  rheight = (int)(getHeight()*getRscale()/2)*2;
 	  
 	  setRwidth(rwidth);
 	  setRheight(rheight);
@@ -583,8 +630,8 @@ protected void validate() {
 	  setHeight(Constants.LINK_STUB_SIZE);
 
 	  // to make it nice, do /2)*2
-	  int rwidth = (int)(getWidth()*getRscale()/2)*2;
-	  int rheight = (int)(getHeight()*getRscale()/2)*2;
+	  rwidth = (int)(getWidth()*getRscale()/2)*2;
+	  rheight = (int)(getHeight()*getRscale()/2)*2;
 	  
 	  setRwidth(rwidth);
 	  setRheight(rheight);
@@ -624,8 +671,8 @@ protected void validate() {
 	  setHeight(Constants.LINK_STUB_SIZE);
 
 	  // to make it nice, do /2)*2
-	  int rwidth = (int)(getWidth()*getRscale()/2)*2;
-	  int rheight = (int)(getHeight()*getRscale()/2)*2;
+	  rwidth = (int)(getWidth()*getRscale()/2)*2;
+	  rheight = (int)(getHeight()*getRscale()/2)*2;
 	  
 	  setRwidth(rwidth);
 	  setRheight(rheight);
@@ -658,7 +705,26 @@ protected void validate() {
 	  rightPoly.ypoints[2]=rightPoly.ypoints[1];
 	  rightPoly.ypoints[3]=rheight/2;
 	  rightPoly.ypoints[4]=rightPoly.ypoints[0];
+	  
+	  rwidth *= 4;
   }
+
+  setLabel(getName());
+
+	///!!! optimize static
+
+  Font font = FontMetricsBuffer.getInstance().getAppropriateFont(
+	  			Constants.DEFAULT_FONT, Font.PLAIN, 
+	  			getLabel(), rwidth*4, rheight);
+
+  if (font!=null)
+  {
+	  FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(font);
+	  setRlabelX(rwidth/2-fm.stringWidth(getLabel())/2);
+ 	  setRlabelY(-fm.getHeight()+fm.getAscent());
+  }
+  
+  setFont(font);
 
 }
 
@@ -774,7 +840,7 @@ private void updateLink() {
 	LinkProperties newProperties = new LinkProperties(data);
 
 	if (newProperties.getRecord()==null) {			// empty field
-		destroy();
+		removeLink();
 		return;
 	}
 	else if (!newProperties.getRecord().equals(properties.getRecord()) ||

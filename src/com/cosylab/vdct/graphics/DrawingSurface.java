@@ -153,13 +153,14 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 	// modification
 	private boolean modified = false;
 	// linking
-	private VDBFieldData tmplink = null;
+	private LinkSource tmplink = null;
 	private Hiliter hiliter;
 	
 	private ComposedAction undoAction = null;
 	
 	private static final String newRecordString = "New record...";
 	private static final String newTemplesString = "New template instance";
+	private static final String addPortString = "Add port";
 	private static final String newPortString = "New port...";
 	private static final String newMacroString = "New macro...";
 	private static final String newLineString = "New line";
@@ -617,29 +618,27 @@ public boolean isModified() {
 /**
  * Insert the method's description here.
  * Creation date: (3.2.2001 13:31:09)
- * @param linkManager com.cosylab.vdct.graphics.objects.LinkManagerObject
- * @param field com.cosylab.vdct.vdb.VDBFieldData
  */
-public void linkCommand(LinkManagerObject linkManager, VDBFieldData field) {
+public void linkCommand(VisibleObject linkObject, LinkSource linkData) {
 	if (tmplink==null) {
 		
 		// start linking (store source field reference)
-		tmplink = field;
+		tmplink = linkData;
 		
-		Field fld = (Field)Group.getRoot().getLookupTable().get(field.getFullName());
+		VisibleObject fld = (VisibleObject)Group.getRoot().getLookupTable().get(linkData.getFullName());
 		if (fld!=null)
 			// field found in lookup table (it is a special link field - not owned by linkManager container)
 			ViewState.getInstance().setAsBlinking(fld);
 		else
-			ViewState.getInstance().setAsBlinking(linkManager);
+			ViewState.getInstance().setAsBlinking(linkObject);
 		hiliter = new Hiliter(1000);
 		hiliter.start();
 	}
 	else {
-		if (field==null)
-			tmplink.setValue(linkManager.getName());
+		if (linkData==null && linkObject instanceof Record)
+			tmplink.setValue(((Record)linkObject).getName());		// fwd link to manager
 		else 
-			tmplink.setValue(field.getFullName());
+			tmplink.setValue(linkData.getFullName());
 			
 		stopLinking();
 	}
@@ -661,8 +660,8 @@ public void mouseClicked(MouseEvent e) {
 
 			// linking support
 			if (tmplink!=null) {
-				if (hilited instanceof LinkManagerObject) {
-					linkCommand((LinkManagerObject)hilited, null);
+				if (hilited instanceof Record) {
+					linkCommand(hilited, null);
 					return;
 				}
 				else if (hilited instanceof EPICSVarLink) {
@@ -789,7 +788,7 @@ private void showPopup(MouseEvent e)
 			if (action.equals(newRecordString))
 				CommandManager.getInstance().execute("ShowNewDialog");
 			else if (action.equals(newPortString))
-				createPort("testPort");
+				createPort(null);
 			else if (action.equals(newMacroString));
 			else if (action.equals(newLineString))
 				createLine();
@@ -805,6 +804,15 @@ private void showPopup(MouseEvent e)
 	
 	};
 					
+	ActionListener al2 = new ActionListener()
+	{
+		public void actionPerformed(ActionEvent e) {
+			String action = e.getActionCommand();
+			createPort((VDBPort)Group.getEditingTemplateData().getPorts().get(action));			
+		}
+	
+	};
+
 	JPopupMenu popUp = new JPopupMenu();
 	
 	JMenuItem item = new JMenuItem(newRecordString);
@@ -833,16 +841,42 @@ private void showPopup(MouseEvent e)
 	if (templatesMenu.getItemCount()==0)
 		templatesMenu.setEnabled(false);
 	
-	popUp.add(new JSeparator());
+	if (Group.getEditingTemplateData()!=null)
+	{
+
+		popUp.add(new JSeparator());
 	
-	JMenuItem portMenuItem = new JMenuItem(newPortString);
-	portMenuItem.addActionListener(al);
-	popUp.add(portMenuItem);
+		// generate visual port
+		JMenu addPortMenu = new JMenu(addPortString);
+		popUp.add(addPortMenu);
+		
+		// add templates
+		Enumeration ports = Group.getEditingTemplateData().getPortsV().elements();
+		while (ports.hasMoreElements())
+		{
+			VDBPort port = (VDBPort)ports.nextElement();
+			if (port.getVisibleObject()!=null) continue; // do not add ports with already visible rep.
+			JMenuItem item2 = new JMenuItem(port.getName());
+			item2.setActionCommand(port.getName());
+			item2.addActionListener(al2);
+			addPortMenu.add(item2);
+		}
+		
+		if (addPortMenu.getItemCount()==0)
+			addPortMenu.setEnabled(false);
 	
-	JMenuItem macroMenuItem = new JMenuItem(newMacroString);
-	macroMenuItem.setEnabled(false);
-	macroMenuItem.addActionListener(al);
-	popUp.add(macroMenuItem);
+	
+		// add port
+		JMenuItem portMenuItem = new JMenuItem(newPortString);
+		portMenuItem.addActionListener(al);
+		popUp.add(portMenuItem);
+	
+		JMenuItem macroMenuItem = new JMenuItem(newMacroString);
+		macroMenuItem.setEnabled(false);
+		macroMenuItem.addActionListener(al);
+		popUp.add(macroMenuItem);
+
+	}
 
 	popUp.add(new JSeparator());
 	
@@ -2990,16 +3024,23 @@ public static void loadBlackOnWhiteColorScheme()
  * Creation date: (3.2.2001 23:27:30)
  * @param name java.lang.String
  */
-public void createPort(String name) {
+public void createPort(VDBPort vdbPort) {
+	
+	// if null bring up dialog and ask for name, then create port
+	if (vdbPort==null)
+		vdbPort = Group.getEditingTemplateData().addPort();
+		
+	if (vdbPort==null)
+		return;
+		
 	ViewState view = ViewState.getInstance();
 	double scale = view.getScale();
 	
-	//!!!
-	Port port = new Port(Group.getEditingTemplateData().addPort(name), viewGroup,
+	Port port = new Port(vdbPort, viewGroup,
 						   (int)((getPressedX() + view.getRx()) / scale),
 						   (int)((getPressedY() + view.getRy()) / scale));
 
-	getViewGroup().addSubObject(name, port);
+	getViewGroup().addSubObject(vdbPort.getName(), port);
 
 	UndoManager.getInstance().addAction(new CreateAction(port));
 

@@ -775,6 +775,13 @@ public void renamePort(VDBPort port, String newName)
  */
 public void addProperty()
 {
+	addPort();
+}
+
+/**
+ */
+public VDBPort addPort()
+{
 	String message = "Enter port name:";
 	int type = JOptionPane.QUESTION_MESSAGE;
 	while (true)
@@ -801,7 +808,7 @@ public void addProperty()
 					continue;
 				}
 				else
-					addPort(reply);
+					return addPort(reply);
 			}
 			else
 			{
@@ -814,6 +821,8 @@ public void addProperty()
 		
 		break;
 	}
+	
+	return null;
 }
 
 /**

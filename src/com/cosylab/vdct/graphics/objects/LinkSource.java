@@ -45,6 +45,11 @@ int getType();
  */
 String getValue();
 /**
+ * Sets (value of )the link target.
+ * @param value
+ */
+void setValue(String value);
+/**
  * Returns fill name of the source.
  * @return java.lang.String
  */

@@ -389,17 +389,22 @@ public static InLink getTarget(LinkProperties link) {
 	// !!! check for getType()==LinkProperties.NOT_VALID
 	if ((recName==null) || recName.equals(nullString)) return null;
 
-	InLink templateLink = (InLink)Group.getRoot().getLookupTable().get(link.getTarget());
-	if (templateLink!=null)
+	Object otherLinkObj = Group.getRoot().getLookupTable().get(link.getTarget());
+	if (otherLinkObj!=null && otherLinkObj instanceof InLink)
 	{
-//		((TemplateEPICSVarLink/TemplateEPICSPort)templateLink).setDestroyed(false);
-		((VisibleObject)templateLink).setDestroyed(false);
-		return templateLink;
+		InLink templateLink = (InLink)otherLinkObj;
+		if (templateLink!=null)
+		{
+	//		((TemplateEPICSVarLink/TemplateEPICSPort)templateLink).setDestroyed(false);
+			((VisibleObject)templateLink).setDestroyed(false);
+			return templateLink;
+		}
 	}
-	
-	Record record = (Record)Group.getRoot().findObject(recName, true);
-	if (record==null) return null;
-	else if (link.getType()==link.FWDLINK_FIELD) {
+		
+	Object obj = Group.getRoot().findObject(recName, true);
+	if (obj==null || !(obj instanceof Record)) return null;
+	Record record = (Record)obj;
+	if (link.getType()==link.FWDLINK_FIELD) {
 		//if (!link.getVarName().equalsIgnoreCase("PROC"))		// !!! proc
 		// check if variable exists
 		if (record.getRecordData().getField(link.getVarName())==null)
@@ -408,19 +413,25 @@ public static InLink getTarget(LinkProperties link) {
 			return record;
 	}
 
-	EPICSVarLink var = null;
+	InLink inlink = null;
+	// already created link field
 	if (record.containsObject(link.getVarName()))
-		var = (EPICSVarLink)record.getSubObject(link.getVarName());
+	{
+		Object subObject = record.getSubObject(link.getVarName());
+		if (subObject instanceof InLink)
+			inlink = (InLink)subObject;
+	}
+	// not yet		
 	else {
 		VDBFieldData target = record.getRecordData().getField(link.getVarName());
 		if ((target==null) ||
 			LinkProperties.getType(target)!=LinkProperties.VARIABLE_FIELD) return null;
 		else { 
-			var = new EPICSVarLink(record, target);
-			record.addLink(var);
+			inlink = new EPICSVarLink(record, target);
+			record.addLink(inlink);
 		}
 	}
-	return var;
+	return inlink;
 }
 /**
  * Insert the method's description here.
