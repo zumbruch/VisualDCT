@@ -91,9 +91,9 @@ public class DBResolver {
 	public static final String VDCTVISIBILITY = "Visibility";
 	public static final String VDCTCONNECTOR = "Connector";
 
-	// used format #! ConstantPort(portname, inLinkID, xpos, ypos, color)
-	// used format #! InputPort(portname, inLinkID, xpos, ypos, color)
-	// used format #! OutputPort(portname, inLinkID, xpos, ypos, color)
+	// used format #! ConstantPort(portname, inLinkID, xpos, ypos, color, defaultVisibility)
+	// used format #! InputPort(portname, inLinkID, xpos, ypos, color, defaultVisibility)
+	// used format #! OutputPort(portname, inLinkID, xpos, ypos, color, defaultVisibility)
 	public static final String VDCT_CONSTANT_PORT = "ConstantPort";
 	public static final String VDCT_INPUT_PORT = "InputPort";
 	public static final String VDCT_OUTPUT_PORT = "OutputPort";
@@ -920,7 +920,7 @@ public static String processTemplateComment(DBTemplate template, StreamTokenizer
  }
  else {																		// graphics layout data
 	
- 	 String str, str2; int t, tx, tx2, ty, ty2, t2, t3;
+ 	 String str;
 
  	 while ((tokenizer.nextToken() != tokenizer.TT_EOL) &&
 		    (tokenizer.ttype != tokenizer.TT_EOF)) 
@@ -968,6 +968,11 @@ public static String processTemplateComment(DBTemplate template, StreamTokenizer
 						// read color
 						tokenizer.nextToken();
 						if (tokenizer.ttype == tokenizer.TT_NUMBER) port.setColor(StringUtils.int2color((int)tokenizer.nval));
+						else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+						// read defaultVisibility
+						tokenizer.nextToken();
+						if (tokenizer.ttype == tokenizer.TT_NUMBER) port.setDefaultVisibility((int)tokenizer.nval);
 						else throw (new DBGParseException(errorString, tokenizer, fileName));
 
 						port.setHasVisual(true);

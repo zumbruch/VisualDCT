@@ -1863,7 +1863,8 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 	}
 
 	group.initializeLayout();
-	group.manageLinks(true);
+	// call this after ports/macros fields are initialized !!
+	//group.manageLinks(true);
 }
 
 /**

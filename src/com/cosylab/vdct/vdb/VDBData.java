@@ -464,7 +464,10 @@ private static VDBData generateTemplate(DBDData dbd, DBTemplate dbTemplate)
 									  port.getX(), port.getY());
 				visualPort.setColor(port.getColor());
 				visualPort.setMode(port.getMode());
-			
+
+				// delegate defaultVisibility
+				vdbPort.setVisibility(port.getDefaultVisibility());
+				
 				Group.getRoot().addSubObject(vdbPort.getName(), visualPort);
 			}
 
@@ -475,6 +478,10 @@ private static VDBData generateTemplate(DBDData dbd, DBTemplate dbTemplate)
 		vt.setPortsV(portsV);
 
 		VDBData.addTemplate(vt);
+
+		// validate all links
+		// !!? should I move this into finally scope?
+		Group.getRoot().manageLinks(true);
 		
 		return vdbData;
 	}

@@ -160,7 +160,6 @@ protected void draw(Graphics g, boolean hilited) {
 		LinkDrawer.drawLink(g, this, inlink, getQueueCount(), rightSide);
 	} else {
 		
-
  		if (getLinkCount()>0) {
 			// ports - draw tail line
 

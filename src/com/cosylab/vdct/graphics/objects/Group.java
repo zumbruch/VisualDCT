@@ -1607,7 +1607,8 @@ private static void writeTemplateData(DataOutputStream stream, NameManipulator n
 			visiblePort.getName() +
 			justComma + StringUtils.quoteIfMacro(target) +
 			justComma + visiblePort.getX() + justComma + visiblePort.getY() + 
-			justComma + StringUtils.color2string(visiblePort.getColor()));
+			justComma + StringUtils.color2string(visiblePort.getColor()) +
+			justComma + port.getVisibility());
 		stream.writeBytes(ending);
 	}	
 

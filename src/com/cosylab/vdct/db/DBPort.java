@@ -1,6 +1,7 @@
 package com.cosylab.vdct.db;
 
 import com.cosylab.vdct.graphics.objects.OutLink;
+import com.cosylab.vdct.inspector.InspectableProperty;
 
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
@@ -43,6 +44,7 @@ public class DBPort extends DBComment
 	protected int x = -1;			// used for layout
 	protected int y = -1;
 	protected int mode = OutLink.CONSTANT_PORT_MODE;
+	protected int defaultVisibility = InspectableProperty.UNDEFINED_VISIBILITY;
 	protected java.awt.Color color = java.awt.Color.black;
 	protected String inLinkID = null;
 	
@@ -216,6 +218,24 @@ public class DBPort extends DBComment
 	public void setMode(int mode)
 	{
 		this.mode = mode;
+	}
+
+	/**
+	 * Returns the defaultVisibility.
+	 * @return int
+	 */
+	public int getDefaultVisibility()
+	{
+		return defaultVisibility;
+	}
+
+	/**
+	 * Sets the defaultVisibility.
+	 * @param defaultVisibility The defaultVisibility to set
+	 */
+	public void setDefaultVisibility(int defaultVisibility)
+	{
+		this.defaultVisibility = defaultVisibility;
 	}
 
 }
