@@ -6716,6 +6716,7 @@ public void zoomSlider_PropertyChange(java.beans.PropertyChangeEvent propertyCha
  * Comment
  */
 public void zoomSlider_updateLabel() {
+	getZoomSlider().setValue(getZoomSlider().getValue()/5*5);
 	getZoomLabel().setText(getZoomSlider().getValue()+"%");
 
     GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
