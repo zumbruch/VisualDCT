@@ -242,6 +242,8 @@ public static void main(java.lang.String[] args) {
 public void print(String text) {
 	getTextPane().append(text);
 	if (!isVisible()) setVisible(true);
+	setExtendedState(NORMAL);
+	toFront();
 }
 /**
  * Insert the method's description here.
@@ -250,6 +252,8 @@ public void print(String text) {
 public void println() {
 	getTextPane().append("\n");
 	if (!isVisible()) setVisible(true);
+	setExtendedState(NORMAL);
+	toFront();
 }
 /**
  * Insert the method's description here.
@@ -260,6 +264,8 @@ public void println(String text) {
 	getTextPane().append(text+"\n");
 	getTextPane().setCaretPosition(getTextPane().getText().length());
 	if (!isVisible()) setVisible(true);
+	setExtendedState(NORMAL);
+	toFront();
 }
 /**
  * Insert the method's description here.
@@ -276,6 +282,8 @@ public void println(Throwable thr) {
 
 	getTextPane().setCaretPosition(getTextPane().getText().length());
 	if (!isVisible()) setVisible(true);
+	setExtendedState(NORMAL);
+	toFront();
 }
 /**
  * Insert the method's description here.
