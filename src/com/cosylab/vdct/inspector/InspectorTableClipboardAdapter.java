@@ -40,6 +40,8 @@ import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 
+import com.cosylab.vdct.undo.UndoManager;
+
 /**
  * TableClipboardAdapter enables Cut-Copy-Paste Clipboard functionality on JTables.
  * The clipboard data format used by the adapter is compatible with
@@ -146,11 +148,13 @@ public class InspectorTableClipboardAdapter implements ActionListener {
     {
         final String EMPTY_STRING = "";
         
-        StringBuffer sbf = new StringBuffer();
-        
         // check to ensure we have selected only a contiguous block of cells
         int numRows = table.getSelectedRowCount();
         int[] rowsSelected = table.getSelectedRows();
+        
+        // noop check
+        if (numRows == 0)
+            return;
         
         // inspector case
         //int numCols = table.getSelectedColumnCount();
@@ -158,6 +162,10 @@ public class InspectorTableClipboardAdapter implements ActionListener {
         int numCols = 2;
         int[] colsSelected = new int[] { 1, 2 };
         
+        // noop check
+        if (numCols == 0)
+            return;
+
         /*
         boolean contiguousRows = 
             (numRows-1) == (rowsSelected[rowsSelected.length - 1] - rowsSelected[0])
@@ -176,24 +184,41 @@ public class InspectorTableClipboardAdapter implements ActionListener {
             return;
         }
         */
-        // construct string
-        for (int i = 0; i < numRows; i++)
-        {
-            for (int j = 0; j < numCols; j++)
-            {
-                sbf.append(table.getValueAt(rowsSelected[i], colsSelected[j]));
-                if (j < numCols - 1)
-                    sbf.append("\t");
-                if (cut)
-                    table.setValueAt(EMPTY_STRING, rowsSelected[i], colsSelected[j]);
-            }
-            sbf.append("\n");
-        }
         
-        // do the copy
-        stringSelection = new StringSelection(sbf.toString());
-        clipboardSystem = Toolkit.getDefaultToolkit().getSystemClipboard();
-        clipboardSystem.setContents(stringSelection, stringSelection);
+        // undo support (to pack all into one action)
+    	try
+    	{
+    	    if (cut)
+    			UndoManager.getInstance().startMacroAction();
+
+            StringBuffer sbf = new StringBuffer();
+            
+    	    // construct string
+            for (int i = 0; i < numRows; i++)
+            {
+                for (int j = 0; j < numCols; j++)
+                {
+                    sbf.append(table.getValueAt(rowsSelected[i], colsSelected[j]));
+                    if (j < numCols - 1)
+                        sbf.append("\t");
+                    // inspector case
+                    if (cut && colsSelected[j] == 2)
+                        table.setValueAt(EMPTY_STRING, rowsSelected[i], colsSelected[j]);
+                }
+                sbf.append("\n");
+            }
+            
+            // do the copy
+            stringSelection = new StringSelection(sbf.toString());
+            clipboardSystem = Toolkit.getDefaultToolkit().getSystemClipboard();
+            clipboardSystem.setContents(stringSelection, stringSelection);
+    	}
+   		finally
+   		{
+   		    if (cut)
+   		        UndoManager.getInstance().stopMacroAction();
+   		}
+        
     }
     
     /**
@@ -216,6 +241,9 @@ public class InspectorTableClipboardAdapter implements ActionListener {
         //int startCol = (table.getSelectedColumns())[0];
         int startCol = 1;
         
+        boolean pasted = false;
+        
+        // w/ packed undo support 
         try
         {
             String transferedString =
@@ -237,19 +265,37 @@ public class InspectorTableClipboardAdapter implements ActionListener {
                     if (columnToSet == 2)
 	                    if (startRow + i < tableRowCount && 
 	                        columnToSet < tableColumnCount)
+	                    {
+	                	    if (!pasted) {
+	                	        pasted = true;
+	                			UndoManager.getInstance().startMacroAction();
+	                	    }
 	                        table.setValueAt(value, startRow + i, columnToSet);
+	                    }
                 }
                 
                 // clear the rest
                 // only one field - inspector case
                 if (startCol + j == 2)
+                {
+            	    if (!pasted) {
+            	        pasted = true;
+            			UndoManager.getInstance().startMacroAction();
+            	    }
                     table.setValueAt(EMPTY_STRING, startRow + i, 2);
+                }
                 
                 
             }
         } catch (Throwable th) {
             // noop
         }
+    	finally
+    	{
+    	    if (pasted)
+    	        UndoManager.getInstance().stopMacroAction();
+    	}
+    	
     }
 
 }
