@@ -98,8 +98,8 @@ public class DBResolver {
 	public static final String VDCT_INPUT_PORT = "InputPort";
 	public static final String VDCT_OUTPUT_PORT = "OutputPort";
 
-	// used format #! InputMacro(portname, description, xpos, ypos, color, defaultVisibility)
-	// used format #! OutputMacro(portname, description, xpos, ypos, color, defaultVisibility)
+	// used format #! InputMacro(macroname, description, xpos, ypos, color, defaultVisibility)
+	// used format #! OutputMacro(macroname, description, xpos, ypos, color, defaultVisibility)
 	public static final String VDCT_INPUT_MACRO = "InputMacro";
 	public static final String VDCT_OUTPUT_MACRO = "OutputMacro";
 
