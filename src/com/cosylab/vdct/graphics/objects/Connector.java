@@ -301,7 +301,10 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 	}
 
 	if (/*!hilited &&*/ (inlink!=null || getMode()==EXTERNAL_OUTPUT_MODE || getMode()==EXTERNAL_INPUT_MODE)) {
-		//g.setColor(getVisibleColor());
+		Color c = getVisibleColor();
+		if (hilited)
+			c = (view.isHilitedObject(this)) ? Constants.HILITE_COLOR : c;
+		g.setColor(c);
 		if (inlink!=null)
 			LinkDrawer.drawLink(g, this, inlink, getQueueCount(), 
 								getOutX()<inlink.getInX());
@@ -529,7 +532,7 @@ public boolean move(int dx, int dy) {
  * Creation date: (29.1.2001 20:05:52)
  */
 public void revalidatePosition() {
-  if (inlink!=null && outlink!=null && mode!=INVISIBLE_MODE) {
+  if (inlink!=null && outlink!=null && mode!=INVISIBLE_MODE && outlink.getMode()!=INVISIBLE_MODE) { //order is important
 	if (getQueueCount()%2==0) 
 		setX((inlink.getInX()+outlink.getOutX())/2);
     else

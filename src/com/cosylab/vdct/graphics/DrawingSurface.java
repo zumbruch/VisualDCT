@@ -2000,9 +2000,9 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 							connector = new Connector(target, record, null, null);
 							connector.setColor(connectorData.getColor());
 							connector.setDescription(connectorData.getDescription());
+							connector.setMode(connectorData.getMode());
 							connector.setX(connectorData.getX());
 							connector.setY(connectorData.getY());
-							connector.setMode(connectorData.getMode());
 							record.addSubObject(connector.getID(), connector);
 							connector.setOutput(outlink, null);
 							outlink.setInput(connector);
