@@ -413,6 +413,11 @@ public static InLink getTarget(LinkProperties link, boolean allowLinkOutAsTarget
 			return templateLink;
 		}
 	}
+	
+	// else macro check (w/o .VAL ending)
+	otherLinkObj = Group.getRoot().getLookupTable().get(link.getRecord());
+	if (otherLinkObj!=null && otherLinkObj instanceof InLink)
+		return (InLink)otherLinkObj;
 		
 	Object obj = Group.getRoot().findObject(recName, true);
 	if (obj==null || !(obj instanceof Record)) return null;

@@ -124,6 +124,8 @@ public class Macro extends VisibleObject implements Descriptable, Movable, InLin
 	protected Polygon rightPoly;
 
 	private int r = 0;
+
+ 	private String lastUpdatedFullName = null;
 	
 /**
  * Insert the method's description here.
@@ -148,6 +150,8 @@ public Macro(VDBMacro data, ContainerObject parent, int x, int y) {
 	rightPoly = new Polygon(pts, pts, 5);
 
 	outlinks = new Vector();
+	
+	updateTemplateLink();
 }
 /**
  * Insert the method's description here.
@@ -202,6 +206,11 @@ public void destroy() {
 			}
 			outlinks.clear();
 		}
+
+		if (lastUpdatedFullName!=null)
+			Group.getRoot().getLookupTable().remove(data.getFullName());
+		//else
+		//	((LinkManagerObject)getParent()).removeInvalidLink(this);
 	}
 	
 }
@@ -799,6 +808,37 @@ public OutLink getOutput() {
 		return (OutLink)outlinks.firstElement();
 	else
 		return null;
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (30.1.2001 16:58:58)
+ * @return boolean
+ */
+public void updateTemplateLink()
+{
+	if (lastUpdatedFullName!=null && data.getFullName().equals(lastUpdatedFullName))
+		return;
+		
+	// remove old one		
+	if (lastUpdatedFullName!=null)
+		Group.getRoot().getLookupTable().remove(lastUpdatedFullName);
+	
+	// ups, we already got this registered
+	if (Group.getRoot().getLookupTable().containsKey(data.getFullName()))
+	{
+		lastUpdatedFullName = null;
+		//!!! this should never happen, but...
+		//((LinkManagerObject)getParent()).addInvalidLink(this);
+	}
+	// everything is OK
+	else
+	{
+		lastUpdatedFullName = data.getFullName();
+		Group.getRoot().getLookupTable().put(lastUpdatedFullName, this);
+		//!!! this should never happen, but...
+		//((LinkManagerObject)getParent()).removeInvalidLink(this);
+	}
 }
 
 }

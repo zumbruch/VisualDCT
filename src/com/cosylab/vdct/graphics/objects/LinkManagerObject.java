@@ -357,11 +357,11 @@ public boolean manageLink(VDBFieldData field) {
 		}
 		
 		
-		// check new VAR->PORT link
+		// check new VAR->PORT/macro link
 		LinkProperties properties = new LinkProperties(field);
 		InLink portLink = EPICSLinkOut.getTarget(properties);
 		
-		if (portLink==null || !(portLink instanceof TemplateEPICSPort))
+		if (portLink==null || (!(portLink instanceof TemplateEPICSPort) && !(portLink instanceof Macro)))
 		{
 			if (link!=null)
 			{

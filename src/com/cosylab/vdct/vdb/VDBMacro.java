@@ -109,7 +109,11 @@ public class VDBMacro implements InspectableProperty, Descriptable, ChangableVis
 	 */
 	public String getFullName()
 	{
-		return template.getId()+":"+name;
+		StringBuffer fullName = new StringBuffer();
+		fullName.append("$(");
+		fullName.append(getName());
+		fullName.append(")");
+		return fullName.toString();
 	}
 
 	/**
