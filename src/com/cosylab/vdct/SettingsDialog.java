@@ -95,7 +95,7 @@ public SettingsDialog() {
  * @param owner java.awt.Frame
  */
 public SettingsDialog(java.awt.Frame owner) {
-	super(owner);
+	super(owner, true);
 	initialize();
 	initializeMacros();	
 }
