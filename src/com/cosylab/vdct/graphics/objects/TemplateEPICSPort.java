@@ -313,6 +313,25 @@ public String getDescription() {
 }
 
 /**
+ * @param visibile
+ */
+public void visilibityChanged(boolean visibile)
+{
+/*
+	if (visibile)
+		((Template)getParent()).manageLink(getFieldData());
+	else
+	{
+		disconnected = true;
+		EPICSLinkOut.destroyChain(inlink, this);
+		setInput(null);
+		properties.setRecord(null);
+		properties.setVarName(null);
+	}
+*/
+}
+
+/**
  * @see com.cosylab.vdct.graphics.objects.TemplateEPICSLink#isVisible()
  */
 public boolean isVisible() {

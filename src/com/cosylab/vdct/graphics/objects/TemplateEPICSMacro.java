@@ -57,7 +57,7 @@ import com.cosylab.vdct.vdb.VDBTemplateMacro;
  * Creation date: (29.1.2001 21:27:30)
  * @author Matej Sekoranja
  */
-
+//TODO deleting target does not remove this link
 public class TemplateEPICSMacro extends EPICSOutLink implements TemplateEPICSLink, Movable {
 
  	private String lastUpdatedFullName = null;
@@ -232,12 +232,6 @@ protected void draw(Graphics g, boolean hilited) {
  */
 public void destroyAndRemove() {
 	super.destroy();
-
-	if (lastUpdatedFullName!=null)
-		Group.getRoot().getLookupTable().remove(getFieldData().getFullName());
-	else
-		((LinkManagerObject)getParent()).removeInvalidLink(this);
-
 }
 
 /**
@@ -343,7 +337,7 @@ class PopupMenuHandler implements ActionListener {
 		else if (action.equals(startLinkingString))
 		{
 			LinkCommand cmd = (LinkCommand)CommandManager.getInstance().getCommand("LinkCommand");
-			cmd.setData((Template)TemplateEPICSMacro.this.getParent(), TemplateEPICSMacro.this.getFieldData());
+			cmd.setData(TemplateEPICSMacro.this, TemplateEPICSMacro.this.getFieldData());
 			cmd.execute();
 		}
 		else if (action.equals(removeString))
@@ -464,10 +458,27 @@ public void valueChanged() {
 }
 
 /**
+ * @param visibile
+ */
+public void visilibityChanged(boolean visibile)
+{
+	if (visibile)
+		((Template)getParent()).manageLink(getFieldData());
+	else
+	{
+		disconnected = true;
+		EPICSLinkOut.destroyChain(inlink, this);
+		setInput(null);
+		properties.setRecord(null);
+		properties.setVarName(null);
+	}
+}
+
+/**
  * @see com.cosylab.vdct.graphics.objects.TemplateEPICSLink#isVisible()
  */
 public boolean isVisible() {
-	return (fieldData.getVisibility() == InspectableProperty.ALWAYS_VISIBLE ||
+	 return (fieldData.getVisibility() == InspectableProperty.ALWAYS_VISIBLE ||
 			(fieldData.getVisibility() == InspectableProperty.NON_DEFAULT_VISIBLE && !fieldData.hasDefaultValue()));
 }
 

@@ -64,6 +64,7 @@ import com.cosylab.vdct.vdb.*;
 // TODO save fields positions
 // TODO do not show hidden macros (with fields?) in properties or not?!
 // TODO make serialization of macro w/o vis. rep. work, but macro is defined only as visible object?!
+// TODO if macro/port is not visible, do not draw/show the link
 public class Template
 	extends LinkManagerObject
 	implements /*Descriptable,*/ Movable, Inspectable, Popupable, Flexible, Selectable, Clipboardable, Hub, MonitoredPropertyListener, SaveInterface, SaveObject
@@ -72,7 +73,7 @@ public class Template
 	class PopupMenuHandler implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 			LinkCommand cmd = (LinkCommand)CommandManager.getInstance().getCommand("LinkCommand");
-			cmd.setData(Template.this, Template.this.getField(e.getActionCommand()));
+			cmd.setData((VisibleObject)Template.this.getSubObject(e.getActionCommand()), Template.this.getField(e.getActionCommand()));
 			cmd.execute();
 		}
 	}
@@ -1187,8 +1188,10 @@ public void removeLink(Linkable link)
  */
 public void fieldChanged(VDBFieldData field) {
 	boolean repaint = false;
-
-	if (manageLink(field)) repaint=true;
+	
+	if (manageLink(field) ||
+		templateData.getProperties().get(field.getName())!=null)
+			repaint=true;
 	
 	if (repaint) {
 		unconditionalValidation();
@@ -1836,6 +1839,12 @@ public void fieldVisibilityChange(VDBFieldData fieldData, boolean newVisible)
 			leftFields--;
 	}
 	
+	// dummy solution !!!
+	if (link instanceof TemplateEPICSMacro)
+		((TemplateEPICSMacro)link).visilibityChanged(newVisible);
+	else if (link instanceof TemplateEPICSPort)
+		((TemplateEPICSPort)link).visilibityChanged(newVisible);
+		
 	unconditionalValidation();
 	com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 	
