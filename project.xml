@@ -27,6 +27,7 @@
   <dependency type="3rdparty" name="VisualDCT-Common" version="1.0" url="http://visualdct.cosylab.com/builds/VisualDCT-Common/" />
 
   <news date="2002-07-10" developer="msekoranja" title="VisualDCT ported to Eclipse and Ant builds."/>
+  <news date="2002-07-23" developer="msekoranja" title="Package A implemented."/>
  
   <!-- additional documentation -->
   <document url="http://visualdct.cosylab.com" comment="VisualDCT homepage where you can find all related manuals, articles and presentations." title="VisualDCT homepage"/>
