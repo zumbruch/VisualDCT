@@ -193,10 +193,18 @@
 				Additionaly you can specify command line option <kwd>-d</kwd> or <kwd>--dbd-file</kwd>, followed by the name of a <f>.dbd</f> file.
 				This loads a specific <f>.dbd</f> file before generating a flat database.
 			</p>
-
 				<code language="command line" id="cmdln">
 					flatdb --dbd-file app.dbd input.vdb output.db<desc>Example with a <f>.dbd</f> file.</desc>
 				</code>
+			<p>
+				Options <kwd>--enable-global-macros</kwd> and <kwd>--disable-global-macros</kwd> respectively enable and disable global macro evaluation.
+			</p>
+			<p>
+				Options <kwd>--enable-capfast</kwd> and <kwd>--disable-capfast</kwd> enable and disable production of hierarhical names like CapFast.
+			</p>
+			<p>
+				Both of the above command line options when not specified on the command line, use the same settings as were made in VisualDCT's visual user interface (settings are automatically saved).
+			</p>
 		</section>
 
 		<section id="hierarchies" title="Hierarchy support">

@@ -382,6 +382,10 @@ public void loadRecentFiles()
 		sync();
 	}
 
+	public void setGlobalMacrosTemp(boolean b) {
+		globalMacros = b;
+	}
+
 	/**
 	 * @return
 	 */
@@ -396,6 +400,10 @@ public void loadRecentFiles()
 		hierarhicalNames = b;
 		prefs.putBoolean("HierarhicalNames", b);
 		sync();
+	}
+
+	public void setHierarhicalNamesTemp(boolean b) {
+		hierarhicalNames = b;
 	}
 
 	/**
