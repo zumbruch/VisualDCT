@@ -44,14 +44,16 @@ import com.cosylab.vdct.Constants;
 public class VDBData {
 	private Vector records = null;
 	private Hashtable templates = null;
-	private Vector templateInstances = null;
+	private Hashtable templateInstances = null;
+	private Vector templateInstancesV = null;
 /**
  * DBDData constructor comment.
  */
 public VDBData() {
 	records = new Vector();
 	templates = new Hashtable();
-	templateInstances = new Vector();
+	templateInstances = new Hashtable();
+	templateInstancesV = new Vector();
 }
 /**
  * This method was created in VisualAge.
@@ -82,9 +84,11 @@ public void addTemplate(VDBTemplate templ) {
 public void addTemplateInstance(VDBTemplateInstance ti) {
 	if (ti!=null)
 		if (!templateInstances.contains(ti))
-			templateInstances.addElement(ti);
+		{
+			templateInstancesV.addElement(ti);
+			templateInstances.put(ti.getName(), ti);
+		}
 }
-
 
 /**
  * This method was created in VisualAge.
@@ -195,7 +199,7 @@ public static void generateTemplateInstances(DBData db, VDBData vdb)
 					+ " does not exist - this definition will be ignored.");
 			continue;
 		}
-		VDBTemplateInstance vti = new VDBTemplateInstance(t);
+		VDBTemplateInstance vti = new VDBTemplateInstance(dbTemplateInstance.getTemplateID(), t);
 		vti.setProperties(dbTemplateInstance.getProperties());
 			
 		vti.setInputs(generateTemplateInstanceIOFields(t.getInputs()));
@@ -529,11 +533,20 @@ public void removeRecord(VDBRecordData record) {
 }
 /**
  * Returns the templateInstances.
- * @return Vector
+ * @return Hashtable
  */
-public Vector getTemplateInstances()
+public Hashtable getTemplateInstances()
 {
 	return templateInstances;
+}
+
+/**
+ * Returns the templateInstances.
+ * @return Vector
+ */
+public Vector getTemplateInstancesV()
+{
+	return templateInstancesV;
 }
 
 /**
@@ -559,6 +572,7 @@ public void removeTemplate(VDBTemplate template) {
  * @param record com.cosylab.vdct.vdb.VDBTemplateInstance
  */
 public void removeTemplateInstance(VDBTemplateInstance templateInstance) {
+	templateInstancesV.remove(templateInstance);
 	templateInstances.remove(templateInstance);
 }
 

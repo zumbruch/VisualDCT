@@ -33,6 +33,7 @@ import java.util.*;
 import com.cosylab.vdct.DataProvider;
 import com.cosylab.vdct.dbd.DBDDeviceData;
 import com.cosylab.vdct.graphics.objects.*;
+import com.cosylab.vdct.inspector.Inspectable;
 
 /**
  * This type was created in VisualAge.
@@ -156,13 +157,13 @@ public java.lang.String getType() {
 public void setComment(java.lang.String newComment) {
 	comment = newComment;
 
-	Record visualRecord = (Record)Group.getRoot().findObject(getName(), true);
-	if (visualRecord==null) {
+	Inspectable visualObj = (Inspectable)Group.getRoot().findObject(getName(), true);
+	if (visualObj==null) {
 		//com.cosylab.vdct.Console.getInstance().println("o) Internal error: no visual representaton of record "+getName()+" found.");
 		return;
 	}
 
-	com.cosylab.vdct.inspector.InspectorManager.getInstance().updateCommentProperty(visualRecord);
+	com.cosylab.vdct.inspector.InspectorManager.getInstance().updateCommentProperty(visualObj);
 }
 /**
  * Insert the method's description here.

@@ -259,30 +259,33 @@ public java.util.Vector getItems() {
 
 	items.add(new JSeparator());
 
-	Record parRec = (Record)getParent();
-	boolean isFirst = parRec.isFirstField(this);
-	boolean isLast = parRec.isLastField(this);
+	if (getParent() instanceof Record)
+	{
+		Record parRec = (Record)getParent();
+		boolean isFirst = parRec.isFirstField(this);
+		boolean isLast = parRec.isLastField(this);
+		
 	
-
-	if (!isFirst)
-	{
-		JMenuItem upItem = new JMenuItem(moveUpString);
-		upItem.addActionListener(al);
-		upItem.setIcon(new ImageIcon(getClass().getResource("/images/up.gif")));
-		items.addElement(upItem);
+		if (!isFirst)
+		{
+			JMenuItem upItem = new JMenuItem(moveUpString);
+			upItem.addActionListener(al);
+			upItem.setIcon(new ImageIcon(getClass().getResource("/images/up.gif")));
+			items.addElement(upItem);
+		}
+	
+		if (!isLast)
+		{
+			JMenuItem downItem = new JMenuItem(moveDownString);
+			downItem.addActionListener(al);
+			downItem.setIcon(new ImageIcon(getClass().getResource("/images/down.gif")));
+			items.addElement(downItem);
+		}
+	
+		if (!(isFirst && isLast))
+			items.add(new JSeparator());
 	}
-
-	if (!isLast)
-	{
-		JMenuItem downItem = new JMenuItem(moveDownString);
-		downItem.addActionListener(al);
-		downItem.setIcon(new ImageIcon(getClass().getResource("/images/down.gif")));
-		items.addElement(downItem);
-	}
-
-	if (!(isFirst && isLast))
-		items.add(new JSeparator());
-
+	
 	JMenuItem removeItem = new JMenuItem(removeString);
 	removeItem.addActionListener(al);
 	items.addElement(removeItem);

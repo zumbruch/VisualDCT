@@ -928,8 +928,8 @@ protected void validate() {
   setRheight(rheight);
 
   // set appropriate font size
-  int x0 = (int)(8*scale);		// insets
-  int y0 = (int)(4*scale);
+  int x0 = (int)(16*scale);		// insets
+  int y0 = (int)(8*scale);
 
   setLabel(getName());
 

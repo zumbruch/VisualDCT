@@ -36,6 +36,7 @@ import java.util.Hashtable;
  */
 public class VDBTemplateInstance
 {
+	String name = null;
 	VDBTemplate template = null;
 	Hashtable properties = null;
 	Hashtable inputs = null;
@@ -44,8 +45,9 @@ public class VDBTemplateInstance
 	/**
 	 * Constructor.
 	 */
-	public VDBTemplateInstance(VDBTemplate template)
+	public VDBTemplateInstance(String name, VDBTemplate template)
 	{
+		this.name = name;
 		this.template = template;
 	}
 		/**
@@ -128,6 +130,15 @@ public class VDBTemplateInstance
 			s = s.replaceAll("\\$\\{"+key+"\\}", val);
 		}		
 		return s;
+	}
+
+	/**
+	 * Returns the name.
+	 * @return String
+	 */
+	public String getName()
+	{
+		return name;
 	}
 
 }

@@ -29,6 +29,7 @@ package com.cosylab.vdct.graphics.objects;
  */
 
 import java.awt.*;
+import java.util.Enumeration;
 import java.util.Vector;
 
 import javax.swing.Icon;
@@ -39,6 +40,9 @@ import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.graphics.popup.Popupable;
 import com.cosylab.vdct.inspector.Inspectable;
 import com.cosylab.vdct.inspector.InspectableProperty;
+import com.cosylab.vdct.vdb.LinkProperties;
+import com.cosylab.vdct.vdb.VDBFieldData;
+import com.cosylab.vdct.vdb.VDBTemplateField;
 import com.cosylab.vdct.vdb.VDBTemplateInstance;
 
 /**
@@ -46,12 +50,29 @@ import com.cosylab.vdct.vdb.VDBTemplateInstance;
  * @author Matej
  */
 public class Template
-	extends VisibleObject
-	implements Descriptable, Movable, Inspectable, Popupable, Flexible, Selectable, Clipboardable
+	extends ContainerObject
+	implements Descriptable, Movable, Inspectable, Popupable, Flexible, Selectable, Clipboardable, Hub
 {
 
 	VDBTemplateInstance templateData = null;
 	String description = null;
+
+	// properties field
+	protected int rfieldLabelX;
+	protected int rfieldLabelY;
+	protected int rfieldRowHeight;
+	protected Font fieldFont = null;
+
+	// templateid (fileName) label
+	protected int ridLabelX;
+	protected int ridLabelY;
+	protected String idlabel;
+	protected Font idFont = null;
+
+	protected int initY;
+	protected int rlinkY;
+
+	private final static String fieldMaxStr = "01234567890123456789012345";
 
 	/**
 	 * Insert the method's description here.
@@ -63,10 +84,13 @@ public class Template
 		super(parent);
 		this.templateData = templateData;
 
-		//!!!
 		setColor(Color.black);
-		setWidth(Constants.GROUP_WIDTH);
-		setHeight(Constants.GROUP_HEIGHT);
+		setWidth(Constants.TEMPLATE_WIDTH);
+		setHeight(Constants.TEMPLATE_INITIAL_HEIGHT);
+		
+		initializeLinkFields();		
+		forceValidation();
+
 	}
 
 	/**
@@ -102,8 +126,40 @@ public class Template
 				g.setFont(getFont());
 				g.drawString(getLabel(), rrx+getRlabelX(), rry+getRlabelY());
 			}
-		
+
+			if (idFont!=null) {
+				g.setFont(idFont);
+				g.drawString(idlabel, rrx+ridLabelX, rry+ridLabelY);
+			}
+
+			// middle line
+			int ox = (int) (10 * getRscale());
+
+			//g.drawLine(rrx + ox, rry + rinitY, rrx + rwidth - ox, rry + rinitY);
+			//g.drawLine(rrx + ox, rry + rlinkY, rrx + rwidth - ox, rry + rlinkY);
+
+			if (fieldFont != null)
+			{
+				g.setFont(fieldFont);
+				FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(fieldFont);
+				String val;
+				int px = rrx + rfieldLabelX;
+				int py = rry + rfieldLabelY;
+				Enumeration e = templateData.getProperties().keys();
+				while (e.hasMoreElements()) {
+					String name = e.nextElement().toString();
+					val = name + "=" + templateData.getProperties().get(name).toString();
+					while ((fm.stringWidth(val) + ox) > rwidth)
+						val = val.substring(0, val.length() - 2);
+					g.drawString(val, px, py);
+					py += rfieldRowHeight;
+				}
+			}
+
 		}
+
+		paintSubObjects(g, hilited);
+
 	}
 
 	/**
@@ -111,7 +167,7 @@ public class Template
 	 */
 	public String getHashID()
 	{
-		return "en ID"; // !!!id of getTemplaTeData() iz DB fajla
+		return templateData.getName();
 	}
 
 	/**
@@ -121,6 +177,9 @@ public class Template
 	{
 		  setRx((int)(getX()*getRscale()));
 		  setRy((int)(getY()*getRscale()));
+
+		  // sub-components
+		  revalidateFieldsPosition();
 	}
 
 	/**
@@ -129,32 +188,96 @@ public class Template
 	protected void validate()
 	{
 		  revalidatePosition();
-			
+
 		  double scale = getRscale();
 		  int rwidth = (int)(getWidth()*scale);
-		  int rheight = (int)(getHeight()*scale);
+		  int height = Constants.TEMPLATE_INITIAL_HEIGHT;
+
+		  initY = height;
+
+		  int irheight = (int)(scale*height);
+
+		  // set appropriate font size
+		  int x0 = (int)(24*scale);		// insets
+		  int y0 = (int)(12*scale);
+
+
+		  // fields
+
+		  int fieldRows = Math.max(templateData.getInputs().size(), templateData.getOutputs().size());
+		  height += fieldRows * Constants.FIELD_HEIGHT;
+		 // height = Math.max(height, Constants.TEMPLATE_MIN_HEIGHT);
+		  int frheight = (int)(scale*height);
+
+		  rlinkY = frheight;
+		  
+		  // properties
+
+		  int xx0 = (int)(14*scale);		// insets
+		  int yy0 = (int)(8*scale);
+
+		  if (rwidth<(2*xx0)) fieldFont = null;
+		  else
+			  fieldFont = FontMetricsBuffer.getInstance().getAppropriateFont(
+				  			 Constants.DEFAULT_FONT, Font.PLAIN, 
+			 	 			 fieldMaxStr, rwidth-x0, frheight-y0);
+
+		  int ascent = 0;
+		  rfieldRowHeight = 0;
+		  if (fieldFont!=null)
+		  {
+			  FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(fieldFont);
+			  rfieldLabelX = xx0;
+		 	  rfieldLabelY = frheight+2*fm.getAscent();
+			  rfieldRowHeight = fm.getHeight();
+			  ascent = fm.getAscent();
+		  }
+		
+		  int rheight = frheight + yy0 + rfieldRowHeight*templateData.getProperties().size()+ascent;
+		  setHeight((int)(rheight/scale));
+
 		  setRwidth(rwidth);
 		  setRheight(rheight);
 		
-		  // set appropriate font size
-		  int x0 = (int)(8*scale);		// insets
-		  int y0 = (int)(4*scale);
-		
+		  // description
+
+		  int idLabelHeight = (int)(Constants.FIELD_HEIGHT*scale);
+		  
 		  setLabel(getDescription());
 		
 		  Font font;
 		  font = FontMetricsBuffer.getInstance().getAppropriateFont(
 			  			Constants.DEFAULT_FONT, Font.PLAIN, 
-			  			getLabel(), rwidth-x0, rheight-y0);
+			  			getLabel(), rwidth-x0, irheight-y0/*-idLabelHeight*/);
 		
 		  if (rwidth<(2*x0)) font = null;
 		  else
 		  if (font!=null) {
 			  FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(font);
 			  setRlabelX((rwidth-fm.stringWidth(getLabel()))/2);
-		 	  setRlabelY((rheight-fm.getHeight())/2+fm.getAscent());
+		 	  setRlabelY((irheight-fm.getHeight()/*+idLabelHeight*/)/2+fm.getAscent());
 		  }
 		  setFont(font);
+
+		  // id label
+		  
+		  idlabel = templateData.getTemplate().getId();
+		  if (rwidth<(2*x0)) idFont = null;
+		  else
+			  idFont = FontMetricsBuffer.getInstance().getAppropriateFont(
+				  			 Constants.DEFAULT_FONT, Font.PLAIN, 
+			 	 			 idlabel, rwidth-x0, idLabelHeight);
+		
+		  if (idFont!=null) {
+			  FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(idFont);
+			  ridLabelX = (rwidth-fm.stringWidth(idlabel))/2;
+		 	  ridLabelY = (idLabelHeight-fm.getHeight())/2+fm.getAscent();
+		  }
+
+		  
+	      // sub-components
+		  revalidatePosition();
+		  validateFields();
 	}
 
 	/**
@@ -207,7 +330,16 @@ public class Template
 	 */
 	public String getName()
 	{
-		return null;
+		return templateData.getName();
+	}
+
+	/**
+	 * Insert the method's description here.
+	 * Creation date: (10.1.2001 14:49:50)
+	 * @return java.lang.String
+	 */
+	public String toString() {
+		return getDescription() + " [" + templateData.getName() + "]";
 	}
 
 	/**
@@ -239,7 +371,7 @@ public class Template
 	 */
 	public String getFlexibleName()
 	{
-		return null;
+		return templateData.getName();
 	}
 
 	/**
@@ -292,4 +424,214 @@ public class Template
 		this.description = description;
 	}
 
+	/**
+	 * Insert the method's description here.
+	 * Creation date: (25.4.2001 22:13:55)
+	 * @return int
+	 */
+	public int getX() {
+		int posX = super.getX();
+		if (com.cosylab.vdct.Settings.getInstance().getSnapToGrid())
+			return posX - posX % Constants.GRID_SIZE;
+		else
+			return posX;
+	}
+	/**
+	 * Insert the method's description here.
+	 * Creation date: (25.4.2001 22:13:55)
+	 * @return int
+	 */
+	public int getY() {
+		int posY = super.getY();
+		if (com.cosylab.vdct.Settings.getInstance().getSnapToGrid())
+			return posY - posY % Constants.GRID_SIZE;
+		else
+			return posY;
+	}
+
+
+
+
+/**
+ * Returned value inicates change
+ * Creation date: (21.12.2000 22:21:12)
+ * @return com.cosylab.visible.objects.VisibleObject
+ * @param x int
+ * @param y int
+ */
+public VisibleObject hiliteComponentsCheck(int x, int y) {
+
+	ViewState view = ViewState.getInstance();
+	VisibleObject spotted = null;
+	
+	Enumeration e = subObjectsV.elements();
+	VisibleObject vo;
+	while (e.hasMoreElements()) {
+		vo = (VisibleObject)(e.nextElement());
+		vo = vo.intersects(x, y);
+		if (vo!=null) {
+			spotted=vo;
+			if (view.getHilitedObject()!=vo) return vo;
+		}
+	}
+
+	return spotted;
+}
+
+
+/**
+ * Default impmlementation for square (must be rescaled)
+ * Creation date: (19.12.2000 20:20:20)
+ * @return com.cosylab.visible.objects.VisibleObject
+ * @param px int
+ * @param py int
+ */
+public VisibleObject intersects(int px, int py) {
+
+	// first check on small sub-objects like connectors
+	VisibleObject spotted = hiliteComponentsCheck(px, py);
+  	if ((spotted==null) &&
+  		(getRx()<=px) && (getRy()<=py) && 
+		((getRx()+getRwidth())>=px) && 
+		((getRy()+getRheight())>=py))
+		spotted = this;
+	return spotted;
+}
+
+
+/**
+ * Insert the method's description here.
+ * Creation date: (26.1.2001 17:18:51)
+ */
+private void revalidateFieldsPosition() {
+
+  int lx = getX();
+  int rx = getX()+getWidth()/2; 
+  int ly = getY()+initY;
+  int ry = getY()+initY;
+  Enumeration e = subObjectsV.elements();
+  EPICSLink field; Object obj;
+  while (e.hasMoreElements()) {
+	obj = e.nextElement();
+	//if (obj instanceof Field) {
+		field = (EPICSLink)obj;
+		if (field.isRight())
+		{
+			field.revalidatePosition(rx, ry);
+			ry+=field.getHeight();
+		}
+		else
+		{
+			field.revalidatePosition(lx, ly);
+			ly+=field.getHeight();
+		}
+	//}
+  }
+
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (21.12.2000 21:58:56)
+ * @param g java.awt.Graphics
+ * @param hilited boolean
+ */
+private void paintSubObjects(Graphics g, boolean hilited) {
+	Enumeration e = subObjectsV.elements();
+	VisibleObject vo;
+	while (e.hasMoreElements()) {
+		vo = (VisibleObject)(e.nextElement());
+			vo.paint(g, hilited);
+	}
+	
+}
+
+
+/**
+ * Insert the method's description here.
+ * Creation date: (26.1.2001 17:19:47)
+ */
+private void validateFields() {
+
+	Enumeration e = subObjectsV.elements();
+	Object obj;
+	while (e.hasMoreElements()) {
+		obj = e.nextElement();
+		//if (obj instanceof Field)
+			((VisibleObject)obj).validate();
+	}
+	
+}
+
+
+/**
+ * Insert the method's description here.
+ * Creation date: (30.1.2001 9:36:15)
+ * @param field com.cosylab.vdct.vdb.VDBFieldData
+ */
+private EPICSLink createLinkField(VDBFieldData field)
+{
+	EPICSLink link = null;	
+	int type = LinkProperties.getType(field);
+	switch (type) {
+		case LinkProperties.INLINK_FIELD:
+			link = new TemplateEPICSInLink(this, field);
+			break;
+		case LinkProperties.OUTLINK_FIELD:
+			link = new TemplateEPICSOutLink(this, field);
+			break;
+		case LinkProperties.FWDLINK_FIELD:
+			link = new TemplateEPICSFwdLink(this, field);
+			break;
+		case LinkProperties.VARIABLE_FIELD:
+			link = new TemplateEPICSVarLink(this, field);
+			break;
+	}
+	return link;
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (26.1.2001 17:19:47)
+ */
+private void initializeLinkFields()
+{
+	clear();
+
+	// inputs
+	Enumeration e = templateData.getInputs().elements();
+	while (e.hasMoreElements())
+	{
+		VDBTemplateField tf = (VDBTemplateField)e.nextElement();
+		EPICSLink link = createLinkField(tf);
+		link.setRight(false);
+		if (link!=null)
+			addSubObject(tf.getAlias(), link);
+	}
+
+	// outputs
+	e = templateData.getOutputs().elements();
+	while (e.hasMoreElements())
+	{
+		VDBTemplateField tf = (VDBTemplateField)e.nextElement();
+		EPICSLink link = createLinkField(tf);
+		link.setRight(true);
+		if (link!=null)
+			addSubObject(tf.getAlias(), link);
+	}
+}
+
+/**
+ * @param link com.cosylab.vdct.graphics.objects.Linkable
+ */
+public void addLink(Linkable link)
+{
+}
+
+/**
+ * @param link com.cosylab.vdct.graphics.objects.Linkable
+ */
+public void removeLink(Linkable link)
+{
+}
 }

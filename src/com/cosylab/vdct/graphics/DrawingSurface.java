@@ -1267,7 +1267,15 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 				continue;
 			}			
 			
-			Template templ = new Template(null, null);
+			VDBTemplateInstance templateInstance = (VDBTemplateInstance)vdbData.getTemplateInstances().get(dbTemplate.getTemplateID());
+			if (templateInstance==null)
+			{
+				Console.getInstance().println(
+					"Template instance "+dbTemplate.getTemplateID()+" does not exist - this definition will be ignored.");
+				continue;
+			}			
+
+			Template templ = new Template(null, templateInstance);
 			templ.setColor(dbTemplate.getColor());
 			//templ.setDescription(dbTemplate.getDescription());
 			templ.setDescription(template.getDescription());

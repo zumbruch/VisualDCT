@@ -83,6 +83,10 @@ public class Constants {
     public static final int GROUP_WIDTH = 200;
     public static final int GROUP_HEIGHT = 120;
 
+    public static final int TEMPLATE_WIDTH = 200;
+    public static final int TEMPLATE_INITIAL_HEIGHT = 120;
+    public static final int TEMPLATE_MIN_HEIGHT = 180;
+
     public static final int CONNECTOR_WIDTH = 6;
     public static final int CONNECTOR_HEIGHT = 6;
     public static final int LINK_RADIOUS = 5;
