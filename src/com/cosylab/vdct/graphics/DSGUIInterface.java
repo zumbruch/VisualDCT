@@ -688,7 +688,7 @@ public void save(java.io.File file) throws IOException {
  } 
  // save as check
  //	fileName & id has been changed, fix them
- else if (data.getFileName()!=file.getAbsolutePath())
+ else if (!file.getAbsolutePath().equals(data.getFileName()))
  {
  	// reload previous ...
  	drawingSurface.reloadTemplate(data);
