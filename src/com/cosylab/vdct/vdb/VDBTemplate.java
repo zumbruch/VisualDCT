@@ -53,14 +53,17 @@ import com.cosylab.vdct.graphics.FontMetricsBuffer;
 import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.graphics.objects.Descriptable;
 import com.cosylab.vdct.graphics.objects.Group;
+import com.cosylab.vdct.graphics.objects.VisibleObject;
 import com.cosylab.vdct.graphics.popup.Popupable;
 import com.cosylab.vdct.inspector.Inspectable;
 import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.inspector.InspectorManager;
+import com.cosylab.vdct.undo.ComposedAction;
 import com.cosylab.vdct.undo.CreateTemplatePortAction;
 import com.cosylab.vdct.undo.DeleteTemplatePortAction;
 import com.cosylab.vdct.undo.DescriptionChangeAction;
 import com.cosylab.vdct.undo.RenameTemplatePortAction;
+import com.cosylab.vdct.undo.UndoManager;
 import com.cosylab.vdct.util.StringUtils;
 
 /**
@@ -720,8 +723,20 @@ public void removePort(String name)
 	if (port!=null)
 		portsV.removeElement(port);
 
-	com.cosylab.vdct.undo.UndoManager.getInstance().addAction(
-			new DeleteTemplatePortAction(this, port));
+	ComposedAction ca = new ComposedAction();
+
+	// remove visible rep.
+	VisibleObject portVisibleObj = port.getVisibleObject();
+	if (portVisibleObj!=null)
+	{
+		portVisibleObj.destroy();
+		ca.addAction(new com.cosylab.vdct.undo.DeleteAction(portVisibleObj));
+		com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+	}
+
+	ca.addAction(new DeleteTemplatePortAction(this, port));
+	
+	UndoManager.getInstance().addAction(ca);
 	
 	regeneratePortsID();
 	InspectorManager.getInstance().updateObject(this);
@@ -738,6 +753,8 @@ public void removePort(VDBPort port)
 {
 	ports.remove(port);
 	portsV.removeElement(port);
+
+	// no undo here
 
 	regeneratePortsID();
 	InspectorManager.getInstance().updateObject(this);
@@ -757,6 +774,10 @@ public void renamePort(VDBPort port, String newName)
 	ports.remove(oldName);
 	port.setName(newName);
 	ports.put(port.getName(), port);
+
+	// also fix visible rep.
+	if (port.getVisibleObject()!=null)
+		port.getVisibleObject().rename(oldName, newName);
 
 	com.cosylab.vdct.undo.UndoManager.getInstance().addAction(
 			new RenameTemplatePortAction(this, port, oldName, newName));
@@ -831,6 +852,7 @@ public VDBPort addPort()
 public void propertyChanged(InspectableProperty property)
 {
 	InspectorManager.getInstance().updateProperty(this, property);
+	
 /*
 	updateTemplateFields();
 	InspectorManager.getInstance().updateProperty(this, null);

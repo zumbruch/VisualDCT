@@ -180,6 +180,12 @@ public class VDBPort implements InspectableProperty, Descriptable, ChangableVisi
 		if (update)
 		{
 			InspectorManager.getInstance().updateObject(template);
+
+			// update inspector (if inspecting visible rep.)
+			if (visibleObject!=null && InspectorManager.getInstance().isInspected(visibleObject))
+			{
+				InspectorManager.getInstance().updateObject(visibleObject);
+			}
 		}
 
 	}
@@ -355,6 +361,12 @@ public class VDBPort implements InspectableProperty, Descriptable, ChangableVisi
 				visibleObject.valueChanged();
 			
 			template.propertyChanged(this);
+			
+			// update inspector (if inspecting visible rep.)
+			if (visibleObject!=null && InspectorManager.getInstance().isInspected(visibleObject))
+			{
+				InspectorManager.getInstance().updateObject(visibleObject);
+			}
 		}
 	}
 

@@ -75,10 +75,13 @@ public class Port extends VisibleObject implements Descriptable, Movable, OutLin
 			else if (action.equals(removeLinkString))
 			{
 				removeLink();
+				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
 			else if (action.equals(removePortString))
 			{
 				destroy();
+				com.cosylab.vdct.undo.UndoManager.getInstance().addAction(new com.cosylab.vdct.undo.DeleteAction(Port.this));
+				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
 			else if (action.equals(constantString)) {
 				setMode(OutLink.CONSTANT_PORT_MODE);
@@ -880,5 +883,31 @@ public void valueChanged()
 	unconditionalValidation();
 	com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 }
+
+/**
+ * @see com.cosylab.vdct.graphics.objects.VisibleObject#setDestroyed(boolean)
+ */
+public void setDestroyed(boolean newDestroyed)
+{
+	super.setDestroyed(newDestroyed);
+	
+	if (!newDestroyed)
+	{
+		// set data appropriate visibleObject
+		data.setVisibleObject(this);
+	}
+}
+
+/**
+ */
+public void rename(String oldName, String newName)
+{
+	getParent().removeObject(oldName);
+	getParent().addSubObject(newName, this);
+
+	unconditionalValidation();
+	com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+}
+
 
 }
