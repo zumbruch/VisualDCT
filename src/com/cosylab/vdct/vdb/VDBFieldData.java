@@ -28,12 +28,14 @@ package com.cosylab.vdct.vdb;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import com.cosylab.vdct.db.DBData;
 import com.cosylab.vdct.dbd.*;
 import com.cosylab.vdct.DataProvider;
 import com.cosylab.vdct.Console;
 import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.graphics.objects.Debuggable;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * This type was created in VisualAge.
@@ -45,7 +47,6 @@ public class VDBFieldData implements InspectableProperty, Debuggable {
 	protected String value;
 	protected String init_value;
 	protected String comment;
-	protected boolean template_def = false;
 	protected DBDFieldData dbdData;
 	protected VDBRecordData record = null;
 
@@ -252,14 +253,6 @@ public boolean isSepatator() {
 /**
  * Insert the method's description here.
  * Creation date: (9.12.2000 18:11:46)
- * @return boolean
- */
-public boolean isTemplate_def() {
-	return template_def;
-}
-/**
- * Insert the method's description here.
- * Creation date: (9.12.2000 18:11:46)
  * @param newComment java.lang.String
  */
 public void setComment(java.lang.String newComment) {
@@ -321,14 +314,6 @@ public void setRecord(VDBRecordData newRecord) {
 /**
  * Insert the method's description here.
  * Creation date: (9.12.2000 18:11:46)
- * @param newTemplate_def boolean
- */
-public void setTemplate_def(boolean newTemplate_def) {
-	template_def = newTemplate_def;
-}
-/**
- * Insert the method's description here.
- * Creation date: (9.12.2000 18:11:46)
  * @param newType int
  */
 public void setType(int newType) {
@@ -356,4 +341,47 @@ public void setValue(java.lang.String newValue) {
 public void setValueSilently(java.lang.String newValue) {
 	value = newValue;
 }
+/**
+ * Insert the method's description here.
+ * Creation date: (24/8/99 15:29:04)
+ */
+public String getToolTipText()
+{
+	String type = DBDResolver.getFieldType(dbdData.getField_type());
+	
+	if ((dbdData.getField_type()==DBDConstants.DBF_INLINK) ||
+		(dbdData.getField_type()==DBDConstants.DBF_OUTLINK))
+	{
+		// if not software
+		String linkType = record.getDTYPLinkType();
+		if (linkType!=null)
+		{
+			Pattern pattern = DataProvider.getInstance().getEditPatternLinkType(linkType);
+			if (pattern!=null)
+				type = type+" ["+pattern.pattern()+"]";
+		}
+	}
+	
+	return type;
+}
+ 
+/**
+ * Insert the method's description here.
+ * Creation date: (24/8/99 15:29:04)
+ * @return java.util.regex.Pattern
+ */
+public Pattern getEditPattern()
+{
+	if ((dbdData.getField_type()==DBDConstants.DBF_INLINK) ||
+		(dbdData.getField_type()==DBDConstants.DBF_OUTLINK))
+	{
+		// if not software
+		String linkType = record.getDTYPLinkType();
+		if (linkType!=null)
+			return DataProvider.getInstance().getEditPatternLinkType(linkType);
+	}
+
+	return null;
+}
+
 }

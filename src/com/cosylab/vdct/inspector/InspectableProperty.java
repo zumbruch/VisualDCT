@@ -1,5 +1,7 @@
 package com.cosylab.vdct.inspector;
 
+import java.util.regex.Pattern;
+
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
  * All rights reserved.
@@ -82,4 +84,16 @@ public boolean isSepatator();
  * @param value java.lang.String
  */
 public void setValue(String value);
+/**
+ * Insert the method's description here.
+ * Creation date: (11.1.2001 21:30:04)
+ * @return java.lang.String
+ */
+public Pattern getEditPattern();
+/**
+ * Insert the method's description here.
+ * Creation date: (11.1.2001 21:30:04)
+ * @return java.lang.String
+ */
+public String getToolTipText();
 }

@@ -28,9 +28,15 @@ package com.cosylab.vdct.inspector;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.text.ParseException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.awt.*;
 import java.awt.event.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import javax.swing.*;
 import javax.swing.table.*;
 import javax.swing.event.*;
@@ -47,10 +53,18 @@ public class InspectorCellEditor implements TableCellEditor, TreeCellEditor {
 	// intelli editor
 	protected boolean intelliEditor = false;
 	protected InspectorTableModel tableModel;
+
 	protected JComboBox intelliComboBox;
 	protected EditorDelegate comboDelegate;
+
 	protected JTextField intelliTextField;
 	protected EditorDelegate textfieldDelegate;
+
+	//protected JFormattedTextField intelliFormattedTextField;
+	//protected RegexFormatter formatter;
+	protected JTextField intelliFormattedTextField;
+	protected EditorDelegate formattedTextfieldDelegate;
+	protected Pattern pattern;
 	
 	protected JComponent editorComponent;
 	protected EditorDelegate delegate;
@@ -155,6 +169,65 @@ public InspectorCellEditor(InspectorTableModel tableModel) {
 			
 		};
 		intelliTextField.addActionListener(textfieldDelegate);
+/*
+		// formattedtexffield
+		formatter = new RegexFormatter();
+		formatter.setAllowsInvalid(true);
+		formatter.setOverwriteMode(false);
+	    formatter.setCommitsOnValidEdit(false);
+		intelliFormattedTextField = new JFormattedTextField(formatter);
+		intelliFormattedTextField.setFocusLostBehavior(JFormattedTextField.PERSIST);
+*/	
+		intelliFormattedTextField = new JTextField();
+		intelliFormattedTextField.setBorder(null);
+		formattedTextfieldDelegate = new EditorDelegate() {
+			
+			public void setValue(Object value) {
+				intelliFormattedTextField.setText((value != null) ? value.toString() : "");
+			}
+
+			public Object getCellEditorValue() {
+				return intelliFormattedTextField.getText();
+			}
+			
+		};
+		intelliFormattedTextField.addActionListener(formattedTextfieldDelegate);
+
+		// coloring
+//		intelliFormattedTextField.addPropertyChangeListener(new PropertyChangeListener() {
+/*		    public void propertyChange(PropertyChangeEvent pce) {
+		        if ("editValid".equals(pce.getPropertyName()))
+		        {
+		        	if (intelliFormattedTextField.isEditValid())
+		        		intelliFormattedTextField.setForeground(Color.blue);
+		        	else
+		        		intelliFormattedTextField.setForeground(Color.red);
+		        }
+		    }*/
+/*		    public void propertyChange(PropertyChangeEvent pce) {
+		    	   System.out.println(pce.getPropertyName());
+		    	   Matcher m = pattern.matcher(intelliFormattedTextField.getText());
+		        	if (m.matches())
+		        		intelliFormattedTextField.setForeground(Color.blue);
+		        	else
+		        		intelliFormattedTextField.setForeground(Color.red);
+		    }
+		});
+*/
+
+		intelliFormattedTextField.getDocument().addDocumentListener(new DocumentListener() {
+			private void check()
+			{
+		    	   Matcher m = pattern.matcher(intelliFormattedTextField.getText());
+		        	if (m.matches())
+		        		intelliFormattedTextField.setForeground(Color.black);
+		        	else
+		        		intelliFormattedTextField.setForeground(Color.red);
+			}
+			public void changedUpdate(DocumentEvent e) {}
+			public void insertUpdate(DocumentEvent e) { check(); }
+			public void removeUpdate(DocumentEvent e) { check(); }
+		});		
 
 }
 	/**
@@ -230,7 +303,42 @@ public InspectorCellEditor(InspectorTableModel tableModel) {
 		};
 		textField.addActionListener(delegate);
 	}
-	// implements javax.swing.CellEditor
+
+	/**
+	 * Constructs a InspectorCellEditor that uses a text field.
+	 *
+	 * @param textField javax.swing.JTextField
+	 */
+	/*public InspectorCellEditor(final JFormattedTextField formattedTextField) {
+		editorComponent = formattedTextField;
+		delegate = new EditorDelegate() {
+			
+			public void setValue(Object value) {
+				formattedTextField.setText((value != null) ? value.toString() : "");
+			}
+
+			public Object getCellEditorValue() {
+				return formattedTextField.getText();
+			}
+			
+		};
+		formattedTextField.addActionListener(delegate);
+		// coloring
+		formattedTextField.addPropertyChangeListener(new PropertyChangeListener() {
+		    public void propertyChange(PropertyChangeEvent pce) {
+		        if ("editValid".equals(pce.getPropertyName()))
+		        {
+		        	if (formattedTextField.isEditValid())
+		        		formattedTextField.setForeground(Color.blue);
+		        	else
+		        		formattedTextField.setForeground(Color.red);
+		        }
+		    }
+		});
+		formatter = (RegexFormatter)formattedTextField.getFormatter();
+	}
+
+*/	// implements javax.swing.CellEditor
 	public void addCellEditorListener(CellEditorListener l) {
 		listenerList.add(CellEditorListener.class, l);
 	}
@@ -247,7 +355,7 @@ public InspectorCellEditor(InspectorTableModel tableModel) {
 	 * @see EventListenerList
 	 */
 	protected void fireEditingCanceled() {
-		textfieldDelegate.cancelCellEditing();
+		delegate.cancelCellEditing();
 		// Guaranteed to return a non-null array
 		Object[] listeners = listenerList.getListenerList();
 		// Process the listeners last to first, notifying
@@ -269,7 +377,7 @@ public InspectorCellEditor(InspectorTableModel tableModel) {
 	 * @see EventListenerList
 	 */
 	protected void fireEditingStopped() {
-		textfieldDelegate.stopCellEditing();
+		delegate.stopCellEditing();
 		// Guaranteed to return a non-null array
 		Object[] listeners = listenerList.getListenerList();
 		// Process the listeners last to first, notifying
@@ -339,7 +447,6 @@ public InspectorCellEditor(InspectorTableModel tableModel) {
  * @param column int
  */
 private void setAppropriateComponent4Table(JTable table, int row, int column) {
-	
 	InspectableProperty property = tableModel.getPropertyAt(row);
 	String[] choices = property.getSelectableValues();
 	
@@ -352,14 +459,32 @@ private void setAppropriateComponent4Table(JTable table, int row, int column) {
 			for (int i=0; i<choices.length; i++)
 				intelliComboBox.addItem(choices[i]);
 		
+			intelliComboBox.setToolTipText(property.getToolTipText());
 			intelliComboBox.setEditable(property.allowsOtherValues());
 			intelliComboBox.setSelectedItem(property.getValue());
 	}
 	else {
-			editorComponent = intelliTextField;
-			delegate = textfieldDelegate;
-			
-			intelliTextField.setText(property.getValue());
+
+			Pattern pattern = property.getEditPattern();
+			if (pattern!=null && !pattern.pattern().equals(".*"))
+			{
+				editorComponent = intelliFormattedTextField;
+				delegate = formattedTextfieldDelegate;
+
+				//formatter.setPattern(pattern);
+				this.pattern = pattern;
+
+				//intelliFormattedTextField.setText(property.getValue());
+				intelliFormattedTextField.setToolTipText(property.getToolTipText());
+			}
+			else
+			{
+				editorComponent = intelliTextField;
+				delegate = textfieldDelegate;
+
+				//intelliTextField.setText(property.getValue());
+				intelliTextField.setToolTipText(property.getToolTipText());
+			}
 	}
 
 	InspectorManager.getInstance().getActiveInspector().setHelp(property.getHelp());

@@ -29,6 +29,8 @@ package com.cosylab.vdct;
  */
 
 import java.util.*;
+import java.util.regex.Pattern;
+
 import com.cosylab.vdct.dbd.*;
 import com.cosylab.vdct.vdb.*;
 import com.cosylab.vdct.graphics.objects.*;
@@ -54,6 +56,9 @@ public class DataProvider {
 	// list of all loaded DBDs
 	private Vector currentDBDs = null;
 
+	// edit masks
+	private Hashtable editMaskTable = null;
+	
 /**
  * DataProvider constructor comment.
  */
@@ -61,6 +66,36 @@ protected DataProvider() {
 	inspectableListeners = new Vector();
 	loadedDBDs = new Vector();
 	currentDBDs = new Vector();
+
+	editMaskTable = new Hashtable();
+	loadDefaultEditMasks();
+}
+/**
+ * Insert the method's description here.
+ * Creation date: (8.1.2001 22:03:39)
+ * @return java.lang.String
+ */
+public Pattern getEditPatternLinkType(String linkType)
+{
+	return (Pattern)editMaskTable.get(linkType);
+}
+/**
+ * Insert the method's description here.
+ * Creation date: (8.1.2001 22:03:39)
+ */
+private void loadDefaultEditMasks()
+{
+	editMaskTable.put("CONSTANT", Pattern.compile(".*"));
+	editMaskTable.put("PV_LINK", Pattern.compile(".*"));
+	editMaskTable.put("VME_IO", Pattern.compile("#C\\d+ S\\d+ @.*"));
+	editMaskTable.put("CAMAC_IO", Pattern.compile("#B\\d+ C\\d+ N\\d+ A\\d+ F\\d+ @.*"));
+	editMaskTable.put("AB_IO", Pattern.compile("#L\\d+ A\\d+ C\\d+ S\\d+ @.*"));
+	editMaskTable.put("GPIB_IO", Pattern.compile("#L\\d+ A\\d+ @.*"));
+	editMaskTable.put("BITBUS_IO", Pattern.compile("#L\\d+ N\\d+ P\\d+ S\\d+ @.*"));
+	editMaskTable.put("INST_IO", Pattern.compile("@.*"));
+	editMaskTable.put("BBGPIB_IO", Pattern.compile("#L\\d+ B\\d+ G\\d+ @.*"));
+	editMaskTable.put("RF_IO", Pattern.compile("#R\\d+ M\\d+ D\\d+ E\\d+ @.*"));
+	editMaskTable.put("VXI_IO", Pattern.compile("#V\\d+ (C\\d+)?+  S\\d+ @.*"));
 }
 /**
  * Insert the method's description here.

@@ -247,6 +247,8 @@ public void stateChanged(ChangeEvent e)
 {
 	// we have direct mapping
 	setMode(getViewTabbedPane().getSelectedIndex());
+	// close all editors and refresh
+	closeCellEditors(true);
 	tableModel.setDataObject(tableModel.getDataObject());
 } 
 

@@ -2,6 +2,7 @@
 	
 	<taskdef classname="au.com.Langdale.styler.StylerTask" name="styler"/>
 	<taskdef name="webdoc" classname="com.cosylab.vdct.ant.WebGeneratorTask"/>
+	<taskdef name="webrt" classname="com.cosylab.vdct.ant.WebRTTicketGeneratorTask"/>
 	<taskdef name="projectwebdoc" classname="com.cosylab.vdct.ant.ProjectWebGeneratorTask"/>
 	<taskdef name="versioner" classname="com.cosylab.vdct.ant.VersionTask"/>
 	
@@ -254,6 +255,24 @@
 		<delete file="${dir.dist}/index.xml"/>
 	</target>
 	
+	<target name="typechk" unless="build.type">
+		<property name="build.type" value="N/A"/>
+	</target>
+
+	<target name="rt" depends="init, typechk">
+		<webrt dir="${dir.dist}" targetProject="${project.name}" version="${build.version}" type="${build.type}"/>
+		<styler>
+			<transform file="${web.xsl}"/>
+			<fileset dir="${dir.dist}">	
+				<include name="rt.xml"/>
+			</fileset>
+			<output dir="${dir.dist}" type="html">
+				<mapper type="glob" from="*.xml" to="*.html"/>
+			</output>
+		</styler>
+		<delete file="${dir.dist}/rt.xml"/>
+	</target>
+
 	
 	<target name="release">
 		<property name="build.type" value="release"/>

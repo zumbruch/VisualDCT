@@ -29,6 +29,9 @@ package com.cosylab.vdct.vdb;
  */
 
 import java.util.*;
+
+import com.cosylab.vdct.DataProvider;
+import com.cosylab.vdct.dbd.DBDDeviceData;
 import com.cosylab.vdct.graphics.objects.*;
 
 /**
@@ -40,7 +43,6 @@ public class VDBRecordData {
 	protected String name;
 	protected Hashtable fields = null;
 	protected Vector fieldsV = null;
-	//public String DTYP_type = com.cosylab.vdct.Constants.NONE;
 	protected String comment;
 /**
  * RecordData constructor comment.
@@ -49,50 +51,28 @@ public VDBRecordData() {
 	fields = new Hashtable();
 	fieldsV = new Vector();
 }
-/**
- * This method was created in VisualAge.
- * @return java.lang.String
- */
-public String _getDTYPType() {
-//	return DTYP_type;
-	return null;
-}
-/**
- * This method was created in VisualAge.
- * @return boolean
- */
-public boolean _isHardwareDTYP() {
-/*	if (DTYP_type.equalsIgnoreCase("CONSTANT") || 
-		DTYP_type.equalsIgnoreCase("PV_LINK") ||
-		DTYP_type.equalsIgnoreCase("<macro>") ||
-		DTYP_type.equalsIgnoreCase(com.cosylab.vdct.Constants.NONE)) return false;
-	else*/ return true;
 
-}
 /**
  * This method was created in VisualAge.
  * @param dbd DBDData
  */
-public void _updateDTYP(com.cosylab.vdct.dbd.DBDData dbd) {
-/*	VDBFieldData dtyp = (VDBFieldData)(fields.get("DTYP"));
-	
-	if (dtyp==null) {
-		System.out.println("Error: Device "+this.record_type+" does not have DTYP field...");
-		return;	
-	}	
-	else if (dtyp.value.equals(com.cosylab.vdct.Constants.NONE)) return;
-	else if ((dtyp.value.indexOf("$")!=-1) || dtyp.value.equals("<template definition>")) {
-		DTYP_type = "<macro>";
-		return;
-	}
+public String getDTYPLinkType() {
 
-	epics.dbd.DBDDeviceData dev = (epics.dbd.DBDDeviceData)(dbd.getDBDDeviceData(this.record_type+"/"+dtyp.value));
-	if (dev==null) {
-		System.out.println("Error: Device "+this.record_type+"/"+dtyp.value+" not found...");
-		return;	
-	}
+	VDBFieldData dtypField = (VDBFieldData)(fields.get("DTYP"));
+	if (dtypField==null)
+	{
+		System.out.println("Error: Record "+name+" does not have DTYP field! Assuming CONSTANT link type.");
+		return null;	
+	}	
+	
+	else if (dtypField.getValue().equals(com.cosylab.vdct.Constants.NONE)) return null;
+	//else if (dtypField.getValue().indexOf("$")!=-1) return null;
+
+	DBDDeviceData dev = (DBDDeviceData)(DataProvider.getInstance().getDbdDB().getDBDDeviceData(record_type+"/"+dtypField.getValue()));
+	if (dev==null)
+		return null;	
 		
-	DTYP_type = dev.link_type;*/
+	return dev.getLink_type();
 }
 /**
  * This method was created in VisualAge.

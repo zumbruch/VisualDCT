@@ -803,8 +803,8 @@ public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode) 
 		Enumeration e = recordData.getFieldsV().elements();
 		while (e.hasMoreElements()) {
 			field = (VDBFieldData)e.nextElement();
-			if (field.getDbdData().getField_type() != 
-				com.cosylab.vdct.dbd.DBDConstants.DBF_NOACCESS) {
+			/*if (field.getDbdData().getField_type() != 
+				com.cosylab.vdct.dbd.DBDConstants.DBF_NOACCESS)*/ {
 	
 				key = new Integer(field.getGUI_type());
 				if (groups.containsKey(key)) {
@@ -853,7 +853,7 @@ public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode) 
 		Enumeration e = recordData.getFieldsV().elements();
 		while (e.hasMoreElements()) {
 			field = (VDBFieldData)e.nextElement();
-			if ((field.getDbdData().getField_type() != com.cosylab.vdct.dbd.DBDConstants.DBF_NOACCESS) &&
+			if (/*(field.getDbdData().getField_type() != com.cosylab.vdct.dbd.DBDConstants.DBF_NOACCESS) &&*/
 				(field.getGUI_type()!=DBDConstants.GUI_UNDEFINED))
 					all.addElement(field);
 			}

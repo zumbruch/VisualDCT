@@ -28,6 +28,8 @@ package com.cosylab.vdct.vdb;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.util.regex.Pattern;
+
 import com.cosylab.vdct.util.StringUtils;
 
 /**
@@ -170,4 +172,25 @@ public void setValue(String value) {
 
 	record.setComment(newValue);
 }
+
+/**
+ * Insert the method's description here.
+ * Creation date: (24/8/99 15:29:04)
+ * @return java.util.regex.Pattern
+ */
+public Pattern getEditPattern()
+{
+	return null;
+}
+/**
+ * Insert the method's description here.
+ * Creation date: (24/8/99 15:29:04)
+ * @return java.lang.String
+ */
+public String getToolTipText()
+{
+	return null;
+}
+
+
 }

@@ -84,7 +84,6 @@ public static void copyVDBFieldData(VDBFieldData sourceField, VDBFieldData targe
 	targetField.setValue(sourceField.getValue());
 	targetField.setInit_value(sourceField.getInit_value());
 	targetField.setGUI_type(sourceField.getGUI_type());
-	targetField.setTemplate_def(sourceField.isTemplate_def());
 	targetField.setDbdData(sourceField.getDbdData());
 }
 /**
@@ -161,7 +160,6 @@ public static VDBFieldData generateVDBFieldData(DBDData dbd, DBRecordData dbReco
 		if (dbField!=null) {
 	 	 	if (dbField.getValue()!=null) vdbField.setValue(dbField.getValue());
 			vdbField.setComment(dbField.getComment());
-			vdbField.setTemplate_def(dbField.isTemplate_def());
 		}
 	}
 
@@ -246,7 +244,6 @@ public static VDBRecordData generateVDBRecordData(DBDData dbd, DBRecordData dbRe
 	}
 */
 
-	/// should I add NOACCESS fields, etc... !!!
 	Enumeration e = dbdRecord.getFieldsV().elements();
 	while (e.hasMoreElements()) {
 		dbdField = (DBDFieldData)(e.nextElement());

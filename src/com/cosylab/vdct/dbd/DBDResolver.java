@@ -70,7 +70,6 @@ public static int getBaseType(String bt) {
  * @param stype java.lang.String
  */
 public static int getFieldType(String stype) {
-	
 	if (stype.equalsIgnoreCase("DBF_STRING"))	     return (DBDConstants.DBF_STRING);
 	else if (stype.equalsIgnoreCase("DBF_CHAR"))     return (DBDConstants.DBF_CHAR);
 	else if (stype.equalsIgnoreCase("DBF_UCHAR"))    return (DBDConstants.DBF_UCHAR);
@@ -89,6 +88,36 @@ public static int getFieldType(String stype) {
 	else if (stype.equalsIgnoreCase("DBF_NOACCESS")) return (DBDConstants.DBF_NOACCESS);
 	else return DBDConstants.NOT_DEFINED;
 }
+
+/**
+ * This method was created in VisualAge.
+ * @param type int
+ * @return java.lang.String
+ */
+public static String getFieldType(int type) {
+	switch (type)
+	{
+		case DBDConstants.DBF_STRING:	return "DBF_STRING";
+		case DBDConstants.DBF_CHAR:		return "DBF_CHAR";
+		case DBDConstants.DBF_UCHAR:	return "DBF_UCHAR";
+		case DBDConstants.DBF_SHORT:	return "DBF_SHORT";
+		case DBDConstants.DBF_USHORT:	return "DBF_USHORT";
+		case DBDConstants.DBF_LONG:		return "DBF_LONG";
+		case DBDConstants.DBF_ULONG:	return "DBF_ULONG";
+		case DBDConstants.DBF_FLOAT:	return "DBF_FLOAT";
+		case DBDConstants.DBF_DOUBLE:	return "DBF_DOUBLE";
+		case DBDConstants.DBF_ENUM:		return "DBF_ENUM";
+		case DBDConstants.DBF_MENU:		return "DBF_MENU";
+		case DBDConstants.DBF_DEVICE:	return "DBF_DEVICE";
+		case DBDConstants.DBF_INLINK:	return "DBF_INLINK";
+		case DBDConstants.DBF_OUTLINK:	return "DBF_OUTLINK";
+		case DBDConstants.DBF_FWDLINK:	return "DBF_FWDLINK";
+		case DBDConstants.DBF_NOACCESS:	return "DBF_NOACCESS";
+		default:
+			return "UNKNOWN";
+	}		
+}
+
 /**
  * This method was created in VisualAge.
  * @return java.lang.String

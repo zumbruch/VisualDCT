@@ -31,4 +31,8 @@
 		<ant antfile="VDCTBuild.xml" dir="." target="doc"/>
 	</target>
 	
+	<target name="rt">
+		<ant antfile="VDCTBuild.xml" dir="." target="rt"/>
+	</target>
+
 </project>
