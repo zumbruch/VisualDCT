@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE changelog SYSTEM 'dtd/changelog.dtd'>
+
+<?xml-stylesheet type="text/xsl" href="changelog.xsl"?>
+
+<!--
+
+Please specify your id as who field, if not specified version/who is assumed.
+
+-->
+
+
+<changelog project="VisualDCT" description="Visual Database Configuration Tool">
+
+	<devs>
+  		<!-- in alphabetical order, by last name -->
+  		
+	  	<person name="Matej Sekoranja" email="matej.sekoranja@cosylab.com" id="ms" expertise="code">
+			Lead developer on VisualDCT.
+  		</person>
+  
+		<person name="John F. Maclean" email="jfm@aps.anl.gov" id="jfm" expertise="test">
+			Requirements coordinator and quality control point of contact between Cosylab and EPICS community.
+  		</person>
+	</devs>
+
+
+	<version ver="2.1" build="1227" date="2001-12-15" who="ms">
+		<fix class="com.cosylab.vdct.graphics.objects.Record">Not all fields are available as link destinations.</fix>
+		<fix class="com.cosylab.vdct.VisualDCT">Type combo-box has multiple instances of the same type.</fix>
+		<enhancement>If DBF_MENU or DBF_DEVICE field has defined 'initial' value, than "&lt;intial_value&gt;*" (e.g. "INVALID*") is used instead "&lt;none&gt;".</enhancement>
+		<comment>For DBF_MENU or DBF_DEVICE fields only values with "&lt;intial_value&gt;*" and "&lt;none&gt;" are threated as default, e.g. "INVALID*" is default, but "INVALID" not.</comment>
+		<comment>Navigation using arrow keys to be added.</comment>
+		<comment>"New record dialog" to be enhanced.</comment>
+		<bug>Changing record type in the "New record dialog" erases record name.</bug>
+	</version>
+
+	<version ver="2.1" build="1226" date="2001-12-09" who="ms">
+		<fix class="com.cosylab.vdct.graphics.objects.Record">Not all fields are available as link destinations.</fix>
+		<comment>Need a better plan? Suggestion: Define field order in DBDs prioritized by usage.</comment>
+		<fix class="com.cosylab.vdct.graphics.print.PrintPreview">Print Preview doesn't erase previous preview.</fix>
+		<fix method="com.cosylab.vdct.graphics.DrawingSurface.loadDB">Links having process options.</fix>
+		<enhancement>Pan when the cursor hits the edge of the drawing (while dragging).</enhancement>
+		<enhancement>Usage of JAXP 1.1 compilant Apache Crimson XML parser.</enhancement>
+		<enhancement>All setting files are now stored in VDCT_DIR/config directory, where VDCT_DIR is environment variable (current directory if not specified or invalid).</enhancement>
+		<enhancement>Plugins (alpha state - currently DebugPlugin and ExportPlugin are supported). Configuration file is config/plugins.xml.</enhancement>
+		<comment>The "One Up Level" button in javax.swing.FileChooser is part of JRE implementation. No problems noticed on Windows platform.</comment>
+		<comment>For proper font scaling fonts have to be "flexible" (bitmap fonts are not recommended). No problems noticed on Windows, Linux (XFree86 4.0.3) platform.</comment>
+		<bug severity="minor">Process options shown by link fields are not properly centered, they can be overdrawn by a link line (large zoom in).</bug>
+		<comment>VisualDCT does not handle invalid DBs having unquoted substitution variables as record names (see EPICS IOC Application Developers Guide, R3.13, June 18, page 35).</comment>
+		<comment>Should connectors be drawn always over other objects? Anyway connectors can be easily accessed (hilited, clicked, dragged) even if they are under other object.</comment>
+	</version>
+	
+	<version ver="2.0" build="1207" date="2001-05-05" who="ms">
+		<comment>Presented at ICALEPCS '01 EPICS workshop.</comment>
+		<comment who="jfm">Agreed to act as requirements coordinator and quality control point of contact between Cosylab and EPICS community.</comment>
+	</version>
+</changelog>

@@ -139,7 +139,7 @@ public static VDBFieldData generateVDBFieldData(DBDData dbd, DBRecordData dbReco
 
 	final String nullString = "";
 
-	if (vdbField.value.equals(nullString)) 
+	if (vdbField.value.equals(nullString) || vdbField.value.equals(dbdField.getInit_value())) 
 	 if (dbdField.getField_type()==DBDConstants.DBF_MENU) {
 		 // gets first element
 	 /*		 DBDMenuData md = (DBDMenuData)(dbd.getDBDMenuData(dbdField.getMenu_name()));
@@ -147,7 +147,13 @@ public static VDBFieldData generateVDBFieldData(DBDData dbd, DBRecordData dbReco
 		 else {
 		   System.out.println("Menu '"+dbdField.getMenu_name()+"' not defined in DBD file...");	 
 		   return null;
-		 }  */ vdbField.setValue(com.cosylab.vdct.Constants.NONE);
+		 }  */ 
+		 	//vdbField.setValue(com.cosylab.vdct.Constants.NONE);
+		 	if (!dbdField.getInit_value().equals(nullString))
+			 	vdbField.setValue(dbdField.getInit_value()+com.cosylab.vdct.Constants.MENU_DEFAULT_VALUE_INDICATOR);
+			else
+			 	vdbField.setValue(com.cosylab.vdct.Constants.NONE);
+			 
 	 }
 	 else if (dbdField.getField_type()==DBDConstants.DBF_DEVICE)
 /*	  if (vdbRecord!=null) {
@@ -162,7 +168,12 @@ public static VDBFieldData generateVDBFieldData(DBDData dbd, DBRecordData dbReco
 			 }	
 		 }
 		 
-	 }*/ vdbField.setValue(com.cosylab.vdct.Constants.NONE);
+	 }*/ 
+			//vdbField.setValue(com.cosylab.vdct.Constants.NONE);
+		 	if (!dbdField.getInit_value().equals(nullString))
+			 	vdbField.setValue(dbdField.getInit_value()+com.cosylab.vdct.Constants.MENU_DEFAULT_VALUE_INDICATOR);
+			else
+			 	vdbField.setValue(com.cosylab.vdct.Constants.NONE);
 
 	vdbField.setRecord(vdbRecord);
 

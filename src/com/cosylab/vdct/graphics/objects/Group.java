@@ -997,7 +997,7 @@ public void writeObjects(java.io.DataOutputStream file, java.lang.String path2re
 					!!! is default value enough
 							!(((fieldData.getType()==DBDConstants.DBF_MENU) ||
 							   (fieldData.getType()==DBDConstants.DBF_DEVICE)) && 
-							  fieldData.getValue().equals(com.cosylab.vdct.Constants.NONE))*/)
+							  fieldData.getValue().equals(com.cosylab.vdct.Constants.NONE) && menu...)*/)
 							{
 								
 			    				// write field value
@@ -1015,8 +1015,11 @@ public void writeObjects(java.io.DataOutputStream file, java.lang.String path2re
 
 							if ((((fieldData.getType()==DBDConstants.DBF_MENU) ||
 							   	  (fieldData.getType()==DBDConstants.DBF_DEVICE)) && 
-							  	 fieldData.getValue().equals(com.cosylab.vdct.Constants.NONE)) || 
+							  	 (fieldData.getValue().equals(com.cosylab.vdct.Constants.NONE) ||
+							  	 fieldData.getValue().equals(fieldData.getDbdData().getInit_value()+Constants.MENU_DEFAULT_VALUE_INDICATOR))) || 
 							  	fieldData.getValue().equals(nullString))
+								// up code is a little bi messy, consider using hasDefaultValue(), etc. !!!
+							
 								// comment it out if it has null value
 				 				file.writeBytes("  "+com.cosylab.vdct.db.DBConstants.commentString+
 					 							  "field("+fieldData.getName()+",\""+fieldData.getValue()+"\")\n");

@@ -7,5 +7,5 @@ package com.cosylab.vdct;
  */
 public interface Version {
 	public final static String VERSION = "2.1";
-	public final static String BUILD = "1226";
+	public final static String BUILD = "1227";
 }

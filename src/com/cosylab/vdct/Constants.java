@@ -24,6 +24,7 @@ public class Constants {
     public final static String MAIN_GROUP = "Main group";
 
     public final static String NONE = "<none>";
+	public final static String MENU_DEFAULT_VALUE_INDICATOR = "*";
     public final static String CLIPBOARD_NAME = "<clipboard>";
 
     public final static String CONFIG_DIR = "config/";

@@ -634,7 +634,7 @@ public Vector getItems() {
 		Enumeration e = recordData.getFieldsV().elements();
 		while (e.hasMoreElements()) {
 			field = (VDBFieldData)(e.nextElement());
-			switch (field.getType()) {
+/*			switch (field.getType()) {
 				case DBDConstants.DBF_CHAR: 
 				case DBDConstants.DBF_UCHAR: 
 				case DBDConstants.DBF_SHORT: 
@@ -645,11 +645,25 @@ public Vector getItems() {
 				case DBDConstants.DBF_DOUBLE: 
 				case DBDConstants.DBF_STRING:
 				case DBDConstants.DBF_NOACCESS:		// added by request of APS
+				case DBDConstants.DBF_ENUM:
+				case DBDConstants.DBF_MENU:
+				case DBDConstants.DBF_DEVICE:  // ?
 				  menuitem = new JMenuItem(field.getName());
 				  menuitem.addActionListener(l);
 				  menu = PopUpMenu.addItem(menuitem, menu, count);
 				  count++; 
 			}
+*/
+			if (field.getType()!=DBDConstants.DBF_INLINK &&
+				field.getType()!=DBDConstants.DBF_OUTLINK &&
+				field.getType()!=DBDConstants.DBF_FWDLINK)
+			{
+				  menuitem = new JMenuItem(field.getName());
+				  menuitem.addActionListener(l);
+				  menu = PopUpMenu.addItem(menuitem, menu, count);
+				  count++; 
+			}
+
 		}
 		if (count > 0) items.addElement(varlinkItem);
 		

@@ -54,7 +54,8 @@ public java.lang.String[] getSelectableValues() {
  */
 public String getValue() {
 /*	String value = field.getValue();
-	if (value.equals(com.cosylab.vdct.Constants.NONE)) //!!! default value
+	if (value.equals(com.cosylab.vdct.Constants.NONE) || 
+		value.indexOf(com.cosylab.vdct.Constants.MENU_DEFAULT_VALUE_INDICATOR)>=0) //!!! default value
 		return field.getDbdData().getInit_value();
 	else */
 		return field.getValue();

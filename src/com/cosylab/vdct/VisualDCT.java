@@ -4567,14 +4567,16 @@ public void newNameTextField_KeyTyped(java.awt.event.KeyEvent keyEvent) {
 /**
  * Comment
  */
-public void newRecordDialog_WindowOpened(java.awt.event.WindowEvent windowEvent) {
-	Object[] names = DataProvider.getInstance().getRecordTypes();
-	JComboBox combo = getTypeComboBox();
-	for(int i=0; i<names.length; i++)
-		combo.addItem(names[i]);
-	getNameTextField().setText("");
-	getWarningLabel().setText(" ");
-	getOKButton().setEnabled(false);
+public void newRecordDialog_WindowOpened(
+    java.awt.event.WindowEvent windowEvent) {
+    Object[] names = DataProvider.getInstance().getRecordTypes();
+    JComboBox combo = getTypeComboBox();
+    combo.removeAllItems(); // always refilling - bad practise
+    for (int i = 0; i < names.length; i++)
+        combo.addItem(names[i]);
+    getNameTextField().setText("");
+    getWarningLabel().setText(" ");
+    getOKButton().setEnabled(false);
 }
 /**
  * Comment

@@ -115,7 +115,12 @@ public java.lang.String[] getSelectableValues() {
 					DBDMenuData md = dbd.getDBDMenuData(dbdData.getMenu_name());
 					if (md!=null) {
 						Enumeration e = md.getChoices().elements();
+
+				 	if (dbdData.getInit_value().length()!=0)
+						values.addElement(dbdData.getInit_value()+com.cosylab.vdct.Constants.MENU_DEFAULT_VALUE_INDICATOR);
+					else
 						values.addElement(com.cosylab.vdct.Constants.NONE);
+						
 						while (e.hasMoreElements())
 							values.addElement(e.nextElement().toString());
 					}					
@@ -125,7 +130,12 @@ public java.lang.String[] getSelectableValues() {
 				
 					Enumeration e = dbd.getDevices().elements();
 					DBDDeviceData dev;
-					values.addElement(com.cosylab.vdct.Constants.NONE);
+					
+				 	if (dbdData.getInit_value().length()!=0)
+						values.addElement(dbdData.getInit_value()+com.cosylab.vdct.Constants.MENU_DEFAULT_VALUE_INDICATOR);
+					else
+						values.addElement(com.cosylab.vdct.Constants.NONE);
+					
 					while (e.hasMoreElements()) {
 						dev = (DBDDeviceData)(e.nextElement());
 						if (record.getType().equals(dev.getRecord_type()))
@@ -170,7 +180,17 @@ public java.lang.String getValue() {
  */
 public boolean hasDefaultValue() {
 	// !!! is this true, also for MENU, DEVICE
-	if (value.equals(com.cosylab.vdct.Constants.NONE) && dbdData.getInit_value().equals("")) return true;
+	if (dbdData.getField_type()==DBDConstants.DBF_MENU ||
+		dbdData.getField_type()==DBDConstants.DBF_DEVICE)
+	{
+		// if initial value is pecified, than it is explicity written
+		if ((value.equals(com.cosylab.vdct.Constants.NONE) && dbdData.getInit_value().length()==0) ||
+			(dbdData.getInit_value().length()>0 &&
+			 value.equals(dbdData.getInit_value()+com.cosylab.vdct.Constants.MENU_DEFAULT_VALUE_INDICATOR))) 
+			return true;
+		else
+			return false;
+	}
 	else if (!value.equals(dbdData.getInit_value()))
 		return false;
 	else 
