@@ -464,9 +464,9 @@ private void setAppropriateComponent4Table(JTable table, int row, int column) {
 			intelliComboBox.setSelectedItem(property.getValue());
 	}
 	else {
-
+			final String allChars = ".*";
 			Pattern pattern = property.getEditPattern();
-			if (pattern!=null && !pattern.pattern().equals(".*"))
+			if (pattern!=null && !pattern.pattern().equals(allChars))
 			{
 				editorComponent = intelliFormattedTextField;
 				delegate = formattedTextfieldDelegate;

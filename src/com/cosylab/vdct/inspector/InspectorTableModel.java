@@ -59,7 +59,7 @@ public Class getColumnClass(int column) {
  * getColumnCount method comment.
  */
 public int getColumnCount() {
-	return 2;			// name & value
+	return 3;			// visibility & name & value
 }
 /**
  * Insert the method's description here.
@@ -93,8 +93,9 @@ public int getRowCount() {
 public Object getValueAt(int row, int column) {
 	switch (column)
 	{
-		case 0: return data[row].getName();
-		case 1: return data[row].getValue();
+		case 0: return null;
+		case 1: return data[row].getName();
+		case 2: return data[row].getValue();
 	}
 	return null;
 }
@@ -111,7 +112,8 @@ public boolean isCellEditable(int rowIndex, int columnIndex) {
 	if (com.cosylab.vdct.plugin.debug.PluginDebugManager.isDebugState())
 		return false;
 		
-	if (columnIndex==1) return data[rowIndex].isEditable();
+	// value
+	if (columnIndex==2) return data[rowIndex].isEditable();
 	else return false;
 }
 /**
@@ -152,7 +154,7 @@ public void updateProperty(InspectableProperty property) {
 	for (int row=0; row < data.length; row++)
 		if (data[row]==property)
 				fireTableRowsUpdated(row, row);
-//				fireTableCellUpdated(row, 1);
+//				fireTableCellUpdated(row, 2);
 }
 /**
  * Insert the method's description here.
@@ -163,6 +165,6 @@ public void updateProperty(String propertyName) {
 	for (int row=0; row < data.length; row++)
 		if (data[row].getName().equals(propertyName))
 				fireTableRowsUpdated(row, row);
-//			fireTableCellUpdated(row, 1);
+//			fireTableCellUpdated(row, 2);
 }
 }

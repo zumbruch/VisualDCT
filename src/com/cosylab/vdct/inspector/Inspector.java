@@ -432,7 +432,8 @@ private javax.swing.JTable getScrollPaneTable() {
 			ivjScrollPaneTable = new javax.swing.JTable();
 			ivjScrollPaneTable.setName("ScrollPaneTable");
 			getTableScrollPane().setColumnHeaderView(ivjScrollPaneTable.getTableHeader());
-			getTableScrollPane().getViewport().setScrollMode(JViewport.BACKINGSTORE_SCROLL_MODE);
+			// this caused visibility icon problems when scrooling
+			//getTableScrollPane().getViewport().setScrollMode(JViewport.BACKINGSTORE_SCROLL_MODE); 
 			ivjScrollPaneTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
 			ivjScrollPaneTable.setBackground(new java.awt.Color(204,204,204));
 			ivjScrollPaneTable.setShowVerticalLines(true);
@@ -460,8 +461,18 @@ private javax.swing.JTable getScrollPaneTable() {
 			});
 
 			// lock field name column width
-			int width = 117;
+			int width = 20;
 		    TableColumn col = ivjScrollPaneTable.getColumnModel().getColumn(0);
+		    col.setMinWidth(width);
+		    col.setMaxWidth(width);
+		    col.setPreferredWidth(width);
+			// user code end
+
+			// lock field name column width
+//			int width = 117;
+//		    TableColumn col = ivjScrollPaneTable.getColumnModel().getColumn(0);
+			width = 117;
+		    col = ivjScrollPaneTable.getColumnModel().getColumn(1);
 		    col.setMinWidth(width);
 		    col.setMaxWidth(width);
 		    col.setPreferredWidth(width);
@@ -786,31 +797,27 @@ private void mouseEvent(MouseEvent event, int row, int col)
 	boolean popupTrigger = event.getButton() == MouseEvent.BUTTON3;
 	// event.isPopupTrigger() does not work on my instalation of Linux (RH7.2, GNOME 1.4) 
 	
-//	if (pupupTrigger)
+	InspectableProperty property = (InspectableProperty)tableModel.getPropertyAt(row);
+
+	// change visibility
+	if (col==0)
 	{
-		InspectableProperty property = (InspectableProperty)tableModel.getPropertyAt(row);
-
-		// change visibility
-		if (col==0 && popupTrigger)
+		if (property!=null && property instanceof VDBFieldData)  ///!!! define interface!!
 		{
-			if (property!=null && property instanceof VDBFieldData)  ///!!! define interface!!
-			{
-				int visibility = property.getVisibility();
-				visibility = (visibility+1) % 3;						/// !!! who said there are only three modes?!
-				((VDBFieldData)property).setVisibility(visibility);
+			int visibility = property.getVisibility();
+			visibility = (visibility+1) % 3;						/// !!! who said there are only three modes?!
+			((VDBFieldData)property).setVisibility(visibility);
 
-				// this does now work permanently (try to scroll), but after table update it works?
-				getScrollPaneTable().tableChanged(new TableModelEvent(tableModel, row, row, col));
-			}
-		}
-		// !!!
-		else if (popupTrigger || !property.isEditable())
-//		else if (col>0 && (popupTrigger || property.isEditable()))
-		{
-			if (property!=null)
-				property.popupEvent(getScrollPaneTable(), event.getX(), event.getY());
+			// this does now work permanently (try to scroll), but after table update it works?
+			getScrollPaneTable().tableChanged(new TableModelEvent(tableModel, row, row, col));
 		}
 	}
+	else if (popupTrigger)
+	{
+		if (property!=null)
+			property.popupEvent(getScrollPaneTable(), event.getX(), event.getY());
+	}
+
 }
 
 /**
