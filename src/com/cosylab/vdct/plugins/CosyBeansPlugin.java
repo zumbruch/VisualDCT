@@ -38,6 +38,11 @@ import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
 
 import com.cosylab.vdct.Console;
+import com.cosylab.vdct.DataProvider;
+import com.cosylab.vdct.dbd.DBDConstants;
+import com.cosylab.vdct.dbd.DBDFieldData;
+import com.cosylab.vdct.dbd.DBDRecordData;
+import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.objects.Record;
 import com.cosylab.vdct.plugin.menu.MenuPlugin;
 import com.cosylab.vdct.plugin.popup.*;
@@ -56,8 +61,36 @@ public class CosyBeansPlugin implements ContextPopupPlugin, MenuPlugin {
 
 	class MenuHandler implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
-			String action = e.getActionCommand();
-			Console.getInstance().println("CosyBeansPlugin action: "+action);
+			String recordName = e.getActionCommand();
+			Console.getInstance().println("CosyBeansPlugin action: "+recordName);
+
+			// TBD: special case for "Show all..." -> should have other handler, etc...			
+			
+			// search for record object
+			Record record = (Record)Group.getRoot().findObject(recordName, true);
+			if (record==null)
+			{
+				Console.getInstance().println("CosyBeansPlugin: failed to find '"+recordName+"' record.");
+				return;
+			}
+			
+			// search for record definition object
+			DBDRecordData recordDefinition = DataProvider.getInstance().getDbdDB().getDBDRecordData(record.getRecordData().getType());
+			if (recordDefinition==null)
+			{
+				Console.getInstance().println("CosyBeansPlugin: failed to find '"+record.getRecordData().getType()+"' record definition.");
+				return;
+			}
+			
+			// find VAL field
+			DBDFieldData fieldData = recordDefinition.getDBDFieldData("VAL");
+			if (fieldData==null)
+			{
+				Console.getInstance().println("CosyBeansPlugin: failed to find VAL field in '"+record.getRecordData().getType()+"' record definition.");
+				return;
+			}
+
+			String channelType = getFieldType(fieldData.getField_type());
 			
 			// call abeans
 			
@@ -66,6 +99,37 @@ public class CosyBeansPlugin implements ContextPopupPlugin, MenuPlugin {
 
 	protected CosyBeansPlugin.MenuHandler menuHandler = null;
 	protected JMenu menu = null;
+
+
+/**
+ * Insert the method's description here.
+ * Creation date: (2.2.2001 23:00:51)
+ * @return com.cosylab.vdct.graphics.objects.Connector.PopupMenuHandler
+ */
+protected static String getFieldType(int type) {
+	switch (type)
+	{
+		case DBDConstants.DBF_STRING:	return "DBF_STRING";
+		case DBDConstants.DBF_CHAR:	return "DBF_CHAR";
+		case DBDConstants.DBF_UCHAR:	return "DBF_UCHAR";
+		case DBDConstants.DBF_SHORT:	return "DBF_SHORT";
+		case DBDConstants.DBF_USHORT:	return "DBF_USHORT";
+		case DBDConstants.DBF_LONG:	return "DBF_LONG";
+		case DBDConstants.DBF_ULONG:	return "DBF_ULONG";
+		case DBDConstants.DBF_FLOAT:	return "DBF_FLOAT";
+		case DBDConstants.DBF_DOUBLE:	return "DBF_DOUBLE";
+		case DBDConstants.DBF_ENUM:	return "DBF_ENUM";
+		case DBDConstants.DBF_MENU:	return "DBF_MENU";
+		case DBDConstants.DBF_DEVICE:	return "DBF_DEVICE";
+		case DBDConstants.DBF_INLINK:	return "DBF_INLINK";
+		case DBDConstants.DBF_OUTLINK:	return "DBF_OUTLINK";
+		case DBDConstants.DBF_FWDLINK:	return "DBF_FWDLINK";
+		case DBDConstants.DBF_NOACCESS:return "DBF_NOACCESS";
+		default:
+			return "UNKNOWN";
+	}		
+}
+
 
 /**
  * Insert the method's description here.
@@ -172,6 +236,7 @@ public Vector getItems(Vector selectedObjects)
 		// nothing to do here
 		return null;
 	}
+	
 	// we have some selected objects
 	else
 	{
