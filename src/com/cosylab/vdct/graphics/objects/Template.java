@@ -47,6 +47,9 @@ import com.cosylab.vdct.graphics.popup.Popupable;
 import com.cosylab.vdct.inspector.Inspectable;
 import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.inspector.InspectorManager;
+import com.cosylab.vdct.undo.ChangeTemplatePropertyAction;
+import com.cosylab.vdct.undo.CreateTemplatePropertyAction;
+import com.cosylab.vdct.undo.DeleteTemplatePropertyAction;
 import com.cosylab.vdct.util.StringUtils;
 import com.cosylab.vdct.vdb.GUISeparator;
 import com.cosylab.vdct.vdb.LinkProperties;
@@ -693,7 +696,7 @@ private void validateFields() {
  * Insert the method's description here.
  * Creation date: (26.1.2001 17:19:47)
  */
-private void updateTemplateFields() {
+public void updateTemplateFields() {
 
 	Enumeration e = subObjectsV.elements();
 	Object obj;
@@ -820,6 +823,10 @@ public void addProperty()
 			if (!templateData.getProperties().containsKey(reply))
 			{
 				templateData.getProperties().put(reply, nullString);
+
+				com.cosylab.vdct.undo.UndoManager.getInstance().addAction(
+						new CreateTemplatePropertyAction(this, reply));
+
 				updateTemplateFields();
 				InspectorManager.getInstance().updateObject(this);
 				unconditionalValidation();
@@ -842,7 +849,12 @@ public void addProperty()
  */
 public void propertyChanged(MonitoredProperty property)
 {
+	String oldValue = (String)templateData.getProperties().get(property.getName());
+
 	templateData.getProperties().put(property.getName(), property.getValue());
+
+	com.cosylab.vdct.undo.UndoManager.getInstance().addAction(
+		new ChangeTemplatePropertyAction(this, property.getName(), property.getValue(), oldValue));
 
 	updateTemplateFields();
 	InspectorManager.getInstance().updateProperty(this, null);
@@ -857,6 +869,9 @@ public void removeProperty(MonitoredProperty property)
 {
 	templateData.getProperties().remove(property.getName());
 	
+	com.cosylab.vdct.undo.UndoManager.getInstance().addAction(
+					new DeleteTemplatePropertyAction(this, property.getName()));
+
 	updateTemplateFields();
 	InspectorManager.getInstance().updateObject(this);
 	unconditionalValidation();
@@ -881,8 +896,16 @@ public void renameProperty(MonitoredProperty property)
 		{
 			if (!templateData.getProperties().containsKey(reply))
 			{
+				com.cosylab.vdct.undo.ComposedAction composedAction = 
+												new com.cosylab.vdct.undo.ComposedAction();
+
 				Object value = templateData.getProperties().remove(property.getName());
+				composedAction.addAction(new DeleteTemplatePropertyAction(this, property.getName()));
+
 				templateData.getProperties().put(reply, value);
+				composedAction.addAction(new CreateTemplatePropertyAction(this, reply));
+
+				com.cosylab.vdct.undo.UndoManager.getInstance().addAction(composedAction);
 
 				updateTemplateFields();
 				InspectorManager.getInstance().updateObject(this);
