@@ -144,10 +144,20 @@
 		</junitreport>
 	</target>
 	
-	<target name="jar" depends="manifest, copyresources">
+	<target name="jar" depends="copyresources">
 		<mkdir dir="${dir.dist}"/>
 		<jar jarfile="${dir.dist}/${project.name}.jar">
 			<fileset dir="${dir.temp}"/>
+			<manifest>
+				<attribute name="Built-By" value="${user.name}"/>
+				<section name="com/cosylab/vdct">
+					<attribute name="Implementation-Title" value="com.cosylab.vdct" />
+					<attribute name="Implementation-Version" value="${build.version}" /> 
+					<attribute name="Implementation-Vendor" value="Cosylab Ltd." />
+				</section>
+				<attribute name="Main-Class" value="com.cosylab.vdct.VisualDCT" />
+				<!--attribute name="Class-Path" value="" /-->
+		  	</manifest>
 		</jar>
 	</target>
 	
@@ -215,9 +225,6 @@
 	
 	<target name="signjar" depends="jar">
 		<!--signjar jar="${dir.dist}/${project.name}.jar" alias="Cosylab" .../-->
-	</target>
-	
-	<target name="manifest" depends="compile">
 	</target>
 	
 	<target name="web" depends="doc">
