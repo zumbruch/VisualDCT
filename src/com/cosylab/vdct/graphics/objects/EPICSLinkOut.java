@@ -96,7 +96,7 @@ public abstract class EPICSLinkOut extends EPICSLink implements OutLink, Popupab
 	protected int realLabelLen = Constants.LINK_LABEL_LENGTH;
 	protected int labelLen = Constants.LINK_LABEL_LENGTH;
 	protected int realHalfHeight = Constants.FIELD_HEIGHT/2;
-	private boolean hasEndpoint = false;
+	protected boolean hasEndpoint = false;
 
 /**
  * EPICSOutLink constructor comment.
@@ -127,6 +127,14 @@ public Connector addConnector() {
 private com.cosylab.vdct.graphics.objects.EPICSLinkOut.PopupMenuHandler createPopupmenuHandler() {
 	return new PopupMenuHandler();
 }
+
+/**
+ * Called when VARIABLE link (source) was destroyed
+ */
+public void sourceDestroyed() {
+	destroy();	
+}
+
 /**
  * Insert the method's description here.
  * Creation date: (29.1.2001 22:11:34)
@@ -373,17 +381,22 @@ public static com.cosylab.vdct.vdb.GUISeparator getRecordSeparator() {
  * @param link com.cosylab.vdct.graphics.objects.Linkable
  */
 public static OutLink getStartPoint(Linkable link) {
-	while (link instanceof InLink)
+	while (!(link instanceof EPICSLinkOut) && link instanceof InLink)
 		link = ((InLink)link).getOutput();
 	return (OutLink)link;
 }
+
+public static InLink getTarget(LinkProperties link) {
+	return getTarget(link, false);
+}
+
 /**
  * get/create target link field
  * Creation date: (30.1.2001 13:40:51)
  * @return com.cosylab.vdct.graphics.objects.InLink
  * @param link com.cosylab.vdct.vdb.LinkProperties
  */
-public static InLink getTarget(LinkProperties link) {
+public static InLink getTarget(LinkProperties link, boolean allowLinkOutAsTarget) {
 
 	String recName = link.getRecord();
 	// !!! check for getType()==LinkProperties.NOT_VALID
@@ -425,10 +438,18 @@ public static InLink getTarget(LinkProperties link) {
 	else {
 		VDBFieldData target = record.getRecordData().getField(link.getVarName());
 		if ((target==null) ||
-			LinkProperties.getType(target)!=LinkProperties.VARIABLE_FIELD) return null;
+			(LinkProperties.getType(target)!=LinkProperties.VARIABLE_FIELD && !allowLinkOutAsTarget)) return null;
 		else { 
-			inlink = new EPICSVarLink(record, target);
-			record.addLink(inlink);
+			//inlink = new EPICSVarLink(record, target);
+			//record.addLink(inlink);
+			
+			EPICSLink el = record.initializeLinkField(target);
+			if (el instanceof InLink)
+			{
+				inlink = (InLink)el;
+			}
+			else
+				inlink = null;
 		}
 	}
 	return inlink;
@@ -488,6 +509,14 @@ public void setInput(InLink input) {
 public String toString() {
 	return getName();
 }
+
+/**
+ */
+public void valueWithNoRecord()
+{
+	destroy();
+}
+
 /**
  * Insert the method's description here.
  * Creation date: (30.1.2001 12:25:44)
@@ -496,7 +525,7 @@ private void updateLink() {
 	LinkProperties newProperties = new LinkProperties(fieldData);
 
 	if (newProperties.getRecord()==null) {			// empty field
-		destroy();
+		valueWithNoRecord();
 		return;
 	}
 	else if (!newProperties.getRecord().equals(properties.getRecord()) ||

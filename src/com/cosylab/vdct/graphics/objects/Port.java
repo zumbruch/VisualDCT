@@ -83,6 +83,11 @@ public class Port extends VisibleObject implements Descriptable, Movable, OutLin
 				com.cosylab.vdct.undo.UndoManager.getInstance().addAction(new com.cosylab.vdct.undo.DeleteAction(Port.this));
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
+			else if (action.equals(removePortDefString))
+			{
+				data.getTemplate().removePort(getName());
+				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+			}
 			else if (action.equals(constantString)) {
 				setMode(OutLink.CONSTANT_PORT_MODE);
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
@@ -117,6 +122,7 @@ public class Port extends VisibleObject implements Descriptable, Movable, OutLin
 	private static final String removeLinkString = "Remove Link";
 	private static final String startLinkingString = "Start linking...";
 	private static final String removePortString = "Remove Port";
+	private static final String removePortDefString = "Remove Port Definition";
 
 	private static final String modeString = "Port Mode";
 	private static final String constantString = "CONSTANT";
@@ -199,8 +205,8 @@ private com.cosylab.vdct.graphics.objects.Port.PopupMenuHandler createPopupmenuH
  */
 public void destroy() {
 	if (!isDestroyed()) {
-		super.destroy();
 		removeLink();
+		super.destroy();
 		data.setVisibleObject(null);
 		getParent().removeObject(getName());
 	}
@@ -228,6 +234,7 @@ public void removeLink() {
 public void disconnect(Linkable disconnector) {
 	if (!disconnected && (inlink==disconnector) ) {
 		disconnected = true;
+		data.setValue("");
 	}
 }
 /**
@@ -393,12 +400,15 @@ public java.util.Vector getItems() {
 	outputModeItem.addActionListener(al);
 	modeMenu.add(outputModeItem);
 
+
+	/*
 	items.add(new JSeparator());
 
 	JMenuItem descItem = new JMenuItem(descriptionString);
-	descItem.setEnabled(false); //!!!
+	descItem.setEnabled(false); 
 	descItem.addActionListener(al);
 	items.addElement(descItem);
+	*/
 	
 	items.add(new JSeparator());
 
@@ -418,6 +428,10 @@ public java.util.Vector getItems() {
 	JMenuItem removePortItem = new JMenuItem(removePortString);
 	removePortItem.addActionListener(al);
 	items.addElement(removePortItem);
+
+	JMenuItem removePortDefItem = new JMenuItem(removePortDefString);
+	removePortDefItem.addActionListener(al);
+	items.addElement(removePortDefItem);
 
 	return items;
 }
@@ -739,12 +753,12 @@ protected void validate() {
 public void setColor(Color newColor) {
 		super.setColor(newColor);
 		Linkable link = this;
-		while (link instanceof OutLink) {
+		while ((link instanceof OutLink) && !(link instanceof EPICSLinkOut)) {
 			link = ((OutLink)link).getInput();
-			if (link instanceof VisibleObject) 
+			if (link instanceof VisibleObject && !(link instanceof EPICSLinkOut)) 
 				((VisibleObject)link).setColor(newColor);
 		}
-		if (link instanceof VisibleObject) 
+		if (link instanceof VisibleObject && !(link instanceof EPICSLinkOut)) 
 			((VisibleObject)link).setColor(newColor);
 }
 
@@ -852,13 +866,13 @@ private void updateLink() {
 		// find endpoint
 		Linkable preendpoint = this;
 		Linkable endpoint = getInput();
-		while ((endpoint instanceof InLink) && (endpoint instanceof OutLink)) {
+		while (!(endpoint instanceof EPICSLinkOutIn) && (endpoint instanceof InLink) && (endpoint instanceof OutLink)) {
 			preendpoint = endpoint;
 			endpoint = ((OutLink)endpoint).getInput();
 		}
 		if ((endpoint!=null) && hasEndpoint) ((InLink)endpoint).disconnect(preendpoint);
 		//OutLink lol = getTarget(properties).getOutput();
-		InLink il = EPICSLinkOut.getTarget(newProperties);
+		InLink il = EPICSLinkOut.getTarget(newProperties, true);
 		OutLink ol = (OutLink)preendpoint;
 		ol.setInput(il);
 		if (il!=null) { 

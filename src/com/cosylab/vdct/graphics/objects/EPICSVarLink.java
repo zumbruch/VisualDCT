@@ -113,8 +113,8 @@ public void destroy() {
 			for(int i=0; i<objs.length; i++) {
 				OutLink outlink = (OutLink)objs[i];
 				OutLink start = EPICSLinkOut.getStartPoint(outlink);
-				if(start instanceof EPICSLinkOut)
-					((EPICSLinkOut)start).destroy();
+				if((start instanceof EPICSLinkOut))
+					((EPICSLinkOut)start).sourceDestroyed();
 				else if (start!=null)
 					start.disconnect(this);
 				else 

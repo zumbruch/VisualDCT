@@ -44,7 +44,7 @@ import com.cosylab.vdct.Constants;
  * Creation date: (29.1.2001 21:34:08)
  * @author Matej Sekoranja
  */
-public class EPICSInLink extends EPICSLinkOut {
+public class EPICSInLink extends EPICSLinkOutIn {
 
 	private static final String processString = "Process";
 	private static final String nppString = "NPP - No Process Passive";

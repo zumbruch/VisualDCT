@@ -49,6 +49,7 @@ public EPICSLink(ContainerObject parent, com.cosylab.vdct.vdb.VDBFieldData field
 	super(parent, fieldData);
 	setColor(Constants.FRAME_COLOR);
 }
+
 /**
  * Insert the method's description here.
  * Creation date: (4.2.2001 19:09:33)
@@ -57,7 +58,8 @@ public void destroy() {
 	if (!isDestroyed()) {
 		super.destroy();
 		disconnected = true;
-		((Hub)getParent()).removeLink(this);
+		if (getParent() instanceof Hub)
+			((Hub)getParent()).removeLink(this);
 	}
 }
 /**

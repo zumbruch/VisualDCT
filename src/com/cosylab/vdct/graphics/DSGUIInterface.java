@@ -309,9 +309,18 @@ public void delete() {
 		while (selected.hasMoreElements())
 		{
 			obj = (VisibleObject)selected.nextElement();
-			obj.destroy();
 
-			UndoManager.getInstance().addAction(new DeleteAction(obj));
+			// ugly code!!!
+			if (obj instanceof Connector)
+			{
+				((Connector)obj).bypass();
+				//!!! bypass undo action
+			}
+			else
+			{
+				obj.destroy();
+				UndoManager.getInstance().addAction(new DeleteAction(obj));
+			}
 			
 		}
 

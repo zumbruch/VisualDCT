@@ -206,6 +206,7 @@ public void destroy() {
 		setOutput(null, outlink);
 	}
 }
+
 /**
  * This method destroys connector (connector should not be used afer this method was called)
  * Creation date: (29.1.2001 20:05:51)

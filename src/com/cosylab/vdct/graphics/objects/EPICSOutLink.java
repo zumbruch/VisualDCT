@@ -45,7 +45,7 @@ import com.cosylab.vdct.Constants;
  * Creation date: (29.1.2001 21:26:07)
  * @author Matej Sekoranja 
  */
-public class EPICSOutLink extends EPICSLinkOut {
+public class EPICSOutLink extends EPICSLinkOutIn {
 
 	protected static final String processString = "Process";
 	protected static final String nppString = "NPP - No Process Passive";
@@ -159,11 +159,42 @@ protected void draw(Graphics g, boolean hilited) {
 
 		LinkDrawer.drawLink(g, this, inlink, getQueueCount(), rightSide);
 	} else {
-		// draw cross
-		if (!rightSide) rrx+=arrowLength;
-		g.drawLine(rrx-r, rry-r, rrx+r, rry+r);
-		g.drawLine(rrx+r, rry-r, rrx-r, rry+r);
+		
+
+ 		if (getLinkCount()>0) {
+			// ports - draw tail line
+
+			// draw arrow
+			g.drawLine(rrx, rry-r, rrx+arrowLength, rry-r);
+			g.drawLine(rrx, rry+r, rrx+arrowLength, rry+r);
+			
+			int dr=-r; 
+			if (rightSide) {
+				dr=-dr;
+				rrx+=arrowLength;
+			}
+			g.drawLine(rrx, rry-r, rrx+dr, rry);
+			g.drawLine(rrx, rry+r, rrx+dr, rry);
+	
+
+			int rrx2 = (int)(getRscale()*getInX()- view.getRx());
+			g.drawLine(rrx, rry, rrx2, rry);
+
+			if (rightSide)
+				rrx-=arrowLength;
+
+		}
+
+		if (getFieldData().getValue().length()!=0)
+		{
+			// draw cross
+			if (!rightSide) rrx+=arrowLength;
+			g.drawLine(rrx-r, rry-r, rrx+r, rry+r);
+			g.drawLine(rrx+r, rry-r, rrx-r, rry+r);
+		}
 	}
+
+
 
 }
 
