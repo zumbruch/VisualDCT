@@ -1684,8 +1684,14 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 						}
 					}
 
-					pos = target.lastIndexOf(Constants.FIELD_SEPARATOR);
-					if (pos >= 0)
+					// is in lookup table ?
+					InLink templateLink = (InLink)Group.getRoot().getLookupTable().get(target);
+					if (templateLink!=null)
+					{
+						templateLink.setOutput(outlink, null);
+						outlink.setInput(templateLink);
+					}
+					else if ((pos = target.lastIndexOf(Constants.FIELD_SEPARATOR)) >= 0)
 					{
 						recordName = target.substring(0, pos);
 						fieldName = target.substring(pos + 1);
