@@ -28,6 +28,7 @@
 
   <news date="2002-07-10" developer="msekoranja" title="VisualDCT ported to Eclipse and Ant builds."/>
   <news date="2002-07-23" developer="msekoranja" title="Package A implemented."/>
+  <news date="2002-08-20" developer="msekoranja" title="Package B alpha integration build available."/>
  
   <!-- additional documentation -->
   <document url="http://visualdct.cosylab.com" comment="VisualDCT homepage where you can find all related manuals, articles and presentations." title="VisualDCT homepage"/>

@@ -6091,7 +6091,7 @@ public void saveAsTemplateMenuItem_ActionPerformed() {
 public void generateMenuItem_ActionPerformed() {
 	JFileChooser chooser = getfileChooser();
 	UniversalFileFilter filter = new UniversalFileFilter(
-		new String("db"), "EPCIS DB file");
+		new String("db"), "EPICS DB file");
 	chooser.resetChoosableFileFilters();
 	chooser.addChoosableFileFilter(filter);
 	chooser.setDialogTitle("Generate");

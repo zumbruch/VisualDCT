@@ -47,7 +47,7 @@
 			   author="Matej Sekoranja"
 			   date="2002"
 			   publisher="Cosylab, Ltd."
-			   revision="2.2.1236"/>
+			   />
 
 	</head>
 	
@@ -149,22 +149,22 @@
 				document this database as a template, and would look like this (the parentheses
 				and braces are required if the <kwd>template</kwd> keyword is present):
 			</p>
-			<code language="EPICS DB" id="template_empty">
-			  <![CDATA[	template () {}]]>
+			<code language="EPICS DB" id="template_empty"><![CDATA[
+	template () {}]]>
 			</code>
 			<p>
 				Similarly an <kwd>expand</kwd> statement doesn't have to define any macros, but the braces
 				are still mandatory:
 			</p>
-			<code language="EPICS DB" id="expand_example">
-			  <![CDATA[	expand ("subsys.vdb", ss) {}]]>
+			<code language="EPICS DB" id="expand_example"><![CDATA[
+	expand ("subsys.vdb", ss) {}]]>
 			</code>
 			<p>
 				There are a couple of interesting and subtle differences between the above
 				empty <kwd>expand</kwd> statemend and the statement:
 			</p>
-			<code language="EPICS DB" id="include_example">
-			  <![CDATA[	include "subsys.vdb"]]>
+			<code language="EPICS DB" id="include_example"><![CDATA[
+	include "subsys.vdb"]]>
 			</code>
 			<p>
 				There may be circumstances where a template designer might use an <kwd>include</kwd>
@@ -222,8 +222,7 @@
 	? means the token preceeding is allowed 0 or 1 times
 	* means the token preceeding is allowed 0 or more times
 	+ means the token preceeding is allowed 1 or more times
-	.. signifies the end of a definition.
-			]]>
+	.. signifies the end of a definition.]]>
 			</code>
 			</p>
 			<code language="EBNFG" id="EBNFG_syntax">
@@ -256,11 +255,15 @@
 		('port' '(' macroname_definition ',' string ( ',' quotedstring)? ')') .
 
 	template = 'template' '(' quotedstring? ')'
-		'{' port_definition* '}' .
-]]>
+		'{' port_definition* '}' .]]>
 			</code>
 
 		</section>
 
+		<section id="files" title="Example DBs">
+			<p>
+				<a href="files/exampleDBs.zip">Download example DBs</a> demonstrating hierarchical capabilities.
+			</p>
+		</section>
 	</body>
 </cosydoc>

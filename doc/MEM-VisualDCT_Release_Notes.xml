@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?xml-stylesheet type="text/xsl" href="..\..\Common\Documentation\Normal.xsl"?>
+
+<cosydoc xmlns="urn:schemas-cosylab-com:Document">
+	<head>
+		<title>VisualDCT Release Notes</title>
+		
+		<info file="MEM-VisualDCT_Release_Notes"
+			  url="http://visualdct.cosylab.com/builds/VisualDCT"
+			  class="mem"
+			  year="2002"
+			  id="XX"
+			  confidentiality="public"
+			  project="VisualDCT"/>
+			  
+		<contributor name="Matej Sekoranja"
+				id="msekoranja"
+				email="matej.sekoranja@cosylab.com"/>
+
+		<modification version="2.2.1236" by="msekoranja" date="2002-08-20">
+			<section>Package B alpha integration build.</section>
+		</modification>
+
+		<scope>
+			This document is contains release notes of the current build.
+		</scope>
+		
+		<audience>
+			The audience of this document are all users of this VisualDCT build.
+		</audience>
+		
+		<reference id="visualdct"
+			   title="VisualDCT Project"
+			   href="http://visuladct.cosylab.com/"
+			   author="Matej Sekoranja"
+			   date="2002"
+			   publisher="Cosylab, Ltd."
+			   />
+			   
+		<reference id="visualdct_latest"
+			   title="VisualDCT latest build"
+			   href="http://visuladct.cosylab.com/builds/VisualDCT/"
+			   author="Matej Sekoranja"
+			   date="2002"
+			   publisher="Cosylab, Ltd."
+			   revision="2.2.1236"/>
+
+	</head>
+	
+	<body>
+		<section id="intro" title="Release Notes">
+			<p>
+			This alpha integration build has the following disabilities:
+			<ul>
+			  <li><kwd>path, addpath</kwd> statements are not supported (this includes path searching)</li>
+			  <li><kwd>include</kwd> statement is implemented, but saving files containing <kwd>include</kwd> statements 
+			  	   will also include all the content of includes files.</li>
+			  <li>multiple templates are not supported</li>
+			  <li>visual definition of template inputs and outputs is not implemented</li>
+			  <li>cyclic referece check of templates not implemented</li>
+			  <li>template instances are not revalidated when the template is changed</li>
+			  <li>no updated documentation and user's manual</li>
+			</ul>
+			</p>
+		</section>
+	</body>
+</cosydoc>
