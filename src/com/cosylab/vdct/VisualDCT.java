@@ -95,6 +95,7 @@ public class VisualDCT extends JFrame {
 	private JMenuItem ivjSave_AsMenuItem = null;
 	private JButton ivjSaveButton = null;
 	private JMenuItem ivjSaveMenuItem = null;
+	private JMenuItem ivjSaveAsTemplateMenuItem = null;
 	private JMenuItem ivjGenerateMenuItem = null;
 	private JMenuItem ivjGenerateAsGroupMenuItem = null;
 	private JMenuItem ivjSelect_AllMenuItem = null;
@@ -312,6 +313,8 @@ class IvjEventHandler implements java.awt.event.ActionListener, java.awt.event.I
 				generateMenuItem_ActionPerformed();
 			else if (e.getSource() == VisualDCT.this.getGenerateAsGroupMenuItem()) 
 				generateAsGroupMenuItem_ActionPerformed();
+			else if (e.getSource() == VisualDCT.this.getSaveAsTemplateMenuItem()) 
+				saveAsTemplateMenuItem_ActionPerformed();
 
 		};
 		public void itemStateChanged(java.awt.event.ItemEvent e) {
@@ -1764,7 +1767,7 @@ public void exportPostScriptFileMenuItem_ActionPerformed()
 
 				jFileChooser.resetChoosableFileFilters();
 				jFileChooser.addChoosableFileFilter(universalFileFilter);
-				jFileChooser.setDialogTitle("Save As");
+				jFileChooser.setDialogTitle("Save as...");
 				jFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
 				boolean jFileChooserConfirmed = false;
@@ -2466,7 +2469,7 @@ private javax.swing.JMenuItem getExportPostScriptFileMenuItem() {
 		try {
 			ivjExportPostScriptFileMenuItem = new javax.swing.JMenuItem();
 			ivjExportPostScriptFileMenuItem.setName("ExportPostScriptFileMenuItem");
-			ivjExportPostScriptFileMenuItem.setText("Export PostScript File");
+			ivjExportPostScriptFileMenuItem.setText("Export to PostScript...");
 			ivjExportPostScriptFileMenuItem.setEnabled(true);
 			// user code begin {1}
 			// user code end
@@ -2519,6 +2522,7 @@ private javax.swing.JMenu getFileMenu() {
 			ivjFileMenu.add(getSaveMenuItem());
 			ivjFileMenu.add(getSave_AsMenuItem());
 			ivjFileMenu.add(getSave_As_GroupMenuItem());
+			ivjFileMenu.add(getSaveAsTemplateMenuItem());
 			ivjFileMenu.add(getJSeparator11a());
 			ivjFileMenu.add(getGenerateMenuItem());
 			ivjFileMenu.add(getGenerateAsGroupMenuItem());
@@ -3723,7 +3727,7 @@ private javax.swing.JMenuItem getPrintAsPostScriptMenuItem() {
 		try {
 			ivjPrintAsPostScriptMenuItem = new javax.swing.JMenuItem();
 			ivjPrintAsPostScriptMenuItem.setName("PrintAsPostScriptMenuItem");
-			ivjPrintAsPostScriptMenuItem.setText("Print As PostScript");
+			ivjPrintAsPostScriptMenuItem.setText("Print as PostScript");
 			ivjPrintAsPostScriptMenuItem.setEnabled(true);
 			// user code begin {1}
 			// user code end
@@ -3932,7 +3936,7 @@ private javax.swing.JMenuItem getSave_As_GroupMenuItem() {
 		try {
 			ivjSave_As_GroupMenuItem = new javax.swing.JMenuItem();
 			ivjSave_As_GroupMenuItem.setName("Save_As_GroupMenuItem");
-			ivjSave_As_GroupMenuItem.setText("Save As Group");
+			ivjSave_As_GroupMenuItem.setText("Save as Group...");
 			// user code begin {1}
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
@@ -3953,7 +3957,7 @@ private javax.swing.JMenuItem getSave_AsMenuItem() {
 		try {
 			ivjSave_AsMenuItem = new javax.swing.JMenuItem();
 			ivjSave_AsMenuItem.setName("Save_AsMenuItem");
-			ivjSave_AsMenuItem.setText("Save As");
+			ivjSave_AsMenuItem.setText("Save as...");
 			// user code begin {1}
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
@@ -4012,6 +4016,27 @@ private javax.swing.JMenuItem getSaveMenuItem() {
 		}
 	}
 	return ivjSaveMenuItem;
+}
+/**
+ * Return the SaveMenuItem property value.
+ * @return javax.swing.JMenuItem
+ */
+/* WARNING: THIS METHOD WILL BE REGENERATED. */
+private javax.swing.JMenuItem getSaveAsTemplateMenuItem() {
+	if (ivjSaveAsTemplateMenuItem == null) {
+		try {
+			ivjSaveAsTemplateMenuItem = new javax.swing.JMenuItem();
+			ivjSaveAsTemplateMenuItem.setName("SaveAsTemplateMenuItem");
+			ivjSaveAsTemplateMenuItem.setText("Save as Template...");
+			// user code begin {1}
+			// user code end
+		} catch (java.lang.Throwable ivjExc) {
+			// user code begin {2}
+			// user code end
+			handleException(ivjExc);
+		}
+	}
+	return ivjSaveAsTemplateMenuItem;
 }
 /**
  * Return the GenerateMenuItem property value.
@@ -4296,7 +4321,7 @@ private javax.swing.JButton getTextBoxButton() {
 		try {
 			textBoxButton = new javax.swing.JButton();
 			textBoxButton.setName("TextBoxButton");
-			textBoxButton.setToolTipText("Box");
+			textBoxButton.setToolTipText("TextBox");
 			textBoxButton.setText("");
 			textBoxButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 			textBoxButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -4979,6 +5004,7 @@ private void initConnections() throws java.lang.Exception {
 	getDownMenuItem().addActionListener(ivjEventHandler);
 	getGenerateMenuItem().addActionListener(ivjEventHandler);
 	getGenerateAsGroupMenuItem().addActionListener(ivjEventHandler);
+	getSaveAsTemplateMenuItem().addActionListener(ivjEventHandler);
 	// user code end
 	getAbout_BoxMenuItem().addActionListener(ivjEventHandler);
 	getZoomSlider().addMouseMotionListener(ivjEventHandler);
@@ -6001,6 +6027,65 @@ public void save_AsMenuItem_ActionPerformed() {
 		try
 		{
 		    cmd.getGUIMenuInterface().save(theFile);
+		    openedFile = theFile;
+		}
+		catch (java.io.IOException e)
+		{
+	 		Console.getInstance().println("o) Failed to save DB to file: '"
+	 			+ theFile.toString() + "'");
+		    Console.getInstance().println(e);
+		}
+	}
+}
+/**
+ * Comment
+ */
+public void saveAsTemplateMenuItem_ActionPerformed() {
+	JFileChooser chooser = getfileChooser();
+	UniversalFileFilter filter = new UniversalFileFilter(
+		new String("db"), "DB File");
+	chooser.resetChoosableFileFilters();
+	chooser.addChoosableFileFilter(filter);
+	chooser.setDialogTitle("Save As");
+	chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
+	boolean jFileChooserConfirmed = false;
+    java.io.File theFile = null;
+
+	while(!jFileChooserConfirmed)
+	{
+		int retval = chooser.showSaveDialog(this);
+
+		if(retval == JFileChooser.CANCEL_OPTION)
+			return;
+			
+	    theFile = chooser.getSelectedFile();
+
+		if(theFile.exists())
+		{
+		    if(JOptionPane.showConfirmDialog(this, "The file '" + theFile.getName()
+		    	+ "' already exists! Overwrite?", "Confirmation", JOptionPane.YES_NO_OPTION,
+		    	JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION)
+		    {
+				jFileChooserConfirmed = true;
+		    }
+		}
+		else
+			jFileChooserConfirmed = true;
+	}
+
+    if(theFile != null)
+    {
+/*
+			// fix ending
+			if ((theFile.getName().lastIndexOf('.')==0) && 
+				chooser.getFileFilter().getDescription().startsWith("All"))
+				theFile = new java.io.File(theFile.getAbsoluteFile()+".db");
+*/		    
+	    GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
+		try
+		{
+		    cmd.getGUIMenuInterface().saveAsTemplate(theFile);
 		    openedFile = theFile;
 		}
 		catch (java.io.IOException e)

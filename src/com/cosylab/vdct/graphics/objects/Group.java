@@ -1175,17 +1175,6 @@ public void writeVDCTData(java.io.DataOutputStream file, NameManipulator namer, 
  */
 public static void writeVDCTData(Vector elements, java.io.DataOutputStream file, NameManipulator namer, boolean export) throws java.io.IOException {
 
- // write layout data
- // used format #! Record(recordname, xpos, ypos, color, rotated, "description")
- // used format #! Group(groupname, xpos, ypos, color, "description")
- // used format #! Field(fieldname, color, rotated, "description")
- // used format #! Visibility(fieldname, visibility)
- // used format #! Link(fieldname, inLinkID)
- // used format #! Connector(id, outLinkID, xpos, ypos, color, "description")
-
- //	 eg.		#! Record(ts:fanOut0, 124, 432, 324568, 0, "fanOut record")
-
-
  Object obj;
  Group group;
  Record record;

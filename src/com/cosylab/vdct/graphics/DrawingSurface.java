@@ -748,7 +748,9 @@ public void mouseClicked(MouseEvent e) {
 				Enumeration templates = VDBData.getTemplates().keys();
 				while (templates.hasMoreElements())
 				{
-					JMenuItem item2 = new JMenuItem(templates.nextElement().toString());
+					String key = templates.nextElement().toString();
+					JMenuItem item2 = new JMenuItem(((VDBTemplate)VDBData.getTemplates().get(key)).getDescription());
+					item2.setActionCommand(key);
 					item2.addActionListener(al);
 					templatesMenu.add(item2);
 				}	

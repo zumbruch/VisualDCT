@@ -151,6 +151,13 @@ void save(File file) throws IOException;
 void saveAsGroup(File file) throws IOException;
 /**
  * Insert the method's description here.
+ * Creation date: (4.2.2001 15:11:04)
+ * @param file java.io.File
+ * @exception java.io.IOException The exception description.
+ */
+void saveAsTemplate(File file) throws IOException;
+/**
+ * Insert the method's description here.
  * Creation date: (4.2.2001 15:48:15)
  * @param file java.io.File
  * @exception java.io.IOException The exception description.

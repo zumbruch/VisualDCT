@@ -628,6 +628,13 @@ public void saveAsGroup(java.io.File file) throws IOException {
 
 }
 /**
+ * @see com.cosylab.vdct.graphics.GUIMenuInterface#saveAsTemplate(File)
+ */
+public void saveAsTemplate(File file) throws IOException
+{
+ System.out.println("Save As template");
+}
+/**
  * Insert the method's description here.
  * Creation date: (4.2.2001 15:48:27)
  * @param file java.io.File
@@ -810,4 +817,5 @@ public void updateMenuItems() {
 	cmd2.setState(UndoManager.getInstance().actions2undo()>0);
 	cmd2.execute();
 }
+
 }
