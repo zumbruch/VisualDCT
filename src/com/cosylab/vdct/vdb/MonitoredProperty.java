@@ -49,6 +49,10 @@ public class MonitoredProperty implements InspectableProperty {
 	private String name;
 	private String value;
 	private MonitoredPropertyListener listener = null;
+	
+	private static final String removeString = "Remove";
+	private static final String renameString = "Rename";
+	
 /**
  * DTYPInfoProperty constructor comment.
  */
@@ -180,23 +184,23 @@ public void popupEvent(Component component, int x, int y)
 	{
 		public void actionPerformed(ActionEvent e) {
 			String action = e.getActionCommand();
-			if (action.equals("Rename"))
+			if (action.equals(renameString))
 				listener.renameProperty(MonitoredProperty.this);
-			else if (action.equals("Remove"))
+			else if (action.equals(removeString))
 				listener.removeProperty(MonitoredProperty.this);
 		}
 
 	};
 	
-	JPopupMenu popup = new JPopupMenu("Inspector popup");
+	JPopupMenu popup = new JPopupMenu();
 	
-	JMenuItem mi = new JMenuItem("Rename");
+	JMenuItem mi = new JMenuItem(renameString);
 	mi.addActionListener(al);
 	popup.add(mi);
 
 	popup.add(new JSeparator());
 	
-	mi = new JMenuItem("Remove");
+	mi = new JMenuItem(removeString);
 	mi.addActionListener(al);
 	popup.add(mi);
 

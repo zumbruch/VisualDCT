@@ -33,12 +33,17 @@ import java.awt.*;
 import java.util.*;
 import java.awt.event.*;
 import java.awt.print.*;
+
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.event.*;
 import com.cosylab.vdct.*;
 import com.cosylab.vdct.db.*;
 import com.cosylab.vdct.dbd.*;
 import com.cosylab.vdct.vdb.*;
 import com.cosylab.vdct.undo.*;
+import com.cosylab.vdct.util.StringUtils;
 import com.cosylab.vdct.events.*;
 import com.cosylab.vdct.events.commands.*;
 import com.cosylab.vdct.graphics.objects.*;
@@ -145,6 +150,10 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 	// linking
 	private VDBFieldData tmplink = null;
 	private Hiliter hiliter;
+	
+	private static final String newRecordString = "New record...";
+	private static final String newTemplesString = "New template";
+	
 /**
  * DrawingSurface constructor comment.
  */
@@ -667,7 +676,42 @@ public void mouseClicked(MouseEvent e) {
 			if (e.getClickCount()==1 && e.getButton()==MouseEvent.BUTTON3)
 			{
 				pressedX=cx; pressedY=cy;
-				CommandManager.getInstance().execute("ShowNewDialog");
+				
+				ActionListener al = new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e) {
+						String action = e.getActionCommand();
+						if (action.equals(newRecordString))
+							CommandManager.getInstance().execute("ShowNewDialog");
+						else
+							createTemplateInstance(null, action, true);
+					}
+			
+				};
+								
+				JPopupMenu popUp = new JPopupMenu();
+				
+				JMenuItem item = new JMenuItem(newRecordString);
+				item.addActionListener(al);
+				popUp.add(item);
+				
+				JMenu templatesMenu = new JMenu(newTemplesString);
+				popUp.add(templatesMenu);
+				
+				// add templates
+				Enumeration templates = VDBData.getTemplates().keys();
+				while (templates.hasMoreElements())
+				{
+					JMenuItem item2 = new JMenuItem(templates.nextElement().toString());
+					item2.addActionListener(al);
+					templatesMenu.add(item2);
+				}	
+
+				if (templatesMenu.getItemCount()==0)
+					templatesMenu.setEnabled(false);
+				
+				popUp.show(getWorkspacePanel(), e.getX(), e.getY());
+				
 			}
 			else if (e.getClickCount()>=2) {
 				pressedX=cx; pressedY=cy;
@@ -1919,4 +1963,60 @@ public void zoomArea(int x1, int y1, int x2, int y2) {
 	recalculateNavigatorPosition();
 	repaint();
 }
+
+/**
+ * Insert the method's description here.
+ * Creation date: (3.2.2001 23:27:30)
+ * @param name java.lang.String
+ * @param type java.lang.String
+ * @param relative boolean
+ */
+public void createTemplateInstance(String name, String type, boolean relative) {
+	if (relative)
+	{
+		String parentName = getViewGroup().getAbsoluteName();
+		if (parentName.length()>0)
+			name = parentName + Constants.GROUP_SEPARATOR + name;
+	}
+	
+	VDBTemplate template = (VDBTemplate)VDBData.getTemplates().get(type);
+	if (template==null)
+	{
+		Console.getInstance().println(
+			"Template instance "+name+" cannot be created since "
+				+ type
+				+ " does not exist.");
+		return;
+	}			
+
+	// generate name
+	if (name==null)
+	{
+		name = "template000";	
+		while (Group.getRoot().findObject(name, true)!=null)
+			name = StringUtils.incrementName(name, null);
+	}
+
+	VDBTemplateInstance templateInstance = VDBData.generateNewVDBTemplateInstance(name, template);
+
+	ViewState view = ViewState.getInstance();
+	int rx = (int)(view.getRx()/view.getScale());
+	int ry = (int)(view.getRy()/view.getScale());
+
+	Template templ = new Template(null, templateInstance);
+	Group.getRoot().addSubObject(name, templ, true);
+
+	//templ.setDescription(dbTemplate.getDescription());
+	templ.setDescription(template.getDescription());
+	templ.setX(getPressedX()+rx);
+	templ.setY(getPressedY()+ry);
+
+	UndoManager.getInstance().addAction(new CreateAction(templ));
+
+	//drawingSurface.setModified(true);
+	repaint();
+}
+
+
+
 }
