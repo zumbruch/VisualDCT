@@ -332,6 +332,8 @@ public void delete() {
 	}
 
 	view.deselectAll();
+	view.deblinkAll();
+	view.setAsHilited(null);
 	drawingSurface.repaint();
 }
 /**

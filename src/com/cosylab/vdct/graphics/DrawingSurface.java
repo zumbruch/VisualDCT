@@ -115,7 +115,7 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 	// drawing switches
 	// does not refersh devices only redraws previous buffer image
 	private boolean fastDrawing = false;
-	private boolean fastDrawingOnce = false;
+	//private boolean fastDrawingOnce = false;
 	// does not refersh devices only draw a hilited object (executed only once)
 	private boolean drawOnlyHilitedOnce = false;
 	// also draws hilited objects
@@ -312,10 +312,10 @@ public void draw(Graphics g) {
 	ViewState view = ViewState.getInstance();
 
 	// forceReadraw does not force really
-	if (fastDrawing || fastDrawingOnce || drawOnlyHilitedOnce || !forceRedraw) {
+	if (fastDrawing || /*fastDrawingOnce ||*/ drawOnlyHilitedOnce || !forceRedraw) {
 		// copy devices buffer
 		copyCanvasImage(g);
-		fastDrawingOnce=false;
+		//fastDrawingOnce=false;
 	} else {
 		forceRedraw=false;
 		redraw(g);
@@ -354,13 +354,21 @@ public void draw(Graphics g) {
 	}
 	else if (mouseOperation==LINK_OPERATION) {
 	}
+	/*
 	else if (drawOnlyHilitedOnce || alsoDrawHilitedOnce) {
-		
 		// hilite object
 		if (view.getHilitedObject()!=null) view.getHilitedObject().paint(g, true);
 
 		drawOnlyHilitedOnce=alsoDrawHilitedOnce=false;
 	}
+	*/
+
+	// hilite object
+	VisibleObject vo = view.getHilitedObject();
+	if (vo!=null && !view.getBlinkingObjects().contains(vo)) vo.paint(g, true);
+
+	drawOnlyHilitedOnce=alsoDrawHilitedOnce=false;
+
 
 	// restore offset
 	view.setDrx(prevDRX); view.setDry(prevDRY);
@@ -634,6 +642,7 @@ public boolean isModified() {
  * Creation date: (3.2.2001 13:31:09)
  */
 public void linkCommand(VisibleObject linkObject, LinkSource linkData) {
+	
 	if (tmplink==null) {
 		
 		// start linking (store source field reference)
@@ -713,47 +722,51 @@ public void mouseClicked(MouseEvent e) {
 				}
 			}
 			
-			if (e.isControlDown() || (e.getClickCount()==1)) {
-				if (!e.isControlDown()) view.deselectAll();			// deselect all
-				if (hilited instanceof Selectable) {				// invert selection
-					if (view.isSelected(hilited))
-						view.deselectObject(hilited);
-					else
-						view.setAsSelected(hilited);
-					repaint();
-				}
-			}
-			else if (e.getClickCount()>=2) {
-
-
-				if (hilited instanceof Selectable) {				// invert selection
-					if (view.isSelected(hilited))
-						view.deselectObject(hilited);
-					else
-						view.setAsSelected(hilited);
-				}
-
-				// shift for template
-				if (e.isShiftDown() && hilited instanceof Template) {
-						descendIntoTemplate((Template)hilited);
-				}
-				else if (hilited instanceof Inspectable) 
-					InspectorManager.getInstance().requestInspectorFor((Inspectable)hilited);
-				else if (hilited instanceof Connector)
-				{
-					Connector con = (Connector)hilited;
-					if (/*con.getMode()==OutLink.INVISIBLE_MODE &&*/ con.getInput()!=null)
-					{
-						centerObject((VisibleObject)con.getInput());			// !!! now is always true, but...
+			boolean leftButtonPush = (e.getModifiers() & InputEvent.BUTTON1_MASK) != 0;
+			if (leftButtonPush)
+			{
+				if (e.isControlDown() || (e.getClickCount()==1)) {
+					if (!e.isControlDown()) view.deselectAll();			// deselect all
+					if (hilited instanceof Selectable) {				// invert selection
+						if (view.isSelected(hilited))
+							view.deselectObject(hilited);
+						else
+							view.setAsSelected(hilited);
+						repaint();
 					}
-					else if (con.getOutput()!=null /*&& con.getOutput().getMode()==OutLink.INVISIBLE_MODE*/)
-					{
-						centerObject((VisibleObject)con.getOutput());			// !!! now is always true, but...
+				}
+				else if (e.getClickCount()>=2) {
+	
+	
+					if (hilited instanceof Selectable) {				// invert selection
+						if (view.isSelected(hilited))
+							view.deselectObject(hilited);
+						else
+							view.setAsSelected(hilited);
 					}
-				} 
-				else {
-					if (hilited instanceof Group) {
-						moveToGroup((Group)hilited);
+	
+					// shift for template
+					if (e.isShiftDown() && hilited instanceof Template) {
+							descendIntoTemplate((Template)hilited);
+					}
+					else if (hilited instanceof Inspectable) 
+						InspectorManager.getInstance().requestInspectorFor((Inspectable)hilited);
+					else if (hilited instanceof Connector)
+					{
+						Connector con = (Connector)hilited;
+						if (/*con.getMode()==OutLink.INVISIBLE_MODE &&*/ con.getInput()!=null)
+						{
+							centerObject((VisibleObject)con.getInput());			// !!! now is always true, but...
+						}
+						else if (con.getOutput()!=null /*&& con.getOutput().getMode()==OutLink.INVISIBLE_MODE*/)
+						{
+							centerObject((VisibleObject)con.getOutput());			// !!! now is always true, but...
+						}
+					} 
+					else {
+						if (hilited instanceof Group) {
+							moveToGroup((Group)hilited);
+						}
 					}
 				}
 			}
@@ -1056,6 +1069,7 @@ public void mouseDragged(MouseEvent e) {
 				break; }
 			
 			case OBJECT_MOVE : {
+				// TODO moving w/ grid enabled (if object not actually moved, because of grid, repaint is called anyway!!)
 //System.out.println("Dragged: OBJECT_MOVE");
 				int rdx = px-draggedX;
 				int rdy = py-draggedY;
@@ -1196,9 +1210,10 @@ public void mouseMoved(MouseEvent e)
 			VisibleObject spotted = viewGroup.hiliteComponentsCheck(cx+view.getRx(), cy+view.getRy());
 			if (ViewState.getInstance().setAsHilited(spotted))
 			{
-			drawOnlyHilitedOnce=true;
-			repaint();
-		}
+			//drawOnlyHilitedOnce=true;
+			//repaint();
+			repaint(true);
+			}
 	}
 }
 }
@@ -2265,7 +2280,7 @@ public void recalculateNavigatorPosition() {
  * Creation date: (25.12.2000 17:06:55)
  * @param g java.awt.Graphics
  */
-private void redraw(Graphics g) {
+private synchronized void redraw(Graphics g) {
 
 	if (Settings.getInstance().getNavigator())
 		createNavigatorImage();
@@ -2403,12 +2418,27 @@ public void run() {
  * Insert the method's description here.
  * Creation date: (25.12.2000 14:59:05)
  */
-public void repaint() {
+public void repaint(boolean drawOnlyHilitedOnce) {
 	// set clip to x0, y0, width, height !!!?
+
+	// if not already set, check if can be set
+	if (!this.drawOnlyHilitedOnce)
+		this.drawOnlyHilitedOnce = drawOnlyHilitedOnce && !redrawRequest;
+	else	// drawOnlyHilitedOnce: true after true case
+		this.drawOnlyHilitedOnce = this.drawOnlyHilitedOnce && drawOnlyHilitedOnce;
+		
 	forceRedraw = true;
 	redrawRequest = true;
 	//getWorkspacePanel().repaint();
 		
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (25.12.2000 14:59:05)
+ */
+public void repaint() {
+	repaint(false);
 }
 /**
  * Insert the method's description here.
