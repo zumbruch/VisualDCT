@@ -21,6 +21,7 @@
 		<modification version="1.0" by="msekoranja" date="2002-10-19">
 			<section>Created.</section>
 		</modification>
+		
 		<release version="1.1" by="msekoranja" date="2002-10-22">
 		</release>
 
@@ -28,6 +29,9 @@
 			<section>Updated hierarchy related sections of manual.</section>
 		</modification>
 
+		<modification version="1.3" by="ilist" date="2004-07-26">
+			<section>Added section about command line tool for generating flat databases.</section>
+		</modification>
 
 		<scope>
 			This document is a users manual of how to use VisualDCT and also contains some tips and ticks.
@@ -162,6 +166,37 @@
 				For saving configuration data Java Preferences API is used. This means configuration is kept in
 				a system depended configuration storage, e.g. registry when using Windows OS, <f>~/.java</f> (user) and <f>/etc/java</f> (system) on UNIX/Linux systems..
 			</p>
+		</section>
+
+		<section id="flatdb" title="Command Line Tool for Generating Flat Databases">
+			<p>
+				You can generate flat databases also from command line, which is useful for generation from scripts or generating large databases.
+				Same as for VisualDCT, Java Runtime Environment 1.4 is required, but the difference is you can use it on a headless terminal.
+				To start the generation you have to add VisualDCT's jar to classpath and invoke a specific class (<kwd>com.cosylab.vdct.GenerateFlatDatabase</kwd>), which takes care of the generation.
+				This command line tool basically takes two parameters: the input <f>.vdb</f> file (probably your main file), which is used together with all the <f>.vdb</f> files included as templates and the output <f>.db</f> file, to which the flat database is generated.
+			</p>
+							
+				<code language="command line" id="cmdln">
+					java -cp VisualDCT.jar com.cosylab.vdct.GenerateFlatDatabase [OPTION]... input.vdb output.db<desc>Generating flat databases.</desc>
+				</code>
+
+			
+			<p>
+				We also provided a script for running this tool, named <kwd>flatdb</kwd>, which can be found next to the distribution of VisualDCT.	
+			</p>
+			
+				<code language="command line" id="cmdln">
+					flatdb [OPTION]... input.vdb output.db<desc>Running with a script.</desc>
+				</code>
+
+			<p>
+				Additionaly you can specify command line option <kwd>-d</kwd> or <kwd>--dbd-file</kwd>, followed by the name of a <f>.dbd</f> file.
+				This loads a specific <f>.dbd</f> file before generating a flat database.
+			</p>
+
+				<code language="command line" id="cmdln">
+					flatdb --dbd-file app.dbd input.vdb output.db<desc>Example with a <f>.dbd</f> file.</desc>
+				</code>
 		</section>
 
 		<section id="hierarchies" title="Hierarchy support">
