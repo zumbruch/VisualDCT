@@ -239,6 +239,23 @@ public static String getTargetFromString(String value) {
 
 	return target;
 }
+
+public static String getRecordFromString(String value) {
+	
+	if (value == null || value.length() == 0 || //value.equals(nullString) ||
+		// check all tokenizer separators 
+		value.charAt(0) == ' ' || value.charAt(0) == '.' || value.charAt(0) == '\t')
+		return null;
+
+	String record = nullString;
+
+
+	StringTokenizer tokenizer = new StringTokenizer(value, tokenizerSettings);
+
+	if (tokenizer.hasMoreTokens()) record=tokenizer.nextToken();		// read record name 
+	
+	return record;
+}
 /**
  * Insert the method's description here.
  * Creation date: (30.1.2001 9:56:35)

@@ -1281,7 +1281,7 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 				 	comma + StringUtils.color2string(record.getColor()) +
 				 	comma + StringUtils.boolean2str(record.isRight()) +
 					comma + quote + 
-				namer.getResolvedName(record.getDescription()) + 
+				renamer.getResolvedName(record.getDescription()) + 
 					quote +	ending);
 
 	 			e2 = record.getSubObjectsV().elements();
