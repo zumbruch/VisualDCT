@@ -2678,13 +2678,6 @@ public void zoomArea(int x1, int y1, int x2, int y2) {
  * @param relative boolean
  */
 public void createTemplateInstance(String name, String type, boolean relative) {
-	if (relative)
-	{
-		String parentName = getViewGroup().getAbsoluteName();
-		if (parentName.length()>0)
-			name = parentName + Constants.GROUP_SEPARATOR + name;
-	}
-	
 	VDBTemplate template = (VDBTemplate)VDBData.getTemplates().get(type);
 	if (template==null)
 	{
@@ -2698,9 +2691,22 @@ public void createTemplateInstance(String name, String type, boolean relative) {
 	// generate name
 	if (name==null)
 	{
-		name = "template000";	
+		//name = "template000";
+		name = template.getId();
+		
+		int pos = name.lastIndexOf('.');  //removes file suffix
+		if (pos>0) name = name.substring(0, pos);
+		
+		if (Group.getRoot().findObject(name, true)!=null) name = name+"2";
 		while (Group.getRoot().findObject(name, true)!=null)
 			name = StringUtils.incrementName(name, null);
+	}
+
+	if (relative)
+	{
+		String parentName = getViewGroup().getAbsoluteName();
+		if (parentName.length()>0)
+			name = parentName + Constants.GROUP_SEPARATOR + name;
 	}
 
 	VDBTemplateInstance templateInstance = VDBData.generateNewVDBTemplateInstance(name, template);

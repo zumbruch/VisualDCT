@@ -1707,7 +1707,11 @@ public static void save(Group group2save, File file, boolean export) throws IOEx
 	String addedPrefix=null;
 	if (export && Settings.getInstance().getHierarhicalNames()) { 
 		VDBTemplate template = Group.getEditingTemplateData();
-		String name = template.getId().replaceFirst("\\..*$",""); //removes file suffix
+		String name = template.getId(); 
+		
+		int pos = name.lastIndexOf('.'); //removes file suffix
+		if (pos>0) name = name.substring(0, pos);
+		
 		addedPrefix=name+Constants.HIERARCHY_SEPARATOR;
 	}
 	
