@@ -1173,7 +1173,7 @@ public boolean open(File file, boolean importDB) throws IOException {
 /**
  * Insert the method's description here.
  */
-private void applyVisualData(boolean importDB, Group group, DBData dbData, VDBData vdbData)
+public static void applyVisualData(boolean importDB, Group group, DBData dbData, VDBData vdbData)
 {
 	// apply visual-data && generate visual object, group hierarchy
 	try {
@@ -1251,25 +1251,34 @@ private void applyVisualData(boolean importDB, Group group, DBData dbData, VDBDa
 		}
 
 
-		// !!! check if template  definition exists!!!
+		// add template instances and apply their visual data
+		DBTemplateInstance dbTemplate;
+		e = dbData.getTemplateInstances().elements();
+		while (e.hasMoreElements()) {
+			dbTemplate = (DBTemplateInstance) (e.nextElement());
 
-			// add template instances and apply their visual data
-			DBTemplateInstance dbTemplate;
-			e = dbData.getTemplateInstances().elements();
-			while (e.hasMoreElements()) {
-				dbTemplate = (DBTemplateInstance) (e.nextElement());
+			VDBTemplate template = (VDBTemplate)vdbData.getTemplates().get(dbTemplate.getTemplateClassID());
+			if (template==null)
+			{
+				Console.getInstance().println(
+					"Template instance "+dbTemplate.getTemplateID()+" cannot be created since "
+						+ dbTemplate.getTemplateClassID()
+						+ " does not exist - this definition will be ignored.");
+				continue;
+			}			
+			
+			Template templ = new Template(null, null);
+			templ.setColor(dbTemplate.getColor());
+			//templ.setDescription(dbTemplate.getDescription());
+			templ.setDescription(template.getDescription());
+			templ.move(dbTemplate.getX(), dbTemplate.getY());
 
-				Template templ = new Template(null, null);
-				templ.setColor(dbTemplate.getColor());
-				//templ.setDescription(dbTemplate.getDescription());
-				DBTemplate template = (DBTemplate)dbData.getTemplates().get(dbTemplate.getTemplateClassID());
-				templ.setDescription(template.getDescription());
-				templ.move(dbTemplate.getX(), dbTemplate.getY());
-
-				group.addSubObject(dbTemplate.getTemplateID(), templ, true);
-			}
+			group.addSubObject(dbTemplate.getTemplateID(), templ, true);
+		}
 
 		// add links, connectors
+		
+		// !!!! fix templates links
 
 		int pos;
 		String recordName;

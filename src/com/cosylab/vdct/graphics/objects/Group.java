@@ -318,7 +318,6 @@ public Object findObject(String objectName, boolean deep) {
 			return parent.findObject(objectName, deep);
 	}
 	else {
-		relName = relName;
 		return getSubObject(relName);
 	}
 }

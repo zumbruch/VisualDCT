@@ -28,7 +28,7 @@ package com.cosylab.vdct.vdb;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Hashtable;
 
 /**
@@ -38,8 +38,8 @@ public class VDBTemplateInstance
 {
 	VDBTemplate template = null;
 	Hashtable properties = null;
-	ArrayList inputs = null;
-	ArrayList outputs = null;
+	Hashtable inputs = null;
+	Hashtable outputs = null;
 	
 	/**
 	 * Constructor.
@@ -50,18 +50,18 @@ public class VDBTemplateInstance
 	}
 		/**
 	 * Returns the inputs.
-	 * @return ArrayList
+	 * @return Hashtable
 	 */
-	public ArrayList getInputs()
+	public Hashtable getInputs()
 	{
 		return inputs;
 	}
 
 	/**
 	 * Returns the outputs.
-	 * @return ArrayList
+	 * @return Hashtable
 	 */
-	public ArrayList getOutputs()
+	public Hashtable getOutputs()
 	{
 		return outputs;
 	}
@@ -88,7 +88,7 @@ public class VDBTemplateInstance
 	 * Sets the inputs.
 	 * @param inputs The inputs to set
 	 */
-	public void setInputs(ArrayList inputs)
+	public void setInputs(Hashtable inputs)
 	{
 		this.inputs = inputs;
 	}
@@ -97,7 +97,7 @@ public class VDBTemplateInstance
 	 * Sets the outputs.
 	 * @param outputs The outputs to set
 	 */
-	public void setOutputs(ArrayList outputs)
+	public void setOutputs(Hashtable outputs)
 	{
 		this.outputs = outputs;
 	}
@@ -111,5 +111,23 @@ public class VDBTemplateInstance
 		this.properties = properties;
 	}
 
+	/**
+	 * Make macro substitutions on a string using properties table.
+	 * @param s The string to be applied
+	 * @param properties The properties to use
+	 * @return String  
+	 */
+	public static String applyProperties(String s, Hashtable properties)
+	{
+		Enumeration e = properties.keys();
+		while (s.indexOf('$')>=0 && e.hasMoreElements())
+		{
+			String key = e.nextElement().toString();
+			String val = properties.get(key).toString();
+			s = s.replaceAll("\\$\\("+key+"\\)", val);
+			s = s.replaceAll("\\$\\{"+key+"\\}", val);
+		}		
+		return s;
+	}
 
 }

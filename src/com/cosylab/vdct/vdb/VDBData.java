@@ -32,22 +32,30 @@ import java.io.*;
 import java.util.*;
 import com.cosylab.vdct.db.*;
 import com.cosylab.vdct.dbd.*;
+import com.cosylab.vdct.graphics.DrawingSurface;
+import com.cosylab.vdct.graphics.objects.Group;
+import com.cosylab.vdct.graphics.objects.Record;
 import com.cosylab.vdct.Console;
+import com.cosylab.vdct.Constants;
 
 /**
  * This type was created in VisualAge.
  */
 public class VDBData {
 	private Vector records = null;
+	private Hashtable templates = null;
+	private Vector templateInstances = null;
 /**
  * DBDData constructor comment.
  */
 public VDBData() {
 	records = new Vector();
+	templates = new Hashtable();
+	templateInstances = new Vector();
 }
 /**
  * This method was created in VisualAge.
- * @param rd VisualDCTPackage.RecordData
+ * @param 
  */
 public void addRecord(VDBRecordData rd) {
 	if (rd!=null)
@@ -56,6 +64,28 @@ public void addRecord(VDBRecordData rd) {
 	if (!records.contains(rd))
 		records.addElement(rd);
 }
+
+/**
+ * This method was created in VisualAge.
+ * @param 
+ */
+public void addTemplate(VDBTemplate templ) {
+	if (templ!=null)
+		if (!templates.containsKey(templ.getId()))
+			templates.put(templ.getId(), templ);
+}
+
+/**
+ * This method was created in VisualAge.
+ * @param 
+ */
+public void addTemplateInstance(VDBTemplateInstance ti) {
+	if (ti!=null)
+		if (!templateInstances.contains(ti))
+			templateInstances.addElement(ti);
+}
+
+
 /**
  * This method was created in VisualAge.
  * @return com.cosylab.vdct.vdb.VDBFieldData
@@ -122,19 +152,169 @@ public static VDBRecordData copyVDBRecordData(VDBRecordData source) {
 public static VDBData generateVDBData(DBDData dbd, DBData db) {
 	
 	VDBData vdb = new VDBData();
-	DBRecordData dbRecord;
 
 	if (db!=null) {
+
+		// add records
+		DBRecordData dbRecord;
 		Enumeration e = db.getRecordsV().elements();
 		while (e.hasMoreElements()) {
 			dbRecord = (DBRecordData)(e.nextElement());
 			vdb.addRecord(generateVDBRecordData(dbd, dbRecord));
 		}
+
+		// extract templates
+		extractTemplates(dbd, db, vdb);
+		
+		
+		// add template instances
+		generateTemplateInstances(db, vdb);
+
 	}
 
 	
 	return vdb;
 }
+
+/**
+ * 
+ */
+public static void generateTemplateInstances(DBData db, VDBData vdb)
+{
+	Enumeration e;
+	DBTemplateInstance dbTemplateInstance;
+	e = db.getTemplateInstances().elements();
+	while (e.hasMoreElements()) {
+		dbTemplateInstance = (DBTemplateInstance)(e.nextElement());
+		VDBTemplate t = (VDBTemplate)vdb.getTemplates().get(dbTemplateInstance.getTemplateClassID());
+		if (t==null)
+		{
+			Console.getInstance().println(
+				"Template instance "+dbTemplateInstance.getTemplateID()+" cannot be created since "
+					+ dbTemplateInstance.getTemplateClassID()
+					+ " does not exist - this definition will be ignored.");
+			continue;
+		}
+		VDBTemplateInstance vti = new VDBTemplateInstance(t);
+		vti.setProperties(dbTemplateInstance.getProperties());
+			
+		vti.setInputs(generateTemplateInstanceIOFields(t.getInputs()));
+		vti.setOutputs(generateTemplateInstanceIOFields(t.getOutputs()));
+	
+		vdb.addTemplateInstance(vti);
+	}
+}
+
+/**
+ * 
+ */
+private static Hashtable generateTemplateInstanceIOFields(Hashtable table)
+{
+	Hashtable ios = new Hashtable();
+	Enumeration keys = table.keys();
+	while (keys.hasMoreElements())
+	{
+		String key = keys.nextElement().toString();
+		VDBFieldData field = (VDBFieldData)table.get(key);
+		ios.put(key, new VDBTemplateField(key, field));
+	}
+	return ios;
+}
+
+
+/**
+ * 
+ */
+public static void extractTemplates(DBDData dbd, DBData db, VDBData vdb)
+{
+	Enumeration e;
+	DBTemplate dbTemplate;
+	e = db.getTemplates().elements();
+	while (e.hasMoreElements()) {
+		dbTemplate = (DBTemplate)(e.nextElement());
+		
+		VDBTemplate vt = new VDBTemplate(dbTemplate.getId(), dbTemplate.getFileName());
+		vt.setDescription(dbTemplate.getDescription());
+		
+		// generate vt.group / VDB data
+		Group root = Group.getRoot();
+	
+		try
+		{
+		
+			vt.setGroup(new Group(null));
+			vt.getGroup().setAbsoluteName("");
+		
+			Group.setRoot(vt.getGroup());
+		
+			VDBData vdbData = VDBData.generateVDBData(dbd, dbTemplate.getData());
+			DrawingSurface.applyVisualData(false, vt.getGroup(), dbTemplate.getData(), vdbData);
+			vt.getGroup().unconditionalValidateSubObjects(false);
+			
+			vt.setInputs(generateTemplateIOFields(dbTemplate, dbTemplate.getInputs(), "input"));
+			vt.setOutputs(generateTemplateIOFields(dbTemplate, dbTemplate.getOutputs(), "output"));
+			
+			vdb.addTemplate(vt);
+		}
+		catch (Exception ex)
+		{
+			Console.getInstance().println();
+			Console.getInstance().println("Exception caught while generating '"+dbTemplate.getId()+"' template.");
+			Console.getInstance().println(ex);
+			Console.getInstance().println();
+		}
+		finally
+		{
+			Group.setRoot(root); 
+		}
+	}
+
+
+}
+/**
+ * 
+ */
+private static Hashtable generateTemplateIOFields(DBTemplate dbTemplate, Hashtable table, String ioType)
+{
+	Hashtable ios = new Hashtable();		
+	Enumeration keys = table.keys();
+	while (keys.hasMoreElements())
+	{
+		String key = keys.nextElement().toString();
+		String field = table.get(key).toString();
+		
+		String recordName, fieldName;
+		int pos = field.lastIndexOf(Constants.FIELD_SEPARATOR);
+		if (pos>0)
+		{
+			recordName = field.substring(0, pos);
+			fieldName = field.substring(pos + 1);
+		}
+		else
+		{
+			recordName = field;
+			fieldName = "VAL";		/// always full specification required !!!
+			Console.getInstance().println("Incomplete '"+dbTemplate.getId()+"' template "+ioType+" specification - field '"+field+"'. Defaulting to VAL field.");
+		}	
+		Record rec = (Record)Group.getRoot().findObject(recordName, true);
+		if (rec!=null)
+		{
+			VDBFieldData fld = (VDBFieldData)rec.getRecordData().getField(fieldName);	 
+			if (fld!=null)
+			{
+				//System.out.println("Adding "+ioType+": "+key+" = "+field);
+				ios.put(key, fld);
+			}
+			else
+				Console.getInstance().println("Invalid '"+dbTemplate.getId()+"' template "+ioType+" specification - field '"+field+"', record field '"+fieldName+"' does not exist. Skipping "+ioType+".");
+		}
+		else
+			Console.getInstance().println("Invalid '"+dbTemplate.getId()+"' template "+ioType+" specification - field '"+field+"', record '"+recordName+"' does not exist. Skipping "+ioType+".");
+		
+	}
+	return ios;
+}
+
 /**
  * This method was created in VisualAge.
  * @return com.cosylab.vdct.vdb.VDBFieldData
@@ -347,4 +527,39 @@ public static VDBRecordData morphVDBRecordData(DBDData dbd, VDBRecordData source
 public void removeRecord(VDBRecordData record) {
 	records.removeElement(record);
 }
+/**
+ * Returns the templateInstances.
+ * @return Vector
+ */
+public Vector getTemplateInstances()
+{
+	return templateInstances;
+}
+
+/**
+ * Returns the templates.
+ * @return Hashtable
+ */
+public Hashtable getTemplates()
+{
+	return templates;
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (10.1.2001 14:44:44)
+ * @param record com.cosylab.vdct.vdb.VDBTemplate
+ */
+public void removeTemplate(VDBTemplate template) {
+	templates.remove(template);
+}
+/**
+ * Insert the method's description here.
+ * Creation date: (10.1.2001 14:44:44)
+ * @param record com.cosylab.vdct.vdb.VDBTemplateInstance
+ */
+public void removeTemplateInstance(VDBTemplateInstance templateInstance) {
+	templateInstances.remove(templateInstance);
+}
+
 }

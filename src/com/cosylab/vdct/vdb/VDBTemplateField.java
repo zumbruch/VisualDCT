@@ -36,6 +36,25 @@ public class VDBTemplateField extends VDBFieldData
 	String alias;
 	
 	/**
+	 */
+	public VDBTemplateField(String alias, VDBFieldData field)
+	{
+		super();
+		this.alias=alias;
+		
+		// copy (is this good - what about ...?!!!)
+		this.setType(field.getType());
+		this.setName(field.getName());
+		this.setValue(field.getInit_value());
+		this.setInit_value(field.getInit_value());
+		this.setGUI_type(field.getGUI_type());
+		this.setDbdData(field.getDbdData());
+		this.setComment(field.getComment());
+		this.setVisibility(field.getVisibility());
+		this.setRecord(field.getRecord());
+	}
+	
+	/**
 	 * Insert the method's description here.
 	 * Creation date: (1.2.2001 12:11:29)
 	 * @return java.lang.String
