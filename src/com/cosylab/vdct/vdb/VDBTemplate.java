@@ -28,7 +28,7 @@ package com.cosylab.vdct.vdb;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.util.ArrayList;
+import java.util.Hashtable;
 import com.cosylab.vdct.graphics.objects.Group;
 
 /**
@@ -42,16 +42,20 @@ import com.cosylab.vdct.graphics.objects.Group;
 public class VDBTemplate
 {
 	
+	String id = null;
+	String fileName = null;
 	String description = null;
-	ArrayList inputs = null;
-	ArrayList outputs = null;
+	Hashtable inputs = null;
+	Hashtable outputs = null;
 	Group group = null;
 	
 	/**
 	 * Constructor for VDBTemplate.
 	 */
-	public VDBTemplate()
+	public VDBTemplate(String id, String fileName)
 	{
+		this.id = id;
+		this.fileName = fileName;
 	}
 
 	/**
@@ -74,18 +78,18 @@ public class VDBTemplate
 
 	/**
 	 * Returns the inputs.
-	 * @return ArrayList
+	 * @return Hashtable
 	 */
-	public ArrayList getInputs()
+	public Hashtable getInputs()
 	{
 		return inputs;
 	}
 
 	/**
 	 * Returns the outputs.
-	 * @return ArrayList
+	 * @return Hashtable
 	 */
-	public ArrayList getOutputs()
+	public Hashtable getOutputs()
 	{
 		return outputs;
 	}
@@ -112,7 +116,7 @@ public class VDBTemplate
 	 * Sets the inputs.
 	 * @param inputs The inputs to set
 	 */
-	public void setInputs(ArrayList inputs)
+	public void setInputs(Hashtable inputs)
 	{
 		this.inputs = inputs;
 	}
@@ -121,9 +125,27 @@ public class VDBTemplate
 	 * Sets the outputs.
 	 * @param outputs The outputs to set
 	 */
-	public void setOutputs(ArrayList outputs)
+	public void setOutputs(Hashtable outputs)
 	{
 		this.outputs = outputs;
+	}
+
+	/**
+	 * Returns the fileName.
+	 * @return String
+	 */
+	public String getFileName()
+	{
+		return fileName;
+	}
+
+	/**
+	 * Returns the id.
+	 * @return String
+	 */
+	public String getId()
+	{
+		return id;
 	}
 
 }

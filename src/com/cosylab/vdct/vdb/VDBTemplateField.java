@@ -33,6 +33,8 @@ package com.cosylab.vdct.vdb;
  */
 public class VDBTemplateField extends VDBFieldData
 {
+	String alias;
+	
 	/**
 	 * Insert the method's description here.
 	 * Creation date: (1.2.2001 12:11:29)
@@ -41,4 +43,22 @@ public class VDBTemplateField extends VDBFieldData
 	public String getFullName() {
 		return super.getFullName();
 	}
+	/**
+	 * Returns the alias.
+	 * @return String
+	 */
+	public String getAlias()
+	{
+		return alias;
+	}
+
+	/**
+	 * Sets the alias.
+	 * @param alias The alias to set
+	 */
+	public void setAlias(String alias)
+	{
+		this.alias = alias;
+	}
+
 }
