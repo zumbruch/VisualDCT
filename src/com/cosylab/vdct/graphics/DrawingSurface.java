@@ -572,7 +572,12 @@ public void linkCommand(LinkManagerObject linkManager, VDBFieldData field) {
 	if (tmplink==null) {
 		// start linking
 		tmplink = field;
-		ViewState.getInstance().setAsBlinking(linkManager);
+		
+		Field fld = (Field)DataProvider.getInstance().getLookupTable().get(field.getFullName());
+		if (fld!=null)
+			ViewState.getInstance().setAsBlinking(fld);
+		else
+			ViewState.getInstance().setAsBlinking(linkManager);
 		hiliter = new Hiliter(1000);
 		hiliter.start();
 	}

@@ -41,9 +41,9 @@ import com.sun.jndi.ldap.ManageReferralControl;
  */
 public class VDBTemplateField extends VDBFieldData implements Descriptable
 {
-	String alias;
-	String description = null;
-	VDBTemplateInstance templateInstance = null;
+	public String alias;
+	public String description = null;
+	public VDBTemplateInstance templateInstance = null;
 	
 	/**
 	 */
@@ -202,11 +202,14 @@ public class VDBTemplateField extends VDBFieldData implements Descriptable
 		// field changed
 		Template visualTemplate = (Template)Group.getRoot().findObject(templateInstance.getName(), true);
 		if (visualTemplate!=null)
+		{
 			if (visualTemplate.manageLink(this)) {
 				visualTemplate.unconditionalValidation();
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
-		
+			InspectorManager.getInstance().updateProperty(visualTemplate, this);
+		}
+
 		// !!!! does not work since VDBRecordData.getDTYPLinkType() does not work for templates
 		/*	
 		if (getRecord()!=null)

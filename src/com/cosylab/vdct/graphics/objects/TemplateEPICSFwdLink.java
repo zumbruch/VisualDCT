@@ -1,7 +1,5 @@
 package com.cosylab.vdct.graphics.objects;
 
-import com.cosylab.vdct.vdb.VDBTemplateField;
-
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
  * All rights reserved.
@@ -30,12 +28,22 @@ import com.cosylab.vdct.vdb.VDBTemplateField;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.awt.Color;
+import java.awt.Graphics;
+
+import com.cosylab.vdct.Constants;
+import com.cosylab.vdct.DataProvider;
+import com.cosylab.vdct.graphics.ViewState;
+import com.cosylab.vdct.vdb.VDBTemplateField;
+
 /**
  * Insert the type's description here.
  * Creation date: (29.1.2001 21:26:39)
  * @author Matej Sekoranja
  */
-public class TemplateEPICSFwdLink extends EPICSFwdLink {
+public class TemplateEPICSFwdLink extends EPICSFwdLink implements TemplateEPICSLink {
+
+	private String lastUpdatedFullName = null;
 
 /**
  * EPICSFWDLink constructor comment.
@@ -44,7 +52,40 @@ public class TemplateEPICSFwdLink extends EPICSFwdLink {
  */
 public TemplateEPICSFwdLink(ContainerObject parent, com.cosylab.vdct.vdb.VDBFieldData fieldData) {
 	super(parent, fieldData);
+	setWidth(Constants.TEMPLATE_WIDTH/2);
+
+	updateTemplateLink();
 }
+
+/**
+ * Insert the method's description here.
+ * Creation date: (30.1.2001 16:58:58)
+ * @return boolean
+ */
+public void updateTemplateLink()
+{
+	if (lastUpdatedFullName!=null && getFieldData().getFullName().equals(lastUpdatedFullName))
+		return;
+		
+	// remove old one		
+	if (lastUpdatedFullName!=null)
+		DataProvider.getInstance().getLookupTable().remove(lastUpdatedFullName);
+	
+	// ups, we already got this registered
+	if (DataProvider.getInstance().getLookupTable().containsKey(getFieldData().getFullName()))
+	{
+		lastUpdatedFullName = null;
+		((LinkManagerObject)getParent()).addInvalidLink(this);
+	}
+	// everything is OK
+	else
+	{
+		lastUpdatedFullName = getFieldData().getFullName();
+		DataProvider.getInstance().getLookupTable().put(lastUpdatedFullName, this);
+		((LinkManagerObject)getParent()).removeInvalidLink(this);
+	}
+}
+
 
 
 /**
@@ -62,6 +103,34 @@ public void rotate() {
  */
 public String getLabel() {
 	return ((VDBTemplateField)getFieldData()).getAlias();
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (29.1.2001 22:10:37)
+ * @param g java.awt.Graphics
+ * @param hilited boolean
+ */
+protected void draw(Graphics g, boolean hilited) {
+	super.draw(g, hilited);
+
+	if (lastUpdatedFullName==null)
+	{
+		ViewState view = ViewState.getInstance();
+		int rrx = getRx()-view.getRx();
+		int rry = getRy()-view.getRy();
+		int rwidth = getRwidth();
+		int rheight = getRheight();
+			
+		// clipping
+		if ((rrx>view.getViewWidth()) || (rry>view.getViewHeight())
+		    || ((rrx+rwidth)<0) || ((rry+rheight)<0)) return;
+	
+		g.setColor(Color.red);
+
+		g.drawLine(rrx, rry, rrx+rwidth, rry+rheight);
+		g.drawLine(rrx+rwidth, rry, rrx, rry+rheight);
+	}
 }
 
 

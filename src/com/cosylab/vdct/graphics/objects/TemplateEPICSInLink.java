@@ -28,6 +28,8 @@ package com.cosylab.vdct.graphics.objects;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -38,6 +40,7 @@ import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.DataProvider;
 import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.events.commands.LinkCommand;
+import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.vdb.VDBTemplateField;
 
 /**
@@ -45,10 +48,11 @@ import com.cosylab.vdct.vdb.VDBTemplateField;
  * Creation date: (29.1.2001 21:34:08)
  * @author Matej Sekoranja
  */
-public class TemplateEPICSInLink extends EPICSInLink {
+public class TemplateEPICSInLink extends EPICSInLink implements TemplateEPICSLink {
 
 	private static final String linkString = "Link";
-
+	private String lastUpdatedFullName = null;
+	
 /**
  * EPICSInLink constructor comment.
  * @param parent com.cosylab.vdct.graphics.objects.ContainerObject
@@ -58,8 +62,36 @@ public TemplateEPICSInLink(ContainerObject parent, com.cosylab.vdct.vdb.VDBField
 	super(parent, fieldData);
 	setWidth(Constants.TEMPLATE_WIDTH/2);
 
-	// destroy !!!!
-	DataProvider.getInstance().getLookupTable().put(fieldData.getFullName(), this);
+	updateTemplateLink();
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (30.1.2001 16:58:58)
+ * @return boolean
+ */
+public void updateTemplateLink()
+{
+	if (lastUpdatedFullName!=null && getFieldData().getFullName().equals(lastUpdatedFullName))
+		return;
+		
+	// remove old one		
+	if (lastUpdatedFullName!=null)
+		DataProvider.getInstance().getLookupTable().remove(lastUpdatedFullName);
+	
+	// ups, we already got this registered
+	if (DataProvider.getInstance().getLookupTable().containsKey(getFieldData().getFullName()))
+	{
+		lastUpdatedFullName = null;
+		((LinkManagerObject)getParent()).addInvalidLink(this);
+	}
+	// everything is OK
+	else
+	{
+		lastUpdatedFullName = getFieldData().getFullName();
+		DataProvider.getInstance().getLookupTable().put(lastUpdatedFullName, this);
+		((LinkManagerObject)getParent()).removeInvalidLink(this);
+	}
 }
 
 /**
@@ -131,6 +163,35 @@ public java.util.Vector getItems() {
 	}
 
 	return items;
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (29.1.2001 22:10:37)
+ * @param g java.awt.Graphics
+ * @param hilited boolean
+ */
+protected void draw(Graphics g, boolean hilited) {
+	super.draw(g, hilited);
+
+	if (lastUpdatedFullName==null)
+	{
+		ViewState
+		 view = ViewState.getInstance();
+		int rrx = getRx()-view.getRx();
+		int rry = getRy()-view.getRy();
+		int rwidth = getRwidth();
+		int rheight = getRheight();
+			
+		// clipping
+		if ((rrx>view.getViewWidth()) || (rry>view.getViewHeight())
+		    || ((rrx+rwidth)<0) || ((rry+rheight)<0)) return;
+	
+		g.setColor(Color.red);
+
+		g.drawLine(rrx, rry, rrx+rwidth, rry+rheight);
+		g.drawLine(rrx+rwidth, rry, rrx, rry+rheight);
+	}
 }
 
 

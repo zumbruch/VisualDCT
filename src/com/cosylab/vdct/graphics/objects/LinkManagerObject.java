@@ -79,6 +79,18 @@ public LinkManagerObject(ContainerObject parent)
 
 /**
  */
+public void addInvalidLink(EPICSLink field)
+{
+}
+
+/**
+ */
+public void removeInvalidLink(EPICSLink field)
+{
+}
+
+/**
+ */
 public abstract VDBFieldData getField(String name);
 
 /**
@@ -131,43 +143,18 @@ public void fixEPICSOutLinks(Enumeration e, String prevGroup, String group) {
 public void fixLinks() {
 
 	Object unknownField;
-	EPICSLinkOut source;
 	EPICSVarLink varlink;
-	String targetName;
 	
 	Enumeration e = getSubObjectsV().elements();
 	while (e.hasMoreElements())
 	{
-		unknownField = e.nextElement();
+			unknownField = e.nextElement();
 			
 			// go and find source
 			if (unknownField instanceof EPICSVarLink)
 			{
 				varlink = (EPICSVarLink)unknownField;
-				targetName = varlink.getFieldData().getFullName();
-
-				
-				Enumeration e2 = varlink.getStartPoints().elements();
-				while (e2.hasMoreElements())
-				{
-					unknownField = e2.nextElement();
-					if (unknownField instanceof EPICSLinkOut) 
-						source = (EPICSLinkOut)unknownField;  
-					else
-						continue;	// nothing to fix
-
-		
-					// now I got source and target, compare values
-					String oldTarget = LinkProperties.getTarget(source.getFieldData());
-					if (!oldTarget.equalsIgnoreCase(targetName))
-					{
-						// not the same, fix it gently as a doctor :)
-						String value = source.getFieldData().getValue();
-						value = targetName + com.cosylab.vdct.util.StringUtils.removeBegining(value, oldTarget);
-						source.getFieldData().setValueSilently(value);
-						source.fixLinkProperties();
-					}
-				}
+				fixLink(varlink);
 			}
 
 /*
@@ -196,6 +183,34 @@ public void fixLinks() {
 			
 	}
 	
+}
+
+public static void fixLink(EPICSVarLink varlink)
+{
+	EPICSLinkOut source;
+	String targetName = varlink.getFieldData().getFullName();
+	
+	Enumeration e2 = varlink.getStartPoints().elements();
+	while (e2.hasMoreElements())
+	{
+		Object unknownField = e2.nextElement();
+		if (unknownField instanceof EPICSLinkOut) 
+			source = (EPICSLinkOut)unknownField;  
+		else
+			continue;	// nothing to fix
+	
+	
+		// now I got source and target, compare values
+		String oldTarget = LinkProperties.getTarget(source.getFieldData());
+		if (!oldTarget.equalsIgnoreCase(targetName))
+		{
+			// not the same, fix it gently as a doctor :)
+			String value = source.getFieldData().getValue();
+			value = targetName + com.cosylab.vdct.util.StringUtils.removeBegining(value, oldTarget);
+			source.getFieldData().setValueSilently(value);
+			source.fixLinkProperties();
+		}
+	}
 }
 
 /**

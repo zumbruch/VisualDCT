@@ -93,6 +93,8 @@ public class Template
 	private static GUISeparator propertiesSeparator = null;
 	private final static String fieldMaxStr = "01234567890123456789012345";
 
+	protected Vector invalidLinks = null;
+	
 	/**
 	 * Insert the method's description here.
 	 * Creation date: (21.12.2000 20:40:53)
@@ -102,6 +104,8 @@ public class Template
 	public Template(ContainerObject parent, VDBTemplateInstance templateData) {
 		super(parent);
 		this.templateData = templateData;
+
+		invalidLinks = new Vector();
 
 		setColor(Color.black);
 		setWidth(Constants.TEMPLATE_WIDTH);
@@ -133,14 +137,27 @@ public class Template
 			else if (view.isSelected(this) ||
 					 view.isBlinking(this)) g.setColor(Constants.SELECTION_COLOR);
 			else g.setColor(Constants.RECORD_COLOR);
-		
+
+			Color fillColor = g.getColor();
+					
 			g.fillRect(rrx, rry, rwidth, rheight);
+
+
 			if (!hilited) g.setColor(Constants.FRAME_COLOR);
 			else g.setColor((this==view.getHilitedObject()) ? 
 							Constants.HILITE_COLOR : Constants.FRAME_COLOR);
 	
 			g.drawRect(rrx, rry, rwidth, rheight);
 	
+			// colors
+			if (invalidLinks.size()>0)
+			{
+				if (fillColor!=Color.red)
+					g.setColor(Color.red);
+				else
+					g.setColor(Color.black);
+			}
+
 			if (getFont()!=null) {
 				g.setFont(getFont());
 				g.drawString(getLabel(), rrx+getRlabelX(), rry+getRlabelY());
@@ -164,6 +181,19 @@ public class Template
 				String val;
 				int px = rrx + rfieldLabelX;
 				int py = rry + rfieldLabelY;
+				
+		 		java.util.Iterator e = templateData.getProperties().keySet().iterator();
+				while (e.hasNext())
+				{				
+					String name = e.next().toString();
+					val = name + "=" + templateData.getProperties().get(name).toString();
+					while ((fm.stringWidth(val) + ox) > rwidth)
+						val = val.substring(0, val.length() - 2);
+					g.drawString(val, px, py);
+					py += rfieldRowHeight;
+				}
+
+/*
 				Enumeration e = templateData.getProperties().keys();
 				while (e.hasMoreElements()) {
 					String name = e.nextElement().toString();
@@ -173,6 +203,9 @@ public class Template
 					g.drawString(val, px, py);
 					py += rfieldRowHeight;
 				}
+
+ */ 
+ 
 			}
 
 		}
@@ -439,13 +472,21 @@ public class Template
 		
 		items.addElement(getPropertiesSeparator());
 
-		e = templateData.getProperties().keys();
+/*
+  		e = templateData.getProperties().keys();
 		while (e.hasMoreElements())
 		{
 			String name = e.nextElement().toString();
 			items.addElement(new MonitoredProperty(name, (String)templateData.getProperties().get(name), this));
 		}
-		
+*/		
+  		java.util.Iterator i = templateData.getProperties().keySet().iterator();
+		while (i.hasNext())
+		{
+			String name = i.next().toString();
+			items.addElement(new MonitoredProperty(name, (String)templateData.getProperties().get(name), this));
+		}
+
 		String addString = "Add property...";
 		items.addElement(new MonitoredActionProperty(addString, this));
 	
@@ -669,6 +710,21 @@ private void validateFields() {
 	
 }
 
+/**
+ * Insert the method's description here.
+ * Creation date: (26.1.2001 17:19:47)
+ */
+private void updateTemplateFields() {
+
+	Enumeration e = subObjectsV.elements();
+	Object obj;
+	while (e.hasMoreElements()) {
+		obj = e.nextElement();
+		if (obj instanceof TemplateEPICSLink)
+			((TemplateEPICSLink)obj).updateTemplateLink();
+	}
+	
+}
 
 /**
  * Insert the method's description here.
@@ -782,19 +838,20 @@ public void addProperty()
 			                           type );
 		if (reply!=null)
 		{
-			// other templates check
 			if (!templateData.getProperties().containsKey(reply))
+			{
 				templateData.getProperties().put(reply, nullString);
+				updateTemplateFields();
+				InspectorManager.getInstance().updateObject(this);
+				unconditionalValidation();
+				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+			}
 			else
 			{
 				message = "Property '"+reply+"' already exists. Enter other name:";
 				type = JOptionPane.WARNING_MESSAGE;
 				continue;
 			}
-		
-			InspectorManager.getInstance().updateObject(this);
-			unconditionalValidation();
-			com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 		}
 		
 		break;
@@ -808,6 +865,7 @@ public void propertyChanged(MonitoredProperty property)
 {
 	templateData.getProperties().put(property.getName(), property.getValue());
 
+	updateTemplateFields();
 	InspectorManager.getInstance().updateProperty(this, null);
 	unconditionalValidation();
 	com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
@@ -819,7 +877,8 @@ public void propertyChanged(MonitoredProperty property)
 public void removeProperty(MonitoredProperty property)
 {
 	templateData.getProperties().remove(property.getName());
-
+	
+	updateTemplateFields();
 	InspectorManager.getInstance().updateObject(this);
 	unconditionalValidation();
 	com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
@@ -841,11 +900,15 @@ public void renameProperty(MonitoredProperty property)
 			                            type);
 		if (reply!=null)
 		{
-			// other templates check
 			if (!templateData.getProperties().containsKey(reply))
 			{
 				Object value = templateData.getProperties().remove(property.getName());
 				templateData.getProperties().put(reply, value);
+
+				updateTemplateFields();
+				InspectorManager.getInstance().updateObject(this);
+				unconditionalValidation();
+				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
 			else
 			{
@@ -854,13 +917,25 @@ public void renameProperty(MonitoredProperty property)
 				continue;
 			}
 		
-			InspectorManager.getInstance().updateObject(this);
-			unconditionalValidation();
-			com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 		}
 		
 		break;
 	}
+}
+
+/**
+ */
+public void addInvalidLink(EPICSLink field)
+{
+	if (!invalidLinks.contains(field))
+		invalidLinks.addElement(field);
+}
+
+/**
+ */
+public void removeInvalidLink(EPICSLink field)
+{
+	invalidLinks.remove(field);
 }
 
 }

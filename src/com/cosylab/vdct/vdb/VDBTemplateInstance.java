@@ -29,7 +29,9 @@ package com.cosylab.vdct.vdb;
  */
 
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.TreeMap;
 
 /**
  * @author Matej
@@ -38,7 +40,8 @@ public class VDBTemplateInstance
 {
 	String name = null;
 	VDBTemplate template = null;
-	Hashtable properties = null;
+//	Hashtable properties = null;
+	TreeMap properties = null;
 	Hashtable inputs = null;
 	Hashtable outputs = null;
 	
@@ -72,7 +75,8 @@ public class VDBTemplateInstance
 	 * Returns the properties.
 	 * @return Hashtable
 	 */
-	public Hashtable getProperties()
+//	public Hashtable getProperties()
+	public TreeMap getProperties()
 	{
 		return properties;
 	}
@@ -110,7 +114,8 @@ public class VDBTemplateInstance
 	 */
 	public void setProperties(Hashtable properties)
 	{
-		this.properties = properties;
+//		this.properties = properties;
+		this.properties = new TreeMap(properties);
 	}
 
 	/**
@@ -119,12 +124,16 @@ public class VDBTemplateInstance
 	 * @param properties The properties to use
 	 * @return String  
 	 */
-	public static String applyProperties(String s, Hashtable properties)
+//	public static String applyProperties(String s, Hashtable properties)
+	public static String applyProperties(String s, TreeMap properties)
 	{
-		Enumeration e = properties.keys();
-		while (s.indexOf('$')>=0 && e.hasMoreElements())
+		java.util.Iterator e = properties.keySet().iterator();
+//		Enumeration e = properties.keys();
+//		while (s.indexOf('$')>=0 && e.hasMoreElements())
+		while (s.indexOf('$')>=0 && e.hasNext())
 		{
-			String key = e.nextElement().toString();
+			String key = e.next().toString();
+//			String key = e.nextElement().toString();
 			String val = properties.get(key).toString();
 			s = s.replaceAll("\\$\\("+key+"\\)", val);
 			s = s.replaceAll("\\$\\{"+key+"\\}", val);

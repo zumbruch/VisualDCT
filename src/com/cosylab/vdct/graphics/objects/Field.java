@@ -81,7 +81,7 @@ protected void draw(Graphics g, boolean hilited) {
 
 	if (!hilited) g.setColor(Constants.RECORD_COLOR);
 	else if (view.isPicked(this)) g.setColor(Constants.PICK_COLOR);
-	else if (view.isSelected(this)) g.setColor(Constants.SELECTION_COLOR);
+	else if (view.isSelected(this) || view.isBlinking(this)) g.setColor(Constants.SELECTION_COLOR);
 	else g.setColor(Constants.RECORD_COLOR);
 	
 	g.fillRect(rrx, rry, rwidth, rheight);
