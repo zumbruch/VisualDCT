@@ -225,11 +225,13 @@ public void destroy() {
 public void disconnect(Linkable disconnector) {
 	if (!disconnected && outlinks.contains(disconnector)) {
 		outlinks.removeElement(disconnector);
-		// cannot be destoryed by removing links
-		//if (outlinks.size()==0) {
-		//	destroy();
-		//}
-		//else
+		
+		if (outlinks.size()==0) {
+		 	// cannot be destoryed by removing links
+			//destroy();
+			disconnected = true;
+		}
+		else
 		 if (outlinks.size()==1)
 			if (outlinks.firstElement() instanceof VisibleObject)
 				setColor(((VisibleObject)outlinks.firstElement()).getColor());
@@ -300,7 +302,31 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 		g.setColor(drawColor);
 		g.drawPolygon(poly);
 		
-		g.drawOval(rrx-r, rry+(rheight-r)/2, r, r);
+		if (rightSide)
+		{
+			int xx = rrx-r;
+			g.drawOval(xx, rry+(rheight-r)/2, r, r);
+
+			// draw tail if there are any links
+			if (!disconnected)
+			{
+				int yy = rry+rheight/2;
+				g.drawLine(xx, yy, xx-r, yy);
+			}
+		}
+		else
+		{
+			int xx = rrx+rwidth;
+			g.drawOval(xx, rry+(rheight-r)/2, r, r);
+
+			// draw tail if there are any links
+			if (!disconnected)
+			{
+				int yy = rry+rheight/2;
+				xx += r;
+				g.drawLine(xx, yy, xx+r, yy);
+			}
+		}
 
 		if (getFont()!=null) {
 			//g.setColor(drawColor);
@@ -423,15 +449,13 @@ public String getLayerID() {
  * @return int
  */
 public int getInX() {
-	// ??? what is nicer
-	//boolean right = !isRight();
-	
+
 	boolean right = isRight();
 
 	if (right)
-		return getX()-r;
+		return getX()-Constants.LINK_RADIOUS*4;
 	else 
-		return getX()+getWidth()+r;
+		return getX()+getWidth()+Constants.LINK_RADIOUS*4;
 }
 /**
  * Insert the method's description here.
@@ -784,7 +808,7 @@ public boolean isRight() {
 	else {
 		OutLink first = (OutLink)outlinks.firstElement();
 		if (first.getLayerID().equals(getLayerID()))
-			return (first.getOutX()>(getX()+getWidth()/2));
+			return (first.getOutX()<(getX()+getWidth()/2));
 		else
 			return true;
 	}
