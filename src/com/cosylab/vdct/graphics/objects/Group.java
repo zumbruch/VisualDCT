@@ -1464,25 +1464,23 @@ private static void writeUsedDBDs(File dbFile, DataOutputStream stream) throws I
 	 Enumeration edbd = DataProvider.getInstance().getDBDs().elements();
 	 while (edbd.hasMoreElements())
 	 {
-	 		String file = ((File)edbd.nextElement()).getAbsolutePath();
-	 		file = file.replace('\\', '/');
-/*
-	 		// make it relative to DB
-	 		int common = 0;
-	 		int pos = file.indexOf('/');
-	 		while (pos!=-1)
-		 		if (file.regionMatches(0, dbFilePath, 0, pos))
-		 		{
-		 			common = pos;
-		 			pos = file.indexOf('/', pos+1);
-		 		}
-		 		else
-		 			break;
+	 		File dbdFile = (File)edbd.nextElement(); 
+			try
+			{
+				// make path relative to <dbFile> path
+				dbdFile = PathSpecification.getRelativeName(dbdFile, dbFile);
+			}
+			catch (Exception ex)
+			{
+				// in case of any exception
+				// do not bail-out, use given dbdFile path
+				// and print stack trace
+				ex.printStackTrace();
+			}
 
-			// do not remove first slash
-	 		if (common>0) common++;
-	 		file = file.substring(common);	
-*/
+	 		String file = dbdFile.toString();
+	 		file = file.replace('\\', '/');
+
 	 		// replace back-slash separator
 			stream.writeBytes(DBResolver.DBD_ENTRY+file+"\")\n");
 	 }

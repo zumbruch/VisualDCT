@@ -1431,6 +1431,8 @@ public boolean open(File file) throws IOException {
  */
 public void checkForIncodedDBDs(File file) throws IOException
 {
+	// get directory
+	File relativeTo = file.getParentFile();
 	
 	Console.getInstance().println();
 	
@@ -1440,6 +1442,22 @@ public void checkForIncodedDBDs(File file) throws IOException
 	for (int i=0; i<dbd.length; i++)
 	{
 		File f = new File(dbd[i]);
+		
+		// if not absolute, make relatove to DB file
+		if (!f.isAbsolute())
+			f = new File(relativeTo, dbd[i]);
+			
+		// try to cannonize to make if more beautiful printout
+		try
+		{
+			f = f.getCanonicalFile();
+		}
+		catch (IOException ioe)
+		{
+			System.out.println("Failed to cannonize '"+f.toString()+"'. Exception: ");
+			ioe.printStackTrace();
+		}
+
 		if (f.exists())
 		{
 			// skip if already loaded
