@@ -31,6 +31,8 @@ package com.cosylab.vdct.graphics.objects;
 import java.awt.*;
 import java.io.*;
 import java.util.*;
+
+import com.cosylab.vdct.Console;
 import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.DataProvider;
 import com.cosylab.vdct.Version;
@@ -1177,7 +1179,7 @@ public static void writeObjects(Vector elements, java.io.DataOutputStream file, 
 	 		}
 		else if (!export && obj instanceof DBTemplateEntry)
 			{
-				writeTemplateData(file);
+				writeTemplateData(file, namer);
 				// !!! TBD multiple templates support
 			}	 		
 		else if (obj instanceof DBDataEntry)
@@ -1500,7 +1502,7 @@ private static void writeUsedDBDs(File dbFile, DataOutputStream stream) throws I
 /**
  * Insert the method's description here.
  */
-private static void writeTemplateData(DataOutputStream stream) throws IOException
+private static void writeTemplateData(DataOutputStream stream, NameManipulator namer) throws IOException
 {
 	final String nl = "\n";
 	
@@ -1527,7 +1529,7 @@ private static void writeTemplateData(DataOutputStream stream) throws IOExceptio
 	// template start
 	stream.writeBytes(nl+DBResolver.TEMPLATE+"(");
 	
-	if (data.getDescription()!=null)
+	if (data.getRealDescription()!=null && data.getRealDescription().length()>0)
 		stream.writeBytes(quote + data.getRealDescription() + quote);
 	
 	stream.writeBytes(") {"+nl);
@@ -1550,6 +1552,65 @@ private static void writeTemplateData(DataOutputStream stream) throws IOExceptio
 		stream.writeBytes(ending);
 	}	
 	
+	boolean first = true;
+
+	final String portPrefix = "  #! ";
+	final String portPostfix = "(";
+	final String NULL = "null";
+	final String justComma = ",";
+	
+	//
+	// write port visual data
+	//
+	i = data.getPortsV().iterator();
+	while (i.hasNext())
+	{
+		VDBPort port = (VDBPort)i.next();
+	
+		Port visiblePort = port.getVisibleObject();
+		if (visiblePort==null)
+			continue;
+			
+		// separate visual data
+		if (first)
+		{
+			stream.writeBytes(nl); first = false;
+		}
+
+		switch (visiblePort.getMode())
+		{
+			case Port.CONSTANT_PORT_MODE:
+				stream.writeBytes(portPrefix);
+				stream.writeBytes(DBResolver.VDCT_CONSTANT_PORT);
+				break;
+			case Port.INPUT_PORT_MODE:
+				stream.writeBytes(portPrefix);
+				stream.writeBytes(DBResolver.VDCT_INPUT_PORT);
+				break;
+			case Port.OUTPUT_PORT_MODE:
+				stream.writeBytes(portPrefix);
+				stream.writeBytes(DBResolver.VDCT_OUTPUT_PORT);
+				break;
+			default:
+				// this should never happen
+				Console.getInstance().println("Warning: unknown port type for port '"+port.getName()+"'. Skipping visual definition...");
+				continue;
+		}
+
+		stream.writeBytes(portPostfix);
+		
+		String target = NULL;
+		if (visiblePort.getInput()!=null)
+			target = namer.getResolvedName(visiblePort.getInput().getID());
+		
+		stream.writeBytes(
+			visiblePort.getName() +
+			justComma + StringUtils.quoteIfMacro(target) +
+			justComma + visiblePort.getX() + justComma + visiblePort.getY() + 
+			justComma + StringUtils.color2string(visiblePort.getColor()));
+		stream.writeBytes(ending);
+	}	
+
 	// template end
 	stream.writeBytes("}"+nl);
 

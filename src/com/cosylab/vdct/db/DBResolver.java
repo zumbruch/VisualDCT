@@ -90,6 +90,13 @@ public class DBResolver {
 	public static final String VDCTVISIBILITY = "Visibility";
 	public static final String VDCTCONNECTOR = "Connector";
 
+	// used format #! ConstantPort(portname, inLinkID, xpos, ypos, color)
+	// used format #! InputPort(portname, inLinkID, xpos, ypos, color)
+	// used format #! OutputPort(portname, inLinkID, xpos, ypos, color)
+	public static final String VDCT_CONSTANT_PORT = "ConstantPort";
+	public static final String VDCT_INPUT_PORT = "InputPort";
+	public static final String VDCT_OUTPUT_PORT = "OutputPort";
+
 	// used format #! Line(name, xpos, ypos, xpos2, ypos2, dashed, startArrow, endArrow, color)
 	// used format #! Box(name, xpos, ypos, xpos2, ypos2, dashed, color)
 	// used format #! TextBox(name, xpos, ypos, xpos2, ypos2, border, fontFamilyName, fontSize, fontStyle, color, "description")

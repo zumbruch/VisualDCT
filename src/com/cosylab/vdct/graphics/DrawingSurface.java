@@ -672,6 +672,13 @@ public void mouseClicked(MouseEvent e) {
 						return;
 					//}
 				}
+				// support port -> EPICSLinkOut
+				else if (tmplink instanceof VDBPort && hilited instanceof EPICSLinkOutIn) {
+						EPICSLinkOutIn link = (EPICSLinkOutIn)hilited;
+						linkCommand((LinkManagerObject)link.getParent(), link.getFieldData());
+						return;
+					//}
+				}
 			}
 			
 			if (e.isControlDown() || (e.getClickCount()==1)) {
@@ -1189,7 +1196,9 @@ public void mousePressed(MouseEvent e) {
 
 				// linking support
 				if (hilitedObject instanceof LinkManagerObject) {
-					((LinkManagerObject)hilitedObject).setTarget((tmplink!=null));
+					//((LinkManagerObject)hilitedObject).setTarget((tmplink!=null));
+					// show all for VBDPorts
+					((LinkManagerObject)hilitedObject).setTarget((tmplink!=null) && !(tmplink instanceof VDBPort));
 				}
 				
 				PopUpMenu.getInstance().show(

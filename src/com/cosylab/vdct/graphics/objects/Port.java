@@ -167,6 +167,8 @@ public Port(VDBPort data, ContainerObject parent, int x, int y) {
 	int[] pts = new int[5];
 	leftPoly = new Polygon(pts, pts, 5);
 	rightPoly = new Polygon(pts, pts, 5);
+	
+	valueChanged();
 }
 /**
  * Insert the method's description here.

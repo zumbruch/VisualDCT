@@ -183,4 +183,30 @@ public abstract class EPICSLinkOutIn extends EPICSLinkOut implements MultiInLink
 			destroy();
 	}
 
+	/**
+	 * Insert the method's description here.
+	 * Creation date: (30.1.2001 16:58:58)
+	 * @return boolean
+	 */
+	public boolean isRight() {
+		// if there is a special case with ports/macros handle it
+		if ((disconnected || inlink==null ||
+			!inlink.getLayerID().equals(getLayerID())) &&
+			outlinks!=null && outlinks.size()==1) 
+		{
+				OutLink outlink = (OutLink)outlinks.firstElement();
+				if (outlink instanceof Connector) {	
+					return (outlink.getOutX()>(getX()+getWidth()/2));
+				}
+				else if (outlink instanceof VisibleObject) {			// do not cycle !!!
+					VisibleObject obj = (VisibleObject)outlink;
+					return ((obj.getX()+obj.getWidth()/2)>(getX()+getWidth()/2));
+				}
+				else 
+					return super.isRight();
+		}
+		else 
+			return super.isRight();
+	}
+
 }
