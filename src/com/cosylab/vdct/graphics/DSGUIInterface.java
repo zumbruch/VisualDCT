@@ -620,7 +620,6 @@ public void morph() {
 			cmd.execute();
 		}
 	view.deselectAll();
-	drawingSurface.getViewGroup().manageLinks(true);
 
 	drawingSurface.repaint();
 }
@@ -637,10 +636,13 @@ public void morph(java.lang.String name, java.lang.String newType) {
 			UndoManager.getInstance().startMacroAction();
 		
 			Morphable morphable = (Morphable)oldObject;
-			VisibleObject newObject = morphable.morph(newType); 
-			if (newObject != null)
+			String oldType = morphable.getType();
+			
+			if (morphable.morph(newType))
 			{	
-				view.deselectObject((VisibleObject)newObject);
+				UndoManager.getInstance().addAction(new MorphAction(morphable, oldType, newType));
+			
+				view.deselectObject((VisibleObject)oldObject);
 				drawingSurface.repaint();
 			}
 		} finally {

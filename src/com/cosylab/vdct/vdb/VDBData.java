@@ -133,7 +133,7 @@ public static VDBFieldData copyVDBFieldData(VDBFieldData sourceField) {
 public static void copyVDBFieldData(VDBFieldData sourceField, VDBFieldData targetField) {
 	targetField.setType(sourceField.getType());
 	targetField.setName(sourceField.getName());
-	targetField.setValue(sourceField.getValue());
+	targetField.setValueSilently(sourceField.getValue());
 	targetField.setInit_value(sourceField.getInit_value());
 	targetField.setGUI_type(sourceField.getGUI_type());
 	targetField.setDbdData(sourceField.getDbdData());

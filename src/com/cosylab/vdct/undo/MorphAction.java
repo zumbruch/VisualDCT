@@ -1,4 +1,4 @@
-package com.cosylab.vdct.graphics.objects;
+package com.cosylab.vdct.undo;
 
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
@@ -30,18 +30,43 @@ package com.cosylab.vdct.graphics.objects;
 
 /**
  * Insert the type's description here.
- * Creation date: (4.2.2001 21:57:00)
- * @author Matej Sekoranja
+ * Creation date: (4.5.2001 11:37:23)
+ * @author 
  */
-public interface Morphable {
+public class MorphAction extends ActionObject {
+	private com.cosylab.vdct.graphics.objects.Morphable object;
+	private String oldType;
+	private String newType;
 /**
  * Insert the method's description here.
- * Creation date: (4.2.2001 21:57:20)
- * @param newType java.lang.String
+ * Creation date: (4.5.2001 11:40:19)
+ * @param object com.cosylab.vdct.graphics.objects.Flexible
+ * @param oldName java.lang.String
+ * @param newName java.lang.String
  */
-boolean morph(String newType);
-
-String getName();
-
-String getType();
+public MorphAction(com.cosylab.vdct.graphics.objects.Morphable object, String oldType, String newType) {
+	this.object=object;
+	this.oldType=oldType;
+	this.newType=newType;
+}
+/**
+ * Insert the method's description here.
+ * Creation date: (4.5.2001 11:37:23)
+ * @return java.lang.String
+ */
+public String getDescription() {
+	return "Morph ["+object.getName()+"](\""+oldType+"\" to \""+newType+"\")";
+}
+/**
+ * This method was created in VisualAge.
+ */
+protected void redoAction() {
+	object.morph(newType);
+}
+/**
+ * This method was created in VisualAge.
+ */
+protected void undoAction() {
+	object.morph(oldType);
+}
 }
