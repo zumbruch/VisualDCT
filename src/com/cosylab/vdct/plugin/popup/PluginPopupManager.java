@@ -136,27 +136,31 @@ public Vector getAllPluginItems(Vector selectedObjects)
 	Iterator iter = list.iterator();
 	while (iter.hasNext())
 	{
-		plugin = (ContextPopupPlugin)((PluginObject)iter.next()).getPlugin();
+		PluginObject pluginObject = (PluginObject)iter.next();
+		plugin = (ContextPopupPlugin)(pluginObject).getPlugin();
 		
-		// protect yourself from buggy plugins
-		try
-		{
-			Vector pluginItems = plugin.getItems(selectedObjects);
-			if (pluginItems!=null)
+		if (pluginObject.getStatus() == PluginObject.PLUGIN_STARTED)
+		{		
+			// protect yourself from buggy plugins
+			try
 			{
-				Enumeration e = pluginItems.elements();
-				while (e.hasMoreElements())
+				Vector pluginItems = plugin.getItems(selectedObjects);
+				if (pluginItems!=null)
 				{
-					Object obj = e.nextElement();
-					if (obj instanceof JMenuItem ||
-						obj instanceof JSeparator)
-						items.addElement(obj);
+					Enumeration e = pluginItems.elements();
+					while (e.hasMoreElements())
+					{
+						Object obj = e.nextElement();
+						if (obj instanceof JMenuItem ||
+							obj instanceof JSeparator)
+							items.addElement(obj);
+					}
 				}
+			} catch (Exception e)
+			{
+				Console.getInstance().println("Exception caught when calling popup plugin '"+plugin.getName()+"'.getItems(Vector).");
+				Console.getInstance().println(e);
 			}
-		} catch (Exception e)
-		{
-			Console.getInstance().println("Exception caught when calling popup plugin '"+plugin.getName()+"'.getItems(Vector).");
-			Console.getInstance().println(e);
 		}
 	}
 
