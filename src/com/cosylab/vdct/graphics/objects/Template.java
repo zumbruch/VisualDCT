@@ -1822,6 +1822,9 @@ private Template.PopupMenuHandler createPopupmenuHandler() {
  */
 public void fieldSideChange(EPICSLink link, boolean isRight)
 {
+	if (!link.isVisible())
+		return;
+
 	if (isRight)
 	{
 		leftFields--; rightFields++;
@@ -1861,7 +1864,7 @@ public void fieldVisibilityChange(VDBFieldData fieldData, boolean newVisible)
 		else			
 			leftFields--;
 	}
-	
+
 	// manageLinks will be called later
 	if (initialized)
 	{
