@@ -119,8 +119,8 @@ public class Port extends VisibleObject implements Descriptable, Movable, OutLin
 	private static final String colorString = "Color...";
 	private static final String removeLinkString = "Remove Link";
 	private static final String startLinkingString = "Start linking...";
-	private static final String removePortString = "Remove Port";
-	private static final String removePortDefString = "Remove Port Definition";
+	private static final String removePortString = "Hide Port";
+	private static final String removePortDefString = "Remove Port";
 
 	private static final String modeString = "Port Mode";
 	private static final String constantString = "CONSTANT";

@@ -160,8 +160,8 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 	
 	private static final String newRecordString = "New record...";
 	private static final String newTemplesString = "New template instance";
-	private static final String addPortString = "Add port";
-	private static final String newPortString = "New port...";
+	private static final String addPortString = "Show port";
+	private static final String newPortString = "Create port...";
 	private static final String newMacroString = "New macro...";
 	private static final String newLineString = "New line";
 	private static final String newBoxString = "New box";
