@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.cosylab.vdct.Console;
 import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.Settings;
 import com.cosylab.vdct.util.StringUtils;
@@ -101,7 +102,7 @@ public class NamingContext {
 	 * @return
 	 */
 	public String resolveMacro(String name, String value) {
-		System.out.println("resolve macro "+name+"="+value);
+		//DebugSystem.out.println("resolve macro "+name+"="+value);
 					
 		// only macros/ports on previous level can have influence	
 		if (getParent()!=null) {
@@ -124,7 +125,7 @@ public class NamingContext {
 	 * @return
 	 */
 	public NamingContext createNamingContextFor(VDBTemplateInstance instance) {
-		System.out.println("create record namer for " +instance);
+		//DebugSystem.out.println("create record namer for " +instance);
 		
 		NamingContext rn=(NamingContext)namingContextCache.get(instance);
 		if (rn==null) {
@@ -147,7 +148,7 @@ public class NamingContext {
 	 * @return
 	 */
 	public String resolvePort(VDBPort port) {
-		System.out.println("resolve port "+port);
+		//DebugSystem.out.println("resolve port "+port);
 		
 		String target = port.getTarget();
 
@@ -202,7 +203,7 @@ public class NamingContext {
 	 * @param value
 	 */
 	public void addPort(String name, String value) {
-		System.out.println("add port "+name+"="+value);
+		//DebugSystem.out.println("add port "+name+"="+value);
 		portMap.put(name, value);
 		map.put(name, value);
 	}
@@ -213,7 +214,7 @@ public class NamingContext {
 	 * @param value
 	 */
 	public void addMacro(String name, String value) {
-		System.out.println("add macro "+name+"="+value);
+		//DebugSystem.out.println("add macro "+name+"="+value);
 		macroMap.put(name, value);
 		map.put(name,value);
 	}
@@ -225,7 +226,7 @@ public class NamingContext {
 	 * @return
 	 */
 	public String resolveLink(String target) {
-		System.out.println("resolve link "+target);
+		//DebugSystem.out.println("resolve link "+target);
 		//TODO
 		
 		String record=LinkProperties.getRecordFromString(target);
@@ -248,13 +249,14 @@ public class NamingContext {
 	 * @return
 	 */
 	public String findAndResolveMacro(String name) {
-		System.out.println("find and resolve macro "+name);
+		//DebugSystem.out.println("find and resolve macro "+name);
 		
 		String value = "$("+name+")";
 		
 		if (macroMap.containsKey(name)) {
 			if (macroMap.get(name) == cycleFlag) {
-				System.out.println("Cycle!");
+				Console.getInstance().println("Warning: cyclic reference made by macro '"+value+"'.");
+				
 				addMacro(name, value);
 			}
 			return (String)macroMap.get(name);
@@ -286,14 +288,14 @@ public class NamingContext {
 	 * @return
 	 */
 	public String findAndResolvePort(String temp, String name) {
-		System.out.println("find and resolve port: "+temp+"."+name);
+		//DebugSystem.out.println("find and resolve port: "+temp+"."+name);
 		
 		String portname=temp+"."+name;
 		String target="$("+portname+")";
 		
 		if (portMap.containsKey(portname)) {
 			if (portMap.get(portname) == cycleFlag) {
-				System.out.println("Cycle!");
+				Console.getInstance().println("Warning: cyclic reference made by port '"+portname+"'.");
 				addPort(portname, target);
 			}
 			return (String)portMap.get(portname);
@@ -328,7 +330,7 @@ public class NamingContext {
 	public String matchAndReplace(String value) {
 		if (value==null || value.indexOf('$')<0) return value;
 		
-		System.out.println("matchandreplace "+value);
+		//DebugSystem.out.println("matchandreplace "+value);
 		
 		// by definition from ebnfg - \0 is bad character, but occurs in groups
 		//Pattern macrop = Pattern.compile("$\\(([a-zA-Z0-9_:-]+)\\)");
