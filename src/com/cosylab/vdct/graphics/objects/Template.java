@@ -1056,7 +1056,7 @@ public boolean rename(java.lang.String newName) {
 	if (!oldObjName.equals(newObjName))
 	{
 		getParent().removeObject(oldObjName);
-		String fullName = com.cosylab.vdct.util.StringUtils.replace(getName(), oldObjName, newObjName);
+		String fullName = com.cosylab.vdct.util.StringUtils.replaceEnding(getName(), oldObjName, newObjName);
 		templateData.setName(fullName);
 		getParent().addSubObject(newObjName, this);
 
@@ -1069,7 +1069,7 @@ public boolean rename(java.lang.String newName) {
 			{
 				connector = (Connector)obj;
 				String id = connector.getID();
-				id = com.cosylab.vdct.util.StringUtils.replace(id, oldObjName, newObjName);
+				id = com.cosylab.vdct.util.StringUtils.replaceEnding(id, oldObjName, newObjName);
 				connector.setID(id);
 			}
 		}

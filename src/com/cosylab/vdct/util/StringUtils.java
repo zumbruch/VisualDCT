@@ -128,13 +128,25 @@ public static String removeBegining(String str, String begining) {
  * @param s1 java.lang.String
  * @param s2 java.lang.String
  */
+public static String replaceEnding(String str, String s1, String s2) {
+	if (str.equals(s1)) return s2;
+	else if (!str.endsWith(s1)) return str;
+	
+	int pos = str.lastIndexOf(s1);
+	if (pos<0) return str;
+	return str.substring(0, str.length()-s1.length())+s2;
+}
+/**
+ * This method was created in VisualAge.
+ * @param str java.lang.String
+ * @param s1 java.lang.String
+ * @param s2 java.lang.String
+ */
 public static String replace(String str, String s1, String s2) {
 	if (str.equals(s1)) return s2;
 	int pos = str.indexOf(s1);
 	if (pos<0) return str;
-	String p1 = str.substring(0, pos);
-	String p2 = str.substring(pos+s1.length());
-	return p1+s2+p2;
+	return str.substring(0, pos)+s2+str.substring(pos+s1.length());
 }
 /**
  * This method was created in VisualAge.

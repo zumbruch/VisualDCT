@@ -163,110 +163,95 @@ public void copy() {
 	drawingSurface.repaint();
 }
 
-public BoxVertex createBoxVertex(BoxVertex partnerVertex)
+public Box createBox()
 {
 	Group parentGroup = drawingSurface.getViewGroup();
 
 	ViewState view = ViewState.getInstance();
 	double scale = view.getScale();
-	int rx = (int)(view.getRx() / scale);
-	int ry = (int)(view.getRy() / scale);
-	
-	BoxVertex boxVertex = new BoxVertex(parentGroup,
-		(int)((drawingSurface.getPressedX() + view.getRx()) / scale),
-		(int)((drawingSurface.getPressedY() + view.getRy()) / scale), partnerVertex);
 
-	String name = nullString;
+	int posX = (int)((drawingSurface.getPressedX() + view.getRx()) / scale);
+	int posY = (int)((drawingSurface.getPressedY() + view.getRy()) / scale);
 
 	String parentName = parentGroup.getAbsoluteName();
-	if(parentName.length() > 0)
-		name = parentName + Constants.GROUP_SEPARATOR;
+	
+	Vertex startVertex = new Vertex(null, parentGroup, parentName, posX, posY);
+ 	Group.getRoot().addSubObject(startVertex.getName(), startVertex, true);
 
-	name += boxVertex.getHashID();
+	Vertex endVertex = new Vertex(null, parentGroup, parentName, posX, posY);
+ 	Group.getRoot().addSubObject(endVertex.getName(), endVertex, true);
 
- 	Group.getRoot().addSubObject(name, boxVertex, true);
+	Box grBox = new Box(null, parentGroup, parentName, startVertex, endVertex);
+ 	Group.getRoot().addSubObject(grBox.getName(), grBox, true);
+
+	startVertex.setOwner(grBox);
+	endVertex.setOwner(grBox);
 
 	drawingSurface.repaint();
 	
-	return boxVertex;
+	return grBox;
 }
 
-public LineVertex createLineVertex(LineVertex partnerVertex)
+public Line createLine()
 {
 	Group parentGroup = drawingSurface.getViewGroup();
 
 	ViewState view = ViewState.getInstance();
 	double scale = view.getScale();
-	int rx = (int)(view.getRx() / scale);
-	int ry = (int)(view.getRy() / scale);
+
+	int posX = (int)((drawingSurface.getPressedX() + view.getRx()) / scale);
+	int posY = (int)((drawingSurface.getPressedY() + view.getRy()) / scale);
 	
-	LineVertex lineVertex = new LineVertex(parentGroup,
-		(int)((drawingSurface.getPressedX() + view.getRx()) / scale),
-		(int)((drawingSurface.getPressedY() + view.getRy()) / scale), partnerVertex);
-
-	String name = nullString;
-
 	String parentName = parentGroup.getAbsoluteName();
-	if(parentName.length() > 0)
-		name = parentName + Constants.GROUP_SEPARATOR;
+	
+	Vertex startVertex = new Vertex(null, parentGroup, parentName, posX, posY);
+ 	Group.getRoot().addSubObject(startVertex.getName(), startVertex, true);
 
-	name += lineVertex.getHashID();
+	Vertex endVertex = new Vertex(null, parentGroup, parentName, posX, posY);
+ 	Group.getRoot().addSubObject(endVertex.getName(), endVertex, true);
 
- 	Group.getRoot().addSubObject(name, lineVertex, true);
+	Line grLine = new Line(null, parentGroup, parentName, startVertex, endVertex);
+ 	Group.getRoot().addSubObject(grLine.getName(), grLine, true);
+
+	startVertex.setOwner(grLine);
+	endVertex.setOwner(grLine);
 
 	drawingSurface.repaint();
 	
-	return lineVertex;
+	return grLine;
 }
 
-public TextBox createTextBox(TextBoxVertex startVertex, TextBoxVertex endVertex)
-{
-	Group parentGroup = drawingSurface.getViewGroup();
-
-	TextBox textBox = new TextBox(parentGroup, startVertex, endVertex);
-
-	String name = nullString;
-
-	String parentName = parentGroup.getAbsoluteName();
-	if(parentName.length() > 0)
-		name = parentName + Constants.GROUP_SEPARATOR;
-
-	name += textBox.getHashID();
-
- 	Group.getRoot().addSubObject(name, textBox, true);
-
-	drawingSurface.repaint();
-	
-	return textBox;
-}
-
-public TextBoxVertex createTextBoxVertex(TextBoxVertex partnerVertex)
+public TextBox createTextBox()
 {
 	Group parentGroup = drawingSurface.getViewGroup();
 
 	ViewState view = ViewState.getInstance();
 	double scale = view.getScale();
-	int rx = (int)(view.getRx() / scale);
-	int ry = (int)(view.getRy() / scale);
-	
-	TextBoxVertex textBoxVertex = new TextBoxVertex(parentGroup,
-		(int)((drawingSurface.getPressedX() + view.getRx()) / scale),
-		(int)((drawingSurface.getPressedY() + view.getRy()) / scale), partnerVertex);
 
-	String name = nullString;
+	int posX = (int)((drawingSurface.getPressedX() + view.getRx()) / scale);
+	int posY = (int)((drawingSurface.getPressedY() + view.getRy()) / scale);
 
 	String parentName = parentGroup.getAbsoluteName();
-	if(parentName.length() > 0)
-		name = parentName + Constants.GROUP_SEPARATOR;
 
-	name += textBoxVertex.getHashID();
+	Vertex startVertex = new Vertex(null, parentGroup, parentName, posX, posY);
+ 	Group.getRoot().addSubObject(startVertex.getName(), startVertex, true);
 
- 	Group.getRoot().addSubObject(name, textBoxVertex, true);
+	Vertex endVertex = new Vertex(null, parentGroup, parentName, posX, posY);
+ 	Group.getRoot().addSubObject(endVertex.getName(), endVertex, true);
+
+	TextBox grTextBox = new TextBox(null, parentGroup, parentName, startVertex, endVertex);
+ 	Group.getRoot().addSubObject(grTextBox.getName(), grTextBox, true);
+
+	grTextBox.setBorder(true);
+
+	startVertex.setOwner(grTextBox);
+	endVertex.setOwner(grTextBox);
 
 	drawingSurface.repaint();
 	
-	return textBoxVertex;
+	return grTextBox;
 }
+
 /**
  * Insert the method's description here.
  * Creation date: (3.2.2001 23:27:30)

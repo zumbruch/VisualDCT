@@ -29,13 +29,13 @@ package com.cosylab.vdct.graphics.objects;
  */
 
 import java.awt.*;
-import java.awt.event.*;
 import java.util.*;
-import javax.swing.*;
 import com.cosylab.vdct.*;
 import com.cosylab.vdct.graphics.*;
 import com.cosylab.vdct.graphics.popup.*;
-import com.cosylab.vdct.events.*;
+import com.cosylab.vdct.undo.DeleteAction;
+import com.cosylab.vdct.undo.UndoManager;
+import com.cosylab.vdct.util.*;
 
 /**
  * @author ssah
@@ -43,102 +43,52 @@ import com.cosylab.vdct.events.*;
  * To change this generated comment edit the template variable "typecomment":
  * Window>Preferences>Java>Templates.
  */
-public class BoxVertex extends VisibleObject implements Movable, Selectable, Popupable
+public class Vertex extends VisibleObject implements Movable, Popupable
 {
-
-class PopupMenuHandler implements ActionListener
-{
-	
-public void actionPerformed(ActionEvent event)
-{
-	String action = event.getActionCommand();
-	if(action.equals(colorString))
-	{
-		Color newColor = JColorChooser.showDialog(null, colorTitleString, getColor());
-		
-		if(newColor != null)
-		{
-			setColor(newColor);
-			if(partnerVertex != null)
-				partnerVertex.setColor(newColor);
-				
-			currentColor = newColor;
-		}
-		
-		CommandManager.getInstance().execute("RepaintWorkspace");
-	}
-	else if(action.equals(isDashedString))
-	{
-		isDashed = !isDashed;
-		if(partnerVertex != null)
-			partnerVertex.setIsDashed(isDashed);
-			
-		currentIsDashed = isDashed;
-
-		CommandManager.getInstance().execute("RepaintWorkspace");
-	}
-}
-
-}
 	
 private String hashId;
-private BoxVertex partnerVertex;
-private boolean isDashed;
+private String name;
+private VisibleObject owner;
 
-private static final String colorString = "Color...";
-private static final String colorTitleString = "Box color";
-private static final String isDashedString = "Dashed";
-
-private static Color currentColor = Constants.LINE_COLOR;
-private static boolean currentIsDashed = false;
-
-private static final String hashIdPrefix = "Box";
+private static final String nullString = "";
+private static final String hashIdPrefix = "Vertex";
 
 private String getAvailableHashId()
 {
-	
-	int grLineNumber = 0;
-	String testHashId = hashIdPrefix + String.valueOf(grLineNumber);
+	int number = 0;
+	String testHashId = hashIdPrefix + String.valueOf(number);
 	
 	while(getParent().containsObject(testHashId))
 	{
-		grLineNumber++;
-		testHashId = hashIdPrefix + String.valueOf(grLineNumber);		
+		number++;
+		testHashId = hashIdPrefix + String.valueOf(number);		
 	}
 
 	return testHashId;
 }
 
-public boolean move(int dx, int dy)
+public Vertex(String parName, ContainerObject parentGroup, String parentName, int parX, int parY)
 {
-	if(checkMove(dx, dy))
-	{
-		setX(super.getX() + dx);
-		setY(super.getY() + dy);
-		
-		revalidatePosition();
-		
-		return true;
-	}
+	super(parentGroup);
 
-	return false;
-}
-
-public BoxVertex(ContainerObject parent, int parX, int parY, BoxVertex parPartnerVertex)
-{
-	super(parent);
+	ViewState view = ViewState.getInstance();
 
 	setX(parX - Constants.CONNECTOR_WIDTH / 2);
 	setY(parY - Constants.CONNECTOR_HEIGHT / 2);
 	setWidth(Constants.CONNECTOR_WIDTH);
 	setHeight(Constants.CONNECTOR_HEIGHT);
+
+	if(parName == null)
+	{
+		hashId = getAvailableHashId();
 	
-	setColor(currentColor);
-	isDashed = currentIsDashed;
-	
-	partnerVertex = parPartnerVertex;
-	
-	hashId = getAvailableHashId();
+		if(parentName.length() > 0)
+			name = parentName + Constants.GROUP_SEPARATOR + hashId;
+		else
+			name = hashId;
+	}
+	else
+		name = parName;	
 }
 
 public void accept(Visitor visitor)
@@ -160,6 +110,38 @@ public boolean checkMove(int dx, int dy)
 	return true;
 }
 
+public Vertex copyToGroup(String group)
+{
+	String newName;
+	if(group.equals(nullString))
+		newName = Group.substractObjectName(getName());
+	else
+		newName = group + Constants.GROUP_SEPARATOR + Group.substractObjectName(getName());
+
+// object with new name already exists, add suffix ///!!!
+	while(Group.getRoot().findObject(newName, true) != null)
+		newName = StringUtils.incrementName(newName, Constants.COPY_SUFFIX);
+
+	Vertex grVertex = new Vertex(newName, null, null, super.getX(), super.getY());
+
+	Group.getRoot().addSubObject(newName, grVertex, true);
+
+	grVertex.move(20, 20);
+
+	unconditionalValidation();
+	return grVertex;
+}
+
+public void destroy()
+{
+	super.destroy();
+	if(getParent() != null)
+		getParent().removeObject(Group.substractObjectName(name));
+	
+	UndoManager.getInstance().addAction(new DeleteAction(this));
+
+}
+
 protected void draw(Graphics g, boolean hilited)
 {
 	ViewState view = ViewState.getInstance();
@@ -177,67 +159,10 @@ protected void draw(Graphics g, boolean hilited)
 	{
 		g.setColor(Constants.HILITE_COLOR);
 		g.drawRect(posX, posY, rwidth, rheight);
+		
+		if(owner instanceof TextBox)
+			((TextBox)owner).drawDashedBorder(g, hilited);
 	}
-
-	g.setColor(getColor());
-
-	double scale = view.getScale();
-	
-	if(partnerVertex.getHashID().compareTo(hashId) < 0)
-	{
-		int rw = (int)(Constants.CONNECTOR_WIDTH * scale / 2);
-		int rh = (int)(Constants.CONNECTOR_HEIGHT * scale / 2);
-		
-		posX = getRx() + rw - offsetX;
-		posY = getRy() + rh - offsetY;
-		
-		int posX2 = partnerVertex.getRx() + rw - offsetX;
-		int posY2 = partnerVertex.getRy() + rh - offsetY;
-
-		int t;
-		if (posX>posX2)
-			{ t=posX; posX=posX2; posX2=t; }
-		if (posY>posY2)
-			{ t=posY; posY=posY2; posY2=t; }
-		
-		if((isDashed) && ((posX != posX2) || (posY != posY2)))
-		{
-			int curX = posX;
-			while(curX <= posX2)
-			{
-				int curX2 = curX + Constants.DASHED_LINE_DENSITY;
-				
-				if (curX2 > posX2)
-					curX2 = posX2;
-				
-				g.drawLine(curX, posY, curX2, posY);
-				g.drawLine(curX, posY2, curX2, posY2);
-				
-				curX += 2 * Constants.DASHED_LINE_DENSITY;
-			}
-
-			int curY = posY;
-			while(curY <= posY2)
-			{
-				int curY2 = curY + Constants.DASHED_LINE_DENSITY;
-				
-				if(curY2 > posY2)
-					curY2 = posY2;
-				
-				g.drawLine(posX, curY, posX, curY2);
-				g.drawLine(posX2, curY, posX2, curY2);
-				
-				curY += 2 * Constants.DASHED_LINE_DENSITY;
-			}
-		}
-		else
-			g.drawRect(posX, posY, posX2-posX, posY2-posY);
-	}
-}
-
-public boolean getIsDashed()
-{
-	return isDashed;
 }
 
 public String getHashID()
@@ -247,20 +172,18 @@ public String getHashID()
 
 public Vector getItems()
 {
-	Vector items = new Vector();
+	if(owner instanceof Box)
+		return ((Box)(owner)).getItems();
+		
+	if(owner instanceof Line)
+		return ((Line)(owner)).getItems(this);
+	
+	return null;
+}
 
-	ActionListener al = new PopupMenuHandler();
-
-	JMenuItem colorItem = new JMenuItem(colorString);
-	colorItem.addActionListener(al);
-	items.addElement(colorItem);
-
-	JCheckBoxMenuItem isDashedItem = new JCheckBoxMenuItem(isDashedString);
-	isDashedItem.setSelected(isDashed);
-	isDashedItem.addActionListener(al);
-	items.addElement(isDashedItem);
-
-	return items;
+public String getName()
+{
+	return name;
 }
 
 public int getX()
@@ -282,6 +205,77 @@ public int getY()
 		
 	return posY;
 }
+
+public boolean move(int dx, int dy)
+{
+	if(checkMove(dx, dy))
+	{
+		setX(super.getX() + dx);
+		setY(super.getY() + dy);
+
+		revalidatePosition();
+		
+		return true;
+	}
+	return false;
+}
+
+public boolean moveToGroup(String group)
+{
+	String currentParent = Group.substractParentName(getName());
+	if(group.equalsIgnoreCase(currentParent))
+		return false;
+	
+	String oldName = getName();
+	String newName;
+	if (group.equals(nullString))
+		newName = Group.substractObjectName(getName());
+	else
+		newName = group + Constants.GROUP_SEPARATOR + Group.substractObjectName(getName());
+
+// object with new name already exists, add suffix // !!!
+	Object obj;
+	while((obj = Group.getRoot().findObject(newName, true)) != null)
+	{
+		if(obj == this)	// it's me :) already moved, fix data
+		{
+			name = newName;
+			return true;
+		}
+		else
+			newName = StringUtils.incrementName(newName, Constants.MOVE_SUFFIX);
+			
+		return rename(newName);
+	}
+	
+	getParent().removeObject(Group.substractObjectName(getName()));
+	setParent(null);
+	Group.getRoot().addSubObject(newName, this, true);
+
+	name = newName;
+	unconditionalValidation();
+
+	return true;
+}
+
+public boolean rename(String newName)
+{
+	String newObjName = Group.substractObjectName(newName);
+	String oldObjName = Group.substractObjectName(getName());
+
+	if(!oldObjName.equals(newObjName))
+	{
+		getParent().removeObject(oldObjName);
+		String fullName = StringUtils.replace(getName(), oldObjName, newObjName);
+		name = fullName;
+		getParent().addSubObject(newObjName, this);
+	}
+	
+// move if needed
+	moveToGroup(Group.substractParentName(newName));
+
+	return true;
+}
 	
 public void revalidatePosition()
 {
@@ -291,14 +285,25 @@ public void revalidatePosition()
 	setRy((int)(getY() * rscale));
 }
 
-public void setIsDashed(boolean parIsDashed)
+public void setOwner(VisibleObject parOwner)
 {
-	isDashed = parIsDashed;
+	owner = parOwner;	
 }
 
-public void setPartnerVertex(BoxVertex parPartnerVertex)
+public void setX(int parX)
 {
-	partnerVertex = parPartnerVertex;
+	super.setX(parX);
+	
+	if(owner != null)
+		owner.revalidatePosition();
+}
+
+public void setY(int parY)
+{
+	super.setY(parY);
+	
+	if(owner != null)
+		owner.revalidatePosition();
 }
 
 protected void validate()

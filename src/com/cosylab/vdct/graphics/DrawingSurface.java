@@ -154,6 +154,8 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 	private VDBFieldData tmplink = null;
 	private Hiliter hiliter;
 	
+	private ComposedAction undoAction = null;
+	
 	private static final String newRecordString = "New record...";
 	private static final String newTemplesString = "New template";
 	private static final String newLineString = "New line";
@@ -161,9 +163,10 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 	private static final String newTextBoxString = "New textbox";
 	private static final String templatePropertiesString = "Template properties...";
 
-	private LineVertex lineVertex = null;
-	private BoxVertex boxVertex = null;
-	private TextBoxVertex textBoxVertex = null;
+	private Line grLine = null;
+	private Box grBox = null;
+	private TextBox grTextBox = null;
+
 
 	private Stack viewStack = null;	
 	private Stack templateStack = null;	
@@ -705,28 +708,28 @@ public void mouseClicked(MouseEvent e) {
 		else {
 			pressedX=cx; pressedY=cy;
 
-			if((e.getClickCount() >= 1) && (lineVertex != null))
+			if((e.getClickCount() >= 1) && (grLine != null))
 			{
-					lineVertex = null;
+				grLine = null;
 
 					// cancel action
 					if (e.getButton() == MouseEvent.BUTTON3)
 						UndoManager.getInstance().undo();
 			}
-			else if((e.getClickCount() >= 1) && (boxVertex != null))
+			else if((e.getClickCount() >= 1) && (grBox != null))
 			{
-					boxVertex = null;
+				grBox = null;
 
 					// cancel action
 					if (e.getButton() == MouseEvent.BUTTON3)
 						UndoManager.getInstance().undo();
 			}
-			else if((e.getClickCount() >= 1) && (textBoxVertex != null))
+			else if((e.getClickCount() >= 1) && (grTextBox != null))
 			{
-					textBoxVertex.getPartnerVertex().setIsAlwaysDrawn(false);
-					textBoxVertex.setIsAlwaysDrawn(false);
+				grTextBox.setBorder(TextBox.getCurrentBorder());
+				grTextBox.showChangeTextDialog();
 	
-					textBoxVertex = null;
+				grTextBox = null;
 
 					// cancel action
 					if (e.getButton() == MouseEvent.BUTTON3)
@@ -847,26 +850,22 @@ private void createTextBox()
 		GetVDBManager manager =
 			(GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
 	
-		TextBoxVertex startingTextBoxVertex = manager.getManager().createTextBoxVertex(null);
-		UndoManager.getInstance().addAction(new CreateAction(startingTextBoxVertex));
-	
-		textBoxVertex = manager.getManager().createTextBoxVertex(startingTextBoxVertex);
-		UndoManager.getInstance().addAction(new CreateAction(textBoxVertex));
-	
-		startingTextBoxVertex.setPartnerVertex(textBoxVertex);
-	
-		TextBox textBox = manager.getManager().createTextBox(startingTextBoxVertex, textBoxVertex);
-		UndoManager.getInstance().addAction(new CreateAction(textBox));
+		grTextBox = manager.getManager().createTextBox();
+		UndoManager.getInstance().addAction(new CreateAction(grTextBox));
+
+// shp: old
+/*
 
 	// temp!!!
 		String reply = JOptionPane.showInputDialog( VisualDCT.getInstance(),
 			                           "Description:",
 			                           "Create textbox...",
 			                           JOptionPane.QUESTION_MESSAGE );
-		if (reply!=null)
-				textBox.setDescription(reply);
+		if(reply != null)
+			grTextBox.setDescription(reply);
 		else
-			textBox.setDescription("Cosylab is one of the few if not the only company that is specialized in software and hardware development in the field of control systems for particle accelerators and other large experimental physics facilities. Our team, consisting mainly of excellent young graduates of physics, electronic engineering, mathematics and computer sciences led by Mark Plesko, has a combined experience of over 40 man-years in this field with a long record of successful projects.\nWe are dedicated to provide high quality products and state of the art technology to our customers. Combining research-level know-how, a professional business approach and our proverbial flexibility, we meet all customers’ demands in terms of system performance, quality, cost and time-to-market.");
+			grTextBox.setDescription("This is the default text... I am typing something really stupid...");
+*/
 	}
 	catch (Exception ex)
 	{
@@ -882,20 +881,13 @@ private void createBox()
 {
 	try
 	{
-	
 		UndoManager.getInstance().startMacroAction();
 	
 		GetVDBManager manager =
 			(GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
 	
-		BoxVertex startingBoxVertex = manager.getManager().createBoxVertex(null);
-		UndoManager.getInstance().addAction(new CreateAction(startingBoxVertex));
-	
-		boxVertex = manager.getManager().createBoxVertex(startingBoxVertex);
-		UndoManager.getInstance().addAction(new CreateAction(boxVertex));
-	
-		startingBoxVertex.setPartnerVertex(boxVertex);
-	
+		grBox = manager.getManager().createBox();
+		UndoManager.getInstance().addAction(new CreateAction(grBox));
 	}
 	catch (Exception ex)
 	{
@@ -915,16 +907,8 @@ private void createLine()
 		GetVDBManager manager =
 			(GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
 	
-		LineVertex startingLineVertex = manager.getManager().createLineVertex(null);
-		UndoManager.getInstance().addAction(new CreateAction(startingLineVertex));
-	
-		lineVertex = manager.getManager().createLineVertex(startingLineVertex);
-		UndoManager.getInstance().addAction(new CreateAction(lineVertex));
-		
-		startingLineVertex.setPartnerVertex(lineVertex);
-		lineVertex.setIsArrow(LineVertex.getCurrentIsArrow());
-	
-	
+		grLine = manager.getManager().createLine();
+		UndoManager.getInstance().addAction(new CreateAction(grLine));
 	}
 	catch (Exception ex)
 	{
@@ -1081,32 +1065,34 @@ public void mouseMoved(MouseEvent e)
 	int cy = e.getY()-view.getY0();
 	double scale = view.getScale();
 
-	if(lineVertex != null)
+	if(grLine != null)
 	{
-		lineVertex.setX((int)((cx + view.getRx()) / scale - Constants.CONNECTOR_WIDTH / 2));
-		lineVertex.setY((int)((cy + view.getRy()) / scale - Constants.CONNECTOR_HEIGHT / 2));
+		grLine.getEndVertex().setX((int)((cx + view.getRx()) / scale - Constants.CONNECTOR_WIDTH / 2));
+		grLine.getEndVertex().setY((int)((cy + view.getRy()) / scale - Constants.CONNECTOR_HEIGHT / 2));
 		
 		repaint();
 	}
-	else if(boxVertex != null)
+	else if(grBox != null)
 	{
-		boxVertex.setX((int)((cx + view.getRx()) / scale - Constants.CONNECTOR_WIDTH / 2));
-		boxVertex.setY((int)((cy + view.getRy()) / scale - Constants.CONNECTOR_HEIGHT / 2));
+		grBox.getEndVertex().setX((int)((cx + view.getRx()) / scale - Constants.CONNECTOR_WIDTH / 2));
+		grBox.getEndVertex().setY((int)((cy + view.getRy()) / scale - Constants.CONNECTOR_HEIGHT / 2));
 		
 		repaint();
 	}
-	else if(textBoxVertex != null)
+	else if(grTextBox != null)
 	{
-		textBoxVertex.setX((int)((cx + view.getRx()) / scale - Constants.CONNECTOR_WIDTH / 2));
-		textBoxVertex.setY((int)((cy + view.getRy()) / scale - Constants.CONNECTOR_HEIGHT / 2));
+		grTextBox.getEndVertex().setX((int)((cx + view.getRx()) / scale - Constants.CONNECTOR_WIDTH / 2));
+		grTextBox.getEndVertex().setY((int)((cy + view.getRy()) / scale - Constants.CONNECTOR_HEIGHT / 2));
 		
 		repaint();
 	}
 	else
 	{
-	if ((cx>0) && (cy>0) && (cx<width) && (cy<height)) {
+		if ((cx>0) && (cy>0) && (cx<width) && (cy<height))
+		{
 		VisibleObject spotted = viewGroup.hiliteComponentsCheck(cx+view.getRx(), cy+view.getRy());
-		if (ViewState.getInstance().setAsHilited(spotted)) {
+			if (ViewState.getInstance().setAsHilited(spotted))
+			{
 			drawOnlyHilitedOnce=true;
 			repaint();
 		}

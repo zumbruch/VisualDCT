@@ -29,8 +29,10 @@ package com.cosylab.vdct;
  */
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.awt.print.*;
 import javax.swing.*;
+import javax.swing.event.*;
 
 import com.cosylab.vdct.about.VisualDCTAboutDialogEngine;
 import com.cosylab.vdct.events.*;
@@ -184,7 +186,7 @@ public class VisualDCT extends JFrame {
 // shp: not final solution
 	private static VisualDCT instance = null;
 
-class IvjEventHandler implements java.awt.event.ActionListener, java.awt.event.ItemListener, java.awt.event.KeyListener, java.awt.event.MouseListener, java.awt.event.MouseMotionListener, java.awt.event.WindowListener {
+class IvjEventHandler implements java.awt.event.ActionListener, java.awt.event.ItemListener, java.awt.event.MouseListener, java.awt.event.MouseMotionListener, java.awt.event.WindowListener {
 		public void actionPerformed(java.awt.event.ActionEvent e) {
 			if (e.getSource() == VisualDCT.this.getLeftMenuItem())
 				VisualDCT.this.moveOrigin(SwingConstants.WEST);
@@ -324,16 +326,6 @@ class IvjEventHandler implements java.awt.event.ActionListener, java.awt.event.I
 				connEtoC46(e);
 			if (e.getSource() == VisualDCT.this.getNavigatorMenuItem()) 
 				connEtoC25(e);
-		};
-		public void keyPressed(java.awt.event.KeyEvent e) {};
-		public void keyReleased(java.awt.event.KeyEvent e) {};
-		public void keyTyped(java.awt.event.KeyEvent e) {
-			if (e.getSource() == VisualDCT.this.getNameTextField()) 
-				connEtoC49(e);
-			if (e.getSource() == VisualDCT.this.getgroupNameTextField()) 
-				connEtoC40(e);
-			if (e.getSource() == VisualDCT.this.getNewNameTextField()) 
-				connEtoC54(e);
 		};
 		public void mouseClicked(java.awt.event.MouseEvent e) {};
 		public void mouseDragged(java.awt.event.MouseEvent e) {
@@ -1025,24 +1017,6 @@ private void connEtoC4(java.awt.event.ActionEvent arg1) {
 	}
 }
 /**
- * connEtoC40:  (groupNameTextField.key.keyTyped(java.awt.event.KeyEvent) --> VisualDCT.groupNameTextField_KeyTyped(Ljava.awt.event.KeyEvent;)V)
- * @param arg1 java.awt.event.KeyEvent
- */
-/* WARNING: THIS METHOD WILL BE REGENERATED. */
-private void connEtoC40(java.awt.event.KeyEvent arg1) {
-	try {
-		// user code begin {1}
-		// user code end
-		this.groupNameTextField_KeyTyped(arg1);
-		// user code begin {2}
-		// user code end
-	} catch (java.lang.Throwable ivjExc) {
-		// user code begin {3}
-		// user code end
-		handleException(ivjExc);
-	}
-}
-/**
  * connEtoC41:  (Base_ViewMenuItem.action.actionPerformed(java.awt.event.ActionEvent) --> VisualDCT.base_ViewMenuItem_ActionPerformed()V)
  * @param arg1 java.awt.event.ActionEvent
  */
@@ -1187,24 +1161,6 @@ private void connEtoC48(java.awt.event.WindowEvent arg1) {
 	}
 }
 /**
- * connEtoC49:  (NameTextField.key.keyTyped(java.awt.event.KeyEvent) --> VisualDCT.nameTextField_KeyTyped(Ljava.awt.event.KeyEvent;)V)
- * @param arg1 java.awt.event.KeyEvent
- */
-/* WARNING: THIS METHOD WILL BE REGENERATED. */
-private void connEtoC49(java.awt.event.KeyEvent arg1) {
-	try {
-		// user code begin {1}
-		// user code end
-		this.nameTextField_KeyTyped(arg1);
-		// user code begin {2}
-		// user code end
-	} catch (java.lang.Throwable ivjExc) {
-		// user code begin {3}
-		// user code end
-		handleException(ivjExc);
-	}
-}
-/**
  * connEtoC5:  (ZoomSlider.mouseMotion.mouseDragged(java.awt.event.MouseEvent) --> VisualDCT.zoomSlider_updateLabel()V)
  * @param arg1 java.awt.event.MouseEvent
  */
@@ -1294,24 +1250,7 @@ private void connEtoC53(java.awt.event.ActionEvent arg1) {
 		handleException(ivjExc);
 	}
 }
-/**
- * connEtoC54:  (NewNameTextField.key.keyTyped(java.awt.event.KeyEvent) --> VisualDCT.newNameTextField_KeyTyped(Ljava.awt.event.KeyEvent;)V)
- * @param arg1 java.awt.event.KeyEvent
- */
-/* WARNING: THIS METHOD WILL BE REGENERATED. */
-private void connEtoC54(java.awt.event.KeyEvent arg1) {
-	try {
-		// user code begin {1}
-		// user code end
-		this.newNameTextField_KeyTyped(arg1);
-		// user code begin {2}
-		// user code end
-	} catch (java.lang.Throwable ivjExc) {
-		// user code begin {3}
-		// user code end
-		handleException(ivjExc);
-	}
-}
+
 /**
  * connEtoC55:  (RenameOKButton.action.actionPerformed(java.awt.event.ActionEvent) --> VisualDCT.renameOKButton_ActionPerformed(Ljava.awt.event.ActionEvent;)V)
  * @param arg1 java.awt.event.ActionEvent
@@ -2656,6 +2595,32 @@ private javax.swing.JTextField getgroupNameTextField() {
 			ivjgroupNameTextField = new javax.swing.JTextField();
 			ivjgroupNameTextField.setName("groupNameTextField");
 			// user code begin {1}
+			
+			ivjgroupNameTextField.getDocument().addDocumentListener(new DocumentListener()
+			{
+			    public void insertUpdate(DocumentEvent e) {
+			        check(e);
+			    }
+			    public void removeUpdate(DocumentEvent e) {
+			        check(e);
+			    }
+			    public void changedUpdate(DocumentEvent e) {
+			        // we won't ever get this with a PlainDocument
+			    }
+			    private void check(DocumentEvent e) {
+					GetVDBManager validator = (GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
+					String errmsg = validator.getManager().checkGroupName(ivjgroupNameTextField.getText(), true);
+					if (errmsg!=null) {
+						getGroupOKButton().setEnabled(false);
+						getGroupWarningLabel().setText(errmsg);
+					}
+					else {
+						getGroupOKButton().setEnabled(true);
+						getGroupWarningLabel().setText(" ");
+					}
+			    }
+			});
+
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
 			// user code begin {2}
@@ -3386,6 +3351,32 @@ private javax.swing.JTextField getNameTextField() {
 			ivjNameTextField = new javax.swing.JTextField();
 			ivjNameTextField.setName("NameTextField");
 			// user code begin {1}
+
+			ivjNameTextField.getDocument().addDocumentListener(new DocumentListener()
+			{
+			    public void insertUpdate(DocumentEvent e) {
+			        check(e);
+			    }
+			    public void removeUpdate(DocumentEvent e) {
+			        check(e);
+			    }
+			    public void changedUpdate(DocumentEvent e) {
+			        // we won't ever get this with a PlainDocument
+			    }
+			    private void check(DocumentEvent e) {
+					GetVDBManager validator = (GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
+					String errmsg = validator.getManager().checkRecordName(ivjNameTextField.getText(), true);
+					if (errmsg!=null) {
+						getOKButton().setEnabled(false);
+						getWarningLabel().setText(errmsg);
+					}
+					else {
+						getOKButton().setEnabled(true);
+						getWarningLabel().setText(" ");
+					}
+			    }
+			});
+
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
 			// user code begin {2}
@@ -3451,6 +3442,32 @@ private javax.swing.JTextField getNewNameTextField() {
 			ivjNewNameTextField = new javax.swing.JTextField();
 			ivjNewNameTextField.setName("NewNameTextField");
 			// user code begin {1}
+
+			ivjNewNameTextField.getDocument().addDocumentListener(new DocumentListener()
+			{
+			    public void insertUpdate(DocumentEvent e) {
+			        check(e);
+			    }
+			    public void removeUpdate(DocumentEvent e) {
+			        check(e);
+			    }
+			    public void changedUpdate(DocumentEvent e) {
+			        // we won't ever get this with a PlainDocument
+			    }
+			    private void check(DocumentEvent e) {
+					GetVDBManager validator = (GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
+					String errmsg = validator.getManager().checkRecordName(ivjNewNameTextField.getText(), true);
+					if (errmsg!=null) {
+						getRenameOKButton().setEnabled(false);
+						getRenameWarningLabel().setText(errmsg);
+					}
+					else {
+						getRenameOKButton().setEnabled(true);
+						getRenameWarningLabel().setText(" ");
+					}
+			    }
+			});
+
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
 			// user code begin {2}
@@ -4897,22 +4914,6 @@ public void groupMenuItem_ActionPerformed() {
 /**
  * Comment
  */
-public void groupNameTextField_KeyTyped(java.awt.event.KeyEvent keyEvent) {
-	GetVDBManager validator = (GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
-	String name = getgroupNameTextField().getText()+keyEvent.getKeyChar();
-	String errmsg = validator.getManager().checkGroupName(name, true);
-	if (errmsg!=null) {
-		getGroupOKButton().setEnabled(false);
-		getGroupWarningLabel().setText(errmsg);
-	}
-	else {
-		getGroupOKButton().setEnabled(true);
-		getGroupWarningLabel().setText(" ");
-	}
-}
-/**
- * Comment
- */
 public void groupOKButton_ActionPerformed(java.awt.event.ActionEvent actionEvent) {
 	if (getGroupOKButton().isEnabled()) {
 		GetVDBManager manager = (GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
@@ -5051,18 +5052,15 @@ private void initConnections() throws java.lang.Exception {
 	getCancelButton().addActionListener(ivjEventHandler);
 	getNameTextField().addActionListener(ivjEventHandler);
 	getNewRecordDialog().addWindowListener(ivjEventHandler);
-	getNameTextField().addKeyListener(ivjEventHandler);
 	getStatusbarMenuItem().addActionListener(ivjEventHandler);
 	getToolbarMenuItem().addActionListener(ivjEventHandler);
 	getFlat_ViewMenuItem().addActionListener(ivjEventHandler);
 	getNavigatorMenuItem().addItemListener(ivjEventHandler);
-	getgroupNameTextField().addKeyListener(ivjEventHandler);
 	getCancelButton1().addActionListener(ivjEventHandler);
 	getGroupDialog().addWindowListener(ivjEventHandler);
 	getGroupOKButton().addActionListener(ivjEventHandler);
 	getgroupNameTextField().addActionListener(ivjEventHandler);
 	getRenameCancelButton().addActionListener(ivjEventHandler);
-	getNewNameTextField().addKeyListener(ivjEventHandler);
 	getRenameOKButton().addActionListener(ivjEventHandler);
 	getNewNameTextField().addActionListener(ivjEventHandler);
 	getRenameDialog().addWindowListener(ivjEventHandler);
@@ -5250,22 +5248,6 @@ public void move_RenameMenuItem_ActionPerformed() {
 /**
  * Comment
  */
-public void nameTextField_KeyTyped(java.awt.event.KeyEvent keyEvent) {
-	GetVDBManager validator = (GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
-	String name = getNameTextField().getText()+keyEvent.getKeyChar();
-	String errmsg = validator.getManager().checkRecordName(name, true);
-	if (errmsg!=null) {
-		getOKButton().setEnabled(false);
-		getWarningLabel().setText(errmsg);
-	}
-	else {
-		getOKButton().setEnabled(true);
-		getWarningLabel().setText(" ");
-	}
-}
-/**
- * Comment
- */
 public void navigatorMenuItem_ItemStateChanged(java.awt.event.ItemEvent itemEvent) {
 	GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
 	if (cmd!=null)
@@ -5293,23 +5275,6 @@ public void newMenuItem_ActionPerformed() {
 		GetGUIInterface cmd2 = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
  		cmd2.getGUIMenuInterface().newCmd();
 		openedFile = null;
-	}
-}
-/**
- * Comment
- */
-public void newNameTextField_KeyTyped(java.awt.event.KeyEvent keyEvent) {
-	GetVDBManager validator = (GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
-	String name = getNewNameTextField().getText()+keyEvent.getKeyChar();
-	// recordName == groupName cheking ?! for now?!
-	String errmsg = validator.getManager().checkRecordName(name, true);
-	if (errmsg!=null) {
-		getRenameOKButton().setEnabled(false);
-		getRenameWarningLabel().setText(errmsg);
-	}
-	else {
-		getRenameOKButton().setEnabled(true);
-		getRenameWarningLabel().setText(" ");
 	}
 }
 /**
