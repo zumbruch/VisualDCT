@@ -28,12 +28,20 @@ package com.cosylab.vdct.graphics.objects;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.util.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+
 /**
  * Insert the type's description here.
  * Creation date: (29.1.2001 21:26:39)
  * @author Matej Sekoranja
  */
 public class EPICSFwdLink extends EPICSOutLink {
+
 /**
  * EPICSFWDLink constructor comment.
  * @param parent com.cosylab.vdct.graphics.objects.ContainerObject
@@ -42,4 +50,39 @@ public class EPICSFwdLink extends EPICSOutLink {
 public EPICSFwdLink(ContainerObject parent, com.cosylab.vdct.vdb.VDBFieldData fieldData) {
 	super(parent, fieldData);
 }
+
+/**
+ * Insert the method's description here.
+ * Creation date: (3.2.2001 11:23:59)
+ * @return java.util.Vector
+ */
+public java.util.Vector getItems() {
+	Vector items = super.getItems();
+
+	// FWD has only CA and PP
+	Enumeration e = items.elements();
+	while (e.hasMoreElements())
+	{
+		Object obj = e.nextElement();
+		if (obj instanceof JMenu)
+		{
+			JMenu menu = (JMenu)obj;
+			if (menu.getText().equals(processString))
+			{
+				for (int i=0; i<menu.getItemCount(); i++)
+					{
+						JMenuItem menuItem = menu.getItem(i);
+						if (!menuItem.getText().equals(caString) &&
+							!menuItem.getText().equals(ppString))
+							{ menu.remove(i); i--; }
+					}
+				}
+			break;
+		}
+	}
+	
+
+	return items;
+}
+
 }

@@ -31,6 +31,9 @@ package com.cosylab.vdct.graphics.objects;
 import java.util.*;
 import java.awt.*;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
@@ -43,6 +46,47 @@ import com.cosylab.vdct.Constants;
  * @author Matej Sekoranja 
  */
 public class EPICSOutLink extends EPICSLinkOut {
+
+	protected static final String processString = "Process";
+	protected static final String nppString = "NPP - No Process Passive";
+	protected static final String ppString ="PP - Process Passive";
+	protected static final String caString = "CA - Channel Access";
+
+	private static final String severityString = "Severity";
+	private static final String nmsString = "NMS - No Maximize Severity";
+	private static final String msString = "MS - Maximize Severity";
+
+	class PopupMenuHandler implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+			String action = e.getActionCommand();
+			if (action.equals(nppString))
+			{
+				EPICSOutLink.this.getLinkProperties().setProcess("NPP");
+				EPICSOutLink.this.getFieldData().setValue(EPICSOutLink.this.getLinkProperties().getCompactLinkDef());
+			}
+			else if (action.equals(ppString))
+			{			
+				EPICSOutLink.this.getLinkProperties().setProcess("PP");
+				EPICSOutLink.this.getFieldData().setValue(EPICSOutLink.this.getLinkProperties().getCompactLinkDef());
+			}
+			else if (action.equals(caString))
+			{			
+				EPICSOutLink.this.getLinkProperties().setProcess("CA");
+				EPICSOutLink.this.getFieldData().setValue(EPICSOutLink.this.getLinkProperties().getCompactLinkDef());
+			}
+			else if (action.equals(nmsString))
+			{			
+				EPICSOutLink.this.getLinkProperties().setMaximize("NMS");
+				EPICSOutLink.this.getFieldData().setValue(EPICSOutLink.this.getLinkProperties().getCompactLinkDef());
+			}
+			else if (action.equals(msString))
+			{			
+				EPICSOutLink.this.getLinkProperties().setMaximize("MS");
+				EPICSOutLink.this.getFieldData().setValue(EPICSOutLink.this.getLinkProperties().getCompactLinkDef());
+			}
+		}
+	}
+	
 /**
  * EPICSOutLink constructor comment.
  * @param parent com.cosylab.vdct.graphics.objects.ContainerObject
@@ -113,4 +157,56 @@ protected void draw(Graphics g, boolean hilited) {
 	}
 
 }
+
+/**
+ * Insert the method's description here.
+ * Creation date: (2.2.2001 23:00:51)
+ * @return com.cosylab.vdct.graphics.objects.EPICSOutnLink.PopupMenuHandler
+ */
+private com.cosylab.vdct.graphics.objects.EPICSOutLink.PopupMenuHandler createPopupmenuHandler() {
+	return new PopupMenuHandler();
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (3.2.2001 11:23:59)
+ * @return java.util.Vector
+ */
+public java.util.Vector getItems() {
+	Vector items = super.getItems();
+
+	ActionListener al = createPopupmenuHandler();
+
+	items.add(new JSeparator());
+
+	JMenu processMenu = new JMenu(processString);
+	items.addElement(processMenu);
+	
+	JMenuItem npp = new JMenuItem(nppString);
+	npp.addActionListener(al);
+	processMenu.add(npp);	
+	
+	JMenuItem pp = new JMenuItem(ppString);
+	pp.addActionListener(al);
+	processMenu.add(pp);	
+
+	JMenuItem ca = new JMenuItem(caString);
+	ca.addActionListener(al);
+	processMenu.add(ca);
+
+	JMenu severityMenu = new JMenu(severityString);
+	items.addElement(severityMenu);
+
+	JMenuItem nms = new JMenuItem(nmsString);
+	nms.addActionListener(al);
+	severityMenu.add(nms);
+
+	JMenuItem ms = new JMenuItem(msString);
+	ms.addActionListener(al);
+	severityMenu.add(ms);
+
+	return items;
+}
+
+
 }
