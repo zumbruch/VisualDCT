@@ -139,9 +139,11 @@ public String getTarget() {
  */
 public static String getOptions(LinkSource fd) {
 
-	if ((fd.getValue()==null) || fd.getValue().equals(nullString)) return null;
-
 	String value = fd.getValue();
+	if (value == null || value.length() == 0 || //value.equals(nullString) ||
+		// check all tokenizer separators 
+		value.charAt(0) == ' ' || value.charAt(0) == '.' || value.charAt(0) == '\t')
+		return null;
 
 	StringTokenizer tokenizer = new StringTokenizer(value, tokenizerSettings);
 
@@ -189,10 +191,13 @@ public java.lang.String getRecord() {
  */
 public static String getTarget(LinkSource fd) {
 	
-	if ((fd.getValue()==null) || fd.getValue().equals(nullString)) return null;
-
 	String target = nullString;
 	String value = fd.getValue();
+
+	if (value == null || value.length() == 0 || //value.equals(nullString) ||
+		// check all tokenizer separators 
+		value.charAt(0) == ' ' || value.charAt(0) == '.' || value.charAt(0) == '\t')
+		return null;
 
 	StringTokenizer tokenizer = new StringTokenizer(value, tokenizerSettings);
 
@@ -214,9 +219,13 @@ public static String getTarget(LinkSource fd) {
  */
 public static String getTargetFromString(String value) {
 	
-	if ((value==null) || value.equals(nullString)) return null;
+	if (value == null || value.length() == 0 || //value.equals(nullString) ||
+		// check all tokenizer separators 
+		value.charAt(0) == ' ' || value.charAt(0) == '.' || value.charAt(0) == '\t')
+		return null;
 
 	String target = nullString;
+
 
 	StringTokenizer tokenizer = new StringTokenizer(value, tokenizerSettings);
 
@@ -313,15 +322,18 @@ public void setProcess(java.lang.String newProcess) {
  */
 private void setProperties(LinkSource fd) {
 
-	if ((fd.getValue()==null) || fd.getValue().equals(nullString)) {
+	String value = fd.getValue();
+
+	if (value == null || value.length() == 0 || //value.equals(nullString) ||
+		// check all tokenizer separators 
+		value.charAt(0) == ' ' || value.charAt(0) == '.' || value.charAt(0) == '\t')
+	{
 		setType(NOT_VALID);
 		setRecord(null);
 		return;
 	}
 	
 	setType(getType(fd));
-
-	String value = fd.getValue();
 
 	StringTokenizer tokenizer = new StringTokenizer(value, tokenizerSettings);
 

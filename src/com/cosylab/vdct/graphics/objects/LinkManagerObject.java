@@ -367,8 +367,9 @@ public static boolean isSoftwareLink(VDBFieldData field)
 	if (field.getValue().startsWith(Constants.HARDWARE_LINK) ||
 		field.getValue().startsWith("@") ||    // !!!?? INST_IO
 		field.getValue().equals(nullString) /*||
-		Character.isDigit(field.getValue().charAt(0))*/) 
-		return false; 	//!!!
+		Character.isDigit(field.getValue().charAt(0))
+		to be checked outside (there can be a record starting with a digit) */) 
+		return false; 	
 	else
 		return true;
 }
@@ -454,7 +455,11 @@ public boolean manageLink(VDBFieldData field) {
 			// can point to null? OK, cross will be showed
 
 			// assume constant (this is not perfect but handles almost all the cases)
-			if (varlink == null && Character.isDigit(field.getValue().charAt(0)))
+			char firstChar = field.getValue().charAt(0); 	// length > 0 already checked...
+			if (varlink == null && 
+					(Character.isDigit(firstChar) || firstChar == '.' ||
+					 firstChar == '-' || firstChar == '+')
+				)
 				return false;
 
 			EPICSLinkOut outlink = null;
