@@ -94,7 +94,7 @@
 				<comment by="msekoranja">To provide possibility of definining kind of a function (e.g. <kwd>"(field name) PP"</kwd>), VDCT data should look like this:
 					<code language="VDCT" id="visdefport"><![CDATA[
 	port("port name", "expression", "desc")
-	!# InputPort("port name", "field name")]]>
+	#! InputPort("port name", "field name")]]>
 					  <desc>Visual definition of a port.</desc>
 					</code>
 				</comment>
@@ -133,7 +133,7 @@
 				<comment by="msekoranja">To provide possibility of definining kind of a function (e.g. <kwd>"(field name) PP"</kwd>), VDCT data should look like this:
 					<code language="VDCT" id="visdefmacro"><![CDATA[
 	macro("macro name", "expression")   // defined in the higher level
-	!# InputMacro("macro name", "field name")]]>
+	#! InputMacro("macro name", "field name")]]>
 					  <desc>Visual definition of a macro.</desc>
 					</code>
 				</comment>
