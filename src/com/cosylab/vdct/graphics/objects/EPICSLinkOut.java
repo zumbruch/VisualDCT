@@ -547,4 +547,12 @@ public ArrayList getModeNames()
 }
 
 
+/**
+ * @see com.cosylab.vdct.graphics.objects.OutLink#getMode()
+ */
+public int getMode()
+{
+	return OutLink.NORMAL_MODE;
+}
+
 }

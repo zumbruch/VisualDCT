@@ -34,6 +34,12 @@ package com.cosylab.vdct.graphics.objects;
  * @author Matej Sekoranja
  */
 public interface OutLink extends Linkable {
+
+	public static final int NORMAL_MODE = 0;
+	public static final int INVISIBLE_MODE = 1;
+	public static final int EXTERNAL_OUTPUT_MODE = 2;
+	public static final int EXTERNAL_INPUT_MODE = 3;
+
 /**
  * 
  * @return com.cosylab.vdct.graphics.objects.InLink
@@ -62,4 +68,10 @@ int getQueueCount();
  * Creation date: (29.1.2001 17:53:59)
  */
 void setInput(InLink input);
+/**
+ * Insert the method's description here.
+ * Creation date: (29.1.2001 17:53:09)
+ * @return int
+ */
+int getMode();
 }

@@ -143,7 +143,87 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 	int y1 = (int)(scale*out.getOutY())-view.getRy();
 	int x2 = (int)(scale*in.getInX())-view.getRx();
 	int y2 = (int)(scale*in.getInY())-view.getRy();
-	
+
+
+	// inivsible mode
+	if (out.getMode() == OutLink.INVISIBLE_MODE)
+	{
+		int s = (int)(scale*Constants.INVISIBLE_CROSS_SIZE);	
+
+		if (firstHorizontal) {
+			g.drawLine(x1-s, y1, x1+s, y1);
+			g.drawLine(x1, y1-s, x1, y1+s);
+
+			g.drawLine(x2, y2-s, x2, y2+s);
+			g.drawLine(x2-s, y2, x2+s, y2);
+		}
+		else {
+			g.drawLine(x1, y1-s, x1, y1+s);
+			g.drawLine(x1-s, y1, x1+s, y1);
+
+			g.drawLine(x2-s, y2, x2+s, y2);
+			g.drawLine(x2, y2-s, x2, y2+s);
+		}
+		return;
+	}
+
+	// only test here
+	else if (out.getMode() == OutLink.EXTERNAL_INPUT_MODE)
+	{
+		// horizontal
+		
+		int s = (int)(scale*Constants.LINK_STUB_SIZE/2.0);
+		
+		if (x2<x1) s = -s;
+		
+		g.drawLine(x1, y1-s, x1, y1+s);
+
+		g.drawLine(x1, y1-s, x1+s, y1-s);
+		g.drawLine(x1, y1+s, x1+s, y1+s);
+
+		g.drawLine(x1+s, y1-s, x1+2*s, y1);
+		g.drawLine(x1+s, y1+s, x1+2*s, y1);
+
+		return;
+	}
+	else if (out.getMode() == OutLink.EXTERNAL_OUTPUT_MODE)
+	{
+		// horizontal
+		
+		int s = (int)(scale*Constants.LINK_STUB_SIZE/2.0);
+		
+		if (x2<x1) s = -s;
+		
+		g.drawLine(x1, y1-s, x1, y1+s);
+
+		g.drawLine(x1, y1-s, x1+2*s, y1-s);
+		g.drawLine(x1, y1+s, x1+2*s, y1+s);
+
+		g.drawLine(x1+2*s, y1-s, x1+s, y1);
+		g.drawLine(x1+2*s, y1+s, x1+s, y1);
+
+		return;
+	}
+/*
+	else if (out.getMode() == ?)
+	{
+		// horizontal
+		
+		int s = (int)(scale*Constants.LINK_STUB_SIZE/2.0);
+		
+		if (x2<x1) s = -s;
+		
+		g.drawLine(x1, y1-s, x1, y1+s);
+
+		g.drawLine(x1, y1-s, x1+2*s, y1-s);
+		g.drawLine(x1, y1+s, x1+2*s, y1+s);
+
+		g.drawLine(x1+s, y1-s, x1+s, y1);
+		g.drawLine(x1+s, y1+s, x1+s, y1);
+
+		return;
+	}
+*/	
 	if (firstHorizontal) {
 		g.drawLine(x1, y1, x2, y1);
 		g.drawLine(x2, y1, x2, y2);

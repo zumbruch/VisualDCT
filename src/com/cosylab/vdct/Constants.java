@@ -89,6 +89,10 @@ public class Constants {
     public static final int TEMPLATE_INITIAL_HEIGHT = 120;
     public static final int TEMPLATE_MIN_HEIGHT = 180;
 
+    public static final int INVISIBLE_CROSS_SIZE = 10;
+
+    public static final int LINK_STUB_SIZE = 20;
+
     public static final int CONNECTOR_WIDTH = 6;
     public static final int CONNECTOR_HEIGHT = 6;
     public static final int LINK_RADIOUS = 5;

@@ -44,11 +44,17 @@ import java.awt.event.*;
  */
 public class Connector extends VisibleObject implements Descriptable, InLink, Movable, OutLink, Popupable {
 
+	private static final String modeString = "Mode";
+	private static final String normalString = "Normal";
+	private static final String invisibleString = "Invisible";
+	private static final String inputString = "External INPUT";
+	private static final String outputString = "External OUTPUT";
+
 	class PopupMenuHandler implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 			String action = e.getActionCommand();
 			if (action.equals(descriptionString)) {
-				setDescription();
+				//setDescription();
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
 			else if (action.equals(addConnectorString)) {
@@ -59,6 +65,22 @@ public class Connector extends VisibleObject implements Descriptable, InLink, Mo
 				bypass();
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
+			else if (action.equals(normalString)) {
+				setMode(OutLink.NORMAL_MODE);
+				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+			}
+			else if (action.equals(invisibleString)) {
+				setMode(OutLink.INVISIBLE_MODE);
+				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+			}
+			else if (action.equals(inputString)) {
+				setMode(OutLink.EXTERNAL_INPUT_MODE);
+				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+			}
+			else if (action.equals(outputString)) {
+				setMode(OutLink.EXTERNAL_OUTPUT_MODE);
+				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+			}
 			
 		}
 	}
@@ -66,6 +88,7 @@ public class Connector extends VisibleObject implements Descriptable, InLink, Mo
 	protected OutLink outlink = null;
 	protected String ID;
 	protected boolean disconnected = false;
+	protected int mode = OutLink.NORMAL_MODE;
 	private static final String descriptionString = "Description";
 	private static final String addConnectorString = "Add connector";
 	private static final String removeConnectorString = "Remove connector";
@@ -234,7 +257,6 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 				c=Color.white;
 		g.setColor(c);
 		
-
 		if (inlink!=null) 
 			g.drawRect(rrx, rry, rwidth, rheight);
 		else {
@@ -314,18 +336,50 @@ public int getInY() {
 public java.util.Vector getItems() {
 	Vector items = new Vector();
 
+	ActionListener al = createPopupmenuHandler();
+
 	JMenuItem descItem = new JMenuItem(descriptionString);
-	descItem.addActionListener(createPopupmenuHandler());
+descItem.setEnabled(false); //!!!
+	descItem.addActionListener(al);
 	items.addElement(descItem);
 
 	JMenuItem addItem = new JMenuItem(addConnectorString);
-	addItem.addActionListener(createPopupmenuHandler());
+	addItem.addActionListener(al);
 	items.addElement(addItem);
 	
 	JMenuItem removeItem = new JMenuItem(removeConnectorString);
-	removeItem.addActionListener(createPopupmenuHandler());
+	removeItem.addActionListener(al);
 	items.addElement(removeItem);
 	
+	// modes
+	items.addElement(new JSeparator());
+	
+	JMenu modeMenu = new JMenu(modeString);
+	items.addElement(modeMenu);
+
+	JRadioButtonMenuItem normalModeItem = new JRadioButtonMenuItem(normalString, getMode()==OutLink.NORMAL_MODE);
+	normalModeItem.setEnabled(getMode()!=OutLink.NORMAL_MODE);
+	normalModeItem.addActionListener(al);
+	modeMenu.add(normalModeItem);
+
+	JRadioButtonMenuItem invisibleModeItem = new JRadioButtonMenuItem(invisibleString, getMode()==OutLink.INVISIBLE_MODE);
+	invisibleModeItem.setEnabled(getMode()!=OutLink.INVISIBLE_MODE);		// what is input is output and also invisible!
+	invisibleModeItem.addActionListener(al);
+	modeMenu.add(invisibleModeItem);
+	
+	modeMenu.add(new JSeparator());
+	
+	JRadioButtonMenuItem inputModeItem = new JRadioButtonMenuItem(inputString, getMode()==OutLink.EXTERNAL_INPUT_MODE);
+	inputModeItem.setEnabled(getMode()!=OutLink.EXTERNAL_INPUT_MODE);
+	inputModeItem.addActionListener(al);
+	modeMenu.add(inputModeItem);
+
+	JRadioButtonMenuItem outputModeItem = new JRadioButtonMenuItem(outputString, getMode()==OutLink.EXTERNAL_OUTPUT_MODE);
+	outputModeItem.setEnabled(getMode()!=OutLink.EXTERNAL_OUTPUT_MODE);
+	outputModeItem.addActionListener(al);
+	modeMenu.add(outputModeItem);
+
+
 	return items;
 }
 /**
@@ -447,11 +501,6 @@ public void revalidatePosition() {
 }
 /**
  * Insert the method's description here.
- * Creation date: (4.2.2001 12:53:08)
- */
-public void setDescription() {}
-/**
- * Insert the method's description here.
  * Creation date: (24.4.2001 18:04:05)
  * @param description java.lang.String
  */
@@ -507,4 +556,22 @@ protected void validate() {
   setRwidth((int)(getWidth()*getRscale()));
   setRheight((int)(getHeight()*getRscale()));
 }
+
+/**
+ * @see com.cosylab.vdct.graphics.objects.OutLink#getMode()
+ */
+public int getMode()
+{
+	return mode;
+}
+
+/**
+ * Sets the mode.
+ * @param mode The mode to set
+ */
+public void setMode(int mode)
+{
+	this.mode = mode;
+}
+
 }

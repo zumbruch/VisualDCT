@@ -525,7 +525,7 @@ private void initialize() {
 		// user code end
 		setName("Inspector");
 		setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-		setSize(264, 474);
+		setSize(300, 550);
 		setTitle("Inspector");
 		setContentPane(getJDialogContentPane());
 		initConnections();
@@ -781,12 +781,15 @@ public void setMode(int mode)
  */
 private void mouseEvent(MouseEvent event, int row, int col)
 {
-//	if (event.isPopupTrigger())
+	boolean popupTrigger = event.getButton() == MouseEvent.BUTTON3;
+	// event.isPopupTrigger() does not work on my instalation of Linux (RH7.2, GNOME 1.4) 
+	
+//	if (pupupTrigger)
 	{
 		InspectableProperty property = (InspectableProperty)tableModel.getPropertyAt(row);
 
 		// change visibility
-		if (col==0 && event.isPopupTrigger())
+		if (col==0 && popupTrigger)
 		{
 			if (property!=null && property instanceof VDBFieldData)  ///!!! define interface!!
 			{
@@ -798,8 +801,8 @@ private void mouseEvent(MouseEvent event, int row, int col)
 			}
 		}
 		// !!!
-		else if (event.isPopupTrigger() || !property.isEditable())
-//		else if (col>0 && (event.isPopupTrigger() || property.isEditable()))
+		else if (popupTrigger || !property.isEditable())
+//		else if (col>0 && (popupTrigger || property.isEditable()))
 		{
 			if (property!=null)
 				property.popupEvent(getScrollPaneTable(), event.getX(), event.getY());

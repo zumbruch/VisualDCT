@@ -683,6 +683,18 @@ public void mouseClicked(MouseEvent e) {
 				}
 				else if (hilited instanceof Inspectable) 
 					InspectorManager.getInstance().requestInspectorFor((Inspectable)hilited);
+				else if (hilited instanceof Connector)
+				{
+					Connector con = (Connector)hilited;
+					if (con.getMode()==OutLink.INVISIBLE_MODE && con.getInput()!=null)
+					{
+						centerObject((VisibleObject)con.getInput());			// !!! now is always true, but...
+					}
+					else if (con.getOutput()!=null && con.getOutput().getMode()==OutLink.INVISIBLE_MODE)
+					{
+						centerObject((VisibleObject)con.getOutput());			// !!! now is always true, but...
+					}
+				} 
 				else {
 					if (hilited instanceof Group) {
 						moveToGroup((Group)hilited);
@@ -2178,6 +2190,35 @@ public void setScale(double scale) {
 
 
 }
+
+/**
+ * Insert the method's description here.
+ * Creation date: (29.12.2000 12:40:13)
+ * @param scale double
+ */
+public void centerObject(VisibleObject object) {
+
+	ViewState view = ViewState.getInstance();
+
+	// TBD: what if groups are not the same !!!
+
+	// find center
+	int drx = object.getRx()+object.getRwidth()/2;
+	int dry = object.getRy()+object.getRheight()/2;
+	
+	// find new origin
+	drx -= view.getViewWidth()/2;
+	dry -= view.getViewHeight()/2;
+
+	view.setRx(drx);
+	view.setRy(dry);
+
+	recalculateNavigatorPosition();
+	repaint();
+
+
+}
+
 /**
  * Insert the method's description here.
  * Creation date: (3.2.2001 16:30:14)
