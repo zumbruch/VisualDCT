@@ -1702,7 +1702,7 @@ public void exportPostScriptFileMenuItem_ActionPerformed()
 
 				JFileChooser jFileChooser = getfileChooser();
 				UniversalFileFilter universalFileFilter =
-					new UniversalFileFilter(new String("ps"), "PostScript File");
+					new UniversalFileFilter(new String("ps"), "PostScript file");
 
 				jFileChooser.resetChoosableFileFilters();
 				jFileChooser.addChoosableFileFilter(universalFileFilter);
@@ -1721,6 +1721,11 @@ public void exportPostScriptFileMenuItem_ActionPerformed()
 
 				    outputFile = jFileChooser.getSelectedFile();
 						    
+							// fix ending
+					if (jFileChooser.getFileFilter().getDescription().startsWith("PostScript") &&
+						!outputFile.getName().endsWith(".ps"))
+						outputFile = new java.io.File(outputFile.getAbsoluteFile()+".ps");
+
 					if(outputFile.exists())
 					{
    						int jOptionPaneOption =
@@ -4974,7 +4979,7 @@ public void import_DBDMenuItem_ActionPerformed() {
 public void import_DBMenuItem_ActionPerformed() {
 	JFileChooser chooser = getfileChooser();
 	UniversalFileFilter filter = new UniversalFileFilter(
-		new String[] {"db", "template"}, "EPICS DB files");
+		new String[] {"db", "vdb"}, "EPICS DB files");
 	chooser.resetChoosableFileFilters();
 	chooser.addChoosableFileFilter(filter);
 	chooser.setDialogTitle("Import DB");
@@ -5386,13 +5391,13 @@ public boolean openDBD(String fileName, boolean allowDB) {
 		String desc;
 		if (allowDB)
 		{
-			desc = "DBD/DB files";
-			String[] tset = {"dbd", "db", "template"};
+			desc = "EPICS DBD/DB files";
+			String[] tset = {"dbd", "db", "vdb"};
 			set = tset;
 		}
 		else
 		{
-			desc = "DBD files";
+			desc = "EPICS DBD files";
 			String[] tset = {"dbd"};
 			set = tset;
 		}
@@ -5446,7 +5451,7 @@ public void openMenuItem_ActionPerformed() {
 	
 	JFileChooser chooser = getfileChooser();
 	UniversalFileFilter filter = new UniversalFileFilter(
-		new String[] {"db", "template"}, "EPICS DB files");
+		new String[] {"db", "vdb"}, "EPICS DB files");
 	chooser.resetChoosableFileFilters();
 	chooser.addChoosableFileFilter(filter);
 	chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -5847,7 +5852,7 @@ public void renameOKButton_ActionPerformed(java.awt.event.ActionEvent actionEven
 public void save_As_GroupMenuItem_ActionPerformed() {
 	JFileChooser chooser = getfileChooser();
 	UniversalFileFilter filter = new UniversalFileFilter(
-		new String("db"), "DB File");
+		new String[] {"db", "vdb"}, "EPICS DB files");
 	chooser.resetChoosableFileFilters();
 	chooser.addChoosableFileFilter(filter);
 	chooser.setDialogTitle("Save Group as...");
@@ -5864,6 +5869,12 @@ public void save_As_GroupMenuItem_ActionPerformed() {
 			return;
 
 	    theFile = chooser.getSelectedFile();
+
+		// fix ending
+		if (chooser.getFileFilter().getDescription().startsWith("EPICS") &&
+			!theFile.getName().endsWith(".db") &&
+			!theFile.getName().endsWith(".vdb"))
+			theFile = new java.io.File(theFile.getAbsoluteFile()+".vdb");
 
 		if(theFile.exists())
 		{
@@ -5899,7 +5910,7 @@ public void save_As_GroupMenuItem_ActionPerformed() {
 public void generateAsGroupMenuItem_ActionPerformed() {
 	JFileChooser chooser = getfileChooser();
 	UniversalFileFilter filter = new UniversalFileFilter(
-		new String("db"), "DB File");
+		new String("db"), "EPICS DB file");
 	chooser.resetChoosableFileFilters();
 	chooser.addChoosableFileFilter(filter);
 	chooser.setDialogTitle("Generate Group as...");
@@ -5916,6 +5927,11 @@ public void generateAsGroupMenuItem_ActionPerformed() {
 			return;
 
 	    theFile = chooser.getSelectedFile();
+
+		// fix ending
+		if (chooser.getFileFilter().getDescription().startsWith("EPICS") &&
+			!theFile.getName().endsWith(".db"))
+			theFile = new java.io.File(theFile.getAbsoluteFile()+".db");
 
 		if(theFile.exists())
 		{
@@ -5951,7 +5967,7 @@ public void generateAsGroupMenuItem_ActionPerformed() {
 public void save_AsMenuItem_ActionPerformed() {
 	JFileChooser chooser = getfileChooser();
 	UniversalFileFilter filter = new UniversalFileFilter(
-		new String("db"), "DB File");
+		new String[] {"db", "vdb"}, "EPICS DB files");
 	chooser.resetChoosableFileFilters();
 	chooser.addChoosableFileFilter(filter);
 	chooser.setDialogTitle("Save as...");
@@ -5969,6 +5985,12 @@ public void save_AsMenuItem_ActionPerformed() {
 			
 	    theFile = chooser.getSelectedFile();
 
+		// fix ending
+		if (chooser.getFileFilter().getDescription().startsWith("EPICS") &&
+			!theFile.getName().endsWith(".db") &&
+			!theFile.getName().endsWith(".vdb"))
+			theFile = new java.io.File(theFile.getAbsoluteFile()+".vdb");
+
 		if(theFile.exists())
 		{
 		    if(JOptionPane.showConfirmDialog(this, "The file '" + theFile.getName()
@@ -5984,12 +6006,7 @@ public void save_AsMenuItem_ActionPerformed() {
 
     if(theFile != null)
     {
-/*
-			// fix ending
-			if ((theFile.getName().lastIndexOf('.')==0) && 
-				chooser.getFileFilter().getDescription().startsWith("All"))
-				theFile = new java.io.File(theFile.getAbsoluteFile()+".db");
-*/		    
+
 	    GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
 		try
 		{
@@ -6010,7 +6027,7 @@ public void save_AsMenuItem_ActionPerformed() {
 public void saveAsTemplateMenuItem_ActionPerformed() {
 	JFileChooser chooser = getfileChooser();
 	UniversalFileFilter filter = new UniversalFileFilter(
-		new String("template"), "Template File");
+		new String[] {"db", "vdb"}, "EPICS DB files");
 	chooser.resetChoosableFileFilters();
 	chooser.addChoosableFileFilter(filter);
 	chooser.setDialogTitle("Save as Template");
@@ -6027,6 +6044,12 @@ public void saveAsTemplateMenuItem_ActionPerformed() {
 			return;
 			
 	    theFile = chooser.getSelectedFile();
+	    
+		// fix ending
+		if (chooser.getFileFilter().getDescription().startsWith("EPICS") &&
+			!theFile.getName().endsWith(".db") &&
+			!theFile.getName().endsWith(".vdb"))
+			theFile = new java.io.File(theFile.getAbsoluteFile()+".vdb");
 
 		if(theFile.exists())
 		{
@@ -6043,12 +6066,6 @@ public void saveAsTemplateMenuItem_ActionPerformed() {
 
     if(theFile != null)
     {
-/*
-			// fix ending
-			if ((theFile.getName().lastIndexOf('.')==0) && 
-				chooser.getFileFilter().getDescription().startsWith("All"))
-				theFile = new java.io.File(theFile.getAbsoluteFile()+".db");
-*/		    
 	    GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
 		try
 		{
@@ -6069,7 +6086,7 @@ public void saveAsTemplateMenuItem_ActionPerformed() {
 public void generateMenuItem_ActionPerformed() {
 	JFileChooser chooser = getfileChooser();
 	UniversalFileFilter filter = new UniversalFileFilter(
-		new String("db"), "DB File");
+		new String("db"), "EPCIS DB file");
 	chooser.resetChoosableFileFilters();
 	chooser.addChoosableFileFilter(filter);
 	chooser.setDialogTitle("Generate");
@@ -6087,6 +6104,11 @@ public void generateMenuItem_ActionPerformed() {
 			
 	    theFile = chooser.getSelectedFile();
 
+		// fix ending
+		if (chooser.getFileFilter().getDescription().startsWith("EPICS") &&
+			!theFile.getName().endsWith(".db"))
+			theFile = new java.io.File(theFile.getAbsoluteFile()+".db");
+
 		if(theFile.exists())
 		{
 		    if(JOptionPane.showConfirmDialog(this, "The file '" + theFile.getName()
@@ -6102,12 +6124,6 @@ public void generateMenuItem_ActionPerformed() {
 
     if(theFile != null)
     {
-/*
-			// fix ending
-			if ((theFile.getName().lastIndexOf('.')==0) && 
-				chooser.getFileFilter().getDescription().startsWith("All"))
-				theFile = new java.io.File(theFile.getAbsoluteFile()+".db");
-*/		    
 	    GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
 		try
 		{

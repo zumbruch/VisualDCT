@@ -148,11 +148,12 @@ public static VDBTemplateInstance copyVDBTemplateInstance(VDBTemplateInstance so
 
 	VDBTemplateInstance vdbTemplateInstance = new VDBTemplateInstance(source.getName(), source.getTemplate());
 
-	vdbTemplateInstance.setProperties((TreeMap)source.getProperties().clone());
+	vdbTemplateInstance.setProperties((Hashtable)source.getProperties().clone(),
+								  	  (Vector)source.getPropertiesV().clone());
 
 
 	Hashtable ios = new Hashtable();
-	Enumeration keys = source.getOutputs().keys();
+/*	Enumeration keys = source.getOutputs().keys();
 	while (keys.hasMoreElements())
 	{
 		String key = keys.nextElement().toString();
@@ -166,12 +167,12 @@ public static VDBTemplateInstance copyVDBTemplateInstance(VDBTemplateInstance so
 		if (initVal!=null)
 			tf.setValueSilently(initVal);
 		ios.put(key, tf);
-	}
+	}*/
 	vdbTemplateInstance.setOutputs(ios);
 
 
 	ios = new Hashtable();
-	keys = source.getInputs().keys();
+/*	keys = source.getInputs().keys();
 	while (keys.hasMoreElements())
 	{
 		String key = keys.nextElement().toString();
@@ -185,7 +186,7 @@ public static VDBTemplateInstance copyVDBTemplateInstance(VDBTemplateInstance so
 		if (initVal!=null)
 			tf.setValueSilently(initVal);
 		ios.put(key, tf);
-	}
+	}*/
 	vdbTemplateInstance.setInputs(ios);
 
 
@@ -332,10 +333,12 @@ public static VDBTemplateInstance generateVDBTemplateInstance(DBTemplateInstance
 	VDBTemplateInstance vti = new VDBTemplateInstance(dbTemplateInstance.getTemplateInstanceId(), t);
 	vti.setComment(dbTemplateInstance.getComment());	
 
-	vti.setProperties(new TreeMap(dbTemplateInstance.getProperties()));
-		
-	vti.setInputs(generateTemplateInstanceIOFields(vti, dbTemplateInstance.getValues(), t.getInputs(), t.getInputComments()));
-	vti.setOutputs(generateTemplateInstanceIOFields(vti, dbTemplateInstance.getValues(), t.getOutputs(), t.getOutputComments()));
+	vti.setProperties(dbTemplateInstance.getProperties(), dbTemplateInstance.getPropertiesV());
+	
+	// !!! temp
+	Hashtable table = new Hashtable();
+	vti.setInputs(generateTemplateInstanceIOFields(vti, table, table, table));
+	vti.setOutputs(generateTemplateInstanceIOFields(vti, table, table, table));
 	
 	return vti;
 }
@@ -346,11 +349,11 @@ public static VDBTemplateInstance generateVDBTemplateInstance(DBTemplateInstance
 public static VDBTemplateInstance generateNewVDBTemplateInstance(String name, VDBTemplate t)
 {
 	VDBTemplateInstance vti = new VDBTemplateInstance(name, t);
-	vti.setProperties(new TreeMap());		// empty properties
+	vti.setProperties(new Hashtable(), new Vector());		// empty properties
 		
 	Hashtable hm = new Hashtable();
-	vti.setInputs(generateTemplateInstanceIOFields(vti, hm, t.getInputs(), t.getInputComments()));
-	vti.setOutputs(generateTemplateInstanceIOFields(vti, hm, t.getOutputs(), t.getOutputComments()));
+	vti.setInputs(generateTemplateInstanceIOFields(vti, hm, hm, hm));
+	vti.setOutputs(generateTemplateInstanceIOFields(vti, hm, hm, hm));
 
 	return vti;
 }
@@ -433,13 +436,16 @@ private static VDBData generateTemplate(DBDData dbd, DBTemplate dbTemplate)
 		VDBData vdbData = VDBData.generateVDBDataInternal(dbd, dbTemplate.getData());
 		DrawingSurface.applyVisualData(false, vt.getGroup(), dbTemplate.getData(), vdbData);
 		vt.getGroup().unconditionalValidateSubObjects(false);
-		
+	/*	
 		vt.setInputs(generateTemplateIOFields(dbTemplate, dbTemplate.getInputs(), "input"));
 		vt.setOutputs(generateTemplateIOFields(dbTemplate, dbTemplate.getOutputs(), "output"));
 	
 		vt.setInputComments(dbTemplate.getInputComments());
 		vt.setOutputComments(dbTemplate.getOutputComments());
-		
+	*/	
+		vt.setPorts(dbTemplate.getPorts());
+		vt.setPortsV(dbTemplate.getPortsV());
+	
 		VDBData.addTemplate(vt);
 		
 		return vdbData;

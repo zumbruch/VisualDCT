@@ -173,7 +173,7 @@ public class Template
 				int px = rrx + rfieldLabelX;
 				int py = rry + rfieldLabelY;
 				
-		 		java.util.Iterator e = templateData.getProperties().keySet().iterator();
+		 		java.util.Iterator e = templateData.getPropertiesV().iterator();
 				while (e.hasNext())
 				{				
 					String name = e.next().toString();
@@ -184,19 +184,6 @@ public class Template
 					py += rfieldRowHeight;
 				}
 
-/*
-				Enumeration e = templateData.getProperties().keys();
-				while (e.hasMoreElements()) {
-					String name = e.nextElement().toString();
-					val = name + "=" + templateData.getProperties().get(name).toString();
-					while ((fm.stringWidth(val) + ox) > rwidth)
-						val = val.substring(0, val.length() - 2);
-					g.drawString(val, px, py);
-					py += rfieldRowHeight;
-				}
-
- */ 
- 
 			}
 
 		}
@@ -473,7 +460,7 @@ public class Template
 			items.addElement(new MonitoredProperty(name, (String)templateData.getProperties().get(name), this));
 		}
 */		
-  		java.util.Iterator i = templateData.getProperties().keySet().iterator();
+  		java.util.Iterator i = templateData.getPropertiesV().iterator();
 		while (i.hasNext())
 		{
 			String name = i.next().toString();
@@ -839,7 +826,7 @@ public void addProperty()
 		{
 			if (!templateData.getProperties().containsKey(reply))
 			{
-				templateData.getProperties().put(reply, nullString);
+				templateData.addProperty(reply, nullString);
 
 				com.cosylab.vdct.undo.UndoManager.getInstance().addAction(
 						new CreateTemplatePropertyAction(this, reply));
@@ -868,6 +855,7 @@ public void propertyChanged(MonitoredProperty property)
 {
 	String oldValue = (String)templateData.getProperties().get(property.getName());
 
+	// just override value
 	templateData.getProperties().put(property.getName(), property.getValue());
 
 	com.cosylab.vdct.undo.UndoManager.getInstance().addAction(
@@ -884,7 +872,7 @@ public void propertyChanged(MonitoredProperty property)
  */
 public void removeProperty(MonitoredProperty property)
 {
-	templateData.getProperties().remove(property.getName());
+	templateData.removeProperty(property.getName());
 	
 	com.cosylab.vdct.undo.UndoManager.getInstance().addAction(
 					new DeleteTemplatePropertyAction(this, property.getName()));
@@ -916,10 +904,11 @@ public void renameProperty(MonitoredProperty property)
 				com.cosylab.vdct.undo.ComposedAction composedAction = 
 												new com.cosylab.vdct.undo.ComposedAction();
 
-				Object value = templateData.getProperties().remove(property.getName());
+				Object value = templateData.getProperties().get(property.getName());
+				templateData.removeProperty(property.getName());
 				composedAction.addAction(new DeleteTemplatePropertyAction(this, property.getName()));
 
-				templateData.getProperties().put(reply, value);
+				templateData.addProperty(reply, value.toString());
 				composedAction.addAction(new CreateTemplatePropertyAction(this, reply));
 
 				com.cosylab.vdct.undo.UndoManager.getInstance().addAction(composedAction);
@@ -1146,7 +1135,7 @@ public void writeObjects(DataOutputStream file, NameManipulator namer, boolean e
 	
 		// macros
 		Map macros = getTemplateData().getProperties();
-		Iterator i = macros.keySet().iterator();
+		Iterator i = getTemplateData().getPropertiesV().iterator();
 		while (i.hasNext())
 		{
 			String name = i.next().toString();

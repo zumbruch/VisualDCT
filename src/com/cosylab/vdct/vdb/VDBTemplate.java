@@ -32,6 +32,7 @@ import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
@@ -39,6 +40,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 import com.cosylab.vdct.Console;
+import com.cosylab.vdct.db.DBPort;
 import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.events.commands.GetGUIInterface;
 import com.cosylab.vdct.graphics.objects.Group;
@@ -48,9 +50,8 @@ import com.cosylab.vdct.inspector.InspectorManager;
 
 /**
  * Data object representing EPICS DB template.
- * All data is obtained from DB (.template) file.
+ * All data is obtained from DB file.
  * <code>Group</code> contains template structure.
- * The name of the group is "<name>.template". 
  * @author Matej
  */
 
@@ -60,10 +61,16 @@ public class VDBTemplate implements Inspectable, Commentable
 	protected String id = null;
 	protected String fileName = null;
 	protected String description = null;
+/*
 	protected Hashtable inputs = null;
 	protected Hashtable outputs = null;
 	protected Hashtable inputComments = null;
 	protected Hashtable outputComments = null;
+*/
+
+	protected Hashtable ports = null;
+	protected Vector portsV = null;
+
 	protected Group group = null;
 	
 	private String comment = null;
@@ -215,9 +222,6 @@ public class VDBTemplate implements Inspectable, Commentable
 		this.id = id;
 		this.fileName = fileName;
 		updateDescription();			
-		
-		Console.getInstance().println("Template '"+id+"' loaded, file '"+fileName+"'.");
-		
 	}
 
 	/**
@@ -256,7 +260,7 @@ public class VDBTemplate implements Inspectable, Commentable
 	 * Returns the inputs.
 	 * @return Hashtable
 	 */
-	public Hashtable getInputs()
+/*	public Hashtable getInputs()
 	{
 		return inputs;
 	}
@@ -265,7 +269,7 @@ public class VDBTemplate implements Inspectable, Commentable
 	 * Returns the outputs.
 	 * @return Hashtable
 	 */
-	public Hashtable getOutputs()
+/*	public Hashtable getOutputs()
 	{
 		return outputs;
 	}
@@ -333,7 +337,7 @@ public class VDBTemplate implements Inspectable, Commentable
 	 * Sets the inputs.
 	 * @param inputs The inputs to set
 	 */
-	public void setInputs(Hashtable inputs)
+/*	public void setInputs(Hashtable inputs)
 	{
 		this.inputs = inputs;
 	}
@@ -342,7 +346,7 @@ public class VDBTemplate implements Inspectable, Commentable
 	 * Sets the outputs.
 	 * @param outputs The outputs to set
 	 */
-	public void setOutputs(Hashtable outputs)
+/*	public void setOutputs(Hashtable outputs)
 	{
 		this.outputs = outputs;
 	}
@@ -369,7 +373,7 @@ public class VDBTemplate implements Inspectable, Commentable
 	 * Returns the inputComments.
 	 * @return Hashtable
 	 */
-	public Hashtable getInputComments()
+/*	public Hashtable getInputComments()
 	{
 		return inputComments;
 	}
@@ -378,7 +382,7 @@ public class VDBTemplate implements Inspectable, Commentable
 	 * Returns the outputComments.
 	 * @return Hashtable
 	 */
-	public Hashtable getOutputComments()
+/*	public Hashtable getOutputComments()
 	{
 		return outputComments;
 	}
@@ -387,7 +391,7 @@ public class VDBTemplate implements Inspectable, Commentable
 	 * Sets the inputComments.
 	 * @param inputComments The inputComments to set
 	 */
-	public void setInputComments(Hashtable inputComments)
+/*	public void setInputComments(Hashtable inputComments)
 	{
 		this.inputComments = inputComments;
 	}
@@ -396,7 +400,7 @@ public class VDBTemplate implements Inspectable, Commentable
 	 * Sets the outputComments.
 	 * @param outputComments The outputComments to set
 	 */
-	public void setOutputComments(Hashtable outputComments)
+/*	public void setOutputComments(Hashtable outputComments)
 	{
 		this.outputComments = outputComments;
 	}
@@ -479,7 +483,7 @@ public class VDBTemplate implements Inspectable, Commentable
 		items.addElement(new NameValueInfoProperty("Class", id));
 		items.addElement(new NameValueInfoProperty("FileName", fileName));
 		items.addElement(new DescriptionProperty());
-
+/*
 		items.addElement(getInputsSeparator());
 		Enumeration e = getInputs().keys();
 		while (e.hasMoreElements())
@@ -497,7 +501,17 @@ public class VDBTemplate implements Inspectable, Commentable
 			VDBFieldData data = (VDBFieldData)getOutputs().get(key);
 			items.addElement(new NameValueInfoProperty(key, data.getFullName()));
 		}
-		
+*/		
+
+/// !!! temp
+		items.addElement(getOutputsSeparator());
+		Iterator i = getPortsV().iterator();
+		while (i.hasNext())
+		{
+			DBPort port = (DBPort)i.next();
+			items.addElement(new NameValueInfoProperty(port.getName(), port.getTarget()));
+		}
+
 		InspectableProperty[] properties = new InspectableProperty[items.size()];
 		items.copyInto(properties);
 		return properties;
@@ -529,4 +543,40 @@ public class VDBTemplate implements Inspectable, Commentable
 		this.comment = comment;
 	}
 
+	/**
+	 * Returns the ports.
+	 * @return Hashtable
+	 */
+	public Hashtable getPorts()
+	{
+		return ports;
+	}
+	
+	/**
+	 * Returns the portsV.
+	 * @return Vector
+	 */
+	public Vector getPortsV()
+	{
+		return portsV;
+	}
+	
+	/**
+	 * Sets the ports.
+	 * @param ports The ports to set
+	 */
+	public void setPorts(Hashtable ports)
+	{
+		this.ports = ports;
+	}
+	
+	/**
+	 * Sets the portsV.
+	 * @param portsV The portsV to set
+	 */
+	public void setPortsV(Vector portsV)
+	{
+		this.portsV = portsV;
+	}
+	
 }

@@ -29,20 +29,19 @@ package com.cosylab.vdct.db;
  */
 
 import java.util.Hashtable;
-
+import java.util.Vector;
 
 /**
  * @author Matej
  */
 public class DBTemplate extends DBComment
 {
-	protected String id;
-	protected String fileName;
-	protected String description;
-	protected Hashtable inputs = null;
-	protected Hashtable inputComments = null;
-	protected Hashtable outputs = null;
-	protected Hashtable outputComments = null;
+	protected String id = null;
+	protected String fileName = null;
+	protected String description = null;
+
+	protected Hashtable ports = null;
+	protected Vector portsV = null;
 
 	protected boolean initialized;
 
@@ -56,40 +55,11 @@ public class DBTemplate extends DBComment
 	{
 		this.id=id;
 		this.fileName=fileName;
-		reset();
+
+		ports = new Hashtable();
+		portsV = new Vector();
 	}
 	
-
-	/**
-	 * Resets template data.
-	 */
-	public void reset()
-	{
-		description = null;
-		comment = null;
-		initialized = false;
-		data = null;
-
-		if (inputs==null)
-			inputs = new Hashtable();
-		else 
-			inputs.clear();
-
-		if (outputs==null)
-			outputs = new Hashtable();
-		else 
-			outputs.clear();
-
-		if (inputComments==null)
-			inputComments = new Hashtable();
-		else 
-			inputComments.clear();
-
-		if (outputComments==null)
-			outputComments = new Hashtable();
-		else 
-			outputComments.clear();
-	}
 
 	/**
 	 * Returns the description.
@@ -145,50 +115,6 @@ public class DBTemplate extends DBComment
 		this.id = id;
 	}
 
-	/**
-	 * Returns the inputs.
-	 * @return Hashtable
-	 */
-	public Hashtable getInputs()
-	{
-		return inputs;
-	}
-
-	/**
-	 * Returns the outputs.
-	 * @return Hashtable
-	 */
-	public Hashtable getOutputs()
-	{
-		return outputs;
-	}
-
-	/**
-	 * Returns the data.
-	 * @return DBData
-	 */
-	public DBData getData()
-	{
-		return data;
-	}
-
-	/**
-	 * Returns the inputComments.
-	 * @return Hashtable
-	 */
-	public Hashtable getInputComments()
-	{
-		return inputComments;
-	}
-
-	/**
-	 * Returns the outputComments.
-	 * @return Hashtable
-	 */
-	public Hashtable getOutputComments()
-	{
-		return outputComments;
-	}
 
 	/**
 	 * Sets the data.
@@ -215,6 +141,44 @@ public class DBTemplate extends DBComment
 	public void setInitialized(boolean initialized)
 	{
 		this.initialized = initialized;
+	}
+
+	/**
+	 * Returns the ports.
+	 * @return Hashtable
+	 */
+	public Hashtable getPorts()
+	{
+		return ports;
+	}
+
+	/**
+	 * Returns the portsV.
+	 * @return Vector
+	 */
+	public Vector getPortsV()
+	{
+		return portsV;
+	}
+
+	/**
+	 */
+	public void addPort(DBPort port)
+	{
+		if (!ports.containsKey(port.getName()))
+		{
+			ports.put(port.getName(), port);
+			portsV.addElement(port);
+		}
+	}
+
+	/**
+	 * Returns the data.
+	 * @return DBData
+	 */
+	public DBData getData()
+	{
+		return data;
 	}
 
 }

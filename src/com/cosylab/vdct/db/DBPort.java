@@ -1,4 +1,4 @@
-package com.cosylab.vdct.undo;
+package com.cosylab.vdct.db;
 
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
@@ -28,53 +28,77 @@ package com.cosylab.vdct.undo;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import com.cosylab.vdct.graphics.objects.Template;
-import com.cosylab.vdct.inspector.InspectorManager;
+/**
+ * @author Matej
+ */
+public class DBPort extends DBComment
+{
+	protected String name = null;
+	protected String target = null;
+	protected String description = null;
+	
+	/**
+	 * Insert the method's description here.
+	 */
+	public DBPort(String name, String target)
+	{
+		this.name = name;
+		this.target = target;
+	}
+	
+	
+	/**
+	 * Returns the name.
+	 * @return String
+	 */
+	public String getName()
+	{
+		return name;
+	}
 
-/**
- * Insert the type's description here.
- * Creation date: (3.5.2001 16:26:04)
- * @author 
- */
-public class CreateTemplatePropertyAction extends ActionObject {
-	protected Template object;
-	protected String name;
+	/**
+	 * Returns the target.
+	 * @return String
+	 */
+	public String getTarget()
+	{
+		return target;
+	}
 
-	private static final String nullString = "";	
-/**
- * Insert the method's description here.
- * Creation date: (3.5.2001 16:27:58)
- */
-public CreateTemplatePropertyAction(Template object, String name) {
-	this.object=object;
-	this.name=name;
-}
-/**
- * Insert the method's description here.
- * Creation date: (3.5.2001 16:26:04)
- * @return java.lang.String
- */
-public String getDescription() {
-	return "Create Template Property ["+object+"]("+name+")";
-}
-/**
- * This method was created in VisualAge.
- */
-protected void redoAction() {
-	object.getTemplateData().addProperty(name, nullString);
+	/**
+	 * Sets the name.
+	 * @param name The name to set
+	 */
+	public void setName(String name)
+	{
+		this.name = name;
+	}
 
-	object.updateTemplateFields();
-	InspectorManager.getInstance().updateObject(object);
-	object.unconditionalValidation();
-}
-/**
- * This method was created in VisualAge.
- */
-protected void undoAction() {
-	object.getTemplateData().removeProperty(name);
+	/**
+	 * Sets the target.
+	 * @param target The target to set
+	 */
+	public void setTarget(String target)
+	{
+		this.target = target;
+	}
 
-	object.updateTemplateFields();
-	InspectorManager.getInstance().updateObject(object);
-	object.unconditionalValidation();
-}
+	/**
+	 * Returns the description.
+	 * @return String
+	 */
+	public String getDescription()
+	{
+		return description;
+	}
+
+	/**
+	 * Sets the description.
+	 * @param description The description to set
+	 */
+	public void setDescription(String description)
+	{
+		this.description = description;
+	}
+
 }

@@ -114,15 +114,13 @@ public class DBResolver {
  	// #! TemplateOutput("alias", "field", "description")
 	
 	// resets all template data && generates template name
-	public static final String TEMPLATE_INPUT = "TemplateInput";
-	public static final String TEMPLATE_OUTPUT = "TemplateOutput";
+	//public static final String TEMPLATE_INPUT = "TemplateInput";
+	//public static final String TEMPLATE_OUTPUT = "TemplateOutput";
 	
 	// template 'instatiation'
 	// used format:
  	// #! TemplateInstance("template instance id", x, y, color, "desc")
- 	// #! TemplateFieldValue("template instance id", "alias", "value")
 	public static final String TEMPLATE_INSTANCE = "TemplateInstance";
-	public static final String TEMPLATE_VALUE ="TemplateFieldValue";
 
 /**
  * This method was created in VisualAge.
@@ -167,11 +165,15 @@ private static DBTemplate loadTemplate(DBData data, String templateFile, String 
 	/// !!! check if already loaded and cyclic ...
 		/// !! temp
 	String templateToResolve = com.cosylab.vdct.util.StringUtils.replaceFileName(referencedFromFile, templateFile);
-System.out.println("Loading template \""+templateFile+"\"...");
+
+	Console.getInstance().println("Loading template \""+templateFile+"\"...");
 
 	DBData templateData = resolveDB(templateToResolve);
 	templateData.getTemplateData().setData(templateData);
 	data.addTemplate(templateData.getTemplateData());
+
+	Console.getInstance().println("Template \""+templateFile+"\" loaded.");
+
 
 	return templateData.getTemplateData();
 }
@@ -454,31 +456,7 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 						ti.setDescription(desc);
 					}
 				}
-				else if (tokenizer.sval.equalsIgnoreCase(TEMPLATE_VALUE)) {
-					// read template id
-					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD)||
-						(tokenizer.ttype == DBConstants.quoteChar)) str=tokenizer.sval;
-					else throw (new DBGParseException(errorString, tokenizer, fileName));
-					
-					// read field alias
-					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD)||
-						(tokenizer.ttype == DBConstants.quoteChar)) str2=tokenizer.sval;
-					else throw (new DBGParseException(errorString, tokenizer, fileName));
-
-					// read value
-					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD)||
-						(tokenizer.ttype == DBConstants.quoteChar)) desc=tokenizer.sval;
-					else throw (new DBGParseException(errorString, tokenizer, fileName));
-
-					DBTemplateInstance ti = (DBTemplateInstance)data.getTemplateInstances().get(str);
-					if (ti!=null)
-						ti.getValues().put(str2, desc);
-					
-				}
-				else if (tokenizer.sval.equalsIgnoreCase(TEMPLATE_INPUT)) {
+/*				else if (tokenizer.sval.equalsIgnoreCase(TEMPLATE_INPUT)) {
 
 					// read alias
 					tokenizer.nextToken();
@@ -534,6 +512,7 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 						templateData.getOutputComments().put(str, desc);
 					}
 				}
+*/
 				else if (tokenizer.sval.equalsIgnoreCase(VDCTLINE)) {
 					// read template name
 					tokenizer.nextToken();
@@ -868,8 +847,7 @@ public static void skipLines(int linesToSkip, StreamTokenizer tokenizer, String 
  */
 public static void processDB(DBData data, StreamTokenizer tokenizer, String fileName) {
 	
-	final String defaultComment = "";
-	String comment = defaultComment;
+	String comment = nullString;
 	String str, str2;
 	String include_filename;
 	StreamTokenizer inctokenizer = null;
@@ -903,7 +881,7 @@ public static void processDB(DBData data, StreamTokenizer tokenizer, String file
 						(tokenizer.ttype == DBConstants.quoteChar)) rd.setName(tokenizer.sval);
 					else throw (new DBParseException("Invalid record name...", tokenizer, fileName));
 
-					rd.setComment(comment);	comment = defaultComment;
+					rd.setComment(comment);	comment = nullString;
 					
 					processFields(rd, tokenizer, fileName);
 					data.addRecord(rd);
@@ -921,10 +899,12 @@ public static void processDB(DBData data, StreamTokenizer tokenizer, String file
 					else
 						tokenizer.pushBack();
 
-if (str==null)
-System.out.println("template()\n{");
-else
-System.out.println("template(\""+str+"\")\n{");
+					/*
+					if (str==null)
+						System.out.println("template()\n{");
+					else
+						System.out.println("template(\""+str+"\")\n{");
+					*/
 
 					// multiple tempaltes
 					// only new ports are added
@@ -932,7 +912,7 @@ System.out.println("template(\""+str+"\")\n{");
 					if (!templateData.isInitialized())
 					{
 						templateData.setInitialized(true);
-						templateData.setComment(comment); comment = defaultComment;
+						templateData.setComment(comment); comment = nullString;
 						templateData.setDescription(str);
 
 						DBTemplateEntry entry = new DBTemplateEntry();
@@ -941,13 +921,13 @@ System.out.println("template(\""+str+"\")\n{");
 					}
 					else
 					{
-				// !!! TBD multiple templates support
-						comment = defaultComment;
+						// !!! TBD multiple templates support
+						comment = nullString;
 					}
 					
 					processPorts(templateData, tokenizer, fileName);
 					
-System.out.println("}");
+					//System.out.println("}");
 
 				}
 
@@ -968,18 +948,16 @@ System.out.println("}");
 
 					DBTemplate loadedTemplate = loadTemplate(data, str, fileName);
 
-System.out.println("expand(\""+str+"\", "+str2+")\n{");
+					//System.out.println("expand(\""+str+"\", "+str2+")\n{");
 
 					DBTemplateInstance ti = new DBTemplateInstance(str2, loadedTemplate.getId());
-					ti.setComment(comment);	comment = defaultComment;
+					ti.setComment(comment);	comment = nullString;
 
 					processMacros(ti, tokenizer, fileName);
 					
 					data.addTemplateInstance(ti);
 
-System.out.println("}");
-
-					
+					//System.out.println("}");
 				}
 
 				/****************** includes ********************/
@@ -992,7 +970,7 @@ System.out.println("}");
 					else throw (new DBParseException("Invalid include filename...", tokenizer, fileName));
 
 					DBDataEntry entry = new DBDataEntry(INCLUDE+" \""+include_filename+"\"");
-					entry.setComment(comment);	comment = defaultComment;
+					entry.setComment(comment);	comment = nullString;
 					data.addEntry(entry);
 
 					// if not absulute fileName, do not use relative path
@@ -1013,7 +991,7 @@ System.out.println("}");
 					else throw (new DBParseException("Invalid path...", tokenizer, fileName));
 
 					DBDataEntry entry = new DBDataEntry(PATH+" \""+str+"\"");
-					entry.setComment(comment);	comment = defaultComment;
+					entry.setComment(comment);	comment = nullString;
 					data.addEntry(entry);
 
 					Console.getInstance().println("Warning: 'path' command is not supported...");
@@ -1029,7 +1007,7 @@ System.out.println("}");
 					else throw (new DBParseException("Invalid addpath...", tokenizer, fileName));
 
 					DBDataEntry entry = new DBDataEntry(ADDPATH+" \""+str+"\"");
-					entry.setComment(comment);	comment = defaultComment;
+					entry.setComment(comment);	comment = nullString;
 					data.addEntry(entry);
 
 					Console.getInstance().println("Warning: 'addpath' command is not supported...");
@@ -1076,9 +1054,9 @@ public static void processMacros(DBTemplateInstance templateInstance, StreamToke
 				if (tokenizer.ttype == DBConstants.quoteChar) value=tokenizer.sval;
 				else throw (new DBParseException("Invalid macro value...", tokenizer, fileName));
 
-System.out.println("\tmacro("+name+", \""+value+"\")");
+				//System.out.println("\tmacro("+name+", \""+value+"\")");
 
-				templateInstance.getProperties().put(name, value);
+				templateInstance.addProperty(name, value);
 			}
 
 			else if (tokenizer.sval.equalsIgnoreCase(INCLUDE)) {
@@ -1112,7 +1090,7 @@ public static void processPorts(DBTemplate template, StreamTokenizer tokenizer, 
 	String value;
 	String description;
 	String include_filename;
-	final String defaultDescription = "";
+	String comment = nullString;
 	StreamTokenizer inctokenizer = null;
 	
 	if (template!=null)
@@ -1123,7 +1101,7 @@ public static void processPorts(DBTemplate template, StreamTokenizer tokenizer, 
 		if (tokenizer.ttype == tokenizer.TT_WORD) 
 			if (tokenizer.sval.equals(ENDSTR)) break;
 			else if (tokenizer.sval.startsWith(DBConstants.commentString)) 
-				processComment(null, tokenizer, fileName);				// !!! no comments are preserved in ports
+				comment+=processComment(null, tokenizer, fileName);
 			else if (tokenizer.sval.equalsIgnoreCase(PORT)) {
 
 				// read name
@@ -1139,17 +1117,19 @@ public static void processPorts(DBTemplate template, StreamTokenizer tokenizer, 
 				else throw (new DBParseException("Invalid port value...", tokenizer, fileName));
 
 				// read optional description
+				description = null;
 				tokenizer.nextToken();
 				if (tokenizer.ttype == DBConstants.quoteChar) description=tokenizer.sval;
 				else
-				{
-					description = defaultDescription;
 					tokenizer.pushBack();
-				}
 
-System.out.println("\tport("+name+", \""+value+"\", \""+description+"\")");
+				//System.out.println("\tport("+name+", \""+value+"\", \""+description+"\")");
 
-				//!!!template.getPorts().put(name, value);
+				DBPort port = new DBPort(name, value);
+				port.setComment(comment); comment = nullString;
+				port.setDescription(description);
+				
+				template.addPort(port);
 			}
 
 			else if (tokenizer.sval.equalsIgnoreCase(INCLUDE)) {

@@ -29,10 +29,9 @@ package com.cosylab.vdct.vdb;
  */
 
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.Vector;
 
 import com.cosylab.vdct.util.StringUtils;
 
@@ -43,8 +42,8 @@ public class VDBTemplateInstance implements Commentable
 {
 	protected String name = null;
 	protected VDBTemplate template = null;
-	//protected Hashtable properties = null;
-	protected TreeMap properties = null;
+	protected Vector propertiesV = null;
+	protected Hashtable properties = null;
 	protected Hashtable inputs = null;
 	protected Hashtable outputs = null;
 
@@ -80,10 +79,37 @@ public class VDBTemplateInstance implements Commentable
 	 * Returns the properties.
 	 * @return Hashtable
 	 */
-//	public Hashtable getProperties()
-	public TreeMap getProperties()
+	public Hashtable getProperties()
 	{
 		return properties;
+	}
+
+	/**
+	 * Returns the properties.
+	 * @return Vector
+	 */
+	public Vector getPropertiesV()
+	{
+		return propertiesV;
+	}
+
+	/**
+	 */
+	public void addProperty(Object key, String value)
+	{
+		if (!propertiesV.contains(key))
+		{
+			properties.put(key, value);
+			propertiesV.addElement(key);
+		}
+	}
+
+	/**
+	 */
+	public void removeProperty(Object key)
+	{
+		propertiesV.remove(key);
+		properties.remove(key);
 	}
 
 	/**
@@ -117,10 +143,10 @@ public class VDBTemplateInstance implements Commentable
 	 * Sets the properties.
 	 * @param properties The properties to set
 	 */
-	public void setProperties(TreeMap properties)
+	public void setProperties(Hashtable properties, Vector propertiesV)
 	{
-//		this.properties = properties;
 		this.properties = properties;
+		this.propertiesV = propertiesV;
 	}
 
 	/**

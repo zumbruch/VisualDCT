@@ -40,6 +40,7 @@ import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.vdb.*;
 import com.cosylab.vdct.db.DBDataEntry;
 import com.cosylab.vdct.db.DBEntry;
+import com.cosylab.vdct.db.DBPort;
 import com.cosylab.vdct.db.DBResolver;
 import com.cosylab.vdct.db.DBTemplateEntry;
 import com.cosylab.vdct.dbd.DBDConstants;
@@ -103,8 +104,7 @@ public void addSubObject(String id, VisibleObject object) {
 	Vector structure = Group.getRoot().getStructure();
 	if (object instanceof SaveObject)
 	{
-		if (!structure.contains(object))
-			structure.addElement(object);
+		structure.addElement(object);
 	}
 /*
 	com.cosylab.vdct.undo.UndoManager.getInstance().addAction(
@@ -1234,8 +1234,7 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
  final String BOX_START = "#! "+DBResolver.VDCTBOX+"(";
  final String TEXTBOX_START = "#! "+DBResolver.VDCTTEXTBOX+"(";
 
- final String TEMPLATE_START  = "#! "+DBResolver.TEMPLATE_INSTANCE+"(";
- final String TEMPLATE_VALUE_START     = "#! "+DBResolver.TEMPLATE_VALUE+"(";
+ final String TEMPLATE_INSTANCE_START  = "#! "+DBResolver.TEMPLATE_INSTANCE+"(";
  	
  Enumeration e = elements.elements();
  while (e.hasMoreElements()) 
@@ -1388,14 +1387,14 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 				 String templateName = namer.getResolvedName(template.getName());
 
 			     file.writeBytes(nl);
-			 	 file.writeBytes(TEMPLATE_START+
+			 	 file.writeBytes(TEMPLATE_INSTANCE_START+
  					 quote + templateName + quote +
 		 			 comma + template.getX() + comma + template.getY() + 
 				 	 comma + StringUtils.color2string(template.getColor()) +
 					 comma + quote /*+ template.getDescription()*/ + quote +
 					 ending);
 					 
-
+/*
 	 			e2 = template.getSubObjectsV().elements();
 	 			while (e2.hasMoreElements())
 	 			{
@@ -1427,7 +1426,7 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 								 ending);
 		 			 }
 				 }					 
-
+*/
 			     file.writeBytes(nl);
 	 		}
 
@@ -1475,7 +1474,8 @@ private static void writeTemplateData(DataOutputStream stream) throws IOExceptio
 
 	// template block not needed
 	if ((data.getRealDescription()==null || data.getRealDescription().length()==0) && 
-		 data.getInputs().isEmpty() && data.getOutputs().isEmpty())
+		  data.getPorts().isEmpty())
+		 //data.getInputs().isEmpty() && data.getOutputs().isEmpty())
 		return;
 	
 	// template start
@@ -1486,17 +1486,29 @@ private static void writeTemplateData(DataOutputStream stream) throws IOExceptio
 	
 	stream.writeBytes(") {"+nl);
 
-	// ports
-	// !!! test
-	stream.writeBytes("#"+DBResolver.PORT+"("+
-		"name" +
-		comma + quote + "value" + quote +
-		comma + quote + "description" + quote + ending);
+	final String portStart = "  "+DBResolver.PORT+"(";
+
+	Iterator i = data.getPortsV().iterator();
+	while (i.hasNext())
+	{
+		DBPort port = (DBPort)i.next();
 	
+		if (port.getComment()!=null)
+			stream.writeBytes(port.getComment()+nl);
+
+		stream.writeBytes(portStart+
+			port.getName() +
+			comma + quote + port.getTarget() + quote);
+		if (port.getDescription()!=null)
+			stream.writeBytes(comma + quote + "description" + quote);
+		stream.writeBytes(ending);
+	}	
 	
 	// template end
-	stream.writeBytes("}"+nl+nl);
-	
+	stream.writeBytes("}"+nl);
+
+
+/*	
 	// inputs
 	Enumeration e = data.getInputs().keys();
 	while (e.hasMoreElements())
@@ -1524,7 +1536,7 @@ private static void writeTemplateData(DataOutputStream stream) throws IOExceptio
 	}
 
 	if (!data.getOutputs().isEmpty()) stream.writeBytes(nl);	
-
+*/
 }
 
 /**

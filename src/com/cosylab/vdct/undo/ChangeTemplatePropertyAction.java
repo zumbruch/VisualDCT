@@ -65,6 +65,7 @@ public String getDescription() {
  * This method was created in VisualAge.
  */
 protected void redoAction() {
+	// just override value
 	object.getTemplateData().getProperties().put(name, oldValue);
 
 	object.updateTemplateFields();
@@ -75,6 +76,7 @@ protected void redoAction() {
  * This method was created in VisualAge.
  */
 protected void undoAction() {
+	// just override value
 	object.getTemplateData().getProperties().put(name, newValue);
 
 	object.updateTemplateFields();

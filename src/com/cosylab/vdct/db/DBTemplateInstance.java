@@ -29,7 +29,7 @@ package com.cosylab.vdct.db;
  */
 
 import java.util.Hashtable;
-
+import java.util.Vector;
 
 /**
  * @author Matej
@@ -39,7 +39,7 @@ public class DBTemplateInstance extends DBComment
 	protected String templateInstanceId;
 	protected String templateId;
 	protected Hashtable properties = null;
-	protected Hashtable values = null;
+	protected Vector propertiesV = null;
 
 	protected int x = -1;			// used for layout
 	protected int y = -1;
@@ -52,7 +52,7 @@ public class DBTemplateInstance extends DBComment
 	public DBTemplateInstance(String templateInstanceId, String templateId)
 	{
 		properties = new Hashtable();
-		values = new Hashtable();
+		propertiesV = new Vector();
 		this.templateInstanceId = templateInstanceId;
 		this.templateId = templateId;
 	}
@@ -64,6 +64,28 @@ public class DBTemplateInstance extends DBComment
 	public Hashtable getProperties()
 	{
 		return properties;
+	}
+
+	/**
+	 * Returns the properties.
+	 * @return Vector
+	 */
+	public Vector getPropertiesV()
+	{
+		return propertiesV;
+	}
+
+	/**
+	 * Returns the properties.
+	 * @return Vector
+	 */
+	public void addProperty(Object key, String value)
+	{
+		if (!propertiesV.contains(key))
+		{
+			properties.put(key, value);
+			propertiesV.addElement(key);
+		}
 	}
 
 	/**
@@ -145,15 +167,6 @@ public class DBTemplateInstance extends DBComment
 	public void setY(int y)
 	{
 		this.y = y;
-	}
-
-	/**
-	 * Returns the values.
-	 * @return Hashtable
-	 */
-	public Hashtable getValues()
-	{
-		return values;
 	}
 
 	/**
