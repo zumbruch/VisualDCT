@@ -73,7 +73,8 @@ public void moveOrigin(int direction)
 {
 	int dx = 0; 
 	int dy = 0;
-	int d = (int)(100*ViewState.getInstance().getScale()); 
+	ViewState view = ViewState.getInstance();
+	int d = (int)(100*view.getScale()); 
 	
 	switch (direction)
 	{
@@ -91,7 +92,7 @@ public void moveOrigin(int direction)
 			break;
 	}
 	
-	if (ViewState.getInstance().moveOrigin(dx, dy))
+	if (view.moveOrigin(dx, dy))
 	{
 		drawingSurface.setBlockNavigatorRedrawOnce(true);
 		drawingSurface.recalculateNavigatorPosition();

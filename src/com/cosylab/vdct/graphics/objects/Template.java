@@ -250,8 +250,9 @@ public class Template
 	 */
 	public void revalidatePosition()
 	{
-		  setRx((int)(getX()*getRscale()));
-		  setRy((int)(getY()*getRscale()));
+		  double Rscale = getRscale();
+		  setRx((int)(getX()*Rscale));
+		  setRy((int)(getY()*Rscale));
 
 		  // sub-components
 		  revalidateFieldsPosition();

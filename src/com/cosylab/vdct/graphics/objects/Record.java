@@ -307,6 +307,7 @@ protected void draw(Graphics g, boolean hilited) {
 	int rwidth = getRwidth();
 	int rheight = getRheight();
 
+	double Rscale = getRscale();
 	// clipping
 	if (!((rrx > view.getViewWidth())
 		|| (rry > view.getViewHeight())
@@ -336,10 +337,10 @@ protected void draw(Graphics g, boolean hilited) {
 
 		g.drawRect(rrx, rry, rwidth, rheight);
 
-		int recordSize = (int)(Constants.RECORD_HEIGHT * getRscale());
+		int recordSize = (int)(Constants.RECORD_HEIGHT * Rscale);
 
 		// middle line
-		int ox = (int) (10 * getRscale());
+		int ox = (int) (10 * Rscale);
 		int ly = (int) (rry + recordSize);
 		g.drawLine(rrx + ox, ly, rrx + rwidth - ox, ly);
 
@@ -430,9 +431,9 @@ protected void draw(Graphics g, boolean hilited) {
 
 			// draw link and its tail
 			boolean isRightSide = isRight();
-			int r = (int)(Constants.LINK_RADIOUS * getRscale());
-			int cy = (int)(getRscale()*getInY()- view.getRy());
-			int ccx = (int)(getRscale()*getInX()- view.getRx());
+			int r = (int)(Constants.LINK_RADIOUS * Rscale);
+			int cy = (int)(Rscale*getInY()- view.getRy());
+			int ccx = (int)(Rscale*getInX()- view.getRx());
 
 			int cx;
 			if (isRightSide) {
@@ -1287,8 +1288,9 @@ public void revalidateFieldsPosition() {
  * Creation date: (21.12.2000 21:22:45)
  */
 public void revalidatePosition() {
-  setRx((int)(getX()*getRscale()));
-  setRy((int)(getY()*getRscale()));
+  double Rscale = getRscale();
+  setRx((int)(getX()*Rscale));
+  setRy((int)(getY()*Rscale));
 
   // sub-components
   revalidateFieldsPosition();

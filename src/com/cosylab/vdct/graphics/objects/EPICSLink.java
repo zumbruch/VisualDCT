@@ -156,8 +156,9 @@ public void setRight(boolean state) { right=state; }
  */
 public void validate() {
 	super.validate();
-	r = (int)(getRscale()*Constants.LINK_RADIOUS);
-	rtailLen = (int)(getRscale()*Constants.TAIL_LENGTH);
+	double Rscale = getRscale();
+	r = (int)(Rscale*Constants.LINK_RADIOUS);
+	rtailLen = (int)(Rscale*Constants.TAIL_LENGTH);
 }
 
 /// Called after chaning value silently (fixLinks)

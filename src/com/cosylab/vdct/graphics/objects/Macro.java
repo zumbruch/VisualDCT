@@ -551,8 +551,9 @@ public boolean move(int dx, int dy) {
  * Creation date: (29.1.2001 20:05:52)
  */
 public void revalidatePosition() {
-  setRx((int)(getX()*getRscale()));
-  setRy((int)(getY()*getRscale()));
+	double Rscale = getRscale();
+  	setRx((int)(getX()*Rscale));
+  	setRy((int)(getY()*Rscale));
 }
 /**
  * Insert the method's description here.
@@ -581,14 +582,16 @@ protected void validate() {
   int rwidth = 0;
   int rheight = 0;
   
+  double Rscale = getRscale();
+  
   if (getMode() == InLink.OUTPUT_MACRO_MODE)
   {
 	  setWidth(Constants.LINK_STUB_SIZE);
 	  setHeight(Constants.LINK_STUB_SIZE);
 
 	  // to make it nice, do /2)*2
-	  rwidth = (int)(getWidth()*getRscale()/2)*2;
-	  rheight = (int)(getHeight()*getRscale()/2)*2;
+	  rwidth = (int)(getWidth()*Rscale/2)*2;
+	  rheight = (int)(getHeight()*Rscale/2)*2;
 	  
 	  setRwidth(rwidth);
 	  setRheight(rheight);
@@ -626,8 +629,8 @@ protected void validate() {
 	  setHeight(Constants.LINK_STUB_SIZE);
 
 	  // to make it nice, do /2)*2
-	  rwidth = (int)(getWidth()*getRscale()/2)*2;
-	  rheight = (int)(getHeight()*getRscale()/2)*2;
+	  rwidth = (int)(getWidth()*Rscale/2)*2;
+	  rheight = (int)(getHeight()*Rscale/2)*2;
 	  
 	  setRwidth(rwidth);
 	  setRheight(rheight);
@@ -677,7 +680,7 @@ protected void validate() {
   
   setFont(font);
 
-  r = (int)(getRscale()*Constants.LINK_RADIOUS*2);
+  r = (int)(Rscale*Constants.LINK_RADIOUS*2);
 
 }
 

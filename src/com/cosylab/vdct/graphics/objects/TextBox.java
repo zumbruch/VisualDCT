@@ -702,9 +702,10 @@ public void setDescription(String description)
  */
 private void updateTextFont(boolean force)
 {
-	if ((force || getRscale()!=fontScale) && getFont()!=null)
+	double Rscale = getRscale();
+	if ((force || Rscale!=fontScale) && getFont()!=null)
 	{
-		fontScale = getRscale();
+		fontScale = Rscale;
 		int size = (int)(getFont().getSize()*fontScale);
 		if (rfont!=null && size==rfont.getSize())
 			return;

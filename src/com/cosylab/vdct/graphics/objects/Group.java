@@ -803,8 +803,9 @@ public boolean rename(java.lang.String newName) {
  * Creation date: (21.12.2000 21:22:45)
  */
 public void revalidatePosition() {
-  setRx((int)(getX()*getRscale()));
-  setRy((int)(getY()*getRscale()));
+	double Rscale = getRscale();
+  	setRx((int)(getX()*Rscale));
+  	setRy((int)(getY()*Rscale));
 }
 /**
  * Insert the method's description here.

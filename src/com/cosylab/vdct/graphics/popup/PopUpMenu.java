@@ -264,9 +264,10 @@ public static void addPluginItems(JPopupMenu menu, Popupable object)
 	if (object!=null)
 	{
 		selectedItems = new Vector();
-		if (ViewState.getInstance().isSelected(object))
+		ViewState view = ViewState.getInstance();
+		if (view.isSelected(object))
 			// make a copy of vector to allow plugins to play with it
-			selectedItems.addAll(ViewState.getInstance().getSelectedObjects());
+			selectedItems.addAll(view.getSelectedObjects());
 		else
 			selectedItems.addElement(object);
 	}

@@ -1093,15 +1093,18 @@ public void mouseDragged(MouseEvent e) {
 		pressedY = draggedY = py;
 		resetDraggedPosition = false;
 	}
-	
-	if ((px>0) && (py>0) && (px<width) && (py<height)) {
+		
+	if ((px>0) && (py>0) && (px<width) && (py<height)) {	
 		switch (mouseOperation) {
 
 			case NAVIGATOR_MOVE : 
 //System.out.println("Dragged: NAVIGATOR_MOVE");
 				if (navigator.contains(e.getX(), e.getY()))	{
-					int dx = (int)((px-pressedX)/navigatorView.getScale()*view.getScale()); 
-					int dy = (int)((py-pressedY)/navigatorView.getScale()*view.getScale());
+					double navigatorScale = navigatorView.getScale();
+					double scale = view.getScale();
+					
+					int dx = (int)((px-pressedX)/navigatorScale*scale); 
+					int dy = (int)((py-pressedY)/navigatorScale*scale);
 					if (view.moveOrigin(dx, dy)) {
 						recalculateNavigatorPosition();
 						repaint();
@@ -1128,8 +1131,9 @@ public void mouseDragged(MouseEvent e) {
 				int rdx = px-draggedX;
 				int rdy = py-draggedY;
 				
-				int dx = (int)(rdx/view.getScale()); 
-				int dy = (int)(rdy/view.getScale());
+				double scale = view.getScale();
+				int dx = (int)(rdx/scale); 
+				int dy = (int)(rdy/scale);
 
 				if (fastMove) { //fast move
 					draggedX=px; draggedY=py;
@@ -1143,16 +1147,16 @@ public void mouseDragged(MouseEvent e) {
 					if (moveSelection(dx, dy)) {			// move selection
 						blockNavigatorRedrawOnce = true;	/// !!! performance
 						repaint();
-						if (dx!=0) draggedX=px-(int)(rdx-dx*view.getScale());
-						if (dy!=0) draggedY=py-(int)(rdy-dy*view.getScale());
+						if (dx!=0) draggedX=px-(int)(rdx-dx*scale);
+						if (dy!=0) draggedY=py-(int)(rdy-dy*scale);
 					}
 				}
 				else if (hilitedObject.move(dx, dy)) {
 					alsoDrawHilitedOnce = true;
 					blockNavigatorRedrawOnce = true;	/// !!! performance
 					repaint();
-					if (dx!=0) draggedX=px-(int)(rdx-dx*view.getScale());
-					if (dy!=0) draggedY=py-(int)(rdy-dy*view.getScale());
+					if (dx!=0) draggedX=px-(int)(rdx-dx*scale);
+					if (dy!=0) draggedY=py-(int)(rdy-dy*scale);
 				}
 				break; }
 				
@@ -1194,8 +1198,9 @@ public void mouseDragged(MouseEvent e) {
 		{
 			if (mouseOperation==OBJECT_MOVE)
 			{
-				int mdx = (int)(dx/view.getScale()); 
-				int mdy = (int)(dy/view.getScale());
+				double scale = view.getScale();
+				int mdx = (int)(dx/scale); 
+				int mdy = (int)(dy/scale);
 				
 				if (!Settings.getInstance().getFastMove()) {
 					Movable hilitedObject = (Movable)view.getHilitedObject();
@@ -1274,7 +1279,7 @@ public void mouseMoved(MouseEvent e)
 		if ((cx>0) && (cy>0) && (cx<width) && (cy<height))
 		{
 			VisibleObject spotted = viewGroup.hiliteComponentsCheck(cx+view.getRx(), cy+view.getRy());
-			if (ViewState.getInstance().setAsHilited(spotted))
+			if (view.setAsHilited(spotted))
 			{
 			//drawOnlyHilitedOnce=true;
 			//repaint();
@@ -1296,15 +1301,18 @@ public void mousePressed(MouseEvent e) {
 
 // 		System.out.println("mousePressed("+leftButtonPush+","+rightButtonPush+")");
 		
-		VisibleObject hilitedObject = ViewState.getInstance().getHilitedObject();
+		VisibleObject hilitedObject = view.getHilitedObject();
 		if (leftButtonPush && !rightButtonPush) {
 
 			if (navigator.contains(e.getX(), e.getY())) {		// navigator
 //System.out.println("Pressed: NAVIGATOR_MOVE");
 				mouseOperation = NAVIGATOR_MOVE;
 
-				int rx = (int)((e.getX()-navigatorRect.width/2.0-navigator.x)/navigatorView.getScale()*view.getScale());
-				int ry = (int)((e.getY()-navigatorRect.height/2.0-navigator.y)/navigatorView.getScale()*view.getScale());
+				double navigatorScale = navigatorView.getScale();
+				double scale = view.getScale();
+				
+				int rx = (int)((e.getX()-navigatorRect.width/2.0-navigator.x)/navigatorScale*scale);
+				int ry = (int)((e.getY()-navigatorRect.height/2.0-navigator.y)/navigatorScale*scale);
 
 				if (view.moveOrigin(rx-view.getRx(), ry-view.getRy())) {
 					recalculateNavigatorPosition();
@@ -1396,7 +1404,7 @@ public void mouseReleased(MouseEvent e) {
 	//boolean rightButtonPush  = (e.getModifiers() & InputEvent.BUTTON3_MASK) != 0;
 	//System.out.println("mouseReleased("+leftButtonPush+","+rightButtonPush+")");
 
-	VisibleObject hilitedObject = ViewState.getInstance().getHilitedObject();
+	VisibleObject hilitedObject = view.getHilitedObject();
 	//System.out.println("hilited: "+hilitedObject);
 
 	switch (mouseOperation) {
@@ -1408,7 +1416,7 @@ public void mouseReleased(MouseEvent e) {
 			repaint(); // jic
 			break;
 				
-		case OBJECT_MOVE :
+		case OBJECT_MOVE : {
 //System.out.println("Released: OBJECT_MOVE");
 			createNavigatorImage();
 
@@ -1419,17 +1427,20 @@ public void mouseReleased(MouseEvent e) {
 				dy = draggedY-pressedY;
 				fastMove=false;
 			}
-			dx = (int)(dx/view.getScale()); 
-			dy = (int)(dy/view.getScale());
-
+			
+			
+			double scale = view.getScale();
+			dx = (int)(dx/scale); 
+			dy = (int)(dy/scale);
+						
 			if (!(dx==0 && dy==0))
 				if (view.isSelected(hilitedObject)) 
 					moveSelection(dx, dy);
 				else
 					((Movable)hilitedObject).move(dx, dy);
 
-			dx = (int)((px-pressedX)/view.getScale()); 
-			dy = (int)((py-pressedY)/view.getScale());
+			dx = (int)((px-pressedX)/scale); 
+			dy = (int)((py-pressedY)/scale);
 			if (!(dx==0 && dy==0))
 				if (view.isSelected(hilitedObject))
 				{
@@ -1452,7 +1463,7 @@ public void mouseReleased(MouseEvent e) {
 			forceRedraw=true;
 			//alsoDrawHilitedOnce=true;
 			repaint();
-			break;
+			break;}
 			
 		case OBJECT_SELECTION : 
 //System.out.println("Released: OBJECT_SELECTION");
@@ -1463,17 +1474,20 @@ public void mouseReleased(MouseEvent e) {
  		    repaint();
 		    break;
 
-		case ZOOM_SELECTION : 
+		case ZOOM_SELECTION :{ 
 //System.out.println("Released: ZOOM_SELECTION");
 		
 			fastDrawing=false;
-			dx = (int)(Math.abs(pressedX-draggedX)/view.getScale());
-			dy = (int)(Math.abs(pressedY-draggedY)/view.getScale());
+			
+			double scale = view.getScale();
+			int dx = (int)(Math.abs(pressedX-draggedX)/scale);
+			int dy = (int)(Math.abs(pressedY-draggedY)/scale);
+			
 			if ((dx>Constants.RECORD_HEIGHT) &&	(dy>Constants.RECORD_HEIGHT))
 				zoomArea(pressedX, pressedY, 
 				   		 draggedX, draggedY);
  		    repaint();
-		    break;
+		    break;}
 		    
 		case LINK_OPERATION :
 //System.out.println("Released: LINK_OPERATION");

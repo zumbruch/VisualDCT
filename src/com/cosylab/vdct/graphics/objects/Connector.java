@@ -519,8 +519,9 @@ public void revalidatePosition() {
 		setY((inlink.getInY()+outlink.getOutY())/2);
   }
   
-  setRx((int)(getX()*getRscale()));
-  setRy((int)(getY()*getRscale()));
+  double  Rscale = getRscale();
+  setRx((int)(getX()*Rscale));
+  setRy((int)(getY()*Rscale));
 }
 /**
  * Insert the method's description here.
@@ -575,9 +576,10 @@ public void setOutput(OutLink output, OutLink prevOutput) {
  */
 protected void validate() {
   revalidatePosition();
-	
-  setRwidth((int)(getWidth()*getRscale()));
-  setRheight((int)(getHeight()*getRscale()));
+  
+  double Rscale = getRscale();
+  setRwidth((int)(getWidth()*Rscale));
+  setRheight((int)(getHeight()*Rscale));
 }
 
 /**
