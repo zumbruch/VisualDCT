@@ -549,12 +549,14 @@ public void initializeWorkspace() {
 	
 	UndoManager.getInstance().reset();
 
-	// !!! call all destory() in objects
-	DataProvider.getInstance().getLookupTable().clear();
+	// !!! call all destory() in objects?!
+	if (Group.getRoot()!=null)
+		Group.getRoot().getLookupTable().clear();
 
 	setModified(false);
 	viewGroup = new Group(null);
 	viewGroup.setAbsoluteName("");
+	viewGroup.setLookupTable(new Hashtable());
 	Group.setRoot(viewGroup);
 	ViewState.getInstance().set(viewGroup);
 
@@ -594,7 +596,7 @@ public void linkCommand(LinkManagerObject linkManager, VDBFieldData field) {
 		// start linking
 		tmplink = field;
 		
-		Field fld = (Field)DataProvider.getInstance().getLookupTable().get(field.getFullName());
+		Field fld = (Field)Group.getRoot().getLookupTable().get(field.getFullName());
 		if (fld!=null)
 			ViewState.getInstance().setAsBlinking(fld);
 		else
@@ -1700,6 +1702,9 @@ public boolean openDBD(File file, boolean importDBD) throws IOException {
 	// add to list of DBDs
 	DataProvider.getInstance().getLoadedDBDs().addElement(file.getAbsoluteFile());
 	DataProvider.getInstance().getDBDs().addElement(file.getAbsoluteFile());
+
+	// !!!
+	VisualDCT.getInstance().updateDBDLabel();	
 
 	restoreCursor();
 	return true;

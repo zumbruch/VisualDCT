@@ -77,10 +77,10 @@ public void updateTemplateLink()
 		
 	// remove old one		
 	if (lastUpdatedFullName!=null)
-		DataProvider.getInstance().getLookupTable().remove(lastUpdatedFullName);
+		Group.getRoot().getLookupTable().remove(lastUpdatedFullName);
 	
 	// ups, we already got this registered
-	if (DataProvider.getInstance().getLookupTable().containsKey(getFieldData().getFullName()))
+	if (Group.getRoot().getLookupTable().containsKey(getFieldData().getFullName()))
 	{
 		lastUpdatedFullName = null;
 		((LinkManagerObject)getParent()).addInvalidLink(this);
@@ -89,7 +89,7 @@ public void updateTemplateLink()
 	else
 	{
 		lastUpdatedFullName = getFieldData().getFullName();
-		DataProvider.getInstance().getLookupTable().put(lastUpdatedFullName, this);
+		Group.getRoot().getLookupTable().put(lastUpdatedFullName, this);
 		((LinkManagerObject)getParent()).removeInvalidLink(this);
 	}
 }
@@ -199,7 +199,7 @@ protected void draw(Graphics g, boolean hilited) {
 public void destroyAndRemove() {
 	super.destroy();
 	if (lastUpdatedFullName!=null)
-		DataProvider.getInstance().getLookupTable().remove(getFieldData().getFullName());
+		Group.getRoot().getLookupTable().remove(getFieldData().getFullName());
 	else
 		((LinkManagerObject)getParent()).removeInvalidLink(this);
 }

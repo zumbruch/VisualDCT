@@ -331,6 +331,7 @@ public static void extractTemplates(DBDData dbd, DBData db, VDBData vdb)
 		
 			vt.setGroup(new Group(null));
 			vt.getGroup().setAbsoluteName("");
+			vt.getGroup().setLookupTable(new Hashtable());
 		
 			Group.setRoot(vt.getGroup());
 		

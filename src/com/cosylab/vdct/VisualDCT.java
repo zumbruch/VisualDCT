@@ -70,6 +70,7 @@ public class VisualDCT extends JFrame {
 	private JPanel ivjJFrameContentPane = null;
 	private JSeparator ivjJSeparator1 = null;
 	private JSeparator ivjJSeparator10 = null;
+	private JSeparator ivjJSeparator11a = null;
 	private JSeparator ivjJSeparator2 = null;
 	private JSeparator ivjJSeparator3 = null;
 	private JSeparator ivjJSeparator4 = null;
@@ -92,6 +93,8 @@ public class VisualDCT extends JFrame {
 	private JMenuItem ivjSave_AsMenuItem = null;
 	private JButton ivjSaveButton = null;
 	private JMenuItem ivjSaveMenuItem = null;
+	private JMenuItem ivjGenerateMenuItem = null;
+	private JMenuItem ivjGenerateAsGroupMenuItem = null;
 	private JMenuItem ivjSelect_AllMenuItem = null;
 	private JCheckBoxMenuItem ivjShow_PointsMenuItem = null;
 	private JMenuItem ivjSmart_ZoomMenuItem = null;
@@ -303,6 +306,10 @@ class IvjEventHandler implements java.awt.event.ActionListener, java.awt.event.I
 				boxButton_ActionPerformed();
 			else if (e.getSource() == VisualDCT.this.getTextBoxButton()) 
 				textBoxButton_ActionPerformed();
+			else if (e.getSource() == VisualDCT.this.getGenerateMenuItem()) 
+				generateMenuItem_ActionPerformed();
+			else if (e.getSource() == VisualDCT.this.getGenerateAsGroupMenuItem()) 
+				generateAsGroupMenuItem_ActionPerformed();
 
 		};
 		public void itemStateChanged(java.awt.event.ItemEvent e) {
@@ -2510,6 +2517,9 @@ private javax.swing.JMenu getFileMenu() {
 			ivjFileMenu.add(getSaveMenuItem());
 			ivjFileMenu.add(getSave_AsMenuItem());
 			ivjFileMenu.add(getSave_As_GroupMenuItem());
+			ivjFileMenu.add(getJSeparator11a());
+			ivjFileMenu.add(getGenerateMenuItem());
+			ivjFileMenu.add(getGenerateAsGroupMenuItem());
 			ivjFileMenu.add(getJSeparator11());
 			ivjFileMenu.add(getExportMenuItem());
 			ivjFileMenu.add(getExportPostScriptFileMenuItem());
@@ -3042,6 +3052,26 @@ private javax.swing.JSeparator getJSeparator11() {
 		}
 	}
 	return ivjJSeparator11;
+}
+/**
+ * Return the JSeparator11 property value.
+ * @return javax.swing.JSeparator
+ */
+/* WARNING: THIS METHOD WILL BE REGENERATED. */
+private javax.swing.JSeparator getJSeparator11a() {
+	if (ivjJSeparator11a == null) {
+		try {
+			ivjJSeparator11a = new javax.swing.JSeparator();
+			ivjJSeparator11a.setName("JSeparator11a");
+			// user code begin {1}
+			// user code end
+		} catch (java.lang.Throwable ivjExc) {
+			// user code begin {2}
+			// user code end
+			handleException(ivjExc);
+		}
+	}
+	return ivjJSeparator11a;
 }
 /**
  * Return the JSeparator2 property value.
@@ -3982,6 +4012,50 @@ private javax.swing.JMenuItem getSaveMenuItem() {
 	return ivjSaveMenuItem;
 }
 /**
+ * Return the GenerateMenuItem property value.
+ * @return javax.swing.JMenuItem
+ */
+/* WARNING: THIS METHOD WILL BE REGENERATED. */
+private javax.swing.JMenuItem getGenerateMenuItem() {
+	if (ivjGenerateMenuItem == null) {
+		try {
+			ivjGenerateMenuItem = new javax.swing.JMenuItem();
+			ivjGenerateMenuItem.setName("GenerateMenuItem");
+			ivjGenerateMenuItem.setMnemonic('G');
+			ivjGenerateMenuItem.setText("Generate...");
+			ivjGenerateMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_G,java.awt.Event.CTRL_MASK));
+			// user code begin {1}
+			// user code end
+		} catch (java.lang.Throwable ivjExc) {
+			// user code begin {2}
+			// user code end
+			handleException(ivjExc);
+		}
+	}
+	return ivjGenerateMenuItem;
+}
+/**
+ * Return the GenerateAsGroupMenuItem property value.
+ * @return javax.swing.JMenuItem
+ */
+/* WARNING: THIS METHOD WILL BE REGENERATED. */
+private javax.swing.JMenuItem getGenerateAsGroupMenuItem() {
+	if (ivjGenerateAsGroupMenuItem == null) {
+		try {
+			ivjGenerateAsGroupMenuItem = new javax.swing.JMenuItem();
+			ivjGenerateAsGroupMenuItem.setName("GenerateAsGroupMenuItem");
+			ivjGenerateAsGroupMenuItem.setText("Generate as Group...");
+			// user code begin {1}
+			// user code end
+		} catch (java.lang.Throwable ivjExc) {
+			// user code begin {2}
+			// user code end
+			handleException(ivjExc);
+		}
+	}
+	return ivjGenerateAsGroupMenuItem;
+}
+/**
  * Return the Select_AllMenuItem property value.
  * @return javax.swing.JMenuItem
  */
@@ -4896,6 +4970,8 @@ private void initConnections() throws java.lang.Exception {
 	getRightMenuItem().addActionListener(ivjEventHandler);
 	getUpMenuItem().addActionListener(ivjEventHandler);
 	getDownMenuItem().addActionListener(ivjEventHandler);
+	getGenerateMenuItem().addActionListener(ivjEventHandler);
+	getGenerateAsGroupMenuItem().addActionListener(ivjEventHandler);
 	// user code end
 	getAbout_BoxMenuItem().addActionListener(ivjEventHandler);
 	getZoomSlider().addMouseMotionListener(ivjEventHandler);
@@ -5346,7 +5422,9 @@ public boolean openDBD(String fileName, boolean allowDB) {
 			cmd.getGUIMenuInterface().openDBD(theFile);
 		else if (allowDB)
 			cmd.getGUIMenuInterface().openDB(theFile);
-		getStatusMsg1().setText(" "+theFile.getCanonicalFile()+" ");
+		
+		//updateDBDLabel();	
+
 	} catch (java.io.IOException e) {
 	    Console.getInstance().println("o) Failed to open DBD/DB file: '"+theFile.getAbsolutePath()+"'.");
 	    Console.getInstance().println(e);
@@ -5821,6 +5899,58 @@ public void save_As_GroupMenuItem_ActionPerformed() {
 /**
  * Comment
  */
+public void generateAsGroupMenuItem_ActionPerformed() {
+	JFileChooser chooser = getfileChooser();
+	UniversalFileFilter filter = new UniversalFileFilter(
+		new String("db"), "DB File");
+	chooser.resetChoosableFileFilters();
+	chooser.addChoosableFileFilter(filter);
+	chooser.setDialogTitle("Generate As Group");
+	chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
+	boolean jFileChooserConfirmed = false;
+    java.io.File theFile = null;
+
+	while(!jFileChooserConfirmed)
+	{
+		int retval = chooser.showSaveDialog(this);
+
+		if(retval == JFileChooser.CANCEL_OPTION)
+			return;
+
+	    theFile = chooser.getSelectedFile();
+
+		if(theFile.exists())
+		{
+		    if(JOptionPane.showConfirmDialog(this, "The file '" + theFile.getName()
+		    	+ "' already exists! Overwrite?", "Confirmation", JOptionPane.YES_NO_OPTION,
+		    	JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION)
+		    {
+				jFileChooserConfirmed = true;
+		    }
+		}
+		else
+			jFileChooserConfirmed = true;
+	}
+	    
+    if(theFile != null)
+    {
+	    GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
+		try
+		{
+		    cmd.getGUIMenuInterface().exportAsGroup(theFile);
+		}
+		catch(java.io.IOException e)
+		{
+			Console.getInstance().println("o) Failed to save DBto file: '"
+				+ theFile.toString() + "'");
+		    Console.getInstance().println(e);
+		}
+	}
+}
+/**
+ * Comment
+ */
 public void save_AsMenuItem_ActionPerformed() {
 	JFileChooser chooser = getfileChooser();
 	UniversalFileFilter filter = new UniversalFileFilter(
@@ -5867,6 +5997,65 @@ public void save_AsMenuItem_ActionPerformed() {
 		try
 		{
 		    cmd.getGUIMenuInterface().save(theFile);
+		    openedFile = theFile;
+		}
+		catch (java.io.IOException e)
+		{
+	 		Console.getInstance().println("o) Failed to save DB to file: '"
+	 			+ theFile.toString() + "'");
+		    Console.getInstance().println(e);
+		}
+	}
+}
+/**
+ * Comment
+ */
+public void generateMenuItem_ActionPerformed() {
+	JFileChooser chooser = getfileChooser();
+	UniversalFileFilter filter = new UniversalFileFilter(
+		new String("db"), "DB File");
+	chooser.resetChoosableFileFilters();
+	chooser.addChoosableFileFilter(filter);
+	chooser.setDialogTitle("Generate");
+	chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
+	boolean jFileChooserConfirmed = false;
+    java.io.File theFile = null;
+
+	while(!jFileChooserConfirmed)
+	{
+		int retval = chooser.showSaveDialog(this);
+
+		if(retval == JFileChooser.CANCEL_OPTION)
+			return;
+			
+	    theFile = chooser.getSelectedFile();
+
+		if(theFile.exists())
+		{
+		    if(JOptionPane.showConfirmDialog(this, "The file '" + theFile.getName()
+		    	+ "' already exists! Overwrite?", "Confirmation", JOptionPane.YES_NO_OPTION,
+		    	JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION)
+		    {
+				jFileChooserConfirmed = true;
+		    }
+		}
+		else
+			jFileChooserConfirmed = true;
+	}
+
+    if(theFile != null)
+    {
+/*
+			// fix ending
+			if ((theFile.getName().lastIndexOf('.')==0) && 
+				chooser.getFileFilter().getDescription().startsWith("All"))
+				theFile = new java.io.File(theFile.getAbsoluteFile()+".db");
+*/		    
+	    GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
+		try
+		{
+		    cmd.getGUIMenuInterface().export(theFile);
 		    openedFile = theFile;
 		}
 		catch (java.io.IOException e)
@@ -6141,5 +6330,40 @@ public void zoomSlider_updateLabel() {
 public void moveOrigin(int direction) {
     GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
     cmd.getGUIMenuInterface().moveOrigin(direction);
+}
+
+/**
+ * Comment
+ */
+public void updateDBDLabel() {
+
+	StringBuffer tip = new StringBuffer();
+	tip.append("<html>");
+
+
+	java.util.Vector dbds = DataProvider.getInstance().getLoadedDBDs();
+	if (dbds.size()==0)
+		tip.append("No loaded DBDs.");
+	else
+	{	
+		tip.append("Loaded DBD(s):<b><ul>");
+		java.util.Enumeration e = dbds.elements();
+		while (e.hasMoreElements())
+		{
+				tip.append("<li>");
+				tip.append(e.nextElement().toString());
+				tip.append(" </li>");
+		}
+		tip.append("</ul></html>");
+	}
+	
+	if (dbds.size()==0)
+		getStatusMsg1().setText(" No loaded DBDs ");
+	else if (dbds.size()==1)
+		getStatusMsg1().setText(" "+dbds.firstElement().toString()+" ");
+	else
+		getStatusMsg1().setText(" "+dbds.size()+" loaded DBD(s) ");
+	
+	getStatusMsg1().setToolTipText(tip.toString());
 }
 }

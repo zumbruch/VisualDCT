@@ -612,7 +612,7 @@ public void rename(java.lang.String oldName, java.lang.String newName) {
  * @param file java.io.File
  */
 public void save(java.io.File file) throws IOException {
- Group.save(Group.getRoot(), file);
+ Group.save(Group.getRoot(), file, false);
  
  // if ok
  drawingSurface.setModified(false);
@@ -628,7 +628,32 @@ public void save(java.io.File file) throws IOException {
  * @param file java.io.File
  */
 public void saveAsGroup(java.io.File file) throws IOException {
- Group.save(drawingSurface.getViewGroup(), file);
+ Group.save(drawingSurface.getViewGroup(), file, false);
+
+}
+/**
+ * Insert the method's description here.
+ * Creation date: (4.2.2001 15:48:27)
+ * @param file java.io.File
+ */
+public void export(java.io.File file) throws IOException {
+ Group.save(Group.getRoot(), file, true);
+ 
+ // if ok
+ drawingSurface.setModified(false);
+
+ SetWorkspaceFile cmd = (SetWorkspaceFile)CommandManager.getInstance().getCommand("SetFile");
+ cmd.setFile(file.getCanonicalPath());
+ cmd.execute();
+
+}
+/**
+ * Insert the method's description here.
+ * Creation date: (4.2.2001 15:32:01)
+ * @param file java.io.File
+ */
+public void exportAsGroup(java.io.File file) throws IOException {
+ Group.save(drawingSurface.getViewGroup(), file, true);
 
 }
 /**

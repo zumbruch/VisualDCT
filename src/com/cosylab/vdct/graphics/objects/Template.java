@@ -1085,20 +1085,52 @@ protected void destroyFields() {
 /**
  * @see com.cosylab.vdct.graphics.objects.SaveInterface#writeObjects(DataOutputStream, String)
  */
-public void writeObjects(DataOutputStream file, NameManipulator namer)
+public void writeObjects(DataOutputStream file, NameManipulator namer, boolean export)
 	throws IOException
 {
+	// do not generate template data if not is export mode
+	if (!export)
+		return;
+	
+	// export DB option
+	
 	 String templateName = namer.getResolvedName(getName());
  	
+	 //
 	 // new fileName
- 	 String fn = templateName.replace('\\', '_').replace(':', '_')+".db";
+	 //
+/*
+	// !!! if not already added as addedPrefix
+	 // get fileName and remove extension
+	 String rootFileName = namer.getFile().getName();
+	 int pos = rootFileName.lastIndexOf('.');
+	 if (pos>0)
+	 	rootFileName = rootFileName.substring(0, pos);
+	 
+ 		// !!!? path can be removed - relative to root file
+	 String path = namer.getFile().getAbsolutePath();
+	 pos = path.lastIndexOf(File.separatorChar);
+	 if (pos>0)
+	 	path = path.substring(0, pos+1);	// include File.separatorChar
 
-	 fn = "D:/"+fn; // !!!
-	 File newFile = new File(fn);
+	 StringBuffer fnb = new StringBuffer();
+	 fnb.append(path);
+	 fnb.append(rootFileName);
+	 fnb.append("_");
+	 fnb.append(templateName.replace('\\', '_').replace(':', '_'));
+	 fnb.append(".db");
+	 
+ 	 String fn = fnb.toString();
+	 // override action is already accepted by overriding root DB file
+	 File newFile = new File(fn);			// /!!!! bug - identical names can be generated !!!
+
 
 
  	 file.writeBytes("\n#! "+DBResolver.VDCTSKIP+"\n");
+ 	 fn = fn.replace('\\', '/');
  	 file.writeBytes(DBResolver.INCLUDE+" \""+fn+"\"\n");
+
+*/
 
 	 // new substitutions 
 	 Map properties = null;
@@ -1132,14 +1164,18 @@ public void writeObjects(DataOutputStream file, NameManipulator namer)
 	 }
 	 
 	 
-	 NameManipulator newNamer = new DefaultNamer(newFile, removedPrefix, addedPrefix, properties);
-	 Group.save(getTemplateData().getTemplate().getGroup(), newFile, newNamer);
+//	 NameManipulator newNamer = new DefaultNamer(newFile, removedPrefix, addedPrefix, properties);
+	 // always pass root file name
+	 NameManipulator newNamer = new DefaultNamer(namer.getFile(), removedPrefix, addedPrefix, properties);
+//	 Group.save(getTemplateData().getTemplate().getGroup(), newFile, newNamer);
+	 getTemplateData().getTemplate().getGroup().writeObjects(file, newNamer, export);
+	 
 }
 
 /**
  * @see com.cosylab.vdct.graphics.objects.SaveInterface#writeVDCTData(DataOutputStream, String)
  */
-public void writeVDCTData(DataOutputStream file, NameManipulator namer)
+public void writeVDCTData(DataOutputStream file, NameManipulator namer, boolean export)
 	throws IOException
 {
 	// No-op (done by writeObjects() method).

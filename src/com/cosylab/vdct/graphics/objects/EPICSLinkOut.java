@@ -387,7 +387,7 @@ public static InLink getTarget(LinkProperties link) {
 	// !!! check for getType()==LinkProperties.NOT_VALID
 	if ((recName==null) || recName.equals(nullString)) return null;
 
-	InLink templateLink = (InLink)DataProvider.getInstance().getLookupTable().get(link.getTarget());
+	InLink templateLink = (InLink)Group.getRoot().getLookupTable().get(link.getTarget());
 	if (templateLink!=null)
 	{
 		((TemplateEPICSVarLink)templateLink).setDestroyed(false);
