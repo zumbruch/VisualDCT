@@ -7,6 +7,10 @@
 package com.cosylab.vdct;
 
 
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.MediaTracker;
+import java.awt.Toolkit;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -14,6 +18,7 @@ import java.io.File;
 
 import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.JFileChooser;
+import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -112,10 +117,47 @@ public class SettingsDialog extends javax.swing.JDialog {
 						jLabelWarning.setVisible(!ok);
 
 						//System.out.println("<html><img src=\"file://"+f.getPath()+"\"></img>");
-						if (ok) jLabelImage.setText("<html><img src=\"file://"+f.getPath()+"\"></img>");
-						else jLabelImage.setText("");
+						jPanelLegend.repaint();
+						/*if (ok) jLabelImage.setText("<html><img src=\"file://"+f.getPath()+"\"></img>");
+						else jLabelImage.setText("");*/
 					}						
 				});
+				
+		JPanel mypanel = new JPanel() {
+			Image img = null;
+			String currImage = "";
+			int logoWidth, logoHeight;
+			
+			private Image getImage() {
+				if (img == null || !currImage.equals(jTextFieldLogo.getText())) {
+										img = Toolkit.getDefaultToolkit().getImage(jTextFieldLogo.getText());
+										MediaTracker mediaTracker = new MediaTracker(this);
+										mediaTracker.addImage(img, 0);
+										try
+										{
+											mediaTracker.waitForID(0);
+										}
+										catch (InterruptedException ie)
+										{
+										}
+					
+										logoWidth = img.getWidth(null); logoHeight = img.getHeight(null);
+										int maxLogo =Math.max(logoWidth,logoHeight);
+										if (maxLogo > 200) {	 
+											logoHeight = logoHeight * 200 / maxLogo; 
+											logoWidth = logoWidth * 200 / maxLogo; 
+										}
+				}
+				return img;
+			}
+			
+			public void paint(Graphics g) {									
+					g.drawImage(getImage(), 0, 0, logoWidth, logoHeight, null);
+			}
+		};
+		mypanel.setMinimumSize(new java.awt.Dimension(128, 128));
+		mypanel.setPreferredSize(new java.awt.Dimension(128, 128));
+		jPanel7.add(mypanel);
 	}
 
 	/**
@@ -640,7 +682,7 @@ public class SettingsDialog extends javax.swing.JDialog {
         jPanel7.setBorder(new javax.swing.border.EtchedBorder());
         jPanel7.setMinimumSize(new java.awt.Dimension(128, 128));
         jPanel7.setPreferredSize(new java.awt.Dimension(128, 128));
-        jPanel7.add(jLabelImage);
+        //jPanel7.add(jLabelImage);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridheight = 6;

@@ -2414,7 +2414,7 @@ private void printLegend(Graphics graphics, int width, int height, int page, int
 	catch (InterruptedException ie)
 	{
 	}
-	int logoWidth = img.getWidth(null), logoHeight = img.getHeight(null)+8;
+	int logoWidth = img.getWidth(null), logoHeight = img.getHeight(null);
 	int maxLogo =Math.max(logoWidth,logoHeight);
 	if (maxLogo > 200) {	 
 		logoHeight = logoHeight * 200 / maxLogo; 
@@ -2436,6 +2436,7 @@ private void printLegend(Graphics graphics, int width, int height, int page, int
 	FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(font);
 	int labelWidth = fm.stringWidth(label)+8, labelHeight = fm.getHeight();
 	
+	logoHeight+=8;
 	int legendWidth = navigatorWidth + Math.max(logoWidth, labelWidth),
 		legendHeight = Math.max(navigatorHeight, logoHeight+labelHeight);
 	
@@ -2462,6 +2463,7 @@ private void printLegend(Graphics graphics, int width, int height, int page, int
 			labX=width-navigatorWidth-labelWidth-8-1; labY=height-1;
 			logoX=width-navigatorWidth-logoWidth-1;  logoY=height-labelHeight-logoHeight-1;
 	}
+	logoHeight-=8;
 	
 	// paints
 	
