@@ -36,7 +36,7 @@ import com.cosylab.vdct.graphics.objects.Group;
 /**
  * Handles PV_LINK properties
  * Creation date: (1.2.2001 22:24:28)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
  
 public final class LinkProperties {

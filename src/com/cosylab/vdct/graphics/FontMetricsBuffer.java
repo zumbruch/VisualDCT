@@ -34,7 +34,7 @@ import java.util.*;
 /**
  * Font metrics buffer (using Flyweight/Singleton pattern)
  * Creation date: (25.12.2000 11:51:01)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 
 public class FontMetricsBuffer {

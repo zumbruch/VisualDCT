@@ -49,7 +49,7 @@ import com.cosylab.vdct.graphics.printing.Page;
 /**
  * Insert the type's description here.
  * Creation date: (10.12.2000 13:19:16)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 public final class DrawingSurface extends Decorator implements Pageable, Printable, MouseInputListener {
 

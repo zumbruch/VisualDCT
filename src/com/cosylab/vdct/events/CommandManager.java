@@ -33,7 +33,7 @@ import java.util.*;
 /**
  * Insert the type's description here.
  * Creation date: (18.12.2000 15:26:40)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 public class CommandManager {
 	protected Hashtable commands;

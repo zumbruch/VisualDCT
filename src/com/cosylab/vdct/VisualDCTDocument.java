@@ -33,7 +33,7 @@ import java.net.URL;
 /**
  * Insert the type's description here.
  * Creation date: (13.5.2001 20:29:29)
- * @author: 
+ * @author 
  */
 public class VisualDCTDocument extends javax.swing.JDialog {
 	private javax.swing.JEditorPane ivjEditorPane = null;

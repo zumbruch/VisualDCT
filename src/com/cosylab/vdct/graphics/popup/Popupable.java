@@ -33,7 +33,7 @@ import java.util.Vector;
 /**
  * Insert the type's description here.
  * Creation date: (2.2.2001 19:55:45)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 public interface Popupable {
 /**

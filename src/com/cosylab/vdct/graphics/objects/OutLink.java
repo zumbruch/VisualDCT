@@ -31,7 +31,7 @@ package com.cosylab.vdct.graphics.objects;
 /**
  * Insert the type's description here.
  * Creation date: (29.1.2001 17:50:31)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 public interface OutLink extends Linkable {
 /**

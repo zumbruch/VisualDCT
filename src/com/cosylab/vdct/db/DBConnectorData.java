@@ -31,7 +31,7 @@ package com.cosylab.vdct.db;
 /**
  * Insert the type's description here.
  * Creation date: (23.4.2001 17:29:39)
- * @author: 
+ * @author 
  */
 public class DBConnectorData {
 	protected String connectorID;

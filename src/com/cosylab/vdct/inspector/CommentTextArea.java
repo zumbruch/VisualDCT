@@ -34,7 +34,7 @@ import java.awt.event.FocusListener;
 /**
  * Insert the type's description here.
  * Creation date: (26.1.2001 15:10:46)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 public class CommentTextArea extends JTextArea implements java.awt.event.FocusListener {
 	InspectableProperty property = null;

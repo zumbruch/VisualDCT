@@ -42,7 +42,7 @@ import org.apache.crimson.tree.XmlDocument;
 /**
 * Insert the class' description here.
 * Creation date: (6.12.2001 21:54:33)
-* @author: 
+* @author 
 */
 public final class XMLManager
 {

@@ -31,7 +31,7 @@ package com.cosylab.vdct.db;
 /**
  * Insert the type's description here.
  * Creation date: (23/8/99 14:06:31)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 public class DBComment {
 	protected String comment;

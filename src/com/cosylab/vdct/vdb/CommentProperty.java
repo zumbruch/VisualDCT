@@ -33,7 +33,7 @@ import com.cosylab.vdct.util.StringUtils;
 /**
  * Insert the type's description here.
  * Creation date: (26.1.2001 15:51:20)
- * @author: 
+ * @author 
  */
 public class CommentProperty implements com.cosylab.vdct.inspector.InspectableProperty {
 	VDBRecordData record;

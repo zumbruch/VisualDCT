@@ -47,7 +47,7 @@ import com.cosylab.vdct.events.commands.*;
 /**
  * Insert the type's description here.
  * Creation date: (21.12.2000 20:46:35)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 public class Record extends ContainerObject implements Clipboardable, Descriptable, Flexible, Hub, Morphable, Movable, MultiInLink, Rotatable, Selectable, Popupable, Inspectable {
 

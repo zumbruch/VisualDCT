@@ -33,7 +33,7 @@ import javax.swing.border.*;
 /**
  * Insert the type's description here.
  * Creation date: (10.1.2001 15:10:15)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 public class InspectorListCellRenderer extends JLabel implements ListCellRenderer {
 	private static String noObject = "(No object selected)";

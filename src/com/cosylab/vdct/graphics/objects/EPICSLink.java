@@ -33,7 +33,7 @@ import com.cosylab.vdct.Constants;
 /**
  * Insert the type's description here.
  * Creation date: (29.1.2001 21:23:04)
- * @author: Matej Sekoranja 
+ * @author Matej Sekoranja 
  */
 public abstract class EPICSLink extends Field implements Descriptable, Linkable, Rotatable {
 	protected int r = Constants.LINK_RADIOUS;

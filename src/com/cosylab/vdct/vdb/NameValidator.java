@@ -31,7 +31,7 @@ package com.cosylab.vdct.vdb;
 /**
  * Insert the type's description here.
  * Creation date: (3.2.2001 21:58:24)
- * @author: matej Sekoranja
+ * @author matej Sekoranja
  */
 public interface NameValidator {
 /**

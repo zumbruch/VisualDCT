@@ -40,7 +40,7 @@ import com.cosylab.vdct.graphics.popup.*;
 /**
  * Insert the type's description here.
  * Creation date: (29.1.2001 21:27:30)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 public class EPICSVarLink extends EPICSLink implements MultiInLink, Popupable, Inspectable {
 

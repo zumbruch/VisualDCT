@@ -37,7 +37,7 @@ import com.cosylab.vdct.inspector.*;
 /**
  * Insert the type's description here.
  * Creation date: (8.1.2001 18:21:54)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
  
 public class DataProvider {

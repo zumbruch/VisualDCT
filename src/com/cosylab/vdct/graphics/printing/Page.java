@@ -33,7 +33,7 @@ import java.awt.print.*;
 /**
  * Insert the type's description here.
  * Creation date: (13.5.2001 12:33:52)
- * @author: 
+ * @author 
  */
 public class Page {
 	public final static int TRUE_SCALE = 0; 

@@ -31,7 +31,7 @@ package com.cosylab.vdct.graphics.objects;
 /**
  * Insert the type's description here.
  * Creation date: (7.12.2001 19:10:29)
- * @author: 
+ * @author 
  */
 public interface Debuggable {
 /**

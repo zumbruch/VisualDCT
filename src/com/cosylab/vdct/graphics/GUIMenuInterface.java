@@ -33,7 +33,7 @@ import java.io.*;
 /**
  * Insert the type's description here.
  * Creation date: (4.2.2001 15:04:32)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 public interface GUIMenuInterface {
 /**

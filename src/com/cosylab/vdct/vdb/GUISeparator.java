@@ -32,7 +32,7 @@ import com.cosylab.vdct.inspector.*;
 /**
  * Insert the type's description here.
  * Creation date: (12.1.2001 22:40:34)
- * @author: 
+ * @author 
  */
 public class GUISeparator implements InspectableProperty {
 	private String title;

@@ -41,7 +41,7 @@ import com.cosylab.vdct.graphics.popup.*;
 /**
  * Insert the type's description here.
  * Creation date: (30.1.2001 12:26:07)
- * @author: Matej Sekoranja 
+ * @author Matej Sekoranja 
  */
 public abstract class EPICSLinkOut extends EPICSLink implements OutLink, Popupable, Inspectable {
 

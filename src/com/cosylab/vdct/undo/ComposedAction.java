@@ -31,7 +31,7 @@ package com.cosylab.vdct.undo;
 /**
  * Insert the type's description here.
  * Creation date: (3.5.2001 20:34:53)
- * @author: 
+ * @author 
  */
 public class ComposedAction extends ActionObject implements ComposedActionInterface {
 	protected java.util.Vector actions;

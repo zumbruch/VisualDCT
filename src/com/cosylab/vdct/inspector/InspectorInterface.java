@@ -34,7 +34,7 @@ import com.cosylab.vdct.vdb.*;
 /**
  * Insert the type's description here.
  * Creation date: (8.1.2001 17:43:35)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 public interface InspectorInterface {
 /**

@@ -34,7 +34,7 @@ import com.cosylab.vdct.VisualDCT;
 /**
  * Insert the type's description here.
  * Creation date: (29.12.2000 12:37:43)
- * @author: 
+ * @author 
  */
 public class SetWorkspaceGroup extends Command {
 	private VisualDCT visualDCT;

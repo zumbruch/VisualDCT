@@ -33,7 +33,7 @@ import java.awt.Graphics;
 /**
  * Decorator (using Decorator pattern)
  * Creation date: (10.12.2000 11:02:55)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 public abstract class Decorator implements VisualComponent {
 	private VisualComponent component;

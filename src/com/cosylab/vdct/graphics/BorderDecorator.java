@@ -33,7 +33,7 @@ import java.awt.*;
 /**
  * Insert the type's description here.
  * Creation date: (10.12.2000 13:07:53)
- * @author: 
+ * @author 
  */
 public class BorderDecorator extends Decorator {
 /**

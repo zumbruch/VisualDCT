@@ -34,7 +34,7 @@ import javax.swing.*;
 /**
  * Insert the type's description here.
  * Creation date: (27.1.2001 17:30:55)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 public class PopUpMenu extends JPopupMenu {
 	private static PopUpMenu instance = null;

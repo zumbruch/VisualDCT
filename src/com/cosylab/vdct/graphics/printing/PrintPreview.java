@@ -38,7 +38,7 @@ import com.cosylab.vdct.events.commands.*;
 /**
  * Insert the type's description here.
  * Creation date: (12.5.2001 15:24:22)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 public class PrintPreview extends javax.swing.JDialog {
 	private javax.swing.JPanel ivjJFrameContentPane = null;

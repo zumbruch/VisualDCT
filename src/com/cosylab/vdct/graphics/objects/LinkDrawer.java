@@ -36,7 +36,7 @@ import com.cosylab.vdct.graphics.*;
  * !!! support for shortened tail drawing 
  * Insert the type's description here.
  * Creation date: (30.1.2001 14:35:04)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
  
 public final class LinkDrawer {

@@ -31,7 +31,7 @@ package com.cosylab.vdct.graphics.objects;
 /**
  * Insert the type's description here.
  * Creation date: (25.12.2000 14:08:34)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 public interface Movable {
 /**

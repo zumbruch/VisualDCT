@@ -32,7 +32,7 @@ package com.cosylab.vdct;
 /**
  * Insert the type's description here.
  * Creation date: (23.5.2001 15:31:19)
- * @author: 
+ * @author 
  */
 public class SettingsDialog extends javax.swing.JDialog {
 	private javax.swing.JButton ivjJButton2 = null;

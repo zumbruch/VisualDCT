@@ -31,7 +31,7 @@ package com.cosylab.vdct.graphics;
 /**
  * Insert the type's description here.
  * Creation date: (4.2.2001 15:36:01)
- * @author: 
+ * @author 
  */
 public interface VDBInterface {
 /**

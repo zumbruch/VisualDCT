@@ -31,7 +31,7 @@ package com.cosylab.vdct.graphics;
 /**
  * Insert the type's description here.
  * Creation date: (2.5.2001 8:25:44)
- * @author: 
+ * @author 
  */
 public class TransparentTextField extends javax.swing.JTextField {
 	private com.cosylab.vdct.graphics.objects.VisibleObject owner = null;

@@ -37,7 +37,7 @@ import com.cosylab.vdct.Console;
 /**
  * Insert the type's description here.
  * Creation date: (6.1.2001 22:41:16)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 public class Inspector extends JDialog implements InspectableObjectsListener, InspectorInterface, WindowListener {
 	private JLabel ivjCommentLabel = null;

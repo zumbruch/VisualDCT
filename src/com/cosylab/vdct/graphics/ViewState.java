@@ -35,7 +35,7 @@ import com.cosylab.vdct.graphics.objects.VisibleObject;
 /**
  * Insert the type's description here.
  * Creation date: (13/7/99 10:26:13)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 
 public class ViewState {

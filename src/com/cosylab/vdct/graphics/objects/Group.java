@@ -41,7 +41,7 @@ import com.cosylab.vdct.util.*;
 /**
  * Insert the type's description here.
  * Creation date: (21.12.2000 20:46:35)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 public class Group extends ContainerObject implements Clipboardable, Descriptable, Flexible, Movable, SaveInterface, Selectable {
 	private static Group clipboard = null;

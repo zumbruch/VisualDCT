@@ -33,7 +33,7 @@ import javax.swing.table.AbstractTableModel;
 /**
  * Insert the type's description here.
  * Creation date: (6.1.2001 23:29:20)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 public class InspectorTableModel extends javax.swing.table.AbstractTableModel {
 	private InspectableProperty[] data = null;

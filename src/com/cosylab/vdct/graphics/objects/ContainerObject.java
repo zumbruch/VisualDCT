@@ -33,7 +33,7 @@ import java.util.*;
 /**
  * Insert the type's description here.
  * Creation date: (21.12.2000 20:27:25)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 public abstract class ContainerObject extends VisibleObject {
 	protected boolean useHashtable = true;

@@ -34,7 +34,7 @@ import com.cosylab.vdct.VisualDCT;
 /**
  * Insert the class' description here.
  * Creation date: (3.2.2001 19:37:21)
- * @author: 
+ * @author 
  */
  
 public class ShowNewDialog extends Command {

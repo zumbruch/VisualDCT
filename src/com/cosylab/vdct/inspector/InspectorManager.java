@@ -34,7 +34,7 @@ import java.util.*;
 /**
  * Insert the type's description here.
  * Creation date: (8.1.2001 21:35:03)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  * !!! inspectors are not disposed !!!! (move ins.listeners in inspectors, when this is implemented);
  */
 public class InspectorManager {

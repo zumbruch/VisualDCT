@@ -31,7 +31,7 @@ package com.cosylab.vdct.graphics.objects;
 /**
  * Insert the type's description here.
  * Creation date: (4.5.2001 9:51:01)
- * @author: 
+ * @author 
  */
 public interface MultiInLink extends InLink {
 /**

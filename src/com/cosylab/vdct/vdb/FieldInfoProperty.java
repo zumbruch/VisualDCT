@@ -33,7 +33,7 @@ import com.cosylab.vdct.inspector.*;
 /**
  * Insert the type's description here.
  * Creation date: (1.2.2001 22:49:33)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 public class FieldInfoProperty implements InspectableProperty {
 	private VDBFieldData field;

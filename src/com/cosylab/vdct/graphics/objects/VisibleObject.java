@@ -34,7 +34,7 @@ import com.cosylab.vdct.graphics.*;
 /**
  * Insert the type's description here.
  * Creation date: (19.12.2000 19:56:38)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 public abstract class VisibleObject implements Visitable {
 	// parent (owner)

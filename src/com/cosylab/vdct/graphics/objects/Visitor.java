@@ -35,7 +35,7 @@ package com.cosylab.vdct.graphics.objects;
  * 		public abstract visitElementA(ElementA element)
  *
  * Creation date: (19.12.2000 18:04:28)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 public abstract class Visitor {
 /**

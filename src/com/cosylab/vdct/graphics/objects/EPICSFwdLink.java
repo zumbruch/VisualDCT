@@ -31,7 +31,7 @@ package com.cosylab.vdct.graphics.objects;
 /**
  * Insert the type's description here.
  * Creation date: (29.1.2001 21:26:39)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 public class EPICSFwdLink extends EPICSOutLink {
 /**

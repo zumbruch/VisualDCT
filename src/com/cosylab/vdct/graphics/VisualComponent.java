@@ -33,7 +33,7 @@ import java.awt.Graphics;
 /**
  * Interface class of ComponentDecorator
  * Creation date: (10.12.2000 11:34:30)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 
 public interface VisualComponent {

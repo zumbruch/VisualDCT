@@ -37,7 +37,7 @@ import com.cosylab.vdct.events.commands.*;
 /**
  * Insert the type's description here.
  * Creation date: (10.12.2000 12:31:58)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
  
 public class WorkspacePanel extends PanelDecorator implements ComponentListener {

@@ -40,7 +40,7 @@ import java.awt.event.*;
 /**
  * Insert the type's description here.
  * Creation date: (29.1.2001 20:05:51)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 public class Connector extends VisibleObject implements Descriptable, InLink, Movable, OutLink, Popupable {
 

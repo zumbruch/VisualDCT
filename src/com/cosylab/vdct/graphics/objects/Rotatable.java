@@ -31,7 +31,7 @@ package com.cosylab.vdct.graphics.objects;
 /**
  * Insert the type's description here.
  * Creation date: (30.1.2001 16:49:56)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 public interface Rotatable {
 /**

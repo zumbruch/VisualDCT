@@ -31,7 +31,7 @@ package com.cosylab.vdct.inspector;
 /**
  * Insert the type's description here.
  * Creation date: (11.1.2001 21:28:00)
- * @author: Matej Sekoranja 
+ * @author Matej Sekoranja 
  */
 public interface InspectableProperty {
 /**

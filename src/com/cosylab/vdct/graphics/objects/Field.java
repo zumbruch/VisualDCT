@@ -37,7 +37,7 @@ import com.cosylab.vdct.vdb.*;
 /**
  * Insert the type's description here.
  * Creation date: (26.01.2000 17:00:35)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
  
 public class Field extends VisibleObject {

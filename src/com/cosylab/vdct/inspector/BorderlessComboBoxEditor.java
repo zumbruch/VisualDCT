@@ -33,7 +33,7 @@ import javax.swing.*;
 /**
  * Insert the type's description here.
  * Creation date: (26.1.2001 21:00:33)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 public class BorderlessComboBoxEditor extends JTextField implements ComboBoxEditor {
 /**

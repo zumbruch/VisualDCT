@@ -34,7 +34,7 @@ import javax.swing.event.MouseInputListener;
 /**
  * Insert the type's description here.
  * Creation date: (18.12.2000 16:23:24)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 public class MouseEventManager extends EventManager {
 	protected static MouseEventManager instance = null;

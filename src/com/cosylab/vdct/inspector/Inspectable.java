@@ -33,7 +33,7 @@ import javax.swing.*;
 /**
  * Insert the type's description here.
  * Creation date: (10.1.2001 14:47:33)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 public interface Inspectable {
 /**

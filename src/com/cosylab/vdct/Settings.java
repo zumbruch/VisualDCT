@@ -33,7 +33,7 @@ import java.util.prefs.*;
 /**
  * Insert the type's description here.
  * Creation date: (4.2.2001 11:30:32)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 public class Settings {
 	private static Settings instance = null;

@@ -31,7 +31,7 @@ package com.cosylab.vdct.graphics.objects;
 /**
  * Insert the type's description here.
  * Creation date: (19.12.2000 20:18:41)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 public interface Linkable {
 /**

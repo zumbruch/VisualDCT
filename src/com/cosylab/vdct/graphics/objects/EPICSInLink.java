@@ -35,7 +35,7 @@ import com.cosylab.vdct.Constants;
 /**
  * Insert the type's description here.
  * Creation date: (29.1.2001 21:34:08)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 public class EPICSInLink extends EPICSLinkOut {
 /**

@@ -40,7 +40,7 @@ import com.cosylab.vdct.events.commands.*;
 /**
  * Insert the type's description here.
  * Creation date: (4.2.2001 15:32:01)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 public class DSGUIInterface implements GUIMenuInterface, VDBInterface {
 

@@ -31,7 +31,7 @@ package com.cosylab.vdct.graphics.objects;
 /**
  * Insert the type's description here.
  * Creation date: (4.2.2001 21:54:45)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 public interface Flexible {
 /**

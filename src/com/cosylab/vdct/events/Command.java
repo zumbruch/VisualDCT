@@ -31,7 +31,7 @@ package com.cosylab.vdct.events;
 /**
  * Command pattern
  * Creation date: (18.12.2000 15:22:19)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 public abstract class Command {
 /**

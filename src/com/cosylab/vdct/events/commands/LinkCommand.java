@@ -36,7 +36,7 @@ import com.cosylab.vdct.graphics.objects.Record;
 /**
  * Insert the class' description here.
  * Creation date: (3.2.2001 13:28:11)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
  
 public class LinkCommand extends com.cosylab.vdct.events.Command {

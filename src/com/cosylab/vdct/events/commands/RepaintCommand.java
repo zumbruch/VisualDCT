@@ -34,7 +34,7 @@ import javax.swing.JComponent;
 /**
  * Insert the type's description here.
  * Creation date: (21.12.2000 22:42:23)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 public class RepaintCommand extends Command {
 	private JComponent component;

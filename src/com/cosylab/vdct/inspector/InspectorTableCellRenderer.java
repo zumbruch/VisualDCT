@@ -36,7 +36,7 @@ import javax.swing.border.*;
 /**
  * Insert the type's description here.
  * Creation date: (7.1.2001 11:03:22)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 public class InspectorTableCellRenderer extends DefaultTableCellRenderer {
 	private Color bgColor;

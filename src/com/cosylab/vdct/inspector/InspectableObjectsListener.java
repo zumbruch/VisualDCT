@@ -31,7 +31,7 @@ package com.cosylab.vdct.inspector;
 /**
  * Insert the type's description here.
  * Creation date: (17.4.2001 17:12:55)
- * @author: Matej Sekoranja
+ * @author Matej Sekoranja
  */
 public interface InspectableObjectsListener {
 /**

@@ -33,7 +33,7 @@ import com.cosylab.vdct.plugin.export.*;
 /**
  * Insert the type's description here.
  * Creation date: (8.12.2001 13:29:26)
- * @author: 
+ * @author 
  */
 public class ExportSimulator implements ExportPlugin {
 /**
