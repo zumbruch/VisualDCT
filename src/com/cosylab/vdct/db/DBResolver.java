@@ -335,7 +335,8 @@ public static String processComment(DBData data, EnhancedStreamTokenizer tokeniz
 						fd=(DBFieldData)rd.getFields().get(str2);
 						if (fd==null)
 						{
-							fd = new DBFieldData(str2, nullString);
+							// default or null (-> default will be set when converted to VDB) value to be set
+							fd = new DBFieldData(str2, null);
 							rd.addField(fd);
 						}
 							
@@ -396,7 +397,8 @@ public static String processComment(DBData data, EnhancedStreamTokenizer tokeniz
 						fd=(DBFieldData)rd.getFields().get(str2);
 						if (fd==null)
 						{
-							fd = new DBFieldData(str2, nullString);
+							// default or null (-> default will be set when converted to VDB) value to be set
+							fd = new DBFieldData(str2, null);
 							rd.addField(fd);
 						}
 							
