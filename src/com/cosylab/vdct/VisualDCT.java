@@ -5381,6 +5381,8 @@ public static void main(java.lang.String[] args) {
 			public void windowClosed(java.awt.event.WindowEvent e) {
 				Settings.getInstance().save();
 				com.cosylab.vdct.plugin.PluginManager.getInstance().save();
+				System.out.println();
+				System.out.println("VisualDCT exited.");
 				System.exit(0);
 			};
 		});
