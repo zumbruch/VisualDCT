@@ -88,12 +88,14 @@ public void importPlugins(String fileName, PluginManager pluginManager) throws E
 	// read from resource
 	URL dtdURL = getClass().getResource("/"+DTD_URL);
 	if (dtdURL==null)
-		throw new Exception("Failed to loacte DTD file: /"+DTD_URL);
+		throw new Exception("Failed to locate DTD file: /"+DTD_URL);
 		
 	Document doc = null;
 	try
 	{
-		doc = XMLManager.readFileDocument(fileName, DTD_SYMBOL, dtdURL);
+// shp: importPlugins is now capable of loading xml from jar files
+//		doc = XMLManager.readFileDocument(fileName, DTD_SYMBOL, dtdURL);
+		doc = XMLManager.readResourceDocument(fileName, DTD_SYMBOL, dtdURL);
 	}
 	catch (FileNotFoundException e)
 	{

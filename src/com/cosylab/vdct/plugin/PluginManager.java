@@ -39,9 +39,6 @@ import com.cosylab.vdct.Constants;
  */
 public final class PluginManager
 {
-
-    private static final String PLUGINS_FILE = ".vdctplugins.xml";
-
 	private static PluginManager instance = null;
     private LinkedList pluginListeners = null;
     private LinkedList plugins = null;
@@ -61,6 +58,13 @@ protected PluginManager()
 	// load
 	load();
 }
+
+// shp: new
+public PluginSerializer getPluginSerializer()
+{
+	return pluginSerializer;
+}
+
 /**
  * Insert the method's description here.
  * Creation date: (6.12.2001 22:17:37)
@@ -171,13 +175,13 @@ private void load()
 		//String fileName = com.cosylab.vdct.Settings.getInstance().getDefaultDir()+com.cosylab.vdct.Constants.CONFIG_DIR+PLUGINS_FILE;
 		String fileName = System.getProperty(Constants.VDCT_PLUGINS_FILE);
 		if (fileName == null)
-			fileName = System.getProperty("user.home")+"/"+PLUGINS_FILE;
+			fileName = System.getProperty("user.home") + "/" + Constants.PLUGINS_FILE_NAME;
 	
 		// is file does not exists, load default file
 		if (!(new java.io.File(fileName).exists()))
 		{
 			com.cosylab.vdct.Console.getInstance().println("o) No plugins configuration file found. Using defaults...");
-			fileName = getClass().getResource("/"+Constants.CONFIG_DIR+PLUGINS_FILE).getFile();
+			fileName = getClass().getResource("/" + Constants.CONFIG_DIR + Constants.PLUGINS_FILE_NAME).getFile();
 		}
 		pluginSerializer.importPlugins(fileName, this);
 	}
@@ -230,7 +234,7 @@ public void save()
 		//String fileName = com.cosylab.vdct.Settings.getInstance().getDefaultDir()+com.cosylab.vdct.Constants.CONFIG_DIR+PLUGINS_FILE;
 		String fileName = System.getProperty(Constants.VDCT_PLUGINS_FILE);
 		if (fileName == null)
-			fileName = System.getProperty("user.home")+"/"+PLUGINS_FILE;
+			fileName = System.getProperty("user.home") + "/" + Constants.PLUGINS_FILE_NAME;
 		pluginSerializer.exportPlugins(fileName, this);
 	}
 	catch (Exception e)

@@ -3683,7 +3683,6 @@ private javax.swing.JMenuItem getPluginManagerMenuItem() {
 			ivjPluginManagerMenuItem.setName("PluginManagerMenuItem");
 			ivjPluginManagerMenuItem.setMnemonic('M');
 			ivjPluginManagerMenuItem.setText("Plugin Manager...");
-			ivjPluginManagerMenuItem.setEnabled(false);
 			// user code begin {1}
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
@@ -5496,8 +5495,11 @@ public void pasteMenuItem_ActionPerformed() {
 /**
  * Comment
  */
-public void pluginManagerMenuItem_ActionPerformed(java.awt.event.ActionEvent actionEvent) {
-	return;
+public void pluginManagerMenuItem_ActionPerformed(java.awt.event.ActionEvent actionEvent)
+{
+	PluginManagerDialog dialog = new PluginManagerDialog(this);
+	dialog.setLocationRelativeTo(this);
+	dialog.setVisible(true);
 }
 /**
  * Comment
