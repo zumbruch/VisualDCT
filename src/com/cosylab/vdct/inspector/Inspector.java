@@ -54,6 +54,7 @@ public class Inspector extends JDialog implements InspectableObjectsListener, In
 	private JPanel ivjJDialogContentPane = null;
 	private JTable ivjScrollPaneTable = null;
 	private JScrollPane ivjTableScrollPane = null;
+	private JScrollPane ivjCommentScrollPane = null;
 	private JComboBox ivjObjectComboBox = null;
 	// inspector components
 	private InspectorTableModel tableModel;
@@ -180,10 +181,7 @@ private CommentTextArea getCommentTextArea() {
 		try {
 			ivjCommentTextArea = new com.cosylab.vdct.inspector.CommentTextArea();
 			ivjCommentTextArea.setName("CommentTextArea");
-			ivjCommentTextArea.setBorder(new javax.swing.border.EtchedBorder());
-			ivjCommentTextArea.setRows(4);
-			ivjCommentTextArea.setMaximumSize(new java.awt.Dimension(352, 80));
-			ivjCommentTextArea.setColumns(32);
+			//ivjCommentTextArea.setBorder(new javax.swing.border.EtchedBorder());
 			// user code begin {1}
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
@@ -193,6 +191,32 @@ private CommentTextArea getCommentTextArea() {
 		}
 	}
 	return ivjCommentTextArea;
+}
+/**
+ * Return the TableScrollPane property value.
+ * @return javax.swing.JScrollPane
+ */
+/* WARNING: THIS METHOD WILL BE REGENERATED. */
+private javax.swing.JScrollPane getCommentScrollPane() {
+	if (ivjCommentScrollPane == null) {
+		try {
+			ivjCommentScrollPane = new javax.swing.JScrollPane();
+			ivjCommentScrollPane.setName("TableScrollPane");
+			ivjCommentScrollPane.setVerticalScrollBarPolicy(javax.swing.JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+			ivjCommentScrollPane.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			getCommentScrollPane().setViewportView(getCommentTextArea());
+			// user code begin {1}
+			//ivjCommentTextArea.setMaximumSize(new java.awt.Dimension(10, 120));
+			//ivjCommentTextArea.setMinimumSize(new java.awt.Dimension(10, 40));
+			//ivjCommentTextArea.setPreferredSize(new java.awt.Dimension(10, 60));
+			// user code end
+		} catch (java.lang.Throwable ivjExc) {
+			// user code begin {2}
+			// user code end
+			handleException(ivjExc);
+		}
+	}
+	return ivjCommentScrollPane;
 }
 /**
  * Return the FrozeCheckBox property value.
@@ -346,7 +370,7 @@ private javax.swing.JPanel getJDialogContentPane() {
 			constraintsCommentTextArea.weightx = 1.0;
 			constraintsCommentTextArea.weighty = 1.0;
 			constraintsCommentTextArea.insets = new java.awt.Insets(4, 4, 4, 4);
-			getJDialogContentPane().add(getCommentTextArea(), constraintsCommentTextArea);
+			getJDialogContentPane().add(getCommentScrollPane(), constraintsCommentTextArea);
 
 			java.awt.GridBagConstraints constraintsHelpLabel = new java.awt.GridBagConstraints();
 			constraintsHelpLabel.gridx = 0; constraintsHelpLabel.gridy = 5;
