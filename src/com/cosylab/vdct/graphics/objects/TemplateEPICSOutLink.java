@@ -70,4 +70,15 @@ public String getLabel() {
 	return ((VDBTemplateField)getFieldData()).getAlias();
 }
 
+/**
+ * Insert the method's description here.
+ * Creation date: (30.1.2001 16:58:58)
+ * @return boolean
+ */
+public boolean isRight()
+{
+	// super.super.isRigth() is the right solution, but ...
+	return isStaticRight();
+}	
+
 }

@@ -59,6 +59,7 @@ public VDBRecordData() {
  */
 public String getDTYPLinkType() {
 
+	// !!!! what if this is a template record !!!
 	VDBFieldData dtypField = (VDBFieldData)(fields.get("DTYP"));
 	if (dtypField==null)
 	{
@@ -66,8 +67,8 @@ public String getDTYPLinkType() {
 		return null;	
 	}	
 	
-	else if (dtypField.getValue().equals(com.cosylab.vdct.Constants.NONE)) return null;
-	//else if (dtypField.getValue().indexOf("$")!=-1) return null;
+	if (dtypField.getValue().equals(com.cosylab.vdct.Constants.NONE)) return null;
+	// if (dtypField.getValue().indexOf("$")!=-1) return null;
 
 	DBDDeviceData dev = (DBDDeviceData)(DataProvider.getInstance().getDbdDB().getDBDDeviceData(record_type+"/"+dtypField.getValue()));
 	if (dev==null)

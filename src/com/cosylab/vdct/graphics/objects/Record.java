@@ -54,13 +54,6 @@ public class Record
 	implements Clipboardable, Descriptable, Flexible, Hub, Morphable, Movable, MultiInLink, Rotatable, Selectable, Popupable, Inspectable
 {
 
-	class PopupMenuHandler implements ActionListener {
-		public void actionPerformed(ActionEvent e) {
-		    LinkCommand cmd = (LinkCommand)CommandManager.getInstance().getCommand("LinkCommand");
-		    cmd.setData(Record.this, recordData.getField(e.getActionCommand()));
-	 		cmd.execute();
-		}
-	}
 	//private final static String nullString = "";
 	private final static String fieldMaxStr = "01234567890123456789012345";
 	private final static int tailSizeOfR = 4;
@@ -80,10 +73,6 @@ public class Record
 	protected Vector outlinks;
 	protected boolean disconnected = false;
 	private boolean right = true;
-	private final static String inlinkString = "INLINK";
-	private final static String outlinkString = "OUTLINK";
-	private final static String fwdlinkString = "FWDLINK";
-	private final static String varlinkString = "VARIABLE";
 	
 	private static GUISeparator alphaSeparator = null;
 	private static GUISeparator dbdSeparator = null;
@@ -228,14 +217,6 @@ public boolean copyToGroup(java.lang.String group) {
 	unconditionalValidation();
 
 	return true;
-}
-/**
- * Insert the method's description here.
- * Creation date: (2.2.2001 23:00:51)
- * @return com.cosylab.vdct.graphics.objects.Record.PopupMenuHandler
- */
-private com.cosylab.vdct.graphics.objects.Record.PopupMenuHandler createPopupmenuHandler() {
-	return new PopupMenuHandler();
 }
 /**
  * Insert the method's description here.
@@ -584,105 +565,7 @@ public int getInY() {
  * @return java.util.Vector
  */
 public Vector getItems() {
-	Vector items = new Vector();
-	ActionListener l = createPopupmenuHandler();
-	VDBFieldData field;
-	JMenuItem menuitem;
-	
-	if (isTarget()) {
-		int count = 0;
-		JMenu varlinkItem = new JMenu(varlinkString);
-		JMenu menu = varlinkItem;
-		
-		Enumeration e = recordData.getFieldsV().elements();
-		while (e.hasMoreElements()) {
-			field = (VDBFieldData)(e.nextElement());
-/*			switch (field.getType()) {
-				case DBDConstants.DBF_CHAR: 
-				case DBDConstants.DBF_UCHAR: 
-				case DBDConstants.DBF_SHORT: 
-				case DBDConstants.DBF_USHORT: 
-				case DBDConstants.DBF_LONG: 
-				case DBDConstants.DBF_ULONG: 
-				case DBDConstants.DBF_FLOAT: 
-				case DBDConstants.DBF_DOUBLE: 
-				case DBDConstants.DBF_STRING:
-				case DBDConstants.DBF_NOACCESS:		// added by request of APS
-				case DBDConstants.DBF_ENUM:
-				case DBDConstants.DBF_MENU:
-				case DBDConstants.DBF_DEVICE:  // ?
-				  menuitem = new JMenuItem(field.getName());
-				  menuitem.addActionListener(l);
-				  menu = PopUpMenu.addItem(menuitem, menu, count);
-				  count++; 
-			}
-*/
-			if (field.getType()!=DBDConstants.DBF_INLINK &&
-				field.getType()!=DBDConstants.DBF_OUTLINK &&
-				field.getType()!=DBDConstants.DBF_FWDLINK)
-			{
-				  menuitem = new JMenuItem(field.getName());
-				  menuitem.addActionListener(l);
-				  menu = PopUpMenu.addItem(menuitem, menu, count);
-				  count++; 
-			}
-
-		}
-		if (count > 0) items.addElement(varlinkItem);
-		
-	}
-	else {
-		
-		JMenu inlinks = new JMenu(inlinkString);
-		JMenu outlinks = new JMenu(outlinkString);
-		JMenu fwdlinks = new JMenu(fwdlinkString);
-		
-		//boolean isSoft = recordData.canBePV_LINK(); !!! can be added
-
-		JMenu inMenu = inlinks;	
-		JMenu outMenu = outlinks;	
-		JMenu fwdMenu = fwdlinks;	
-		
-		int inpItems, outItems, fwdItems;
-		inpItems=outItems=fwdItems=0;
-
-		Enumeration e = recordData.getFieldsV().elements();
-		while (e.hasMoreElements()) {
-			field = (VDBFieldData)(e.nextElement());
-			if (field.getValue().equals(nullString)) {
-				switch (field.getType()) {
-					case DBDConstants.DBF_INLINK:
-						 menuitem = new JMenuItem(field.getName());
-						 menuitem.addActionListener(l);
-						 inlinks = PopUpMenu.addItem(menuitem, inlinks, inpItems); 
-						 inpItems++;
-						 break;
-					case DBDConstants.DBF_OUTLINK: 
-						 menuitem = new JMenuItem(field.getName());
-						 menuitem.addActionListener(l);
-						 outlinks = PopUpMenu.addItem(menuitem, outlinks, outItems); 
-						 outItems++;
-						 break;
-					case DBDConstants.DBF_FWDLINK:
-						 menuitem = new JMenuItem(field.getName());
-						 menuitem.addActionListener(l);
-						 fwdlinks = PopUpMenu.addItem(menuitem, fwdlinks, fwdItems); 
-						 fwdItems++;
-						 break;
-				}
-			}
-		}
-
-		if (inMenu.getItemCount() > 0)
-			items.addElement(inMenu);
-		if (outMenu.getItemCount() > 0)
-			items.addElement(outMenu);
-		if (fwdMenu.getItemCount() > 0)
-			items.addElement(fwdMenu);
-
-	}
-		
-	return items;
+	return getLinkMenus(recordData.getFieldsV().elements());
 }
 /**
  * Insert the method's description here.
@@ -1403,4 +1286,11 @@ private void validateFields() {
 	}
 	
 }
+
+/**
+ */
+public VDBFieldData getField(String name) {
+	return recordData.getField(name);
+}
+
 }

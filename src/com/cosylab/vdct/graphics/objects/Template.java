@@ -30,6 +30,7 @@ package com.cosylab.vdct.graphics.objects;
 
 import java.awt.*;
 import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.Vector;
 
 import javax.swing.Icon;
@@ -447,7 +448,9 @@ public class Template
 	 */
 	public Vector getItems()
 	{
-		return null;
+		Hashtable allLinks = (Hashtable)templateData.getInputs().clone();
+		allLinks.putAll(templateData.getOutputs());
+		return getLinkMenus(allLinks.elements());
 	}
 
 	/**
@@ -742,5 +745,15 @@ public void fieldChanged(VDBFieldData field) {
 		com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 	}
 }
+
+/**
+ */
+public VDBFieldData getField(String name) {
+	VDBFieldData field = (VDBFieldData)templateData.getInputs().get(name);
+	if (field==null)
+		field = (VDBFieldData)templateData.getOutputs().get(name);
+	return field;
+}
+
 
 }

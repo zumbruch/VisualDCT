@@ -28,11 +28,13 @@ package com.cosylab.vdct.vdb;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import com.cosylab.vdct.dbd.DBDConstants;
 import com.cosylab.vdct.graphics.objects.Descriptable;
 import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.objects.Template;
 import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.inspector.InspectorManager;
+import com.sun.jndi.ldap.ManageReferralControl;
 
 /**
  * @author Matej
@@ -197,8 +199,46 @@ public class VDBTemplateField extends VDBFieldData implements Descriptable
 				new com.cosylab.vdct.undo.FieldValueChangeAction(this, value, newValue)
 			);
 		value = newValue;
+
+		// field changed
+		Template visualTemplate = (Template)Group.getRoot().findObject(templateInstance.getName(), true);
+		if (visualTemplate!=null)
+			if (visualTemplate.manageLink(this)) {
+				visualTemplate.unconditionalValidation();
+				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+			}
+		
+		// !!!! does not work since VDBRecordData.getDTYPLinkType() does not work for templates
+		/*	
+		if (getRecord()!=null)
+		{
+			// if DTYP has changed - notify all INP/OUT links
+			if (name.equals("DTYP") && !com.cosylab.vdct.plugin.debug.PluginDebugManager.isDebugState())
+			{
+				java.util.Enumeration e = templateInstance.getInputs().elements();
+				while (e.hasMoreElements())
+				{
+					VDBFieldData f = (VDBFieldData)e.nextElement();
+					if (f!=this && f.getRecord()==getRecord() &&
+						((f.getDbdData().getField_type()==DBDConstants.DBF_INLINK) ||
+						(f.getDbdData().getField_type()==DBDConstants.DBF_OUTLINK)))
+							f.updateInspector();
+				}
+				e = templateInstance.getOutputs().elements();
+				while (e.hasMoreElements())
+				{
+					VDBFieldData f = (VDBFieldData)e.nextElement();
+					if (f!=this && f.getRecord()==getRecord() &&
+						((f.getDbdData().getField_type()==DBDConstants.DBF_INLINK) ||
+						(f.getDbdData().getField_type()==DBDConstants.DBF_OUTLINK)))
+							f.updateInspector();
+				}
+			}
+		}
+*/
 		/*if (record!=null)
 		{
+
 			record.fieldValueChanged(this);
 	
 			// if DTYP has changed - notify all INP/OUT links
