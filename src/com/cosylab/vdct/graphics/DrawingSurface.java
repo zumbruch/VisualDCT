@@ -1365,7 +1365,14 @@ public boolean open(File file, boolean importDB) throws IOException {
 			} catch (java.net.MalformedURLException e) { Console.getInstance().println(e); }
 		else  */
 
-		dbData = DBResolver.resolveDB(file.getAbsolutePath());
+		try
+		{
+			dbData = DBResolver.resolveDB(file.getAbsolutePath());
+		} 
+		catch(Exception e)
+		{
+			Console.getInstance().println(e);
+		}
 
 		// check for sucess
 		if ((dbData == null) || !dbdData.consistencyCheck(dbData))

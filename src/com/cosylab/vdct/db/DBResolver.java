@@ -164,7 +164,7 @@ public static void initializeTokenizer(StreamTokenizer tokenizer) {
 
 
 
-private static String loadTemplate(DBData data, String templateFile, String referencedFromFile, PathSpecification paths) throws Exception
+private static String loadTemplate(DBData data, String templateFile, String referencedFromFile, PathSpecification paths, Stack loadStack) throws Exception
 {
 
 	File file = paths.search4File(templateFile);
@@ -180,13 +180,11 @@ private static String loadTemplate(DBData data, String templateFile, String refe
 		return file.getName();
 	}
 
-	// cyclic reference check !!!
-	{
-	}
-	
 	Console.getInstance().println("Loading template \""+templateFile+"\"...");
 
-	DBData templateData = resolveDB(templateToResolve);
+	DBData templateData = resolveDB(templateToResolve, loadStack);
+	if (templateData==null)
+		throw new DBException("Failed to load template: '"+templateFile+"'");
 	templateData.getTemplateData().setData(templateData);
 	data.addTemplate(templateData.getTemplateData());
 	
@@ -875,7 +873,7 @@ public static void skipLines(int linesToSkip, StreamTokenizer tokenizer, String 
  * @param rootData com.cosylab.vdct.db.DBData
  * @param tokenizer java.io.StreamTokenizer
  */
-public static void processDB(DBData data, StreamTokenizer tokenizer, String fileName, PathSpecification paths) throws Exception
+public static void processDB(DBData data, StreamTokenizer tokenizer, String fileName, PathSpecification paths, Stack loadStack) throws Exception
 {
 	
 	String comment = nullString;
@@ -884,170 +882,194 @@ public static void processDB(DBData data, StreamTokenizer tokenizer, String file
 	StreamTokenizer inctokenizer = null;
 
 	if (data!=null)
-	
-	try {
+	{
+		if (loadStack.contains(fileName))
+		{
+			StringBuffer buf = new StringBuffer();
+			buf.append("Cyclic reference detected when trying to load '");
+			buf.append(fileName);
+			buf.append("'.\nLoad stack trace:\n");
+			for (int i = loadStack.size()-1; i>=0; i--)
+			{
+				buf.append("\t");
+				buf.append(loadStack.elementAt(i));
+				buf.append("\n");
+			}
+			throw new DBException(buf.toString());
+		}
+		else
+		{
+			loadStack.push(fileName);
+		}
 		
-		while (tokenizer.nextToken() != tokenizer.TT_EOF)
-  		  if (tokenizer.ttype == tokenizer.TT_WORD)
-			if (tokenizer.sval.startsWith(DBConstants.commentString))
-				comment+=processComment(data, tokenizer, fileName);
-			else
-
-				/****************** records ********************/
-
-				if (tokenizer.sval.equalsIgnoreCase(RECORD) ||
-					tokenizer.sval.equalsIgnoreCase(GRECORD)) {
+		
+		try {
 			
-					DBRecordData rd = new DBRecordData();
-
-					// read record_type
-					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD) ||
-						(tokenizer.ttype == DBConstants.quoteChar)) rd.setRecord_type(tokenizer.sval);
-					else throw (new DBParseException("Invalid record type...", tokenizer, fileName));
-
-					// read record_name
-					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD) ||
-						(tokenizer.ttype == DBConstants.quoteChar)) rd.setName(tokenizer.sval);
-					else throw (new DBParseException("Invalid record name...", tokenizer, fileName));
-
-					rd.setComment(comment);	comment = nullString;
-					
-					processFields(rd, tokenizer, fileName, paths);
-					data.addRecord(rd);
-					
-				}
-
-				/****************** templates ********************/
-
-				else if (tokenizer.sval.equalsIgnoreCase(TEMPLATE)) {
-
-					// read optional description
-					str = null;
-					tokenizer.nextToken();
-					if (tokenizer.ttype == DBConstants.quoteChar) str = tokenizer.sval;
-					else
-						tokenizer.pushBack();
-
-					/*
-					if (str==null)
-						System.out.println("template()\n{");
-					else
-						System.out.println("template(\""+str+"\")\n{");
-					*/
-
-					// multiple tempaltes
-					// only new ports are added
-					DBTemplate templateData = data.getTemplateData();
-					if (!templateData.isInitialized())
-					{
-						templateData.setInitialized(true);
-						templateData.setComment(comment); comment = nullString;
-						templateData.setDescription(str);
-
-						DBTemplateEntry entry = new DBTemplateEntry();
-						data.addEntry(entry);
-
-					}
-					else
-					{
-						// !!! TBD multiple templates support
-						comment = nullString;
-					}
-					
-					processPorts(templateData, tokenizer, fileName, paths);
-					
-					//System.out.println("}");
-
-				}
-
-				/****************** expands ********************/
-
-				else if (tokenizer.sval.equalsIgnoreCase(EXPAND)) {
-
-					// read template file
-					tokenizer.nextToken();
-					if (tokenizer.ttype == DBConstants.quoteChar) str = tokenizer.sval;
-					else throw (new DBParseException("Invalid expand file...", tokenizer, fileName));
-
-					// read tempalte instance id
-					tokenizer.nextToken();
-					if ((tokenizer.ttype == tokenizer.TT_WORD) ||
-						(tokenizer.ttype == DBConstants.quoteChar)) str2 = tokenizer.sval;
-					else throw (new DBParseException("Invalid expand template instance name...", tokenizer, fileName));
-
-					String loadedTemplateId = loadTemplate(data, str, fileName, paths);
-
-					//System.out.println("expand(\""+str+"\", "+str2+")\n{");
-
-					DBTemplateInstance ti = new DBTemplateInstance(str2, loadedTemplateId);
-					ti.setComment(comment);	comment = nullString;
-
-					processMacros(ti, tokenizer, fileName, paths);
-					
-					data.addTemplateInstance(ti);
-
-					//System.out.println("}");
-				}
-
-				/****************** includes ********************/
-				
-				else if (tokenizer.sval.equalsIgnoreCase(INCLUDE)) {
-
-					// read incude_filename
-					tokenizer.nextToken();
-					if (tokenizer.ttype == DBConstants.quoteChar) include_filename=tokenizer.sval;
-					else throw (new DBParseException("Invalid include filename...", tokenizer, fileName));
-
-					DBDataEntry entry = new DBDataEntry(INCLUDE+" \""+include_filename+"\"");
-					entry.setComment(comment);	comment = nullString;
-					data.addEntry(entry);
-
-					File file = paths.search4File(include_filename);
-					inctokenizer = getStreamTokenizer(file.getAbsolutePath());
-					if (inctokenizer!=null) processDB(data, inctokenizer, include_filename, new PathSpecification(file.getParentFile().getAbsolutePath()));
-				}
-			
-				/****************** path ********************/
-
-				 else if (tokenizer.sval.equalsIgnoreCase(PATH))
-  				{
-					// read paths
-					tokenizer.nextToken();
-					if (tokenizer.ttype == DBConstants.quoteChar) str=tokenizer.sval;
-					else throw (new DBParseException("Invalid path...", tokenizer, fileName));
-
-					DBDataEntry entry = new DBDataEntry(PATH+" \""+str+"\"");
-					entry.setComment(comment);	comment = nullString;
-					data.addEntry(entry);
-
-					paths.setPath(str);
-					//Console.getInstance().println("Warning: 'path' command is not yet supported...");
-  				}
-				
-				/****************** addpath ********************/
-
-				 else if (tokenizer.sval.equalsIgnoreCase(ADDPATH))
-  				{
-					// read add paths
-					tokenizer.nextToken();
-					if (tokenizer.ttype == DBConstants.quoteChar) str=tokenizer.sval;
-					else throw (new DBParseException("Invalid addpath...", tokenizer, fileName));
-
-					DBDataEntry entry = new DBDataEntry(ADDPATH+" \""+str+"\"");
-					entry.setComment(comment);	comment = nullString;
-					data.addEntry(entry);
-
-					paths.addAddPath(str);
-					//Console.getInstance().println("Warning: 'addpath' command is not yet supported...");
-  				}
-
-	} catch (Exception e) {
-		Console.getInstance().println("\n"+e);
-		throw e;
-	}	
+			while (tokenizer.nextToken() != tokenizer.TT_EOF)
+	  		  if (tokenizer.ttype == tokenizer.TT_WORD)
+				if (tokenizer.sval.startsWith(DBConstants.commentString))
+					comment+=processComment(data, tokenizer, fileName);
+				else
 	
+					/****************** records ********************/
+	
+					if (tokenizer.sval.equalsIgnoreCase(RECORD) ||
+						tokenizer.sval.equalsIgnoreCase(GRECORD)) {
+				
+						DBRecordData rd = new DBRecordData();
+	
+						// read record_type
+						tokenizer.nextToken();
+						if ((tokenizer.ttype == tokenizer.TT_WORD) ||
+							(tokenizer.ttype == DBConstants.quoteChar)) rd.setRecord_type(tokenizer.sval);
+						else throw (new DBParseException("Invalid record type...", tokenizer, fileName));
+	
+						// read record_name
+						tokenizer.nextToken();
+						if ((tokenizer.ttype == tokenizer.TT_WORD) ||
+							(tokenizer.ttype == DBConstants.quoteChar)) rd.setName(tokenizer.sval);
+						else throw (new DBParseException("Invalid record name...", tokenizer, fileName));
+	
+						rd.setComment(comment);	comment = nullString;
+						
+						processFields(rd, tokenizer, fileName, paths);
+						data.addRecord(rd);
+						
+					}
+	
+					/****************** templates ********************/
+	
+					else if (tokenizer.sval.equalsIgnoreCase(TEMPLATE)) {
+	
+						// read optional description
+						str = null;
+						tokenizer.nextToken();
+						if (tokenizer.ttype == DBConstants.quoteChar) str = tokenizer.sval;
+						else
+							tokenizer.pushBack();
+	
+						/*
+						if (str==null)
+							System.out.println("template()\n{");
+						else
+							System.out.println("template(\""+str+"\")\n{");
+						*/
+	
+						// multiple tempaltes
+						// only new ports are added
+						DBTemplate templateData = data.getTemplateData();
+						if (!templateData.isInitialized())
+						{
+							templateData.setInitialized(true);
+							templateData.setComment(comment); comment = nullString;
+							templateData.setDescription(str);
+	
+							DBTemplateEntry entry = new DBTemplateEntry();
+							data.addEntry(entry);
+	
+						}
+						else
+						{
+							// !!! TBD multiple templates support
+							comment = nullString;
+						}
+						
+						processPorts(templateData, tokenizer, fileName, paths);
+						
+						//System.out.println("}");
+	
+					}
+	
+					/****************** expands ********************/
+	
+					else if (tokenizer.sval.equalsIgnoreCase(EXPAND)) {
+	
+						// read template file
+						tokenizer.nextToken();
+						if (tokenizer.ttype == DBConstants.quoteChar) str = tokenizer.sval;
+						else throw (new DBParseException("Invalid expand file...", tokenizer, fileName));
+	
+						// read tempalte instance id
+						tokenizer.nextToken();
+						if ((tokenizer.ttype == tokenizer.TT_WORD) ||
+							(tokenizer.ttype == DBConstants.quoteChar)) str2 = tokenizer.sval;
+						else throw (new DBParseException("Invalid expand template instance name...", tokenizer, fileName));
+	
+						String loadedTemplateId = loadTemplate(data, str, fileName, paths, loadStack);
+	
+						//System.out.println("expand(\""+str+"\", "+str2+")\n{");
+	
+						DBTemplateInstance ti = new DBTemplateInstance(str2, loadedTemplateId);
+						ti.setComment(comment);	comment = nullString;
+	
+						processMacros(ti, tokenizer, fileName, paths);
+						
+						data.addTemplateInstance(ti);
+	
+						//System.out.println("}");
+					}
+	
+					/****************** includes ********************/
+					
+					else if (tokenizer.sval.equalsIgnoreCase(INCLUDE)) {
+	
+						// read incude_filename
+						tokenizer.nextToken();
+						if (tokenizer.ttype == DBConstants.quoteChar) include_filename=tokenizer.sval;
+						else throw (new DBParseException("Invalid include filename...", tokenizer, fileName));
+	
+						DBDataEntry entry = new DBDataEntry(INCLUDE+" \""+include_filename+"\"");
+						entry.setComment(comment);	comment = nullString;
+						data.addEntry(entry);
+	
+						File file = paths.search4File(include_filename);
+						inctokenizer = getStreamTokenizer(file.getAbsolutePath());
+						if (inctokenizer!=null) processDB(data, inctokenizer, include_filename, new PathSpecification(file.getParentFile().getAbsolutePath()), loadStack);
+					}
+				
+					/****************** path ********************/
+	
+					 else if (tokenizer.sval.equalsIgnoreCase(PATH))
+	  				{
+						// read paths
+						tokenizer.nextToken();
+						if (tokenizer.ttype == DBConstants.quoteChar) str=tokenizer.sval;
+						else throw (new DBParseException("Invalid path...", tokenizer, fileName));
+	
+						DBDataEntry entry = new DBDataEntry(PATH+" \""+str+"\"");
+						entry.setComment(comment);	comment = nullString;
+						data.addEntry(entry);
+	
+						paths.setPath(str);
+						//Console.getInstance().println("Warning: 'path' command is not yet supported...");
+	  				}
+					
+					/****************** addpath ********************/
+	
+					 else if (tokenizer.sval.equalsIgnoreCase(ADDPATH))
+	  				{
+						// read add paths
+						tokenizer.nextToken();
+						if (tokenizer.ttype == DBConstants.quoteChar) str=tokenizer.sval;
+						else throw (new DBParseException("Invalid addpath...", tokenizer, fileName));
+	
+						DBDataEntry entry = new DBDataEntry(ADDPATH+" \""+str+"\"");
+						entry.setComment(comment);	comment = nullString;
+						data.addEntry(entry);
+	
+						paths.addAddPath(str);
+						//Console.getInstance().println("Warning: 'addpath' command is not yet supported...");
+	  				}
+	
+		} catch (Exception e) {
+			//Console.getInstance().println("\n"+e);
+			throw e;
+		}
+		finally
+		{
+			loadStack.pop();
+		}
+	}	
 }
 
 /**
@@ -1296,7 +1318,7 @@ public static String[] resolveIncodedDBDs(String fileName) throws IOException {
  * @return Vector
  * @param fileName java.lang.String
  */
-public static DBData resolveDB(String fileName) {
+public static DBData resolveDB(String fileName, Stack loadStack) {
 	
 	DBData data = null; 
 	
@@ -1311,10 +1333,11 @@ public static DBData resolveDB(String fileName) {
 			PathSpecification paths = new PathSpecification(file.getParentFile().getAbsolutePath());
 			data = new DBData(file.getName(), file.getAbsolutePath());
 
-			processDB(data, tokenizer, fileName, paths);
+			processDB(data, tokenizer, fileName, paths, loadStack);
 		}
 		catch (Exception e)
 		{
+			Console.getInstance().println(e.toString());
 			data = null;
 		}
 		finally
@@ -1331,7 +1354,19 @@ public static DBData resolveDB(String fileName) {
  * @return Vector
  * @param fileName java.lang.String
  */
-public static DBData resolveDBasURL(java.net.URL url) {
+public static DBData resolveDB(String fileName) throws Exception {
+	Stack loadStack = new Stack();
+	return resolveDB(fileName, loadStack);
+}
+
+
+
+/**
+ * This method was created in VisualAge.
+ * @return Vector
+ * @param fileName java.lang.String
+ */
+public static DBData resolveDBasURL(java.net.URL url) throws Exception {
 	
 	DBData data = null;
 
