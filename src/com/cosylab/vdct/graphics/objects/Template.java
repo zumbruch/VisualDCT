@@ -1437,7 +1437,7 @@ public Flexible copyToGroup(java.lang.String group) {
 			newName = StringUtils.incrementName(newName, Constants.COPY_SUFFIX);
 
 	
-	ViewState view = ViewState.getInstance();
+	//ViewState view = ViewState.getInstance();
 
 	VDBTemplateInstance theDataCopy = VDBData.copyVDBTemplateInstance(templateData);
 	theDataCopy.setName(newName);
