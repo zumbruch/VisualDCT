@@ -357,7 +357,7 @@ public static void fixLink_(EPICSVarLink varlink)
 }
 
 /**
- * Returns true if link is softeare link
+ * Returns true if link is software link
  * Creation date: (30.1.2001 9:36:15)
  * @return boolean
  * @param field com.cosylab.vdct.vdb.VDBFieldData
@@ -365,9 +365,9 @@ public static void fixLink_(EPICSVarLink varlink)
 public static boolean isSoftwareLink(VDBFieldData field)
 {
 	if (field.getValue().startsWith(Constants.HARDWARE_LINK) ||
-		field.getValue().startsWith("@") ||    // !!!??
-		field.getValue().equals(nullString) ||
-		Character.isDigit(field.getValue().charAt(0))) 
+		field.getValue().startsWith("@") ||    // !!!?? INST_IO
+		field.getValue().equals(nullString) /*||
+		Character.isDigit(field.getValue().charAt(0))*/) 
 		return false; 	//!!!
 	else
 		return true;
@@ -402,7 +402,7 @@ public boolean manageLink(VDBFieldData field) {
 		
 		// check new VAR->PORT/macro link
 		LinkProperties properties = new LinkProperties(field);
-		InLink portLink = EPICSLinkOut.getTarget(properties);
+		InLink portLink = EPICSLinkOut.getTarget(properties, false, true);
 		
 		if (portLink==null || (!(portLink instanceof TemplateEPICSPort) && !(portLink instanceof Macro)))
 		{
@@ -452,6 +452,10 @@ public boolean manageLink(VDBFieldData field) {
 			LinkProperties properties = new LinkProperties(field);
 			InLink varlink = EPICSLinkOut.getTarget(properties);
 			// can point to null? OK, cross will be showed
+
+			// assume constant (this is not perfect but handles almost all the cases)
+			if (varlink == null && Character.isDigit(field.getValue().charAt(0)))
+				return false;
 
 			EPICSLinkOut outlink = null;
 			
