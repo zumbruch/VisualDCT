@@ -41,7 +41,7 @@ public class DBData {
 	protected Hashtable groups = null;
 	protected Hashtable links = null;
 	protected Hashtable connectors = null;
-	protected Hashtable templates = null;		// !!! temp
+	protected Hashtable templates = null;
 	protected Hashtable templateInstances = null;
 /**
  * DBDData constructor comment.
@@ -104,6 +104,7 @@ public void addTemplateInstance(DBTemplateInstance ti) {
 		Console.getInstance().println("Warning: Template instance of '"+ti.getTemplateID()+"' already exists, skiping...");
 }
 /**
+ * Check is DTYP fields are defined before any DBF_INPUT/DBF_OUTPUT fields...
  * Insert the method's description here.
  * Creation date: (18.11.1999 18:26:27)
  */
@@ -191,13 +192,13 @@ public Hashtable getTemplateInstances()
 	return templateInstances;
 }
 
-	/**
-	 * Returns the templates.
-	 * @return Hashtable
-	 */
-	public Hashtable getTemplates()
-	{
-		return templates;
-	}
+/**
+ * Returns the templates.
+ * @return Hashtable
+ */
+public Hashtable getTemplates()
+{
+	return templates;
+}
 
 }

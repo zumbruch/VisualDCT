@@ -1097,6 +1097,10 @@ public void checkForIncodedDBDs(File file) throws IOException
  */
 public boolean open(File file, boolean importDB) throws IOException {
 
+	///
+	/// DBD managment
+	///
+
 	// clean list of unexisting DBDs
 	File[] dbds = new File[com.cosylab.vdct.DataProvider.getInstance().getDBDs().size()];
 	com.cosylab.vdct.DataProvider.getInstance().getDBDs().toArray(dbds);
@@ -1107,240 +1111,52 @@ public boolean open(File file, boolean importDB) throws IOException {
 	// check for in-coded DBDs
 	checkForIncodedDBDs(file);
 
-	DBDData dbdData = com.cosylab.vdct.DataProvider.getInstance().getDbdDB();
 
-	if (dbdData != null) {
+	///
+	/// load DB if we have DBD 
+	///
+
+	DBDData dbdData = com.cosylab.vdct.DataProvider.getInstance().getDbdDB();
+	if (dbdData != null)
+	{
 		setCursor(hourCursor);
 
-		ArrayList blackList = null;
-		if (importDB)
-			blackList = new ArrayList();
-
+		// prepare workspace
 		if (!importDB)
 			initializeWorkspace();
 		UndoManager.getInstance().setMonitor(false);
 
+		// load
 		DBData dbData = null;
-		/*if (getAppletBase()!=null) 	//applet
-			try {
+		/*if (getAppletBase()!=null) 	// applet
+			try
+			{
 				dbData = DBResolver.resolveDBasURL(new java.net.URL(getVDCTFrame().getAppletBase(), file.getAbsolutePath()));
 			} catch (java.net.MalformedURLException e) { Console.getInstance().println(e); }
 		else  */
+
 		dbData = DBResolver.resolveDB(file.getAbsolutePath());
 
-		if ((dbData == null) || !dbdData.consistencyCheck(dbData)) {
+		// check for sucess
+		if ((dbData == null) || !dbdData.consistencyCheck(dbData))
+		{
 			restoreCursor();
 			return false;
 		}
 
+		// check is DTYP fields are defined before any DBF_INPUT/DBF_OUTPUT fields...
 		DBData.checkDTYPfield(dbData, dbdData);
 
 		VDBData vdbData = VDBData.generateVDBData(dbdData, dbData);
 
-		// apply visual-data && generate visual object, group hierarchy
-		try {
+		applyVisualData(importDB, viewGroup, dbData, vdbData);
 
-			// add records
-
-			EPICSLink field;
-			DBFieldData dbField;
-			Enumeration e2;
-
-			Record record;
-			DBRecordData dbRec = null;
-			VDBRecordData vdbRec = null;
-			Enumeration e = vdbData.getRecords().elements();
-			while (e.hasMoreElements()) {
-				vdbRec = (VDBRecordData) (e.nextElement());
-				dbRec = (DBRecordData) dbData.getRecords().get(vdbRec.getName());
-				// check if record already exists
-				if ((record = (Record) Group.getRoot().findObject(vdbRec.getName(), true))
-					!= null) {
-					Console.getInstance().println(
-						"Record "
-							+ vdbRec.getName()
-							+ " already exists - this definition will be ignored.");
-					blackList.add(record);
-					continue;
-				}
-
-				record = new Record(null, vdbRec, dbRec.getX(), dbRec.getY());
-				record.setRight(dbRec.isRotated());
-				record.setColor(dbRec.getColor());
-				record.setDescription(dbRec.getDescription());
-
-				// add fields
-				e2 = dbRec.getFieldsV().elements();
-				while (e2.hasMoreElements()) {
-					dbField = (DBFieldData) (e2.nextElement());
-					if (dbField.isHasAdditionalData()) {
-						field = record.initializeLinkField(vdbRec.getField(dbField.getName()));
-						field.setColor(dbField.getColor());
-						field.setRight(dbField.isRotated());
-						field.setDescription(dbField.getDescription());
-					}
-				}
-
-				viewGroup.addSubObject(vdbRec.getName(), record, true);
-			}
-
-			// add groups (if not already created) and apply visual data
-
-			Group group;
-			DBGroupData dbGrp;
-			e = dbData.getGroups().elements();
-			while (e.hasMoreElements()) {
-				dbGrp = (DBGroupData) (e.nextElement());
-				group = (Group) Group.getRoot().findObject(dbGrp.getName(), true);
-				if (importDB && (group != null)) {
-					Console.getInstance().println(
-						"Group "
-							+ dbGrp.getName()
-							+ " already exists - this definition will be ignored.");
-					continue;
-				}
-				if (group == null)
-					group = Group.getRoot().createGroup(dbGrp.getName());
-				group.setColor(dbGrp.getColor());
-				group.setDescription(dbGrp.getDescription());
-				group.move(dbGrp.getX(), dbGrp.getY());
-			}
-
-
-
-			// add templates and apply visual data
-			//!!! test - template is group
-			DBTemplateInstance dbTemplate;
-			e = dbData.getTemplateInstances().elements();
-			while (e.hasMoreElements()) {
-				dbTemplate = (DBTemplateInstance) (e.nextElement());
-
-				group = Group.getRoot().createGroup(dbTemplate.getTemplateID());
-				group.setColor(dbTemplate.getColor());
-				group.setDescription(dbTemplate.getDescription());
-				group.move(dbTemplate.getX(), dbTemplate.getY());
-			}
-
-
-
-
-			// add links, connectors
-
-			int pos;
-			String recordName;
-			String fieldName;
-			String target;
-
-			OutLink outlink;
-			InLink inlink;
-			Connector connector;
-			DBConnectorData connectorData;
-			DBLinkData dbLink;
-			e = dbData.getLinks().elements();
-			while (e.hasMoreElements()) {
-				dbLink = (DBLinkData) (e.nextElement());
-
-				pos = dbLink.getFieldName().lastIndexOf(Constants.FIELD_SEPARATOR);
-				recordName = dbLink.getFieldName().substring(0, pos);
-				fieldName = dbLink.getFieldName().substring(pos + 1);
-
-				record = (Record) Group.getRoot().findObject(recordName, true);
-				if (record != null) {
-					if (importDB) {
-						if (blackList.contains(record)) {
-							Console.getInstance().println(
-								"Link "
-									+ dbLink.getFieldName()
-									+ " already exists - this definition will be ignored.");
-							continue;
-						}
-					}
-
-					Object unknownTarget = record.getSubObjects().get(fieldName);
-					if (unknownTarget instanceof OutLink)
-					{
-						outlink = (OutLink) unknownTarget;
-
-						target = dbLink.getTargetID();
-						pos = target.lastIndexOf(EPICSLinkOut.LINK_SEPARATOR);
-						if (pos >= 0) // connectors
-							{
-							while ((connectorData = (DBConnectorData) dbData.getConnectors().get(target))!= null) {
-								connector = new Connector(target, record, null, null);
-								connector.setColor(connectorData.getColor());
-								connector.setDescription(connectorData.getDescription());
-								connector.setX(connectorData.getX());
-								connector.setY(connectorData.getY());
-								record.addSubObject(connector.getID(), connector);
-								connector.setOutput(outlink, null);
-								outlink.setInput(connector);
-
-								outlink = connector;
-								target = connectorData.getTargetID();
-							}
-						}
-
-						// final target
-						pos = target.lastIndexOf(Constants.FIELD_SEPARATOR);
-						if (pos >= 0) {
-							recordName = target.substring(0, pos);
-							fieldName = target.substring(pos + 1);
-
-							// remove process
-							pos = fieldName.indexOf(' ');
-							if (pos>0)
-								fieldName = fieldName.substring(0, pos);
-
-							record = (Record) Group.getRoot().findObject(recordName, true);
-							if (record != null) {
-								Object unknown = record.getSubObjects().get(fieldName);
-								if (unknown instanceof InLink) {
-									inlink = (InLink)unknown;
-									inlink.setOutput(outlink, null);
-									outlink.setInput(inlink);
-								}
-							}
-						} else {
-							Record targetRecord = null;
-							if ((targetRecord = (Record) Group.getRoot().findObject(target, true)) != null) {
-								// VAL or forward link
-								VDBFieldData fieldData = (VDBFieldData) record.getRecordData().getField(fieldName);		// existance already checked
-								if (fieldData.getType()	== DBDConstants.DBF_FWDLINK) {
-									// forward link
-									targetRecord.setOutput(outlink, null);
-									outlink.setInput(targetRecord);
-								} 
-								else
-								{
-									// VAL
-									inlink = (InLink) record.getSubObjects().get("VAL");
-									if (inlink != null) {
-										inlink.setOutput(outlink, null);
-										outlink.setInput(inlink);
-									}
-
-								}
-
-							}
-						}
-
-					}
-
-				}
-			}
-
-		} catch (Exception e) {
-			Console.getInstance().println("Error occured while applying visual data!");
-			e.printStackTrace();
-		}
-
-		viewGroup.initializeLayout();
-		viewGroup.manageLinks(true);
-
-		if (!importDB) {
+		if (!importDB)
+		{
 			setModified(false);
 			viewGroup.unconditionalValidateSubObjects(isFlat());
 		}
+
 		//createNavigatorImage();
 		forceRedraw = true;
 		repaint();
@@ -1349,9 +1165,225 @@ public boolean open(File file, boolean importDB) throws IOException {
 		UndoManager.getInstance().setMonitor(true);
 
 		return true;
-	} else
+	} 
+	else
 		return false;
 }
+
+/**
+ * Insert the method's description here.
+ */
+private void applyVisualData(boolean importDB, Group group, DBData dbData, VDBData vdbData)
+{
+	// apply visual-data && generate visual object, group hierarchy
+	try {
+
+		Group rootGroup = Group.getRoot();
+
+		ArrayList blackList = null;
+		if (importDB)
+			blackList = new ArrayList();
+
+		// add records
+
+		EPICSLink field;
+		DBFieldData dbField;
+		Enumeration e2;
+
+		Record record;
+		DBRecordData dbRec = null;
+		VDBRecordData vdbRec = null;
+		Enumeration e = vdbData.getRecords().elements();
+		while (e.hasMoreElements()) {
+			vdbRec = (VDBRecordData) (e.nextElement());
+			dbRec = (DBRecordData) dbData.getRecords().get(vdbRec.getName());
+			// check if record already exists
+			if ((record = (Record) rootGroup.findObject(vdbRec.getName(), true))
+				!= null) {
+				Console.getInstance().println(
+					"Record "
+						+ vdbRec.getName()
+						+ " already exists - this definition will be ignored.");
+				blackList.add(record);
+				continue;
+			}
+
+			record = new Record(null, vdbRec, dbRec.getX(), dbRec.getY());
+			record.setRight(dbRec.isRotated());
+			record.setColor(dbRec.getColor());
+			record.setDescription(dbRec.getDescription());
+
+			// add fields
+			e2 = dbRec.getFieldsV().elements();
+			while (e2.hasMoreElements()) {
+				dbField = (DBFieldData) (e2.nextElement());
+				if (dbField.isHasAdditionalData()) {
+					field = record.initializeLinkField(vdbRec.getField(dbField.getName()));
+					field.setColor(dbField.getColor());
+					field.setRight(dbField.isRotated());
+					field.setDescription(dbField.getDescription());
+				}
+			}
+
+			group.addSubObject(vdbRec.getName(), record, true);
+		}
+
+		// add groups (if not already created) and apply visual data
+
+		Group grp;
+		DBGroupData dbGrp;
+		e = dbData.getGroups().elements();
+		while (e.hasMoreElements()) {
+			dbGrp = (DBGroupData) (e.nextElement());
+			grp = (Group) rootGroup.findObject(dbGrp.getName(), true);
+			if (importDB && (grp != null)) {
+				Console.getInstance().println(
+					"Group "
+						+ dbGrp.getName()
+						+ " already exists - this definition will be ignored.");
+				continue;
+			}
+			if (grp == null)
+				grp = rootGroup.createGroup(dbGrp.getName());
+			grp.setColor(dbGrp.getColor());
+			grp.setDescription(dbGrp.getDescription());
+			grp.move(dbGrp.getX(), dbGrp.getY());
+		}
+
+
+		// !!! check if template  definition exists!!!
+
+			// add template instances and apply their visual data
+			DBTemplateInstance dbTemplate;
+			e = dbData.getTemplateInstances().elements();
+			while (e.hasMoreElements()) {
+				dbTemplate = (DBTemplateInstance) (e.nextElement());
+
+				Template templ = new Template(null, null);
+				templ.setColor(dbTemplate.getColor());
+				//templ.setDescription(dbTemplate.getDescription());
+				DBTemplate template = (DBTemplate)dbData.getTemplates().get(dbTemplate.getTemplateClassID());
+				templ.setDescription(template.getDescription());
+				templ.move(dbTemplate.getX(), dbTemplate.getY());
+
+				group.addSubObject(dbTemplate.getTemplateID(), templ, true);
+			}
+
+		// add links, connectors
+
+		int pos;
+		String recordName;
+		String fieldName;
+		String target;
+
+		OutLink outlink;
+		InLink inlink;
+		Connector connector;
+		DBConnectorData connectorData;
+		DBLinkData dbLink;
+		e = dbData.getLinks().elements();
+		while (e.hasMoreElements()) {
+			dbLink = (DBLinkData) (e.nextElement());
+
+			pos = dbLink.getFieldName().lastIndexOf(Constants.FIELD_SEPARATOR);
+			recordName = dbLink.getFieldName().substring(0, pos);
+			fieldName = dbLink.getFieldName().substring(pos + 1);
+
+			record = (Record) rootGroup.findObject(recordName, true);
+			if (record != null) {
+				if (importDB) {
+					if (blackList.contains(record)) {
+						Console.getInstance().println(
+							"Link "
+								+ dbLink.getFieldName()
+								+ " already exists - this definition will be ignored.");
+						continue;
+					}
+				}
+
+				Object unknownTarget = record.getSubObjects().get(fieldName);
+				if (unknownTarget instanceof OutLink)
+				{
+					outlink = (OutLink) unknownTarget;
+
+					target = dbLink.getTargetID();
+					pos = target.lastIndexOf(EPICSLinkOut.LINK_SEPARATOR);
+					if (pos >= 0) // connectors
+						{
+						while ((connectorData = (DBConnectorData) dbData.getConnectors().get(target))!= null) {
+							connector = new Connector(target, record, null, null);
+							connector.setColor(connectorData.getColor());
+							connector.setDescription(connectorData.getDescription());
+							connector.setX(connectorData.getX());
+							connector.setY(connectorData.getY());
+							record.addSubObject(connector.getID(), connector);
+							connector.setOutput(outlink, null);
+							outlink.setInput(connector);
+
+							outlink = connector;
+							target = connectorData.getTargetID();
+						}
+					}
+
+					// final target
+					pos = target.lastIndexOf(Constants.FIELD_SEPARATOR);
+					if (pos >= 0) {
+						recordName = target.substring(0, pos);
+						fieldName = target.substring(pos + 1);
+
+						// remove process
+						pos = fieldName.indexOf(' ');
+						if (pos>0)
+							fieldName = fieldName.substring(0, pos);
+
+						record = (Record) rootGroup.findObject(recordName, true);
+						if (record != null) {
+							Object unknown = record.getSubObjects().get(fieldName);
+							if (unknown instanceof InLink) {
+								inlink = (InLink)unknown;
+								inlink.setOutput(outlink, null);
+								outlink.setInput(inlink);
+							}
+						}
+					} else {
+						Record targetRecord = null;
+						if ((targetRecord = (Record) rootGroup.findObject(target, true)) != null)
+						{
+							// VAL or forward link
+							VDBFieldData fieldData = (VDBFieldData) record.getRecordData().getField(fieldName);		// existance already checked
+							if (fieldData.getType() == DBDConstants.DBF_FWDLINK) {
+								// forward link
+								targetRecord.setOutput(outlink, null);
+								outlink.setInput(targetRecord);
+							} 
+							else
+							{
+								// VAL
+								inlink = (InLink) record.getSubObjects().get("VAL");
+								if (inlink != null) {
+									inlink.setOutput(outlink, null);
+									outlink.setInput(inlink);
+								}
+
+							}
+
+						}
+					}
+
+				}
+
+			}
+		}
+
+	} catch (Exception e) {
+		Console.getInstance().println("Error occured while applying visual data!");
+		e.printStackTrace();
+	}
+
+	group.initializeLayout();
+	group.manageLinks(true);
+}
+
 /**
  * Insert the method's description here.
  * Creation date: (6.1.2001 22:35:40)
@@ -1407,30 +1439,31 @@ public boolean openDBD(File file, boolean importDBD) throws IOException {
 	restoreCursor();
 	return true;
 }
-	/**
-	 * Prints the page at the specified index into the specified 
-	 * {@link Graphics} context in the specified
-	 * format.  A <code>PrinterJob</code> calls the 
-	 * <code>Printable</code> interface to request that a page be
-	 * rendered into the context specified by 
-	 * <code>graphics</code>.  The format of the page to be drawn is
-	 * specified by <code>pageFormat</code>.  The zero based index
-	 * of the requested page is specified by <code>pageIndex</code>. 
-	 * If the requested page does not exist then this method returns
-	 * NO_SUCH_PAGE; otherwise PAGE_EXISTS is returned.
-	 * The <code>Graphics</code> class or subclass implements the
-	 * {@link PrinterGraphics} interface to provide additional
-	 * information.  If the <code>Printable</code> object
-	 * aborts the print job then it throws a {@link PrinterException}.
-	 * @param graphics the context into which the page is drawn 
-	 * @param pageFormat the size and orientation of the page being drawn
-	 * @param pageIndex the zero based index of the page to be drawn
-	 * @return PAGE_EXISTS if the page is rendered successfully
-	 *         or NO_SUCH_PAGE if <code>pageIndex</code> specifies a
-	 *	       non-existent page.
-	 * @exception java.awt.print.PrinterException
-	 *         thrown when the print job is terminated.
-	 */
+
+/**
+ * Prints the page at the specified index into the specified 
+ * {@link Graphics} context in the specified
+ * format.  A <code>PrinterJob</code> calls the 
+ * <code>Printable</code> interface to request that a page be
+ * rendered into the context specified by 
+ * <code>graphics</code>.  The format of the page to be drawn is
+ * specified by <code>pageFormat</code>.  The zero based index
+ * of the requested page is specified by <code>pageIndex</code>. 
+ * If the requested page does not exist then this method returns
+ * NO_SUCH_PAGE; otherwise PAGE_EXISTS is returned.
+ * The <code>Graphics</code> class or subclass implements the
+ * {@link PrinterGraphics} interface to provide additional
+ * information.  If the <code>Printable</code> object
+ * aborts the print job then it throws a {@link PrinterException}.
+ * @param graphics the context into which the page is drawn 
+ * @param pageFormat the size and orientation of the page being drawn
+ * @param pageIndex the zero based index of the page to be drawn
+ * @return PAGE_EXISTS if the page is rendered successfully
+ *         or NO_SUCH_PAGE if <code>pageIndex</code> specifies a
+ *	       non-existent page.
+ * @exception java.awt.print.PrinterException
+ *         thrown when the print job is terminated.
+ */
 public int print(java.awt.Graphics graphics, java.awt.print.PageFormat pageFormat, int pageIndex) throws java.awt.print.PrinterException {
 	
 	graphics.translate((int)pageFormat.getImageableX(),

@@ -42,11 +42,15 @@ public class DBTemplate
 	Hashtable inputs = null;
 	Hashtable outputs = null;
 
+	// data
+	DBData data = null;
+
 	/**
 	 * Constructor.
 	 */
 	public DBTemplate()
 	{
+		data = new DBData();
 		reset();
 	}
 	
@@ -157,6 +161,15 @@ public class DBTemplate
 	public void setOutputs(Hashtable outputs)
 	{
 		this.outputs = outputs;
+	}
+
+	/**
+	 * Returns the data.
+	 * @return DBData
+	 */
+	public DBData getData()
+	{
+		return data;
 	}
 
 }

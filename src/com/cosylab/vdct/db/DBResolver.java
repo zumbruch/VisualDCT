@@ -145,12 +145,12 @@ public static void initializeTokenizer(StreamTokenizer tokenizer) {
 }
 /**
  * VisualDCT layout data is also processed here
- * @param data com.cosylab.vdct.db.DBData
+ * @param rootData com.cosylab.vdct.db.DBData
  * @param tokenizer java.io.StreamTokenizer
  */
-public static String processComment(DBData data, StreamTokenizer tokenizer, String fileName) throws Exception {
+public static String processComment(DBData rootData, StreamTokenizer tokenizer, String fileName) throws Exception {
   
- if ((data==null) || !tokenizer.sval.equals(DBConstants.layoutDataString)) {	// comment
+ if ((rootData==null) || !tokenizer.sval.equals(DBConstants.layoutDataString)) {	// comment
 	 String comment = tokenizer.sval;
 	 
 	 tokenizer.wordChars(32, 255);		
@@ -173,6 +173,15 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 
  }
  else {																		// graphics layout data
+	
+	// only template definition od depth 1 are supported
+	// (use stack od DBData-s otherwise)
+	DBData data = null;
+	if (templateData!=null)
+		data = templateData.getData();
+	else
+		data = rootData;
+
 
 	 DBRecordData rd;
 	 DBFieldData fd;
@@ -182,7 +191,6 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
  	 while ((tokenizer.nextToken() != tokenizer.TT_EOL) &&
 		    (tokenizer.ttype != tokenizer.TT_EOF)) 
 		if (tokenizer.ttype == tokenizer.TT_WORD) 
-
 
 				if (tokenizer.sval.equalsIgnoreCase(VDCTRECORD)) {
 
@@ -404,6 +412,8 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 					templateData.setId(id);
 					templateData.setDescription(id);		// default
 					templateData.setFileName(fileName);
+
+					data = templateData.getData();			// redirect
 				}
 				else if (tokenizer.sval.equalsIgnoreCase(TEMPLATE_INSTANCE)) {
 					// read template id
@@ -511,6 +521,7 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 					templateData.getOutputs().put(str, str2);
 				}
 				else if (templateData!=null && tokenizer.sval.equalsIgnoreCase(TEMPLATE_END)) {
+					data = rootData;
 					templateEnd(data);
 				}
 
@@ -664,10 +675,10 @@ private static void templateEnd(DBData data)
 
 /**
  * This method was created in VisualAge.
- * @param data com.cosylab.vdct.db.DBData
+ * @param rootData com.cosylab.vdct.db.DBData
  * @param tokenizer java.io.StreamTokenizer
  */
-public static void processDB(DBData data, StreamTokenizer tokenizer, String fileName) {
+public static void processDB(DBData rootData, StreamTokenizer tokenizer, String fileName) {
 	
 	DBRecordData rd;
 
@@ -676,14 +687,25 @@ public static void processDB(DBData data, StreamTokenizer tokenizer, String file
 	String include_filename;
 	StreamTokenizer inctokenizer = null;
 
+	DBData data = rootData;
+
 	if (data!=null)
 	
-	try	{
+	try {
 		
 		while (tokenizer.nextToken() != tokenizer.TT_EOF)
   		  if (tokenizer.ttype == tokenizer.TT_WORD)
-			if (tokenizer.sval.startsWith(DBConstants.commentString)) 
-				comment+=processComment(data, tokenizer, fileName);
+			if (tokenizer.sval.startsWith(DBConstants.commentString))
+			{
+				comment+=processComment(rootData, tokenizer, fileName);
+
+				// only template definition od depth 1 are supported
+				// (use stack od DBData-s otherwise)
+				if (templateData!=null)
+					data = templateData.getData();
+				else
+					data = rootData;
+			}
 			else
 
 				/****************** records ********************/
