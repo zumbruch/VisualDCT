@@ -1,1 +1,1 @@
-java -cp jaxp.jar;crimson.jar;visualdct1.228.jar -DVDCT_DIR=. com.cosylab.vdct.VisualDCT 
+java -cp jaxp.jar;crimson.jar;visualdct1.232.jar -DVDCT_DIR=. com.cosylab.vdct.VisualDCT 
