@@ -565,14 +565,18 @@ private void initializeNavigator() {
  */
 public void initializeWorkspace() {
 	
+	if (isModified())
+		reloadTemplate(Group.getEditingTemplateData());
+
 	UndoManager.getInstance().reset();
 
 	InspectorManager.getInstance().disposeAllInspectors();
 
 	// !!! call all destory() in objects?!
-	if (Group.getRoot()!=null)
-		Group.getRoot().getLookupTable().clear();
+	//if (Group.getRoot()!=null)
+	//	Group.getRoot().getLookupTable().clear();
 
+	// clear all stacks
 	viewStack.clear();
 	templateStack.clear();
 	Group.setEditingTemplateData(null);
@@ -585,7 +589,6 @@ public void initializeWorkspace() {
 	moveToGroup(group);
 	
 	//Console.getInstance().flush();
-
 	
 	UndoManager.getInstance().setMonitor(true);
 	blockNavigatorRedrawOnce = false;
@@ -2694,12 +2697,79 @@ public void createTemplateInstance(String name, String type, boolean relative) {
 }
 
 /**
+ * true - OK, false - denied
+ */
+public boolean prepareTemplateLeave()
+{
+	/// !!! getInstance()
+	if (isModified())
+	{
+		if (templateStack.isEmpty())
+		{
+			JOptionPane.showMessageDialog(VisualDCT.getInstance(), "The file has to be saved first...");
+			return false;
+		}
+		else if (JOptionPane.showConfirmDialog(VisualDCT.getInstance(), "The file has been modified. Discard changes?", "Confirmation", 
+						JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE)==JOptionPane.OK_OPTION)
+		{
+			// pop old current
+			VDBTemplate backup = (VDBTemplate)templateStack.pop();
+			// reload template
+			boolean ok = reloadTemplate(Group.getEditingTemplateData());
+			// push new
+			VDBTemplate reloaded = (VDBTemplate)VDBData.getTemplates().get(backup.getId());
+			
+			if (!ok || reloaded==null)
+			{
+				VDBData.addTemplate(backup);
+				templateStack.push(backup);
+			}
+			else
+			{
+				templateStack.push(reloaded);
+				viewGroup = reloaded.getGroup();
+			}
+					
+			return true;
+		}
+		else
+			return false;
+	}
+	else		
+		return true;
+}
+
+/**
+ */
+public void templateReloadPostInit()
+{
+
+	// initialize
+	setModified(false);
+	UndoManager.getInstance().reset();
+	UndoManager.getInstance().setMonitor(true);
+
+	// update opened file
+	if (Group.getEditingTemplateData()==null)
+		VisualDCT.getInstance().setOpenedFile(null);
+	else
+		VisualDCT.getInstance().setOpenedFile(new File(Group.getEditingTemplateData().getFileName()));
+
+	InspectorManager.getInstance().updateObjectLists();
+
+}
+
+/**
  * Insert the method's description here.
  * Creation date: (22.4.2001 18:44:03)
  * @param template com.cosylab.vdct.graphics.objects.Template
  */
 public void descendIntoTemplate(Template template)
 {
+
+	if (!prepareTemplateLeave())
+		return;
+
 	viewStack.push(viewGroup);
 	templateStack.push(template.getTemplateData().getTemplate());
 	
@@ -2708,7 +2778,8 @@ public void descendIntoTemplate(Template template)
 
 	Group.setEditingTemplateData(template.getTemplateData().getTemplate());
 	
-	InspectorManager.getInstance().updateObjectLists();
+	// initialize
+	templateReloadPostInit();
 
 	moveToGroup(group);
 }
@@ -2720,8 +2791,10 @@ public void descendIntoTemplate(Template template)
  */
 public void ascendFromTemplate()
 {
+	if (!prepareTemplateLeave())
+		return;
+
 	viewGroup = (Group)viewStack.pop();
-	
 	templateStack.pop();
 	
 	if (!templateStack.isEmpty())
@@ -2734,7 +2807,8 @@ public void ascendFromTemplate()
 		grp = (Group)grp.getParent();
 	Group.setRoot(grp);
 
-	InspectorManager.getInstance().updateObjectLists();
+	// initialize
+	templateReloadPostInit();
 	
 	moveToGroup(grp);	
 }
@@ -2785,6 +2859,40 @@ public void updateWorkspaceGroup()
 public Stack getTemplateStack()
 {
 	return templateStack;
+}
+
+/**
+ */
+public boolean reloadTemplate(VDBTemplate data)
+{
+	// remove from template repository
+	VDBData.removeTemplate(data);
+
+	InspectorManager.getInstance().updateObjectLists();
+
+	Console.getInstance().println("Reloading template '"+data.getFileName()+"'.");	
+	
+	// reload
+	try
+	{
+		// import
+		boolean ok = open(new File(data.getFileName()), true);
+
+		if (!ok || !VDBData.getTemplates().containsKey(data.getId()))
+		{
+			Console.getInstance().println("Failed to reload template '"+data.getFileName()+"'. Using in-memory definitions...");	
+		}
+
+		return true;
+		
+	}
+	catch (Exception e)
+	{
+		Console.getInstance().println("Failed to reload template '"+data.getFileName()+"'. Using in-memory definitions...");	
+		Console.getInstance().println(e);
+	}
+	
+	return false;
 }
 
 /**

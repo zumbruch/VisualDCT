@@ -777,6 +777,26 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 		return portsSeparator;
 	}
 
+	/**
+	 * Insert the method's description here.
+	 * Creation date: (3.2.2001 13:07:04)
+	 * @return com.cosylab.vdct.vdb.GUISeparator
+	 */
+/*	public static com.cosylab.vdct.vdb.GUISeparator getInputsSeparator() {
+		if (inputsSeparator==null) inputsSeparator = new GUISeparator("Inputs");
+		return inputsSeparator;
+	}
+	
+	/**
+	 * Insert the method's description here.
+	 * Creation date: (3.2.2001 13:07:04)
+	 * @return com.cosylab.vdct.vdb.GUISeparator
+	 */
+/*	public static com.cosylab.vdct.vdb.GUISeparator getOutputsSeparator() {
+		if (outputsSeparator==null) outputsSeparator = new GUISeparator("Outputs");
+		return outputsSeparator;
+	}
+
 /**
  */
 public VDBPort addPort(String name)
@@ -969,4 +989,29 @@ public void renameProperty(InspectableProperty property)
 }
 
 	
+	/**
+	 * Sets the fileName.
+	 * @param fileName The fileName to set
+	 */
+	public void setFileName(String fileName)
+	{
+		this.fileName = fileName;
+	}
+
+	/**
+	 * Sets the id.
+	 * @param id The id to set
+	 */
+	public void setId(String id)
+	{
+		this.id = id;
+		updateDescription();			
+		if (VDBData.getTemplates().containsKey(this.getId()))
+		{
+			Console.getInstance().print("Template with ID '"+this.getId()+"' is already loaded. Failed to store template '"+getFileName()+"' to the template repository.");
+		}
+		else
+			VDBData.addTemplate(this);
+	}
+
 }

@@ -436,9 +436,11 @@ public void newCmd() {
 public void openDB(java.io.File file) throws IOException {
 	if (drawingSurface.open(file))
 	{
-		SetWorkspaceFile cmd = (SetWorkspaceFile)CommandManager.getInstance().getCommand("SetFile");
-		cmd.setFile(file.getCanonicalPath());
-		cmd.execute();
+		 //!!!
+		 VisualDCT.getInstance().setOpenedFile(file);
+		//SetWorkspaceFile cmd = (SetWorkspaceFile)CommandManager.getInstance().getCommand("SetFile");
+		//cmd.setFile(file.getCanonicalPath());
+		//cmd.execute();
 	}
 }
 /**
@@ -577,26 +579,39 @@ public void save(java.io.File file) throws IOException {
  if (data==null)
  {
  	// create a new
+ 	// id = basename
 	data = new VDBTemplate(file.getName(), file.getAbsolutePath());
 	data.setPorts(new Hashtable());
 	data.setPortsV(new Vector());
 	data.setGroup(Group.getRoot());
-
+	
 	Group.setEditingTemplateData(data);
 	drawingSurface.getTemplateStack().push(data);
+
+	VDBData.addTemplate(data);
  } 
- else
+ // save as check
+ //	fileName & id has been changed, fix them
+ else if (data.getFileName()!=file.getAbsolutePath())
  {
-	// saveas!!!
-//	fileName & id has been changed!! new template...
+ 	// reload previous ...
+ 	drawingSurface.reloadTemplate(data);
+ 	
+ 	// ... and fix current id (basename) and path
+	data.setFileName(file.getAbsolutePath()); 	
+	data.setId(file.getName());
+
  }
  
  // if ok
  drawingSurface.setModified(false);
 
- SetWorkspaceFile cmd = (SetWorkspaceFile)CommandManager.getInstance().getCommand("SetFile");
- cmd.setFile(file.getCanonicalPath());
- cmd.execute();
+ // !!!
+ VisualDCT.getInstance().updateLoadLabel();	
+ VisualDCT.getInstance().setOpenedFile(file);
+ //SetWorkspaceFile cmd = (SetWorkspaceFile)CommandManager.getInstance().getCommand("SetFile");
+ //cmd.setFile(file.getCanonicalPath());
+ //cmd.execute();
 
 }
 /**

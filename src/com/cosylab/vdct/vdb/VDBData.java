@@ -769,7 +769,7 @@ public static Hashtable getTemplates()
  * @param record com.cosylab.vdct.vdb.VDBTemplate
  */
 public static void removeTemplate(VDBTemplate template) {
-	templates.remove(template);
+	templates.remove(template.getId());
 }
 /**
  * Insert the method's description here.

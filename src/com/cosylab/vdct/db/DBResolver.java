@@ -34,6 +34,8 @@ import com.cosylab.vdct.Console;
 import com.cosylab.vdct.DataProvider;
 import com.cosylab.vdct.util.*;
 import com.cosylab.vdct.util.StringUtils;
+import com.cosylab.vdct.vdb.VDBData;
+import com.cosylab.vdct.vdb.VDBTemplate;
 
 /**
  * This type was created in VisualAge.
@@ -171,7 +173,20 @@ private static String loadTemplate(DBData data, String templateFile, String refe
 	String templateToResolve = file.getAbsolutePath();
 
 	// check if file already loaded
-	if(DataProvider.getInstance().getLoadedDBs().contains(templateToResolve))
+	boolean alreadyLoaded = false;
+	Enumeration enum = VDBData.getTemplates().elements();
+	while (enum.hasMoreElements())
+	{
+		VDBTemplate t = (VDBTemplate)enum.nextElement();
+		if (t.getFileName().equals(templateToResolve))
+		{
+			alreadyLoaded = true;
+			break;
+		}
+	}
+	
+	//if(DataProvider.getInstance().getLoadedDBs().contains(templateToResolve))
+	if (alreadyLoaded)
 	{
 		Console.getInstance().println("Template \""+templateFile+"\" already loaded...");
 		
@@ -189,7 +204,7 @@ private static String loadTemplate(DBData data, String templateFile, String refe
 	data.addTemplate(templateData.getTemplateData());
 	
 	// add to loaded list
-	DataProvider.getInstance().getLoadedDBs().addElement(templateData.getTemplateData().getFileName());
+	//DataProvider.getInstance().getLoadedDBs().addElement(templateData.getTemplateData().getFileName());
 
 	Console.getInstance().println("Template \""+templateFile+"\" loaded.");
 

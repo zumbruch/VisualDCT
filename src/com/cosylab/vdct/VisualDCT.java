@@ -6491,4 +6491,26 @@ public void updateLoadLabel() {
 	getStatusMsg1().setToolTipText(tip.toString());
 	getStatusMsg1().setText(label.toString());
 }
+	/**
+	 * Returns the openedFile.
+	 * @return java.io.File
+	 */
+	public java.io.File getOpenedFile()
+	{
+		return openedFile;
+	}
+
+	/**
+	 * Sets the openedFile.
+	 * @param openedFile The openedFile to set
+	 */
+	public void setOpenedFile(java.io.File openedFile)
+	{
+		this.openedFile = openedFile;
+		if (openedFile==null)
+			setFileInTitle(null);
+		else
+			setFileInTitle(openedFile.getAbsolutePath());
+	}
+
 }

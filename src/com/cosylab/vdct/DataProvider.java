@@ -60,7 +60,7 @@ public class DataProvider {
 	private Hashtable linkTypeConfigTable = null;
 	
 	// list of all loaded DBs
-	private Vector loadedDBs = null;
+	//private Vector loadedDBs = null;
 	
 /**
  * DataProvider constructor comment.
@@ -70,7 +70,7 @@ protected DataProvider() {
 	loadedDBDs = new Vector();
 	currentDBDs = new Vector();
 
-	loadedDBs = new Vector();
+	//loadedDBs = new Vector();
 
 	linkTypeConfigTable = new Hashtable();
 	loadDefaultLinkTypeConfig();
@@ -266,9 +266,9 @@ public Vector getLoadedDBDs()
  * Returns the loadedDBs.
  * @return Vector
  */
-public Vector getLoadedDBs()
+/*public Vector getLoadedDBs()
 {
 	return loadedDBs;
 }
-
+*/
 }
