@@ -71,6 +71,10 @@ public class Settings {
 	private int legendPosition = 4;  
 	// 1 2
 	// 3 4
+	
+	private boolean legendNavigatorVisibility = true;
+	private int legendNavigatorWidth = 100;
+	private int legendNavigatorHeight = 100;
 /**
  * Settings constructor comment.
  */
@@ -103,7 +107,9 @@ protected Settings() {
 	legendLogo = prefs.get("LegendLogo", "");
 	legendVisibility = prefs.getInt("LegendVisibility", 1);
 	legendPosition = prefs.getInt("LegendPosition", 4);
-	
+	legendNavigatorVisibility = prefs.getBoolean("LegendNavigatorVisibility", true);
+	legendNavigatorWidth = prefs.getInt("LegendNavigatorWidth",100);
+	legendNavigatorHeight = prefs.getInt("LegendNavigatorHeight",100);
 	
 	if (grouping)
 	{
@@ -634,6 +640,54 @@ public void loadRecentFiles()
 	public void setHideLinks(boolean b) {
 		hideLinks = b;
 		prefs.putBoolean("HideLinks", hideLinks);
+		sync();
+	}
+
+	/**
+	 * @return
+	 */
+	public int getLegendNavigatorHeight() {
+		return legendNavigatorHeight;
+	}
+
+	/**
+	 * @return
+	 */
+	public boolean isLegendNavigatorVisibility() {
+		return legendNavigatorVisibility;
+	}
+
+	/**
+	 * @return
+	 */
+	public int getLegendNavigatorWidth() {
+		return legendNavigatorWidth;
+	}
+
+	/**
+	 * @param i
+	 */
+	public void setLegendNavigatorHeight(int i) {
+		legendNavigatorHeight = i;
+		prefs.putInt("LegendNavigatorHeight",i);
+		sync();
+	}
+
+	/**
+	 * @param b
+	 */
+	public void setLegendNavigatorVisibility(boolean b) {
+		legendNavigatorVisibility = b;
+		prefs.putBoolean("LegendNavigatorVisibility", b);
+		sync();
+	}
+
+	/**
+	 * @param i
+	 */
+	public void setLegendNavigatorWidth(int i) {
+		legendNavigatorWidth = i;
+		prefs.putInt("LegendNavigatorWidth",i);
 		sync();
 	}
 

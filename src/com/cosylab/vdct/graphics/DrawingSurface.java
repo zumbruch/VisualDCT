@@ -2400,8 +2400,12 @@ private void printLegend(Graphics graphics, int width, int height, int page, int
 	Settings s = Settings.getInstance();
 	
 	//prepare
-	int navigatorWidth = navigator.width, navigatorHeight = navigator.height;
-	
+	int navigatorWidth=0, navigatorHeight=0; 
+	if (s.isLegendNavigatorVisibility()) {
+		navigatorWidth = s.getLegendNavigatorWidth();
+		navigatorHeight = s.getLegendNavigatorHeight();	
+	}
+		
 	Image img = Toolkit.getDefaultToolkit().getImage(s.getLegendLogo());
 	MediaTracker mediaTracker = new MediaTracker(VisualDCT.getInstance());
 	mediaTracker.addImage(img, 0);
@@ -2466,48 +2470,50 @@ private void printLegend(Graphics graphics, int width, int height, int page, int
 	//navigator
 	ViewState view = ViewState.getInstance();
 	
-	AffineTransform transf = ((Graphics2D)graphics).getTransform();
+	if (s.isLegendNavigatorVisibility()) {
+		AffineTransform transf = ((Graphics2D)graphics).getTransform();
 	
-	graphics.translate(navX, navY);
-	graphics.setClip(new Rectangle(0,0,navigatorWidth, navigatorHeight));
+		graphics.translate(navX, navY);
+		graphics.setClip(new Rectangle(0,0,navigatorWidth, navigatorHeight));
 	
-	Dimension navigatorSize = new Dimension(navigatorWidth, navigatorHeight);
-	double xscale = navigatorWidth/(double)view.getWidth();
-	double yscale = navigatorHeight/(double)view.getHeight();
-	double nscale = Math.min(xscale, yscale);
+		Dimension navigatorSize = new Dimension(navigatorWidth, navigatorHeight);
+		double xscale = navigatorWidth/(double)view.getWidth();
+		double yscale = navigatorHeight/(double)view.getHeight();
+		double nscale = Math.min(xscale, yscale);
 	
-	graphics.setColor(Color.white);
-	graphics.fillRect(0, 0, navigatorWidth-1, navigatorHeight-1);
+		graphics.setColor(Color.white);
+		graphics.fillRect(0, 0, navigatorWidth-1, navigatorHeight-1);
 	
-	((Graphics2D)graphics).scale(nscale, nscale);
+		((Graphics2D)graphics).scale(nscale, nscale);
 	
 	
 	
-	double rx=(double)view.getRx()*nscale, ry=(double)view.getRy()*nscale;
-	int rwidth = (int)(view.getViewWidth()*nscale), rheight = (int)(view.getViewHeight()*nscale);
+		double rx=(double)view.getRx()*nscale, ry=(double)view.getRy()*nscale;
+		int rwidth = (int)(view.getViewWidth()*nscale), rheight = (int)(view.getViewHeight()*nscale);
 	
-	view.setRx(0); view.setRy(0);
-	viewGroup.paintComponents(graphics, false, isFlat());
+		view.setRx(0); view.setRy(0);
+		viewGroup.paintComponents(graphics, false, isFlat());
 
-	((Graphics2D)graphics).setTransform(transf);
-	graphics.translate(navX, navY);
+		((Graphics2D)graphics).setTransform(transf);
+		graphics.translate(navX, navY);
 
-	graphics.setColor(Color.black);
-	graphics.drawRect((int)rx, (int)ry, rwidth, rheight);
+		graphics.setColor(Color.black);
+		graphics.drawRect((int)rx, (int)ry, rwidth, rheight);
 
 //	add lock rectangle if necessary
-	 final int min = 8;
-	 if ((rwidth<min) || (rheight<min)) {
-		 graphics.setColor(Color.lightGray);
-		 graphics.drawRect((int)(rx-min), (int)(ry-min), 
+	 	final int min = 8;
+	 	if ((rwidth<min) || (rheight<min)) {
+			graphics.setColor(Color.lightGray);
+		 	graphics.drawRect((int)(rx-min), (int)(ry-min), 
 		 		(int)(rwidth+2*min), (int)(rheight+2*min));
-	 }
+	 	}
 	 
-	graphics.setColor(Color.gray);
-	graphics.drawRect(0, 0, navigatorWidth-1, navigatorHeight-1);
+		graphics.setColor(Color.gray);
+		graphics.drawRect(0, 0, navigatorWidth-1, navigatorHeight-1);
 	
 	
-	((Graphics2D)graphics).setTransform(transf);
+		((Graphics2D)graphics).setTransform(transf);
+	}
 	
 	graphics.setClip(logoX, logoY, logoWidth, logoHeight);
 	if (img!=null) {

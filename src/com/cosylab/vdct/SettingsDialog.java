@@ -15,7 +15,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.util.Enumeration;
 
 import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.JFileChooser;
@@ -26,9 +25,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.MouseInputAdapter;
 
 import com.cosylab.vdct.graphics.DrawingSurface;
-import com.cosylab.vdct.graphics.objects.ContainerObject;
 import com.cosylab.vdct.graphics.objects.Group;
-import com.cosylab.vdct.graphics.objects.Record;
 import com.cosylab.vdct.util.DoubleClickProxy;
 import com.cosylab.vdct.util.UniversalFileFilter;
 
@@ -102,6 +99,16 @@ public class SettingsDialog extends javax.swing.JDialog {
 						jTextFieldGroupingSeparator.setEnabled(b);
 					}			
 		});
+		
+		jCheckBoxDisplayNavigator.setModel(new JToggleButton.ToggleButtonModel(){	
+			public void setSelected(boolean b) {
+				super.setSelected(b);
+				jLabel13.setEnabled(b);
+				jLabel14.setEnabled(b);
+				jSpinnerNavigatorWidth.setEnabled(b);
+				jSpinnerNavigatorHeight.setEnabled(b);
+			}			
+	});
 		
 		jTextFieldLogo.getDocument().addDocumentListener(new DocumentListener() {
 					public void changedUpdate(DocumentEvent e) {
@@ -205,6 +212,9 @@ public class SettingsDialog extends javax.swing.JDialog {
 			case 3: jToggleButtonBL.setSelected(true); break;
 			case 4: jToggleButtonBR.setSelected(true); break;
 		}
+		jCheckBoxDisplayNavigator.setSelected(s.isLegendNavigatorVisibility());
+		jSpinnerNavigatorWidth.setValue(new Integer(s.getLegendNavigatorWidth()));
+		jSpinnerNavigatorHeight.setValue(new Integer(s.getLegendNavigatorHeight()));
 	}
 	
 	private void saveSettings() {
@@ -240,6 +250,9 @@ public class SettingsDialog extends javax.swing.JDialog {
 		s.setLegendLogo(jTextFieldLogo.getText());
 		s.setLegendVisibility(Integer.parseInt(buttonGroupVisibility.getSelection().getActionCommand()));
 		s.setLegendPosition(Integer.parseInt(buttonGroupLocation.getSelection().getActionCommand()));
+		s.setLegendNavigatorVisibility(jCheckBoxDisplayNavigator.isSelected());
+		s.setLegendNavigatorWidth(((Number)jSpinnerNavigatorWidth.getValue()).intValue());
+		s.setLegendNavigatorHeight(((Number)jSpinnerNavigatorHeight.getValue()).intValue());
 	}
 
 	/** This method is called from within the constructor to
@@ -295,7 +308,6 @@ public class SettingsDialog extends javax.swing.JDialog {
         jRadioButton1 = new javax.swing.JRadioButton();
         jRadioButton2 = new javax.swing.JRadioButton();
         jRadioButton3 = new javax.swing.JRadioButton();
-        jButtonBrowse = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jToggleButtonTL = new javax.swing.JToggleButton();
         jToggleButtonTR = new javax.swing.JToggleButton();
@@ -303,9 +315,17 @@ public class SettingsDialog extends javax.swing.JDialog {
         jToggleButtonBR = new javax.swing.JToggleButton();
         jLabel4 = new javax.swing.JLabel();
         jTextFieldLogo = new javax.swing.JTextField();
-        jLabelWarning = new javax.swing.JLabel();
         jPanel7 = new javax.swing.JPanel();
         jLabelImage = new javax.swing.JLabel();
+        jLabel12 = new javax.swing.JLabel();
+        jCheckBoxDisplayNavigator = new javax.swing.JCheckBox();
+        jLabel14 = new javax.swing.JLabel();
+        jSpinnerNavigatorHeight = new javax.swing.JSpinner();
+        jSpinnerNavigatorWidth = new javax.swing.JSpinner();
+        jLabel13 = new javax.swing.JLabel();
+        jPanel10 = new javax.swing.JPanel();
+        jButtonBrowse = new javax.swing.JButton();
+        jLabelWarning = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Settings Dialog");
@@ -343,17 +363,17 @@ public class SettingsDialog extends javax.swing.JDialog {
         jLabel5.setText("Record name length limit: ");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
         jPanel1.add(jLabel5, gridBagConstraints);
 
         jSpinnerRecordNameLength.setMinimumSize(new java.awt.Dimension(60, 20));
         jSpinnerRecordNameLength.setPreferredSize(new java.awt.Dimension(60, 20));
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.insets = new java.awt.Insets(8, 0, 7, 7);
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(8, 0, 7, 7);
         jPanel1.add(jSpinnerRecordNameLength, gridBagConstraints);
 
         jPanelDatabase.add(jPanel1);
@@ -444,8 +464,8 @@ public class SettingsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
         jPanel9.add(jLabel6, gridBagConstraints);
 
         jLabel11.setText("Height:");
@@ -460,10 +480,10 @@ public class SettingsDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 8, 8);
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 8, 8);
         jPanel9.add(jSpinnerHeight, gridBagConstraints);
 
         jSpinnerWidth.setMinimumSize(new java.awt.Dimension(60, 20));
@@ -471,9 +491,9 @@ public class SettingsDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new java.awt.Insets(8, 0, 8, 8);
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(8, 0, 8, 8);
         jPanel9.add(jSpinnerWidth, gridBagConstraints);
 
         jPanelDatabase.add(jPanel9);
@@ -582,9 +602,9 @@ public class SettingsDialog extends javax.swing.JDialog {
         jCheckBoxDefaultVisiblity.setText("Show value of fields when it is not default");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
         jPanel8.add(jCheckBoxDefaultVisiblity, gridBagConstraints);
 
         jCheckBoxLinksVisibility.setText("Hide value of valid links");
@@ -592,10 +612,10 @@ public class SettingsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(0, 8, 8, 8);
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 8, 8, 8);
         jPanel8.add(jCheckBoxLinksVisibility, gridBagConstraints);
 
         jPanelVisual.add(jPanel8);
@@ -610,25 +630,25 @@ public class SettingsDialog extends javax.swing.JDialog {
         jLabel1.setDisplayedMnemonic('L');
         jLabel1.setText("Lab's logo:");
         gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 4, 8);
         jPanelLegend.add(jLabel1, gridBagConstraints);
 
-        jLabel2.setText("Print:");
+        jLabel2.setText("Print legend:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 4, 8);
         jPanelLegend.add(jLabel2, gridBagConstraints);
 
-        jLabel3.setText("Location:");
+        jLabel3.setText("Legend location:");
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 8;
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
@@ -641,11 +661,10 @@ public class SettingsDialog extends javax.swing.JDialog {
         jRadioButton1.setActionCommand("0");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 12, 0, 8);
         jPanelLegend.add(jRadioButton1, gridBagConstraints);
 
@@ -657,11 +676,10 @@ public class SettingsDialog extends javax.swing.JDialog {
         jRadioButton2.setDisplayedMnemonicIndex(8);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 12, 0, 8);
         jPanelLegend.add(jRadioButton2, gridBagConstraints);
 
@@ -671,28 +689,12 @@ public class SettingsDialog extends javax.swing.JDialog {
         jRadioButton3.setActionCommand("2");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 12, 0, 8);
         jPanelLegend.add(jRadioButton3, gridBagConstraints);
-
-        jButtonBrowse.setMnemonic('B');
-        jButtonBrowse.setText("Browse...");
-        jButtonBrowse.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonBrowseActionPerformed(evt);
-            }
-        });
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 12, 0, 8);
-        jPanelLegend.add(jButtonBrowse, gridBagConstraints);
 
         jPanel2.setLayout(new java.awt.GridLayout(2, 2));
 
@@ -726,44 +728,31 @@ public class SettingsDialog extends javax.swing.JDialog {
         jPanel2.add(jToggleButtonBR);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 9;
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridheight = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 17, 8, 8);
+        gridBagConstraints.insets = new java.awt.Insets(4, 20, 8, 8);
         jPanelLegend.add(jPanel2, gridBagConstraints);
 
-        jLabel4.setText("Preview:");
+        jLabel4.setText("Preview logo:");
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTHWEST;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
+        gridBagConstraints.insets = new java.awt.Insets(8, 0, 4, 8);
         jPanelLegend.add(jLabel4, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 12, 8, 8);
         jPanelLegend.add(jTextFieldLogo, gridBagConstraints);
-
-        jLabelWarning.setFont(new java.awt.Font("Dialog", 0, 12));
-        jLabelWarning.setForeground(new java.awt.Color(255, 0, 0));
-        jLabelWarning.setText("Warning: file doesn't exist");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(7, 12, 0, 8);
-        jPanelLegend.add(jLabelWarning, gridBagConstraints);
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
 
@@ -774,10 +763,109 @@ public class SettingsDialog extends javax.swing.JDialog {
         jPanel7.add(jLabelImage);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.gridheight = 6;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
         jPanelLegend.add(jPanel7, gridBagConstraints);
+
+        jLabel12.setText("Navigator:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(8, 8, 4, 8);
+        jPanelLegend.add(jLabel12, gridBagConstraints);
+
+        jCheckBoxDisplayNavigator.setSelected(true);
+        jCheckBoxDisplayNavigator.setText("Display navigator");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 12, 5, 12);
+        jPanelLegend.add(jCheckBoxDisplayNavigator, gridBagConstraints);
+
+        jLabel14.setText("Height:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 10;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 16, 7, 12);
+        jPanelLegend.add(jLabel14, gridBagConstraints);
+
+        jSpinnerNavigatorHeight.setMinimumSize(new java.awt.Dimension(60, 20));
+        jSpinnerNavigatorHeight.setPreferredSize(new java.awt.Dimension(60, 20));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 10;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 7, 8);
+        jPanelLegend.add(jSpinnerNavigatorHeight, gridBagConstraints);
+
+        jSpinnerNavigatorWidth.setMinimumSize(new java.awt.Dimension(60, 20));
+        jSpinnerNavigatorWidth.setPreferredSize(new java.awt.Dimension(60, 20));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 9;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
+        jPanelLegend.add(jSpinnerNavigatorWidth, gridBagConstraints);
+
+        jLabel13.setText("Width:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 9;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 16, 0, 12);
+        jPanelLegend.add(jLabel13, gridBagConstraints);
+
+        jPanel10.setLayout(new java.awt.GridBagLayout());
+
+        jButtonBrowse.setMnemonic('B');
+        jButtonBrowse.setText("Browse...");
+        jButtonBrowse.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonBrowseActionPerformed(evt);
+            }
+        });
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 0.0010;
+        jPanel10.add(jButtonBrowse, gridBagConstraints);
+
+        jLabelWarning.setFont(new java.awt.Font("Dialog", 0, 12));
+        jLabelWarning.setForeground(new java.awt.Color(255, 0, 0));
+        jLabelWarning.setText("Warning: file doesn't exist");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 0);
+        jPanel10.add(jLabelWarning, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(0, 12, 0, 8);
+        jPanelLegend.add(jPanel10, gridBagConstraints);
 
         jPanelPrint.add(jPanelLegend);
 
@@ -828,6 +916,7 @@ public class SettingsDialog extends javax.swing.JDialog {
     private javax.swing.JButton jButtonOk;
     private javax.swing.JCheckBox jCheckBoxCapFast;
     private javax.swing.JCheckBox jCheckBoxDefaultVisiblity;
+    private javax.swing.JCheckBox jCheckBoxDisplayNavigator;
     private javax.swing.JCheckBox jCheckBoxEnableGrouping;
     private javax.swing.JCheckBox jCheckBoxGlobalMacros;
     private javax.swing.JCheckBox jCheckBoxLinksVisibility;
@@ -835,6 +924,9 @@ public class SettingsDialog extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -848,6 +940,7 @@ public class SettingsDialog extends javax.swing.JDialog {
     private javax.swing.JLabel jLabelTest;
     private javax.swing.JLabel jLabelWarning;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -868,6 +961,8 @@ public class SettingsDialog extends javax.swing.JDialog {
     private javax.swing.JSlider jSliderDoubleClickSmudge;
     private javax.swing.JSlider jSliderDoubleClickSpeed;
     private javax.swing.JSpinner jSpinnerHeight;
+    private javax.swing.JSpinner jSpinnerNavigatorHeight;
+    private javax.swing.JSpinner jSpinnerNavigatorWidth;
     private javax.swing.JSpinner jSpinnerRecordNameLength;
     private javax.swing.JSpinner jSpinnerWidth;
     private javax.swing.JTabbedPane jTabbedPanel;
