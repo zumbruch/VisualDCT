@@ -264,8 +264,8 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 			{
 				target = EPICSLinkOut.getStartPoint(descPoint);
 				// any special threatment ??
-				if (target instanceof Descriptable)
-					label = ((Descriptable)target).getDescription();
+				if (target instanceof Field)
+					label = ((Field)target).getFieldData().getValue();
 			}
 				
 			if (label!=null) {
@@ -313,8 +313,8 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 			{
 				target = EPICSLinkOut.getStartPoint(descPoint);
 				// any special threatment ??
-				if (target instanceof Descriptable)
-					label = ((Descriptable)target).getDescription();
+				if (target instanceof Field)
+					label = ((Field)target).getFieldData().getValue();
 			}
 				
 			if (label!=null) {
