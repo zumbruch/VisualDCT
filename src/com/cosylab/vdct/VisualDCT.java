@@ -38,6 +38,7 @@ import javax.swing.event.*;
 import com.cosylab.vdct.about.VisualDCTAboutDialogEngine;
 import com.cosylab.vdct.events.*;
 import com.cosylab.vdct.events.commands.*;
+import com.cosylab.vdct.find.FindDialog;
 import com.cosylab.vdct.util.ComboBoxFileChooser;
 import com.cosylab.vdct.util.DBDEntry;
 import com.cosylab.vdct.util.UniversalFileFilter;
@@ -90,6 +91,7 @@ public class VisualDCT extends JFrame {
 	private JMenuItem ivjLevel_UpMenuItem = null;
 	private JMenuItem ivjMove_RenameMenuItem = null;
 	private JMenuItem ivjMorphMenuItem = null;
+	private JMenuItem ivjFindMenuItem = null;
 	private JMenuItem ivjNewMenuItem = null;
 	private JButton ivjOpenButton = null;
 	private JMenuItem ivjOpenMenuItem = null;
@@ -258,6 +260,8 @@ class IvjEventHandler implements java.awt.event.ActionListener, java.awt.event.I
 				connEtoC20(e);
 			else if (e.getSource() == VisualDCT.this.getMorphMenuItem()) 
 				connEtoC69(e);				
+			else if (e.getSource() == VisualDCT.this.getFindMenuItem()) 
+			    VisualDCT.this.findActionPerformed();				
 			else if (e.getSource() == VisualDCT.this.getGroupMenuItem()) 
 				connEtoC21(e);
 			else if (e.getSource() == VisualDCT.this.getUngroupMenuItem()) 
@@ -2391,6 +2395,8 @@ private javax.swing.JMenu getEditMenu() {
 			ivjEditMenu.add(getJSeparator6());
 			ivjEditMenu.add(getDeleteMenuItem());
 			ivjEditMenu.add(getSelect_AllMenuItem());
+			ivjEditMenu.add(new JSeparator());
+			ivjEditMenu.add(getFindMenuItem());
 			// user code begin {1}
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
@@ -3494,6 +3500,32 @@ private javax.swing.JMenuItem getMorphMenuItem() {
 	return ivjMorphMenuItem;
 }
 
+private javax.swing.JMenuItem getFindMenuItem() {
+	if (ivjFindMenuItem == null) {
+		try {
+		    ivjFindMenuItem = new javax.swing.JMenuItem();
+		    ivjFindMenuItem.setName("FindMenuItem");
+		    ivjFindMenuItem.setMnemonic('f');
+		    ivjFindMenuItem.setText("Find...");
+		    ivjFindMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F,java.awt.Event.CTRL_MASK));
+			// user code begin {1}
+			// user code end
+		} catch (java.lang.Throwable ivjExc) {
+			// user code begin {2}
+			// user code end
+			handleException(ivjExc);
+		}
+	}
+	return ivjFindMenuItem;
+}
+
+private FindDialog findDialog = null;
+public void findActionPerformed()
+{
+    if (findDialog == null)
+        findDialog = new FindDialog(this);
+    findDialog.setVisible(true);
+}
 /**
  * Return the NameLabel property value.
  * @return javax.swing.JLabel
@@ -5584,6 +5616,7 @@ private void initConnections() throws java.lang.Exception {
 	getPasteMenuItem().addActionListener(ivjEventHandler);
 	getMove_RenameMenuItem().addActionListener(ivjEventHandler);
 	getMorphMenuItem().addActionListener(ivjEventHandler);
+	getFindMenuItem().addActionListener(ivjEventHandler);
 	getGroupMenuItem().addActionListener(ivjEventHandler);
 	getUngroupMenuItem().addActionListener(ivjEventHandler);
 	getDeleteMenuItem().addActionListener(ivjEventHandler);
