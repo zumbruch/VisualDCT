@@ -57,12 +57,13 @@ import com.cosylab.vdct.vdb.VDBTemplateMacro;
  * Creation date: (29.1.2001 21:27:30)
  * @author Matej Sekoranja
  */
-//TODO deleting target does not remove this link
 public class TemplateEPICSMacro extends EPICSOutLink implements TemplateEPICSLink, Movable {
 
  	private String lastUpdatedFullName = null;
 	private static GUISeparator macroSeparator = null;
 	private static javax.swing.ImageIcon icon = null;
+
+	private static final String nullString = "";
 
 	private static final String selectTitle = "Select link color...";
 	private static final String startLinkingString = "Start linking...";
@@ -558,6 +559,17 @@ public void setRight(boolean isRight)
 
 		return moved;
 		
+	}
+
+	/**
+	 * ...
+	 * Creation date: (29.1.2001 20:05:51)
+	 */
+	public void disconnect(Linkable disconnector) {
+		if (!disconnected && (inlink==disconnector) ) {
+			disconnected = true;
+			fieldData.setValue(nullString);
+		}
 	}
 
 }
