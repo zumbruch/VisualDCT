@@ -159,8 +159,8 @@ protected void validate() {
   setRheight(rheight);
 
   // set appropriate font size
-  int x0 = (int)(8*scale);		// insets
-  int y0 = (int)(4*scale);
+  final int x0 = (int)(8*scale);		// insets
+  final int y0 = (int)(4*scale);
 
   setLabel(fieldData.getName());
 

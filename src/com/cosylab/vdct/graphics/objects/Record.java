@@ -557,9 +557,11 @@ public void fieldChanged(VDBFieldData field) {
 
 public boolean isVisible(VDBFieldData field) {
 	int visibility = field.getVisibility();
+	/*
 	boolean link = field.getDbdData().getGUI_type()==DBDConstants.GUI_LINKS ||
 		field.getDbdData().getGUI_type()==DBDConstants.GUI_OUTPUT ||
 		field.getDbdData().getGUI_type()==DBDConstants.GUI_INPUTS;
+	*/
 	
 	boolean validLink = false;	
 	Object obj = getSubObject(field.getName());
@@ -1420,8 +1422,9 @@ protected void validate() {
   setRwidth(rwidth);
 
   // set appropriate font size
-  int x0 = (int)(8*scale);		// insets
-  int y0 = (int)(4*scale);
+  final int x0 = (int)(8*scale);		// insets
+  final int y0 = (int)(4*scale);
+  final int fieldRowHeight = (int)((Constants.RECORD_HEIGHT-2*4)*0.375);
 
   Font font;
   
@@ -1471,7 +1474,7 @@ protected void validate() {
   if (oldNumOfFields != changedFields.size()) {
   	int difference = oldNumOfFields - changedFields.size(); 
 	oldNumOfFields = changedFields.size();
-  	move(0,(int)Math.round(rfieldRowHeight*difference));
+  	move(0, fieldRowHeight*difference);
   }
   
   // increase record size for VAL value and timestamp
