@@ -206,6 +206,7 @@ public static void fixLink(EPICSVarLink varlink)
 		{
 			// not the same, fix it gently as a doctor :)
 			String value = source.getFieldData().getValue();
+			// value = targetName + link properties
 			value = targetName + com.cosylab.vdct.util.StringUtils.removeBegining(value, oldTarget);
 			source.getFieldData().setValueSilently(value);
 			source.fixLinkProperties();

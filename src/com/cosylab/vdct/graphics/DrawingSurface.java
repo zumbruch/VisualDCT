@@ -2183,6 +2183,9 @@ public int print(java.awt.Graphics graphics, java.awt.print.PageFormat pageForma
 
 	//graphics.clipRect(0, 0, pageWidth, pageHeight);
 
+	//System.out.println(pageFormat.getOrientation()==PageFormat.LANDSCAPE);
+	//if (true) throw new java.awt.print.PrinterException();
+	
 	/*------------------------------------------------------------*/
 	
 	ViewState view = ViewState.getInstance();

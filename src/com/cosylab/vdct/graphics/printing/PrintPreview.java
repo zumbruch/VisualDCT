@@ -846,49 +846,25 @@ public void printPreviewFrame_WindowClosed(java.awt.event.WindowEvent windowEven
  * Comment
  */
 public void printToolBarButton_ActionEvents() {
-	final Pageable target2 = target;
-	new Thread() {
-		public void run() {
-			
-			try {
-				PrinterJob job = PrinterJob.getPrinterJob();
-				job.setJobName(getTitle());
-
-				job.setPageable(target2);
-		
-				if (job.printDialog())
-				{
-					setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
-					Thread.yield();
-					job.print();
-					setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
-					dispose();
-				}
-			} catch (PrinterException ex) {
-				ex.printStackTrace();
-				com.cosylab.vdct.Console.getInstance().println("Printing error: "+ex);
-			}
-		}
-	}.start();
+	// !!!
+	com.cosylab.vdct.VisualDCT.getInstance().printMenuItem_ActionPerformed();
 }
 /**
  * Comment
  */
 public void printToolBarButton1_ActionPerformed(java.awt.event.ActionEvent actionEvent) {
-	new Thread() {
-		public void run() {
-			PrinterJob job = PrinterJob.getPrinterJob();
-			PageFormat pf = Page.getPageFormat();
-			PageFormat pf2 = job.pageDialog(pf);
-			
-			if (pf!=pf2)
-			{
-				Page.setPageFormat(pf2);
+	PageFormat pf = Page.getPageFormat();
+	//!!!
+	com.cosylab.vdct.VisualDCT.getInstance().pageSetupMenuItem_ActionPerformed(actionEvent);
+
+	// update if necessary
+	if (pf!=Page.getPageFormat())
+		new Thread() {
+			public void run() {
 				loadPreview();
 			}
-		}
-	}.start();
-	
+		}.start();
+
 }
 /**
  * Comment

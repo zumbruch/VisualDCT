@@ -76,6 +76,7 @@ public class VisualDCT extends JFrame {
 	private JSeparator ivjJSeparator1 = null;
 	private JSeparator ivjJSeparator10 = null;
 	private JSeparator ivjJSeparator11a = null;
+	private JSeparator ivjJSeparator12 = null;
 	private JSeparator ivjJSeparator2 = null;
 	private JSeparator ivjJSeparator3 = null;
 	private JSeparator ivjJSeparator4 = null;
@@ -1668,8 +1669,7 @@ public void exportPostScriptFileMenuItem_ActionPerformed()
 			DocFlavor pageableFlavor = DocFlavor.SERVICE_FORMATTED.PAGEABLE;
 		    String postScriptMime = new String("application/postscript");
 
-	        PrintRequestAttributeSet printRequestAttributeSet =
-	        	new HashPrintRequestAttributeSet();
+			PrintRequestAttributeSet printRequestAttributeSet = Page.getPrintRequestAttributeSet();
 
 			StreamPrintServiceFactory[] streamPrintServiceFactory =
 				StreamPrintServiceFactory.lookupStreamPrintServiceFactories(pageableFlavor,
@@ -1694,6 +1694,8 @@ public void exportPostScriptFileMenuItem_ActionPerformed()
 			int rx = view.getRx();
 			int ry = view.getRy();
 			double scale = view.getScale();
+
+			boolean showGrid = Settings.getInstance().getShowGrid();
 
 			try
 			{
@@ -1751,7 +1753,6 @@ public void exportPostScriptFileMenuItem_ActionPerformed()
 				pi.getPageable().getPageFormat(0).setOrientation(pageFormat.getOrientation());
 				pi.getPageable().getPageFormat(0).setPaper(pageFormat.getPaper());
 
-				boolean showGrid = Settings.getInstance().getShowGrid();
 				Settings.getInstance().setShowGrid(false);
 
 				printerJob.print();
@@ -1905,6 +1906,7 @@ public void exportPostScriptFileMenuItem_ActionPerformed()
 				view.setRy(ry);
 
 				setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
+				Settings.getInstance().setShowGrid(showGrid);
 		
 				CommandManager.getInstance().execute("RepaintWorkspace");
 			}
@@ -1929,7 +1931,7 @@ private javax.swing.JMenuItem getAbout_BoxMenuItem() {
 			ivjAbout_BoxMenuItem = new javax.swing.JMenuItem();
 			ivjAbout_BoxMenuItem.setName("About_BoxMenuItem");
 			ivjAbout_BoxMenuItem.setMnemonic('A');
-			ivjAbout_BoxMenuItem.setText("About Box");
+			ivjAbout_BoxMenuItem.setText("About VisualDCT");
 			// user code begin {1}
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
@@ -1974,6 +1976,7 @@ private javax.swing.JMenuItem getBooks_OnlineMenuItem() {
 			ivjBooks_OnlineMenuItem.setName("Books_OnlineMenuItem");
 			ivjBooks_OnlineMenuItem.setMnemonic('B');
 			ivjBooks_OnlineMenuItem.setText("Books Online");
+			ivjBooks_OnlineMenuItem.setEnabled(false);
 			// user code begin {1}
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
@@ -2730,6 +2733,7 @@ private javax.swing.JMenu getHelpMenu() {
 			ivjHelpMenu.setText("Help");
 			ivjHelpMenu.add(getHelp_TopicsMenuItem());
 			ivjHelpMenu.add(getBooks_OnlineMenuItem());
+			ivjHelpMenu.add(getJSeparator12());
 			ivjHelpMenu.add(getAbout_BoxMenuItem());
 			// user code begin {1}
 			// user code end
@@ -3041,6 +3045,26 @@ private javax.swing.JSeparator getJSeparator11() {
 		}
 	}
 	return ivjJSeparator11;
+}
+/**
+ * Return the JSeparator12 property value.
+ * @return javax.swing.JSeparator
+ */
+/* WARNING: THIS METHOD WILL BE REGENERATED. */
+private javax.swing.JSeparator getJSeparator12() {
+	if (ivjJSeparator12 == null) {
+		try {
+			ivjJSeparator12 = new javax.swing.JSeparator();
+			ivjJSeparator12.setName("JSeparator12");
+			// user code begin {1}
+			// user code end
+		} catch (java.lang.Throwable ivjExc) {
+			// user code begin {2}
+			// user code end
+			handleException(ivjExc);
+		}
+	}
+	return ivjJSeparator12;
 }
 /**
  * Return the JSeparator11 property value.
@@ -5506,12 +5530,55 @@ public void openMenuItem_ActionPerformed() {
  * Comment
  */
 public void pageSetupMenuItem_ActionPerformed(java.awt.event.ActionEvent actionEvent) {
-	final java.awt.print.PrinterJob job = java.awt.print.PrinterJob.getPrinterJob();
-		new Thread() {
-			public void run() {
-				com.cosylab.vdct.graphics.printing.Page.setPageFormat(job.pageDialog(com.cosylab.vdct.graphics.printing.Page.getPageFormat()));
+//	new Thread() {
+//		public void run()
+//		{
+
+			final GetPrintableInterface pi = (GetPrintableInterface)CommandManager.getInstance().getCommand("GetPrintableInterface");
+		
+			if(pi == null)
+				return;
+		
+			PrintRequestAttributeSet printRequestAttributeSet = Page.getPrintRequestAttributeSet();
+		
+			PrinterJob printerJob = PrinterJob.getPrinterJob();
+		
+			PageFormat pageFormat = printerJob.pageDialog(printRequestAttributeSet);
+			if(pageFormat==null)
+				return;
+		
+			int pageFormatOrientation = PageFormat.PORTRAIT;
+
+			OrientationRequested orientationRequested = (OrientationRequested)
+				printRequestAttributeSet.get(OrientationRequested.class);
+				
+			if(orientationRequested != null)
+			{
+				if(orientationRequested.equals(OrientationRequested.LANDSCAPE))
+					pageFormatOrientation = PageFormat.LANDSCAPE;
+				else if(orientationRequested.equals(OrientationRequested.REVERSE_LANDSCAPE))
+					pageFormatOrientation = PageFormat.REVERSE_LANDSCAPE;
 			}
-		}.start();
+			
+			pi.getPageable().getPageFormat(0).setOrientation(pageFormatOrientation);
+		
+			MediaPrintableArea mediaPrintableArea = (MediaPrintableArea)
+				printRequestAttributeSet.get(MediaPrintableArea.class);
+				
+			Paper paper = pi.getPageable().getPageFormat(0).getPaper();
+		
+			paper.setImageableArea(mediaPrintableArea.getX(MediaPrintableArea.INCH) * 72.0,
+				mediaPrintableArea.getY(MediaPrintableArea.INCH) * 72.0,
+				mediaPrintableArea.getWidth(MediaPrintableArea.INCH) * 72,
+				mediaPrintableArea.getHeight(MediaPrintableArea.INCH) * 72);
+		
+			pi.getPageable().getPageFormat(0).setPaper(paper);
+			
+			// store settings 
+			com.cosylab.vdct.graphics.printing.Page.setPageFormat(pageFormat);
+	//	}
+	//}.start();
+
 }
 /**
  * Comment
@@ -5557,11 +5624,11 @@ public void printAsPostScriptMenuItem_ActionPerformed()
 			int rx = view.getRx();
 			int ry = view.getRy();
 			double scale = view.getScale();
+			boolean showGrid = Settings.getInstance().getShowGrid();
 
 			try
 			{
-		        PrintRequestAttributeSet printRequestAttributeSet =
-		        	new HashPrintRequestAttributeSet();
+				PrintRequestAttributeSet printRequestAttributeSet = Page.getPrintRequestAttributeSet();
 
 				PrinterJob printerJob = PrinterJob.getPrinterJob();
 				printerJob.setJobName(getTitle());
@@ -5570,18 +5637,17 @@ public void printAsPostScriptMenuItem_ActionPerformed()
 				if(!printerJob.printDialog(printRequestAttributeSet))
 					return;
 
+				int pageFormatOrientation = PageFormat.PORTRAIT;
+		
 
 				OrientationRequested orientationRequested = (OrientationRequested)
 					printRequestAttributeSet.get(OrientationRequested.class);
 					
-				int pageFormatOrientation = PageFormat.PORTRAIT;
-		
 				if(orientationRequested != null)
 				{
 					if(orientationRequested.equals(OrientationRequested.LANDSCAPE))
 						pageFormatOrientation = PageFormat.LANDSCAPE;
-
-					if(orientationRequested.equals(OrientationRequested.REVERSE_LANDSCAPE))
+					else if(orientationRequested.equals(OrientationRequested.REVERSE_LANDSCAPE))
 						pageFormatOrientation = PageFormat.REVERSE_LANDSCAPE;
 				}
 				
@@ -5626,7 +5692,6 @@ public void printAsPostScriptMenuItem_ActionPerformed()
 				setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
 				Thread.yield();
 
-				boolean showGrid = Settings.getInstance().getShowGrid();
 				Settings.getInstance().setShowGrid(false);
 
 				postScriptPrinterJob.print(printRequestAttributeSet);
@@ -5799,6 +5864,7 @@ public void printAsPostScriptMenuItem_ActionPerformed()
 				view.setRy(ry);
 
 				setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
+				Settings.getInstance().setShowGrid(showGrid);
 
 				CommandManager.getInstance().execute("RepaintWorkspace");
 			}
@@ -5814,15 +5880,52 @@ public void printMenuItem_ActionPerformed() {
 	new Thread() {
 		public void run() {
 			try {
-				PrinterJob job = PrinterJob.getPrinterJob();
-				job.setJobName(getTitle());
-				job.setPageable(pi.getPageable());
-				if (job.printDialog())
+
+	
+				PrintRequestAttributeSet printRequestAttributeSet = Page.getPrintRequestAttributeSet();
+
+				PrinterJob printerJob = PrinterJob.getPrinterJob();
+				printerJob.setJobName(getTitle());
+				printerJob.setPageable(pi.getPageable());
+
+				if(!printerJob.printDialog(printRequestAttributeSet))
+					return;
+
+				int pageFormatOrientation = PageFormat.PORTRAIT;
+
+				OrientationRequested orientationRequested = (OrientationRequested)
+					printRequestAttributeSet.get(OrientationRequested.class);
+					
+				if(orientationRequested != null)
 				{
-					setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
-					Thread.yield();
-					job.print();
+					if(orientationRequested.equals(OrientationRequested.LANDSCAPE))
+						pageFormatOrientation = PageFormat.LANDSCAPE;
+					else if(orientationRequested.equals(OrientationRequested.REVERSE_LANDSCAPE))
+						pageFormatOrientation = PageFormat.REVERSE_LANDSCAPE;
 				}
+				
+				pi.getPageable().getPageFormat(0).setOrientation(pageFormatOrientation);
+
+				MediaPrintableArea mediaPrintableArea = (MediaPrintableArea)
+					printRequestAttributeSet.get(MediaPrintableArea.class);
+					
+				Paper paper = pi.getPageable().getPageFormat(0).getPaper();
+
+				paper.setImageableArea(mediaPrintableArea.getX(MediaPrintableArea.INCH) * 72.0,
+					mediaPrintableArea.getY(MediaPrintableArea.INCH) * 72.0,
+					mediaPrintableArea.getWidth(MediaPrintableArea.INCH) * 72,
+					mediaPrintableArea.getHeight(MediaPrintableArea.INCH) * 72);
+	
+				pi.getPageable().getPageFormat(0).setPaper(paper);
+
+				// store settings 
+				com.cosylab.vdct.graphics.printing.Page.setPageFormat(pi.getPageable().getPageFormat(0));
+
+				setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
+				
+				Thread.yield();
+				printerJob.print(printRequestAttributeSet);
+				
 			} catch (PrinterException ex) {
 				ex.printStackTrace();
 				com.cosylab.vdct.Console.getInstance().println("Printing error: "+ex);

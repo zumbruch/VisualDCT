@@ -30,6 +30,9 @@ package com.cosylab.vdct.graphics.printing;
 
 import java.awt.print.*;
 
+import javax.print.attribute.HashPrintRequestAttributeSet;
+import javax.print.attribute.PrintRequestAttributeSet;
+
 /**
  * Insert the type's description here.
  * Creation date: (13.5.2001 12:33:52)
@@ -43,6 +46,8 @@ public class Page {
 	private static int printMode = FIT_SCALE;
 
 	private static PageFormat pageFormat = PrinterJob.getPrinterJob().defaultPage();
+	
+	private static PrintRequestAttributeSet printRequestAttributeSet = new HashPrintRequestAttributeSet();
 
 	private static double userScale = 1.0;
 
@@ -100,4 +105,22 @@ public static void setPrintMode(int newPrintMode) {
 public static void setUserScale(double newUserScale) {
 	userScale = newUserScale;
 }
+	/**
+	 * Returns the printRequestAttributeSet.
+	 * @return PrintRequestAttributeSet
+	 */
+	public static PrintRequestAttributeSet getPrintRequestAttributeSet()
+	{
+		return printRequestAttributeSet;
+	}
+
+	/**
+	 * Sets the printRequestAttributeSet.
+	 * @param printRequestAttributeSet The printRequestAttributeSet to set
+	 */
+	public static void setPrintRequestAttributeSet(PrintRequestAttributeSet printRequestAttributeSet)
+	{
+		Page.printRequestAttributeSet = printRequestAttributeSet;
+	}
+
 }
