@@ -29,6 +29,7 @@ package com.cosylab.vdct.db;
  */
 
 import com.cosylab.vdct.Console;
+import com.cosylab.vdct.util.EnhancedStreamTokenizer;
 
 /**
  * This type was created in VisualAge.
@@ -39,7 +40,7 @@ public class DBParseException extends Exception {
  * DBParseException constructor comment.
  * @param s java.lang.String
  */
-public DBParseException(String s, java.io.StreamTokenizer t, String fileName) {
+public DBParseException(String s, EnhancedStreamTokenizer t, String fileName) {
 	super(s);
 	Console.getInstance().print("\nError found in file '"+fileName+"', line "+t.lineno()+": ");
 }

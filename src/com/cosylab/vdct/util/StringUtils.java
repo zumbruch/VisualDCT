@@ -204,6 +204,7 @@ public static java.awt.Color string2color(String str) {
  * @return java.lang.String
  * @param str java.lang.String
  */
+// TODO implement more efficient algorithm
 public static String removeQuotesAndLineBreaks(String str) {
 	return str.replaceAll("\\\"", "\\\\\"").replaceAll("\\n", "\\\\n");
 }
@@ -213,6 +214,7 @@ public static String removeQuotesAndLineBreaks(String str) {
  * @return java.lang.String
  * @param str java.lang.String
  */
+//TODO implement more efficient algorithm
 public static String removeQuotes(String str) {
 	if (str.indexOf('"')>=0)
 		str = str.replaceAll("\\\"", "\\\\\"");

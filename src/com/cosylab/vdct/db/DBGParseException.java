@@ -31,6 +31,7 @@ package com.cosylab.vdct.db;
 import java.io.StreamTokenizer;
 
 import com.cosylab.vdct.Console;
+import com.cosylab.vdct.util.EnhancedStreamTokenizer;
 
 /**
  * This type was created in VisualAge.
@@ -40,7 +41,7 @@ public class DBGParseException extends Exception {
  * DBParseException constructor comment.
  * @param s java.lang.String
  */
-public DBGParseException(String s, java.io.StreamTokenizer t, String fileName) {
+public DBGParseException(String s, EnhancedStreamTokenizer t, String fileName) {
 	super(s);
 	if (t.ttype == StreamTokenizer.TT_WORD)
 		if (t.sval!=null)
