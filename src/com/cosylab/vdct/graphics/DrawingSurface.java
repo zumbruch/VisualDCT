@@ -649,6 +649,8 @@ public void mouseClicked(MouseEvent e) {
 						SetWorkspaceGroup cmd = (SetWorkspaceGroup)CommandManager.getInstance().getCommand("SetGroup");
 						cmd.setGroup(viewGroup.getAbsoluteName());
 						cmd.execute();
+					
+						updateWorkspaceScale();
 						
 						forceRedraw = true;
 						repaint();
@@ -1016,6 +1018,7 @@ public void moveLevelUp() {
 		ViewState.getInstance().set(viewGroup);
 		//createNavigatorImage();
 		viewGroup.unconditionalValidateSubObjects(isFlat());
+		updateWorkspaceScale();
 		forceRedraw = true;
 		repaint();
 	}

@@ -4479,7 +4479,7 @@ public static void main(java.lang.String[] args) {
 			
 		if (args.length==0) {
 			System.out.println("\no) Usage: java "+VisualDCT.class.getName()+" [<DBDs>] [<DB>]\n");
-			aVisualDCT.openDBD(null);					// bring up a file dialog
+			aVisualDCT.openDBD(null, true);					// bring up a file dialog
 		}
 		else {
 			for (int i=0; i < args.length; i++)
@@ -4489,6 +4489,7 @@ public static void main(java.lang.String[] args) {
 					aVisualDCT.openDBD(args[i]);
 				}
 
+			// only one DB
 			if (!args[args.length-1].toUpperCase().endsWith("DBD"))
 			{
 				System.out.println("Directive to load DB: '"+args[args.length-1]+"'.");
@@ -4681,11 +4682,20 @@ public void openDB(String fileName) {
 	}
 
 }
+
 /**
  * Insert the method's description here.
  * Creation date: (8.1.2001 20:30:58)
  */
 public boolean openDBD(String fileName) {
+	return openDBD(fileName, false);
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (8.1.2001 20:30:58)
+ */
+public boolean openDBD(String fileName, boolean allowDB) {
 	if (fileName!=null && fileName.indexOf(java.io.File.separatorChar)<0)
 		fileName = getfileChooser().getCurrentDirectory().toString()+
 									java.io.File.separatorChar+
@@ -4694,8 +4704,21 @@ public boolean openDBD(String fileName) {
 	java.io.File theFile = null;
 	if (fileName==null) {
 		JFileChooser chooser = getfileChooser();
-		UniversalFileFilter filter = new UniversalFileFilter(
-			new String("dbd"), "DBD File");
+		String[] set;
+		String desc;
+		if (allowDB)
+		{
+			desc = "DBD/DB files";
+			String[] tset = {"dbd", "db", "template"};
+			set = tset;
+		}
+		else
+		{
+			desc = "DBD files";
+			String[] tset = {"dbd"};
+			set = tset;
+		}
+		UniversalFileFilter filter = new UniversalFileFilter(set, desc);
 		chooser.addChoosableFileFilter(filter);
 		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		int retval = chooser.showOpenDialog(this);
@@ -4709,17 +4732,21 @@ public boolean openDBD(String fileName) {
 		return false;			// canceled dialog
 	else if (!theFile.exists())
 	{
-		 System.out.println("o) Failed to open DBD file - file does not exist: '"+theFile.getAbsolutePath()+"'.");
+		 System.out.println("o) Failed to open DBD/DB file - file does not exist: '"+theFile.getAbsolutePath()+"'.");
 		 return false;
 	}
 	
 	GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
 
 	try {
-		cmd.getGUIMenuInterface().openDBD(theFile);
+
+		if (!allowDB || theFile.getName().toUpperCase().endsWith("DBD"))
+			cmd.getGUIMenuInterface().openDBD(theFile);
+		else if (allowDB)
+			cmd.getGUIMenuInterface().openDB(theFile);
 		getStatusMsg1().setText(" "+theFile.getCanonicalFile()+" ");
 	} catch (java.io.IOException e) {
-	    Console.getInstance().println("o) Failed to open DBD file: '"+theFile.getAbsolutePath()+"'.");
+	    Console.getInstance().println("o) Failed to open DBD/DB file: '"+theFile.getAbsolutePath()+"'.");
 	    Console.getInstance().println(e);
 	    return false;
 	}
