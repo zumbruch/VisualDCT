@@ -80,7 +80,7 @@ public class EPICSVarOutLink extends EPICSVarLink implements OutLink
 	protected LinkProperties properties = null;
 	private boolean hasEndpoint = false;
 
-	private static final String addConnectorString = "Add connector";
+	//private static final String addConnectorString = "Add connector";
 
 	private static final String moveUpString = "Move Up";
 	private static final String moveDownString = "Move Down";

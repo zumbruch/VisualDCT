@@ -38,9 +38,7 @@ public class AboutDialog extends javax.swing.JDialog implements AboutTabReceiver
 	private javax.swing.JPanel ivjJDialogContentPane = null;
 	private javax.swing.JPanel ivjJPanelCloseButtonDivider = null;
 	private javax.swing.JTabbedPane ivjJTabbedPane = null;
-	private AboutDialogEngine engine = null;
 	IvjEventHandler ivjEventHandler = new IvjEventHandler();
-	private java.awt.Frame aboutedFrame = null;
 
 class IvjEventHandler implements java.awt.event.ActionListener {
 		public void actionPerformed(java.awt.event.ActionEvent e) {

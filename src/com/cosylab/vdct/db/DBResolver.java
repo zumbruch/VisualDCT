@@ -65,7 +65,7 @@ public class DBResolver {
 
 	// internal
 	private static final String ENDSTR = "}";
-	private static final String SPACE = " ";
+	//private static final String SPACE = " ";
 	private static final String NL = "\n";
 	
 	// skip commands

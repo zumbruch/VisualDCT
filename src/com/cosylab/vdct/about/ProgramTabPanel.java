@@ -28,8 +28,6 @@ package com.cosylab.vdct.about;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.util.Properties;
-
 import javax.swing.Icon;
 import javax.swing.JPanel;
 
@@ -42,8 +40,6 @@ import javax.swing.JPanel;
  * Window>Preferences>Java>Code Generation.
  */
 public class ProgramTabPanel extends AboutTabPanel {
-	
-	private Properties programProperties = null;
 	
     private javax.swing.JPanel JPanelLogo = null;
 	private javax.swing.JLabel JLabelLogo = null;
@@ -79,7 +75,7 @@ private javax.swing.JLabel getJLabelCopyright1() {
 			JLabelCopyright1.setName("JLabelCopyright1");
 			JLabelCopyright1.setFont(new java.awt.Font("dialog", 1, 10));
 			JLabelCopyright1.setAlignmentX(java.awt.Component.CENTER_ALIGNMENT);
-			JLabelCopyright1.setText("Copyright © 2002 All rights reserved.");
+			JLabelCopyright1.setText("Copyright © 2001 - 2003. All rights reserved.");
         } catch (Exception e) {
             e.printStackTrace();
         }

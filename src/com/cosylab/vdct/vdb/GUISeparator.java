@@ -35,11 +35,11 @@ import com.cosylab.vdct.inspector.*;
  * @author 
  */
 public class GUISeparator extends GUIHeader {
-	private String title;
-/**
- * GUISeparator constructor comment.
- */
-public GUISeparator(String title) {
-	super(title, title, InspectableProperty.UNDEFINED_VISIBILITY);
-}
+
+	/**
+	 * GUISeparator constructor comment.
+	 */
+	public GUISeparator(String title) {
+		super(title, title, InspectableProperty.UNDEFINED_VISIBILITY);
+	}
 }

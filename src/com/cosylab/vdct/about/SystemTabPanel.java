@@ -57,7 +57,6 @@ public class SystemTabPanel extends AboutTabPanel {
 	private javax.swing.JScrollPane JScrollPaneSystemJavaClasspathProperty = null;	
 
 	private javax.swing.JTextArea JTextAreaSystemJavaClasspathProperty = null;
-	private javax.swing.JTextArea JTextAreaPaneSystemJavaDirProperty = null;
 	/**
 	 * Constructor for SystemTabPanel.
 	 * @param tabModel

@@ -43,9 +43,9 @@ import com.cosylab.vdct.graphics.popup.*;
 public class Vertex extends VisibleObject implements Movable, Popupable
 {
 	
-private VisibleObject owner;
-private static final String nullString = "";
-private boolean hilited = false;
+	private VisibleObject owner;
+	//private static final String nullString = "";
+	private boolean hilited = false;
 
 public Vertex(VisibleObject owner, int parX, int parY)
 {

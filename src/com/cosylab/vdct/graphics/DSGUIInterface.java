@@ -53,7 +53,7 @@ public class DSGUIInterface implements GUIMenuInterface, VDBInterface {
 
 	private ArrayList pasteNames = null;
 	
-	private static final String nullString = "";
+	//private static final String nullString = "";
 
 /**
  * Insert the method's description here.

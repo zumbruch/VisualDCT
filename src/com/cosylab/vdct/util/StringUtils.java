@@ -36,7 +36,7 @@ import java.awt.Color;
 public class StringUtils {
 	private static final String ZERO = "0";
 	private static final String ONE = "1";
-	private static final String HEX = "0x";
+	//private static final String HEX = "0x";
 
 	private static final String nullString = "";
 

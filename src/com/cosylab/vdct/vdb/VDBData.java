@@ -289,7 +289,7 @@ private static VDBData generateVDBDataInternal(DBDData dbd, DBData db) throws DB
 /**
  * 
  */
-private static void generateRecords(DBDData dbd, DBData db, VDBData vdb) throws DBException
+public static void generateRecords(DBDData dbd, DBData db, VDBData vdb) throws DBException
 {
 	// add records
 	DBRecordData dbRecord;
@@ -362,7 +362,7 @@ public static VDBTemplateInstance generateNewVDBTemplateInstance(String name, VD
 /**
  * 
  */
-private static Hashtable generateTemplateInstanceIOFields(VDBTemplateInstance vti, Hashtable values,
+public static Hashtable generateTemplateInstanceIOFields(VDBTemplateInstance vti, Hashtable values,
 															Hashtable table, Hashtable descTable)
 {
 
@@ -531,7 +531,7 @@ private static VDBData generateTemplate(DBDData dbd, DBTemplate dbTemplate)
 /**
  * 
  */
-private static Hashtable generateTemplateIOFields(DBTemplate dbTemplate, Hashtable table, String ioType)
+public static Hashtable generateTemplateIOFields(DBTemplate dbTemplate, Hashtable table, String ioType)
 {
 	Hashtable ios = new Hashtable();		
 	Enumeration keys = table.keys();
