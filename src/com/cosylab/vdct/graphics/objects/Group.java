@@ -1175,7 +1175,10 @@ public static void writeObjects(Vector elements, java.io.DataOutputStream file, 
 		else if (obj instanceof Template)
  	 		{
 			 	 template = (Template)obj;
-			 	 template.writeObjects(file, namer, export);
+			 	 
+			 	 // skip templates on clipboard
+			 	 if (!template.getTemplateData().getName().startsWith(Constants.CLIPBOARD_NAME))
+			 	 	template.writeObjects(file, namer, export);
 	 		}
 		else if (!export && obj instanceof DBTemplateEntry)
 			{
