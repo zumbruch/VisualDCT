@@ -4,7 +4,7 @@
   
   <title>VisualDCT project info XML</title>
   
-  <audience>All users and developers interesting in VisualDCT, mainly EPICS community.</audience>
+  <audience>All users and developers interested in VisualDCT, mainly EPICS community.</audience>
   
   <scope>This project page contains all distribution files, sources, documentation and any other VisualDCT resources.</scope>
   
@@ -20,7 +20,7 @@
 
   <!--testlog url="test/testlog.txt"/-->
 
-  <dependency type="3rdparty" name="JavaTM 2 Platform, Standard Edition" version="1.4" url="http://java.sun.com/j2se/1.4/download.html" />
+  <dependency type="3rdparty" name="Java 2 Platform, Standard Edition" version="1.4" url="http://java.sun.com/j2se/1.4/download.html" />
   <dependency type="3rdparty" name="JUnit Testing Framework" version="3.7" url="http://sourceforge.net/projects/junit/" />
   <dependency type="3rdparty" name="Styler ANT Task" version="1.0" url="http://www.langdale.com.au/styler/" />
   <dependency type="3rdparty" name="MySQL JDBC driver" version="2.0.11" url="http://sourceforge.net/projects/mmmysql/" />
