@@ -32,9 +32,14 @@ import javax.swing.*;
 
 import java.util.*;
 import java.beans.*;
+import java.awt.Toolkit;
 import java.awt.event.*;
 
+import com.cosylab.vdct.Console;
+import com.cosylab.vdct.VisualDCT;
+import com.cosylab.vdct.graphics.DrawingSurface;
 import com.cosylab.vdct.graphics.objects.Debuggable;
+import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.objects.Record;
 import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.plugin.*;
@@ -48,7 +53,7 @@ import com.cosylab.vdct.vdb.VDBRecordData;
  */
 public class DebugStartMenu extends JMenu implements PluginListener
 {
-	private class DebugPluginMenuItem extends JMenuItem implements PropertyChangeListener, ActionListener
+	private class DebugPluginMenuItem extends JMenuItem implements PropertyChangeListener, ActionListener, Runnable
 	{
 /**
  * Insert the method's description here.
@@ -67,53 +72,106 @@ public void actionPerformed(ActionEvent event)
 	{
 
 		if (PluginDebugManager.getDebugPlugin()!=null)
-			DebugStopMenuItem.stopDebugging();
+		{
+			Console.getInstance().println("Debug pluging '" + PluginDebugManager.getDebugPlugin().getName()+ "' is already running, stop it first...");
+			Toolkit.getDefaultToolkit().beep();
+			return;
+		}
 		
 		DebugPlugin debugPlugin = (DebugPlugin)plugin.getPlugin();
 		PluginDebugManager.setDebugPlugin(debugPlugin);
 		PluginDebugManager.setDebugState(true);
 		debugPlugin.startDebugging();
-
-		/// for the time being fields in the current group are registered
-		/// all new (or deleted) filed are not updated
-		// if field has InspectableProperty.ALWAYS_VISIBLE visibility then is is monitored
-		// (otherwise only remote value is retrieved) - it took to mich time
-		// VAL fields is always registered
-		final String valFieldName = "VAL";
-		com.cosylab.vdct.graphics.objects.Group group = com.cosylab.vdct.graphics.DrawingSurface.getInstance().getViewGroup();
-		Enumeration e = group.getSubObjectsV().elements();
-		while (e.hasMoreElements())
-		{
-			Object obj = e.nextElement();
-			if (obj instanceof com.cosylab.vdct.graphics.objects.Record)
-			{
-				VDBRecordData rec = ((Record)obj).getRecordData();
-				Enumeration e2 = rec.getFieldsV().elements();
-				while (e2.hasMoreElements())
-				{
-					VDBFieldData field = (VDBFieldData)e2.nextElement();
-					//if (!field.equals(valFieldName))
-						if (field.getVisibility() == InspectableProperty.ALWAYS_VISIBLE && !field.equals(valFieldName))
-							debugPlugin.registerMonitor(field);
-							
-						/*
-						{
-							String debugValue = debugPlugin.getValue(field.getFullName());
-							if (debugValue != null)
-								field.setDebugValue(debugValue);
-						}
-						*/
-				}
-
-				// always register VAL field
-				Debuggable valField = (Debuggable)rec.getField(valFieldName);
-				if (valField != null)
-					debugPlugin.registerMonitor(valField);
-					
-			}
-		}
+	
+		new Thread(this).start();
 	}
 }
+
+
+public void run()
+{
+
+	DebugPlugin debugPlugin = PluginDebugManager.getDebugPlugin();
+	
+
+	// all new (or deleted) filed are not updated
+	// if field has InspectableProperty.ALWAYS_VISIBLE visibility then is is monitored
+	// (otherwise only remote value is retrieved) - removed, it took to much time
+	// VAL fields is always registered
+	final String valFieldName = "VAL";
+
+	Group group = com.cosylab.vdct.graphics.DrawingSurface.getInstance().getViewGroup();
+	//Group group = Group.getRoot();
+
+	int progress = 0;
+	ProgressMonitor progressMonitor = new ProgressMonitor(VisualDCT.getInstance(),
+								"Connecting to PVs",
+								"Initializing...", 0, group.getSubObjectsV().size());
+	progressMonitor.setProgress(0);
+
+	Enumeration e = group.getSubObjectsV().elements();
+	while (e.hasMoreElements() && !progressMonitor.isCanceled())
+	{
+		Object obj = e.nextElement();
+		if (obj instanceof com.cosylab.vdct.graphics.objects.Record)
+		{
+			VDBRecordData rec = ((Record)obj).getRecordData();
+			Enumeration e2 = rec.getFieldsV().elements();
+			while (e2.hasMoreElements() && !progressMonitor.isCanceled())
+			{
+				VDBFieldData field = (VDBFieldData)e2.nextElement();
+					
+				//if (!field.equals(valFieldName))
+					if (field.getVisibility() == InspectableProperty.ALWAYS_VISIBLE && !field.equals(valFieldName))
+					{
+						progressMonitor.setNote("Connecting to "+field.getFullName()+"...");
+						debugPlugin.registerMonitor(field);
+					}
+							
+					/*
+					{
+						String debugValue = debugPlugin.getValue(field.getFullName());
+						if (debugValue != null)
+							field.setDebugValue(debugValue);
+					}
+					*/
+			}
+
+			if (progressMonitor.isCanceled())
+				break;
+
+			// always register VAL field
+			Debuggable valField = (Debuggable)rec.getField(valFieldName);
+			if (valField != null)
+			{
+				progressMonitor.setNote("Connecting to "+valField.getFullName()+"...");
+				debugPlugin.registerMonitor(valField);
+			}
+					
+		}
+			
+		progress++;
+		progressMonitor.setProgress(progress);
+			
+	}
+		
+	if (progressMonitor.isCanceled())
+	{
+		Console.getInstance().println("Debugging canceled.");
+		debugPlugin.deregisterAll();
+		debugPlugin.stopDebugging();
+		PluginDebugManager.setDebugState(false);
+		PluginDebugManager.setDebugPlugin(null);
+		Group.getRoot().unconditionalValidateSubObjects(false);
+	}
+
+	progressMonitor.close();
+
+	Group.getRoot().unconditionalValidateSubObjects(false);
+	DrawingSurface.getInstance().repaint();
+
+}
+	
 
 /**
  * Insert the method's description here.

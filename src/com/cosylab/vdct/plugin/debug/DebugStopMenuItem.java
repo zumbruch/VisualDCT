@@ -30,8 +30,11 @@ package com.cosylab.vdct.plugin.debug;
 
 import javax.swing.*;
 
-import java.util.*;
+import com.cosylab.vdct.graphics.DrawingSurface;
+import com.cosylab.vdct.graphics.objects.Group;
+
 import java.awt.event.*;
+import java.util.Enumeration;
 
 /**
  * Insert the class' description here.
@@ -70,10 +73,10 @@ public static void stopDebugging()
 		PluginDebugManager.setDebugState(false);
 		PluginDebugManager.setDebugPlugin(null);
 
-		/// !!! to be reimplemented
-		/// for the time being ALL fields in the current group are updated
-		/// current group can be different from the debugging!!!
-		com.cosylab.vdct.graphics.objects.Group group = com.cosylab.vdct.graphics.DrawingSurface.getInstance().getViewGroup();
+
+		
+		// update all fields
+		Group group = DrawingSurface.getInstance().getViewGroup();
 		Enumeration e = group.getSubObjectsV().elements();
 		while (e.hasMoreElements())
 		{
@@ -87,7 +90,10 @@ public static void stopDebugging()
 					
 			}
 		}
-		
+
+		Group.getRoot().unconditionalValidateSubObjects(false);
+		DrawingSurface.getInstance().repaint();
+
 	}
 }
 }
