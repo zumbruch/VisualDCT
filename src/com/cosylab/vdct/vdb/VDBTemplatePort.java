@@ -87,8 +87,9 @@ public class VDBTemplatePort extends VDBFieldData implements Descriptable, Chang
 			return "(undefined)"+com.cosylab.vdct.Constants.FIELD_SEPARATOR+port.getName();
 		else
 		{
-			return VDBTemplateInstance.applyProperties(port.getPortDefinition(templateInstance.getName()),
-														templateInstance.getProperties());
+			/*return VDBTemplateInstance.applyProperties(port.getPortDefinition(templateInstance.getName()),
+														templateInstance.getProperties());*/
+			return port.getPortDefinition(templateInstance.getName());
 		}
 	}
 
