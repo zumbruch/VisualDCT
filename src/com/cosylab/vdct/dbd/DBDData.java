@@ -122,6 +122,11 @@ public boolean consistencyCheck(com.cosylab.vdct.db.DBData db) {
 				dbdField = dbdRecord.getDBDFieldData(dbField.getName());
 				if (dbdField!=null) {
 
+					// case when visual data is applied on non-existing (defined) field
+					// aloww this
+					if (dbField.getValue() == null)
+						continue;
+
 					// device check
 					if (dbdField.getField_type() == DBDConstants.DBF_DEVICE) {
 						dev = dbRecord.getRecord_type()+"/"+dbField.getValue();
