@@ -45,7 +45,7 @@ import com.cosylab.vdct.events.*;
 import com.cosylab.vdct.util.*;
 
 /**
- * @author ssah
+ * @author ssah, msekoran
  *
  * To change this generated comment edit the template variable "typecomment":
  * Window>Preferences>Java>Templates.
@@ -732,6 +732,15 @@ public VisibleObject intersects(int px, int py) {
 		((getRy()+getRheight())>=py))
 		spotted = this;
 	return spotted;
+}
+
+/**
+ * Returns the border.
+ * @return boolean
+ */
+public boolean isBorder()
+{
+	return border;
 }
 
 }

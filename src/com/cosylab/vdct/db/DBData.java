@@ -36,6 +36,9 @@ import java.util.*;
  * This type was created in VisualAge.
  */
 public class DBData {
+	protected Hashtable lines = null;
+	protected Hashtable boxes = null;
+	protected Hashtable textboxes = null;
 	protected Hashtable records = null;
 	protected Vector recordsV = null;			// ordered
 	protected Hashtable groups = null;
@@ -54,6 +57,9 @@ public DBData() {
 	connectors = new Hashtable();
 	templates = new Hashtable();
 	templateInstances = new Hashtable();
+	lines = new Hashtable();
+	boxes = new Hashtable();
+	textboxes = new Hashtable();
 }
 /**
  * Insert the method's description here.
@@ -80,6 +86,34 @@ public void addLink(DBLinkData ld) {
 	if (!links.containsKey(ld.getFieldName()))
 		links.put(ld.getFieldName(), ld);
 }
+
+/**
+ * This method was created in VisualAge.
+ * @param ld com.cosylab.vdct.db.DBLine
+ */
+public void addLine(DBLine ld) {
+	if (!lines.containsKey(ld.getName()))
+		lines.put(ld.getName(), ld);
+}
+
+/**
+ * This method was created in VisualAge.
+ * @param ld com.cosylab.vdct.db.DBBox
+ */
+public void addBox(DBBox bd) {
+	if (!boxes.containsKey(bd.getName()))
+		boxes.put(bd.getName(), bd);
+}
+
+/**
+ * This method was created in VisualAge.
+ * @param ld com.cosylab.vdct.db.DBTextBox
+ */
+public void addTextBox(DBTextBox td) {
+	if (!textboxes.containsKey(td.getName()))
+		textboxes.put(td.getName(), td);
+}
+
 /**
  * This method was created in VisualAge.
  * @param rd com.cosylab.vdct.db.RecordData
@@ -200,5 +234,32 @@ public Hashtable getTemplates()
 {
 	return templates;
 }
+
+	/**
+	 * Returns the boxes.
+	 * @return Hashtable
+	 */
+	public Hashtable getBoxes()
+	{
+		return boxes;
+	}
+
+	/**
+	 * Returns the lines.
+	 * @return Hashtable
+	 */
+	public Hashtable getLines()
+	{
+		return lines;
+	}
+
+	/**
+	 * Returns the textboxes.
+	 * @return Hashtable
+	 */
+	public Hashtable getTextboxes()
+	{
+		return textboxes;
+	}
 
 }

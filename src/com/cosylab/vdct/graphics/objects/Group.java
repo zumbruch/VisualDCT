@@ -1208,6 +1208,11 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
  final String VISIBILITY_START= "#! "+DBResolver.VDCTVISIBILITY+"(";
  final String LINK_START      = "#! "+DBResolver.VDCTLINK+"(";
  final String CONNECTOR_START = "#! "+DBResolver.VDCTCONNECTOR+"(";
+
+ final String LINE_START = "#! "+DBResolver.VDCTLINE+"(";
+ final String BOX_START = "#! "+DBResolver.VDCTBOX+"(";
+ final String TEXTBOX_START = "#! "+DBResolver.VDCTTEXTBOX+"(";
+
  final String TEMPLATE_START  = "#! "+DBResolver.TEMPLATE_INSTANCE+"(";
  final String TEMPLATE_PROPERTY_START  = "#! "+DBResolver.TEMPLATE_PROPERTY+"(";
  final String TEMPLATE_VALUE_START     = "#! "+DBResolver.TEMPLATE_VALUE+"(";
@@ -1229,7 +1234,7 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 				 	comma + StringUtils.boolean2str(record.isRight()) +
 					comma + quote + 
 					namer.getResolvedName(record.getDescription()) + 
-					quote +	")\n");
+					quote +	ending);
 
 	 			e2 = record.getSubObjectsV().elements();
 	 			while (e2.hasMoreElements())
@@ -1309,6 +1314,51 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 					 comma + quote /*+ connector.getDescription() */+ quote +
 					 ending);
 			 	 group.writeVDCTData(file, namer, export);
+	 		}
+ 	 	else if (obj instanceof Line)
+ 	 		{
+			 	 Line line = (Line)obj;
+			 	 file.writeBytes(LINE_START+
+ 					StringUtils.quoteIfMacro(
+	 					namer.getResolvedName(line.getName())
+		 			 ) +
+		 			 comma + line.getStartVertex().getX() + comma + line.getStartVertex().getY() +
+		 			 comma + line.getEndVertex().getX() + comma + line.getEndVertex().getY() + 
+				 	 comma + StringUtils.boolean2str(line.getDashed()) +
+				 	 comma + StringUtils.boolean2str(line.getStartArrow()) +
+				 	 comma + StringUtils.boolean2str(line.getEndArrow()) +
+				 	 comma + StringUtils.color2string(line.getColor()) +
+					 ending);
+	 		}
+ 	 	else if (obj instanceof Box)
+ 	 		{
+			 	 Box box = (Box)obj;
+			 	 file.writeBytes(BOX_START+
+ 					StringUtils.quoteIfMacro(
+	 					namer.getResolvedName(box.getName())
+		 			 ) +
+		 			 comma + box.getStartVertex().getX() + comma + box.getStartVertex().getY() +
+		 			 comma + box.getEndVertex().getX() + comma + box.getEndVertex().getY() + 
+				 	 comma + StringUtils.boolean2str(box.getIsDashed()) +
+				 	 comma + StringUtils.color2string(box.getColor()) +
+					 ending);
+	 		}
+
+ 	 	else if (obj instanceof TextBox)
+ 	 		{
+			 	 TextBox box = (TextBox)obj;
+			 	 file.writeBytes(TEXTBOX_START+
+ 					StringUtils.quoteIfMacro(
+	 					namer.getResolvedName(box.getName())
+		 			 ) +
+		 			 comma + box.getStartVertex().getX() + comma + box.getStartVertex().getY() +
+		 			 comma + box.getEndVertex().getX() + comma + box.getEndVertex().getY() + 
+				 	 comma + StringUtils.boolean2str(box.isBorder()) +
+					 comma + quote + box.getFont().getFontName() + quote +	
+					 comma + box.getFont().getSize() +	
+				 	 comma + StringUtils.color2string(box.getColor()) +
+					 comma + quote + box.getDescription() + quote +			//!! new lines, quotes
+					 ending);
 	 		}
 
  	 	else if (obj instanceof Template)

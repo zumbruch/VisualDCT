@@ -37,7 +37,7 @@ import com.cosylab.vdct.util.StringUtils;
  * This type was created in VisualAge.
  */
 public class DBResolver {
-	private static final String errorString = "Invalid VisualDCT layout data..."; 
+	private static final String errorString = "Invalid VisualDCT visual data..."; 
 
 	private static final String nullString = "";
 
@@ -76,6 +76,13 @@ public class DBResolver {
 	public static final String VDCTLINK = "Link";
 	public static final String VDCTVISIBILITY = "Visibility";
 	public static final String VDCTCONNECTOR = "Connector";
+
+	// used format #! Line(name, xpos, ypos, xpos2, ypos2, dashed, startArrow, endArrow, color)
+	// used format #! Box(name, xpos, ypos, xpos2, ypos2, dashed, color)
+	// used format #! TextBox(name, xpos, ypos, xpos2, ypos2, border, fontName, fontSize, color, "description")
+	public static final String VDCTLINE = "Line";
+	public static final String VDCTBOX = "Box";
+	public static final String VDCTTEXTBOX = "TextBox";
 
 	// incoded DBDs
  	// used format:
@@ -202,7 +209,7 @@ public static String processComment(DBData rootData, StreamTokenizer tokenizer, 
 
 	 DBRecordData rd;
 	 DBFieldData fd;
- 	 String str, str2, desc; int t, tx, tx2, ty;
+ 	 String str, str2, desc; int t, tx, tx2, ty, ty2, t2;
  	 boolean r1, r2;
 
  	 while ((tokenizer.nextToken() != tokenizer.TT_EOL) &&
@@ -588,6 +595,155 @@ public static String processComment(DBData rootData, StreamTokenizer tokenizer, 
 				else if (templateData!=null && tokenizer.sval.equalsIgnoreCase(TEMPLATE_END)) {
 					data = rootData;
 					templateEnd(data);
+				}
+				else if (tokenizer.sval.equalsIgnoreCase(VDCTLINE)) {
+					// read template name
+					tokenizer.nextToken();
+					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+						(tokenizer.ttype == DBConstants.quoteChar)) str=tokenizer.sval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+					
+					// read x pos
+					tokenizer.nextToken();
+					if (tokenizer.ttype == tokenizer.TT_NUMBER) tx=(int)tokenizer.nval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+					
+					// read y pos
+					tokenizer.nextToken();
+					if (tokenizer.ttype == tokenizer.TT_NUMBER) ty=(int)tokenizer.nval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					// read x2 pos
+					tokenizer.nextToken();
+					if (tokenizer.ttype == tokenizer.TT_NUMBER) tx2=(int)tokenizer.nval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+					
+					// read y2 pos
+					tokenizer.nextToken();
+					if (tokenizer.ttype == tokenizer.TT_NUMBER) ty2=(int)tokenizer.nval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					// read dashed
+					boolean dashed = false;
+					tokenizer.nextToken();
+					if (tokenizer.ttype == tokenizer.TT_NUMBER) dashed=((int)tokenizer.nval)!=0;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					// read startArrow
+					boolean startArrow = false;
+					tokenizer.nextToken();
+					if (tokenizer.ttype == tokenizer.TT_NUMBER) startArrow=((int)tokenizer.nval)!=0;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					// read endArrow
+					boolean endArrow = false;
+					tokenizer.nextToken();
+					if (tokenizer.ttype == tokenizer.TT_NUMBER) endArrow=((int)tokenizer.nval)!=0;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					// read color
+					tokenizer.nextToken();
+					if (tokenizer.ttype == tokenizer.TT_NUMBER) t=(int)tokenizer.nval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					data.addLine(new DBLine(str, tx, ty, tx2, ty2, dashed, startArrow, endArrow, StringUtils.int2color(t)));
+				}
+				else if (tokenizer.sval.equalsIgnoreCase(VDCTBOX)) {
+					// read template name
+					tokenizer.nextToken();
+					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+						(tokenizer.ttype == DBConstants.quoteChar)) str=tokenizer.sval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+					
+					// read x pos
+					tokenizer.nextToken();
+					if (tokenizer.ttype == tokenizer.TT_NUMBER) tx=(int)tokenizer.nval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+					
+					// read y pos
+					tokenizer.nextToken();
+					if (tokenizer.ttype == tokenizer.TT_NUMBER) ty=(int)tokenizer.nval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					// read x2 pos
+					tokenizer.nextToken();
+					if (tokenizer.ttype == tokenizer.TT_NUMBER) tx2=(int)tokenizer.nval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+					
+					// read y2 pos
+					tokenizer.nextToken();
+					if (tokenizer.ttype == tokenizer.TT_NUMBER) ty2=(int)tokenizer.nval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					// read dashed
+					boolean dashed = false;
+					tokenizer.nextToken();
+					if (tokenizer.ttype == tokenizer.TT_NUMBER) dashed=((int)tokenizer.nval)!=0;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					// read color
+					tokenizer.nextToken();
+					if (tokenizer.ttype == tokenizer.TT_NUMBER) t=(int)tokenizer.nval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					data.addBox(new DBBox(str, tx, ty, tx2, ty2, dashed, StringUtils.int2color(t)));
+				}
+				else if (tokenizer.sval.equalsIgnoreCase(VDCTTEXTBOX)) {
+					// read template name
+					tokenizer.nextToken();
+					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+						(tokenizer.ttype == DBConstants.quoteChar)) str=tokenizer.sval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+					
+					// read x pos
+					tokenizer.nextToken();
+					if (tokenizer.ttype == tokenizer.TT_NUMBER) tx=(int)tokenizer.nval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+					
+					// read y pos
+					tokenizer.nextToken();
+					if (tokenizer.ttype == tokenizer.TT_NUMBER) ty=(int)tokenizer.nval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					// read x2 pos
+					tokenizer.nextToken();
+					if (tokenizer.ttype == tokenizer.TT_NUMBER) tx2=(int)tokenizer.nval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+					
+					// read y2 pos
+					tokenizer.nextToken();
+					if (tokenizer.ttype == tokenizer.TT_NUMBER) ty2=(int)tokenizer.nval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					// read border
+					boolean border = false;
+					tokenizer.nextToken();
+					if (tokenizer.ttype == tokenizer.TT_NUMBER) border=((int)tokenizer.nval)!=0;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					// read fontName
+					tokenizer.nextToken();
+					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+						(tokenizer.ttype == DBConstants.quoteChar)) str2=tokenizer.sval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					// read fontSize pos
+					tokenizer.nextToken();
+					if (tokenizer.ttype == tokenizer.TT_NUMBER) t2=(int)tokenizer.nval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					// read color
+					tokenizer.nextToken();
+					if (tokenizer.ttype == tokenizer.TT_NUMBER) t=(int)tokenizer.nval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					// read description
+					tokenizer.nextToken();
+					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+						(tokenizer.ttype == DBConstants.quoteChar)) desc=tokenizer.sval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					data.addTextBox(new DBTextBox(str, tx, ty, tx2, ty2, border, str2, t2, StringUtils.int2color(t), desc));
 				}
 				else if (tokenizer.sval.equalsIgnoreCase(VDCTSKIP)) {
 
