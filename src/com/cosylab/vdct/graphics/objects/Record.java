@@ -1122,6 +1122,9 @@ public boolean morph(java.lang.String newType) {
 	
 	setRecordData(recordData);
 		
+	// update inspector
+	InspectorManager.getInstance().updateObject(this);
+	
 	return true;
 }
 
