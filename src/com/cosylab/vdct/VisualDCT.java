@@ -166,6 +166,16 @@ public class VisualDCT extends JFrame {
 	private JMenuItem ivjPrintAsPostScriptMenuItem = null;
 	private JMenuItem ivjExportPostScriptFileMenuItem = null;
 
+	private JButton lineButton = null;
+	private JButton boxButton = null;
+	private JButton textBoxButton = null;
+	private boolean lineButtonEnabled = false;
+	private boolean boxButtonEnabled = false;
+	private boolean textBoxButtonEnabled = false;
+
+// shp: not final solution
+	private static VisualDCT instance = null;
+
 class IvjEventHandler implements java.awt.event.ActionListener, java.awt.event.ItemListener, java.awt.event.KeyListener, java.awt.event.MouseListener, java.awt.event.MouseMotionListener, java.awt.event.WindowListener {
 		public void actionPerformed(java.awt.event.ActionEvent e) {
 			if (e.getSource() == VisualDCT.this.getLeftMenuItem())
@@ -285,7 +295,13 @@ class IvjEventHandler implements java.awt.event.ActionListener, java.awt.event.I
 				connEtoC64(e);
 			else if (e.getSource() == VisualDCT.this.getPrintAsPostScriptMenuItem()) 
 				connEtoC65(e);
-				
+			else if (e.getSource() == VisualDCT.this.getLineButton()) 
+				lineButton_ActionPerformed();
+			else if (e.getSource() == VisualDCT.this.getBoxButton()) 
+				boxButton_ActionPerformed();
+			else if (e.getSource() == VisualDCT.this.getTextBoxButton()) 
+				textBoxButton_ActionPerformed();
+
 		};
 		public void itemStateChanged(java.awt.event.ItemEvent e) {
 			if (e.getSource() == VisualDCT.this.getShow_PointsMenuItem()) 
@@ -346,6 +362,9 @@ class IvjEventHandler implements java.awt.event.ActionListener, java.awt.event.I
 public VisualDCT() {
 	super();
 	initialize();
+
+// shp: not final solution
+	instance = this;
 }
 /**
  * VisualDCT constructor comment.
@@ -353,6 +372,9 @@ public VisualDCT() {
  */
 public VisualDCT(String title) {
 	super(title);
+
+// shp: not final solution
+	instance = this;
 }
 /**
  * Comment
@@ -367,6 +389,15 @@ public void base_ViewMenuItem_ActionPerformed() {
 public void books_OnlineMenuItem_ActionPerformed() {
 	return;
 }
+
+public void boxButton_ActionPerformed()
+{
+	if(boxButtonEnabled)
+		setBoxButtonEnabled(false);
+	else
+		setBoxButtonEnabled(true);
+}
+
 /**
  * connEtoC1:  (ToolbarMenuItem.action.actionPerformed(java.awt.event.ActionEvent) --> VisualDCT.viewToolBar()V)
  * @param arg1 java.awt.event.ActionEvent
@@ -2008,6 +2039,30 @@ private com.cosylab.vdct.graphics.BorderDecorator getborder() {
 	}
 	return ivjborder;
 }
+
+private javax.swing.JButton getBoxButton() {
+	if (boxButton == null) {
+		try {
+			boxButton = new javax.swing.JButton();
+			boxButton.setName("BoxButton");
+			boxButton.setToolTipText("Box");
+			boxButton.setText("");
+			boxButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+			boxButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+			boxButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/boxn.gif")));
+			boxButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
+		} catch (java.lang.Throwable ivjExc) {
+			handleException(ivjExc);
+		}
+	}
+	return boxButton;
+}
+
+public boolean getBoxButtonEnabled()
+{
+	return boxButtonEnabled;
+}
+
 /**
  * Return the ButtonPanel property value.
  * @return javax.swing.JPanel
@@ -2165,6 +2220,7 @@ private com.cosylab.vdct.graphics.DrawingSurface getcanvas() {
 	}
 	return ivjcanvas;
 }
+
 /**
  * Return the CopyButton property value.
  * @return javax.swing.JButton
@@ -2522,6 +2578,7 @@ private javax.swing.JCheckBoxMenuItem getFlat_ViewMenuItem() {
 	}
 	return ivjFlat_ViewMenuItem;
 }
+
 /**
  * Return the GroupDialog property value.
  * @return javax.swing.JDialog
@@ -2724,6 +2781,11 @@ private javax.swing.JMenuItem getImport_DBMenuItem() {
 		}
 	}
 	return ivjImport_DBMenuItem;
+}
+// shp: not final solution
+public static VisualDCT getInstance()
+{
+	return instance;
 }
 /**
  * Return the JDialogContentPane property value.
@@ -3159,6 +3221,30 @@ private javax.swing.JMenuItem getLevel_UpMenuItem() {
 		}
 	}
 	return ivjLevel_UpMenuItem;
+}
+
+private javax.swing.JButton getLineButton() {
+	if (lineButton == null) {
+		try {
+			lineButton = new javax.swing.JButton();
+			lineButton.setName("LineButton");
+			lineButton.setToolTipText("Line");
+			lineButton.setText("");
+			lineButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+			lineButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+			lineButton.setIcon(
+					new javax.swing.ImageIcon(getClass().getResource("/images/linen.gif")));
+			lineButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
+		} catch (java.lang.Throwable ivjExc) {
+			handleException(ivjExc);
+		}
+	}
+	return lineButton;
+}
+
+public boolean getLineButtonEnabled()
+{
+	return lineButtonEnabled;
 }
 /**
  * Return the Move_RenameMenuItem property value.
@@ -4123,6 +4209,29 @@ private com.cosylab.vdct.plugin.debug.DebugStopMenuItem getStopDebugMenuItem() {
 	}
 	return ivjStopDebugMenuItem;
 }
+
+private javax.swing.JButton getTextBoxButton() {
+	if (textBoxButton == null) {
+		try {
+			textBoxButton = new javax.swing.JButton();
+			textBoxButton.setName("TextBoxButton");
+			textBoxButton.setToolTipText("Box");
+			textBoxButton.setText("");
+			textBoxButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+			textBoxButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+			textBoxButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/textboxn.gif")));
+			textBoxButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
+		} catch (java.lang.Throwable ivjExc) {
+			handleException(ivjExc);
+		}
+	}
+	return textBoxButton;
+}
+
+public boolean getTextBoxButtonEnabled()
+{
+	return textBoxButtonEnabled;
+}
 /**
  * Return the ToolbarMenuItem property value.
  * @return javax.swing.JCheckBoxMenuItem
@@ -4166,6 +4275,10 @@ private javax.swing.JToolBar getToolBarPane() {
 			ivjToolBarPane.add(getCutButton());
 			ivjToolBarPane.add(getCopyButton());
 			ivjToolBarPane.add(getPasteButton());
+			ivjToolBarPane.add(getLineButton());
+			ivjToolBarPane.add(getBoxButton());
+			ivjToolBarPane.add(getTextBoxButton());
+
 			// user code begin {1}
 			ivjToolBarPane.setFloatable(false);
 			// user code end
@@ -4836,6 +4949,10 @@ private void initConnections() throws java.lang.Exception {
 	getExportPostScriptFileMenuItem().addActionListener(ivjEventHandler);
 	getPrintAsPostScriptMenuItem().addActionListener(ivjEventHandler);
 
+	getLineButton().addActionListener(ivjEventHandler);
+	getBoxButton().addActionListener(ivjEventHandler);
+	getTextBoxButton().addActionListener(ivjEventHandler);
+
 	connPtoP1SetTarget();
 	connPtoP2SetTarget();
 }
@@ -4877,6 +4994,15 @@ public void level_UpMenuItem_ActionPerformed() {
 	GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
     cmd.getGUIMenuInterface().levelUp();
 }
+
+public void lineButton_ActionPerformed()
+{
+	if(lineButtonEnabled)
+		setLineButtonEnabled(false);
+	else
+		setLineButtonEnabled(true);
+}
+
 /**
  * Starts the application.
  * main entrypoint - starts the part when it is run as an application
@@ -4981,6 +5107,7 @@ public static void main(java.lang.String[] args) {
 		});
 		
 		aVisualDCT.setVisible(true);
+
 	} catch (Throwable exception) {
 		System.err.println("Exception occurred in main() of VisualDCT");
 		exception.printStackTrace(System.out);
@@ -5761,6 +5888,22 @@ public void select_AllMenuItem_ActionPerformed() {
     GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
     cmd.getGUIMenuInterface().selectAll();
 }
+
+public void setBoxButtonEnabled(boolean parBoxButtonEnabled)
+{
+	if(parBoxButtonEnabled != boxButtonEnabled)
+	{
+		boxButtonEnabled = parBoxButtonEnabled;
+
+		if(boxButtonEnabled)
+		{
+			validateGraphicsButtons(boxButton);
+			boxButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/boxs.gif")));
+		}
+		else
+			boxButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/boxn.gif")));
+	}
+}
 /**
  * Insert the method's description here.
  * Creation date: (29.4.2001 11:17:11)
@@ -5793,6 +5936,22 @@ public void setFileInTitle(String fileName) {
 	setTitle("VisualDCT - ["+fileName+"]");
 	addedToTitle =  " - ["+fileName+"]";
 }
+
+public void setLineButtonEnabled(boolean parLineButtonEnabled)
+{
+	if(parLineButtonEnabled != lineButtonEnabled)
+	{
+		lineButtonEnabled = parLineButtonEnabled;
+
+		if(lineButtonEnabled)
+		{
+			validateGraphicsButtons(lineButton);
+			lineButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/lines.gif")));
+		}
+		else
+			lineButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/linen.gif")));
+	}
+}
 /**
  * Insert the method's description here.
  * Creation date: (29.12.2000 12:43:58)
@@ -5801,6 +5960,22 @@ public void setFileInTitle(String fileName) {
 public void setScale(double scale) {
 	getZoomSlider().setValue((int)(scale*100+0.5));
 	zoomSlider_updateLabel();
+}
+
+public void setTextBoxButtonEnabled(boolean parTextBoxButtonEnabled)
+{
+	if(parTextBoxButtonEnabled != textBoxButtonEnabled)
+	{
+		textBoxButtonEnabled = parTextBoxButtonEnabled;
+
+		if(textBoxButtonEnabled)
+		{
+			validateGraphicsButtons(textBoxButton);
+			textBoxButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/textboxs.gif")));
+		}
+		else
+			textBoxButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/textboxn.gif")));
+	}
 }
 /**
  * Comment
@@ -5868,6 +6043,14 @@ public void snapToGridMenuItem_ItemStateChanged(java.awt.event.ItemEvent itemEve
 public void statusbarMenuItem_ActionPerformed() {
 	Settings.getInstance().setStatusbar(getStatusbarMenuItem().isSelected());
 }
+
+public void textBoxButton_ActionPerformed()
+{
+	if(textBoxButtonEnabled)
+		setTextBoxButtonEnabled(false);
+	else
+		setTextBoxButtonEnabled(true);
+}
 /**
  * Comment
  */
@@ -5888,6 +6071,17 @@ public void ungroupMenuItem_ActionPerformed() {
     GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
  	cmd.getGUIMenuInterface().ungroup();
 }
+
+private void validateGraphicsButtons(JButton clickedButton)
+{
+	if((boxButton != clickedButton) && (boxButtonEnabled))
+		setBoxButtonEnabled(false);
+	if((lineButton != clickedButton) && (lineButtonEnabled))
+		setLineButtonEnabled(false);
+	if((textBoxButton != clickedButton) && (textBoxButtonEnabled))
+		setTextBoxButtonEnabled(false);
+}
+
 public void viewStatusBar() {
 	/* Hide or show the statusbar */
 	getStatusBarPane().setVisible(getStatusbarMenuItem().isSelected());

@@ -1,5 +1,7 @@
 package com.cosylab.vdct.graphics;
 
+import com.cosylab.vdct.graphics.objects.*;
+
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
  * All rights reserved.
@@ -55,5 +57,14 @@ java.lang.String checkRecordName(String name, boolean relative);
  * @param type java.lang.String
  * @param relative boolean
  */
+
+BoxVertex createBoxVertex(BoxVertex partnerVertex);
+
+LineVertex createLineVertex(LineVertex partnerVertex);
+
+TextBox createTextBox(TextBoxVertex startVertex, TextBoxVertex endVertex);
+
+TextBoxVertex createTextBoxVertex(TextBoxVertex partnerVertex);
+
 void createRecord(String name, String type, boolean relative);
 }
