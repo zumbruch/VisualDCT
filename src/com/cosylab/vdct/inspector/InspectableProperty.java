@@ -1,5 +1,6 @@
 package com.cosylab.vdct.inspector;
 
+import java.awt.Component;
 import java.util.regex.Pattern;
 
 /**
@@ -120,4 +121,12 @@ public String getToolTipText();
  * @return int
  */
 public int getVisibility();
+/**
+ * Insert the method's description here.
+ * Creation date: (11.1.2001 21:30:04)
+ * @param java.awt.Component
+ * @param x
+ * @param y
+ */
+public void popupEvent(Component component, int x, int y);
 }

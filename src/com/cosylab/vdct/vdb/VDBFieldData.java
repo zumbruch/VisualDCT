@@ -38,6 +38,7 @@ import com.cosylab.vdct.graphics.objects.Debuggable;
 import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.objects.Record;
 
+import java.awt.Component;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -484,6 +485,16 @@ public void setVisibility(int visibility)
 	this.visibility = visibility;
 	if (record!=null) record.fieldValueChanged(this);
 	//updateInspector();
+}
+/**
+ * Insert the method's description here.
+ * Creation date: (11.1.2001 21:30:04)
+ * @param java.awt.Component
+ * @param x
+ * @param y
+ */
+public void popupEvent(Component component, int x, int y)
+{
 }
 
 }

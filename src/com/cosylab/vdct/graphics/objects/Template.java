@@ -28,7 +28,10 @@ package com.cosylab.vdct.graphics.objects;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -42,8 +45,11 @@ import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.graphics.popup.Popupable;
 import com.cosylab.vdct.inspector.Inspectable;
 import com.cosylab.vdct.inspector.InspectableProperty;
+import com.cosylab.vdct.inspector.InspectorManager;
 import com.cosylab.vdct.vdb.GUISeparator;
 import com.cosylab.vdct.vdb.LinkProperties;
+import com.cosylab.vdct.vdb.MonitoredProperty;
+import com.cosylab.vdct.vdb.MonitoredPropertyListener;
 import com.cosylab.vdct.vdb.NameValueInfoProperty;
 import com.cosylab.vdct.vdb.VDBFieldData;
 import com.cosylab.vdct.vdb.VDBTemplateField;
@@ -55,7 +61,7 @@ import com.cosylab.vdct.vdb.VDBTemplateInstance;
  */
 public class Template
 	extends LinkManagerObject
-	implements Descriptable, Movable, Inspectable, Popupable, Flexible, Selectable, Clipboardable, Hub
+	implements Descriptable, Movable, Inspectable, Popupable, Flexible, Selectable, Clipboardable, Hub, MonitoredPropertyListener
 {
 
 	VDBTemplateInstance templateData = null;
@@ -435,7 +441,7 @@ public class Template
 		{
 			String name = e.nextElement().toString();
 				// !!!
-			items.addElement(new NameValueInfoProperty(name, templateData.getProperties().get(name).toString()));
+			items.addElement(new MonitoredProperty(name, (String)templateData.getProperties().get(name), this));
 		}
 	
 		InspectableProperty[] properties = new InspectableProperty[items.size()];
@@ -755,5 +761,37 @@ public VDBFieldData getField(String name) {
 	return field;
 }
 
+
+/**
+ * @see com.cosylab.vdct.vdb.MonitoredPropertyListener#addProperty()
+ */
+public void addProperty()
+{
+}
+
+/**
+ * @see com.cosylab.vdct.vdb.MonitoredPropertyListener#propertyChanged(MonitoredProperty)
+ */
+public void propertyChanged(MonitoredProperty property)
+{
+	templateData.getProperties().put(property.getName(), property.getValue());
+
+	InspectorManager.getInstance().updateProperty(this, null);
+	unconditionalValidation();
+	com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+}
+
+/**
+ * @see com.cosylab.vdct.vdb.MonitoredPropertyListener#removeProperty(MonitoredProperty)
+ */
+public void removeProperty(MonitoredProperty property)
+{
+	templateData.getProperties().remove(property.getName());
+
+	InspectorManager.getInstance().updateObject(this);
+	unconditionalValidation();
+	com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+	
+}
 
 }

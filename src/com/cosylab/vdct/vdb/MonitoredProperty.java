@@ -29,7 +29,13 @@ package com.cosylab.vdct.vdb;
  */
 
 import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.regex.Pattern;
+
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.Popup;
 
 import com.cosylab.vdct.inspector.*;
 
@@ -38,15 +44,17 @@ import com.cosylab.vdct.inspector.*;
  * Creation date: (1.2.2001 22:49:33)
  * @author Matej Sekoranja
  */
-public class NameValueInfoProperty implements InspectableProperty {
+public class MonitoredProperty implements InspectableProperty {
 	private String name;
 	private String value;
+	private MonitoredPropertyListener listener = null;
 /**
  * DTYPInfoProperty constructor comment.
  */
-public NameValueInfoProperty(String name, String value) {
+public MonitoredProperty(String name, String value, MonitoredPropertyListener listener) {
 	this.name=name;
 	this.value=value;
+	this.listener=listener;
 }
 /**
  * Insert the method's description here.
@@ -103,7 +111,7 @@ public String getInitValue()
  * @return boolean
  */
 public boolean isEditable() {
-	return false;
+	return true;
 }
 /**
  * Insert the method's description here.
@@ -118,7 +126,10 @@ public boolean isSepatator() {
  * Creation date: (1.2.2001 22:49:33)
  * @param value java.lang.String
  */
-public void setValue(String value) {}
+public void setValue(String value) {
+	this.value=value;
+	listener.propertyChanged(this);
+}
 /**
  * Insert the method's description here.
  * Creation date: (24/8/99 15:29:04)
@@ -164,6 +175,29 @@ public int getVisibility()
  */
 public void popupEvent(Component component, int x, int y)
 {
+	ActionListener al = new ActionListener()
+	{
+		public void actionPerformed(ActionEvent e) {
+			String action = e.getActionCommand();
+			if (action.equals("Add"))
+				listener.addProperty();
+			else if (action.equals("Remove"))
+				listener.removeProperty(MonitoredProperty.this);
+		}
+
+	};
+	
+	JPopupMenu popup = new JPopupMenu("Inspector popup");
+	
+	JMenuItem mi = new JMenuItem("Add");
+	mi.addActionListener(al);
+	popup.add(mi);
+	
+	mi = new JMenuItem("Remove");
+	mi.addActionListener(al);
+	popup.add(mi);
+
+	popup.show(component, x, y);
 }
 
 }

@@ -162,6 +162,26 @@ public void requestInspectorFor(Inspectable object) {
 	inspector.inspectObject(object);
 	inspector.setVisible(true);			// bug fix
 }
+
+/**
+ * Insert the method's description here.
+ * Creation date: (8.1.2001 21:37:54)
+ * @param object com.cosylab.vdct.inspector.Inspectable
+ */
+public void updateObject(Inspectable object) {
+
+	// search for it
+	InspectorInterface inspector = null;
+	Enumeration e = inspectors.elements();
+	while (e.hasMoreElements()) {
+		inspector = (InspectorInterface)e.nextElement();
+		if (inspector.getInspectedObject()==object) {
+			inspector.updateObject();
+			return;
+		}
+	}
+}
+
 /**
  * Insert the method's description here.
  * Creation date: (10.1.2001 16:00:49)

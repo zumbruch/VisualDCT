@@ -658,6 +658,11 @@ private void objectChanged() {
 public void reinitialize() {}
 /**
  * Insert the method's description here.
+ * Creation date: (8.1.2001 17:50:20)
+ */
+public void updateObject() { Inspectable ins = inspectedObject; inspectedObject=null; inspectObject(ins); }
+/**
+ * Insert the method's description here.
  * Creation date: (26.1.2001 15:18:44)
  * @param help java.lang.String
  */
@@ -772,16 +777,26 @@ public void setMode(int mode)
  */
 private void mouseEvent(MouseEvent event, int row, int col)
 {
-	if ((event.getButton()==MouseEvent.BUTTON3 && col==0))
+	if (event.isPopupTrigger())
 	{
-		InspectableProperty property = (InspectableProperty)tableModel.getPropertyAt(row);
-		if (property!=null && property instanceof VDBFieldData)  ///!!! define interface
+		// change visibility
+		if (col==0)
 		{
-			int visibility = property.getVisibility();
-			visibility = (visibility+1) % 3;
-			((VDBFieldData)property).setVisibility(visibility);
-			
-			getScrollPaneTable().tableChanged(new TableModelEvent(tableModel, row, row, col));
+			InspectableProperty property = (InspectableProperty)tableModel.getPropertyAt(row);
+			if (property!=null && property instanceof VDBFieldData)  ///!!! define interface
+			{
+				int visibility = property.getVisibility();
+				visibility = (visibility+1) % 3;
+				((VDBFieldData)property).setVisibility(visibility);
+				
+				getScrollPaneTable().tableChanged(new TableModelEvent(tableModel, row, row, col));
+			}
+		}
+		else if (col>0)
+		{
+			InspectableProperty property = (InspectableProperty)tableModel.getPropertyAt(row);
+			if (property!=null)
+				property.popupEvent(getScrollPaneTable(), event.getX(), event.getY());
 		}
 	}
 }
