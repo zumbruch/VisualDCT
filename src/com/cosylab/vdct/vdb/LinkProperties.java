@@ -156,8 +156,8 @@ public static String getOptions(LinkSource fd) {
 	if (tokenizer.hasMoreTokens()) maximize=tokenizer.nextToken(); // read var variable maxmimize
 	else {
 		// checks if process variable is actually maximize variable?!
-		if (process.equalsIgnoreCase("NMS") || 
-			process.equalsIgnoreCase("MS")) {
+		if (process.equals("NMS") || 
+			process.equals("MS")) {
 			maximize=process;
 			process=defaultProcess;
 		}
@@ -336,8 +336,8 @@ private void setProperties(LinkSource fd) {
 	if (tokenizer.hasMoreTokens()) setMaximize(tokenizer.nextToken()); // read var variable maxmimize
 	else {
 		// checks if process variable is actually maximize variable?!
-		if (getProcess().equalsIgnoreCase("NMS") || 
-			getProcess().equalsIgnoreCase("MS")) {
+		if (getProcess().equals("NMS") || 
+			getProcess().equals("MS")) {
 			setMaximize(getProcess());
 			setProcess(defaultProcess);
 		}

@@ -60,7 +60,7 @@ public boolean containsValue(String value) {
 	Enumeration e = choices.elements();
 	while (e.hasMoreElements()) {
 		val = e.nextElement().toString();
-		if (val.equalsIgnoreCase(value)) return true;
+		if (val.equals(value)) return true;
 	}
 	return false;
 }

@@ -71,12 +71,12 @@ public ContainerObject(ContainerObject parent, boolean useHashtable) {
 public void addSubObject(String id, VisibleObject object) {
 	if (useHashtable)
 	{
-		if (subObjects.containsKey(id.toUpperCase()))
+		if (subObjects.containsKey(id))
 		{
 			com.cosylab.vdct.Console.getInstance().println("Object with name "+id+" already in this group -> will not be added.");
 			return;
 		}
-		subObjects.put(id.toUpperCase(), object);
+		subObjects.put(id, object);
 	}
 	subObjectsV.addElement(object);
 
@@ -104,7 +104,7 @@ public void clear() {
  */
 public boolean containsObject(String id) {
 	if (useHashtable)
-		return subObjects.containsKey(id.toUpperCase());
+		return subObjects.containsKey(id);
 	else
 		return false;
 }
@@ -116,7 +116,7 @@ public boolean containsObject(String id) {
  */
 public Object getSubObject(String id) {
 	if (useHashtable)
-		return subObjects.get(id.toUpperCase());
+		return subObjects.get(id);
 	else
 		return null;
 }
@@ -145,7 +145,7 @@ public java.util.Vector getSubObjectsV() {
  */
 public Object removeObject(String id) {
 	if (useHashtable) {
-		Object object = subObjects.remove(id.toUpperCase());
+		Object object = subObjects.remove(id);
 		if (object!=null) subObjectsV.removeElement(object);
 
 		/*

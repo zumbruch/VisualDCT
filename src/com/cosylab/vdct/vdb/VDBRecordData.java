@@ -82,8 +82,8 @@ public String getDTYPLinkType() {
  */
 public void addField(VDBFieldData fd) {
    if (fd!=null)
-	if (!fields.containsKey(fd.name.toUpperCase())) {
-		fields.put(fd.name.toUpperCase(), fd);
+	if (!fields.containsKey(fd.name)) {
+		fields.put(fd.name, fd);
 		fieldsV.addElement(fd);
 	}
 }
@@ -116,7 +116,7 @@ public java.lang.String getComment() {
  * @param fieldName java.lang.String
  */
 public VDBFieldData getField(String fieldName) {
-	return (VDBFieldData)(fields.get(fieldName.toUpperCase()));
+	return (VDBFieldData)(fields.get(fieldName));
 }
 /**
  * Insert the method's description here.

@@ -641,7 +641,7 @@ public boolean move(int dx, int dy) {
  * @param group java.lang.String
  */
 public boolean moveToGroup(java.lang.String group) {
-	if (group.equalsIgnoreCase(getAbsoluteName())) return false; 	// move to itself
+	if (group.equals(getAbsoluteName())) return false; 	// move to itself
 
 	//String oldName = getAbsoluteName();
 	String newName;

@@ -193,7 +193,7 @@ public void fixLinks_() {
 					targetName = varlink.getFieldData().getFullName();
 					// now I got source and target, compare values
 					String oldTarget = LinkProperties.getTarget(source.getFieldData());
-					if (!oldTarget.equalsIgnoreCase(targetName))
+					if (!oldTarget.equals(targetName))
 					{
 						// not the same, fix it gently as a doctor :)
 						String value = source.getFieldData().getValue();
@@ -231,7 +231,7 @@ public static void fixLink(EPICSVarLink varlink)
 	
 		// now I got source and target, compare values
 		String oldTarget = LinkProperties.getTarget(data);
-		if (!oldTarget.equalsIgnoreCase(targetName))
+		if (!oldTarget.equals(targetName))
 		{
 			// not the same, fix it gently as a doctor :)
 			String value = data.getValue();
@@ -273,7 +273,7 @@ public static void fixMacroLink(Macro macro)
 	
 		// now I got source and target, compare values
 		String oldTarget = LinkProperties.getTarget(data);
-		if (!oldTarget.equalsIgnoreCase(targetName))
+		if (!oldTarget.equals(targetName))
 		{
 			// not the same, fix it gently as a doctor :)
 			String value = data.getValue();
@@ -311,7 +311,7 @@ public static void fixLink(EPICSLinkOutIn linkoutin)
 	
 		// now I got source and target, compare values
 		String oldTarget = LinkProperties.getTarget(data);
-		if (!oldTarget.equalsIgnoreCase(targetName))
+		if (!oldTarget.equals(targetName))
 		{
 			// not the same, fix it gently as a doctor :)
 			String value = data.getValue();
@@ -344,7 +344,7 @@ public static void fixLink_(EPICSVarLink varlink)
 	
 		// now I got source and target, compare values
 		String oldTarget = LinkProperties.getTarget(source.getFieldData());
-		if (!oldTarget.equalsIgnoreCase(targetName))
+		if (!oldTarget.equals(targetName))
 		{
 			// not the same, fix it gently as a doctor :)
 			String value = source.getFieldData().getValue();

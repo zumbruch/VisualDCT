@@ -588,7 +588,7 @@ private void fixForwardLinks() {
 		
 		// now I got source and target, compare values
 		String oldTarget = LinkProperties.getTarget(source.getFieldData());
-		if (!oldTarget.equalsIgnoreCase(targetName))
+		if (!oldTarget.equals(targetName))
 		{
 			// not the same, fix it gently as a doctor :)
 			String value = source.getFieldData().getValue();
@@ -1105,7 +1105,7 @@ public boolean move(int dx, int dy) {
  */
 public boolean moveToGroup(java.lang.String group) {
 	String currentParent = Group.substractParentName(recordData.getName());
-	if (group.equalsIgnoreCase(currentParent)) return false;
+	if (group.equals(currentParent)) return false;
 	
 	//String oldName = getName();
 	String newName;

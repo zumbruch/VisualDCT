@@ -446,7 +446,7 @@ public boolean move(int dx, int dy)
 public boolean moveToGroup(String group)
 {
 	String currentParent = Group.substractParentName(getName());
-	if(group.equalsIgnoreCase(currentParent))
+	if(group.equals(currentParent))
 		return false;
 	
 	//String oldName = getName();

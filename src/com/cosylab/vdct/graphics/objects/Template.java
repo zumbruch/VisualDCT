@@ -1102,7 +1102,7 @@ private void synchronizeMacroLinkFields()
 					{
 						// !!! not perfect solution
 						String propertyName = it.next().toString();
-						if (propertyName.equalsIgnoreCase(keyStr))
+						if (propertyName.equals(keyStr))
 							templateData.removeProperty(propertyName);
 					}
 				}
@@ -1469,7 +1469,7 @@ public boolean copyToGroup(java.lang.String group) {
  */
 public boolean moveToGroup(java.lang.String group) {
 	String currentParent = Group.substractParentName(templateData.getName());
-	if (group.equalsIgnoreCase(currentParent)) return false;
+	if (group.equals(currentParent)) return false;
 	
 	//String oldName = getName();
 	String newName;
