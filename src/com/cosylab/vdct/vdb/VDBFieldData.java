@@ -70,7 +70,8 @@ public class VDBFieldData implements InspectableProperty, Debuggable, ChangableV
 		new SimpleDateFormat("HH:mm:ss.SSS");
 	
 	protected String debugValueTimeStamp = "n/a";
-	protected short severity;
+	protected short severity = 0;
+	protected boolean connected = false;
 	private static final String NAME_VAL = "VAL";
 	
 	protected int visibility = NON_DEFAULT_VISIBLE;
@@ -552,6 +553,24 @@ public void initialize() {
 	debugValue = debugDefault;
 	debugValueTimeStamp = "n/a";
 	severity = 0;
+}
+
+/**
+ * @see com.cosylab.vdct.graphics.objects.Debuggable#setConnected(boolean)
+ */
+public void setConnected(boolean connected) {
+	this.connected = connected;
+	
+	// update
+	if (record!=null) record.fieldValueChanged(this);
+}
+
+/**
+ * Return debug connection status.
+ * @return debug connection status
+ */
+public boolean isConnected() {
+	return connected;
 }
 
 }

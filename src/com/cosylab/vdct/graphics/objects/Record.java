@@ -77,7 +77,9 @@ public class Record
 	private boolean right = true;
 
 	private boolean inDebugMode = false;
-	
+	private boolean debugConnected = false;
+	private int debugTimeoutHour = -1;
+	private int debugTimeoutMinute = -1;
 	protected Color debugValueColor = null; 
 	
 	// timestamp label
@@ -358,6 +360,10 @@ protected void draw(Graphics g, boolean hilited) {
 				g.drawString(timestamp, rrx + timestampX, rry + timestampY + recordSize);
 			}
 
+			// draw a nice clock
+			if (!debugConnected)
+				drawDebugTimeout(g, debugTimeoutHour, debugTimeoutMinute, rrx, rry, rwidth, rheight);
+
 			g.setColor(col);
 
 		}
@@ -450,6 +456,65 @@ protected void draw(Graphics g, boolean hilited) {
 		paintSubObjects(g, hilited);
 
 }
+
+/**
+ * Draws a timeout clock.
+ * @param g
+ * @param hour
+ * @param minute
+ * @param x0
+ * @param y0
+ * @param w
+ * @param h
+ */
+protected static void drawDebugTimeout(Graphics g, int hour, int minute, int x0, int y0, int w, int h)
+{
+	g.setColor(Color.MAGENTA);
+	
+	final int thickness = 3;
+	if (w < 5*thickness || h < 5*thickness) return;
+
+	// calculate angles	
+	double phiHour = (2*Math.PI/12)*hour-Math.PI/2;
+	double phiMinute = (2*Math.PI/60)*minute-Math.PI/2;
+
+	int size = (int)Math.min(0.75 * h, 0.75 * w);
+	
+	// optimize
+	w = w/2;
+	h = h/2;
+	size = size/2;
+	double cosHour = Math.cos(phiHour);
+	double sinHour = Math.sin(phiHour);
+	double cosMin = Math.cos(phiMinute);
+	double sinMin = Math.sin(phiMinute);
+	
+	g.drawOval(x0 + w - size + thickness, y0 + h - size + thickness, 2*size - 2*thickness, 2*size - 2*thickness);
+	g.drawOval(x0 + w - size, y0 + h - size, size*2, size*2);
+	
+	int pointerSize = (3 * size) / 4;
+	g.drawLine(x0 + w,     y0 + h, x0 + (int)(w + pointerSize * cosMin),      y0 + (int)(h + pointerSize * sinMin));
+	g.drawLine(x0 + w + 1, y0 + h, x0 + (int)(w + pointerSize * cosMin) + 1,  y0 + (int)(h + pointerSize * sinMin));
+	
+	pointerSize = size / 2;
+	g.drawLine(x0 + w,     y0 + h, x0 + (int)(w + pointerSize * cosHour),      y0 + (int)(h + pointerSize * sinHour));
+	g.drawLine(x0 + w + 1, y0 + h, x0 + (int)(w + pointerSize * cosHour) + 1,  y0 + (int)(h + pointerSize * sinHour));
+
+	int[] xs2 = { x0 + w - 5, x0 + w - 5, x0 + w + 5, x0 + w + 5};
+	int[] ys2 = { y0 + h - size, y0 + h - size - 5, y0 + h - size - 5, y0 + h - size};
+	g.drawPolyline(xs2, ys2, xs2.length);
+
+	for (int i = 0; i < 12; i++)
+	{
+		int length = 8 + (i%3==0?4:0);
+		int x1 = (int)(Math.cos(i*360/12*Math.PI/180)*(size - length));
+		int y1 = (int)(Math.sin(i*360/12*Math.PI/180)*(size - length));
+		int x2 = (int)(Math.cos(i*360/12*Math.PI/180)*(size - thickness));
+		int y2 = (int)(Math.sin(i*360/12*Math.PI/180)*(size - thickness));
+		g.drawLine(x0 + w + x1, y0 + h + y1, x0 + w + x2, y0 + h + y2);
+	}
+}
+
 /**
  * Insert the method's description here.
  * Creation date: (27.1.2001 16:12:03)
@@ -1369,6 +1434,16 @@ private void validateDebug(VDBFieldData valField)
 	int x0 = (int)(8*scale);		// insets
 	int y0 = (int)(4*scale);
 
+	debugConnected = valField.isConnected();
+	if (!debugConnected && debugTimeoutHour < 0)
+	{
+		Calendar c = Calendar.getInstance();
+		debugTimeoutHour = c.get(Calendar.HOUR_OF_DAY) % 12;
+		debugTimeoutMinute = c.get(Calendar.MINUTE);
+	}
+	else if (debugConnected)
+		debugTimeoutHour = -1;
+		
 	// select debug color (follows MEDM standard)
 	switch (valField.getSeverity())
 	{

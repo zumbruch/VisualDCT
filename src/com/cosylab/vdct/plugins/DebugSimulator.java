@@ -74,7 +74,10 @@ public void deregisterMonitor(Debuggable field)
 	if (!list.contains(field))
 		com.cosylab.vdct.Console.getInstance().println("BUG: Invalid deregistration of the field!");
 	else
+	{
 		list.remove(field);
+		field.setConnected(true);
+	}
 }
 /**
  * Insert the method's description here.
@@ -166,7 +169,10 @@ public void registerMonitor(Debuggable field)
 	if (list.contains(field))
 		com.cosylab.vdct.Console.getInstance().println("BUG: Multiple registration of the field!");
 	else
+	{
 		list.add(field);
+		field.setConnected(true);
+	}
 }
 /**
  * When an object implementing interface <code>Runnable</code> is used 

@@ -31,26 +31,35 @@ import java.util.Date;
  */
 
 /**
- * Insert the type's description here.
- * Creation date: (7.12.2001 19:10:29)
- * @author 
+ * Interace defining a debuggable instance.
+ * @author Matej Sekoranja (matej.sekoranja@cosylab.com 
  */
 public interface Debuggable {
-/**
- * Insert the method's description here.
- * Creation date: (7.12.2001 19:12:09)
- * @return java.lang.String
- */
-String getFullName();
-/**
- * Insert the method's description here.
- * Creation date: (7.12.2001 19:10:57)
- * @param value java.lang.String
- */
-void setDebugValue(String value, Date timeStamp, short severity);
 
-/**
- * Sets values to initial state.
- */
-void initialize();
+	/**
+	 * Return fully qualified name of this object.
+	 * @return fully qualified name of this object.
+	 */
+	String getFullName();
+	
+	/**
+	 * Set debug value.
+	 * @param value	debug value
+	 * @param timeStamp timestamp of the value
+	 * @param severity alarm severity
+	 */
+	void setDebugValue(String value, Date timeStamp, short severity);
+	
+	/**
+	 * Initialize debug value to initial state.
+	 */
+	void initialize();
+	
+	/**
+	 * Set connection status.
+	 * @param connected	<code>true</code> if instance is connected, <code>false</code> otherwise
+	 */
+	void setConnected(boolean connected);
+	
+
 }
