@@ -46,7 +46,7 @@ import com.cosylab.vdct.db.*;
 import com.cosylab.vdct.dbd.*;
 import com.cosylab.vdct.vdb.*;
 import com.cosylab.vdct.undo.*;
-import com.cosylab.vdct.util.PathSpecification;
+import com.cosylab.vdct.util.DBDEntry;
 import com.cosylab.vdct.util.StringUtils;
 import com.cosylab.vdct.events.*;
 import com.cosylab.vdct.events.commands.*;
@@ -1553,56 +1553,39 @@ public void checkForIncodedDBDs(File file) throws IOException
 {
 	// get directory
 	File relativeTo = file.getParentFile();
+	DBDEntry.setBaseDir(relativeTo);
 	
 	Console.getInstance().println();
 	
-	Vector dbds = com.cosylab.vdct.DataProvider.getInstance().getDBDs();
+	Vector dbds = com.cosylab.vdct.DataProvider.getInstance().getCurrentDBDs();
 	String[] dbd = DBResolver.resolveIncodedDBDs(file.getAbsolutePath());
-	
-	if (dbd!=null && dbd.length>0) Group.setAbsoluteDBDs(false);
 	
 	if (dbd!=null)
 	for (int i=0; i<dbd.length; i++)
 	{
-		File f = new File( PathSpecification.matchAndReplace(dbd[i]) );
+		DBDEntry entry = new DBDEntry(dbd[i]);
+		File f = entry.getFile();
 		
-		if (f.isAbsolute() && dbd[i].indexOf('$')==-1) Group.setAbsoluteDBDs(true);
-		
-		// if not absolute, make relatove to DB file
-		if (!f.isAbsolute()) f = new File(relativeTo, dbd[i]);
-		
-		
-			
-		// try to cannonize to make if more beautiful printout
-		try
-		{
-			f = f.getCanonicalFile();
-		}
-		catch (IOException ioe)
-		{
-			System.out.println("Failed to cannonize '"+f.toString()+"'. Exception: ");
-			ioe.printStackTrace();
-		}
-
 		if (f.exists())
 		{
 			// skip if already loaded
-			if (!dbds.contains(f))
+			if (!dbds.contains(entry))
 			{
 				Console.getInstance().println("Loading DBD file: '"+f.getAbsolutePath()+"'.");
 				openDBD(f, com.cosylab.vdct.DataProvider.getInstance().getDbdDB()!=null);
 			}
-			else
+			else {			
 				Console.getInstance().println("DBD file '"+f.getAbsolutePath()+"' is already loaded.");
+			}
 		}
 		else 
 		{
 			Console.getInstance().println("DBD file not found: '"+f.getAbsolutePath()+"'.");
-			
-			// add anyway
-			if (!dbds.contains(f))
-				dbds.addElement(f);
 		}
+		
+		//	replace
+		if (dbds.contains(entry)) dbds.remove(entry);
+		dbds.addElement(entry);
 	}
 		
 }
@@ -1619,12 +1602,14 @@ public boolean open(File file, boolean importDB) throws IOException {
 	///
 
 	// clean list of unexisting DBDs
-	File[] dbds = new File[com.cosylab.vdct.DataProvider.getInstance().getDBDs().size()];
-	com.cosylab.vdct.DataProvider.getInstance().getDBDs().toArray(dbds);
+	DBDEntry[] dbds = new DBDEntry[com.cosylab.vdct.DataProvider.getInstance().getCurrentDBDs().size()];
+	com.cosylab.vdct.DataProvider.getInstance().getCurrentDBDs().toArray(dbds);
 	for (int i=0; i<dbds.length; i++)
-		if (!dbds[i].exists())
-			com.cosylab.vdct.DataProvider.getInstance().getDBDs().removeElement(dbds[i]);
-
+		if (!dbds[i].getFile().exists())
+			com.cosylab.vdct.DataProvider.getInstance().getCurrentDBDs().removeElement(dbds[i]);
+		else
+			dbds[i].setSavesToFile(false);
+	 
 	// check for in-coded DBDs
 	checkForIncodedDBDs(file);
 
@@ -2148,22 +2133,6 @@ public boolean openDBD(File file, boolean importDBD) throws IOException {
 		Console.getInstance().println("o) DBD file '"+file.getAbsolutePath()+"' is already loaded.");
 		return true;
 	}
-	else
-	{
-		// more exact compare
-		String canonicalFile = file.getCanonicalPath();
-		Enumeration e = DataProvider.getInstance().getLoadedDBDs().elements();
-		while (e.hasMoreElements())
-		{
-			String loadedFile = ((File)e.nextElement()).getCanonicalPath();
-			if (canonicalFile.equals(loadedFile))
-			{
-				Console.getInstance().println();
-				Console.getInstance().println("o) DBD file '"+file.getAbsolutePath()+"' is already loaded.");
-				return true;
-			}
-		}
-	}
 
 	setCursor(hourCursor);
 
@@ -2193,8 +2162,7 @@ public boolean openDBD(File file, boolean importDBD) throws IOException {
 	}
 
 	// add to list of DBDs
-	DataProvider.getInstance().getLoadedDBDs().addElement(file.getAbsoluteFile());
-	DataProvider.getInstance().getDBDs().addElement(file.getAbsoluteFile());
+	DataProvider.getInstance().getLoadedDBDs().addElement(file);
 
 	// !!!
 	if (VisualDCT.getInstance()!=null)

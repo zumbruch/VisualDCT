@@ -73,8 +73,6 @@ public class Group
 	// contains DB structure (entry (include, path, addpath statements), record, expand)
 	protected Vector structure = null; 
 	
-	private static boolean absoluteDBDs = false; 
-	
 /**
  * Group constructor comment.
  * @param parent com.cosylab.vdct.graphics.objects.ContainerObject
@@ -1475,36 +1473,19 @@ private static void writeUsedDBDs(File dbFile, DataOutputStream stream) throws I
 	 // write used DBDs
 	 //String dbFilePath = dbFile.getAbsolutePath().replace('\\', '/');
 	 stream.writeBytes(DBResolver.DBD_START);
-	 Enumeration edbd = DataProvider.getInstance().getDBDs().elements();
+	 Enumeration edbd = DataProvider.getInstance().getCurrentDBDs().elements();
 	 while (edbd.hasMoreElements())
 	 {
-	 		File dbdFile = (File)edbd.nextElement(); 
-			try
-			{
-				// make path relative to <dbFile> path
-				
-				if (Group.getAbsoluteDBDs()) 
-					dbdFile = dbdFile.getAbsoluteFile();
-				else {
-					File epicsDbdFile = PathSpecification.getRelativeNameNoStepdowns(dbdFile, new File(System.getProperty("EPICS_BASE")));
-					if  (epicsDbdFile!=null) 
-						dbdFile = new File("$(EPICS_BASE)/"+epicsDbdFile);
-					else dbdFile = PathSpecification.getRelativeName(dbdFile, dbFile);
-				}
-			}
-			catch (Exception ex)
-			{
-				// in case of any exception
-				// do not bail-out, use given dbdFile path
-				// and print stack trace
-				ex.printStackTrace();
-			}
+	 //		File dbdFile = (File)edbd.nextElement();
+	 	DBDEntry entry = (DBDEntry)edbd.nextElement(); 
+	 	if (entry.getSavesToFile()) { 
 
-	 		String file = dbdFile.toString();
+	 		String file = entry.getValue();
 	 		file = file.replace('\\', '/');
 
 	 		// replace back-slash separator
 			stream.writeBytes(DBResolver.DBD_ENTRY+file+"\")\n");
+	 	}
 	 }
 	 stream.writeBytes(DBResolver.DBD_END);
 	 stream.writeBytes("\n");
@@ -1840,19 +1821,5 @@ public void generateMacros(HashMap macros, boolean deep) {
 			((Group)obj).generateMacros(macros, deep);
 	}
 }
-
-	/**
-	 * @return
-	 */
-	public static boolean getAbsoluteDBDs() {
-		return absoluteDBDs;
-	}
-
-	/**
-	 * @param b
-	 */
-	public static void setAbsoluteDBDs(boolean b) {
-		absoluteDBDs = b;
-	}
 
 }

@@ -33,8 +33,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @author Matej
@@ -306,22 +304,7 @@ public class PathSpecification
 		return new File(resultingRelativePath.substring(1));
 	}		
 	
-	public static String matchAndReplace(String value) {
-		if (value==null || value.indexOf('$')<0) return value;
-		
-		Pattern macrop = Pattern.compile("\\$\\(([^\\.\\$]+)\\)");
-		
-		Matcher macro = macrop.matcher(value);
-		StringBuffer result=new StringBuffer();
-		while (macro.find()) {
-			String macron=macro.group(1);
-			macro.appendReplacement(result, System.getProperty(macron).replaceAll("\\$","\\\\\\$"));
-		}
-		
-		macro.appendTail(result);
-		
-		return result.toString();
-	}
+
 
 /*	
 	public static void main(String[] argv)

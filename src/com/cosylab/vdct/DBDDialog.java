@@ -28,15 +28,29 @@ package com.cosylab.vdct;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
 import java.io.File;
+import java.util.Vector;
 
-import javax.swing.*;
-import javax.swing.table.*;
-import javax.swing.event.*;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JViewport;
+import javax.swing.event.TableModelEvent;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 
 import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.events.commands.GetGUIInterface;
+import com.cosylab.vdct.util.ComboBoxFileChooser;
+import com.cosylab.vdct.util.DBDEntry;
+import com.cosylab.vdct.util.PathSpecification;
 import com.cosylab.vdct.util.UniversalFileFilter;
 
 /**
@@ -65,10 +79,11 @@ class CellRenderer extends DefaultTableCellRenderer {
 public class TableModel extends AbstractTableModel {
 
 	// table header
-	private final String[] columnNames = { "Loaded Database Definition File(s)" };
+	//private final String[] columnNames = { "Loaded Database Definition File(s)" };
+	private final String[] columnNames = { "String Definition", "Path to Actual File", "Store" };
 
 	// table classes
-	private final Class[] columnClasses = { java.io.File.class };
+	private final Class[] columnClasses = { String.class, java.io.File.class, Boolean.class};
 	
 /**
  * Insert the method's description here.
@@ -97,7 +112,7 @@ public String getColumnName(int column) {
  */
 
 public int getRowCount() {
-	return DataProvider.getInstance().getDBDs().size();
+	return DataProvider.getInstance().getCurrentDBDs().size();
 }
 
 /**
@@ -110,7 +125,14 @@ public int getRowCount() {
  */
  
 public Object getValueAt(int row, int column) {
-	return DataProvider.getInstance().getDBDs().get(row);
+	DBDEntry entry = (DBDEntry)DataProvider.getInstance().getCurrentDBDs().get(row);
+	switch (column) {
+		case 0: return entry.getValue();
+		case 1: return entry.getFile().getAbsoluteFile();
+		case 2: return new Boolean(entry.getSavesToFile());
+		default:
+			return null;
+	}
 }
 
 /**
@@ -121,7 +143,7 @@ public Object getValueAt(int row, int column) {
  * @param col int
  */
 public boolean isCellEditable(int row, int col) {
-	return true;
+	return col!=1;
 }
 
 /**
@@ -136,38 +158,38 @@ public boolean isCellEditable(int row, int col) {
  */
 
 public void setValueAt(Object aValue, int row, int column) {
+	Vector dbds = DataProvider.getInstance().getCurrentDBDs();
+	DBDEntry entry = (DBDEntry)dbds.get(row);
 
-	java.util.Vector dbds = DataProvider.getInstance().getDBDs();
-
-	// remove it
-	if (aValue==null || dbds.contains(aValue))
-	{
-		dbds.removeElementAt(row);
-		//update entire table
-		getScrollPaneTable().tableChanged(new TableModelEvent(getScrollPaneTable().getModel()));
+	if (column == 2) {
+		entry.setSavesToFile(((Boolean)aValue).booleanValue());
 		return;
 	}
-
-
-	Object oldValue = dbds.get(row);
-
-	// no change
-	if (aValue.equals(oldValue))
-		return;
 	
-	dbds.setElementAt(aValue, row);
-	
-	File f = (File)aValue;
-	if (f.exists())
-	{
-	    GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
-	    try {
-  		 	cmd.getGUIMenuInterface().importDBD(f);
-	    } catch (java.io.IOException e) {
-		    Console.getInstance().println();
-		    Console.getInstance().println("o) Failed to load DBD file: '"+f.getAbsolutePath()+"'.");
-		    Console.getInstance().println(e);
-	    }
+	if (column == 0) {
+		
+		if (aValue==null)
+			{
+				dbds.removeElementAt(row);
+				//update entire table
+				getScrollPaneTable().tableChanged(new TableModelEvent(getScrollPaneTable().getModel()));
+				return;
+			}	
+			
+		entry.setValue(aValue.toString());
+		
+		File f = entry.getFile();
+			if (f.exists())
+			{
+				GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
+				try {
+					cmd.getGUIMenuInterface().importDBD(f);
+				} catch (java.io.IOException e) {
+					Console.getInstance().println();
+					Console.getInstance().println("o) Failed to load DBD file: '"+f.getAbsolutePath()+"'.");
+					Console.getInstance().println(e);
+				}
+			}
 	}
 	
 	// generate notification
@@ -175,6 +197,7 @@ public void setValueAt(Object aValue, int row, int column) {
 }
 }
 	private JButton ivjAddDBDButton = null;
+	private JButton ivjAddStringButton = null;
 	private JPanel ivjButtonPanel = null;
 	private JButton ivjCloseButton = null;
 	private JPanel ivjJDialogContentPane = null;
@@ -192,6 +215,8 @@ class IvjEventHandler implements java.awt.event.ActionListener {
 				connEtoC1(e);
 			if (e.getSource() == DBDDialog.this.getAddDBDButton()) 
 				connEtoC2(e);
+			if (e.getSource() == DBDDialog.this.getAddStringButton()) 
+				connEtoC3(e);				
 		};
 	};
 /**
@@ -238,39 +263,73 @@ public DBDDialog(java.awt.Frame owner, boolean modal) {
  * Comment
  */
 public void addDBDButton_ActionPerformed(java.awt.event.ActionEvent actionEvent) {
-	JFileChooser chooser = ((VisualDCT)getParent()).getfileChooser();
+	ComboBoxFileChooser chooserDialog = ((VisualDCT)getParent()).getComboBoxFileChooser();
+	//JFileChooser chooser = ((VisualDCT)getParent()).getfileChooser();
+	JFileChooser chooser = chooserDialog.getJFileChooser();
 	UniversalFileFilter filter = new UniversalFileFilter(
 		new String("dbd"), "DBD File");
 	chooser.resetChoosableFileFilters();
 	chooser.addChoosableFileFilter(filter);
 	chooser.setDialogTitle("Import DBD");
 	chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-	int retval = chooser.showOpenDialog(this);
+	chooser.setDialogType(JFileChooser.OPEN_DIALOG);
+	int retval = chooserDialog.showDialog(); //showOpenDialog(this);
 
-	if(retval == JFileChooser.APPROVE_OPTION) {
+	if(retval != JFileChooser.CANCEL_OPTION) {
 	    java.io.File theFile = chooser.getSelectedFile();
 	    if(theFile != null) {
-		    
-		    // check if already exists
-		    java.util.Vector dbds = DataProvider.getInstance().getDBDs();
-		    if (dbds.contains(theFile))
-			{
-			    Console.getInstance().println();
-			    Console.getInstance().println("o) Failed to import DBD file: '"+theFile.getAbsolutePath()+"' is already loaded.");
-			    Console.getInstance().println();
-				return;
-			}
-			
+	    	if (chooserDialog.getJCheckBoxAbsoluteDBD().isSelected()) {
+	    		theFile = theFile.getAbsoluteFile(); 			
+	    	} else {
+	    		if (VisualDCT.getInstance().getOpenedFile()==null)
+					theFile = PathSpecification.getRelativeName(theFile, new File(Settings.getDefaultDir()));
+				else
+					theFile = PathSpecification.getRelativeName(theFile, VisualDCT.getInstance().getOpenedFile());
+	    	}
+	    				
 		    GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
 		    try {
-	  		 	cmd.getGUIMenuInterface().importDBD(theFile);
+		    	
+		    	DBDEntry entry = new DBDEntry(theFile.getPath());
+		    	
+		    	Vector dbds = DataProvider.getInstance().getCurrentDBDs();
+				//	replace
+				if (dbds.contains(entry)) dbds.remove(entry);
+				dbds.addElement(entry);
+				
 				getScrollPaneTable().tableChanged(new TableModelEvent(getScrollPaneTable().getModel()));
+				
+	  		 	cmd.getGUIMenuInterface().importDBD(entry.getFile());
 		    } catch (java.io.IOException e) {
 			    Console.getInstance().println();
 			    Console.getInstance().println("o) Failed to import DBD file: '"+theFile.getAbsolutePath()+"'.");
 			    Console.getInstance().println(e);
 		    }
 		}
+	}
+}
+
+public void addStringButton_ActionPerformed(java.awt.event.ActionEvent actionEvent) {
+	String str = JOptionPane.showInputDialog(this, "Enter string:");
+	if (str!=null) {
+					GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
+					try {
+		    	
+						DBDEntry entry = new DBDEntry(str);
+		    	
+						Vector dbds = DataProvider.getInstance().getCurrentDBDs();
+						//	replace
+						if (dbds.contains(entry)) dbds.remove(entry);
+						dbds.addElement(entry);
+										
+						getScrollPaneTable().tableChanged(new TableModelEvent(getScrollPaneTable().getModel()));
+				
+						cmd.getGUIMenuInterface().importDBD(entry.getFile());
+					} catch (java.io.IOException e) {
+						Console.getInstance().println();
+						Console.getInstance().println("o) Failed to import DBD file: '"+str+"'.");
+						Console.getInstance().println(e);
+					}
 	}
 }
 /**
@@ -309,6 +368,21 @@ private void connEtoC2(java.awt.event.ActionEvent arg1) {
 		handleException(ivjExc);
 	}
 }
+
+private void connEtoC3(java.awt.event.ActionEvent arg1) {
+	try {
+		// user code begin {1}
+		// user code end
+		this.addStringButton_ActionPerformed(arg1);
+		// user code begin {2}
+		// user code end
+	} catch (java.lang.Throwable ivjExc) {
+		// user code begin {3}
+		// user code end
+		handleException(ivjExc);
+	}
+}
+
 /**
  * connEtoM1:  (CloseButton.action.actionPerformed(java.awt.event.ActionEvent) --> DBDDialog.dispose()V)
  * @param arg1 java.awt.event.ActionEvent
@@ -337,7 +411,7 @@ private javax.swing.JButton getAddDBDButton() {
 		try {
 			ivjAddDBDButton = new javax.swing.JButton();
 			ivjAddDBDButton.setName("AddDBDButton");
-			ivjAddDBDButton.setText("Add...");
+			ivjAddDBDButton.setText("Add file...");
 			// user code begin {1}
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
@@ -348,6 +422,23 @@ private javax.swing.JButton getAddDBDButton() {
 	}
 	return ivjAddDBDButton;
 }
+private javax.swing.JButton getAddStringButton() {
+	if (ivjAddStringButton == null) {
+		try {
+			ivjAddStringButton = new javax.swing.JButton();
+			ivjAddStringButton.setName("AddStringButton");
+			ivjAddStringButton.setText("Add string...");
+			// user code begin {1}
+			// user code end
+		} catch (java.lang.Throwable ivjExc) {
+			// user code begin {2}
+			// user code end
+			handleException(ivjExc);
+		}
+	}
+	return ivjAddStringButton;
+}
+
 /**
  * Return the ButtonPanel property value.
  * @return javax.swing.JPanel
@@ -364,23 +455,31 @@ private javax.swing.JPanel getButtonPanel() {
 			constraintsAddDBDButton.gridx = 0; constraintsAddDBDButton.gridy = 0;
 			constraintsAddDBDButton.anchor = java.awt.GridBagConstraints.EAST;
 			constraintsAddDBDButton.weightx = 1.0;
-			constraintsAddDBDButton.ipadx = 16;
+			//constraintsAddDBDButton.ipadx = 16;
 			constraintsAddDBDButton.insets = new java.awt.Insets(4, 4, 10, 4);
 			getButtonPanel().add(getAddDBDButton(), constraintsAddDBDButton);
 
+			java.awt.GridBagConstraints constraintsAddStringButton = new java.awt.GridBagConstraints();
+			constraintsAddStringButton.gridx = 1; constraintsAddStringButton.gridy = 0;
+			constraintsAddStringButton.anchor = java.awt.GridBagConstraints.EAST;
+			constraintsAddStringButton.weightx = 0.0;
+			//constraintsAddStringButton.ipadx = 16;
+			constraintsAddStringButton.insets = new java.awt.Insets(4, 0, 10, 4);
+			getButtonPanel().add(getAddStringButton(), constraintsAddStringButton);
+
 			java.awt.GridBagConstraints constraintsRemoveDBDButton = new java.awt.GridBagConstraints();
-			constraintsRemoveDBDButton.gridx = 1; constraintsRemoveDBDButton.gridy = 0;
-			constraintsRemoveDBDButton.anchor = java.awt.GridBagConstraints.WEST;
-			constraintsRemoveDBDButton.weightx = 1.0;
-			constraintsRemoveDBDButton.insets = new java.awt.Insets(4, 4, 10, 4);
+			constraintsRemoveDBDButton.gridx = 2; constraintsRemoveDBDButton.gridy = 0;
+			constraintsRemoveDBDButton.anchor = java.awt.GridBagConstraints.EAST;
+			constraintsRemoveDBDButton.weightx = 0.0;
+			constraintsRemoveDBDButton.insets = new java.awt.Insets(4, 10, 10, 10);
 			getButtonPanel().add(getRemoveDBDButton(), constraintsRemoveDBDButton);
 
 			java.awt.GridBagConstraints constraintsCloseButton = new java.awt.GridBagConstraints();
-			constraintsCloseButton.gridx = 2; constraintsCloseButton.gridy = 0;
-			constraintsCloseButton.anchor = java.awt.GridBagConstraints.WEST;
-			constraintsCloseButton.weightx = 1.0;
-			constraintsCloseButton.ipadx = 10;
-			constraintsCloseButton.insets = new java.awt.Insets(4, 4, 10, 4);
+			constraintsCloseButton.gridx = 3; constraintsCloseButton.gridy = 0;
+			constraintsCloseButton.anchor = java.awt.GridBagConstraints.EAST;
+			constraintsCloseButton.weightx = 0.0;
+		//	constraintsCloseButton.ipadx = 10;
+			constraintsCloseButton.insets = new java.awt.Insets(4, 4, 10, 10);
 			getButtonPanel().add(getCloseButton(), constraintsCloseButton);
 			// user code begin {1}
 			// user code end
@@ -527,6 +626,8 @@ private javax.swing.JTable getScrollPaneTable() {
 			// user code begin {1}
 			ivjScrollPaneTable.setDefaultRenderer(java.io.File.class, new DBDDialog.CellRenderer());
 			ivjScrollPaneTable.setModel(new DBDDialog.TableModel());
+			ivjScrollPaneTable.getColumnModel().getColumn(2).setMaxWidth(40);
+			ivjScrollPaneTable.getColumnModel().getColumn(2).setMinWidth(32);
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
 			// user code begin {2}
@@ -557,6 +658,7 @@ private void initConnections() throws java.lang.Exception {
 	getCloseButton().addActionListener(ivjEventHandler);
 	getRemoveDBDButton().addActionListener(ivjEventHandler);
 	getAddDBDButton().addActionListener(ivjEventHandler);
+	getAddStringButton().addActionListener(ivjEventHandler);
 }
 /**
  * Initialize the class.
@@ -606,8 +708,7 @@ public static void main(java.lang.String[] args) {
  * Comment
  */
 public void removeDBDButton_ActionPerformed(java.awt.event.ActionEvent actionEvent) {
-
-	java.util.Vector dbds = DataProvider.getInstance().getDBDs();
+	java.util.Vector dbds = DataProvider.getInstance().getCurrentDBDs();
 
 	int[] selected = getScrollPaneTable().getSelectedRows();
 	Object[] objs = new Object[selected.length];
@@ -618,6 +719,5 @@ public void removeDBDButton_ActionPerformed(java.awt.event.ActionEvent actionEve
 		dbds.removeElement(objs[i]);
 		
 	getScrollPaneTable().tableChanged(new TableModelEvent(getScrollPaneTable().getModel()));
-
 }
 }

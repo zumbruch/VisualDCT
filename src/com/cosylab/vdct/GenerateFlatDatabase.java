@@ -16,8 +16,10 @@ package com.cosylab.vdct;
 
 import com.cosylab.vdct.graphics.DrawingSurface;
 import com.cosylab.vdct.graphics.objects.Group;
+import com.cosylab.vdct.util.DBDEntry;
 
 import java.io.File;
+import java.util.Vector;
 
 
 /**
@@ -27,7 +29,7 @@ import java.io.File;
  */
 public class GenerateFlatDatabase
 {
-	private static File dbdFile = null;
+	private static Vector dbdEntries = new Vector();
 	private static File vdbFile = null;
 	private static File dbFile = null;
 
@@ -74,11 +76,11 @@ public class GenerateFlatDatabase
 						
 			DrawingSurface drawingSurface = new DrawingSurface();
 
-			if (dbdFile != null) {
-				drawingSurface.openDBD(dbdFile,
+			for (int i=0; i<dbdEntries.size(); i++)
+				drawingSurface.openDBD(((DBDEntry)dbdEntries.get(i)).getFile(),
 				    com.cosylab.vdct.DataProvider.getInstance().getDbdDB() != null);				    
-			}
-
+			
+			System.out.println();
 			System.out.println("Loading VDB files.");
 			if (!drawingSurface.open(vdbFile)) {
 				if (com.cosylab.vdct.DataProvider.getInstance().getDbdDB() == null)
@@ -132,7 +134,7 @@ public class GenerateFlatDatabase
 							return false;
 						}
 
-						dbdFile = new File(args[i]);
+						dbdEntries.add(new DBDEntry(args[i]));
 						continue;
 					} else if (args[i].equals("--enable-capfast")) {
 						Settings.getInstance().setHierarhicalNamesTemp(true);
@@ -206,7 +208,7 @@ public class GenerateFlatDatabase
 		final String notWrite = "File cannot be written: ";
 		final String notRead = "File cannot be read: ";
 
-		if (dbdFile != null) {
+		/*if (dbdFile != null) {
 			if (!dbdFile.exists()) {
 				System.err.println(notExist + dbdFile);
 
@@ -218,7 +220,7 @@ public class GenerateFlatDatabase
 
 				return false;
 			}
-		}
+		}*/
 
 		if (!vdbFile.exists()) {
 			System.err.println(notExist + vdbFile);

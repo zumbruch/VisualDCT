@@ -69,8 +69,6 @@ protected DataProvider() {
 	loadedDBDs = new Vector();
 	currentDBDs = new Vector();
 
-	//loadedDBs = new Vector();
-
 	linkTypeConfigTable = new Hashtable();
 	loadDefaultLinkTypeConfig();
 }
@@ -246,14 +244,13 @@ public void setDbdDB(com.cosylab.vdct.dbd.DBDData newDbdDB) {
  * Returns the currentDBDs.
  * @return Vector
  */
-public Vector getDBDs()
-//public Vector getCurrentDBDs()
+public Vector getCurrentDBDs()
 {
 	return currentDBDs;
 }
 
 /**
- * Returns the loadedDBDs.
+ * Returns the loadedDBs.
  * @return Vector
  */
 public Vector getLoadedDBDs()
@@ -261,13 +258,4 @@ public Vector getLoadedDBDs()
 	return loadedDBDs;
 }
 
-/**
- * Returns the loadedDBs.
- * @return Vector
- */
-/*public Vector getLoadedDBs()
-{
-	return loadedDBs;
-}
-*/
 }

@@ -39,9 +39,9 @@ import com.cosylab.vdct.about.VisualDCTAboutDialogEngine;
 import com.cosylab.vdct.events.*;
 import com.cosylab.vdct.events.commands.*;
 import com.cosylab.vdct.util.ComboBoxFileChooser;
+import com.cosylab.vdct.util.DBDEntry;
 import com.cosylab.vdct.util.UniversalFileFilter;
 import com.cosylab.vdct.vdb.VDBData;
-import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.printing.*;
 
 import com.cosylab.vdct.graphics.*;
@@ -6058,8 +6058,11 @@ public boolean openDBD(String fileName, boolean allowDB) {
 
 	try {
 
-		if (!allowDB || theFile.getName().toUpperCase().endsWith("DBD"))
-			cmd.getGUIMenuInterface().openDBD(theFile);
+		if (!allowDB || theFile.getName().toUpperCase().endsWith("DBD")) {
+			DBDEntry entry = new DBDEntry(theFile.getPath());
+			DataProvider.getInstance().getCurrentDBDs().add(entry);
+			cmd.getGUIMenuInterface().openDBD(entry.getFile()); 
+		}
 		else if (allowDB)
 			cmd.getGUIMenuInterface().openDB(theFile);
 	} catch (java.io.IOException e) {
@@ -6583,31 +6586,25 @@ public void renameOKButton_ActionPerformed(java.awt.event.ActionEvent actionEven
  * Comment
  */
 public void save_As_GroupMenuItem_ActionPerformed() {
-	ComboBoxFileChooser chooserDialog = getComboBoxFileChooser();
-	JFileChooser chooser = chooserDialog.getJFileChooser();
-
+	JFileChooser chooser = getfileChooser();
 	UniversalFileFilter filter = new UniversalFileFilter(
 		new String[] {"db", "vdb"}, "EPICS DB files");
 	chooser.resetChoosableFileFilters();
 	chooser.addChoosableFileFilter(filter);
-	chooserDialog.setTitle("Save Group as...");
- 	chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-	chooser.setDialogType(JFileChooser.SAVE_DIALOG);
-	chooserDialog.getJCheckBoxAbsoluteDBD().setSelected(Group.getAbsoluteDBDs());
+	chooser.setDialogTitle("Save Group as...");
+	chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
 	boolean jFileChooserConfirmed = false;
     java.io.File theFile = null;
 
 	while(!jFileChooserConfirmed)
 	{
-		int retval = chooserDialog.showDialog(); 
-		
+		int retval = chooser.showSaveDialog(this);
+
 		if(retval == JFileChooser.CANCEL_OPTION)
 			return;
 
 	    theFile = chooser.getSelectedFile();
-
-		if (theFile == null) theFile = new File("");
 
 		// fix ending
 		if (chooser.getFileFilter().getDescription().startsWith("EPICS") &&
@@ -6633,7 +6630,6 @@ public void save_As_GroupMenuItem_ActionPerformed() {
 	    GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
 		try
 		{
-			Group.setAbsoluteDBDs(chooserDialog.getJCheckBoxAbsoluteDBD().isSelected());
 		    cmd.getGUIMenuInterface().saveAsGroup(theFile);
 		}
 		catch(java.io.IOException e)
@@ -6705,31 +6701,25 @@ public void generateAsGroupMenuItem_ActionPerformed() {
  * Comment
  */
 public void save_AsMenuItem_ActionPerformed() {
-	ComboBoxFileChooser chooserDialog  = getComboBoxFileChooser();
-	JFileChooser chooser = chooserDialog.getJFileChooser();
-
+	JFileChooser chooser = getfileChooser();
 	UniversalFileFilter filter = new UniversalFileFilter(
 		new String[] {"db", "vdb"}, "EPICS DB files");
 	chooser.resetChoosableFileFilters();
 	chooser.addChoosableFileFilter(filter);
-	chooserDialog.setTitle("Save as...");
+	chooser.setDialogTitle("Save as...");
 	chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-	chooser.setDialogType(JFileChooser.SAVE_DIALOG);
-	chooserDialog.getJCheckBoxAbsoluteDBD().setSelected(Group.getAbsoluteDBDs());
 
 	boolean jFileChooserConfirmed = false;
     java.io.File theFile = null;
 
 	while(!jFileChooserConfirmed)
 	{
-		int retval = chooserDialog.showDialog();
-				
+		int retval = chooser.showSaveDialog(this);
+
 		if(retval == JFileChooser.CANCEL_OPTION)
 			return;
 			
 	    theFile = chooser.getSelectedFile();
-
-		if (theFile == null) theFile = new File("");
 
 		// fix ending
 		if (chooser.getFileFilter().getDescription().startsWith("EPICS") &&
@@ -6756,7 +6746,6 @@ public void save_AsMenuItem_ActionPerformed() {
 	    GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
 		try
 		{
-			Group.setAbsoluteDBDs(chooserDialog.getJCheckBoxAbsoluteDBD().isSelected());
 		    cmd.getGUIMenuInterface().save(theFile);
 		    openedFile = theFile;
 		}
@@ -6772,22 +6761,20 @@ public void save_AsMenuItem_ActionPerformed() {
  * Comment
  */
 public void saveAsTemplateMenuItem_ActionPerformed() {
-	ComboBoxFileChooser chooserDialog = getComboBoxFileChooser();
-	JFileChooser chooser = chooserDialog.getJFileChooser();
+	JFileChooser chooser = getfileChooser();
 	UniversalFileFilter filter = new UniversalFileFilter(
 		new String[] {"db", "vdb"}, "EPICS DB files");
 	chooser.resetChoosableFileFilters();
 	chooser.addChoosableFileFilter(filter);
 	chooser.setDialogTitle("Save as Template");
 	chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-	chooser.setDialogType(JFileChooser.SAVE_DIALOG);
 
 	boolean jFileChooserConfirmed = false;
     java.io.File theFile = null;
 
 	while(!jFileChooserConfirmed)
 	{
-		int retval = chooserDialog.showDialog();
+		int retval = chooser.showSaveDialog(this);
 
 		if(retval == JFileChooser.CANCEL_OPTION)
 			return;
