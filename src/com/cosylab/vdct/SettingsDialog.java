@@ -198,7 +198,9 @@ public class SettingsDialog extends javax.swing.JDialog {
 		
 		jCheckBoxDefaultVisiblity.setSelected(s.isDefaultVisibility());
 		jCheckBoxLinksVisibility.setSelected(s.isHideLinks());
-		
+
+		jCheckBoxWireCrossingAvoidiance.setSelected(s.isWireCrossingAvoidiance());
+
 		//legend
 		jTextFieldLogo.setText(s.getLegendLogo());
 		switch (s.getLegendVisibility()) {
@@ -245,6 +247,8 @@ public class SettingsDialog extends javax.swing.JDialog {
 		s.setDefaultVisibility(jCheckBoxDefaultVisiblity.isSelected());
 		s.setHideLinks(jCheckBoxLinksVisibility.isSelected());
 		Group.getRoot().updateFields();
+		
+		s.setWireCrossingAvoidiance(jCheckBoxWireCrossingAvoidiance.isSelected());
 		
 		// legend
 		s.setLegendLogo(jTextFieldLogo.getText());

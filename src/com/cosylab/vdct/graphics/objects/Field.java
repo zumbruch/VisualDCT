@@ -30,6 +30,7 @@ package com.cosylab.vdct.graphics.objects;
 
 import java.awt.*;
 import com.cosylab.vdct.Constants;
+import com.cosylab.vdct.Settings;
 import com.cosylab.vdct.graphics.*;
 import com.cosylab.vdct.vdb.*;
 
@@ -186,7 +187,7 @@ protected void validate() {
 	 * @return
 	 */
 	public int getVerticalPosition() {
-	    return Constants.WIRE_CROSSING_AVOIDIANCE ? verticalPosition : 0;
+	    return Settings.getInstance().isWireCrossingAvoidiance() ? verticalPosition : 0;
 	}
 
 	/**

@@ -30,6 +30,7 @@ package com.cosylab.vdct.graphics.objects;
 
 import java.awt.*;
 import com.cosylab.vdct.Constants;
+import com.cosylab.vdct.Settings;
 import com.cosylab.vdct.graphics.*;
 
 /**
@@ -348,7 +349,7 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 	}
 */	
 
-	if (Constants.WIRE_CROSSING_AVOIDIANCE)		// smart connectors
+	if (Settings.getInstance().isWireCrossingAvoidiance())		// smart connectors
 	{
 		int vx = firstHorizontal ? x2 : x1;
 		

@@ -62,6 +62,8 @@ public class Settings {
 	private boolean defaultVisibility = true;
 	private boolean hideLinks = false;
 	
+	private boolean wireCrossingAvoidiance = true;
+	
 	private int doubleClickSpeed = -1;
 	private int doubleClickSmudge = 4;
 	
@@ -103,6 +105,7 @@ protected Settings() {
 	canvasHeight = prefs.getInt("CanvasHeight", 5000);
 	defaultVisibility = prefs.getBoolean("DefaultVisibility", true);
 	hideLinks = prefs.getBoolean("HideLinks", false);
+	wireCrossingAvoidiance = prefs.getBoolean("WireCrossingAvoidiance", wireCrossingAvoidiance);
 	
 	legendLogo = prefs.get("LegendLogo", "");
 	legendVisibility = prefs.getInt("LegendVisibility", 1);
@@ -644,6 +647,15 @@ public void loadRecentFiles()
 	}
 
 	/**
+	 * @param b
+	 */
+	public void setWireCrossingAvoidiance(boolean b) {
+		wireCrossingAvoidiance = b;
+		prefs.putBoolean("WireCrossingAvoidiance", wireCrossingAvoidiance);
+		sync();
+	}
+
+	/**
 	 * @return
 	 */
 	public int getLegendNavigatorHeight() {
@@ -691,4 +703,11 @@ public void loadRecentFiles()
 		sync();
 	}
 
+	/**
+	 * @return
+	 */
+    public boolean isWireCrossingAvoidiance()
+    {
+        return wireCrossingAvoidiance;
+    }
 }
