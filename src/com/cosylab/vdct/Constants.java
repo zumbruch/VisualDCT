@@ -92,6 +92,8 @@ public class Constants {
 
     public static final String DEFAULT_FONT = "sansserif";
 
+/*
+	// VDCT mode
     public final static Color BACKGROUND_COLOR = Color.white;
     public final static Color PICK_COLOR = Color.pink;
     public final static Color FRAME_COLOR = Color.black;
@@ -99,6 +101,18 @@ public class Constants {
     public final static Color LINE_COLOR = Color.black;
     public final static Color RECORD_COLOR = Color.white;
     public final static Color SELECTION_COLOR = Color.pink;
+    public final static Color LINK_COLOR = Color.white;
+
+    public final static Color GRID_COLOR = Color.lightGray;
+*/
+	// Capfast mode
+    public final static Color BACKGROUND_COLOR = Color.black;
+    public final static Color PICK_COLOR = Color.red;
+    public final static Color FRAME_COLOR = Color.white;
+    public final static Color HILITE_COLOR = Color.yellow;
+    public final static Color LINE_COLOR = Color.white;
+    public final static Color RECORD_COLOR = Color.black;
+    public final static Color SELECTION_COLOR = Color.red;
     public final static Color LINK_COLOR = Color.white;
 
     public final static Color GRID_COLOR = Color.lightGray;
