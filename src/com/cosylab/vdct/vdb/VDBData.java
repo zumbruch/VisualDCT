@@ -479,10 +479,6 @@ private static VDBData generateTemplate(DBDData dbd, DBTemplate dbTemplate)
 
 		VDBData.addTemplate(vt);
 
-		// validate all links
-		// !!? should I move this into finally scope?
-		Group.getRoot().manageLinks(true);
-		
 		return vdbData;
 	}
 	catch (Exception ex)
@@ -494,6 +490,8 @@ private static VDBData generateTemplate(DBDData dbd, DBTemplate dbTemplate)
 	}
 	finally
 	{
+		// validate all links
+		Group.getRoot().manageLinks(true);
 		Group.setRoot(root); 
 	}
 	

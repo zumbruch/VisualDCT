@@ -153,25 +153,58 @@ protected void draw(Graphics g, boolean hilited) {
 	int len;
 	int rrx;			// rrx, rry is center
 	if (isRightSide)
-	{
 		rrx = getRx()+getRwidth()-view.getRx();
-		len = 3*r;
-	}
 	else
-	{ 
 		rrx = getRx()-view.getRx();
-		len = - 3*r;
-	}
 	
-	int rryField = getRy()-view.getRy();
 	int rry = (int)(getRscale()*getInY()- view.getRy());
 	
 	if (!hilited) g.setColor(Constants.FRAME_COLOR);
 	else g.setColor((this==view.getHilitedObject()) ? 
 					Constants.HILITE_COLOR : Constants.FRAME_COLOR);
 
-	g.drawLine(rrx, rryField, rrx+len, rry);
-	g.drawLine(rrx, rryField+getRheight(), rrx+len, rry);
+
+	int mode = OutLink.CONSTANT_PORT_MODE;
+	Port visiblePort = ((VDBTemplatePort)getFieldData()).getPort().getVisibleObject();
+	if (visiblePort!=null)
+		mode = visiblePort.getMode();
+	
+	if (mode == OutLink.INPUT_PORT_MODE)
+	{
+		// input link
+		int arrowLength = 2*r;
+
+		// draw arrow
+		g.drawLine(rrx, rry-r, rrx+arrowLength, rry-r);
+		g.drawLine(rrx, rry+r, rrx+arrowLength, rry+r);
+		
+		int dr=-r; 
+		if (isRightSide) {
+			dr=-dr;
+			rrx+=arrowLength;
+		}
+		g.drawLine(rrx, rry-r, rrx+dr, rry);
+		g.drawLine(rrx, rry+r, rrx+dr, rry);
+	}
+	else if (mode == OutLink.OUTPUT_PORT_MODE)
+	{
+		// output link	
+		int arrowLength = 3*r;
+
+		// draw arrow
+		g.drawLine(rrx, rry-r, rrx+arrowLength, rry-r);
+		g.drawLine(rrx, rry+r, rrx+arrowLength, rry+r);
+		
+		int dr=r; 
+		if (isRightSide) {
+			dr=-dr;
+			rrx+=arrowLength;
+		}
+		g.drawLine(rrx, rry-r, rrx+dr, rry);
+		g.drawLine(rrx, rry+r, rrx+dr, rry);
+	}
+	//else 	
+		// constant (none)
 
 
 

@@ -214,6 +214,24 @@ public static void fixLink(EPICSVarLink varlink)
 	}
 }
 
+
+/**
+ * Returns true if link is softeare link
+ * Creation date: (30.1.2001 9:36:15)
+ * @return boolean
+ * @param field com.cosylab.vdct.vdb.VDBFieldData
+ */
+public static boolean isSoftwareLink(VDBFieldData field)
+{
+	if (field.getValue().startsWith(Constants.HARDWARE_LINK) ||
+		field.getValue().startsWith("@") ||    // !!!??
+		field.getValue().equals(nullString) ||
+		Character.isDigit(field.getValue().charAt(0))) 
+		return false; 	//!!!
+	else
+		return true;
+}
+
 /**
  * Insert the method's description here.
  * Creation date: (30.1.2001 9:36:15)
@@ -247,11 +265,9 @@ public boolean manageLink(VDBFieldData field) {
 		}
 		else
 		{
-			if (field.getValue().startsWith(Constants.HARDWARE_LINK) ||
-				field.getValue().startsWith("@") ||    // !!!??
-				field.getValue().equals(nullString) ||
-				Character.isDigit(field.getValue().charAt(0))) 
-				return false; 	//!!!
+			if (!LinkManagerObject.isSoftwareLink(field))
+				return false;
+				
 			// new link
 			LinkProperties properties = new LinkProperties(field);
 			InLink varlink = EPICSLinkOut.getTarget(properties);

@@ -1348,6 +1348,11 @@ public void writeObjects(DataOutputStream file, NameManipulator namer, boolean e
 	 
 	 // new addedPrefix
 	 String addedPrefix = null;
+/*
+	//
+	// no adding !!! anyway I noticed added prefix is not reset (to be checked, if this code is used someday)...
+	//
+	 
 	 if (getParent()==null)
 	 	addedPrefix = namer.getAddedPrefix();
 	 else
@@ -1367,7 +1372,7 @@ public void writeObjects(DataOutputStream file, NameManipulator namer, boolean e
 	 	else if (addedPrefix.charAt(len-1)!=Constants.GROUP_SEPARATOR)
 	 		addedPrefix = addedPrefix + Constants.GROUP_SEPARATOR;
 	 }
-	 
+*/	 
 	 NameManipulator newNamer = new DefaultNamer(namer.getFile(), removedPrefix, addedPrefix, properties, ports);
 
 	 file.writeBytes("\n# expand(\""+getTemplateData().getTemplate().getFileName()+"\", "+templateName+")\n");
