@@ -6198,7 +6198,7 @@ public void pluginManagerMenuItem_ActionPerformed(java.awt.event.ActionEvent act
  * Comment
  */
 public void preferences___MenuItem_ActionPerformed() {
-	SettingsDialog sd = new SettingsDialog(this);
+	SettingsDialog sd = new SettingsDialog(this, true);
 	sd.setLocationRelativeTo(this);
 	sd.setVisible(true);
 }

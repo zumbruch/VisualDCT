@@ -1,582 +1,60 @@
+/*
+ * SettingsDialog2.java
+ *
+ * Created on August 13, 2004, 9:57 AM
+ */
+
 package com.cosylab.vdct;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
+
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.io.File;
 
 import javax.swing.DefaultBoundedRangeModel;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.JSpinner;
-import javax.swing.event.MouseInputListener;
+import javax.swing.JFileChooser;
+import javax.swing.JToggleButton;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.MouseInputAdapter;
 
 import com.cosylab.vdct.util.DoubleClickProxy;
+import com.cosylab.vdct.util.UniversalFileFilter;
 
 /**
- * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
- * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
- *
- * Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer. 
- * Redistributions in binary form must reproduce the above copyright notice,
- * this list of conditions and the following disclaimer in the documentation 
- * and/or other materials provided with the distribution. 
- * Neither the name of the Cosylab, Ltd., Control System Laboratory nor the names
- * of its contributors may be used to endorse or promote products derived 
- * from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE 
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, 
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
-
-/**
- * Insert the type's description here.
- * Creation date: (23.5.2001 15:31:19)
- * @author 
+ * @author  ilist
  */
 public class SettingsDialog extends javax.swing.JDialog {
-	private javax.swing.JButton ivjJButton2 = null;
-	private javax.swing.JPanel ivjJDialogContentPane = null;
-	private javax.swing.JPanel ivjJPanel1 = null;
-	private javax.swing.JCheckBox ivjGroupingCheckBox = null;
-	private javax.swing.JCheckBox ivjFastMoveCheckBox = null;
-	private javax.swing.JPanel ivjGroupingPanel = null;
-	private javax.swing.JLabel ivjGroupingSeparatorLabel = null;
-	private javax.swing.JTextField ivjGroupingSeparatorTextField = null;
-	private javax.swing.JButton ivjOKButton = null;
-	IvjEventHandler ivjEventHandler = new IvjEventHandler();
-	private javax.swing.JLabel ivjWarningLabel = null;
-	
-	private javax.swing.JCheckBox GlobalMacrosCheckBox = null;
-	private javax.swing.JCheckBox HierarhicalNamesCheckBox = null; 
-	private javax.swing.JPanel MacrosPanel = null;
-	private javax.swing.JPanel DoubleClickPanel = null;
-	private javax.swing.JPanel RecordLengthPanel = null;
-	private JSlider JSliderDoubleClickSpeed = null;
-	private JSlider JSliderDoubleClickSmudge = null;
-	private JSpinner JSpinnerRecordLength = null;
-	
-class IvjEventHandler implements java.awt.event.ActionListener, java.awt.event.KeyListener {
-		public void actionPerformed(java.awt.event.ActionEvent e) {
-			if (e.getSource() == SettingsDialog.this.getJButton2()) 
-				connEtoM2(e);
-			if (e.getSource() == SettingsDialog.this.getGroupingCheckBox()) 
-				connEtoC1(e);
-			if (e.getSource() == SettingsDialog.this.getOKButton()) 
-				connEtoC2(e);
-		};
-		public void keyPressed(java.awt.event.KeyEvent e) {};
-		public void keyReleased(java.awt.event.KeyEvent e) {};
-		public void keyTyped(java.awt.event.KeyEvent e) {
-			if (e.getSource() == SettingsDialog.this.getGroupingSeparatorTextField()) 
-				connEtoC3(e);
-		};
-	};
-/**
- * SettingsDialog constructor comment.
- */
-public SettingsDialog() {
-	super();
-	initialize();
-	initializeMacros();
-}
-/**
- * SettingsDialog constructor comment.
- * @param owner java.awt.Frame
- */
-public SettingsDialog(java.awt.Frame owner) {
-	super(owner, true);
-	initialize();
-	initializeMacros();	
-}
-/**
- * SettingsDialog constructor comment.
- * @param owner java.awt.Frame
- * @param modal boolean
- */
-public SettingsDialog(java.awt.Frame owner, boolean modal) {
-	super(owner, modal);
-	initialize();
-	initializeMacros();	
-}
-/**
- * connEtoC1:  (GroupingCheckBox.action.actionPerformed(java.awt.event.ActionEvent) --> SettingsDialog.groupingCheckBox_ActionPerformed(Ljava.awt.event.ActionEvent;)V)
- * @param arg1 java.awt.event.ActionEvent
- */
-/* WARNING: THIS METHOD WILL BE REGENERATED. */
-private void connEtoC1(java.awt.event.ActionEvent arg1) {
-	try {
-		// user code begin {1}
-		// user code end
-		this.groupingCheckBox_ActionPerformed(null);
-		// user code begin {2}
-		// user code end
-	} catch (java.lang.Throwable ivjExc) {
-		// user code begin {3}
-		// user code end
-		handleException(ivjExc);
-	}
-}
-/**
- * connEtoC2:  (OKButton.action.actionPerformed(java.awt.event.ActionEvent) --> SettingsDialog.oKButton_ActionPerformed(Ljava.awt.event.ActionEvent;)V)
- * @param arg1 java.awt.event.ActionEvent
- */
-/* WARNING: THIS METHOD WILL BE REGENERATED. */
-private void connEtoC2(java.awt.event.ActionEvent arg1) {
-	try {
-		// user code begin {1}
-		// user code end
-		this.oKButton_ActionPerformed(null);
-		// user code begin {2}
-		// user code end
-	} catch (java.lang.Throwable ivjExc) {
-		// user code begin {3}
-		// user code end
-		handleException(ivjExc);
-	}
-}
-/**
- * connEtoC3:  (GroupingSeparatorTextField.key.keyTyped(java.awt.event.KeyEvent) --> SettingsDialog.groupingSeparatorTextField_KeyTyped(Ljava.awt.event.KeyEvent;)V)
- * @param arg1 java.awt.event.KeyEvent
- */
-/* WARNING: THIS METHOD WILL BE REGENERATED. */
-private void connEtoC3(java.awt.event.KeyEvent arg1) {
-	try {
-		// user code begin {1}
-		// user code end
-		this.groupingSeparatorTextField_KeyTyped(arg1);
-		// user code begin {2}
-		// user code end
-	} catch (java.lang.Throwable ivjExc) {
-		// user code begin {3}
-		// user code end
-		handleException(ivjExc);
-	}
-}
-/**
- * connEtoM2:  (JButton2.action.actionPerformed(java.awt.event.ActionEvent) --> SettingsDialog.dispose()V)
- * @param arg1 java.awt.event.ActionEvent
- */
-/* WARNING: THIS METHOD WILL BE REGENERATED. */
-private void connEtoM2(java.awt.event.ActionEvent arg1) {
-	try {
-		// user code begin {1}
-		// user code end
-		cancelButton_ActionPerformed(null);
-		// user code begin {2}
-		// user code end
-	} catch (java.lang.Throwable ivjExc) {
-		// user code begin {3}
-		// user code end
-		handleException(ivjExc);
-	}
-}
-/**
- * connPtoP1SetTarget:  (GroupingCheckBox.selected <--> GroupingSeparatorLabel.enabled)
- */
-/* WARNING: THIS METHOD WILL BE REGENERATED. */
-private void connPtoP1SetTarget() {
-	/* Set the target from the source */
-	try {
-		getGroupingSeparatorLabel().setEnabled(getGroupingCheckBox().isSelected());
-		// user code begin {1}
-		// user code end
-	} catch (java.lang.Throwable ivjExc) {
-		// user code begin {3}
-		// user code end
-		handleException(ivjExc);
-	}
-}
-/**
- * connPtoP2SetTarget:  (GroupingCheckBox.selected <--> GroupingSeparatorTextField.enabled)
- */
-/* WARNING: THIS METHOD WILL BE REGENERATED. */
-private void connPtoP2SetTarget() {
-	/* Set the target from the source */
-	try {
-		getGroupingSeparatorTextField().setEnabled(getGroupingCheckBox().isSelected());
-		// user code begin {1}
-		// user code end
-	} catch (java.lang.Throwable ivjExc) {
-		// user code begin {3}
-		// user code end
-		handleException(ivjExc);
-	}
-}
-/**
- * Return the GroupingCheckBox property value.
- * @return javax.swing.JCheckBox
- */
-/* WARNING: THIS METHOD WILL BE REGENERATED. */
-private javax.swing.JCheckBox getGroupingCheckBox() {
-	if (ivjGroupingCheckBox == null) {
-		try {
-			ivjGroupingCheckBox = new javax.swing.JCheckBox();
-			ivjGroupingCheckBox.setName("GroupingCheckBox");
-			ivjGroupingCheckBox.setSelected(true);
-			ivjGroupingCheckBox.setText("Enable Grouping");
-			// user code begin {1}
-			// user code end
-		} catch (java.lang.Throwable ivjExc) {
-			// user code begin {2}
-			// user code end
-			handleException(ivjExc);
-		}
-	}
-	return ivjGroupingCheckBox;
-}
+    
+    /** Creates new form SettingsDialog */
+    public SettingsDialog(java.awt.Frame parent, boolean modal) {
+        super(parent, modal);
+        initComponents();
+        initModel();
+        loadSettings();
+    }
+    
+    /**
+	 * 
+	 */
+	private void initModel() {
+		jSliderDoubleClickSmudge.setModel(new DefaultBoundedRangeModel(){
+			public int getMaximum() {
+				return 10;
+			}
 
-private javax.swing.JCheckBox getFastMoveCheckBox() {
-	if (ivjFastMoveCheckBox == null) {
-		try {
-			ivjFastMoveCheckBox = new javax.swing.JCheckBox();
-			ivjFastMoveCheckBox.setName("FastMoveCheckBox");
-			ivjFastMoveCheckBox.setSelected(true);
-			ivjFastMoveCheckBox.setText("Silhouette when moving a record");
-			// user code begin {1}
-			// user code end
-		} catch (java.lang.Throwable ivjExc) {
-			// user code begin {2}
-			// user code end
-			handleException(ivjExc);
-		}
-	}
-	return ivjFastMoveCheckBox;
-}
+			public int getValue() {
+				return DoubleClickProxy.getAwt_multiclick_smudge();
+			}
 
-
-private javax.swing.JCheckBox getGlobalMacrosCheckBox() {
-	if (GlobalMacrosCheckBox == null) {
-		try {
-			GlobalMacrosCheckBox = new javax.swing.JCheckBox();
-			GlobalMacrosCheckBox.setName("GlobalMacrosCheckBox");
-			GlobalMacrosCheckBox.setSelected(false);
-			GlobalMacrosCheckBox.setText("Enable global macros evaluation");			
-		} catch (java.lang.Throwable ivjExc) {
-			handleException(ivjExc);
-		}
-	}
-	return GlobalMacrosCheckBox;
-}
-
-private javax.swing.JCheckBox getHierarhicalNamesCheckBox() {
-	if (HierarhicalNamesCheckBox == null) {
-		try {
-			HierarhicalNamesCheckBox = new javax.swing.JCheckBox();
-			HierarhicalNamesCheckBox.setName("HierarhicalNamesCheckBox");
-			HierarhicalNamesCheckBox.setSelected(false);
-			HierarhicalNamesCheckBox.setText("Produce hierarchical names like CapFast");			
-		} catch (java.lang.Throwable ivjExc) {
-			handleException(ivjExc);
-		}
-	}
-	return HierarhicalNamesCheckBox;
-}
-
-/**
- * Return the GroupingPanel property value.
- * @return javax.swing.JPanel
- */
-/* WARNING: THIS METHOD WILL BE REGENERATED. */
-private javax.swing.JPanel getGroupingPanel() {
-	if (ivjGroupingPanel == null) {
-		try {
-			ivjGroupingPanel = new javax.swing.JPanel();
-			ivjGroupingPanel.setName("GroupingPanel");
-			ivjGroupingPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(" Grouping "));
-			ivjGroupingPanel.setLayout(new java.awt.GridBagLayout());
-
-			java.awt.GridBagConstraints constraintsGroupingCheckBox = new java.awt.GridBagConstraints();
-			constraintsGroupingCheckBox.gridx = 0; constraintsGroupingCheckBox.gridy = 0;
-			constraintsGroupingCheckBox.insets = new java.awt.Insets(4, 14, 4, 4);
-			constraintsGroupingCheckBox.weighty = 1.0;
-			constraintsGroupingCheckBox.weightx = 1.0;
-			constraintsGroupingCheckBox.gridwidth = 2;
-			constraintsGroupingCheckBox.anchor = GridBagConstraints.WEST;
-			getGroupingPanel().add(getGroupingCheckBox(), constraintsGroupingCheckBox);
-
-			java.awt.GridBagConstraints constraintsGroupingSeparatorLabel = new java.awt.GridBagConstraints();
-			constraintsGroupingSeparatorLabel.gridx = 0; constraintsGroupingSeparatorLabel.gridy = 1;
-			constraintsGroupingSeparatorLabel.insets = new java.awt.Insets(4, 14, 4, 4);
-			constraintsGroupingSeparatorLabel.weighty = 1.0;
-			constraintsGroupingSeparatorLabel.anchor = GridBagConstraints.WEST;
-			getGroupingPanel().add(getGroupingSeparatorLabel(), constraintsGroupingSeparatorLabel);
-
-			java.awt.GridBagConstraints constraintsGroupingSeparatorTextField = new java.awt.GridBagConstraints();
-			constraintsGroupingSeparatorTextField.gridx = 1; constraintsGroupingSeparatorTextField.gridy = 1;
-			constraintsGroupingSeparatorTextField.anchor = java.awt.GridBagConstraints.WEST;
-			constraintsGroupingSeparatorTextField.weightx = 1.0;
-			constraintsGroupingSeparatorTextField.weighty = 1.0;
-			constraintsGroupingSeparatorTextField.ipadx = 3;
-			constraintsGroupingSeparatorTextField.insets = new java.awt.Insets(4, 4, 4, 4);
-			getGroupingPanel().add(getGroupingSeparatorTextField(), constraintsGroupingSeparatorTextField);
-
-			java.awt.GridBagConstraints constraintsWarningLabel = new java.awt.GridBagConstraints();
-			constraintsWarningLabel.gridx = 0; constraintsWarningLabel.gridy = 2;
-			constraintsWarningLabel.gridwidth = 2;
-			constraintsWarningLabel.fill = java.awt.GridBagConstraints.HORIZONTAL;
-			constraintsWarningLabel.insets = new java.awt.Insets(14, 14, 4, 14);
-			constraintsWarningLabel.weighty = 1.0;
-			constraintsWarningLabel.weightx = 1.0;
-			constraintsWarningLabel.anchor = GridBagConstraints.WEST;
-			getGroupingPanel().add(getWarningLabel(), constraintsWarningLabel);
-			// user code begin {1}
-			// user code end
-		} catch (java.lang.Throwable ivjExc) {
-			// user code begin {2}
-			// user code end
-			handleException(ivjExc);
-		}
-	}
-	return ivjGroupingPanel;
-}
-
-private javax.swing.JPanel getMacrosPanel() {
-	if (MacrosPanel == null) {
-		try {
-			MacrosPanel = new javax.swing.JPanel();
-			MacrosPanel.setName("MacrosPanel");
-			MacrosPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(" Generating Flat Database "));
-			MacrosPanel.setLayout(new java.awt.GridBagLayout());
-
-			java.awt.GridBagConstraints constraintsGlobalMacrosCheckBox = new java.awt.GridBagConstraints();
-			constraintsGlobalMacrosCheckBox.gridx = 0; constraintsGlobalMacrosCheckBox.gridy = 0;
-			constraintsGlobalMacrosCheckBox.anchor = java.awt.GridBagConstraints.WEST;
-			constraintsGlobalMacrosCheckBox.weightx = 1.0;
-			constraintsGlobalMacrosCheckBox.weighty = 1.0;
-			constraintsGlobalMacrosCheckBox.insets = new java.awt.Insets(4, 14, 0, 4);
-			getMacrosPanel().add(getGlobalMacrosCheckBox(), constraintsGlobalMacrosCheckBox);
-
-			java.awt.GridBagConstraints constraintsHierarhicalNamesCheckBox = new java.awt.GridBagConstraints();
-			constraintsHierarhicalNamesCheckBox.gridx = 0; constraintsHierarhicalNamesCheckBox.gridy = 1;
-			constraintsHierarhicalNamesCheckBox.anchor = java.awt.GridBagConstraints.WEST;
-			constraintsHierarhicalNamesCheckBox.weightx = 1.0;
-			constraintsHierarhicalNamesCheckBox.weighty = 1.0;
-			constraintsHierarhicalNamesCheckBox.insets = new java.awt.Insets(4, 14, 4, 4);
-			getMacrosPanel().add(getHierarhicalNamesCheckBox(), constraintsHierarhicalNamesCheckBox);
-
-		} catch (java.lang.Throwable ivjExc) {
-							
-			handleException(ivjExc);
-		}
-	}
-	return MacrosPanel;
-}
-
-private javax.swing.JPanel getDoubleClickPanel() {
-	if (DoubleClickPanel == null) {
-		try {
-			DoubleClickPanel = new javax.swing.JPanel();
-			DoubleClickPanel.setName("DoubleClickPanel");
-			DoubleClickPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(" Visual Settings "));
-			DoubleClickPanel.setLayout(new java.awt.GridBagLayout());
-
-			java.awt.GridBagConstraints gridBagConstraints;
-			
-			gridBagConstraints = new java.awt.GridBagConstraints();
-			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy = 0;
-			gridBagConstraints.anchor = GridBagConstraints.WEST;
-			gridBagConstraints.weightx = 1.0;
-			gridBagConstraints.insets = new java.awt.Insets(4, 14, 4, 4);
-			getDoubleClickPanel().add(new JLabel("Double click speed: "), gridBagConstraints);
-			
-			gridBagConstraints = new java.awt.GridBagConstraints();
-			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy = 1;
-			gridBagConstraints.anchor = GridBagConstraints.WEST;
-			gridBagConstraints.weightx = 1.0;
-			gridBagConstraints.insets = new java.awt.Insets(4, 14, 4, 4);
-			getDoubleClickPanel().add(getJSliderDoubleClickSpeed(), gridBagConstraints);
-
-			gridBagConstraints = new java.awt.GridBagConstraints();
-			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy = 2;
-			gridBagConstraints.anchor = GridBagConstraints.WEST;
-			gridBagConstraints.weightx = 1.0;
-			gridBagConstraints.insets = new java.awt.Insets(4, 14, 4, 4);
-			getDoubleClickPanel().add(new JLabel("Double click smudge: "), gridBagConstraints);
-			
-			gridBagConstraints = new java.awt.GridBagConstraints();
-			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy = 3;
-			gridBagConstraints.anchor = GridBagConstraints.WEST;
-			gridBagConstraints.weightx = 1.0;
-			gridBagConstraints.insets = new java.awt.Insets(4, 14, 4, 4);
-			getDoubleClickPanel().add(getJSliderDoubleClickSmudge(), gridBagConstraints);
-
-			gridBagConstraints = new java.awt.GridBagConstraints();
-			gridBagConstraints.gridx = 1;
-			gridBagConstraints.gridy = 0;
-			gridBagConstraints.anchor = GridBagConstraints.WEST;
-			gridBagConstraints.insets = new java.awt.Insets(4, 4, 14, 14);
-			getDoubleClickPanel().add(new JLabel("Test"), gridBagConstraints);
-
-			final JPanel testPanel = new JPanel();
-			final JLabel testLabel = new JLabel("0");
-			testLabel.setHorizontalAlignment(JLabel.CENTER);
-			testPanel.setLayout(new BorderLayout());						
-			testPanel.add(testLabel, BorderLayout.CENTER);
-			testPanel.setMinimumSize(new Dimension(64,64));
-			testPanel.setPreferredSize(new Dimension(64,64));
-			
-			DoubleClickProxy proxy = new DoubleClickProxy(new MouseInputListener() {
-
-				public void mouseClicked(MouseEvent e) {
-					testLabel.setText(new Integer(e.getClickCount()).toString());				
-				}
-
-				public void mouseEntered(MouseEvent e) {	
-				}
-
-				public void mouseExited(MouseEvent e) {
-				}
-
-				public void mousePressed(MouseEvent e) {
-				}
-
-				public void mouseReleased(MouseEvent e) {
-				}
-
-				public void mouseDragged(MouseEvent e) {
-				}
-
-				public void mouseMoved(MouseEvent e) {
-				}
-			});
-			testPanel.addMouseListener(proxy);
-			testPanel.addMouseMotionListener(proxy);
-			testPanel.setBorder(javax.swing.BorderFactory.createLineBorder(java.awt.Color.black));
-			
-			gridBagConstraints = new java.awt.GridBagConstraints();
-			gridBagConstraints.gridx = 1;
-			gridBagConstraints.gridy = 1;
-			gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-			gridBagConstraints.gridheight=3;
-		//	gridBagConstraints.fill = GridBagConstraints.BOTH;
-			gridBagConstraints.insets = new java.awt.Insets(4, 4, 14, 14);
-			getDoubleClickPanel().add(testPanel, gridBagConstraints);
-
-			gridBagConstraints = new java.awt.GridBagConstraints();
-			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy = 4;
-			gridBagConstraints.anchor = GridBagConstraints.WEST;
-			gridBagConstraints.weightx = 1.0;
-			gridBagConstraints.insets = new java.awt.Insets(4, 14, 4, 4);
-			getDoubleClickPanel().add(getFastMoveCheckBox(), gridBagConstraints);
-
-		} catch (java.lang.Throwable ivjExc) {
-							
-			handleException(ivjExc);
-		}
-	}
-	return DoubleClickPanel;
-}
-
-private javax.swing.JPanel getRecordLengthPanel() {
-	if (RecordLengthPanel == null) {
-		try {
-			RecordLengthPanel = new javax.swing.JPanel();
-			RecordLengthPanel.setName("RecordLengthPanel");
-			RecordLengthPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(" Record Name Length Limit Settings "));
-			RecordLengthPanel.setLayout(new java.awt.GridBagLayout());
-
-			java.awt.GridBagConstraints gridBagConstraints;
-			
-			gridBagConstraints = new java.awt.GridBagConstraints();
-			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy = 0;
-			gridBagConstraints.anchor = GridBagConstraints.WEST;
-			gridBagConstraints.insets = new java.awt.Insets(4, 14, 14, 4);
-			getRecordLengthPanel().add(new JLabel("Record name length limit: "), gridBagConstraints);
-			
-			gridBagConstraints = new java.awt.GridBagConstraints();
-			gridBagConstraints.gridx = 1;
-			gridBagConstraints.gridy = 0;
-			gridBagConstraints.anchor = GridBagConstraints.WEST;
-			gridBagConstraints.weightx = 1.0;
-			gridBagConstraints.insets = new java.awt.Insets(4, 4, 14, 14);
-			getRecordLengthPanel().add(getJSpinnerRecordLength(), gridBagConstraints);
-
-		} catch (java.lang.Throwable ivjExc) {
-							
-			handleException(ivjExc);
-		}
-	}
-	return RecordLengthPanel;
-}
-
-/**
- * @return
- */
-private JSlider getJSliderDoubleClickSmudge() {
-	if (JSliderDoubleClickSmudge == null) {
-		try {
-			JSliderDoubleClickSmudge = new javax.swing.JSlider();			
-			JSliderDoubleClickSmudge.setMajorTickSpacing(1);
-			JSliderDoubleClickSmudge.setSnapToTicks(true);
-			JSliderDoubleClickSmudge.setPaintTicks(true);
-			JSliderDoubleClickSmudge.setMinimumSize(JSliderDoubleClickSmudge.getPreferredSize());
-			JSliderDoubleClickSmudge.setModel(new DefaultBoundedRangeModel(){
-				public int getMaximum() {
-					return 10;
-				}
-
-				public int getValue() {
-					return DoubleClickProxy.getAwt_multiclick_smudge();
-				}
-
-				public void setValue(int newValue) {
-					DoubleClickProxy.setAwt_multiclick_smudge(newValue);
-				}
-			});
-		} catch (java.lang.Throwable ivjExc) {
-			handleException(ivjExc);
-		}
-	}
-	return JSliderDoubleClickSmudge;
-}
-
-private JSpinner getJSpinnerRecordLength() {
-	if (JSpinnerRecordLength == null) {
-		try {
-			JSpinnerRecordLength = new JSpinner();			
-			JSpinnerRecordLength.setPreferredSize(new Dimension(60,20));
-			JSpinnerRecordLength.setMinimumSize(new Dimension(60,20));
-		} catch (java.lang.Throwable ivjExc) {
-			handleException(ivjExc);
-		}
-	}
-	return JSpinnerRecordLength;
-}
-
-/**
- * @return
- */
-private JSlider getJSliderDoubleClickSpeed() {
-	if (JSliderDoubleClickSpeed == null) {
-		try {
-			JSliderDoubleClickSpeed = new javax.swing.JSlider();			
-			JSliderDoubleClickSpeed.setMajorTickSpacing(100);
-			JSliderDoubleClickSpeed.setPaintTicks(true);
-			JSliderDoubleClickSpeed.setMinimumSize(JSliderDoubleClickSpeed.getPreferredSize());
-			JSliderDoubleClickSpeed.setModel(new DefaultBoundedRangeModel(){
+			public void setValue(int newValue) {
+				DoubleClickProxy.setAwt_multiclick_smudge(newValue);
+			}
+		});
+		
+		jSliderDoubleClickSpeed.setModel(new DefaultBoundedRangeModel(){
 				public int getMaximum() {
 					return 1000;
 				}
@@ -588,357 +66,679 @@ private JSlider getJSliderDoubleClickSpeed() {
 				public void setValue(int newValue) {
 					DoubleClickProxy.setAwt_multiclick_time(newValue);
 				}
-			});
-		} catch (java.lang.Throwable ivjExc) {
-			handleException(ivjExc);
-		}
-	}
-	return JSliderDoubleClickSpeed;
-}
-
-/**
- * Return the GroupingSeparatorLabel property value.
- * @return javax.swing.JLabel
- */
-/* WARNING: THIS METHOD WILL BE REGENERATED. */
-private javax.swing.JLabel getGroupingSeparatorLabel() {
-	if (ivjGroupingSeparatorLabel == null) {
-		try {
-			ivjGroupingSeparatorLabel = new javax.swing.JLabel();
-			ivjGroupingSeparatorLabel.setName("GroupingSeparatorLabel");
-			ivjGroupingSeparatorLabel.setText("Grouping separator:");
-			// user code begin {1}
-			// user code end
-		} catch (java.lang.Throwable ivjExc) {
-			// user code begin {2}
-			// user code end
-			handleException(ivjExc);
-		}
-	}
-	return ivjGroupingSeparatorLabel;
-}
-/**
- * Return the GroupingSeparatorTextField property value.
- * @return javax.swing.JTextField
- */
-/* WARNING: THIS METHOD WILL BE REGENERATED. */
-private javax.swing.JTextField getGroupingSeparatorTextField() {
-	if (ivjGroupingSeparatorTextField == null) {
-		try {
-			ivjGroupingSeparatorTextField = new javax.swing.JTextField();
-			ivjGroupingSeparatorTextField.setName("GroupingSeparatorTextField");
-			ivjGroupingSeparatorTextField.setOpaque(false);
-			ivjGroupingSeparatorTextField.setBorder(javax.swing.BorderFactory.createLineBorder(java.awt.Color.black));
-			ivjGroupingSeparatorTextField.setText("");
-			ivjGroupingSeparatorTextField.setColumns(/*1 linux needs more space*/3);
-			ivjGroupingSeparatorTextField.setHorizontalAlignment(javax.swing.JLabel.CENTER);
-			ivjGroupingSeparatorTextField.setMargin(new java.awt.Insets(0, 2, 0, 1));
-			ivjGroupingSeparatorTextField.setMinimumSize(ivjGroupingSeparatorTextField.getPreferredSize());
-			// user code begin {1}
-			// user code end
-		} catch (java.lang.Throwable ivjExc) {
-			// user code begin {2}
-			// user code end
-			handleException(ivjExc);
-		}
-	}
-	return ivjGroupingSeparatorTextField;
-}
-/**
- * Return the JButton2 property value.
- * @return javax.swing.JButton
- */
-/* WARNING: THIS METHOD WILL BE REGENERATED. */
-private javax.swing.JButton getJButton2() {
-	if (ivjJButton2 == null) {
-		try {
-			ivjJButton2 = new javax.swing.JButton();
-			ivjJButton2.setName("JButton2");
-			ivjJButton2.setPreferredSize(new java.awt.Dimension(75, 25));
-			ivjJButton2.setText("Cancel");
-			// user code begin {1}
-			// user code end
-		} catch (java.lang.Throwable ivjExc) {
-			// user code begin {2}
-			// user code end
-			handleException(ivjExc);
-		}
-	}
-	return ivjJButton2;
-}
-/**
- * Return the JDialogContentPane property value.
- * @return javax.swing.JPanel
- */
-/* WARNING: THIS METHOD WILL BE REGENERATED. */
-private javax.swing.JPanel getJDialogContentPane() {
-	if (ivjJDialogContentPane == null) {
-		try {
-			ivjJDialogContentPane = new javax.swing.JPanel();
-			ivjJDialogContentPane.setName("JDialogContentPane");
-			ivjJDialogContentPane.setLayout(new java.awt.GridBagLayout());
-			
-			java.awt.GridBagConstraints gridBagConstraints;
-			
-			gridBagConstraints = new java.awt.GridBagConstraints();
-			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy = 0;
-			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-			gridBagConstraints.weightx = 1.0;
-			gridBagConstraints.weighty = 1.0;
-			getJDialogContentPane().add(getGroupingPanel(), gridBagConstraints);
-			
-			gridBagConstraints = new java.awt.GridBagConstraints();
-			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy = 1;
-			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-			gridBagConstraints.weightx = 1.0;
-			gridBagConstraints.weighty = 1.0;
-			getJDialogContentPane().add(getMacrosPanel(), gridBagConstraints);
-			
-			gridBagConstraints = new java.awt.GridBagConstraints();
-			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy = 2;
-			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-			gridBagConstraints.weightx = 1.0;
-			gridBagConstraints.weighty = 1.0;
-			getJDialogContentPane().add(getRecordLengthPanel(), gridBagConstraints);
-			
-			gridBagConstraints = new java.awt.GridBagConstraints();
-			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy = 3;
-			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-			gridBagConstraints.weightx = 1.0;
-			gridBagConstraints.weighty = 1.0;
-			getJDialogContentPane().add(getDoubleClickPanel(), gridBagConstraints);
-			
-			gridBagConstraints = new java.awt.GridBagConstraints();
-			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy = 4;
-			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-			gridBagConstraints.weightx = 1.0;
-			getJDialogContentPane().add(getJPanel1(), gridBagConstraints);			
-			// user code begin {1}
-			// user code end
-		} catch (java.lang.Throwable ivjExc) {
-			// user code begin {2}
-			// user code end
-			handleException(ivjExc);
-		}
-	}
-	return ivjJDialogContentPane;
-}
-/**
- * Return the JPanel1 property value.
- * @return javax.swing.JPanel
- */
-/* WARNING: THIS METHOD WILL BE REGENERATED. */
-private javax.swing.JPanel getJPanel1() {
-	if (ivjJPanel1 == null) {
-		try {
-			ivjJPanel1 = new javax.swing.JPanel();
-			ivjJPanel1.setName("JPanel1");
-			ivjJPanel1.setLayout(new java.awt.GridBagLayout());
-
-			java.awt.GridBagConstraints constraintsOKButton = new java.awt.GridBagConstraints();
-			constraintsOKButton.gridx = 0; constraintsOKButton.gridy = 0;
-			constraintsOKButton.insets = new java.awt.Insets(4, 4, 4, 4);
-			getJPanel1().add(getOKButton(), constraintsOKButton);
-
-			java.awt.GridBagConstraints constraintsJButton2 = new java.awt.GridBagConstraints();
-			constraintsJButton2.gridx = 1; constraintsJButton2.gridy = 0;
-			constraintsJButton2.insets = new java.awt.Insets(4, 4, 4, 4);
-			getJPanel1().add(getJButton2(), constraintsJButton2);
-			// user code begin {1}
-			// user code end
-		} catch (java.lang.Throwable ivjExc) {
-			// user code begin {2}
-			// user code end
-			handleException(ivjExc);
-		}
-	}
-	return ivjJPanel1;
-}
-/**
- * Return the JButton1 property value.
- * @return javax.swing.JButton
- */
-/* WARNING: THIS METHOD WILL BE REGENERATED. */
-private javax.swing.JButton getOKButton() {
-	if (ivjOKButton == null) {
-		try {
-			ivjOKButton = new javax.swing.JButton();
-			ivjOKButton.setName("OKButton");
-			ivjOKButton.setPreferredSize(new java.awt.Dimension(75, 25));
-			ivjOKButton.setText("OK");
-			// user code begin {1}
-			// user code end
-		} catch (java.lang.Throwable ivjExc) {
-			// user code begin {2}
-			// user code end
-			handleException(ivjExc);
-		}
-	}
-	return ivjOKButton;
-}
-/**
- * Return the WarningLabel property value.
- * @return javax.swing.JLabel
- */
-/* WARNING: THIS METHOD WILL BE REGENERATED. */
-private javax.swing.JLabel getWarningLabel() {
-	if (ivjWarningLabel == null) {
-		try {
-			ivjWarningLabel = new javax.swing.JLabel();
-			ivjWarningLabel.setName("WarningLabel");
-			ivjWarningLabel.setFont(new java.awt.Font("Arial", 1, 10));
-			ivjWarningLabel.setAlignmentX(java.awt.Component.CENTER_ALIGNMENT);
-			ivjWarningLabel.setText("Warning: Changing separator char will not reflect changes on preexistings names!");
-			ivjWarningLabel.setForeground(java.awt.Color.red);
-			// user code begin {1}
-			// user code end
-		} catch (java.lang.Throwable ivjExc) {
-			// user code begin {2}
-			// user code end
-			handleException(ivjExc);
-		}
-	}
-	return ivjWarningLabel;
-}
-/**
- * Comment
- */
-public void groupingCheckBox_ActionPerformed(java.awt.event.ActionEvent actionEvent) {
-	boolean status = getGroupingCheckBox().isSelected();
-	getGroupingSeparatorLabel().setEnabled(status);
-	getGroupingSeparatorTextField().setEnabled(status);
-	return;
-}
-/**
- * Comment
- */
-public void groupingSeparatorTextField_KeyTyped(java.awt.event.KeyEvent keyEvent) {
-	if ((keyEvent.getKeyChar()!=java.awt.event.KeyEvent.VK_BACK_SPACE && getGroupingSeparatorTextField().getText().length()>=1) &&
-		((getGroupingSeparatorTextField().getSelectedText()==null) || (getGroupingSeparatorTextField().getSelectedText().length()==0)))
-		keyEvent.setKeyChar('\0');
-	return;
-}
-/**
- * Called whenever the part throws an exception.
- * @param exception java.lang.Throwable
- */
-private void handleException(java.lang.Throwable exception) {
-
-	/* Uncomment the following lines to print uncaught exceptions to stdout */
-	System.out.println("--------- UNCAUGHT EXCEPTION ---------");
-	exception.printStackTrace(System.out);
-}
-/**
- * Initializes connections
- * @exception java.lang.Exception The exception description.
- */
-/* WARNING: THIS METHOD WILL BE REGENERATED. */
-private void initConnections() throws java.lang.Exception {
-	// user code begin {1}
-	getGroupingCheckBox().setSelected(Settings.getInstance().getGrouping());
-	if (Constants.GROUP_SEPARATOR=='\0')
-		getGroupingSeparatorTextField().setText("");
-	else
-		getGroupingSeparatorTextField().setText(String.valueOf((char)Constants.GROUP_SEPARATOR));
-	// user code end
-	getJButton2().addActionListener(ivjEventHandler);
-	getGroupingCheckBox().addActionListener(ivjEventHandler);
-	getOKButton().addActionListener(ivjEventHandler);
-	getGroupingSeparatorTextField().addKeyListener(ivjEventHandler);
-	connPtoP1SetTarget();
-	connPtoP2SetTarget();
-}
-/**
- * Initialize the class.
- */
-/* WARNING: THIS METHOD WILL BE REGENERATED. */
-private void initialize() {
-	try {
-		// user code begin {1}
-		// user code end
-		setName("SettingsDialog");
-		setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-		//setSize(475, 197+60+80);
-		setTitle("Visual DCT Settings");
-		setContentPane(getJDialogContentPane());
-		initConnections();
-		addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent e) {
-				cancelButton_ActionPerformed(null);
+		});
+		
+		DoubleClickProxy proxy = new DoubleClickProxy(new MouseInputAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				jLabelTest.setText(new Integer(e.getClickCount()).toString());				
 			}
 		});
-		pack();
-	} catch (java.lang.Throwable ivjExc) {
-		handleException(ivjExc);
-	}
-	// user code begin {2}
-	// user code end
-}
+		jPanelTesting.addMouseListener(proxy);
+		jPanelTesting.addMouseMotionListener(proxy);
 
-private void initializeMacros() {
-	getJSpinnerRecordLength().setValue(new Integer(Settings.getInstance().getRecordLength()));
-	getFastMoveCheckBox().setSelected(Settings.getInstance().getFastMove());
-	getGlobalMacrosCheckBox().setSelected(Settings.getInstance().getGlobalMacros());
-	getHierarhicalNamesCheckBox().setSelected(Settings.getInstance().getHierarhicalNames());
-}
-/**
- * main entrypoint - starts the part when it is run as an application
- * @param args java.lang.String[]
- */
-public static void main(java.lang.String[] args) {
-	try {
-		SettingsDialog aSettingsDialog;
-		aSettingsDialog = new SettingsDialog();
-		aSettingsDialog.setModal(true);
-		aSettingsDialog.addWindowListener(new java.awt.event.WindowAdapter() {
-			public void windowClosing(java.awt.event.WindowEvent e) {
-				System.exit(0);
-			};
+		jTextFieldGroupingSeparator.addKeyListener(new KeyAdapter() {
+					public void keyTyped(KeyEvent keyEvent) {
+						if ((keyEvent.getKeyChar()!=java.awt.event.KeyEvent.VK_BACK_SPACE && jTextFieldGroupingSeparator.getText().length()>=1) &&
+							((jTextFieldGroupingSeparator.getSelectedText()==null) || (jTextFieldGroupingSeparator.getSelectedText().length()==0)))
+							keyEvent.setKeyChar('\0');
+					}
 		});
-		aSettingsDialog.show();
-		java.awt.Insets insets = aSettingsDialog.getInsets();
-		aSettingsDialog.setSize(aSettingsDialog.getWidth() + insets.left + insets.right, aSettingsDialog.getHeight() + insets.top + insets.bottom);
-		aSettingsDialog.setVisible(true);
-	} catch (Throwable exception) {
-		System.err.println("Exception occurred in main() of javax.swing.JDialog");
-		exception.printStackTrace(System.out);
-	}
-}
-/**
- * Comment
- */
-public void oKButton_ActionPerformed(java.awt.event.ActionEvent actionEvent) {
-	Settings.getInstance().setGrouping(getGroupingCheckBox().isSelected());
-	
-	if (getGroupingSeparatorTextField().getText().length()>0)
-	{
-		Settings.getInstance().setGroupSeparator(getGroupingSeparatorTextField().getText().charAt(0));
-	}
-	else
-	{
-		Settings.getInstance().setGroupSeparator('\0');
-	}
-	
-	Settings.getInstance().setRecordLength(((Integer)getJSpinnerRecordLength().getValue()).intValue());
 
-	Settings.getInstance().setGlobalMacros(getGlobalMacrosCheckBox().isSelected());
-	Settings.getInstance().setHierarhicalNames(getHierarhicalNamesCheckBox().isSelected());
+		jCheckBoxEnableGrouping.setModel(new JToggleButton.ToggleButtonModel(){	
+					public void setSelected(boolean b) {
+						super.setSelected(b);
+						
+						jLabelGroupingSeparator.setEnabled(b);
+						jTextFieldGroupingSeparator.setEnabled(b);
+					}			
+		});
+		
+		jTextFieldLogo.getDocument().addDocumentListener(new DocumentListener() {
+					public void changedUpdate(DocumentEvent e) {
+						// we won't ever get this with a PlainDocument
+					}
 
-	Settings.getInstance().setDoubleClickSpeed(getJSliderDoubleClickSpeed().getValue());
-	Settings.getInstance().setDoubleClickSmudge(getJSliderDoubleClickSmudge().getValue());
-	Settings.getInstance().setFastMove(getFastMoveCheckBox().isSelected());
-	DoubleClickProxy.update();
+					public void insertUpdate(DocumentEvent e) {
+						update(e);
+					}
+
+					public void removeUpdate(DocumentEvent e) {
+						update(e);
+					}
+			
+					private void update(DocumentEvent e) {
+						File f = new File(jTextFieldLogo.getText());			
+						boolean ok = f.canRead();
+						jLabelWarning.setVisible(!ok);
+
+						//System.out.println("<html><img src=\"file://"+f.getPath()+"\"></img>");
+						if (ok) jLabelImage.setText("<html><img src=\"file://"+f.getPath()+"\"></img>");
+						else jLabelImage.setText("");
+					}						
+				});
+	}
+
+	/**
+	 * 
+	 */
+	private void loadSettings() {
+		Settings s = Settings.getInstance();
+		jSpinnerRecordNameLength.setValue(new Integer(s.getRecordLength()));
+		
+		jCheckBoxEnableGrouping.setSelected(s.getGrouping());
+		if (Constants.GROUP_SEPARATOR=='\0')
+				jTextFieldGroupingSeparator.setText("");
+			else
+				jTextFieldGroupingSeparator.setText(String.valueOf((char)Constants.GROUP_SEPARATOR));
 	
-	dispose();
-}
+		
+		jCheckBoxGlobalMacros.setSelected(s.getGlobalMacros());
+		jCheckBoxCapFast.setSelected(s.getHierarhicalNames());
+		
+		// double click is global
+		DoubleClickProxy.update();
+		jCheckBoxSilhouetteMoving.setSelected(s.getFastMove());
+		
+		//legend
+		jTextFieldLogo.setText(s.getLegendLogo());
+		switch (s.getLegendVisibility()) {
+			case 0: jRadioButton1.setSelected(true); break;
+			case 1: jRadioButton2.setSelected(true); break;
+			case 2: jRadioButton3.setSelected(true); break;
+		}
+		switch (s.getLegendPosition()) {
+			case 1: jToggleButtonTL.setSelected(true); break;
+			case 2: jToggleButtonTR.setSelected(true); break;
+			case 3: jToggleButtonBL.setSelected(true); break;
+			case 4: jToggleButtonBR.setSelected(true); break;
+		}
+	}
+	
+	private void saveSettings() {
+		Settings s = Settings.getInstance();
 
-public void cancelButton_ActionPerformed(java.awt.event.ActionEvent actionEvent) {
-	DoubleClickProxy.update();
-	this.dispose();
-}
+		s.setRecordLength(((Number)jSpinnerRecordNameLength.getValue()).intValue());
+		
+		s.setGrouping(jCheckBoxEnableGrouping.isSelected());
+		if (jTextFieldGroupingSeparator.getText().length()>0) 
+			s.setGroupSeparator(jTextFieldGroupingSeparator.getText().charAt(0));
+		else 
+			s.setGroupSeparator('\0');
+					
+		s.setGlobalMacros(jCheckBoxGlobalMacros.isSelected());
+		s.setHierarhicalNames(jCheckBoxCapFast.isSelected());
+		
+		// double click is global
+		s.setDoubleClickSpeed(jSliderDoubleClickSpeed.getValue());
+		s.setDoubleClickSmudge(jSliderDoubleClickSmudge.getValue());
+		DoubleClickProxy.update();
+		
+		s.setFastMove(jCheckBoxSilhouetteMoving.isSelected());
+		
+		s.setLegendLogo(jTextFieldLogo.getText());
+		s.setLegendVisibility(Integer.parseInt(buttonGroupVisibility.getSelection().getActionCommand()));
+		s.setLegendPosition(Integer.parseInt(buttonGroupLocation.getSelection().getActionCommand()));
+	}
+
+
+	/** This method is called from within the constructor to
+     * initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is
+     * always regenerated by the Form Editor.
+     */
+    private void initComponents() {//GEN-BEGIN:initComponents
+        java.awt.GridBagConstraints gridBagConstraints;
+
+        buttonGroupVisibility = new javax.swing.ButtonGroup();
+        buttonGroupLocation = new javax.swing.ButtonGroup();
+        jPanelButtons = new javax.swing.JPanel();
+        jButtonOk = new javax.swing.JButton();
+        jButtonCancel = new javax.swing.JButton();
+        jTabbedPanel = new javax.swing.JTabbedPane();
+        jPanelDatabase = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel5 = new javax.swing.JLabel();
+        jSpinnerRecordNameLength = new javax.swing.JSpinner();
+        jPanel3 = new javax.swing.JPanel();
+        jCheckBoxEnableGrouping = new javax.swing.JCheckBox();
+        jLabelGroupingSeparator = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        jTextFieldGroupingSeparator = new javax.swing.JTextField();
+        jPanel4 = new javax.swing.JPanel();
+        jCheckBoxGlobalMacros = new javax.swing.JCheckBox();
+        jCheckBoxCapFast = new javax.swing.JCheckBox();
+        jPanelVisual = new javax.swing.JPanel();
+        jPanel5 = new javax.swing.JPanel();
+        jLabel8 = new javax.swing.JLabel();
+        jSliderDoubleClickSpeed = new javax.swing.JSlider();
+        jLabel9 = new javax.swing.JLabel();
+        jSliderDoubleClickSmudge = new javax.swing.JSlider();
+        jLabel10 = new javax.swing.JLabel();
+        jPanelTesting = new javax.swing.JPanel();
+        jLabelTest = new javax.swing.JLabel();
+        jPanel6 = new javax.swing.JPanel();
+        jCheckBoxSilhouetteMoving = new javax.swing.JCheckBox();
+        jPanel8 = new javax.swing.JPanel();
+        jPanelPrint = new javax.swing.JPanel();
+        jPanelLegend = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jRadioButton1 = new javax.swing.JRadioButton();
+        jRadioButton2 = new javax.swing.JRadioButton();
+        jRadioButton3 = new javax.swing.JRadioButton();
+        jButtonBrowse = new javax.swing.JButton();
+        jPanel2 = new javax.swing.JPanel();
+        jToggleButtonTL = new javax.swing.JToggleButton();
+        jToggleButtonTR = new javax.swing.JToggleButton();
+        jToggleButtonBL = new javax.swing.JToggleButton();
+        jToggleButtonBR = new javax.swing.JToggleButton();
+        jLabel4 = new javax.swing.JLabel();
+        jTextFieldLogo = new javax.swing.JTextField();
+        jLabelWarning = new javax.swing.JLabel();
+        jPanel7 = new javax.swing.JPanel();
+        jLabelImage = new javax.swing.JLabel();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Settings Dialog");
+        jButtonOk.setMnemonic('O');
+        jButtonOk.setText("OK");
+        jButtonOk.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonOkActionPerformed(evt);
+            }
+        });
+
+        jPanelButtons.add(jButtonOk);
+
+        jButtonCancel.setMnemonic('C');
+        jButtonCancel.setText("Cancel");
+        jButtonCancel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonCancelActionPerformed(evt);
+            }
+        });
+
+        jPanelButtons.add(jButtonCancel);
+
+        getContentPane().add(jPanelButtons, java.awt.BorderLayout.SOUTH);
+
+        jTabbedPanel.setTabLayoutPolicy(javax.swing.JTabbedPane.SCROLL_TAB_LAYOUT);
+        jTabbedPanel.setAutoscrolls(true);
+        jPanelDatabase.setLayout(new javax.swing.BoxLayout(jPanelDatabase, javax.swing.BoxLayout.Y_AXIS));
+
+        jPanel1.setLayout(new java.awt.GridBagLayout());
+
+        jPanel1.setBorder(new javax.swing.border.TitledBorder("Record Name"));
+        jLabel5.setDisplayedMnemonic('R');
+        jLabel5.setLabelFor(jSpinnerRecordNameLength);
+        jLabel5.setText("Record name length limit: ");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
+        jPanel1.add(jLabel5, gridBagConstraints);
+
+        jSpinnerRecordNameLength.setMinimumSize(new java.awt.Dimension(60, 20));
+        jSpinnerRecordNameLength.setPreferredSize(new java.awt.Dimension(60, 20));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(8, 0, 7, 7);
+        jPanel1.add(jSpinnerRecordNameLength, gridBagConstraints);
+
+        jPanelDatabase.add(jPanel1);
+
+        jPanel3.setLayout(new java.awt.GridBagLayout());
+
+        jPanel3.setBorder(new javax.swing.border.TitledBorder("Grouping"));
+        jCheckBoxEnableGrouping.setMnemonic('G');
+        jCheckBoxEnableGrouping.setText("Enable Grouping");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
+        jPanel3.add(jCheckBoxEnableGrouping, gridBagConstraints);
+
+        jLabelGroupingSeparator.setDisplayedMnemonic('s');
+        jLabelGroupingSeparator.setLabelFor(jTextFieldGroupingSeparator);
+        jLabelGroupingSeparator.setText("Grouping separator:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 20, 8, 8);
+        jPanel3.add(jLabelGroupingSeparator, gridBagConstraints);
+
+        jLabel7.setFont(new java.awt.Font("Dialog", 0, 11));
+        jLabel7.setForeground(java.awt.Color.red);
+        jLabel7.setText("Warning: Changing separator char will not reflect changes on preexisting names!");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 20, 8, 8);
+        jPanel3.add(jLabel7, gridBagConstraints);
+
+        jTextFieldGroupingSeparator.setColumns(3);
+        jTextFieldGroupingSeparator.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jTextFieldGroupingSeparator.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0)));
+        jTextFieldGroupingSeparator.setMinimumSize(new java.awt.Dimension(35, 17));
+        jTextFieldGroupingSeparator.setOpaque(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 8, 9);
+        jPanel3.add(jTextFieldGroupingSeparator, gridBagConstraints);
+
+        jPanelDatabase.add(jPanel3);
+
+        jPanel4.setLayout(new java.awt.GridBagLayout());
+
+        jPanel4.setBorder(new javax.swing.border.TitledBorder("Generating Flat Database"));
+        jCheckBoxGlobalMacros.setMnemonic('m');
+        jCheckBoxGlobalMacros.setText("Enable global macros evaluation");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
+        jPanel4.add(jCheckBoxGlobalMacros, gridBagConstraints);
+
+        jCheckBoxCapFast.setMnemonic('P');
+        jCheckBoxCapFast.setText("Produce hierarhical names like CapFast");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 8, 8, 8);
+        jPanel4.add(jCheckBoxCapFast, gridBagConstraints);
+
+        jPanelDatabase.add(jPanel4);
+
+        jTabbedPanel.addTab("Database", jPanelDatabase);
+
+        jPanelVisual.setLayout(new javax.swing.BoxLayout(jPanelVisual, javax.swing.BoxLayout.Y_AXIS));
+
+        jPanel5.setLayout(new java.awt.GridBagLayout());
+
+        jPanel5.setBorder(new javax.swing.border.TitledBorder("Double Click"));
+        jLabel8.setDisplayedMnemonic('s');
+        jLabel8.setLabelFor(jSliderDoubleClickSpeed);
+        jLabel8.setText("Double click speed:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(8, 8, 0, 8);
+        jPanel5.add(jLabel8, gridBagConstraints);
+
+        jSliderDoubleClickSpeed.setMajorTickSpacing(100);
+        jSliderDoubleClickSpeed.setMaximum(1000);
+        jSliderDoubleClickSpeed.setPaintTicks(true);
+        jSliderDoubleClickSpeed.setSnapToTicks(true);
+        jSliderDoubleClickSpeed.setValue(0);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(8, 8, 0, 8);
+        jPanel5.add(jSliderDoubleClickSpeed, gridBagConstraints);
+
+        jLabel9.setDisplayedMnemonic('m');
+        jLabel9.setLabelFor(jSliderDoubleClickSmudge);
+        jLabel9.setText("Double click smudge:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(12, 8, 0, 8);
+        jPanel5.add(jLabel9, gridBagConstraints);
+
+        jSliderDoubleClickSmudge.setMajorTickSpacing(1);
+        jSliderDoubleClickSmudge.setMaximum(10);
+        jSliderDoubleClickSmudge.setPaintTicks(true);
+        jSliderDoubleClickSmudge.setSnapToTicks(true);
+        jSliderDoubleClickSmudge.setValue(0);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
+        jPanel5.add(jSliderDoubleClickSmudge, gridBagConstraints);
+
+        jLabel10.setText("Test:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(8, 0, 0, 8);
+        jPanel5.add(jLabel10, gridBagConstraints);
+
+        jPanelTesting.setLayout(new java.awt.BorderLayout());
+
+        jPanelTesting.setBackground(java.awt.Color.white);
+        jPanelTesting.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0)));
+        jPanelTesting.setMinimumSize(new java.awt.Dimension(64, 64));
+        jPanelTesting.setPreferredSize(new java.awt.Dimension(64, 64));
+        jLabelTest.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabelTest.setText("1");
+        jPanelTesting.add(jLabelTest, java.awt.BorderLayout.CENTER);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridheight = java.awt.GridBagConstraints.REMAINDER;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(8, 0, 7, 7);
+        jPanel5.add(jPanelTesting, gridBagConstraints);
+
+        jPanelVisual.add(jPanel5);
+
+        jPanel6.setLayout(new java.awt.GridBagLayout());
+
+        jPanel6.setBorder(new javax.swing.border.TitledBorder("Speed"));
+        jCheckBoxSilhouetteMoving.setMnemonic('m');
+        jCheckBoxSilhouetteMoving.setText("Silhouette when moving a record");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(7, 7, 7, 7);
+        jPanel6.add(jCheckBoxSilhouetteMoving, gridBagConstraints);
+
+        jPanelVisual.add(jPanel6);
+
+        jPanel8.setLayout(new java.awt.GridBagLayout());
+
+        jPanelVisual.add(jPanel8);
+
+        jTabbedPanel.addTab("Visual", jPanelVisual);
+
+        jPanelPrint.setLayout(new javax.swing.BoxLayout(jPanelPrint, javax.swing.BoxLayout.Y_AXIS));
+
+        jPanelLegend.setLayout(new java.awt.GridBagLayout());
+
+        jPanelLegend.setBorder(new javax.swing.border.TitledBorder("Legend Settings"));
+        jLabel1.setDisplayedMnemonic('L');
+        jLabel1.setText("Lab's logo:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(8, 8, 4, 8);
+        jPanelLegend.add(jLabel1, gridBagConstraints);
+
+        jLabel2.setText("Print:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(8, 8, 4, 8);
+        jPanelLegend.add(jLabel2, gridBagConstraints);
+
+        jLabel3.setText("Location:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(8, 8, 4, 8);
+        jPanelLegend.add(jLabel3, gridBagConstraints);
+
+        jRadioButton1.setMnemonic('n');
+        jRadioButton1.setText("never");
+        buttonGroupVisibility.add(jRadioButton1);
+        jRadioButton1.setActionCommand("0");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 12, 0, 8);
+        jPanelLegend.add(jRadioButton1, gridBagConstraints);
+
+        jRadioButton2.setMnemonic('o');
+        jRadioButton2.setSelected(true);
+        jRadioButton2.setText("only on one page");
+        buttonGroupVisibility.add(jRadioButton2);
+        jRadioButton2.setActionCommand("1");
+        jRadioButton2.setDisplayedMnemonicIndex(8);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 12, 0, 8);
+        jPanelLegend.add(jRadioButton2, gridBagConstraints);
+
+        jRadioButton3.setMnemonic('e');
+        jRadioButton3.setText("on every page");
+        buttonGroupVisibility.add(jRadioButton3);
+        jRadioButton3.setActionCommand("2");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 12, 0, 8);
+        jPanelLegend.add(jRadioButton3, gridBagConstraints);
+
+        jButtonBrowse.setMnemonic('B');
+        jButtonBrowse.setText("Browse...");
+        jButtonBrowse.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonBrowseActionPerformed(evt);
+            }
+        });
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 12, 0, 8);
+        jPanelLegend.add(jButtonBrowse, gridBagConstraints);
+
+        jPanel2.setLayout(new java.awt.GridLayout(2, 2));
+
+        buttonGroupLocation.add(jToggleButtonTL);
+        jToggleButtonTL.setActionCommand("1");
+        jToggleButtonTL.setMaximumSize(new java.awt.Dimension(32, 32));
+        jToggleButtonTL.setMinimumSize(new java.awt.Dimension(32, 32));
+        jToggleButtonTL.setPreferredSize(new java.awt.Dimension(32, 32));
+        jPanel2.add(jToggleButtonTL);
+
+        buttonGroupLocation.add(jToggleButtonTR);
+        jToggleButtonTR.setActionCommand("2");
+        jToggleButtonTR.setMaximumSize(new java.awt.Dimension(32, 32));
+        jToggleButtonTR.setMinimumSize(new java.awt.Dimension(32, 32));
+        jToggleButtonTR.setPreferredSize(new java.awt.Dimension(32, 32));
+        jPanel2.add(jToggleButtonTR);
+
+        buttonGroupLocation.add(jToggleButtonBL);
+        jToggleButtonBL.setActionCommand("3");
+        jToggleButtonBL.setMaximumSize(new java.awt.Dimension(32, 32));
+        jToggleButtonBL.setMinimumSize(new java.awt.Dimension(32, 32));
+        jToggleButtonBL.setPreferredSize(new java.awt.Dimension(32, 32));
+        jPanel2.add(jToggleButtonBL);
+
+        jToggleButtonBR.setSelected(true);
+        buttonGroupLocation.add(jToggleButtonBR);
+        jToggleButtonBR.setActionCommand("4");
+        jToggleButtonBR.setMaximumSize(new java.awt.Dimension(32, 32));
+        jToggleButtonBR.setMinimumSize(new java.awt.Dimension(32, 32));
+        jToggleButtonBR.setPreferredSize(new java.awt.Dimension(32, 32));
+        jPanel2.add(jToggleButtonBR);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 17, 8, 8);
+        jPanelLegend.add(jPanel2, gridBagConstraints);
+
+        jLabel4.setText("Preview:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
+        jPanelLegend.add(jLabel4, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 12, 8, 8);
+        jPanelLegend.add(jTextFieldLogo, gridBagConstraints);
+
+        jLabelWarning.setFont(new java.awt.Font("Dialog", 0, 12));
+        jLabelWarning.setForeground(new java.awt.Color(255, 0, 0));
+        jLabelWarning.setText("Warning: file doesn't exist");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(7, 12, 0, 8);
+        jPanelLegend.add(jLabelWarning, gridBagConstraints);
+
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+
+        jPanel7.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel7.setBorder(new javax.swing.border.EtchedBorder());
+        jPanel7.setMinimumSize(new java.awt.Dimension(128, 128));
+        jPanel7.setPreferredSize(new java.awt.Dimension(128, 128));
+        jPanel7.add(jLabelImage);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridheight = 6;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 8);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        jPanelLegend.add(jPanel7, gridBagConstraints);
+
+        jPanelPrint.add(jPanelLegend);
+
+        jTabbedPanel.addTab("Print", jPanelPrint);
+
+        getContentPane().add(jTabbedPanel, java.awt.BorderLayout.CENTER);
+
+        pack();
+    }//GEN-END:initComponents
+
+    private void jButtonBrowseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonBrowseActionPerformed
+		JFileChooser chooser = VisualDCT.getInstance().getfileChooser();
+
+		UniversalFileFilter filter = new UniversalFileFilter(new String[]{"jpg","gif","png"}, "Image files");
+		chooser.resetChoosableFileFilters();
+		chooser.addChoosableFileFilter(filter);
+
+		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		int retval = chooser.showOpenDialog(this);
+		if(retval == JFileChooser.APPROVE_OPTION) {			
+			File theFile = chooser.getSelectedFile();
+			jTextFieldLogo.setText(theFile.getPath());
+		}
+    }//GEN-LAST:event_jButtonBrowseActionPerformed
+
+    private void jButtonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCancelActionPerformed
+		DoubleClickProxy.update();
+		dispose();
+    }//GEN-LAST:event_jButtonCancelActionPerformed
+
+    private void jButtonOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonOkActionPerformed
+        saveSettings();
+        dispose();
+    }//GEN-LAST:event_jButtonOkActionPerformed
+    
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        new SettingsDialog(new javax.swing.JFrame(), true).show();
+    }
+    
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup buttonGroupLocation;
+    private javax.swing.ButtonGroup buttonGroupVisibility;
+    private javax.swing.JButton jButtonBrowse;
+    private javax.swing.JButton jButtonCancel;
+    private javax.swing.JButton jButtonOk;
+    private javax.swing.JCheckBox jCheckBoxCapFast;
+    private javax.swing.JCheckBox jCheckBoxEnableGrouping;
+    private javax.swing.JCheckBox jCheckBoxGlobalMacros;
+    private javax.swing.JCheckBox jCheckBoxSilhouetteMoving;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JLabel jLabelGroupingSeparator;
+    private javax.swing.JLabel jLabelImage;
+    private javax.swing.JLabel jLabelTest;
+    private javax.swing.JLabel jLabelWarning;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanelButtons;
+    private javax.swing.JPanel jPanelDatabase;
+    private javax.swing.JPanel jPanelLegend;
+    private javax.swing.JPanel jPanelPrint;
+    private javax.swing.JPanel jPanelTesting;
+    private javax.swing.JPanel jPanelVisual;
+    private javax.swing.JRadioButton jRadioButton1;
+    private javax.swing.JRadioButton jRadioButton2;
+    private javax.swing.JRadioButton jRadioButton3;
+    private javax.swing.JSlider jSliderDoubleClickSmudge;
+    private javax.swing.JSlider jSliderDoubleClickSpeed;
+    private javax.swing.JSpinner jSpinnerRecordNameLength;
+    private javax.swing.JTabbedPane jTabbedPanel;
+    private javax.swing.JTextField jTextFieldGroupingSeparator;
+    private javax.swing.JTextField jTextFieldLogo;
+    private javax.swing.JToggleButton jToggleButtonBL;
+    private javax.swing.JToggleButton jToggleButtonBR;
+    private javax.swing.JToggleButton jToggleButtonTL;
+    private javax.swing.JToggleButton jToggleButtonTR;
+    // End of variables declaration//GEN-END:variables
+    
 }

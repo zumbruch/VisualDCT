@@ -59,6 +59,12 @@ public class Settings {
 	private int doubleClickSpeed = -1;
 	private int doubleClickSmudge = 4;
 	
+	private String legendLogo = "";
+	private int legendVisibility = 1;
+	// 0 not, 1 once, 2 repeated
+	private int legendPosition = 4;  
+	// 1 2
+	// 3 4
 /**
  * Settings constructor comment.
  */
@@ -82,6 +88,11 @@ protected Settings() {
 	
 	doubleClickSpeed = prefs.getInt("DoubleClickSpeed", doubleClickSpeed);
 	doubleClickSmudge = prefs.getInt("DoubleClickSmudge", doubleClickSmudge);
+	
+	legendLogo = prefs.get("LegendLogo", "");
+	legendVisibility = prefs.getInt("LegendVisibility", 1);
+	legendPosition = prefs.getInt("LegendPosition", 4);
+	
 	
 	if (grouping)
 	{
@@ -500,6 +511,54 @@ public void loadRecentFiles()
 	public void setFastMove(boolean b) {
 		fastMove = b;
 		prefs.putBoolean("FastMove", fastMove);
+		sync();
+	}
+
+	/**
+	 * @return
+	 */
+	public String getLegendLogo() {
+		return legendLogo;
+	}
+
+	/**
+	 * @return
+	 */
+	public int getLegendPosition() {
+		return legendPosition;
+	}
+
+	/**
+	 * @return
+	 */
+	public int getLegendVisibility() {
+		return legendVisibility;
+	}
+
+	/**
+	 * @param string
+	 */
+	public void setLegendLogo(String string) {
+		legendLogo = string;
+		prefs.put("LegendLogo", legendLogo);
+		sync();
+	}
+
+	/**
+	 * @param i
+	 */
+	public void setLegendPosition(int i) {
+		legendPosition = i;
+		prefs.putInt("LegendPosition", legendPosition);
+		sync();
+	}
+
+	/**
+	 * @param i
+	 */
+	public void setLegendVisibility(int i) {		
+		legendVisibility = i;
+		prefs.putInt("LegendVisibility", legendVisibility);
 		sync();
 	}
 

@@ -30,6 +30,7 @@ package com.cosylab.vdct.graphics;
 
 import java.io.*;
 import java.awt.*;
+import java.text.DateFormat;
 import java.util.*;
 import java.awt.event.*;
 import java.awt.print.*;
@@ -2321,9 +2322,12 @@ public int print(java.awt.Graphics graphics, java.awt.print.PageFormat pageForma
 
 		viewGroup.paintComponents(graphics, false, isFlat());
 
-		// restore color sheme 
-		loadWhiteOnBlackColorScheme();
-		
+		//resets clipping
+		if (Page.getPrintMode()==Page.FIT_SCALE) graphics.translate(-(pageWidth-w)/2, -(pageHeight-h)/2);
+		graphics.setClip(0,0,pageWidth, pageHeight);
+		if ((Settings.getInstance().getLegendVisibility()==1 && pageIndex==0) || Settings.getInstance().getLegendVisibility()==2)
+		printLegend(graphics, pageWidth, pageHeight, pageIndex+1, maxNumPage);
+	
 	}
 	catch (Exception e)
 	{
@@ -2332,6 +2336,10 @@ public int print(java.awt.Graphics graphics, java.awt.print.PageFormat pageForma
 	{
 		view.setScale(scale);
 		view.setRx(rx); view.setRy(ry);
+		
+//		restore color sheme 
+		 loadWhiteOnBlackColorScheme();
+		 createNavigatorImage();
 	}
 	
 
@@ -2340,6 +2348,82 @@ public int print(java.awt.Graphics graphics, java.awt.print.PageFormat pageForma
 	
 	System.gc();	
 	return PAGE_EXISTS;
+}
+/**
+ * @param graphics
+ */
+private void printLegend(Graphics graphics, int width, int height, int page, int pagenum) {
+	Settings s = Settings.getInstance();
+	
+	//prepare
+	int navigatorWidth = 100, navigatorHeight = 100;
+	
+	Image img = Toolkit.getDefaultToolkit().getImage(s.getLegendLogo());
+	MediaTracker mediaTracker = new MediaTracker(VisualDCT.getInstance());
+	mediaTracker.addImage(img, 0);
+	try
+	{
+		mediaTracker.waitForID(0);
+	}
+	catch (InterruptedException ie)
+	{
+	}
+	int logoWidth = img.getWidth(null), logoHeight = img.getHeight(null)+8;
+	
+	String label = "";
+	if (VisualDCT.getInstance().getOpenedFile()!=null)
+		label = VisualDCT.getInstance().getOpenedFile().getName()+", ";
+	label+=DateFormat.getDateInstance(DateFormat.SHORT).format(new Date())+", "
+			+(int)(ViewState.getInstance().getScale()*1000+0.5)/10.0+"% scale";
+	if (s.getLegendVisibility()==1) label+=", "+pagenum+" pages";
+	if (s.getLegendVisibility()==2) label+=", Page "+page+" of "+pagenum;
+			
+	Font font =FontMetricsBuffer.getInstance().getAppropriateFont(
+		Constants.DEFAULT_FONT, Font.PLAIN, 
+		label, 200, 16);
+	graphics.setFont(font);			
+	FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(font);
+	int labelWidth = fm.stringWidth(label)+8, labelHeight = fm.getHeight();
+	
+	int legendWidth = navigatorWidth + Math.max(logoWidth, labelWidth),
+		legendHeight = Math.max(navigatorHeight, logoHeight+labelHeight);
+	
+	int navX, navY, labX=0, labY, logoX, logoY;
+	switch (s.getLegendPosition()) {
+		case 1:	 
+			navX=0; navY=0;
+			labX=navigatorWidth+8; labY=labelHeight;
+			logoX=navigatorWidth; logoY=labelHeight+8;
+			break;
+		case 2: 
+			navX=width-navigatorWidth-1; navY=0;
+			labX=width-navigatorWidth-labelWidth-8-1; labY=labelHeight;
+			logoX=width-navigatorWidth-logoWidth-1; logoY=labelHeight+8;
+			break;
+		case 3: 
+			navX=0; navY=height-navigatorHeight-1; 
+			labX=navigatorWidth+8; labY=height-1;
+			logoX=navigatorWidth; logoY=height-labelHeight-logoHeight-1;
+			break;
+		default:
+		case 4: 
+			navX=width-navigatorWidth-1; navY=height-navigatorHeight-1;
+			labX=width-navigatorWidth-labelWidth-8-1; labY=height-1;
+			logoX=width-navigatorWidth-logoWidth-1;  logoY=height-labelHeight-logoHeight-1;
+	}
+	
+	// paints
+	
+	Rectangle backup = navigator;
+	navigator = new Rectangle(navX, navY,navigatorWidth,navigatorHeight);
+	createNavigatorImage();
+	drawNavigator(graphics);
+	navigator = backup;
+	
+	graphics.drawImage(img, logoX, logoY, null);
+	
+	graphics.setColor(Constants.FRAME_COLOR);
+	graphics.drawString(label, labX, labY);
 }
 /**
  * Insert the method's description here.
