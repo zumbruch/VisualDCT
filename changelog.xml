@@ -26,6 +26,10 @@ Please specify your id as who field, if not specified version/who is assumed.
 	</devs>
 
 
+	<version ver="2.1" build="1228" date="2002-01-22" who="ms">
+		<fix class="com.cosylab.vdct.VisualDCT">"New record dialog" record type JComboBox bug workaround (problems with removing items).</fix>
+	</version>
+
 	<version ver="2.1" build="1227" date="2001-12-15" who="ms">
 		<fix class="com.cosylab.vdct.graphics.objects.Record">Not all fields are available as link destinations.</fix>
 		<fix class="com.cosylab.vdct.VisualDCT">Type combo-box has multiple instances of the same type.</fix>

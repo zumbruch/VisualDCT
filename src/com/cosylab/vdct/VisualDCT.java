@@ -4569,11 +4569,31 @@ public void newNameTextField_KeyTyped(java.awt.event.KeyEvent keyEvent) {
  */
 public void newRecordDialog_WindowOpened(
     java.awt.event.WindowEvent windowEvent) {
+
+	// there can be no less types (for now)
     Object[] names = DataProvider.getInstance().getRecordTypes();
     JComboBox combo = getTypeComboBox();
-    combo.removeAllItems(); // always refilling - bad practise
-    for (int i = 0; i < names.length; i++)
-        combo.addItem(names[i]);
+
+    if (names.length > combo.getItemCount())
+     {
+	    ComboBoxModel model = combo.getModel();
+	    
+		for (int i = 0; i < names.length; i++)
+		{
+			boolean found = false;
+			int c = model.getSize();
+			for (int j=0;!found && (j<c); j++)
+				if (model.getElementAt(j).equals(names[i]))
+					found = true;
+					
+			if (!found)
+		    	combo.addItem(names[i]);
+		}
+
+
+			
+     }
+
     getNameTextField().setText("");
     getWarningLabel().setText(" ");
     getOKButton().setEnabled(false);
