@@ -1644,6 +1644,15 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 
 		Group rootGroup = Group.getRoot();
 
+		// read current view
+		if (dbData.getView()!=null)
+		{
+			DBView view = dbData.getView();
+			rootGroup.getLocalView().setRx(view.getRx());
+			rootGroup.getLocalView().setRy(view.getRy());
+			rootGroup.getLocalView().setScale(view.getScale());
+		}
+
 		ArrayList blackList = null;
 		if (importDB)
 			blackList = new ArrayList();

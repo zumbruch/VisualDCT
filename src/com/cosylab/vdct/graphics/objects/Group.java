@@ -1242,6 +1242,7 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
  final String quote = "\"";
  final String ending = ")"+nl;
 
+ final String VIEW_START      = "#! "+DBResolver.VDCTVIEW+"(";
  final String RECORD_START    = "#! "+DBResolver.VDCTRECORD+"(";
  final String GROUP_START     = "#! "+DBResolver.VDCTGROUP+"(";
  final String FIELD_START     = "#! "+DBResolver.VDCTFIELD+"(";
@@ -1257,6 +1258,11 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
  final String TEMPLATE_FIELD_START  = "#! "+DBResolver.TEMPLATE_FIELD+"(";
 
  final String NULL  = "null";
+
+ ViewState view = ViewState.getInstance();
+
+ file.writeBytes(VIEW_START + view.getRx() + comma + view.getRy() +
+	 			 comma + view.getScale() + ending);
  	
  Enumeration e = elements.elements();
  while (e.hasMoreElements()) 

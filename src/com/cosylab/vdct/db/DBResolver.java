@@ -77,6 +77,7 @@ public class DBResolver {
 	public static final String VDCTSKIP = "SKIP";
 
 	// visual data
+	// used format #! View(xffset, yoffset, scale)
 	// used format #! Record(recordname, xpos, ypos, color, rotated, "description")
 	// used format #! Group(groupname, xpos, ypos, color, "description")
 	// used format #! Field(fieldname, color, rotated, "description")
@@ -84,6 +85,7 @@ public class DBResolver {
 	// used format #! Link(fieldname, inLinkID)
 	// used format #! Connector(id, outLinkID, xpos, ypos, color, "description")
 	//	 eg.       #! Record(ts:fanOut0, 124, 432, 324568, 0, "fanOut record")
+	public static final String VDCTVIEW = "View";
 	public static final String VDCTRECORD = "Record";
 	public static final String VDCTGROUP = "Group";
 	public static final String VDCTFIELD = "Field";
@@ -357,6 +359,24 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 					}
 				}
 				
+				else if (tokenizer.sval.equalsIgnoreCase(VDCTLINK)) {
+								
+					// read name
+					tokenizer.nextToken();
+					if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
+						(tokenizer.ttype == DBConstants.quoteChar)) str=tokenizer.sval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+							
+					// read target
+					tokenizer.nextToken();
+					if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
+						(tokenizer.ttype == DBConstants.quoteChar)) str2=tokenizer.sval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+			
+					data.addLink(new DBLinkData(str, str2));
+									
+				}
+			
 				else if (tokenizer.sval.equalsIgnoreCase(VDCTVISIBILITY)) {
 
 					// read name
@@ -432,24 +452,6 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 				}
 
 
-				else if (tokenizer.sval.equalsIgnoreCase(VDCTLINK)) {
-					
-					// read name
-					tokenizer.nextToken();
-					if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
-						(tokenizer.ttype == DBConstants.quoteChar)) str=tokenizer.sval;
-					else throw (new DBGParseException(errorString, tokenizer, fileName));
-				
-					// read target
-					tokenizer.nextToken();
-					if ((tokenizer.ttype == StreamTokenizer.TT_WORD)||
-						(tokenizer.ttype == DBConstants.quoteChar)) str2=tokenizer.sval;
-					else throw (new DBGParseException(errorString, tokenizer, fileName));
-
-					data.addLink(new DBLinkData(str, str2));
-						
-				}
-				
 				else if (tokenizer.sval.equalsIgnoreCase(VDCTGROUP)) {
 
 					// read group_name
@@ -482,6 +484,7 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 					data.addGroup(new DBGroupData(str, tx, ty, StringUtils.int2color(t), desc));
 
 				}
+
 				else if (tokenizer.sval.equalsIgnoreCase(TEMPLATE_INSTANCE)) {
 
 					// read template instance id
@@ -518,6 +521,7 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 						ti.setDescription(desc);
 					}
 				}
+
 				else if (tokenizer.sval.equalsIgnoreCase(TEMPLATE_FIELD)) {
 			
 					// read template instance id
@@ -552,6 +556,7 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 					if (ti!=null)
 						ti.getTemplateFields().addElement(new DBTemplateField(str2, StringUtils.int2color(t), isRight, t2));
 				}
+
 				else if (tokenizer.sval.equalsIgnoreCase(VDCTLINE)) {
 					// read template name
 					tokenizer.nextToken();
@@ -604,6 +609,7 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 
 					data.addLine(new DBLine(str, tx, ty, tx2, ty2, dashed, startArrow, endArrow, StringUtils.int2color(t)));
 				}
+
 				else if (tokenizer.sval.equalsIgnoreCase(VDCTBOX)) {
 					// read template name
 					tokenizer.nextToken();
@@ -644,6 +650,7 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 
 					data.addBox(new DBBox(str, tx, ty, tx2, ty2, dashed, StringUtils.int2color(t)));
 				}
+
 				else if (tokenizer.sval.equalsIgnoreCase(VDCTTEXTBOX)) {
 					// read template name
 					tokenizer.nextToken();
@@ -706,6 +713,29 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
 
 					data.addTextBox(new DBTextBox(str, tx, ty, tx2, ty2, border, str2, t2, t3, StringUtils.int2color(t), desc));
 				}
+
+				else if (tokenizer.sval.equalsIgnoreCase(VDCTVIEW)) {
+								
+					// read rx
+					tokenizer.nextToken();
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) t=(int)tokenizer.nval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					// read ry
+					tokenizer.nextToken();
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) t2=(int)tokenizer.nval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					// read scale
+					double scale = 1.0;
+					tokenizer.nextToken();
+					if (tokenizer.ttype == StreamTokenizer.TT_NUMBER) scale=tokenizer.nval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+					
+					data.setView(new DBView(t, t2, scale));
+									
+				}
+			
 				else if (tokenizer.sval.equalsIgnoreCase(VDCTSKIP)) {
 
 					// read optional n of lines

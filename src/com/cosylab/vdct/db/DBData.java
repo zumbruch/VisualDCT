@@ -52,6 +52,8 @@ public class DBData {
 	protected Hashtable templates = null;		// templates loaded by the way
 	protected Hashtable templateInstances = null;
 	
+	protected DBView view = null;
+	
 	// contains DB structure (entry (include, path, addpath statements), record, expand)
 	protected Vector structure = null; 
 	
@@ -316,6 +318,20 @@ public Hashtable getTemplates()
 	public Vector getStructure()
 	{
 		return structure;
+	}
+
+	/**
+	 * @return
+	 */
+	public DBView getView() {
+		return view;
+	}
+
+	/**
+	 * @param view
+	 */
+	public void setView(DBView view) {
+		this.view = view;
 	}
 
 }
