@@ -805,7 +805,8 @@ private void showPopup(MouseEvent e)
 				CommandManager.getInstance().execute("ShowNewDialog");
 			else if (action.equals(newPortString))
 				createPort(null);
-			else if (action.equals(newMacroString));
+			else if (action.equals(newMacroString))
+				createMacro(null);
 			else if (action.equals(newLineString))
 				createLine();
 			else if (action.equals(newBoxString))
@@ -888,7 +889,6 @@ private void showPopup(MouseEvent e)
 		popUp.add(portMenuItem);
 	
 		JMenuItem macroMenuItem = new JMenuItem(newMacroString);
-		macroMenuItem.setEnabled(false);
 		macroMenuItem.addActionListener(al);
 		popUp.add(macroMenuItem);
 
@@ -2779,4 +2779,34 @@ public void createPort(VDBPort vdbPort) {
 	//drawingSurface.setModified(true);
 	repaint();
 }
+
+/**
+ * Insert the method's description here.
+ * Creation date: (3.2.2001 23:27:30)
+ * @param name java.lang.String
+ */
+public void createMacro(VDBMacro vdbMacro) {
+	
+	// if null bring up dialog and ask for name, then create port
+	if (vdbMacro==null)
+		vdbMacro = Group.getEditingTemplateData().addMacro();
+		
+	if (vdbMacro==null)
+		return;
+		
+	ViewState view = ViewState.getInstance();
+	double scale = view.getScale();
+	
+	Macro macro = new Macro(vdbMacro, viewGroup,
+						   (int)((getPressedX() + view.getRx()) / scale),
+						   (int)((getPressedY() + view.getRy()) / scale));
+
+	getViewGroup().addSubObject(vdbMacro.getName(), macro);
+
+	UndoManager.getInstance().addAction(new CreateAction(macro));
+
+	//drawingSurface.setModified(true);
+	repaint();
+}
+
 }

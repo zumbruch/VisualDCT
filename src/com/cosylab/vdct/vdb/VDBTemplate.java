@@ -50,9 +50,12 @@ import com.cosylab.vdct.inspector.Inspectable;
 import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.inspector.InspectorManager;
 import com.cosylab.vdct.undo.ComposedAction;
+import com.cosylab.vdct.undo.CreateTemplateMacroAction;
 import com.cosylab.vdct.undo.CreateTemplatePortAction;
+import com.cosylab.vdct.undo.DeleteTemplateMacroAction;
 import com.cosylab.vdct.undo.DeleteTemplatePortAction;
 import com.cosylab.vdct.undo.DescriptionChangeAction;
+import com.cosylab.vdct.undo.RenameTemplateMacroAction;
 import com.cosylab.vdct.undo.RenameTemplatePortAction;
 import com.cosylab.vdct.undo.UndoManager;
 
@@ -78,6 +81,9 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 	protected Hashtable ports = null;
 	protected Vector portsV = null;
 
+	protected Hashtable macros = null;
+	protected Vector macrosV = null;
+
 	protected Group group = null;
 	
 	private String comment = null;
@@ -89,12 +95,14 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 	//private static GUISeparator inputsSeparator = null;
 	//private static GUISeparator outputsSeparator = null;
 	private static GUISeparator portsSeparator = null;
+	private static GUISeparator macrosSeparator = null;
 
 	private static final String nullString = "";
 
 	private String tempDescription = null;
 	
 	private long portsGeneratedID = 0;
+	private long macrosGeneratedID = 0;
 	protected static Random random = null;
 
 	static
@@ -543,6 +551,17 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 		final String addString = "Add port...";
 		items.addElement(new MonitoredActionProperty(addString, this));
 
+		items.addElement(VDBTemplate.getMacrosSeparator());
+
+		i = getMacrosV().iterator();
+		while (i.hasNext())
+		{
+			VDBMacro macro = (VDBMacro)i.next();
+			items.addElement(new GUISeparator(macro.getName()));
+			items.addElement(macro);
+			items.addElement(new MacroDescriptionProperty(macro));
+		}
+
 		InspectableProperty[] properties = new InspectableProperty[items.size()];
 		items.copyInto(properties);
 		return properties;
@@ -593,6 +612,24 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 	}
 	
 	/**
+	 * Returns the macros.
+	 * @return Hashtable
+	 */
+	public Hashtable getMacros()
+	{
+		return macros;
+	}
+	
+	/**
+	 * Returns the macrosV.
+	 * @return Vector
+	 */
+	public Vector getMacrosV()
+	{
+		return macrosV;
+	}
+
+	/**
 	 * Sets the ports.
 	 * @param ports The ports to set
 	 */
@@ -612,10 +649,36 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 	}
 
 	/**
+	 * Sets the macros.
+	 * @param macros The macros to set
+	 */
+	public void setMacros(Hashtable macros)
+	{
+		regenerateMacrosID();		
+		this.macros = macros;
+	}
+	
+	/**
+	 * Sets the macrosV.
+	 * @param macrosV The macrosV to set
+	 */
+	public void setMacrosV(Vector macrosV)
+	{
+		this.macrosV = macrosV;
+	}
+
+	/**
 	 */
 	private void regeneratePortsID()
 	{
 		portsGeneratedID = random.nextLong();
+	}
+
+	/**
+	 */
+	private void regenerateMacrosID()
+	{
+		macrosGeneratedID = random.nextLong();
 	}
 
 	/**
@@ -646,6 +709,16 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 	public static com.cosylab.vdct.vdb.GUISeparator getPortsSeparator() {
 		if (portsSeparator==null) portsSeparator = new GUISeparator("Ports");
 		return portsSeparator;
+	}
+
+	/**
+	 * Insert the method's description here.
+	 * Creation date: (3.2.2001 13:07:04)
+	 * @return com.cosylab.vdct.vdb.GUISeparator
+	 */
+	public static com.cosylab.vdct.vdb.GUISeparator getMacrosSeparator() {
+		if (macrosSeparator==null) macrosSeparator = new GUISeparator("Macros");
+		return macrosSeparator;
 	}
 
 	/**
@@ -691,12 +764,49 @@ public VDBPort addPort(String name)
 
 /**
  */
+public VDBMacro addMacro(String name)
+{
+	VDBMacro vdbMacro = new VDBMacro(this, name, nullString, null);	
+	macros.put(name, vdbMacro);
+	macrosV.addElement(vdbMacro);
+
+	com.cosylab.vdct.undo.UndoManager.getInstance().addAction(
+			new CreateTemplateMacroAction(this, vdbMacro));
+
+	regenerateMacrosID();		
+	InspectorManager.getInstance().updateObject(this);
+/*
+	updateTemplateFields();
+	unconditionalValidation();
+	com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+*/
+	return vdbMacro;
+}
+
+/**
+ */
 public void addPort(VDBPort vdbPort)
 {
 	ports.put(vdbPort.getName(), vdbPort);
 	portsV.addElement(vdbPort);
 
 	regeneratePortsID();
+	InspectorManager.getInstance().updateObject(this);
+/*
+	updateTemplateFields();
+	unconditionalValidation();
+	com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+*/
+}
+
+/**
+ */
+public void addMacro(VDBMacro vdbMacro)
+{
+	macros.put(vdbMacro.getName(), vdbMacro);
+	macrosV.addElement(vdbMacro);
+
+	regenerateMacrosID();		
 	InspectorManager.getInstance().updateObject(this);
 /*
 	updateTemplateFields();
@@ -739,6 +849,38 @@ public void removePort(String name)
 
 /**
  */
+public void removeMacro(String name)
+{
+	VDBMacro macro = (VDBMacro)macros.remove(name);
+	if (macros!=null)
+		macrosV.removeElement(macros);
+
+	ComposedAction ca = new ComposedAction();
+
+	// remove visible rep.
+	VisibleObject macroVisibleObj = macro.getVisibleObject();
+	if (macroVisibleObj!=null)
+	{
+		macroVisibleObj.destroy();
+		ca.addAction(new com.cosylab.vdct.undo.DeleteAction(macroVisibleObj));
+		com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+	}
+
+	ca.addAction(new DeleteTemplateMacroAction(this, macro));
+	
+	UndoManager.getInstance().addAction(ca);
+	
+	regenerateMacrosID();		
+	InspectorManager.getInstance().updateObject(this);
+/*
+	updateTemplateFields();
+	unconditionalValidation();
+	com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+*/
+}
+
+/**
+ */
 public void removePort(VDBPort port)
 {
 	ports.remove(port);
@@ -747,6 +889,24 @@ public void removePort(VDBPort port)
 	// no undo here
 
 	regeneratePortsID();
+	InspectorManager.getInstance().updateObject(this);
+/*
+	updateTemplateFields();
+	unconditionalValidation();
+	com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+*/
+}
+
+/**
+ */
+public void removeMacro(VDBMacro macro)
+{
+	macros.remove(macro);
+	macrosV.removeElement(macro);
+
+	// no undo here
+
+	regenerateMacrosID();		
 	InspectorManager.getInstance().updateObject(this);
 /*
 	updateTemplateFields();
@@ -773,6 +933,32 @@ public void renamePort(VDBPort port, String newName)
 			new RenameTemplatePortAction(this, port, oldName, newName));
 
 	regeneratePortsID();
+	InspectorManager.getInstance().updateObject(this);
+/*
+	updateTemplateFields();
+	unconditionalValidation();
+	com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+*/
+}
+
+/**
+ */
+public void renameMacro(VDBMacro macro, String newName)
+{
+	String oldName = macro.getName();
+	
+	macros.remove(oldName);
+	macro.setName(newName);
+	macros.put(macro.getName(), macro);
+
+	// also fix visible rep.
+	if (macro.getVisibleObject()!=null)
+		macro.getVisibleObject().rename(oldName, newName);
+
+	com.cosylab.vdct.undo.UndoManager.getInstance().addAction(
+			new RenameTemplateMacroAction(this, macro, oldName, newName));
+
+	regenerateMacrosID();		
 	InspectorManager.getInstance().updateObject(this);
 /*
 	updateTemplateFields();
@@ -837,6 +1023,53 @@ public VDBPort addPort()
 }
 
 /**
+ */
+public VDBMacro addMacro()
+{
+	String message = "Enter macro name:";
+	int type = JOptionPane.QUESTION_MESSAGE;
+	while (true)
+	{
+		String reply = JOptionPane.showInputDialog( null,
+			                           message,
+			                           "Add macro...",
+			                           type );
+		if (reply!=null)
+		{
+			if (!macros.containsKey(reply))
+			{
+				// check name
+				if (reply.trim().length()==0)
+				{
+					message = "Empty name! Enter valid name:";
+					type = JOptionPane.WARNING_MESSAGE;
+					continue;
+				}
+				else if (reply.indexOf(' ')!=-1)
+				{
+					message = "No spaces allowed! Enter valid name:";
+					type = JOptionPane.WARNING_MESSAGE;
+					continue;
+				}
+				else
+					return addMacro(reply);
+			}
+			else
+			{
+				message = "Macro '"+reply+"' already exists. Enter other name:";
+				type = JOptionPane.WARNING_MESSAGE;
+				continue;
+			}
+
+		}
+		
+		break;
+	}
+	
+	return null;
+}
+
+/**
  * @see com.cosylab.vdct.vdb.MonitoredPropertyListener#propertyChanged(InspectableProperty)
  */
 public void propertyChanged(InspectableProperty property)
@@ -856,6 +1089,8 @@ public void propertyChanged(InspectableProperty property)
  */
 public void removeProperty(InspectableProperty property)
 {
+	//!!! what if macro (if impl.)
+	
 	removePort(property.getName());
 }
 
@@ -864,6 +1099,8 @@ public void removeProperty(InspectableProperty property)
  */
 public void renameProperty(InspectableProperty property)
 {
+	//!!! what if macro (if impl.)
+	
 	String message = "Enter new port name of '"+property.getName()+"':";
 	int type = JOptionPane.QUESTION_MESSAGE;
 	while (true)
@@ -940,4 +1177,12 @@ public void renameProperty(InspectableProperty property)
 		return portsGeneratedID;
 	}
 
+	/**
+	 * Returns the macrosGeneratedID.
+	 * @return long
+	 */
+	public long getMacrosGeneratedID()
+	{
+		return macrosGeneratedID;
+	}
 }

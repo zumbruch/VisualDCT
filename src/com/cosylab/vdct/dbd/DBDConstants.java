@@ -52,6 +52,7 @@ public interface DBDConstants {
 
 	// artificial type
 	public static final int DBF_PORT	 = Integer.MAX_VALUE-1;
+	public static final int DBF_MACRO  = Integer.MAX_VALUE-2;
 	
 	public static final int DECIMAL	= 0;
 	public static final int HEX		= 1;

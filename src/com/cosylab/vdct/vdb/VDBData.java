@@ -33,6 +33,7 @@ import com.cosylab.vdct.db.*;
 import com.cosylab.vdct.dbd.*;
 import com.cosylab.vdct.graphics.DrawingSurface;
 import com.cosylab.vdct.graphics.objects.Group;
+import com.cosylab.vdct.graphics.objects.Macro;
 import com.cosylab.vdct.graphics.objects.Port;
 import com.cosylab.vdct.graphics.objects.Record;
 import com.cosylab.vdct.Console;
@@ -475,6 +476,37 @@ private static VDBData generateTemplate(DBDData dbd, DBTemplate dbTemplate)
 		}
 		vt.setPorts(ports);
 		vt.setPortsV(portsV);
+
+
+		Hashtable macros = new Hashtable();
+		Vector macrosV = new Vector();
+		keys = dbTemplate.getMacros().keys();
+		while (keys.hasMoreElements())
+		{
+			Object key = keys.nextElement();
+			DBMacro macro = (DBMacro)dbTemplate.getMacros().get(key);
+			VDBMacro vdbMacro = new VDBMacro(vt, macro);	
+
+			// has visual
+			if (macro.isHasVisual())
+			{
+				Macro visualMacro = new Macro(vdbMacro, Group.getRoot(),
+									  macro.getX(), macro.getY());
+				visualMacro.setColor(macro.getColor());
+				visualMacro.setMode(macro.getMode());
+
+				// delegate defaultVisibility
+				vdbMacro.setVisibility(macro.getDefaultVisibility());
+				
+				Group.getRoot().addSubObject(vdbMacro.getName(), visualMacro);
+			}
+
+			macros.put(key, vdbMacro);
+			macrosV.addElement(vdbMacro);
+		}
+		vt.setMacros(macros);
+		vt.setMacrosV(macrosV);
+
 
 		VDBData.addTemplate(vt);
 

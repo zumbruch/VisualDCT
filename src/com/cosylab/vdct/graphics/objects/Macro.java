@@ -41,8 +41,8 @@ import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.vdb.GUIHeader;
 import com.cosylab.vdct.vdb.GUISeparator;
 import com.cosylab.vdct.vdb.LinkProperties;
-import com.cosylab.vdct.vdb.PortDescriptionProperty;
-import com.cosylab.vdct.vdb.VDBPort;
+import com.cosylab.vdct.vdb.MacroDescriptionProperty;
+import com.cosylab.vdct.vdb.VDBMacro;
 
 import javax.swing.*;
 
@@ -53,7 +53,7 @@ import java.awt.event.*;
  * Creation date: (29.1.2001 20:05:51)
  * @author Matej Sekoranja
  */
-public class Port extends VisibleObject implements Descriptable, Movable, OutLink, Popupable, Selectable, Inspectable
+public class Macro extends VisibleObject implements Descriptable, Movable, OutLink, Popupable, Selectable, Inspectable
 {
 	class PopupMenuHandler implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
@@ -75,33 +75,25 @@ public class Port extends VisibleObject implements Descriptable, Movable, OutLin
 				removeLink();
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
-			else if (action.equals(removePortString))
+			else if (action.equals(removeMacroString))
 			{
-				destroy();
-				com.cosylab.vdct.undo.UndoManager.getInstance().addAction(new com.cosylab.vdct.undo.DeleteAction(Port.this));
-				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
-			}
-			else if (action.equals(removePortDefString))
-			{
-				data.getTemplate().removePort(getName());
-				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
-			}
-			else if (action.equals(constantString)) {
-				setMode(OutLink.CONSTANT_PORT_MODE);
+				//destroy();
+				//com.cosylab.vdct.undo.UndoManager.getInstance().addAction(new com.cosylab.vdct.undo.DeleteAction(Macro.this));
+				data.getTemplate().removeMacro(getName());
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
 			else if (action.equals(inputString)) {
-				setMode(OutLink.INPUT_PORT_MODE);
+				setMode(OutLink.INPUT_MACRO_MODE);
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
 			else if (action.equals(outputString)) {
-				setMode(OutLink.OUTPUT_PORT_MODE);
+				setMode(OutLink.OUTPUT_MACRO_MODE);
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
 			else if (action.equals(startLinkingString))
 			{
 			    LinkCommand cmd = (LinkCommand)CommandManager.getInstance().getCommand("LinkCommand");
-			    cmd.setData(Port.this, data);
+			    cmd.setData(Macro.this, data);
 		 		cmd.execute();
 			}
 			
@@ -119,21 +111,19 @@ public class Port extends VisibleObject implements Descriptable, Movable, OutLin
 	private static final String colorString = "Color...";
 	private static final String removeLinkString = "Remove Link";
 	private static final String startLinkingString = "Start linking...";
-	private static final String removePortString = "Hide Port";
-	private static final String removePortDefString = "Remove Port";
+	private static final String removeMacroString = "Remove Macro";
 
-	private static final String modeString = "Port Mode";
-	private static final String constantString = "CONSTANT";
+	private static final String modeString = "Macro Mode";
 	private static final String inputString = "INPUT";
 	private static final String outputString = "OUTPUT";
 
 	private static final String nullString = "";
 
-	private int mode = OutLink.CONSTANT_PORT_MODE;
+	private int mode = OutLink.INPUT_MACRO_MODE;
 
 	private static javax.swing.ImageIcon icon = null;
-	private static GUISeparator portSeparator = null;
-	protected VDBPort data = null;
+	private static GUISeparator macroSeparator = null;
+	protected VDBMacro data = null;
 	
 	protected int rightXtranslation = 0;
 	protected int rightYtranslation = 0;
@@ -146,7 +136,7 @@ public class Port extends VisibleObject implements Descriptable, Movable, OutLin
  * Insert the method's description here.
  * Creation date: (1.2.2001 17:22:29)
  */
-public Port(VDBPort data, ContainerObject parent, int x, int y) {
+public Macro(VDBMacro data, ContainerObject parent, int x, int y) {
 	super(parent);
 	this.data = data;
 
@@ -196,7 +186,7 @@ public boolean checkMove(int dx, int dy) {
  * Creation date: (2.2.2001 23:00:51)
  * @return com.cosylab.vdct.graphics.objects.Connector.PopupMenuHandler
  */
-private com.cosylab.vdct.graphics.objects.Port.PopupMenuHandler createPopupmenuHandler() {
+private com.cosylab.vdct.graphics.objects.Macro.PopupMenuHandler createPopupmenuHandler() {
 	return new PopupMenuHandler();
 }
 /**
@@ -372,7 +362,7 @@ public java.util.Vector getItems() {
 	colorItem.addActionListener(al);
 	items.addElement(colorItem);
 
-	// no connectors for ports yet
+	// no connectors for macros yet
 	/*
 	JMenuItem addItem = new JMenuItem(addConnectorString);
 	addItem.setEnabled(!isDisconnected());
@@ -386,18 +376,13 @@ public java.util.Vector getItems() {
 	JMenu modeMenu = new JMenu(modeString);
 	items.addElement(modeMenu);
 
-	JRadioButtonMenuItem constantModeItem = new JRadioButtonMenuItem(constantString, getMode()==OutLink.CONSTANT_PORT_MODE);
-	constantModeItem.setEnabled(getMode()!=OutLink.CONSTANT_PORT_MODE);
-	constantModeItem.addActionListener(al);
-	modeMenu.add(constantModeItem);
-
-	JRadioButtonMenuItem inputModeItem = new JRadioButtonMenuItem(inputString, getMode()==OutLink.INPUT_PORT_MODE);
-	inputModeItem.setEnabled(getMode()!=OutLink.INPUT_PORT_MODE);
+	JRadioButtonMenuItem inputModeItem = new JRadioButtonMenuItem(inputString, getMode()==OutLink.INPUT_MACRO_MODE);
+	inputModeItem.setEnabled(getMode()!=OutLink.INPUT_MACRO_MODE);
 	inputModeItem.addActionListener(al);
 	modeMenu.add(inputModeItem);
 
-	JRadioButtonMenuItem outputModeItem = new JRadioButtonMenuItem(outputString, getMode()==OutLink.OUTPUT_PORT_MODE);
-	outputModeItem.setEnabled(getMode()!=OutLink.OUTPUT_PORT_MODE);
+	JRadioButtonMenuItem outputModeItem = new JRadioButtonMenuItem(outputString, getMode()==OutLink.OUTPUT_MACRO_MODE);
+	outputModeItem.setEnabled(getMode()!=OutLink.OUTPUT_MACRO_MODE);
 	outputModeItem.addActionListener(al);
 	modeMenu.add(outputModeItem);
 
@@ -426,13 +411,9 @@ public java.util.Vector getItems() {
 		items.addElement(removeLinkItem);
 	}
 	
-	JMenuItem removePortItem = new JMenuItem(removePortString);
-	removePortItem.addActionListener(al);
-	items.addElement(removePortItem);
-
-	JMenuItem removePortDefItem = new JMenuItem(removePortDefString);
-	removePortDefItem.addActionListener(al);
-	items.addElement(removePortDefItem);
+	JMenuItem removeMacroItem = new JMenuItem(removeMacroString);
+	removeMacroItem.addActionListener(al);
+	items.addElement(removeMacroItem);
 
 	return items;
 }
@@ -477,7 +458,6 @@ public int getOutX() {
 	//boolean right = !isRight();
 	
 	boolean right = isRight();
-	if (getMode()==OutLink.CONSTANT_PORT_MODE) right=!right;
 	 
 	if (right)
 		return getX();
@@ -603,7 +583,7 @@ protected void validate() {
   int rwidth = 0;
   int rheight = 0;
   
-  if (getMode() == OutLink.OUTPUT_PORT_MODE)
+  if (getMode() == OutLink.OUTPUT_MACRO_MODE)
   {
 	  setWidth(Constants.LINK_STUB_SIZE);
 	  setHeight(Constants.LINK_STUB_SIZE);
@@ -642,7 +622,7 @@ protected void validate() {
 	  rightPoly.ypoints[3]=rheight/2;
 	  rightPoly.ypoints[4]=rightPoly.ypoints[0];
   }
-  else if (getMode() == OutLink.INPUT_PORT_MODE)
+  else if (getMode() == OutLink.INPUT_MACRO_MODE)
   {
 	  setWidth(Constants.LINK_STUB_SIZE);
 	  setHeight(Constants.LINK_STUB_SIZE);
@@ -680,51 +660,6 @@ protected void validate() {
 	  rightPoly.ypoints[2]=rightPoly.ypoints[1];
 	  rightPoly.ypoints[3]=rheight/2;
 	  rightPoly.ypoints[4]=rightPoly.ypoints[0];
-  }
-  else if (getMode() == OutLink.CONSTANT_PORT_MODE)
-  {
-  	  int factor = 4;
-  	
-	  setWidth(Constants.LINK_STUB_SIZE*factor);
-	  setHeight(Constants.LINK_STUB_SIZE);
-
-	  // to make it nice, do /2)*2
-	  rwidth = (int)(getWidth()*getRscale()/2)*2;
-	  rheight = (int)(getHeight()*getRscale()/2)*2;
-	  
-	  setRwidth(rwidth);
-	  setRheight(rheight);
-
-	  rwidth /= factor;
-	  
-	  // left poly
-	  leftPoly.xpoints[0]=0;
-	  leftPoly.xpoints[1]=rwidth/2;
-	  leftPoly.xpoints[2]=rwidth*factor;
-	  leftPoly.xpoints[3]=leftPoly.xpoints[2];
-	  leftPoly.xpoints[4]=leftPoly.xpoints[1];
-	
-	  leftPoly.ypoints[0]=rheight/2;
-	  leftPoly.ypoints[1]=rheight;
-	  leftPoly.ypoints[2]=leftPoly.ypoints[1];
-	  leftPoly.ypoints[3]=0;
-	  leftPoly.ypoints[4]=leftPoly.ypoints[3];
-
-	
-	  // right poly
-	  rightPoly.xpoints[0]=0;
-	  rightPoly.xpoints[1]=rightPoly.xpoints[0];
-	  rightPoly.xpoints[2]=factor*rwidth-rwidth/2;
-	  rightPoly.xpoints[3]=rwidth*factor;
-	  rightPoly.xpoints[4]=rightPoly.xpoints[2];
-	
-	  rightPoly.ypoints[0]=0;
-	  rightPoly.ypoints[1]=rheight;
-	  rightPoly.ypoints[2]=rightPoly.ypoints[1];
-	  rightPoly.ypoints[3]=rheight/2;
-	  rightPoly.ypoints[4]=rightPoly.ypoints[0];
-	  
-	  rwidth *= 4;
   }
 
   setLabel(getName());
@@ -795,7 +730,7 @@ public InspectableProperty getCommentProperty()
 public Icon getIcon()
 {
 	if (icon==null)
-		icon = new javax.swing.ImageIcon(getClass().getResource("/images/port.gif"));
+		icon = new javax.swing.ImageIcon(getClass().getResource("/images/macro.gif"));
 	return icon;
 }
 
@@ -828,9 +763,9 @@ public String toString()
  * Creation date: (3.2.2001 13:07:04)
  * @return com.cosylab.vdct.vdb.GUISeparator
  */
-public static com.cosylab.vdct.vdb.GUISeparator getPortSeparator() {
-	if (portSeparator==null) portSeparator = new GUISeparator("Port");
-	return portSeparator;
+public static com.cosylab.vdct.vdb.GUISeparator getMacroSeparator() {
+	if (macroSeparator==null) macroSeparator = new GUISeparator("Macro");
+	return macroSeparator;
 }
 
 /**
@@ -841,9 +776,9 @@ public InspectableProperty[] getProperties(int mode)
 	InspectableProperty[] properties = new InspectableProperty[4];
 
 	properties[0]=GUIHeader.getDefaultHeader();
-	properties[1]=getPortSeparator();
+	properties[1]=getMacroSeparator();
 	properties[2]=data;
-	properties[3]=new PortDescriptionProperty(data);
+	properties[3]=new MacroDescriptionProperty(data);
 
 	return properties;
 }
@@ -935,9 +870,9 @@ public void fixLinkProperties()
 
 	/**
 	 * Returns the data.
-	 * @return VDBPort
+	 * @return VDBMacro
 	 */
-	public VDBPort getData()
+	public VDBMacro getData()
 	{
 		return data;
 	}

@@ -1,4 +1,4 @@
-package com.cosylab.vdct.graphics.objects;
+package com.cosylab.vdct.undo;
 
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
@@ -28,55 +28,44 @@ package com.cosylab.vdct.graphics.objects;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import com.cosylab.vdct.vdb.VDBMacro;
+import com.cosylab.vdct.vdb.VDBTemplate;
+
 /**
  * Insert the type's description here.
- * Creation date: (29.1.2001 17:50:31)
- * @author Matej Sekoranja
+ * Creation date: (3.5.2001 16:26:04)
+ * @author 
  */
-public interface OutLink extends Linkable {
-
-	public static final int NORMAL_MODE = 0;
-	public static final int INVISIBLE_MODE = 1;
-	public static final int EXTERNAL_OUTPUT_MODE = 2;
-	public static final int EXTERNAL_INPUT_MODE = 3;
-	public static final int CONSTANT_PORT_MODE = 4;
-	public static final int INPUT_PORT_MODE = 5;
-	public static final int OUTPUT_PORT_MODE = 6;
-	public static final int INPUT_MACRO_MODE = 7;
-	public static final int OUTPUT_MACRO_MODE = 8;
+public class CreateTemplateMacroAction extends ActionObject {
+	protected VDBTemplate object;
+	protected VDBMacro macro;
 
 /**
- * 
- * @return com.cosylab.vdct.graphics.objects.InLink
+ * Insert the method's description here.
+ * Creation date: (3.5.2001 16:27:58)
  */
-InLink getInput();
+public CreateTemplateMacroAction(VDBTemplate object, VDBMacro macro) {
+	this.object=object;
+	this.macro=macro;
+}
 /**
  * Insert the method's description here.
- * Creation date: (29.1.2001 17:53:09)
- * @return int
+ * Creation date: (3.5.2001 16:26:04)
+ * @return java.lang.String
  */
-int getOutX();
+public String getDescription() {
+	return "Create Template Macro ["+object+"]("+macro.getFullName()+")";
+}
 /**
- * Insert the method's description here.
- * Creation date: (29.1.2001 17:53:18)
- * @return int
+ * This method was created in VisualAge.
  */
-int getOutY();
+protected void redoAction() {
+	object.addMacro(macro);
+}
 /**
- * Insert the method's description here.
- * Creation date: (30.1.2001 14:46:40)
- * @return int
+ * This method was created in VisualAge.
  */
-int getQueueCount();
-/**
- * Insert the method's description here.
- * Creation date: (29.1.2001 17:53:59)
- */
-void setInput(InLink input);
-/**
- * Insert the method's description here.
- * Creation date: (29.1.2001 17:53:09)
- * @return int
- */
-int getMode();
+protected void undoAction() {
+	object.removeMacro(macro);
+}
 }

@@ -34,7 +34,7 @@ import com.cosylab.vdct.inspector.InspectableProperty;
 /**
  * @author Matej
  */
-public class DBPort extends DBComment
+public class DBMacro extends DBComment
 {
 	protected String name = null;
 	protected String target = null;
@@ -43,7 +43,7 @@ public class DBPort extends DBComment
 	protected boolean hasVisual = false;
 	protected int x = -1;			// used for layout
 	protected int y = -1;
-	protected int mode = OutLink.CONSTANT_PORT_MODE;
+	protected int mode = OutLink.INPUT_MACRO_MODE;
 	protected int defaultVisibility = InspectableProperty.UNDEFINED_VISIBILITY;
 	protected java.awt.Color color = java.awt.Color.black;
 	protected String inLinkID = null;
@@ -51,7 +51,7 @@ public class DBPort extends DBComment
 	/**
 	 * Insert the method's description here.
 	 */
-	public DBPort(String name, String target)
+	public DBMacro(String name, String target)
 	{
 		this.name = name;
 		this.target = target;

@@ -97,6 +97,11 @@ public class DBResolver {
 	public static final String VDCT_INPUT_PORT = "InputPort";
 	public static final String VDCT_OUTPUT_PORT = "OutputPort";
 
+	// used format #! InputMacro(portname, inLinkID, xpos, ypos, color, defaultVisibility)
+	// used format #! OutputMacro(portname, inLinkID, xpos, ypos, color, defaultVisibility)
+	public static final String VDCT_INPUT_MACRO = "InputMacro";
+	public static final String VDCT_OUTPUT_MACRO = "OutputMacro";
+
 	// used format #! Line(name, xpos, ypos, xpos2, ypos2, dashed, startArrow, endArrow, color)
 	// used format #! Box(name, xpos, ypos, xpos2, ypos2, dashed, color)
 	// used format #! TextBox(name, xpos, ypos, xpos2, ypos2, border, fontFamilyName, fontSize, fontStyle, color, "description")
@@ -979,6 +984,63 @@ public static String processTemplateComment(DBTemplate template, StreamTokenizer
 					}
 				}
 
+				else if (tokenizer.sval.equalsIgnoreCase(VDCT_INPUT_MACRO) ||
+					tokenizer.sval.equalsIgnoreCase(VDCT_OUTPUT_MACRO)) {
+
+					int mode;
+					if (tokenizer.sval.equalsIgnoreCase(VDCT_INPUT_MACRO))
+						mode = OutLink.INPUT_MACRO_MODE;
+					else /*if (tokenizer.sval.equalsIgnoreCase(VDCT_OUTPUT_MACRO))*/
+						mode = OutLink.OUTPUT_MACRO_MODE;
+						
+					// read port name
+					tokenizer.nextToken();
+					if ((tokenizer.ttype == tokenizer.TT_WORD)||
+						(tokenizer.ttype == DBConstants.quoteChar)) str=tokenizer.sval;
+					else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					DBMacro macro = (DBMacro)(template.getMacros().get(str));
+					if (macro==null)
+					{
+						macro = new DBMacro(str, nullString);
+						/*
+						macro.setComment(comment); comment = nullString;
+						macro.setDescription(description);
+						*/
+						
+						template.addMacro(macro);
+												
+						macro.setMode(mode);
+						
+						// read port inlink
+						tokenizer.nextToken();
+						if ((tokenizer.ttype == tokenizer.TT_WORD)||
+							(tokenizer.ttype == DBConstants.quoteChar)) macro.setInLinkID(tokenizer.sval);
+						else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+						// read x pos
+						tokenizer.nextToken();
+						if (tokenizer.ttype == tokenizer.TT_NUMBER) macro.setX((int)tokenizer.nval);
+						else throw (new DBGParseException(errorString, tokenizer, fileName));
+					
+						// read y pos
+						tokenizer.nextToken();
+						if (tokenizer.ttype == tokenizer.TT_NUMBER) macro.setY((int)tokenizer.nval);
+						else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+						// read color
+						tokenizer.nextToken();
+						if (tokenizer.ttype == tokenizer.TT_NUMBER) macro.setColor(StringUtils.int2color((int)tokenizer.nval));
+						else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+						// read defaultVisibility
+						tokenizer.nextToken();
+						if (tokenizer.ttype == tokenizer.TT_NUMBER) macro.setDefaultVisibility((int)tokenizer.nval);
+						else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+						macro.setHasVisual(true);
+					}
+				}
 		return nullString;
   }
 }

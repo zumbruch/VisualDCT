@@ -43,6 +43,9 @@ public class DBTemplate extends DBComment
 	protected Hashtable ports = null;
 	protected Vector portsV = null;
 
+	protected Hashtable macros = null;
+	protected Vector macrosV = null;
+
 	protected boolean initialized;
 
 	// data
@@ -58,6 +61,9 @@ public class DBTemplate extends DBComment
 
 		ports = new Hashtable();
 		portsV = new Vector();
+
+		macros = new Hashtable();
+		macrosV = new Vector();
 	}
 	
 
@@ -173,12 +179,41 @@ public class DBTemplate extends DBComment
 	}
 
 	/**
+	 */
+	public void addMacro(DBMacro macro)
+	{
+		if (!macros.containsKey(macro.getName()))
+		{
+			macros.put(macro.getName(), macro);
+			macrosV.addElement(macro);
+		}
+	}
+
+	/**
 	 * Returns the data.
 	 * @return DBData
 	 */
 	public DBData getData()
 	{
 		return data;
+	}
+
+	/**
+	 * Returns the macros.
+	 * @return Hashtable
+	 */
+	public Hashtable getMacros()
+	{
+		return macros;
+	}
+
+	/**
+	 * Returns the macrosV.
+	 * @return Vector
+	 */
+	public Vector getMacrosV()
+	{
+		return macrosV;
 	}
 
 }

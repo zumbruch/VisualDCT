@@ -1555,6 +1555,8 @@ private static void writeTemplateData(DataOutputStream stream, NameManipulator n
 
 	final String portPrefix = "  #! ";
 	final String portPostfix = "(";
+	final String macroPrefix = "  #! ";
+	final String macroPostfix = "(";
 	final String NULL = "null";
 	final String justComma = ",";
 	
@@ -1608,6 +1610,56 @@ private static void writeTemplateData(DataOutputStream stream, NameManipulator n
 			justComma + visiblePort.getX() + justComma + visiblePort.getY() + 
 			justComma + StringUtils.color2string(visiblePort.getColor()) +
 			justComma + port.getVisibility());
+		stream.writeBytes(ending);
+	}	
+
+	//
+	// write macro visual data
+	//
+	i = data.getMacrosV().iterator();
+	while (i.hasNext())
+	{
+		VDBMacro macro = (VDBMacro)i.next();
+	
+		Macro visibleMacro = macro.getVisibleObject();
+		if (visibleMacro==null)
+			continue;
+			
+		// separate visual data
+		if (first)
+		{
+			stream.writeBytes(nl); first = false;
+		}
+
+		switch (visibleMacro.getMode())
+		{
+			case Macro.INPUT_MACRO_MODE:
+				stream.writeBytes(macroPrefix);
+				stream.writeBytes(DBResolver.VDCT_INPUT_MACRO);
+				break;
+			case Macro.OUTPUT_MACRO_MODE:
+				stream.writeBytes(macroPrefix);
+				stream.writeBytes(DBResolver.VDCT_OUTPUT_MACRO);
+				break;
+			default:
+				// this should never happen
+				Console.getInstance().println("Warning: unknown macro type for macro '"+macro.getName()+"'. Skipping visual definition...");
+				continue;
+		}
+
+		stream.writeBytes(macroPostfix);
+		
+		///!!!! not needed for macros
+		String target = NULL;
+		if (visibleMacro.getInput()!=null)
+			target = namer.getResolvedName(visibleMacro.getInput().getID());
+		
+		stream.writeBytes(
+			visibleMacro.getName() +
+			justComma + StringUtils.quoteIfMacro(target) +
+			justComma + visibleMacro.getX() + justComma + visibleMacro.getY() + 
+			justComma + StringUtils.color2string(visibleMacro.getColor()) +
+			justComma + macro.getVisibility());
 		stream.writeBytes(ending);
 	}	
 

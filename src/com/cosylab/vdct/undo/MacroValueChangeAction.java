@@ -1,4 +1,4 @@
-package com.cosylab.vdct.graphics.objects;
+package com.cosylab.vdct.undo;
 
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
@@ -30,53 +30,44 @@ package com.cosylab.vdct.graphics.objects;
 
 /**
  * Insert the type's description here.
- * Creation date: (29.1.2001 17:50:31)
- * @author Matej Sekoranja
+ * Creation date: (3.5.2001 15:23:26)
+ * @author 
  */
-public interface OutLink extends Linkable {
-
-	public static final int NORMAL_MODE = 0;
-	public static final int INVISIBLE_MODE = 1;
-	public static final int EXTERNAL_OUTPUT_MODE = 2;
-	public static final int EXTERNAL_INPUT_MODE = 3;
-	public static final int CONSTANT_PORT_MODE = 4;
-	public static final int INPUT_PORT_MODE = 5;
-	public static final int OUTPUT_PORT_MODE = 6;
-	public static final int INPUT_MACRO_MODE = 7;
-	public static final int OUTPUT_MACRO_MODE = 8;
-
-/**
- * 
- * @return com.cosylab.vdct.graphics.objects.InLink
- */
-InLink getInput();
+public class MacroValueChangeAction extends ActionObject {
+	private com.cosylab.vdct.vdb.VDBMacro macro;
+	private String oldValue;
+	private String newValue;
+	
 /**
  * Insert the method's description here.
- * Creation date: (29.1.2001 17:53:09)
- * @return int
+ * Creation date: (3.5.2001 15:30:47)
+ * @param field com.cosylab.vdct.vdb.VDBMacro
+ * @param oldValue java.lang.String
+ * @param newValue java.lang.String
  */
-int getOutX();
+public MacroValueChangeAction(com.cosylab.vdct.vdb.VDBMacro macro, String oldValue, String newValue) {
+	this.macro=macro;
+	this.oldValue=oldValue;
+	this.newValue=newValue;
+}
 /**
  * Insert the method's description here.
- * Creation date: (29.1.2001 17:53:18)
- * @return int
+ * Creation date: (3.5.2001 15:50:49)
+ * @return java.lang.String
  */
-int getOutY();
+public java.lang.String getDescription() {
+	return "Macro value change ["+macro.getFullName()+"](\""+oldValue+"\" to \""+newValue+"\")";
+}
 /**
- * Insert the method's description here.
- * Creation date: (30.1.2001 14:46:40)
- * @return int
+ * This method was created in VisualAge.
  */
-int getQueueCount();
+protected void redoAction() {
+	macro.setValue(newValue);
+}
 /**
- * Insert the method's description here.
- * Creation date: (29.1.2001 17:53:59)
+ * This method was created in VisualAge.
  */
-void setInput(InLink input);
-/**
- * Insert the method's description here.
- * Creation date: (29.1.2001 17:53:09)
- * @return int
- */
-int getMode();
+protected void undoAction() {
+	macro.setValue(oldValue);
+}
 }
