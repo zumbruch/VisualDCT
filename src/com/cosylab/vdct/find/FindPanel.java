@@ -32,7 +32,6 @@ import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.border.*;
 
 import com.cosylab.vdct.graphics.DrawingSurface;
 import com.cosylab.vdct.graphics.objects.Group;
@@ -292,7 +291,8 @@ public class FindPanel extends JPanel
     protected boolean accept(Object candidate, FindFilter[] filters)
     {
         if (candidate == null || filters == null)
-
+            return false;
+        
         for (int i = 0; i < filters.length; i++)
         {
             if (!filters[i].accept(candidate, this))
@@ -415,7 +415,7 @@ public class FindPanel extends JPanel
             // Directory
             title = new JLabel();
             title.setForeground(Color.black);
-            title.setFont(new Font("Helvetica", Font.PLAIN, 10));
+            //title.setFont(new Font("Helvetica", Font.PLAIN, 12));
             add(title);
         }
 
@@ -461,7 +461,7 @@ public class FindPanel extends JPanel
             progress.setDoubleBuffered(true);
 
             progress.setForeground(Color.black);
-            //progress.setFont(new Font("Helvetica", Font.PLAIN, 10));
+            progress.setFont(new Font("Helvetica", Font.PLAIN, 12));
             add(progress, BorderLayout.EAST);
         }
 
@@ -605,10 +605,7 @@ public class FindPanel extends JPanel
         protected JList fileList = null;
 
         /**
-         * Construct a search results pane with a scrollable list of files. When
-         * an item is double-clicked the FindPanel controller will be
-         * instructed to select the file in the parent JFileChooser's item
-         * display.
+         * Construct a search results pane with a scrollable list of files. 
          */
         FindResults() {
             super();
@@ -616,8 +613,8 @@ public class FindPanel extends JPanel
 
             model = new DefaultListModel();
             fileList = new JList(model);
-            fileList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            fileList.setCellRenderer(new FindResultsCellRenderer());
+            fileList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+            fileList.setFont(fileList.getFont().deriveFont(Font.PLAIN));
             add(fileList, BorderLayout.CENTER);
 
             // Double click listener
@@ -665,48 +662,6 @@ public class FindPanel extends JPanel
             }
         }
 
-        /**
-         * Convenience class for rendering cells in the results list.
-         */
-        class FindResultsCellRenderer extends JLabel implements
-                ListCellRenderer {
-
-            FindResultsCellRenderer() {
-                setOpaque(true);
-                setBorder(new EmptyBorder(1, 2, 1, 2));
-            }
-
-            public Component getListCellRendererComponent(JList list,
-                    Object value, int index, boolean isSelected,
-                    boolean cellHasFocus)
-            {
-                if (index == -1)
-                {
-                    // This shouldn't happen since we won't be using this
-                    // renderer in a combo box
-                    int selected = list.getSelectedIndex();
-                    if (selected == -1)
-                        return this;
-                    else
-                        index = selected;
-                }
-
-                setText(value.toString());
-
-                // selection characteristics
-                if (isSelected)
-                {
-                    setBackground(list.getSelectionBackground());
-                    setForeground(list.getSelectionForeground());
-                } else
-                {
-                    setBackground(Color.white);
-                    setForeground(Color.black);
-                }
-                return this;
-            }
-
-        }
     }
 
 }
