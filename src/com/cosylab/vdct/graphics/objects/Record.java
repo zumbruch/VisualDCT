@@ -766,6 +766,9 @@ public OutLink getOutput() {
  */
 public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode) {
 	
+	// to fix DBD which do not have prompt group set for VAL field 
+	final String VAL_NAME = "VAL";
+	
 	if (mode == GUI_GROUP_ORDER)
 	{
 		int size = 0;
@@ -778,12 +781,12 @@ public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode) 
 				com.cosylab.vdct.dbd.DBDConstants.DBF_NOACCESS)*/ {
 	
 				key = new Integer(field.getGUI_type());
-				if (groups.containsKey(key)) {
+				if (groups.containsKey(key) /*VAL DBD fix -> */ && key.intValue()!=DBDConstants.GUI_UNDEFINED /* <- VAL DBD fix*/) {
 					((Vector)(groups.get(key))).addElement(field);
 					size++;
 				}
 				// do not add fields with undefined GUI type
-				else if (key.intValue()!=DBDConstants.GUI_UNDEFINED) {
+				else if (key.intValue()!=DBDConstants.GUI_UNDEFINED /*VAL DBD fix -> */ || field.getName().equals(VAL_NAME) /* <- VAL DBD fix*/) {
 					Vector v = new Vector();
 					v.addElement(field);
 					groups.put(key, v);
@@ -832,7 +835,7 @@ public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode) 
 				dbdField = (DBDFieldData)e.nextElement();
 				field = (VDBFieldData)recordData.getField(dbdField.getName());
 				if (/*(field.getDbdData().getField_type() != com.cosylab.vdct.dbd.DBDConstants.DBF_NOACCESS) &&*/
-					(field.getGUI_type()!=DBDConstants.GUI_UNDEFINED))
+					(field.getGUI_type()!=DBDConstants.GUI_UNDEFINED) || field.getName().equals(VAL_NAME))
 						all.addElement(field);
 			}
 		}
@@ -842,7 +845,7 @@ public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode) 
 			while (e.hasMoreElements()) {
 				field = (VDBFieldData)e.nextElement();
 				if (/*(field.getDbdData().getField_type() != com.cosylab.vdct.dbd.DBDConstants.DBF_NOACCESS) &&*/
-					(field.getGUI_type()!=DBDConstants.GUI_UNDEFINED))
+					(field.getGUI_type()!=DBDConstants.GUI_UNDEFINED) || field.getName().equals(VAL_NAME))
 						all.addElement(field);
 				}
 		}				
