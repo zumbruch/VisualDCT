@@ -81,9 +81,9 @@ public class DBResolver {
 	// used format:
 	// #! TEMPLATESTART
  	// #! TemplateDescription("description")
- 	// #! TemplateInput("alias", "field")
+ 	// #! TemplateInput("alias", "field", "description")
  	// ...
- 	// #! TemplateOutput("alias", "field")
+ 	// #! TemplateOutput("alias", "field", "description")
  	// ...
 	// #! TEMPLATEEND
 	

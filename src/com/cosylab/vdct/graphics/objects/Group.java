@@ -123,7 +123,7 @@ public void addSubObject(String id, VisibleObject object, boolean create) {
 				parent.setX(object.getX());
 				parent.setY(object.getY());
 				parent.setName(firstParentName);
-				parent.setNamePrefix(getName());
+				parent.setNamePrefix(getAbsoluteName());
 				addSubObject(firstParentName, parent);
 			}
 		}

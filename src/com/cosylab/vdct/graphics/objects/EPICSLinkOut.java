@@ -306,7 +306,7 @@ public com.cosylab.vdct.vdb.LinkProperties getLinkProperties() {
  * @return java.lang.String
  */
 public String getName() {
-	return fieldData.getRecord().getName()+Constants.FIELD_SEPARATOR+fieldData.getName();
+	return fieldData.getFullName();
 }
 /**
  * Insert the method's description here.
@@ -381,17 +381,20 @@ public static InLink getTarget(LinkProperties link) {
 	if ((recName==null) || recName.equals(nullString)) return null;
 
 	Record record = (Record)Group.getRoot().findObject(recName, true);
+	//LinkManagerObject record = (LinkManagerObject)Group.getRoot().findObject(recName, true);
 	if (record==null) return null;
 	else if (link.getType()==link.FWDLINK_FIELD) {
 		if (!link.getVarName().equalsIgnoreCase("PROC"))		// !!! proc
+//			return (Record)record;
 			return record;
 	}
 
-	EPICSVarLink var;
+	EPICSVarLink var = null;
 	if (record.containsObject(link.getVarName()))
 		var = (EPICSVarLink)record.getSubObject(link.getVarName());
 	else {
 		VDBFieldData target = record.getRecordData().getField(link.getVarName());
+		//VDBFieldData target = ((Record)record).getRecordData().getField(link.getVarName());
 		if ((target==null) ||
 			LinkProperties.getType(target)!=LinkProperties.VARIABLE_FIELD) return null;
 		else { 

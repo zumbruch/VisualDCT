@@ -311,7 +311,7 @@ public static com.cosylab.vdct.vdb.GUISeparator getLinkSeparator() {
  * @return java.lang.String
  */
 public String getName() {
-	return fieldData.getRecord().getName()+Constants.FIELD_SEPARATOR+fieldData.getName();
+	return fieldData.getFullName();
 }
 /**
  * Insert the method's description here.

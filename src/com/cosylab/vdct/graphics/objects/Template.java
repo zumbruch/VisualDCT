@@ -52,7 +52,7 @@ import com.cosylab.vdct.vdb.VDBTemplateInstance;
  * @author Matej
  */
 public class Template
-	extends ContainerObject
+	extends LinkManagerObject
 	implements Descriptable, Movable, Inspectable, Popupable, Flexible, Selectable, Clipboardable, Hub
 {
 
@@ -78,6 +78,7 @@ public class Template
 	private static GUISeparator inputsSeparator = null;
 	private static GUISeparator outputsSeparator = null;
 	private static GUISeparator templateInstanceSeparator = null;
+	private static GUISeparator propertiesSeparator = null;
 	private final static String fieldMaxStr = "01234567890123456789012345";
 
 	/**
@@ -308,6 +309,7 @@ public class Template
 		if (checkMove(dx, dy)) {
 			setX(super.getX()+dx);
 			setY(super.getY()+dy);
+			moveConnectors(dx, dy);
 			revalidatePosition();
 			return true;
 		}
@@ -388,6 +390,15 @@ public class Template
 		return outputsSeparator;
 	}
 
+	/**
+	 * Insert the method's description here.
+	 * Creation date: (3.2.2001 13:07:04)
+	 * @return com.cosylab.vdct.vdb.GUISeparator
+	 */
+	public static com.cosylab.vdct.vdb.GUISeparator getPropertiesSeparator() {
+		if (propertiesSeparator==null) propertiesSeparator = new GUISeparator("Properties");
+		return propertiesSeparator;
+	}
 
 	/**
 	 * @see com.cosylab.vdct.inspector.Inspectable#getProperties(int)
@@ -412,6 +423,14 @@ public class Template
 		while (e.hasMoreElements())
 			items.addElement(e.nextElement());
 		
+		items.addElement(getPropertiesSeparator());
+		e = templateData.getProperties().keys();
+		while (e.hasMoreElements())
+		{
+			String name = e.nextElement().toString();
+				// !!!
+			items.addElement(new NameValueInfoProperty(name, templateData.getProperties().get(name).toString()));
+		}
 	
 		InspectableProperty[] properties = new InspectableProperty[items.size()];
 		items.copyInto(properties);
@@ -702,4 +721,21 @@ public void addLink(Linkable link)
 public void removeLink(Linkable link)
 {
 }
+
+/**
+ * Insert the method's description here.
+ * Creation date: (27.1.2001 16:12:03)
+ * @param field com.cosylab.vdct.vdb.VDBFieldData
+ */
+public void fieldChanged(VDBFieldData field) {
+	boolean repaint = false;
+
+	if (manageLink(field)) repaint=true;
+	
+	if (repaint) {
+		unconditionalValidation();
+		com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+	}
+}
+
 }

@@ -565,20 +565,20 @@ public boolean isModified() {
 /**
  * Insert the method's description here.
  * Creation date: (3.2.2001 13:31:09)
- * @param record com.cosylab.vdct.graphics.objects.Record
+ * @param linkManager com.cosylab.vdct.graphics.objects.LinkManagerObject
  * @param field com.cosylab.vdct.vdb.VDBFieldData
  */
-public void linkCommand(Record record, VDBFieldData field) {
+public void linkCommand(LinkManagerObject linkManager, VDBFieldData field) {
 	if (tmplink==null) {
 		// start linking
 		tmplink = field;
-		ViewState.getInstance().setAsBlinking(record);
+		ViewState.getInstance().setAsBlinking(linkManager);
 		hiliter = new Hiliter(1000);
 		hiliter.start();
 	}
 	else {
 		if (field==null)
-			tmplink.setValue(record.getName());
+			tmplink.setValue(linkManager.getName());
 		else 
 			tmplink.setValue(field.getFullName());
 			
@@ -602,15 +602,15 @@ public void mouseClicked(MouseEvent e) {
 
 			// linking support
 			if (tmplink!=null) {
-				if (hilited instanceof Record) {
-					linkCommand((Record)hilited, null);
+				if (hilited instanceof LinkManagerObject) {
+					linkCommand((LinkManagerObject)hilited, null);
 					return;
 				}
 				else if (hilited instanceof EPICSVarLink) {
 					EPICSVarLink varlink = (EPICSVarLink)hilited;
 					if ((tmplink.getType()!=DBDConstants.DBF_FWDLINK) ||		// !!! proc
 						varlink.getFieldData().getName().equalsIgnoreCase("PROC")) {
-						linkCommand((Record)varlink.getParent(), varlink.getFieldData());
+						linkCommand((LinkManagerObject)varlink.getParent(), varlink.getFieldData());
 						return;
 					}
 				}
@@ -894,8 +894,8 @@ public void mousePressed(MouseEvent e) {
 			else if (hilitedObject instanceof Popupable) {
 
 				// linking support
-				if (hilitedObject instanceof Record) {
-					((Record)hilitedObject).setTarget((tmplink!=null));
+				if (hilitedObject instanceof LinkManagerObject) {
+					((LinkManagerObject)hilitedObject).setTarget((tmplink!=null));
 				}
 				
 				PopUpMenu.getInstance().show(

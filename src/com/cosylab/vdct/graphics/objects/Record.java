@@ -49,7 +49,10 @@ import com.cosylab.vdct.events.commands.*;
  * Creation date: (21.12.2000 20:46:35)
  * @author Matej Sekoranja
  */
-public class Record extends ContainerObject implements Clipboardable, Descriptable, Flexible, Hub, Morphable, Movable, MultiInLink, Rotatable, Selectable, Popupable, Inspectable {
+public class Record 
+	extends LinkManagerObject
+	implements Clipboardable, Descriptable, Flexible, Hub, Morphable, Movable, MultiInLink, Rotatable, Selectable, Popupable, Inspectable
+{
 
 	class PopupMenuHandler implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
@@ -58,7 +61,7 @@ public class Record extends ContainerObject implements Clipboardable, Descriptab
 	 		cmd.execute();
 		}
 	}
-	private final static String nullString = "";
+	//private final static String nullString = "";
 	private final static String fieldMaxStr = "01234567890123456789012345";
 	private final static int tailSizeOfR = 4;
 	private static javax.swing.ImageIcon icon = null;
@@ -77,7 +80,6 @@ public class Record extends ContainerObject implements Clipboardable, Descriptab
 	protected Vector outlinks;
 	protected boolean disconnected = false;
 	private boolean right = true;
-	private boolean target = false;
 	private final static String inlinkString = "INLINK";
 	private final static String outlinkString = "OUTLINK";
 	private final static String fwdlinkString = "FWDLINK";
@@ -447,31 +449,9 @@ public void fieldChanged(VDBFieldData field) {
  * @param group java.lang.String
  */
 public void fixEPICSOutLinks(String prevGroup, String group) {
-	if (prevGroup.equals(group)) return;
-	
-	String prefix;
-	if (group.equals(nullString)) prefix=nullString;
-	else prefix=group+Constants.GROUP_SEPARATOR;
-
-	String old; 
-	int type; VDBFieldData field;
-	Enumeration e = recordData.getFieldsV().elements();
-	while (e.hasMoreElements()) {
-		field = (VDBFieldData)e.nextElement();
-		type = LinkProperties.getType(field);
-		if (type != LinkProperties.VARIABLE_FIELD) {
-			old = field.getValue();
-			if (!old.equals(nullString) && !old.startsWith(Constants.HARDWARE_LINK) &&
-				old.startsWith(prevGroup)) {
-				if (prevGroup.equals(nullString))
-					field.setValue(prefix+old);
-				else
-					field.setValue(prefix+old.substring(prevGroup.length()+1));
-			}
-		}
-	}
-
+	super.fixEPICSOutLinks(recordData.getFieldsV().elements(), prevGroup, group);
 }
+
 /**
  * Insert the method's description here.
  * Creation date: (3.5.2001 8:37:37)
@@ -516,74 +496,10 @@ public void fixLinks() {
 
 	// links to this record
 	fixForwardLinks();
-	
-	Object unknownField;
-	EPICSLinkOut source;
-	EPICSVarLink varlink;
-	String targetName;
-	
-	Enumeration e = getSubObjectsV().elements();
-	while (e.hasMoreElements())
-	{
-		unknownField = e.nextElement();
-			
-			// go and find source
-			if (unknownField instanceof EPICSVarLink)
-			{
-				varlink = (EPICSVarLink)unknownField;
-				targetName = varlink.getFieldData().getFullName();
 
-				
-				Enumeration e2 = varlink.getStartPoints().elements();
-				while (e2.hasMoreElements())
-				{
-					unknownField = e2.nextElement();
-					if (unknownField instanceof EPICSLinkOut) 
-						source = (EPICSLinkOut)unknownField;  
-					else
-						continue;	// nothing to fix
-
-		
-					// now I got source and target, compare values
-					String oldTarget = LinkProperties.getTarget(source.getFieldData());
-					if (!oldTarget.equalsIgnoreCase(targetName))
-					{
-						// not the same, fix it gently as a doctor :)
-						String value = source.getFieldData().getValue();
-						value = targetName + com.cosylab.vdct.util.StringUtils.removeBegining(value, oldTarget);
-						source.getFieldData().setValueSilently(value);
-						source.fixLinkProperties();
-					}
-				}
-			}
-
-/*
-			else if (unknownField instanceof EPICSLinkOut)
-			{
-				source = (EPICSLinkOut)unknownField;
-				InLink inlink = EPICSLinkOut.getEndPoint(source);
-				if (inlink!=null && inlink instanceof EPICSVarLink)
-				{
-					varlink = (EPICSVarLink)inlink;
-					targetName = varlink.getFieldData().getFullName();
-					// now I got source and target, compare values
-					String oldTarget = LinkProperties.getTarget(source.getFieldData());
-					if (!oldTarget.equalsIgnoreCase(targetName))
-					{
-						// not the same, fix it gently as a doctor :)
-						String value = source.getFieldData().getValue();
-						value = targetName + com.cosylab.vdct.util.StringUtils.removeBegining(value, oldTarget);
-						source.getFieldData().setValueSilently(value);
-						source.fixLinkProperties();
-					}
-				}
-			}
-
-*/
-			
-	}
-	
+	super.fixLinks();
 }
+
 /**
  * Insert the method's description here.
  * Creation date: (26.1.2001 15:00:15)
@@ -1105,87 +1021,7 @@ public boolean isRight() {
 			return right;
 	}
 }
-/**
- * Insert the method's description here.
- * Creation date: (3.2.2001 13:25:42)
- * @return boolean
- */
-public boolean isTarget() {
-	return target;
-}
-/**
- * Insert the method's description here.
- * Creation date: (30.1.2001 9:36:15)
- * @return boolean
- * @param field com.cosylab.vdct.vdb.VDBFieldData
- */
-private boolean manageLink(VDBFieldData field) {
 
-	int type = LinkProperties.getType(field);
-	if (type == LinkProperties.VARIABLE_FIELD)
-	{
-		if (this.containsObject(field.getName()))
-		{
-			EPICSVarLink link = (EPICSVarLink)getSubObject(field.getName());
-			link.validateLink();
-			return true;			
-		}
-		return false;
-	}	
-	else
-	{
-		
-		if (this.containsObject(field.getName()))
-		{
-			// existing link
-			EPICSLinkOut link = (EPICSLinkOut)getSubObject(field.getName());
-			link.valueChanged();
-			return true;
-			
-		}
-		else
-		{
-			if (field.getValue().startsWith(Constants.HARDWARE_LINK) ||
-				field.getValue().startsWith("@") ||    // !!!??
-				field.getValue().equals(nullString) ||
-				Character.isDigit(field.getValue().charAt(0))) 
-				return false; 	//!!!
-			// new link
-			LinkProperties properties = new LinkProperties(field);
-			InLink varlink = EPICSLinkOut.getTarget(properties);
-			// can point to null? OK, cross will be showed
-
-			EPICSLinkOut outlink = null;
-			
-			if (type==LinkProperties.INLINK_FIELD)
-				outlink = new EPICSInLink(this, field);
-			else if (type==LinkProperties.OUTLINK_FIELD)
-				outlink = new EPICSOutLink(this, field);
-			else /*if (type==LinkProperties.FWDLINK_FIELD)*/
-				outlink = new EPICSFwdLink(this, field);
-		
-			addLink(outlink);
-			/*if (!properties.isIsInterGroupLink())
-			{
-				String id = EPICSLinkOut.generateConnectorID(outlink);
-				Connector connector = new Connector(id, this, outlink, varlink);
-				if (varlink!=null)
-				{
-					connector.setX((outlink.getOutX()+varlink.getInX())/2);
-					connector.setY((outlink.getOutY()+varlink.getInY())/2);
-				}
-				addSubObject(id, connector);
-			}
-			else*/
-			{
-				if (varlink!=null) varlink.setOutput(outlink, null);
-				outlink.setInput(varlink);
-			}
-
-			return true;
-		}
-	}
-}
 /**
  * Insert the method's description here.
  * Creation date: (30.1.2001 11:35:39)
@@ -1198,6 +1034,7 @@ public void manageLinks() {
 		manageLink(field);
 	}
 }
+
 /**
  * Insert the method's description here.
  * Creation date: (4.2.2001 21:58:46)
@@ -1221,35 +1058,6 @@ public boolean move(int dx, int dy) {
 	}
 	else 
 		return false;
-}
-/**
- * Insert the method's description here.
- * Creation date: (1.2.2001 17:38:36)
- * @param dx int
- * @param dy int
- */
-private void moveConnectors(int dx, int dy) {
-	
-  ViewState view = ViewState.getInstance();
-  Enumeration e = subObjectsV.elements();
-  Connector con; Object obj;
-  while (e.hasMoreElements()) {
-	obj = e.nextElement();
-	if (obj instanceof Connector) {
-		con = (Connector)obj;
-		InLink endpoint = EPICSLinkOut.getEndPoint(con);
-		/*OutLink startpoint = EPICSLinkOut.getStartPoint(con);
-		EPICSLinkOut lo = null;
-		if (!(startpoint instanceof EPICSLinkOut))
-			lo = (EPICSLinkOut)startpoint;*/
-		if (((endpoint instanceof EPICSLink) &&
-			(view.isSelected(((EPICSLink)endpoint).getParent())) /*||
-			((lo!=null) && lo.getLinkProperties().isIsInterGroupLink())*/)
-			||
-			((endpoint instanceof Record) && view.isSelected(endpoint)))
-			con.move(dx, dy);
-	}
-  }
 }
 /**
  * Insert the method's description here.
@@ -1356,22 +1164,7 @@ private void paintSubObjects(Graphics g, boolean hilited) {
 	}
 	
 }
-/**
- * Insert the method's description here.
- * Creation date: (21.12.2000 21:58:56)
- * @param g java.awt.Graphics
- * @param hilited boolean
- */
-public void postDraw(Graphics g, boolean hilited) {
-	Enumeration e = subObjectsV.elements();
-	VisibleObject vo;
-	while (e.hasMoreElements()) {
-		vo = (VisibleObject)(e.nextElement());
-		if (vo instanceof Connector)
-			vo.paint(g, hilited);
-	}
-	
-}
+
 /**
  * Insert the method's description here.
  * Creation date: (29.1.2001 22:40:48)
@@ -1512,14 +1305,6 @@ public void setOutput(OutLink output, OutLink prevOutput) {
  * @param state boolean
  */
 public void setRight(boolean state) { right=state; }
-/**
- * Insert the method's description here.
- * Creation date: (3.2.2001 13:25:42)
- * @param newTarget boolean
- */
-public void setTarget(boolean newTarget) {
-	target = newTarget;
-}
 /**
  * Insert the method's description here.
  * Creation date: (10.1.2001 14:49:50)

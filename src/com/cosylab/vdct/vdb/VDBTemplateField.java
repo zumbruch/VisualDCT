@@ -38,14 +38,16 @@ public class VDBTemplateField extends VDBFieldData implements Descriptable
 {
 	String alias;
 	String description = null;
+	VDBTemplateInstance templateInstance = null;
 	
 	/**
 	 */
-	public VDBTemplateField(String alias, VDBFieldData field)
+	public VDBTemplateField(String alias, VDBTemplateInstance templateInstance, VDBFieldData field)
 	{
 		super();
 		this.alias=alias;
-		
+		this.templateInstance = templateInstance;
+			
 		// copy (is this good - what about delegation...?!!!)
 		this.setType(field.getType());
 		this.setName(field.getName());
@@ -58,14 +60,6 @@ public class VDBTemplateField extends VDBFieldData implements Descriptable
 		this.setRecord(field.getRecord());
 	}
 	
-	/**
-	 * Insert the method's description here.
-	 * Creation date: (1.2.2001 12:11:29)
-	 * @return java.lang.String
-	 */
-	public String getFullName() {
-		return super.getFullName();
-	}
 	/**
 	 * Returns the alias.
 	 * @return String
@@ -101,6 +95,23 @@ public class VDBTemplateField extends VDBFieldData implements Descriptable
 	public String getName() {
 		return alias;
 	}
+	
+	/**
+	 * Insert the method's description here.
+	 * Creation date: (1.2.2001 12:11:29)
+	 * @return java.lang.String
+	 */
+	public String getFullName() {
+		if (getRecord()==null)
+			return "(undefined)"+com.cosylab.vdct.Constants.FIELD_SEPARATOR+name;
+		else
+		{
+			// optimizie
+			String fullName = getRecord().getName()+com.cosylab.vdct.Constants.FIELD_SEPARATOR+name;
+			return VDBTemplateInstance.applyProperties(fullName, templateInstance.getProperties());
+		}
+	}
+
 	/**
 	 * Insert the method's description here.
 	 * Creation date: (11.1.2001 21:30:04)
@@ -146,6 +157,15 @@ public class VDBTemplateField extends VDBFieldData implements Descriptable
 	public void setDescription(String description)
 	{
 		this.description = description;
+	}
+
+	/**
+	 * Returns the templateInstance.
+	 * @return VDBTemplateInstance
+	 */
+	public VDBTemplateInstance getTemplateInstance()
+	{
+		return templateInstance;
 	}
 
 }
