@@ -101,18 +101,4 @@ public class DBPort extends DBComment
 		this.description = description;
 	}
 	
-	/**
-	 * Returns port name
-	 * @param dtemplateInstanceName The name of the template instance
-	 */
-	public String getPortDefinition(String templateInstanceName)
-	{
-		StringBuffer fullName = new StringBuffer();
-		fullName.append("$(");
-		fullName.append(templateInstanceName);
-		fullName.append(com.cosylab.vdct.Constants.FIELD_SEPARATOR);
-		fullName.append(getName());
-		fullName.append(")");
-		return fullName.toString();
-	}
 }

@@ -582,9 +582,14 @@ public void save(java.io.File file) throws IOException {
 	data.setPortsV(new Vector());
 	data.setGroup(Group.getRoot());
 
-	
-	 Group.setEditingTemplateData(data);
+	Group.setEditingTemplateData(data);
+	drawingSurface.getTemplateStack().push(data);
  } 
+ else
+ {
+	// saveas!!!
+//	fileName & id has been changed!! new template...
+ }
  
  // if ok
  drawingSurface.setModified(false);

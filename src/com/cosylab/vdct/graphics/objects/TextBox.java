@@ -42,6 +42,7 @@ import com.cosylab.vdct.*;
 import com.cosylab.vdct.graphics.*;
 import com.cosylab.vdct.graphics.popup.*;
 import com.cosylab.vdct.events.*;
+import com.cosylab.vdct.undo.DescriptionChangeAction;
 import com.cosylab.vdct.util.*;
 
 /**
@@ -134,7 +135,7 @@ private static boolean currentBorder = false;
 
 private static final String nullString = "";
 private static final String htmlString = "<html>";
-protected String description = nullString;
+protected String description = null;
 protected JLabel label = null;
 protected boolean htmlMode = false;
 
@@ -231,7 +232,6 @@ public TextBox(String parName, Group parentGroup, int posX, int posY, int posX2,
 	setColor(currentColor);
 	
 	label.setVerticalAlignment(JLabel.TOP);
-	setDescription(nullString);
 	
 	setDescription(nullString);
 	setFont(label.getFont());
@@ -667,6 +667,10 @@ public String getDescription()
  */
 public void setDescription(String description)
 {
+	if (this.description!=null && !this.description.equals(nullString) && !this.description.equals(description))
+		com.cosylab.vdct.undo.UndoManager.getInstance().addAction(
+				new DescriptionChangeAction(this, this.description, description));
+
 	this.description = description;
 	updateText();
 }

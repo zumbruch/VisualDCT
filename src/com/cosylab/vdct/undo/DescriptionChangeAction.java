@@ -1,4 +1,6 @@
-package com.cosylab.vdct;
+package com.cosylab.vdct.undo;
+
+import com.cosylab.vdct.graphics.objects.Descriptable;
 
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
@@ -28,15 +30,46 @@ package com.cosylab.vdct;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 /**
  * Insert the type's description here.
- * Creation date: (24.4.2001 15:59:00)
- * @author Matej Sekoranja
+ * Creation date: (3.5.2001 15:23:26)
+ * @author 
  */
-public interface Version {
-	public final static String VERSION = "2.2";
-	public final static String BUILD = "1237";
-
-	public final static String JAVA_VERSION_REQUIRED = "1.4.0";
+public class DescriptionChangeAction extends ActionObject {
+	private Descriptable object;
+	private String oldValue;
+	private String newValue;
+	
+/**
+ * Insert the method's description here.
+ * Creation date: (3.5.2001 15:30:47)
+ * @param objectDescriptable
+ * @param oldValue java.lang.String
+ * @param newValue java.lang.String
+ */
+public DescriptionChangeAction(Descriptable object, String oldValue, String newValue) {
+	this.object=object;
+	this.oldValue=oldValue;
+	this.newValue=newValue;
+}
+/**
+ * Insert the method's description here.
+ * Creation date: (3.5.2001 15:50:49)
+ * @return java.lang.String
+ */
+public java.lang.String getDescription() {
+	return "Description changed ["+object+"](\""+oldValue+"\" to \""+newValue+"\")";
+}
+/**
+ * This method was created in VisualAge.
+ */
+protected void redoAction() {
+	object.setDescription(newValue);
+}
+/**
+ * This method was created in VisualAge.
+ */
+protected void undoAction() {
+	object.setDescription(oldValue);
+}
 }

@@ -1429,7 +1429,7 @@ public boolean open(File file, boolean importDB) throws IOException {
 				{
 					Group.setRoot(template.getGroup());
 					Group.setEditingTemplateData(template);
-					//templateStack.push(template);
+					templateStack.push(template);
 
 					InspectorManager.getInstance().updateObjectLists();
 					moveToGroup(template.getGroup());
@@ -2695,6 +2695,8 @@ public void ascendFromTemplate()
 	
 	if (!templateStack.isEmpty())
 		Group.setEditingTemplateData((VDBTemplate)templateStack.peek());
+	else
+		Group.setEditingTemplateData(null);
 		
 	Group grp = viewGroup;
 	while (grp.getParent()!=null)
@@ -2739,21 +2741,11 @@ public void updateWorkspaceGroup()
 	if (name.length()==0)
 		name = Constants.MAIN_GROUP;
 	
-	if (isTemplateMode()) 
+	if (templateStack.size()>1) 
 		name = Constants.TEMPLATE_GROUP + " [" + ((VDBTemplate)templateStack.peek()).getDescription() + "]: "+ name;
 	cmd.setGroup(name);
 	cmd.execute();
 }
-
-/**
- * Insert the method's description here.
- * Creation date: (22.4.2001 18:44:03)
- */
-public boolean isTemplateMode()
-{
-	return templateStack.size()>0;
-}
-
 
 /**
  * Returns the templateStack.

@@ -5106,7 +5106,8 @@ private void initialize() {
 		CommandManager.getInstance().addCommand("SetGroup", new SetWorkspaceGroup(this));
 		// user code end
 		setName("VisualDCT");
-		setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+//		setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+		setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
 		setJMenuBar(getVisualDCTJMenuBar());
 		setSize(460, 300);
 		setTitle("VisualDCT");
@@ -5177,7 +5178,7 @@ public static void main(java.lang.String[] args) {
 		aVisualDCTSplashScreen.setVisible(true);
 		
 		/* Create the frame */
-		VisualDCT aVisualDCT = new VisualDCT();
+		final VisualDCT aVisualDCT = new VisualDCT();
 		aVisualDCT.setSize(Constants.VDCT_WIDTH, Constants.VDCT_HEIGHT);
 		aVisualDCT.getworkspace();
 
@@ -5234,13 +5235,16 @@ public static void main(java.lang.String[] args) {
 
 		/* Add a windowListener for the windowClosedEvent */
 		aVisualDCT.addWindowListener(new java.awt.event.WindowAdapter() {
+			public void windowClosing(java.awt.event.WindowEvent e) {
+				aVisualDCT.exitMenuItem_ActionPerformed();
+			};
+
 			public void windowClosed(java.awt.event.WindowEvent e) {
 				Settings.getInstance().save();
 				com.cosylab.vdct.plugin.PluginManager.getInstance().save();
 				System.exit(0);
 			};
 		});
-		
 		aVisualDCT.setVisible(true);
 
 	} catch (Throwable exception) {

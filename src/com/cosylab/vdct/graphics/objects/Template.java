@@ -42,7 +42,6 @@ import java.util.Iterator;
 import javax.swing.*;
 
 import com.cosylab.vdct.Constants;
-import com.cosylab.vdct.db.DBPort;
 import com.cosylab.vdct.db.DBResolver;
 import com.cosylab.vdct.graphics.FontMetricsBuffer;
 import com.cosylab.vdct.graphics.ViewState;
@@ -88,8 +87,6 @@ public class Template
 	private static GUISeparator templateSeparator = null;
 	//private static GUISeparator inputsSeparator = null;
 	//private static GUISeparator outputsSeparator = null;
-
-	private static GUISeparator portsSeparator = null;
 
 	private static GUISeparator templateInstanceSeparator = null;
 	private static GUISeparator propertiesSeparator = null;
@@ -261,7 +258,7 @@ public class Template
 
   		 // !!! optimize - static
  
-		  rfieldRowHeight = (frheight-2*y0)*0.092;
+		  rfieldRowHeight = (irheight-2*y0)*0.175;
 
 		  if (rwidth<(2*xx0)) fieldFont = null;
 		  else
@@ -420,36 +417,6 @@ public class Template
 	 * Creation date: (3.2.2001 13:07:04)
 	 * @return com.cosylab.vdct.vdb.GUISeparator
 	 */
-/*	public static com.cosylab.vdct.vdb.GUISeparator getInputsSeparator() {
-		if (inputsSeparator==null) inputsSeparator = new GUISeparator("Inputs");
-		return inputsSeparator;
-	}
-	
-	/**
-	 * Insert the method's description here.
-	 * Creation date: (3.2.2001 13:07:04)
-	 * @return com.cosylab.vdct.vdb.GUISeparator
-	 */
-/*	public static com.cosylab.vdct.vdb.GUISeparator getOutputsSeparator() {
-		if (outputsSeparator==null) outputsSeparator = new GUISeparator("Outputs");
-		return outputsSeparator;
-	}
-
-	/**
-	 * Insert the method's description here.
-	 * Creation date: (3.2.2001 13:07:04)
-	 * @return com.cosylab.vdct.vdb.GUISeparator
-	 */
-	public static com.cosylab.vdct.vdb.GUISeparator getPortsSeparator() {
-		if (portsSeparator==null) portsSeparator = new GUISeparator("Ports");
-		return portsSeparator;
-	}
-
-	/**
-	 * Insert the method's description here.
-	 * Creation date: (3.2.2001 13:07:04)
-	 * @return com.cosylab.vdct.vdb.GUISeparator
-	 */
 	public static com.cosylab.vdct.vdb.GUISeparator getPropertiesSeparator() {
 		if (propertiesSeparator==null) propertiesSeparator = new GUISeparator("Properties");
 		return propertiesSeparator;
@@ -479,18 +446,9 @@ public class Template
 			items.addElement(e.nextElement());
 */		
 
-		items.addElement(getPortsSeparator());
 
 		items.addElement(getPropertiesSeparator());
 
-/*
-  		e = templateData.getProperties().keys();
-		while (e.hasMoreElements())
-		{
-			String name = e.nextElement().toString();
-			items.addElement(new MonitoredProperty(name, (String)templateData.getProperties().get(name), this));
-		}
-*/		
   		java.util.Iterator i = templateData.getPropertiesV().iterator();
 		while (i.hasNext())
 		{
@@ -498,7 +456,7 @@ public class Template
 			items.addElement(new MonitoredProperty(name, (String)templateData.getProperties().get(name), this));
 		}
 
-		String addString = "Add property...";
+		final String addString = "Add property...";
 		items.addElement(new MonitoredActionProperty(addString, this));
 	
 		InspectableProperty[] properties = new InspectableProperty[items.size()];
@@ -511,9 +469,10 @@ public class Template
 	 */
 	public Vector getItems()
 	{
-		Hashtable allLinks = (Hashtable)templateData.getInputs().clone();
-		allLinks.putAll(templateData.getOutputs());
-		return getLinkMenus(allLinks.elements());
+		//Hashtable allLinks = (Hashtable)templateData.getInputs().clone();
+		//allLinks.putAll(templateData.getOutputs());
+		//return getLinkMenus(allLinks.elements());
+		return null;
 	}
 
 	/**
@@ -779,7 +738,7 @@ private void initializeLinkFields()
 	Enumeration e = templateData.getTemplate().getPortsV().elements();
 	while (e.hasMoreElements())
 	{
-		DBPort port = (DBPort)e.nextElement();
+		VDBPort port = (VDBPort)e.nextElement();
 		VDBTemplatePort tf = new VDBTemplatePort(getTemplateData(), port);
 
 		EPICSLink link = createLinkField(tf);
@@ -880,15 +839,31 @@ public void addProperty()
 		{
 			if (!templateData.getProperties().containsKey(reply))
 			{
-				templateData.addProperty(reply, nullString);
-
-				com.cosylab.vdct.undo.UndoManager.getInstance().addAction(
-						new CreateTemplatePropertyAction(this, reply));
-
-				updateTemplateFields();
-				InspectorManager.getInstance().updateObject(this);
-				unconditionalValidation();
-				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+				// check name
+				if (reply.trim().length()==0)
+				{
+					message = "Empty name! Enter valid name:";
+					type = JOptionPane.WARNING_MESSAGE;
+					continue;
+				}
+				else if (reply.indexOf(' ')!=-1)
+				{
+					message = "No spaces allowed! Enter valid name:";
+					type = JOptionPane.WARNING_MESSAGE;
+					continue;
+				}
+				else
+				{
+					templateData.addProperty(reply, nullString);
+	
+					com.cosylab.vdct.undo.UndoManager.getInstance().addAction(
+							new CreateTemplatePropertyAction(this, reply));
+	
+					updateTemplateFields();
+					InspectorManager.getInstance().updateObject(this);
+					unconditionalValidation();
+					com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+				}
 			}
 			else
 			{
@@ -903,9 +878,9 @@ public void addProperty()
 }
 
 /**
- * @see com.cosylab.vdct.vdb.MonitoredPropertyListener#propertyChanged(MonitoredProperty)
+ * @see com.cosylab.vdct.vdb.MonitoredPropertyListener#propertyChanged(InspectableProperty)
  */
-public void propertyChanged(MonitoredProperty property)
+public void propertyChanged(InspectableProperty property)
 {
 	String oldValue = (String)templateData.getProperties().get(property.getName());
 
@@ -922,9 +897,9 @@ public void propertyChanged(MonitoredProperty property)
 }
 
 /**
- * @see com.cosylab.vdct.vdb.MonitoredPropertyListener#removeProperty(MonitoredProperty)
+ * @see com.cosylab.vdct.vdb.MonitoredPropertyListener#removeProperty(InspectableProperty)
  */
-public void removeProperty(MonitoredProperty property)
+public void removeProperty(InspectableProperty property)
 {
 	templateData.removeProperty(property.getName());
 	
@@ -939,9 +914,9 @@ public void removeProperty(MonitoredProperty property)
 }
 
 /**
- * @see com.cosylab.vdct.vdb.MonitoredPropertyListener#renameProperty(MonitoredProperty)
+ * @see com.cosylab.vdct.vdb.MonitoredPropertyListener#renameProperty(InspectableProperty)
  */
-public void renameProperty(MonitoredProperty property)
+public void renameProperty(InspectableProperty property)
 {
 	String message = "Enter new property name of '"+property.getName()+"':";
 	int type = JOptionPane.QUESTION_MESSAGE;
@@ -1307,7 +1282,7 @@ public static Map preparePorts(Group group, Map substitutions)
 			Iterator i2 = t.getTemplateData().getTemplate().getPortsV().iterator();
 			while (i2.hasNext())
 			{
-				DBPort port = (DBPort)i2.next();
+				VDBPort port = (VDBPort)i2.next();
 				
 				String target = port.getTarget();
 

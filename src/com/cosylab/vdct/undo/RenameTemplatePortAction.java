@@ -1,4 +1,4 @@
-package com.cosylab.vdct;
+package com.cosylab.vdct.undo;
 
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
@@ -28,15 +28,48 @@ package com.cosylab.vdct;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import com.cosylab.vdct.vdb.VDBPort;
+import com.cosylab.vdct.vdb.VDBTemplate;
 
 /**
  * Insert the type's description here.
- * Creation date: (24.4.2001 15:59:00)
- * @author Matej Sekoranja
+ * Creation date: (3.5.2001 16:26:04)
+ * @author 
  */
-public interface Version {
-	public final static String VERSION = "2.2";
-	public final static String BUILD = "1237";
+public class RenameTemplatePortAction extends ActionObject {
+	protected VDBTemplate object;
+	protected VDBPort port;
+	protected String oldName;
+	protected String newName;
 
-	public final static String JAVA_VERSION_REQUIRED = "1.4.0";
+/**
+ * Insert the method's description here.
+ * Creation date: (3.5.2001 16:27:58)
+ */
+public RenameTemplatePortAction(VDBTemplate object, VDBPort port, String oldName, String newName) {
+	this.object=object;
+	this.port=port;
+	this.oldName=oldName;
+	this.newName=newName;
+}
+/**
+ * Insert the method's description here.
+ * Creation date: (3.5.2001 16:26:04)
+ * @return java.lang.String
+ */
+public String getDescription() {
+	return "Rename Template Port ["+object+"]("+port.getFullName()+": "+oldName+" -> "+newName+")";
+}
+/**
+ * This method was created in VisualAge.
+ */
+protected void redoAction() {
+	object.renamePort(port, newName);
+}
+/**
+ * This method was created in VisualAge.
+ */
+protected void undoAction() {
+	object.renamePort(port, oldName);
+}
 }

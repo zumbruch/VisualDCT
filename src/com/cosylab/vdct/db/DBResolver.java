@@ -149,6 +149,7 @@ public static StreamTokenizer getStreamTokenizer(String fileName) {
  * @param st java.io.StreamTokenizer
  */
 public static void initializeTokenizer(StreamTokenizer tokenizer) {
+	tokenizer.resetSyntax();
 	tokenizer.whitespaceChars(0, 32);
 	tokenizer.wordChars(33, 255);			// reset
 	tokenizer.eolIsSignificant(true);
@@ -210,22 +211,25 @@ public static String processComment(DBData data, StreamTokenizer tokenizer, Stri
  if ((data==null) || !tokenizer.sval.equals(DBConstants.layoutDataString)) {	// comment
 	 String comment = tokenizer.sval;
 	 
-	 // initialize tokenizer for comments
-	 tokenizer.wordChars(32, 255);		
-	 tokenizer.wordChars('\t', '\t');
-	 
-	 while ((tokenizer.nextToken() != tokenizer.TT_EOL) &&						// read till EOL
+	// initialize tokenizer for comments
+	tokenizer.resetSyntax();
+	tokenizer.whitespaceChars(0, 31);
+	tokenizer.wordChars(32, 255);		
+	tokenizer.wordChars('\t', '\t');
+	tokenizer.eolIsSignificant(true);
+
+	while ((tokenizer.nextToken() != tokenizer.TT_EOL) &&						// read till EOL
 		    (tokenizer.ttype != tokenizer.TT_EOF))
 	 	if (tokenizer.ttype == tokenizer.TT_NUMBER) {
-		 	if (!comment.equals(nullString)) comment+=SPACE;
+		 	//if (!comment.equals(nullString)) comment+=SPACE;
 	 		comment=comment+tokenizer.nval;
 	 	}
 		else {
-		 	if (!comment.equals(nullString)) comment+=SPACE;
+		 	//if (!comment.equals(nullString)) comment+=SPACE;
 			comment=comment+tokenizer.sval;
 		}
 
-	// reinitialzie it back
+	 // reinitialzie it back
 	 initializeTokenizer(tokenizer);
 
 	 return comment+NL;

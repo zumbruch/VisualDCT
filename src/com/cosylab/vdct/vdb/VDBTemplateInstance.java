@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import com.cosylab.vdct.db.DBPort;
 import com.cosylab.vdct.util.StringUtils;
 
 /**
@@ -47,8 +46,8 @@ public class VDBTemplateInstance implements Commentable
 	protected VDBTemplate template = null;
 	protected Vector propertiesV = null;
 	protected Hashtable properties = null;
-	protected Hashtable inputs = null;
-	protected Hashtable outputs = null;
+	//protected Hashtable inputs = null;
+	//protected Hashtable outputs = null;
 
 	private String comment = null;
 	
@@ -64,7 +63,7 @@ public class VDBTemplateInstance implements Commentable
 	 * Returns the inputs.
 	 * @return Hashtable
 	 */
-	public Hashtable getInputs()
+	/*public Hashtable getInputs()
 	{
 		return inputs;
 	}
@@ -73,7 +72,7 @@ public class VDBTemplateInstance implements Commentable
 	 * Returns the outputs.
 	 * @return Hashtable
 	 */
-	public Hashtable getOutputs()
+	/*public Hashtable getOutputs()
 	{
 		return outputs;
 	}
@@ -128,7 +127,7 @@ public class VDBTemplateInstance implements Commentable
 	 * Sets the inputs.
 	 * @param inputs The inputs to set
 	 */
-	public void setInputs(Hashtable inputs)
+	/*public void setInputs(Hashtable inputs)
 	{
 		this.inputs = inputs;
 	}
@@ -137,7 +136,7 @@ public class VDBTemplateInstance implements Commentable
 	 * Sets the outputs.
 	 * @param outputs The outputs to set
 	 */
-	public void setOutputs(Hashtable outputs)
+	/*public void setOutputs(Hashtable outputs)
 	{
 		this.outputs = outputs;
 	}

@@ -28,9 +28,11 @@ package com.cosylab.vdct.vdb;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import com.cosylab.vdct.inspector.InspectableProperty;
+
 public interface MonitoredPropertyListener {
 	void addProperty();
-	void removeProperty(MonitoredProperty property);
-	void propertyChanged(MonitoredProperty property);
-	void renameProperty(MonitoredProperty property);
+	void removeProperty(InspectableProperty property);
+	void propertyChanged(InspectableProperty property);
+	void renameProperty(InspectableProperty property);
 }

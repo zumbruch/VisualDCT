@@ -151,9 +151,9 @@ public static VDBTemplateInstance copyVDBTemplateInstance(VDBTemplateInstance so
 	vdbTemplateInstance.setProperties((Hashtable)source.getProperties().clone(),
 								  	  (Vector)source.getPropertiesV().clone());
 
-
+/*
 	Hashtable ios = new Hashtable();
-/*	Enumeration keys = source.getOutputs().keys();
+	Enumeration keys = source.getOutputs().keys();
 	while (keys.hasMoreElements())
 	{
 		String key = keys.nextElement().toString();
@@ -167,12 +167,12 @@ public static VDBTemplateInstance copyVDBTemplateInstance(VDBTemplateInstance so
 		if (initVal!=null)
 			tf.setValueSilently(initVal);
 		ios.put(key, tf);
-	}*/
-	vdbTemplateInstance.setOutputs(ios);
+	}
+	vdbTemplateInstance.setOutputs(ios);*/
 
-
+/*
 	ios = new Hashtable();
-/*	keys = source.getInputs().keys();
+	keys = source.getInputs().keys();
 	while (keys.hasMoreElements())
 	{
 		String key = keys.nextElement().toString();
@@ -186,8 +186,8 @@ public static VDBTemplateInstance copyVDBTemplateInstance(VDBTemplateInstance so
 		if (initVal!=null)
 			tf.setValueSilently(initVal);
 		ios.put(key, tf);
-	}*/
-	vdbTemplateInstance.setInputs(ios);
+	}
+	vdbTemplateInstance.setInputs(ios);*/
 
 
 
@@ -336,9 +336,9 @@ public static VDBTemplateInstance generateVDBTemplateInstance(DBTemplateInstance
 	vti.setProperties(dbTemplateInstance.getProperties(), dbTemplateInstance.getPropertiesV());
 	
 	// !!! temp
-	Hashtable table = new Hashtable();
-	vti.setInputs(generateTemplateInstanceIOFields(vti, table, table, table));
-	vti.setOutputs(generateTemplateInstanceIOFields(vti, table, table, table));
+	//Hashtable table = new Hashtable();
+	//vti.setInputs(generateTemplateInstanceIOFields(vti, table, table, table));
+	//vti.setOutputs(generateTemplateInstanceIOFields(vti, table, table, table));
 	
 	return vti;
 }
@@ -351,9 +351,9 @@ public static VDBTemplateInstance generateNewVDBTemplateInstance(String name, VD
 	VDBTemplateInstance vti = new VDBTemplateInstance(name, t);
 	vti.setProperties(new Hashtable(), new Vector());		// empty properties
 		
-	Hashtable hm = new Hashtable();
-	vti.setInputs(generateTemplateInstanceIOFields(vti, hm, hm, hm));
-	vti.setOutputs(generateTemplateInstanceIOFields(vti, hm, hm, hm));
+	//Hashtable hm = new Hashtable();
+	//vti.setInputs(generateTemplateInstanceIOFields(vti, hm, hm, hm));
+	//vti.setOutputs(generateTemplateInstanceIOFields(vti, hm, hm, hm));
 
 	return vti;
 }
@@ -442,9 +442,24 @@ private static VDBData generateTemplate(DBDData dbd, DBTemplate dbTemplate)
 	
 		vt.setInputComments(dbTemplate.getInputComments());
 		vt.setOutputComments(dbTemplate.getOutputComments());
-	*/	
+
 		vt.setPorts(dbTemplate.getPorts());
 		vt.setPortsV(dbTemplate.getPortsV());
+	*/	
+	
+		Hashtable ports = new Hashtable();
+		Vector portsV = new Vector();
+		Enumeration keys = dbTemplate.getPorts().keys();
+		while (keys.hasMoreElements())
+		{
+			Object key = keys.nextElement();
+			DBPort port = (DBPort)dbTemplate.getPorts().get(key);
+			VDBPort vdbPort = new VDBPort(vt, port);	
+			ports.put(key, vdbPort);
+			portsV.addElement(vdbPort);
+		}
+		vt.setPorts(ports);
+		vt.setPortsV(portsV);
 	
 		VDBData.addTemplate(vt);
 		

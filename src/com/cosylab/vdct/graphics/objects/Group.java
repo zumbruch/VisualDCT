@@ -40,7 +40,6 @@ import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.vdb.*;
 import com.cosylab.vdct.db.DBDataEntry;
 import com.cosylab.vdct.db.DBEntry;
-import com.cosylab.vdct.db.DBPort;
 import com.cosylab.vdct.db.DBResolver;
 import com.cosylab.vdct.db.DBTemplateEntry;
 import com.cosylab.vdct.dbd.DBDConstants;
@@ -1505,7 +1504,7 @@ private static void writeTemplateData(DataOutputStream stream) throws IOExceptio
 	Iterator i = data.getPortsV().iterator();
 	while (i.hasNext())
 	{
-		DBPort port = (DBPort)i.next();
+		VDBPort port = (VDBPort)i.next();
 	
 		if (port.getComment()!=null)
 			stream.writeBytes(port.getComment()+nl);

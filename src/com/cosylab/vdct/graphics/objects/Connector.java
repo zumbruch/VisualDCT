@@ -116,6 +116,7 @@ public Connector(String id, LinkManagerObject parent, OutLink outlink, InLink in
 	setHeight(Constants.CONNECTOR_HEIGHT);
 
 	/// !!! better initial layout
+	// out of screen
 	if ((inlink==null) && (outlink==null)) {
 		setX(parent.getX()-(3*parent.getWidth())/2);
 		setY(parent.getY()+parent.getHeight()/2);
@@ -363,19 +364,19 @@ descItem.setEnabled(false); //!!!
 	modeMenu.add(normalModeItem);
 
 	JRadioButtonMenuItem invisibleModeItem = new JRadioButtonMenuItem(invisibleString, getMode()==OutLink.INVISIBLE_MODE);
-	invisibleModeItem.setEnabled(getMode()!=OutLink.INVISIBLE_MODE);		// what is input is output and also invisible!
+	invisibleModeItem.setEnabled(getMode()!=OutLink.INVISIBLE_MODE && getInput()!=null && (getOutput()==null || getOutput().getMode()!=OutLink.INVISIBLE_MODE));
 	invisibleModeItem.addActionListener(al);
 	modeMenu.add(invisibleModeItem);
 	
 	modeMenu.add(new JSeparator());
 	
 	JRadioButtonMenuItem inputModeItem = new JRadioButtonMenuItem(inputString, getMode()==OutLink.EXTERNAL_INPUT_MODE);
-	inputModeItem.setEnabled(getMode()!=OutLink.EXTERNAL_INPUT_MODE);
+	inputModeItem.setEnabled(getMode()!=OutLink.EXTERNAL_INPUT_MODE && getInput()==null);	// if endpoint
 	inputModeItem.addActionListener(al);
 	modeMenu.add(inputModeItem);
 
 	JRadioButtonMenuItem outputModeItem = new JRadioButtonMenuItem(outputString, getMode()==OutLink.EXTERNAL_OUTPUT_MODE);
-	outputModeItem.setEnabled(getMode()!=OutLink.EXTERNAL_OUTPUT_MODE);
+	outputModeItem.setEnabled(getMode()!=OutLink.EXTERNAL_OUTPUT_MODE && getInput()==null);	// if endpoint
 	outputModeItem.addActionListener(al);
 	modeMenu.add(outputModeItem);
 

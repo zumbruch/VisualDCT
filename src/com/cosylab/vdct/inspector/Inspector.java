@@ -183,6 +183,8 @@ private CommentTextArea getCommentTextArea() {
 			ivjCommentTextArea.setName("CommentTextArea");
 			//ivjCommentTextArea.setBorder(new javax.swing.border.EtchedBorder());
 			// user code begin {1}
+			if (ivjCommentTextArea.getFont()!=null)
+				ivjCommentTextArea.setFont(new java.awt.Font("monospaced", ivjCommentTextArea.getFont().getStyle(), ivjCommentTextArea.getFont().getSize()));
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
 			// user code begin {2}

@@ -32,6 +32,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.Enumeration;
 import java.util.Vector;
+import java.util.regex.Pattern;
 
 import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.DataProvider;
@@ -53,6 +54,7 @@ public class TemplateEPICSPort extends EPICSVarLink implements TemplateEPICSLink
 
  	private String lastUpdatedFullName = null;
 	private static GUISeparator portSeparator = null;
+	private static javax.swing.ImageIcon icon = null;
 
 /**
  * EPICSVarLink constructor comment.
@@ -219,12 +221,13 @@ public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode) 
 		if (out instanceof EPICSLinkOut) starts.addElement(out);
 	}
 
-	InspectableProperty[] properties = new InspectableProperty[2+2*starts.size()];
+	InspectableProperty[] properties = new InspectableProperty[3+2*starts.size()];
 
 	properties[0]=getPortSeparator();
 	properties[1]=new NameValueInfoProperty("Value", getFieldData().getValue());
+	properties[2]=new NameValueInfoProperty("Description", getFieldData().getHelp());
 
-	int i = 2;
+	int i = 3;
 	VDBFieldData fieldData;
 	e = starts.elements();
 	while (e.hasMoreElements())
@@ -236,6 +239,24 @@ public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode) 
 	return properties;
 }
 
+/**
+ * Insert the method's description here.
+ * Creation date: (4.5.2001 9:20:14)
+ * @return java.lang.String
+ */
+public String toString() {
+	return "Port: "+getName();
+}
 
+/**
+ * Insert the method's description here.
+ * Creation date: (1.2.2001 22:22:37)
+ * @return javax.swing.Icon
+ */
+public javax.swing.Icon getIcon() {
+	if (icon==null)
+		icon = new javax.swing.ImageIcon(getClass().getResource("/images/link.gif"));
+	return icon;
+}
 
 }

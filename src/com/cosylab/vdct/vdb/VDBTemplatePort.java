@@ -29,7 +29,6 @@ package com.cosylab.vdct.vdb;
  */
 
 import com.cosylab.vdct.Constants;
-import com.cosylab.vdct.db.DBPort;
 import com.cosylab.vdct.dbd.DBDConstants;
 import com.cosylab.vdct.graphics.objects.Descriptable;
 import com.cosylab.vdct.graphics.objects.Group;
@@ -42,12 +41,12 @@ import com.cosylab.vdct.inspector.InspectorManager;
  */
 public class VDBTemplatePort extends VDBFieldData implements Descriptable
 {
-	public DBPort port = null;
+	public VDBPort port = null;
 	public VDBTemplateInstance templateInstance = null;
-	
+
 	/**
 	 */
-	public VDBTemplatePort(VDBTemplateInstance templateInstance, DBPort port)
+	public VDBTemplatePort(VDBTemplateInstance templateInstance, VDBPort port)
 	{
 		super();
 		this.port=port;
@@ -128,6 +127,7 @@ public class VDBTemplatePort extends VDBFieldData implements Descriptable
 	 */
 	public void setDescription(String description)
 	{
+		port.setDescription(description);
 	}
 
 	/**
@@ -155,6 +155,7 @@ public class VDBTemplatePort extends VDBFieldData implements Descriptable
 	 */
 	public void setValue(java.lang.String newValue)
 	{
+		port.setValue(newValue);
 	}
 
 	/**
@@ -163,9 +164,9 @@ public class VDBTemplatePort extends VDBFieldData implements Descriptable
 	 * @return java.lang.String
 	 */
 	public java.lang.String getValue() {
-		if (!com.cosylab.vdct.plugin.debug.PluginDebugManager.isDebugState())
-			return port.getTarget();
-		else
+		//if (!com.cosylab.vdct.plugin.debug.PluginDebugManager.isDebugState())
+		//	return port.getTarget();
+		//else
 			return port.getTarget();
 	}
 
