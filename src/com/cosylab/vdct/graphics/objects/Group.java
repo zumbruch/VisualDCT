@@ -1772,6 +1772,9 @@ public static void save(Group group2save, File file, NamingContext renamer, bool
 		
 	stream.flush();
 	stream.close();
+	
+	// do the repaint (updateFields can cause some shifts)
+	com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 }
 
 /**

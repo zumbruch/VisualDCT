@@ -1175,6 +1175,18 @@ public boolean move(int dx, int dy) {
 		return false;
 }
 /**
+ * NOTE: only dy &lt; 0 is checked
+ */
+public boolean moveAsMuchAsPossibleTopUp(int dx, int dy) {
+
+    boolean validMove = checkMove(dx, dy);
+    if (!validMove && (getY() < -dy))
+        dy = -getY();
+
+    return move(dx, dy);
+}
+
+/**
  * Insert the method's description here.
  * Creation date: (4.2.2001 22:02:29)
  * @param group java.lang.String
@@ -1474,7 +1486,8 @@ protected void validate() {
   if (oldNumOfFields != changedFields.size()) {
   	int difference = oldNumOfFields - changedFields.size(); 
 	oldNumOfFields = changedFields.size();
-  	move(0, fieldRowHeight*difference);
+  	//move(0, fieldRowHeight*difference);
+  	moveAsMuchAsPossibleTopUp(0, fieldRowHeight*difference);
   }
   
   // increase record size for VAL value and timestamp
