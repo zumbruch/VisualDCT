@@ -1585,7 +1585,7 @@ protected void destroyFields() {
 /**
  * @see com.cosylab.vdct.graphics.objects.SaveInterface#writeObjects(DataOutputStream, String)
  */
-public void writeObjects(DataOutputStream file, NameManipulator namer, boolean export)
+public void writeObjects(DataOutputStream file, NamingContext context, boolean export)
 	throws IOException
 {
 	// do not generate template data if not is export mode
@@ -1628,7 +1628,8 @@ public void writeObjects(DataOutputStream file, NameManipulator namer, boolean e
 	 //	
  	 // export (generate, flatten) DB option
 	 //
-	 String templateName = namer.getResolvedName(getName());
+	 //String templateName = namer.getResolvedName(getName());
+	 String templateName = getName();
 
 
 
@@ -1639,17 +1640,17 @@ public void writeObjects(DataOutputStream file, NameManipulator namer, boolean e
 	 // macros have to be made out of macros and ports (^^^ it's probably same with ports) 
 	 Map properties = prepareSubstitutions(getTemplateData(), namer.getSubstitutions(), namer.getPorts());
 	*/
-	Map properties = prepareSubstitutions(getTemplateData(), namer.getSubstitutions(), namer.getPorts());
-	Map ports = preparePorts(getTemplateData().getTemplate().getGroup(), properties);
+	//Map properties = prepareSubstitutions(getTemplateData(), namer.getSubstitutions(), null);
+	//Map ports = preparePorts(getTemplateData().getTemplate().getGroup(), properties, namer);
 	// TODO !!! some strange path could break this code 
 	
 	 // new removedPrefix
-	 String removedPrefix = namer.getRemovedPrefix();
+	 //String removedPrefix = namer.getRemovedPrefix();
 	 
 	 // new addedPrefix
-	 String addedPrefix = null;
-/*
-	//
+	 //String addedPrefix = null;
+
+/*	//
 	// no adding !!! anyway I noticed added prefix is not reset (to be checked, if this code is used someday)...
 	//
 	 
@@ -1673,7 +1674,7 @@ public void writeObjects(DataOutputStream file, NameManipulator namer, boolean e
 	 		addedPrefix = addedPrefix + Constants.GROUP_SEPARATOR;
 	 }
 */	 
-	 NameManipulator newNamer = new DefaultNamer(namer.getFile(), removedPrefix, addedPrefix, properties, ports);
+	 //NameManipulator newNamer = new DefaultNamer(namer.getFile(),removedPrefix, addedPrefix, properties, ports, export); 
 
 	 file.writeBytes("\n# expand(\""+getTemplateData().getTemplate().getFileName()+"\", "+templateName+")\n");
 
@@ -1681,7 +1682,7 @@ public void writeObjects(DataOutputStream file, NameManipulator namer, boolean e
 	 try
 	 {
 	 	Group.setRoot(getTemplateData().getTemplate().getGroup());
-	 	getTemplateData().getTemplate().getGroup().writeObjects(file, newNamer, export);
+	 	getTemplateData().getTemplate().getGroup().writeObjects(file, context.createNamingContextFor(getTemplateData()), export);
 	 }
 	 finally
 	 {
@@ -1690,6 +1691,37 @@ public void writeObjects(DataOutputStream file, NameManipulator namer, boolean e
 	 file.writeBytes("\n# end("+templateName+")\n");
 	 
 }
+
+/*public static Map prepareMap(NamingContext renamer, Hashtable cache) {	
+	if (renamer.getTemplateInstance()!=null && renamer.getParent()!=null) {
+		Iterator i = renamer.getTemplateInstance().getPropertiesV().iterator();
+		while (i.hasNext()) {
+			String name=(String)i.next();
+			String value=(String)renamer.getTemplateInstance().getProperties().get(name);
+			value=renamer.resolveMacro(name, value);			
+		}
+	}		
+	
+	Iterator i = renamer.getTemplate().getGroup().getStructure().iterator();
+	while (i.hasNext())
+	{
+		Object obj = i.next();
+		if (obj instanceof Template)
+		{
+			Template t = (Template)obj;			
+			NamingContext newRenamer = renamer.createNamingContextFor(t.getTemplateData());
+
+			Iterator i2 = t.getTemplateData().getTemplate().getPortsV().iterator();
+			while (i2.hasNext())
+			{
+					VDBPort port = (VDBPort)i2.next();
+					String value=newRenamer.resolvePort(port);					
+			}
+		}
+	}	
+
+	return renamer.getMap();
+}*/
 
 /**
  * Insert the method's description here.
@@ -1717,6 +1749,15 @@ public static Map prepareSubstitutions(VDBTemplateInstance templateData, Map sub
 	 	{
 	 		Object key = i.next();
 	 		String value = properties.get(key).toString();
+	 		
+			/*LinkProperties lp = new LinkProperties(properties.get(key));								
+			Object rec = Group.getRoot().findObject(lp.getRecord(), true);
+			if (rec!=null) System.out.println("bingo:"+rec);
+			if (rec !=null && rec instanceof Record) {
+				lp.setRecord(namer.getResolvedName(((Record)rec).getRecordData()));
+				value=lp.getFull();
+			}*/
+	 		
 			if (substitutions != null) value = VDBTemplateInstance.applyProperties(value, substitutions);
 			if (ports != null) value = VDBTemplateInstance.applyPorts(value, ports);			
 		 	properties.put(key, value);
@@ -1730,7 +1771,7 @@ public static Map prepareSubstitutions(VDBTemplateInstance templateData, Map sub
  * Insert the method's description here
  * @param substitutions <code>group</code> current substitutions
  */
-public static Map preparePorts(Group group, Map substitutions)
+public static Map preparePorts(Group group, Map substitutions, NameManipulator namer)
 {
 	HashMap map = new HashMap();
 	
@@ -1749,56 +1790,42 @@ public static Map preparePorts(Group group, Map substitutions)
 				
 				String target = port.getTarget();
 
+/*				LinkProperties lp = new LinkProperties(port);								
+				Object rec = Group.getRoot().findObject(lp.getRecord(), true);
+				if (rec!=null) System.out.println("bingo:"+rec);
+				if (rec !=null && rec instanceof Record) {
+					lp.setRecord(namer.getResolvedName(((Record)rec).getRecordData()));
+					target=lp.getFull();
+				}*/
+
 				// new macros
 				// !!! this is done twice - optimize with buffering
 	 			Map newSubstitutions = prepareSubstitutions(t.getTemplateData(), substitutions, null);
 
 				target = VDBTemplateInstance.applyProperties(target, newSubstitutions);				
-				
+						
 				// if target is a contains a port definition it might be defined in lower levels
 				// try to resolve it
-				int pos = target.indexOf('$');
-				int posStart = 0;  // '(' char
-				int posMiddle = 0; // '.' char
-				int posEnd = 0;	// ')' char
-
-				while (pos>=0)
-				{
+																
+				if (target.matches(".*\\$\\([a-zA-Z0-9_:-]+\\.[a-zA-Z0-9_:-]+\\).*")) {
+					//  System.out.println("Recursive: "+target);
+					//	we have sequence od '(' .. '.' .. ')'
 					
-					//System.out.println("Recursive: "+target);
-					
-					posStart = target.indexOf('(', pos);
-					if (posStart>=0)
-					{
-						posMiddle = target.indexOf('.', posStart);
-						if (posMiddle>=0)
+					Map lowerLevelPorts = preparePorts(t.getTemplateData().getTemplate().getGroup(), newSubstitutions, namer);
+					/*
+						System.out.println("Ports at lower level:");
+						Iterator i3 = lowerLevelPorts.keySet().iterator();
+						while (i3.hasNext())
 						{
-							posEnd = target.indexOf(')', posStart);
-							// possible port definition
-							// we have sequence od '(' .. '.' .. ')'
-							if (posEnd>posMiddle)
-							{
-								Map lowerLevelPorts = preparePorts(t.getTemplateData().getTemplate().getGroup(), newSubstitutions);
-								/*
-								System.out.println("Ports at lower level:");
-								Iterator i3 = lowerLevelPorts.keySet().iterator();
-								while (i3.hasNext())
-								{
-									Object key = i3.next();
-									System.out.println("\t"+key+"="+lowerLevelPorts.get(key));	
-								}
-								*/
-								target = VDBTemplateInstance.applyPorts(target, lowerLevelPorts);
-								break;
-							}
+							Object key = i3.next();
+							System.out.println("\t"+key+"="+lowerLevelPorts.get(key));	
 						}
-					}
-	
-					pos = target.indexOf('$', pos+1);		// no problems if pos == length	
+					*/
+					target = VDBTemplateInstance.applyPorts(target, lowerLevelPorts);	
 				}
 				
 				//if (target.indexOf('$')>=0) 
-					//System.out.println(port.getPortDefinition(t.getTemplateData().getName())+"="+target+"<map>:"+newSubstitutions+"<map>:"+substitutions);	
+			//System.out.println(port.getPortDefinition(t.getTemplateData().getName())+"="+target+"<map>:"+newSubstitutions+"<map>:"+substitutions);	
 				map.put(port.getPortDefinition(t.getTemplateData().getName()), target);			
 			}
 
@@ -1811,7 +1838,7 @@ public static Map preparePorts(Group group, Map substitutions)
 /**
  * @see com.cosylab.vdct.graphics.objects.SaveInterface#writeVDCTData(DataOutputStream, String)
  */
-public void writeVDCTData(DataOutputStream file, NameManipulator namer, boolean export)
+public void writeVDCTData(DataOutputStream file, NamingContext renamer, boolean export)
 	throws IOException
 {
 	// No-op (done by writeObjects() method).

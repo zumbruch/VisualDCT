@@ -35,6 +35,7 @@ import java.util.*;
 import com.cosylab.vdct.Console;
 import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.DataProvider;
+import com.cosylab.vdct.Settings;
 import com.cosylab.vdct.Version;
 import com.cosylab.vdct.graphics.*;
 import com.cosylab.vdct.inspector.InspectableProperty;
@@ -1032,9 +1033,9 @@ public void validateSubObjects() {
  * @param path2remove java.lang.String
  * @exception java.io.IOException The exception description.
  */
-public void writeObjects(java.io.DataOutputStream file, NameManipulator namer, boolean export) throws java.io.IOException {
+public void writeObjects(java.io.DataOutputStream file, NamingContext renamer, boolean export) throws java.io.IOException {
 	//writeObjects(getSubObjectsV(), file, namer, export);
-	writeObjects(Group.getRoot().getStructure(), file, namer, export);
+	writeObjects(Group.getRoot().getStructure(), file, renamer, export);
 }
 
 /**
@@ -1043,7 +1044,7 @@ public void writeObjects(java.io.DataOutputStream file, NameManipulator namer, b
  * @param file java.io.DataOutputStream
  * @exception java.io.IOException The exception description.
  */
-public static void writeObjects(Vector elements, java.io.DataOutputStream file, NameManipulator namer, boolean export) throws java.io.IOException {
+public static void writeObjects(Vector elements, java.io.DataOutputStream file, NamingContext renamer, boolean export) throws java.io.IOException {
 
  Object obj;
  String name;
@@ -1072,8 +1073,10 @@ public static void writeObjects(Vector elements, java.io.DataOutputStream file, 
 			 	record = (Record)obj;
 	 			recordData = record.getRecordData();
 
-			 	name = StringUtils.quoteIfMacro(namer.getResolvedName(recordData.getName()));
-
+			 	name = renamer.getResolvedName(recordData.getName());
+			 	if (export) name = renamer.matchAndReplace(name);
+			 	
+				name = StringUtils.quoteIfMacro(name);
 			 	// write comment
 			 	if (recordData.getComment()!=null)
 			 		file.writeBytes(nl+recordData.getComment());
@@ -1119,28 +1122,29 @@ public static void writeObjects(Vector elements, java.io.DataOutputStream file, 
 							
 						String value = StringUtils.removeQuotes(fieldData.getValue());
 						
+						// first we rename the link if there is one
+						if (((fieldData.getType()==DBDConstants.DBF_INLINK) ||
+														 (fieldData.getType()==DBDConstants.DBF_OUTLINK) ||
+														 (fieldData.getType()==DBDConstants.DBF_FWDLINK))
+														 && !value.startsWith(Constants.HARDWARE_LINK))
+													   value = renamer.resolveLink(value);
+						
 						if (export)
 						{
-							// apply ports
+							/*// apply ports
 							if (namer.getPorts()!=null && value!=null) 
 								value = VDBTemplateInstance.applyPorts(value, namer.getPorts());
 							
 							// apply macro substitutions
 							if (namer.getSubstitutions()!=null && value!=null) 								
-								 value = VDBTemplateInstance.applyProperties(value, namer.getSubstitutions());
-							  	 
+								 value = VDBTemplateInstance.applyProperties(value, namer.getSubstitutions());*/
+							value = renamer.matchAndReplace(value);							  	 
 						}
 												
 						// if value is different from init value
 						if (!fieldData.hasDefaultValue())
 						{
-			    				// write field value
-								if (((fieldData.getType()==DBDConstants.DBF_INLINK) ||
-								    (fieldData.getType()==DBDConstants.DBF_OUTLINK) ||
-								    (fieldData.getType()==DBDConstants.DBF_FWDLINK))
-								    && !value.startsWith(Constants.HARDWARE_LINK))
-								  value = namer.getResolvedName(value);
-								
+								//						write field value						 		
 								file.writeBytes(fieldStart+fieldData.getName()+comma+"\""+value+"\")"+nl);
 				    
 		 				}
@@ -1153,14 +1157,7 @@ public static void writeObjects(Vector elements, java.io.DataOutputStream file, 
 				 				file.writeBytes("  "+com.cosylab.vdct.db.DBConstants.commentString+
 					 							DBResolver.FIELD+"("+fieldData.getName()+comma+"\""+value+"\")"+nl);
 							else
-							{
-			    				// write field value
-								if (((fieldData.getType()==DBDConstants.DBF_INLINK) ||
-								    (fieldData.getType()==DBDConstants.DBF_OUTLINK) ||
-								    (fieldData.getType()==DBDConstants.DBF_FWDLINK))
-								    && !value.startsWith(Constants.HARDWARE_LINK))
-								  value = namer.getResolvedName(value);
-
+							{	  
 								file.writeBytes(fieldStart+fieldData.getName()+comma+"\""+value+"\")"+nl);
 							}								
 			 			}
@@ -1179,11 +1176,11 @@ public static void writeObjects(Vector elements, java.io.DataOutputStream file, 
 			 	 
 			 	 // skip templates on clipboard
 			 	 if (!template.getTemplateData().getName().startsWith(Constants.CLIPBOARD_NAME))
-			 	 	template.writeObjects(file, namer, export);
+			 	 	template.writeObjects(file, renamer, export);
 	 		}
 		else if (!export && obj instanceof DBTemplateEntry)
 			{
-				writeTemplateData(file, namer);
+				writeTemplateData(file, renamer);
 				// !!! TBD multiple templates support
 			}	 		
 		else if (obj instanceof DBDataEntry)
@@ -1218,8 +1215,8 @@ private static void writeIncludes(java.io.DataOutputStream file) throws IOExcept
  * @param path2remove java.lang.String
  * @exception java.io.IOException The exception description.
  */
-public void writeVDCTData(java.io.DataOutputStream file, NameManipulator namer, boolean export) throws java.io.IOException {
-	writeVDCTData(getSubObjectsV(), file, namer, export);
+public void writeVDCTData(java.io.DataOutputStream file, NamingContext renamer, boolean export) throws java.io.IOException {
+	writeVDCTData(getSubObjectsV(), file, renamer, export);
 }
 
 /**
@@ -1229,7 +1226,7 @@ public void writeVDCTData(java.io.DataOutputStream file, NameManipulator namer, 
  * @param path2remove java.lang.String
  * @exception java.io.IOException The exception description.
  */
-public static void writeVDCTData(Vector elements, java.io.DataOutputStream file, NameManipulator namer, boolean export) throws java.io.IOException {
+public static void writeVDCTData(Vector elements, java.io.DataOutputStream file, NamingContext renamer, boolean export) throws java.io.IOException {
 
  Object obj;
  Group group;
@@ -1279,12 +1276,12 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 
 	 			file.writeBytes(RECORD_START+
 			 		StringUtils.quoteIfMacro(
-				 		namer.getResolvedName(record.getRecordData().getName())
+				 		renamer.getResolvedName(record.getRecordData().getName())
 				 	) + comma + record.getX() + comma + record.getY() + 
 				 	comma + StringUtils.color2string(record.getColor()) +
 				 	comma + StringUtils.boolean2str(record.isRight()) +
 					comma + quote + 
-					namer.getResolvedName(record.getDescription()) + 
+				namer.getResolvedName(record.getDescription()) + 
 					quote +	ending);
 
 	 			e2 = record.getSubObjectsV().elements();
@@ -1297,11 +1294,11 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 
 						String target = NULL;
 						if (connector.getInput()!=null)
-							target = namer.getResolvedName(connector.getInput().getID());
+							target = renamer.getResolvedName(connector.getInput().getID());
 							
 			 			file.writeBytes(CONNECTOR_START+
 					 		StringUtils.quoteIfMacro(
-						 		namer.getResolvedName(connector.getID())
+						 		renamer.getResolvedName(connector.getID())
 						 	) + comma +  
 					 		StringUtils.quoteIfMacro(
 						 		target
@@ -1319,11 +1316,11 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 	
 				 			file.writeBytes(FIELD_START+
 						 		StringUtils.quoteIfMacro(
-							 		namer.getResolvedName(field.getFieldData().getFullName())
+							 		renamer.getResolvedName(field.getFieldData().getFullName())
 							 	) + 
 							 	comma + StringUtils.color2string(field.getColor()) +
 							 	comma + StringUtils.boolean2str(field.isRight()) +
-								comma + quote + namer.getResolvedName(field.getDescription()) + quote + 
+								comma + quote + renamer.getResolvedName(field.getDescription()) + quote + 
 								ending);
 
 			 			 }
@@ -1333,10 +1330,10 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 				 			if (link.getInput()!=null)
 				 				file.writeBytes(LINK_START+
 						 			StringUtils.quoteIfMacro(
-							 			namer.getResolvedName(link.getFieldData().getFullName())
+							 			renamer.getResolvedName(link.getFieldData().getFullName())
 							 		) + comma + 
 					 				StringUtils.quoteIfMacro(
-						 				namer.getResolvedName(link.getInput().getID())
+						 				renamer.getResolvedName(link.getInput().getID())
 							 		) +
 									ending);
 			 			 }
@@ -1351,7 +1348,7 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 					if (vfd.getVisibility()!=InspectableProperty.NON_DEFAULT_VISIBLE)
 		 				file.writeBytes(VISIBILITY_START+
 				 			StringUtils.quoteIfMacro(
-					 			namer.getResolvedName(vfd.getFullName())
+					 			renamer.getResolvedName(vfd.getFullName())
 					 		) + comma +
 					 		String.valueOf(vfd.getVisibility()) +
 							ending);
@@ -1364,19 +1361,19 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 			 	 group = (Group)obj;
 			 	 file.writeBytes(GROUP_START+
  					StringUtils.quoteIfMacro(
-	 					namer.getResolvedName(group.getAbsoluteName())
+	 					renamer.getResolvedName(group.getAbsoluteName())
 		 			 ) + comma + group.getX() + comma + group.getY() + 
 				 	 comma + StringUtils.color2string(group.getColor()) +
 					 comma + quote /*+ connector.getDescription() */+ quote +
 					 ending);
-			 	 group.writeVDCTData(file, namer, export);
+			 	 group.writeVDCTData(file, renamer, export);
 	 		}
  	 	else if (obj instanceof Line)
  	 		{
 			 	 Line line = (Line)obj;
 			 	 file.writeBytes(LINE_START+
  					StringUtils.quoteIfMacro(
-	 					namer.getResolvedName(line.getName())
+	 					renamer.getResolvedName(line.getName())
 		 			 ) +
 		 			 comma + line.getStartVertex().getX() + comma + line.getStartVertex().getY() +
 		 			 comma + line.getEndVertex().getX() + comma + line.getEndVertex().getY() + 
@@ -1391,7 +1388,7 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 			 	 Box box = (Box)obj;
 			 	 file.writeBytes(BOX_START+
  					StringUtils.quoteIfMacro(
-	 					namer.getResolvedName(box.getName())
+	 					renamer.getResolvedName(box.getName())
 		 			 ) +
 		 			 comma + box.getStartVertex().getX() + comma + box.getStartVertex().getY() +
 		 			 comma + box.getEndVertex().getX() + comma + box.getEndVertex().getY() + 
@@ -1405,7 +1402,7 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 			 	 TextBox box = (TextBox)obj;
 			 	 file.writeBytes(TEXTBOX_START+
  					StringUtils.quoteIfMacro(
-	 					namer.getResolvedName(box.getName())
+	 					renamer.getResolvedName(box.getName())
 		 			 ) +
 		 			 comma + box.getStartVertex().getX() + comma + box.getStartVertex().getY() +
 		 			 comma + box.getEndVertex().getX() + comma + box.getEndVertex().getY() + 
@@ -1421,7 +1418,7 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
  	 	else if (obj instanceof Template)
  	 		{
 			 	 template = (Template)obj;
-				 String templateName = namer.getResolvedName(template.getName());
+				 String templateName = renamer.getResolvedName(template.getName());
 
 			     file.writeBytes(nl);
 			 	 file.writeBytes(TEMPLATE_INSTANCE_START+
@@ -1501,7 +1498,7 @@ private static void writeUsedDBDs(File dbFile, DataOutputStream stream) throws I
 /**
  * Insert the method's description here.
  */
-private static void writeTemplateData(DataOutputStream stream, NameManipulator namer) throws IOException
+private static void writeTemplateData(DataOutputStream stream, NamingContext renamer) throws IOException
 {
 	final String nl = "\n";
 	
@@ -1601,7 +1598,8 @@ private static void writeTemplateData(DataOutputStream stream, NameManipulator n
 		
 		String target = NULL;
 		if (visiblePort.getInput()!=null)
-			target = namer.getResolvedName(visiblePort.getInput().getID());
+			//target = namer.getResolvedName(visiblePort.getInput().getID());
+			target = renamer.resolveLink(visiblePort.getInput().getID());
 		
 		stream.writeBytes(
 			visiblePort.getName() +
@@ -1702,14 +1700,20 @@ public static void save(Group group2save, File file, boolean export) throws IOEx
 	if (!path2remove.equals(nullString)) path2remove+=Constants.GROUP_SEPARATOR;
 	else path2remove = null;
 	
-	NameManipulator namer = new DefaultNamer(file, path2remove, null, null, Template.preparePorts(group2save, null));
-	save(group2save, file, namer, export);
+	String addedPrefix=null;
+	if (export && Settings.getInstance().getHierarhicalNames()) { 
+		VDBTemplate template = Group.getEditingTemplateData();
+		String name = template.getId().replaceFirst("\\..*$",""); //removes file suffix
+		addedPrefix=name+Constants.HIERARCHY_SEPARATOR;
+	}
+	
+	save(group2save, file, new NamingContext(null, Group.getEditingTemplateData(), addedPrefix, path2remove, export), export);
 }
 
 /**
  * Insert the method's description here.
  */
-public static void save(Group group2save, File file, NameManipulator namer, boolean export) throws IOException
+public static void save(Group group2save, File file, NamingContext renamer, boolean export) throws IOException
 {
 	DataOutputStream stream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
 	
@@ -1740,12 +1744,12 @@ public static void save(Group group2save, File file, NameManipulator namer, bool
 		Group.getRoot().getStructure().insertElementAt(new DBTemplateEntry(), pos);
 	}
 
-	group2save.writeObjects(stream, namer, export);
+	group2save.writeObjects(stream, renamer, export);
 
 	if (!export)	
 	{
 		stream.writeBytes("\n#! Further lines contain data used by VisualDCT\n");
-		group2save.writeVDCTData(stream, namer, export);
+		group2save.writeVDCTData(stream, renamer, export);
 	}
 		
 	stream.flush();

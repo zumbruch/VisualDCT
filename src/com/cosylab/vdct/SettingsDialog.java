@@ -46,7 +46,8 @@ public class SettingsDialog extends javax.swing.JDialog {
 	IvjEventHandler ivjEventHandler = new IvjEventHandler();
 	private javax.swing.JLabel ivjWarningLabel = null;
 	
-	private javax.swing.JCheckBox GlobalMacrosCheckBox = null; 
+	private javax.swing.JCheckBox GlobalMacrosCheckBox = null;
+	private javax.swing.JCheckBox HierarhicalNamesCheckBox = null; 
 	private javax.swing.JPanel MacrosPanel = null;
 	
 class IvjEventHandler implements java.awt.event.ActionListener, java.awt.event.KeyListener {
@@ -233,6 +234,20 @@ private javax.swing.JCheckBox getGlobalMacrosCheckBox() {
 	return GlobalMacrosCheckBox;
 }
 
+private javax.swing.JCheckBox getHierarhicalNamesCheckBox() {
+	if (HierarhicalNamesCheckBox == null) {
+		try {
+			HierarhicalNamesCheckBox = new javax.swing.JCheckBox();
+			HierarhicalNamesCheckBox.setName("HierarhicalNamesCheckBox");
+			HierarhicalNamesCheckBox.setSelected(false);
+			HierarhicalNamesCheckBox.setText("Produce hierarchical names like CapFast");			
+		} catch (java.lang.Throwable ivjExc) {
+			handleException(ivjExc);
+		}
+	}
+	return HierarhicalNamesCheckBox;
+}
+
 /**
  * Return the GroupingPanel property value.
  * @return javax.swing.JPanel
@@ -286,16 +301,22 @@ private javax.swing.JPanel getMacrosPanel() {
 		try {
 			MacrosPanel = new javax.swing.JPanel();
 			MacrosPanel.setName("MacrosPanel");
-			MacrosPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(" Macros evaluation "));
+			MacrosPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(" Generating Flat Database "));
 			MacrosPanel.setLayout(new java.awt.GridBagLayout());
 
 			java.awt.GridBagConstraints constraintsGlobalMacrosCheckBox = new java.awt.GridBagConstraints();
 			constraintsGlobalMacrosCheckBox.gridx = 0; constraintsGlobalMacrosCheckBox.gridy = 0;
 			constraintsGlobalMacrosCheckBox.anchor = java.awt.GridBagConstraints.WEST;
 			constraintsGlobalMacrosCheckBox.weightx = 1.0;
-			constraintsGlobalMacrosCheckBox.weighty = 1.0;
-			constraintsGlobalMacrosCheckBox.insets = new java.awt.Insets(4, 4, 4, 4);
+			constraintsGlobalMacrosCheckBox.insets = new java.awt.Insets(4, 14, 0, 4);
 			getMacrosPanel().add(getGlobalMacrosCheckBox(), constraintsGlobalMacrosCheckBox);
+
+			java.awt.GridBagConstraints constraintsHierarhicalNamesCheckBox = new java.awt.GridBagConstraints();
+			constraintsHierarhicalNamesCheckBox.gridx = 0; constraintsHierarhicalNamesCheckBox.gridy = 1;
+			constraintsHierarhicalNamesCheckBox.anchor = java.awt.GridBagConstraints.WEST;
+			constraintsHierarhicalNamesCheckBox.weightx = 1.0;
+			constraintsHierarhicalNamesCheckBox.insets = new java.awt.Insets(4, 14, 4, 4);
+			getMacrosPanel().add(getHierarhicalNamesCheckBox(), constraintsHierarhicalNamesCheckBox);
 
 		} catch (java.lang.Throwable ivjExc) {
 							
@@ -533,7 +554,7 @@ private void initialize() {
 		// user code end
 		setName("SettingsDialog");
 		setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-		setSize(475, 197+30);
+		setSize(475, 197+60);
 		setTitle("Visual DCT Settings");
 		setContentPane(getJDialogContentPane());
 		initConnections();
@@ -546,6 +567,7 @@ private void initialize() {
 
 private void initializeMacros() {
 	getGlobalMacrosCheckBox().setSelected(Settings.getInstance().getGlobalMacros());
+	getHierarhicalNamesCheckBox().setSelected(Settings.getInstance().getHierarhicalNames());
 }
 /**
  * main entrypoint - starts the part when it is run as an application
@@ -586,6 +608,7 @@ public void oKButton_ActionPerformed(java.awt.event.ActionEvent actionEvent) {
 	}
 
 	Settings.getInstance().setGlobalMacros(getGlobalMacrosCheckBox().isSelected());
+	Settings.getInstance().setHierarhicalNames(getHierarhicalNamesCheckBox().isSelected());
 
 	dispose();
 }

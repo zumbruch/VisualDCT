@@ -43,7 +43,7 @@ public interface SaveInterface {
  * @param namer NameManipulator
  * @exception java.io.IOException The exception description.
  */
-void writeObjects(DataOutputStream file, NameManipulator namer, boolean export) throws java.io.IOException;
+void writeObjects(DataOutputStream file, NamingContext renamer, boolean export) throws java.io.IOException;
 /**
  * Insert the method's description here.
  * Creation date: (22.4.2001 21:47:00)
@@ -51,5 +51,5 @@ void writeObjects(DataOutputStream file, NameManipulator namer, boolean export) 
  * @param namer NameManipulator
  * @exception java.io.IOException The exception description.
  */
-void writeVDCTData(DataOutputStream file, NameManipulator namer, boolean export) throws java.io.IOException;
+void writeVDCTData(DataOutputStream file, NamingContext renamer, boolean export) throws java.io.IOException;
 }

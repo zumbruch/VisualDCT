@@ -50,6 +50,7 @@ public class Settings {
 	private boolean navigator = true;
 	private boolean grouping = false;
 	private boolean globalMacros = false;
+	private boolean hierarhicalNames = false;
 	
 /**
  * Settings constructor comment.
@@ -67,6 +68,7 @@ protected Settings() {
 	navigator = prefs.getBoolean("Navigator", navigator);
 	grouping = prefs.getBoolean("Grouping", grouping);
 	globalMacros = prefs.getBoolean("GlobalMacros", globalMacros);
+	hierarhicalNames = prefs.getBoolean("HierarhicalNames", hierarhicalNames);
 
 	if (grouping)
 	{
@@ -366,6 +368,22 @@ public void loadRecentFiles()
 	public void setGlobalMacros(boolean b) {
 		globalMacros = b;
 		prefs.putBoolean("GlobalMacros", b);
+		sync();
+	}
+
+	/**
+	 * @return
+	 */
+	public boolean getHierarhicalNames() {
+		return hierarhicalNames;
+	}
+
+	/**
+	 * @param b
+	 */
+	public void setHierarhicalNames(boolean b) {
+		hierarhicalNames = b;
+		prefs.putBoolean("HierarhicalNames", b);
 		sync();
 	}
 
