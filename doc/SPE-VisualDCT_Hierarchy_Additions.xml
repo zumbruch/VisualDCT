@@ -34,6 +34,10 @@
 			<section>Created.</section>
 		</modification>
 
+		<modification version="1.1" by="msekoranja" date="2003-07-18">
+			<section>Updated to reflect implementation.</section>
+		</modification>
+
 		<scope>
 			This document specifies further additions to the hierarchy mechanism of VisualDCT to be implemented in the future releases.
 			<p>
@@ -68,6 +72,7 @@
 			After implementing new additions template instance symbol should look like this:
 			</p>
 			<figure id="template.png">Template instance symbol</figure>
+			<comment by="msekoranja">I find having 2 columns (sides) very useful - to separate inputs (left size) from outputs (right side).</comment>
 		</section>
 		<section id="ports" title="Ports">
 			<p>
@@ -87,14 +92,13 @@
 				  <li><img src="SPE-VisualDCT_Hierarchy_Additions/outport.png"/><b>OUTPUT</b> - port passing a name of <kwd>OUTPUT</kwd> type field.</li>
 				  <li><img src="SPE-VisualDCT_Hierarchy_Additions/constport.png"/><b>CONSTANT</b> - port passing a constant value.</li>
 				</ul>
-				<comment by="msekoranja">INPUT and OUTPUT ports can be automatically determined by checking field type of the 'port source'.</comment>
 				<p>
 				There should also be a possiblity of defining a default state port vislibility (inspector, context sensitive pop-up menu).
 				</p>
 				<comment by="msekoranja">To provide possibility of definining kind of a function (e.g. <kwd>"(field name) PP"</kwd>), VDCT data should look like this:
 					<code language="VDCT" id="visdefport"><![CDATA[
 	port("port name", "expression", "desc")
-	#! InputPort("port name", "field name")]]>
+	#! InputPort("port name", "target field name", xpos, ypos, colour, defaultVisibility)]]>
 					  <desc>Visual definition of a port.</desc>
 					</code>
 				</comment>
@@ -113,9 +117,6 @@
 			<p>
 				Macros are used to pass information downwards into a template instance from their calling database (from higher level), i.e. taking a string (link name or constant) into a template instance.
 			</p>
-			<p>
-			All additional visual data used by VisualDCT is stored as comments in the template block statement.
-			</p>
 			<section id="macrosll" title="Lower Level">
 				<p>
 				To have macros visible as links in the higher level, they have to be to be defined in the lower level schamantics. Just after creating a new macro, done simply by mouse clicking, user has to determine the type of the macro.
@@ -126,14 +127,13 @@
 				  <li><img src="SPE-VisualDCT_Hierarchy_Additions/inmacro.png"/><b>INPUT</b> - macro passing a name of <kwd>INPUT</kwd> type field.</li>
 				  <li><img src="SPE-VisualDCT_Hierarchy_Additions/outmacro.png"/><b>OUTPUT</b> - macro passing a name of <kwd>OUTPUT</kwd> type field.</li>
 				</ul>
-				<comment by="msekoranja">INPUT and OUTPUT ports can be automatically determined by checking field type of the 'macro source'.</comment>
 				<p>
 				There should also be a possiblity of defining a default state macro vislibility (inspector, context sensitive pop-up menu).
 				</p>
-				<comment by="msekoranja">To provide possibility of definining kind of a function (e.g. <kwd>"(field name) PP"</kwd>), VDCT data should look like this:
+				<comment by="msekoranja">VDCT data should look like this:
 					<code language="VDCT" id="visdefmacro"><![CDATA[
 	macro("macro name", "expression")   // defined in the higher level
-	#! InputMacro("macro name", "field name")]]>
+	#! InputMacro("macro name", description, xpos, ypos, colour, defaultVisibility)]]>
 					  <desc>Visual definition of a macro.</desc>
 					</code>
 				</comment>
