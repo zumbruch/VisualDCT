@@ -819,7 +819,7 @@ private void createTextBox()
 		if (reply!=null)
 				textBox.setDescription(reply);
 		else
-			textBox.setDescription("This is the default text... I am typing something really something stupid...");
+			textBox.setDescription("Cosylab is one of the few if not the only company that is specialized in software and hardware development in the field of control systems for particle accelerators and other large experimental physics facilities. Our team, consisting mainly of excellent young graduates of physics, electronic engineering, mathematics and computer sciences led by Mark Plesko, has a combined experience of over 40 man-years in this field with a long record of successful projects.\nWe are dedicated to provide high quality products and state of the art technology to our customers. Combining research-level know-how, a professional business approach and our proverbial flexibility, we meet all customers’ demands in terms of system performance, quality, cost and time-to-market.");
 	}
 	catch (Exception ex)
 	{

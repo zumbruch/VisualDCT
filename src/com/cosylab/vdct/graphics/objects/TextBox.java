@@ -30,6 +30,12 @@ package com.cosylab.vdct.graphics.objects;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.font.FontRenderContext;
+import java.awt.font.LineBreakMeasurer;
+import java.awt.font.TextAttribute;
+import java.awt.font.TextLayout;
+import java.text.AttributedCharacterIterator;
+import java.text.AttributedString;
 import java.util.*;
 import javax.swing.*;
 import com.cosylab.vdct.*;
@@ -85,6 +91,15 @@ private static final String nullString = "";
 private static final String htmlString = "<html>";
 protected String description = nullString;
 protected JLabel label = null;
+protected boolean htmlMode = false;
+
+
+protected Hashtable map;
+protected AttributedString attText = null;
+protected AttributedCharacterIterator paragraph = null;
+int paragraphStart = 0;
+int paragraphEnd = 0;
+LineBreakMeasurer lineMeasurer = null;
 
 
 private String getAvailableHashId()
@@ -129,7 +144,8 @@ public TextBox(ContainerObject parent, TextBoxVertex parStartVertex, TextBoxVert
 	revalidatePosition();
 	
 	hashId = getAvailableHashId();
-	
+
+	// initialize html text helpers	
 	label = new javax.swing.JLabel() {
 		    public void paint(Graphics g) {
 				Shape clip = g.getClip();
@@ -146,6 +162,14 @@ public TextBox(ContainerObject parent, TextBoxVertex parStartVertex, TextBoxVert
 	label.setVerticalAlignment(JLabel.TOP);
 	label.setFont(getFont());
 	setDescription(nullString);
+
+	// initialize plain text helpers
+	map = new Hashtable();
+    attText = null;
+	paragraph = null;;
+	paragraphStart = 0;
+	paragraphEnd = 0;
+
 }
 
 public void setColor(java.awt.Color color)
@@ -173,6 +197,36 @@ public boolean checkMove(int dx, int dy)
 	return true;
 }
 
+
+protected void drawMultiLineText(Graphics g, float drawPosX, float drawPosY, float formatWidth)
+{
+	if (formatWidth<8 || lineMeasurer==null)
+		return;
+
+	Graphics2D graphics2D = (Graphics2D)g;
+
+    lineMeasurer.setPosition(paragraphStart);
+
+    // Get lines from lineMeasurer until the entire
+    // paragraph has been displayed.
+    while (lineMeasurer.getPosition() < paragraphEnd) {
+
+        // Retrieve next layout.
+        TextLayout layout = lineMeasurer.nextLayout(formatWidth);
+
+        // Move y-coordinate by the ascent of the layout.
+        drawPosY += layout.getAscent();
+
+        // Draw the TextLayout at (drawPosX, drawPosY).
+        layout.draw(graphics2D, drawPosX, drawPosY);
+
+        // Move y-coordinate in preparation for next layout.
+        drawPosY += layout.getDescent() + layout.getLeading();
+    }
+
+ }
+
+
 protected void draw(Graphics g, boolean hilited)
 {
 	ViewState view = ViewState.getInstance();
@@ -194,10 +248,22 @@ protected void draw(Graphics g, boolean hilited)
 		g.drawRect(posX + 2, posY + 2, rwidth - 4, rheight - 4);
 		*/
 
-		label.setBounds(posX + 2, posY + 2, rwidth - 4, rheight - 4);
-		label.paint(g);
-	
-		drawDashedBorder(g, hilited, view, posX, posY, rwidth, rheight);
+		if (htmlMode)
+		{
+			label.setBounds(posX + 2, posY + 2, rwidth - 4, rheight - 4);
+			label.paint(g);
+		}
+		else
+		{
+				Shape clip = g.getClip();
+				g.setClip(posX, posY, rwidth, rheight);
+				g.setColor(getColor());
+				drawMultiLineText(g, posX+2, posY+2, rwidth-4);	
+				g.setClip(clip);
+		}
+		
+		if (hilited)
+			drawDashedBorder(g, hilited, view, posX, posY, rwidth, rheight);
 		
 	}
 }
@@ -360,10 +426,37 @@ protected void validate()
 	public void setDescription(String description)
 	{
 		this.description = description;
-		if (!description.startsWith(htmlString))
-			description = htmlString + description;
+		if (description.startsWith(htmlString))
+		{
+			htmlMode = true;
+			label.setText(description);
+		}
+		else
+		{
+			htmlMode = false;
 
-		label.setText(description);
+
+			if (description.trim().length()>1)
+			{
+		     	// let attText be an AttributedCharacterIterator containing at least one character, otherwise null
+		        if (getFont()!=null) map.put(TextAttribute.FONT, getFont());
+		
+		    	attText = new AttributedString(description, map);
+		
+				paragraph = attText.getIterator();
+				paragraphStart = paragraph.getBeginIndex();
+			    paragraphEnd = paragraph.getEndIndex();
+	
+				FontRenderContext frc = new FontRenderContext(null, false, false);
+	 			lineMeasurer = new LineBreakMeasurer(paragraph, frc);
+			}
+			else
+			{
+				lineMeasurer = null;
+				paragraph = null;
+				attText = null;
+			}
+		}
 	}
 
 }
