@@ -77,7 +77,7 @@ public class DBResolver {
 	public static final String VDCTSKIP = "SKIP";
 
 	// visual data
-	// used format #! View(xffset, yoffset, scale)
+	// used format #! View(xoffset, yoffset, scale)
 	// used format #! Record(recordname, xpos, ypos, color, rotated, "description")
 	// used format #! Group(groupname, xpos, ypos, color, "description")
 	// used format #! Field(fieldname, color, rotated, "description")
