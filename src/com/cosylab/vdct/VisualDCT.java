@@ -7246,7 +7246,7 @@ public void updateLoadLabel() {
 		this.openedFile = openedFile;
 		if (openedFile==null)
 			setFileInTitle(null);
-		else
+		else 
 			setFileInTitle(openedFile.getAbsolutePath());
 	}
 

@@ -51,7 +51,6 @@ import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.events.commands.GetGUIInterface;
 import com.cosylab.vdct.util.ComboBoxFileChooser;
 import com.cosylab.vdct.util.DBDEntry;
-import com.cosylab.vdct.util.PathSpecification;
 import com.cosylab.vdct.util.StringWriterDialog;
 import com.cosylab.vdct.util.UniversalFileFilter;
 
@@ -82,122 +81,130 @@ public class TableModel extends AbstractTableModel {
 
 	// table header
 	//private final String[] columnNames = { "Loaded Database Definition File(s)" };
-	private final String[] columnNames = { "String Definition", "Path to Actual File", "Store" };
+	private final String[] columnNames = { "String Definition", "Path to Actual File", "Relative", "Store" };
 
 	// table classes
-	private final Class[] columnClasses = { String.class, java.io.File.class, Boolean.class};
-	
-/**
- * Insert the method's description here.
- * Creation date: (14.11.1999 15:22:35)
- * @return java.lang.Class
- * @param col int
- */
-public Class getColumnClass(int col) {
-	return columnClasses[col];
-}
-
-/**
- * getColumnCount method comment.
- */
-public int getColumnCount() {
-	return columnClasses.length;
-}
-
-public String getColumnName(int column) {
-	return columnNames[column];
-}
-
-/**
- * getRowCount method comment.
- * @return the number of rows in the model.
- */
-
-public int getRowCount() {
-	return DataProvider.getInstance().getCurrentDBDs().size();
-}
-
-/**
- * Returns an attribute value for the cell at <I>row</I>
- * and <I>column</I>.
- *
- * @param   row             the row whose value is to be looked up
- * @param   column          the column whose value is to be looked up
- * @return                  the value Object at the specified cell
- */
- 
-public Object getValueAt(int row, int column) {
-	DBDEntry entry = (DBDEntry)DataProvider.getInstance().getCurrentDBDs().get(row);
-	switch (column) {
-		case 0: return entry.getValue();
-		case 1: return entry.getFile().getAbsoluteFile();
-		case 2: return new Boolean(entry.getSavesToFile());
-		default:
-			return null;
-	}
-}
-
-/**
- * Insert the method's description here.
- * Creation date: (14.11.1999 15:23:25)
- * @return boolean
- * @param row int
- * @param col int
- */
-public boolean isCellEditable(int row, int col) {
-	return col!=1;
-}
-
-/**
- * Sets the object value for the cell at <I>column</I> and
- * <I>row</I>.  <I>aValue</I> is the new value.  This method
- * will generate a tableChanged() notification.
- *
- * @param   aValue          the new value.  This can be null.
- * @param   row             the row whose value is to be looked up
- * @param   column          the column whose value is to be looked up
- * @return                  the value Object at the specified cell
- */
-
-public void setValueAt(Object aValue, int row, int column) {
-	Vector dbds = DataProvider.getInstance().getCurrentDBDs();
-	DBDEntry entry = (DBDEntry)dbds.get(row);
-
-	if (column == 2) {
-		entry.setSavesToFile(((Boolean)aValue).booleanValue());
-		return;
-	}
-	
-	if (column == 0) {
+	private final Class[] columnClasses = { String.class, java.io.File.class, Boolean.class, Boolean.class};
 		
-		if (aValue==null)
-			{
-				dbds.removeElementAt(row);
-				//update entire table
-				getScrollPaneTable().tableChanged(new TableModelEvent(getScrollPaneTable().getModel()));
-				return;
-			}	
+	/**
+	 * Insert the method's description here.
+	 * Creation date: (14.11.1999 15:22:35)
+	 * @return java.lang.Class
+	 * @param col int
+	 */
+	public Class getColumnClass(int col) {
+		return columnClasses[col];
+	}
+	
+	/**
+	 * getColumnCount method comment.
+	 */
+	public int getColumnCount() {
+		return columnClasses.length;
+	}
+	
+	public String getColumnName(int column) {
+		return columnNames[column];
+	}
+	
+	/**
+	 * getRowCount method comment.
+	 * @return the number of rows in the model.
+	 */
+	
+	public int getRowCount() {
+		return DataProvider.getInstance().getCurrentDBDs().size();
+	}
+	
+	/**
+	 * Returns an attribute value for the cell at <I>row</I>
+	 * and <I>column</I>.
+	 *
+	 * @param   row             the row whose value is to be looked up
+	 * @param   column          the column whose value is to be looked up
+	 * @return                  the value Object at the specified cell
+	 */
+	 
+	public Object getValueAt(int row, int column) {
+		DBDEntry entry = (DBDEntry)DataProvider.getInstance().getCurrentDBDs().get(row);
+		switch (column) {
+			case 0: return entry.getValue();
+			case 1: return entry.getFile().getAbsoluteFile();
+			case 2: return new Boolean(entry.isRelative());
+			case 3: return new Boolean(entry.getSavesToFile());
+			default:
+				return null;
+		}
+	}
+	
+	/**
+	 * Insert the method's description here.
+	 * Creation date: (14.11.1999 15:23:25)
+	 * @return boolean
+	 * @param row int
+	 * @param col int
+	 */
+	public boolean isCellEditable(int row, int col) {
+		return col!=1;
+	}
+	
+	/**
+	 * Sets the object value for the cell at <I>column</I> and
+	 * <I>row</I>.  <I>aValue</I> is the new value.  This method
+	 * will generate a tableChanged() notification.
+	 *
+	 * @param   aValue          the new value.  This can be null.
+	 * @param   row             the row whose value is to be looked up
+	 * @param   column          the column whose value is to be looked up
+	 * @return                  the value Object at the specified cell
+	 */
+
+	public void setValueAt(Object aValue, int row, int column) {
+		Vector dbds = DataProvider.getInstance().getCurrentDBDs();
+		DBDEntry entry = (DBDEntry)dbds.get(row);
+	
+		switch (column) {
+			case 2:
+				entry.setRelative(((Boolean)aValue).booleanValue());
+				fireTableCellUpdated(row, 0);
+				break;
+				
+			case 3:
+				entry.setSavesToFile(((Boolean)aValue).booleanValue());
+				break;
+				
+			case 0:
+				if (aValue==null)
+				{
+					dbds.removeElementAt(row);
+					//update entire table
+					getScrollPaneTable().tableChanged(new TableModelEvent(getScrollPaneTable().getModel()));
+					return;
+				}	
+				
+				entry.setValue(aValue.toString());
 			
-		entry.setValue(aValue.toString());
-		
-		File f = entry.getFile();
-			if (f.exists())
-			{
-				GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
-				try {
-					cmd.getGUIMenuInterface().importDBD(f);
-				} catch (java.io.IOException e) {
-					Console.getInstance().println();
-					Console.getInstance().println("o) Failed to load DBD file: '"+f.getAbsolutePath()+"'.");
-					Console.getInstance().println(e);
+				File f = entry.getFile();
+				if (f.exists())
+				{
+					GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
+					try {
+						cmd.getGUIMenuInterface().importDBD(f);
+					} catch (java.io.IOException e) {
+						Console.getInstance().println();
+						Console.getInstance().println("o) Failed to load DBD file: '"+f.getAbsolutePath()+"'.");
+						Console.getInstance().println(e);
+					}
 				}
-			}
+		
+		}
+		
+		// generate notification
+		fireTableCellUpdated(row, column);
 	}
-	
-	// generate notification
-	fireTableCellUpdated(row, column);
 }
-}
+
+
 	private JButton ivjAddDBDButton = null;
 	private JButton ivjAddStringButton = null;
 	private JPanel ivjButtonPanel = null;
@@ -279,19 +286,13 @@ public void addDBDButton_ActionPerformed(java.awt.event.ActionEvent actionEvent)
 	if(retval == JFileChooser.APPROVE_OPTION) {
 	    java.io.File theFile = chooser.getSelectedFile();
 	    if(theFile != null) {
-	    	if (chooser.getJCheckBoxAbsoluteDBD().isSelected()) {
-	    		theFile = theFile.getAbsoluteFile(); 			
-	    	} else {
-	    		if (VisualDCT.getInstance().getOpenedFile()==null)
-					theFile = PathSpecification.getRelativeName(theFile, new File(Settings.getDefaultDir()));
-				else
-					theFile = PathSpecification.getRelativeName(theFile, VisualDCT.getInstance().getOpenedFile());
-	    	}
+			theFile = theFile.getAbsoluteFile();
 	    				
 		    GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
 		    try {
 		    	
 		    	DBDEntry entry = new DBDEntry(theFile.getPath());
+				entry.setRelative(!chooser.getJCheckBoxAbsoluteDBD().isSelected());
 		    	
 		    	Vector dbds = DataProvider.getInstance().getCurrentDBDs();
 				//	replace
@@ -630,6 +631,8 @@ private javax.swing.JTable getScrollPaneTable() {
 			ivjScrollPaneTable.setModel(new DBDDialog.TableModel());
 			ivjScrollPaneTable.getColumnModel().getColumn(2).setMaxWidth(40);
 			ivjScrollPaneTable.getColumnModel().getColumn(2).setMinWidth(32);
+			ivjScrollPaneTable.getColumnModel().getColumn(3).setMaxWidth(40);
+			ivjScrollPaneTable.getColumnModel().getColumn(3).setMinWidth(32);
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
 			// user code begin {2}

@@ -1471,7 +1471,9 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 private static void writeUsedDBDs(File dbFile, DataOutputStream stream) throws IOException
 {
 	 // write used DBDs
-	 //String dbFilePath = dbFile.getAbsolutePath().replace('\\', '/');
+	File relativeTo = dbFile.getParentFile();
+	DBDEntry.setBaseDir(relativeTo);	 
+	 
 	 stream.writeBytes(DBResolver.DBD_START);
 	 Enumeration edbd = DataProvider.getInstance().getCurrentDBDs().elements();
 	 while (edbd.hasMoreElements())

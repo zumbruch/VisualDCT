@@ -16,27 +16,41 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.cosylab.vdct.Console;
+import com.cosylab.vdct.Settings;
 
 /**
  * @author ilist
  *
- * To change the template for this generated type comment go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
+ * Stores info about DBD entry.
  */
 public class DBDEntry {
-	static File baseDir;
+	private static File baseDir = null;
 	
-	String value;
-	boolean savesToFile = true;
+	private String value;
 	
+	private boolean savesToFile = true;
+	private boolean relative = false;
+
 	public DBDEntry(String value) {
 		this.value = value;
+		relativityTest();
 	}
 	
+	/**
+	 * 
+	 */
+	private void relativityTest() {
+		if (value.indexOf('$')==-1 && !new File(value).isAbsolute()) {
+			value = getFile().getPath(); 	
+			relative = true;
+		} 
+	}
+
 	/**
 	 * @return
 	 */
 	public String getValue() {
+		if (relative) return PathSpecification.getRelativeName(new File(value), getBaseDir()).getPath();
 		return value;
 	}
 
@@ -45,6 +59,7 @@ public class DBDEntry {
 	 */
 	public void setValue(String string) {
 		value = string;
+		relativityTest();
 	}
 
 	public File getFile() {
@@ -112,6 +127,7 @@ public class DBDEntry {
 	 * @return
 	 */
 	public static File getBaseDir() {
+		if (baseDir == null) baseDir = new File(Settings.getDefaultDir());
 		return baseDir;
 	}
 
@@ -169,4 +185,18 @@ public class DBDEntry {
 		
 		return properties;
 	}
+	/**
+	 * @return
+	 */
+	public boolean isRelative() {
+		return relative;
+	}
+
+	/**
+	 * @param b
+	 */
+	public void setRelative(boolean b) {
+		if (value.indexOf('$')==-1 || !b) relative = b;
+	}
+
 }
