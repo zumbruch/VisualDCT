@@ -384,8 +384,8 @@ protected void draw(Graphics g, boolean hilited) {
 			while (e.hasMoreElements()) {
 				fd = (VDBFieldData) (e.nextElement());
 				val = fd.getName() + "=" + fd.getValue();
-				while ((fm.stringWidth(val) + ox) > rwidth)
-					val = val.substring(0, val.length() - 2);
+				while (val.length() > 1 && (fm.stringWidth(val) + ox) > rwidth)
+					val = val.substring(0, val.length() - 2); // !!! TODO !!!
 					
 				// make monitored fields visible
 				if (inDebugMode && fd.getVisibility() == InspectableProperty.ALWAYS_VISIBLE)
