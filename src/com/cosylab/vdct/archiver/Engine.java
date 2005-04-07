@@ -41,6 +41,13 @@ public class Engine
 	private static final short INDENT_TYPE = 1;
 	private static final short LONG_INDENT_TYPE = 2;
 
+	static final String[] engineConfigProperties = new String[] {
+	        "write_period", "get_threshold", "file_size", "ignored_future",
+	        "buffer_reserve", "max_repeat_count", "disconnect"};
+	
+	static final String[] channelProperties = new String[] {
+	        "period", "disable", "scan", "monitor"};
+	
 	private static final String[] rejected = { "name", "#text" };
 
 	private static final String[] descriptors = {
@@ -48,7 +55,7 @@ public class Engine
 		};
 
 	private static final String[] propertyDescriptors = {
-			"scan", "monitor", "disable"
+			"scan", "monitor", "disable", "disconnect"
 		};
 	private Document doc;
 
@@ -79,6 +86,7 @@ public class Engine
 
 		try {
 			accept = doc.getDoctype().getSystemId().equals(DTD_FILE);
+			
 		} catch (Exception e) {
 			accept = true;
 		}
@@ -257,7 +265,7 @@ public class Engine
 	
 	private boolean appendToRootNode(ArchiverTreeNode root, Node rootNode)
 	{
-		if (!rootNode.hasChildNodes()) {
+		if (root.getChildCount() == 0) {
 			//            JOptionPane.showMessageDialog(null, "EngineConfig must contain at least one group. \n Parsing aborted!", "Structure invalid", JOptionPane.WARNING_MESSAGE);
 			return false;
 		}
@@ -276,9 +284,11 @@ public class Engine
 					level1 = doc.createElement(node.getArchiverTreeUserElement()
 						    .getName());
 					rootNode.appendChild(getIndentNode(INDENT_TYPE));
-					level1.appendChild(doc.createTextNode(
-					        ((Property)node.getArchiverTreeUserElement())
-					        .getValue()));
+					
+					String value = ((Property)node.getArchiverTreeUserElement()).getValue();
+					if (value != null) {
+					    level1.appendChild(doc.createTextNode(value));
+					}
 				} else {
 					//                    JOptionPane.showMessageDialog(null, "Group " + node.getArchiverTreeUserElement().getName() + " must contain at least one channel. \n Parsing aborted!", "Structure invalid", JOptionPane.WARNING_MESSAGE);
 					return false;
@@ -363,8 +373,7 @@ public class Engine
 		return new TextNode();
 	}
 
-	/**
-	 */
+	
 
 	//    private void appendChildrenToNode(Node parent, ArchiverTreeNode treeNode) {
 	//        

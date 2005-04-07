@@ -16,7 +16,9 @@ package com.cosylab.vdct.archiver;
 
 import org.w3c.dom.Document;
 
+import org.xml.sax.EntityResolver;
 import org.xml.sax.ErrorHandler;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
@@ -155,6 +157,16 @@ public class Archiver extends JFrame
 
 		JPanel archiverPanel = new JPanel(new GridBagLayout());
 		tree = new ArchiverTree();
+		tree.addTreeListener(new TreeListener() {
+
+            public void channelRemoved(ChannelRemovedEvent e) {
+                ArchiverTreeChannelNode[] nodes = e.getChannelNode();
+                for (int i = 0; i < nodes.length; i++) {
+                    list.getDefaultModel().addElement(nodes[i]); 
+                }
+            }
+		    
+		});
 
 		JScrollPane treePane = new JScrollPane(tree);
 		list = new ArchiverList();
@@ -200,7 +212,9 @@ public class Archiver extends JFrame
 				{
 					ArchiverTreeChannelNode[] records = tree
 						.getSelectionRecords();
-
+					if (records == null) {
+					    return;
+					}
 					if (records.length != 0) {
 						for (int i = 0; i < records.length; i++) {
 							list.getDefaultModel().addElement(records[i]);
@@ -330,9 +344,9 @@ public class Archiver extends JFrame
 			if (builder == null) {
 				builder = factory.newDocumentBuilder();
 			}
-
+			
 			Document doc = builder.parse(f);
-
+			
 			if (parsingSuccessful) {
 				tree.setRoot(engine.parseFromDocument(doc));
 			}
@@ -373,6 +387,7 @@ public class Archiver extends JFrame
 				t.setOutputProperty("doctype-system", Engine.DTD_FILE);
 				t.transform(new DOMSource(doc),
 				    new StreamResult(new FileOutputStream(f)));
+				
 			} else {
 				JOptionPane.showMessageDialog(this,
 				    "Check the structure of the document. \n Parsing aborted!",

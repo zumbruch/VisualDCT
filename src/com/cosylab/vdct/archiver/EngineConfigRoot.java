@@ -27,12 +27,15 @@ package com.cosylab.vdct.archiver;
 public class EngineConfigRoot extends ArchiverTreeElement
 {
 	/**
-	 * Creates a new ArchiverEngineConfigRoot object.
+	 * Creates a new ArchiverEngineConfigRoot object. The name for the EngineConfig should be 
+	 * fileName;
 	 */
 	public EngineConfigRoot()
 	{
 		super("EngineConfig");
+		isEditable = false;
 	}
+	
 
 	/*
 	 *  (non-Javadoc)

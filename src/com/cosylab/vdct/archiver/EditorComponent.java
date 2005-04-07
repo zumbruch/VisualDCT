@@ -23,9 +23,11 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.tree.DefaultTreeCellEditor;
+import javax.swing.tree.TreeCellEditor;
 
 
 /**
@@ -80,9 +82,10 @@ public class EditorComponent extends JPanel
 	 * @param invoker Editor that invoked this method
 	 */
 	public void setup(final ArchiverTreeNode node,
-	    final DefaultTreeCellEditor invoker)
+	    final TreeCellEditor invoker, final ArchiverTree tree)
 	{
 		final ArchiverTreeElement element = node.getArchiverTreeUserElement();
+		
 		boolean property = element instanceof Property;
 		boolean hasValue = property ? ((Property)element).hasValue() : false;
 
@@ -92,40 +95,58 @@ public class EditorComponent extends JPanel
 			valueField.removeKeyListener(kl[i]);
 		}
 
-		if (!hasValue) {
-			KeyListener t = new KeyAdapter() {
-					public void keyPressed(KeyEvent e)
-					{
-						if (e.getKeyCode() == 10) {
-							element.setName(valueField.getText());
-							invoker.stopCellEditing();
+//		if (!element.isEditable()) {
+//		    valueField.setVisible(false);
+//		    nameLabel.setVisible(true);
+//		    nameLabel.setText(element.getName());
+//		    nameLabel.setBackground(valueField.getSelectionColor());
+//		    nameLabel.setOpaque(true);
+//		} else {
+			if (!hasValue) {
+				KeyListener t = new KeyAdapter() {
+						public void keyPressed(KeyEvent e)
+						{
+							if (e.getKeyCode() == 10) {
+							    if (element instanceof Group) {
+							        String text = valueField.getText();
+							        if (!tree.isGroupNameUnique(text)) {
+							            JOptionPane.showMessageDialog(tree, "Group named " + text + " already exists. Rename this group.", "Invalid group name" , JOptionPane.WARNING_MESSAGE);
+							            valueField.selectAll();
+							            return;
+							        }
+							    }
+								element.setName(valueField.getText());
+								invoker.stopCellEditing();
+							}
 						}
-					}
-				};
-
-			valueField.addKeyListener(t);
-			valueField.setText(element.getName());
-			valueField.setPreferredSize(null);
-			nameLabel.setVisible(false);
-		} else {
-			KeyListener t = new KeyAdapter() {
-					public void keyPressed(KeyEvent e)
-					{
-						if (e.getKeyCode() == 10) {
-							((Property)element).setValue(valueField.getText());
-							invoker.stopCellEditing();
+					};
+				valueField.setVisible(true);	
+				valueField.addKeyListener(t);
+				valueField.setText(element.getName());
+				valueField.setPreferredSize(null);
+				nameLabel.setVisible(false);
+			} else {
+				KeyListener t = new KeyAdapter() {
+						public void keyPressed(KeyEvent e)
+						{
+							if (e.getKeyCode() == 10) {
+								((Property)element).setValue(valueField.getText());
+								invoker.stopCellEditing();
+							}
 						}
-					}
-				};
-
-			valueField.addKeyListener(t);
-			valueField.setText(((Property)element).getValue());
-			valueField.setPreferredSize(dim);
-			nameLabel.setText(element.getName());
-			nameLabel.setVisible(true);
-		}
-
-		valueField.selectAll();
+					};
+				valueField.setVisible(true);	
+				valueField.addKeyListener(t);
+				valueField.setText(((Property)element).getValue());
+				valueField.setPreferredSize(dim);
+				nameLabel.setText(element.getName());
+				nameLabel.setVisible(true);
+			}
+			
+			valueField.selectAll();
+//		}
+		
+		
 	}
 }
 

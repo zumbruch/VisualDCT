@@ -36,11 +36,13 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 
 import javax.swing.AbstractCellEditor;
 import javax.swing.Icon;
@@ -76,6 +78,9 @@ public class ArchiverTree extends JTree
 	private ArchiverTreeNode rootNode;
 	private CellRenderer cellRenderer;
 	private ArchiverTreeChannelNode[] draggedValues;
+	private ArrayList treeListeners = new ArrayList();
+	private JMenuItem[] engineItems;
+	private JMenuItem[] channelItems;
 
 	/**
 	 * Creates a new ArchiverTree object.
@@ -101,6 +106,64 @@ public class ArchiverTree extends JTree
 		this.setEditable(true);
 		this.setCellEditor(new CellEditor(this, cellRenderer,
 		        new DefaultEditor()));
+		
+				
+		// constructs JMenuItems for adding properties to the tree
+		engineItems = new JMenuItem[Engine.engineConfigProperties.length];
+		for (int i = 0; i < engineItems.length; i++) {
+		    final String name = Engine.engineConfigProperties[i];
+		    final int c = i;
+		    engineItems[i] = new JMenuItem(name);
+		    engineItems[i].addActionListener(new ActionListener() {
+
+                public void actionPerformed(ActionEvent e) {
+                    Property property = new Property(name, (c==6 ? false : true));
+                    rootNode.insert(new ArchiverTreeNode(property), 0);
+                    getDefaultModel().reload(rootNode);
+                }
+		        
+		    });
+		}
+		
+		channelItems = new JMenuItem[Engine.channelProperties.length];
+		for (int i = 0; i < channelItems.length; i++) {
+		    final String name = Engine.channelProperties[i];
+		    final int c = i;
+		    channelItems[i] = new JMenuItem(name);
+		    channelItems[i].addActionListener(new ActionListener() {
+
+                public void actionPerformed(ActionEvent e) {
+                    Property property = new Property(name, (c < 1 ? true : false));
+                    ArchiverTreeNode parent = (ArchiverTreeNode) getSelectionPath().getLastPathComponent();
+                    parent.add(new ArchiverTreeNode(property));
+                    getDefaultModel().reload(parent);
+                }
+		        
+		    });
+		}
+		
+			
+	}
+	
+	/**
+	 * 
+	 * Checks if there is another Group with the same name.
+	 * @param name the name to be checked for
+	 * @return true if a group with that name alreasy exist
+	 */
+	boolean isGroupNameUnique(String name) {
+	    
+	    int j = rootNode.getChildCount();
+	    for (int i = 0; i < j; i++) {
+	        ArchiverTreeElement elem = ((ArchiverTreeNode) rootNode.getChildAt(i)).getArchiverTreeUserElement();
+	        if (elem instanceof Group) {
+	            if (elem.getName().equals(name)) {
+	                return false;
+	            }
+	        }
+	    }
+	    return true;
+	    
 	}
 
 	/**
@@ -112,20 +175,46 @@ public class ArchiverTree extends JTree
 	{
 		return (DefaultTreeModel)getModel();
 	}
-
+	
+	
+	/**
+	 * 
+	 * Sets the root for this tree.
+	 * @param root
+	 */
 	void setRoot(ArchiverTreeNode root)
 	{
 		this.rootNode = root;
 		getDefaultModel().setRoot(root);
 	}
-
+	
+	
 	void reset()
 	{
+	    stopEditing();
+	    
 		rootNode = new ArchiverTreeNode(new EngineConfigRoot());
 		getDefaultModel().setRoot(rootNode);
 		getDefaultModel().reload();
 	}
-
+	
+	protected void fireChannelRemoved(ArchiverTreeChannelNode[] channel) {
+	    
+	    ChannelRemovedEvent evt = new ChannelRemovedEvent(this, channel);
+	    for (int i = 0; i < treeListeners.size(); i++) {
+	        ((TreeListener)treeListeners.get(i)).channelRemoved(evt);
+	    }
+	    
+	}
+	
+	public void addTreeListener(TreeListener listener) {
+	    treeListeners.add(listener);
+	}
+	
+	public void removeTreeListener(TreeListener listener) {
+	    treeListeners.remove(listener);
+	}
+	
 	private JPopupMenu getPopup()
 	{
 		if (popup == null) {
@@ -142,26 +231,12 @@ public class ArchiverTree extends JTree
 				});
 			popup.add(addGRoup);
 
-			//			JMenuItem removeGroup = new JMenuItem("Remove Group");
-			//			removeGroup.addActionListener(new ActionListener() {
-			//					public void actionPerformed(ActionEvent e)
-			//					{
-			//					    ArchiverTreeNode node = (ArchiverTreeNode) getSelectionPath().getLastPathComponent();
-			//					    if (node.getArchiverTreeUserElement() instanceof Group) {
-			//					        rootNode.remove(node);
-			//					    }
-			//					    ((DefaultTreeModel)getModel()).reload(rootNode);
-			//					}
-			//				});
-			//			popup.add(removeGroup);
-			//			popup.addSeparator();
-			//			JMenu addProperties = new JMenu("Add Properties");
-			//			JMenuItem addPeriod = new JMenuItem("Period property");
-			//			
-			//			addProperties.add(addPeriod);
-			//			popup.add(addProperties);
-			JMenuItem removeProperty = new JMenuItem("Remove Group/Property");
-			removeProperty.addActionListener(new ActionListener() {
+			addProperties = new JMenu("Add Property");
+			popup.add(addProperties);
+			addProperties.setEnabled(false);
+			
+			remove = new JMenuItem("Remove");
+			remove.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e)
 					{
 						ArchiverTreeNode node = (ArchiverTreeNode)getSelectionPath()
@@ -169,17 +244,136 @@ public class ArchiverTree extends JTree
 						ArchiverTreeElement elem = node
 							.getArchiverTreeUserElement();
 
-						if (elem instanceof Property || elem instanceof Group) {
+						if (! (elem instanceof EngineConfigRoot)) {
 							TreeNode parent = node.getParent();
 							node.removeFromParent();
 							((DefaultTreeModel)getModel()).reload(parent);
-						}
+							if (elem instanceof Group) {
+							    ArchiverTreeChannelNode[] nodes = new ArchiverTreeChannelNode[node.getChildCount()];
+							    for (int i = 0; i < nodes.length; i++) {
+							        nodes[i] = (ArchiverTreeChannelNode) node.getChildAt(i);
+							    }
+							    fireChannelRemoved(nodes);
+							} else if (elem instanceof Channel) {
+							    fireChannelRemoved(new ArchiverTreeChannelNode[] {(ArchiverTreeChannelNode) node});
+							}
+						} 						
 					}
 				});
-			popup.add(removeProperty);
+			remove.setEnabled(false);
+			popup.add(remove);
+			
+			
 		}
 
 		return popup;
+	}
+	
+	private JMenuItem remove;
+	private JMenu addProperties;
+	
+	private void popupInit(TreePath path) {
+	    
+	    if (path == null) {
+	        return;
+	    }
+	    
+	    if (popup == null) {
+	        getPopup();
+	    }
+	    
+	    ArchiverTreeNode node = (ArchiverTreeNode) path.getLastPathComponent();
+	    ArchiverTreeElement elem = node.getArchiverTreeUserElement();
+	    
+	    if (!(elem instanceof EngineConfigRoot)) {
+	        remove.setEnabled(true);
+	    } else {
+	        remove.setEnabled(false);
+	    }
+	    addProperties.setEnabled(false);
+	    addProperties.removeAll();
+	    
+	    if (elem instanceof EngineConfigRoot || elem instanceof Channel) {
+	        addProperties.setEnabled(true);
+	        JMenuItem[] item = getPropertisItems(node);
+	        for (int i = 0; i < item.length; i++) {
+	            addProperties.add(item[i]);
+	        }
+	    }
+	    
+	}
+	
+	
+	/**
+	 * Adds properties to the JMenu. Only those properties are added that are not attached to the
+	 * node yet.
+	 * 
+	 * @param node
+	 * @return
+	 */
+	private JMenuItem[] getPropertisItems(ArchiverTreeNode node) {
+	    
+	    ArchiverTreeElement elem = node.getArchiverTreeUserElement();
+	    
+	    ArrayList items = new ArrayList();
+	    
+	    
+	    if (elem instanceof EngineConfigRoot) {
+	        for (int i = 0; i < engineItems.length; i++) {
+	            boolean exist = false;
+	            Enumeration children = node.children();
+		        while (children.hasMoreElements()) {
+		            ArchiverTreeNode child = (ArchiverTreeNode) children.nextElement();
+		            if (child.getArchiverTreeUserElement().getName().equals(engineItems[i].getText())) {
+		                exist = true;
+		                break;
+		            }
+		        }
+		        if (!exist) {
+		            items.add(engineItems[i]);
+		        }
+	        }
+	    } else if (elem instanceof Channel) {
+	        for (int i = 0; i < channelItems.length - 2; i++) {
+	            boolean exist = false;
+	            Enumeration children = node.children();
+		        while (children.hasMoreElements()) {
+		            ArchiverTreeNode child = (ArchiverTreeNode) children.nextElement();
+		            if (child.getArchiverTreeUserElement().getName().equals(channelItems[i].getText())) {
+		                exist = true;
+		                break;
+		            }
+		        }
+		        if (!exist) {
+		            items.add(channelItems[i]);
+		        }
+	        }
+	        
+	        boolean exist = false;
+	        for (int i = channelItems.length - 2; i < channelItems.length; i++) {
+	            Enumeration children = node.children();
+		        while (children.hasMoreElements()) {
+		            ArchiverTreeNode child = (ArchiverTreeNode) children.nextElement();
+		            if (child.getArchiverTreeUserElement().getName().equals(channelItems[i].getText())) {
+		                exist = true;
+		                break;
+		            }
+		        }
+		        if (exist) {
+		            break;
+		        }
+	        }
+	        if (!exist) {
+	            items.add(channelItems[channelItems.length - 2]);
+	            items.add(channelItems[channelItems.length - 1]);
+	        }
+	        
+	        
+	    } 
+	    JMenuItem[] array = new JMenuItem[items.size()];
+	    return (JMenuItem[]) items.toArray(array);
+	    
+	    
 	}
 
 	private void initializeAsDragSource()
@@ -250,7 +444,9 @@ public class ArchiverTree extends JTree
 	{
 		ArrayList nodes = new ArrayList();
 		TreePath[] paths = getSelectionPaths();
-
+		if (paths == null) {
+		    return null;
+		}
 		for (int i = 0; i < paths.length; i++) {
 			ArchiverTreeNode lastNode = (ArchiverTreeNode)paths[i]
 				.getLastPathComponent();
@@ -357,16 +553,30 @@ public class ArchiverTree extends JTree
 	 */
 	private class TreeMouseHandler extends MouseAdapter
 	{
+	    
+	    
 		/*
 		 *  (non-Javadoc)
 		 * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
 		 */
 		public void mouseReleased(MouseEvent e)
 		{
-			if ((e.getClickCount() == 2) && SwingUtilities.isLeftMouseButton(e)) {
-				ArchiverTree.this.startEditingAtPath(getPathForLocation(
-				        e.getX(), e.getY()));
+		    if ((e.getClickCount() == 3) && SwingUtilities.isLeftMouseButton(e)) {
+		        stopEditing();
+		    }
+		    
+		    if ((e.getClickCount() == 2) && SwingUtilities.isLeftMouseButton(e)) {
+		    	TreePath path = getPathForLocation(e.getX(), e.getY());
+		    	if (path != null) {
+			    	ArchiverTreeNode node = (ArchiverTreeNode) path.getLastPathComponent();
+			    	
+			    	if (node.getArchiverTreeUserElement().isEditable()) {
+			    	    ArchiverTree.this.startEditingAtPath(path);
+			    	}
+		    	}
+
 			} else if (e.getClickCount() == 1) {
+			    
 				boolean ctrlDown = (e.getModifiersEx()
 					& InputEvent.CTRL_DOWN_MASK) == InputEvent.CTRL_DOWN_MASK;
 
@@ -395,8 +605,10 @@ public class ArchiverTree extends JTree
 						// clear selection
 						getSelectionModel().clearSelection();
 					}
-
+					
+					popupInit(p);
 					getPopup().show(ArchiverTree.this, e.getX(), e.getY());
+					
 				}
 			}
 		}
@@ -489,8 +701,9 @@ public class ArchiverTree extends JTree
 			DataFlavor[] flavors = transferable.getTransferDataFlavors();
 
 			Point point = dtde.getLocation();
+			
 			ArchiverTreeNode groupNode = findClosestGroupNode(getClosestPathForLocation(
-				        (int)(point.getX() + 0.5), (int)(point.getY() + 0.5)));
+			        (int)(point.getX() + 0.5), (int)(point.getY() + 0.5)));
 
 			if (groupNode != null) {
 				for (int i = 0; i < flavors.length; i++) {
@@ -654,21 +867,24 @@ public class ArchiverTree extends JTree
 		    final Object value, boolean isSelected, boolean expanded,
 		    boolean leaf, int row)
 		{
-			setTree(tree);
+		    if (!((ArchiverTreeNode)value).getArchiverTreeUserElement().isEditable()) {
+		        return renderer.getTreeCellRendererComponent(tree, value, isSelected, expanded, leaf, row, true);
+		    }
+		    setTree(tree);
 			lastRow = row;
 			determineOffset(tree, value, isSelected, expanded, leaf, row);
 
 			if (editingComponent != null) {
 				editingContainer.remove(editingComponent);
 			}
-
+			
 			editingIcon = CellUtilities.getIcon((ArchiverTreeNode)value);
 
 			editingComponent = realEditor.getTreeCellEditorComponent(tree,
 				    value, isSelected, expanded, leaf, row);
 
 			((EditorComponent)editingComponent).setup((ArchiverTreeNode)value,
-			    this);
+			    this, ArchiverTree.this);
 
 			TreePath newPath = tree.getPathForRow(row);
 

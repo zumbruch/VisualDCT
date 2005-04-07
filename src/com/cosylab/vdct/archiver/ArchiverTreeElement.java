@@ -32,6 +32,7 @@ import java.io.Serializable;
 public abstract class ArchiverTreeElement implements Serializable
 {
 	protected String name = "";
+	protected boolean isEditable = true;
 
 	/**
 	 * Creates a new ArchiverTreeElement object.
@@ -43,19 +44,11 @@ public abstract class ArchiverTreeElement implements Serializable
 		setName(name);
 	}
 
-	/*
-	 *  (non-Javadoc)
-	 * @see com.cosylab.vdct.archiver.TreeUserElement#setName(java.lang.String)
-	 */
 	public void setName(String name)
 	{
 		this.name = name;
 	}
 
-	/*
-	 *  (non-Javadoc)
-	 * @see com.cosylab.vdct.archiver.TreeUserElement#getName()
-	 */
 	public String getName()
 	{
 		return name;
@@ -68,6 +61,10 @@ public abstract class ArchiverTreeElement implements Serializable
 	public String toString()
 	{
 		return getName();
+	}
+	
+	public boolean isEditable() {
+	    return isEditable;
 	}
 }
 

@@ -36,7 +36,7 @@ public class Property extends ArchiverTreeElement
 	 */
 	public Property(String name, boolean hasValue)
 	{
-		this(name, null, false);
+		this(name, null, hasValue);
 	}
 
 	/**
@@ -55,6 +55,7 @@ public class Property extends ArchiverTreeElement
 		super(name);
 		this.hasValue = hasValue;
 		setValue(value);
+		super.isEditable = hasValue;
 	}
 
 	/**
@@ -76,7 +77,7 @@ public class Property extends ArchiverTreeElement
 	public void setValue(String value)
 	{
 		if (hasValue) {
-			this.value = value;
+		    this.value = value;
 		}
 	}
 
