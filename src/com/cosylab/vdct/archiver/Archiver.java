@@ -14,6 +14,7 @@
 
 package com.cosylab.vdct.archiver;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -53,7 +54,6 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-
 /**
  * <code>Archiver</code> is the frame of the Archiver application.
  *
@@ -76,6 +76,7 @@ public class Archiver extends JFrame
 	private DocumentBuilderFactory factory;
 	private Engine engine;
 	private boolean parsingSuccessful = true;
+	private File currentFile;
 
 	/**
 	 * Creates a new ArchiverDialog object.
@@ -139,8 +140,10 @@ public class Archiver extends JFrame
 		}
 
 		//		this.setModal(true);
-		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		this.setTitle("Archiver");
 		this.setSize(500, 500);
+		
 	}
 
 	private JPanel getPanel()
@@ -161,15 +164,17 @@ public class Archiver extends JFrame
 		});
 
 		JScrollPane treePane = new JScrollPane(tree);
+		treePane.setPreferredSize(new Dimension(180,100));
+		
 		list = new ArchiverList();
-
 		JScrollPane listPane = new JScrollPane(list);
-
+		listPane.setPreferredSize(new Dimension(160,100));
+		
 		archiverPanel.add(treePane,
-		    new GridBagConstraints(0, 0, 1, 1, 1, 1, GridBagConstraints.WEST,
+		    new GridBagConstraints(0, 0, 1, 1, 1, 1, GridBagConstraints.CENTER,
 		        GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
 		archiverPanel.add(listPane,
-		    new GridBagConstraints(2, 0, 1, 1, 1, 1, GridBagConstraints.EAST,
+		    new GridBagConstraints(2, 0, 1, 1, 1, 1, GridBagConstraints.CENTER,
 		        GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
 
 		//select buttons
@@ -301,16 +306,29 @@ public class Archiver extends JFrame
 			save.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e)
 					{
-						saveFile();
+					    if (currentFile != null) {
+						    saveFile(currentFile);
+						} else {
+						    saveFileAs();
+						}
 					}
 				});
 			fileMenu.add(save);
+			
+			JMenuItem saveas = new JMenuItem("Save as");
+			saveas.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e)
+					{
+					    saveFileAs();
+					}
+				});
+			fileMenu.add(saveas);
 
-			JMenuItem exit = new JMenuItem("Exit");
+			JMenuItem exit = new JMenuItem("Close");
 			exit.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e)
 					{
-						System.exit(0);
+						dispose();
 					}
 				});
 
@@ -344,6 +362,7 @@ public class Archiver extends JFrame
 				tree.getRoot().getArchiverTreeUserElement().setName(f.getName());
 				tree.getDefaultModel().reload();
 			}
+			currentFile = f;
 		} catch (IOException exception) {
 			JOptionPane.showMessageDialog(this, exception);
 		} catch (ParserConfigurationException exception) {
@@ -353,7 +372,8 @@ public class Archiver extends JFrame
 		}
 	}
 
-	private void saveFile()
+	
+	private void saveFileAs()
 	{
 		if (getFileChooser().showSaveDialog(this) != JFileChooser.APPROVE_OPTION) {
 			return;
@@ -365,8 +385,12 @@ public class Archiver extends JFrame
 		if (!name.endsWith(".xml")) {
 			f = new File(name + ".xml");
 		}
-
-		try {
+		saveFile(f);
+		
+	}
+	
+	private void saveFile(File file) {
+	    try {
 			if (builder == null) {
 				builder = DocumentBuilderFactory.newInstance()
 					.newDocumentBuilder();
@@ -384,8 +408,11 @@ public class Archiver extends JFrame
 				t.setOutputProperty("standalone", "no");
 				t.setOutputProperty("doctype-system", Engine.DTD_FILE);
 				t.transform(new DOMSource(doc),
-				    new StreamResult(new FileOutputStream(f)));
-				tree.getRoot().getArchiverTreeUserElement().setName(f.getName());
+				    new StreamResult(new FileOutputStream(file)));
+				tree.getRoot().getArchiverTreeUserElement().setName(file.getName());
+				tree.getDefaultModel().nodeChanged(tree.getRoot());
+				currentFile = file;
+				
 //			} else {
 //				JOptionPane.showMessageDialog(this,
 //				    "Check the structure of the document. \n Parsing aborted!",
@@ -463,6 +490,10 @@ public class Archiver extends JFrame
 	    list.getDefaultModel().addElement(atcn);
 	    
 	}
+	
+	public void clear() {
+	    list.getDefaultModel().clear();
+	}
 
 	/**
 	 * DOCUMENT ME!
@@ -473,21 +504,17 @@ public class Archiver extends JFrame
 	{
 		Archiver dialog = new Archiver();
 
-		//		Channel[] record = new Channel[15];
-		for (int i = 0; i < 15; i++) {
-			//			record[i] = new Channel(i + " record");
-			Channel ch = new Channel(i + " channel");
-			dialog.addChannel(ch);
-//			Property sm = new Property((Math.random() < 0.5) ? "scan" : "monitor",
-//				    false);
-//			Property period = new Property("period",
-//				    String.valueOf(Math.random() * 10));
-//			dialog.addChannel(ch, sm, period,
-//			    (Math.random() < 0.5) ? true : false);
-		}
-
-		//		dialog.addChannels(record);
+//		for (int i = 0; i < 15; i++) {
+//			Channel ch = new Channel(i + " channel");
+//			dialog.addChannel(ch);
+//		}
+		
+//		Vector v = DataProvider.getInstance().getInspectable();
+//		for (int i = 0; i < v.size(); i++) {
+//		    System.out.println(v.getClass());
+//		}
 		dialog.show();
+		
 	}
 }
 

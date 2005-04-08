@@ -14,6 +14,7 @@
 
 package com.cosylab.vdct.archiver;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Font;
@@ -95,7 +96,7 @@ public class ArchiverTree extends JTree
 		initializeAsDragSource();
 
 		rootNode = new ArchiverTreeNode(new EngineConfigRoot());
-
+		
 		DefaultTreeModel model = new DefaultTreeModel(rootNode);
 		setModel(model);
 		addMouseListener(new TreeMouseHandler());
@@ -104,7 +105,7 @@ public class ArchiverTree extends JTree
 		this.setEditable(true);
 		this.setCellEditor(new CellEditor(this, cellRenderer,
 		        new DefaultEditor()));
-		
+				
 				
 		// constructs JMenuItems for adding properties to the tree
 		engineItems = new JMenuItem[Engine.engineConfigProperties.length];
@@ -792,7 +793,7 @@ public class ArchiverTree extends JTree
 		{
 			super.getTreeCellRendererComponent(tree, value, selected, expanded,
 			    leaf, row, hasFocus);
-
+			this.setBackground(new Color(255,255,225));
 			if (value instanceof ArchiverTreeNode) {
 				ArchiverTreeNode node = (ArchiverTreeNode)value;
 				this.setText(node.getArchiverTreeUserElement().toString());

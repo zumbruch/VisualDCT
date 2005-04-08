@@ -66,6 +66,7 @@ public class ArchiverList extends JList
 
 		DefaultListModel model = new DefaultListModel();
 		this.setModel(model);
+				
 	}
 
 	private void initializeAsDragSource()
