@@ -17,7 +17,8 @@ package com.cosylab.vdct.archiver;
 /**
  * <code>ArchiverEngineConfigRoot</code> is the root element of for the
  * <code>ArhiverTree</code>. It holds information about all
- * <code>ArchiverTreeGroup</code> which paths are connected to this root.
+ * <code>ArchiverTreeGroup</code> which paths are connected to this root. This element is not 
+ * editable.
  *
  * @author <a href="mailto:jaka.bobnar@cosylab.com">Jaka Bobnar</a>
  * @version $Id$
@@ -36,26 +37,15 @@ public class EngineConfigRoot extends ArchiverTreeElement
 		isEditable = false;
 	}
 	
+//	public String getName()
+//	{
+//		return "EngineConfig";
+//	}
 
-	/*
-	 *  (non-Javadoc)
-	 * @see com.cosylab.vdct.archiver.ArchiverTreeElement#getName()
-	 * This method always return "EngineConfig".
-	 */
-	public String getName()
-	{
-		return "EngineConfig";
-	}
-
-	/*
-	 *  (non-Javadoc)
-	 * @see com.cosylab.vdct.archiver.TreeUserElement#setName(java.lang.String)
-	 * Renaming the root is not allowed
-	 */
-	public void setName(String name)
-	{
-		//do nothig
-	}
+//	public void setName(String name)
+//	{
+//		//do nothig
+//	}
 }
 
 /* __oOo__ */

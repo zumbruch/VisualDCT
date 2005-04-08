@@ -14,15 +14,14 @@
 
 package com.cosylab.vdct.archiver;
 
-import org.apache.crimson.tree.TextNode;
+import javax.swing.JOptionPane;
 
+import org.apache.crimson.tree.TextNode;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
-
-import javax.swing.JOptionPane;
 
 
 /**
@@ -46,7 +45,7 @@ public class Engine
 	        "buffer_reserve", "max_repeat_count", "disconnect"};
 	
 	static final String[] channelProperties = new String[] {
-	        "period", "disable", "scan", "monitor"};
+	        "period", "scan", "monitor", "disable"};
 	
 	private static final String[] rejected = { "name", "#text" };
 
@@ -54,16 +53,19 @@ public class Engine
 			"engineconfig", "group", "channel", "name"
 		};
 
-	private static final String[] propertyDescriptors = {
-			"scan", "monitor", "disable", "disconnect"
-		};
+//	private static final String[] propertyDescriptors = {
+//			"scan", "monitor", "disable", "disconnect"
+//		};
 	private Document doc;
+	
+	private Archiver archiver;
 
 	/**
 	 * Creates a new Engine object.
 	 */
-	public Engine()
+	public Engine(Archiver arch)
 	{
+	    this.archiver = arch;
 	}
 
 	/**
@@ -162,13 +164,19 @@ public class Engine
 		} else if (represent.equals(descriptors[2])) {
 			treeElement = new Channel("<name>");
 		} else {
-			for (int i = 0; i < propertyDescriptors.length; i++) {
-				if (represent.equals(propertyDescriptors[i])) {
-					return new Property(represent, false);
-				}
+//			for (int i = 0; i < propertyDescriptors.length; i++) {
+//				if (represent.equals(propertyDescriptors[i])) {
+//					return new Property(represent, false);
+//				}
+//			}
+			
+			try {
+			    return new Property(represent, domNode.getChildNodes().item(0).getNodeValue().trim());
+			} catch (NullPointerException e) {
+			    return new Property(represent, false);
 			}
 			
-			treeElement = new Property(represent, content(domNode).trim());
+//			treeElement = new Property(represent, content(domNode).trim());
 		}
 
 		NodeList list = domNode.getChildNodes();
@@ -178,7 +186,8 @@ public class Engine
 			node = list.item(i);
 
 			if (node.getNodeName().equals(descriptors[3])) {
-				treeElement.setName(content(node));
+			    treeElement.setName(node.getChildNodes().item(0).getNodeValue());
+			    //				treeElement.setName(content(node));
 
 				break;
 			}
@@ -190,54 +199,53 @@ public class Engine
 	/*
 	 * Returns the content od the node. 
 	 */
-	private String content(Node dnode)
-	{
-		String s = "";
-		NodeList nodeList = dnode.getChildNodes();
-
-		for (int i = 0; i < nodeList.getLength(); i++) {
-			Node node = nodeList.item(i);
-			int type = node.getNodeType();
-
-			if (type == Node.ELEMENT_NODE) {
-				// Skip subelements that are displayed in the tree.   
-				if (!isRejected(node.getNodeName())) {
-					continue;
-				}
-
-				s += "<" + node.getNodeName() + ">";
-				s += content(node);
-				s += "</" + node.getNodeName() + ">";
-			} else if (type == Node.TEXT_NODE) {
-				s += node.getNodeValue();
-			} else if (type == Node.ENTITY_REFERENCE_NODE) {
-				// The content is in the TEXT node under it
-				s += content(node);
-			} else if (type == Node.CDATA_SECTION_NODE) {
-				// The "value" has the text, same as a text node.
-				//   while EntityRef has it in a text node underneath.
-				//   (because EntityRef can contain multiple subelements)
-				// Convert angle brackets and ampersands for display
-				StringBuffer sb = new StringBuffer(node.getNodeValue());
-
-				for (int j = 0; j < sb.length(); j++) {
-					if (sb.charAt(j) == '<') {
-						sb.setCharAt(j, '&');
-						sb.insert(j + 1, "lt;");
-						j += 3;
-					} else if (sb.charAt(j) == '&') {
-						sb.setCharAt(j, '&');
-						sb.insert(j + 1, "amp;");
-						j += 4;
-					}
-				}
-
-				s += "<pre>" + sb + "\n</pre>";
-			}
-		}
-
-		return s;
-	}
+//	private String content(Node dnode)
+//	{
+//		StringBuffer s = new StringBuffer("");
+//		NodeList nodeList = dnode.getChildNodes();
+//
+//		for (int i = 0; i < nodeList.getLength(); i++) {
+//			Node node = nodeList.item(i);
+//			int type = node.getNodeType();
+//
+//			if (type == Node.ELEMENT_NODE) {
+//				// Skip subelements that are displayed in the tree.   
+//				if (!isRejected(node.getNodeName())) {
+//					continue;
+//				}
+//				s.append("<" + node.getNodeName() + ">");
+//				s.append(content(node));
+//				s.append("</" + node.getNodeName() + ">");
+//			} else if (type == Node.TEXT_NODE) {
+//			    s.append(node.getNodeValue());
+//			} else if (type == Node.ENTITY_REFERENCE_NODE) {
+//				// The content is in the TEXT node under it
+//			    s.append(content(node));
+//			} else if (type == Node.CDATA_SECTION_NODE) {
+//				// The "value" has the text, same as a text node.
+//				//   while EntityRef has it in a text node underneath.
+//				//   (because EntityRef can contain multiple subelements)
+//				// Convert angle brackets and ampersands for display
+//				StringBuffer sb = new StringBuffer(node.getNodeValue());
+//
+//				for (int j = 0; j < sb.length(); j++) {
+//					if (sb.charAt(j) == '<') {
+//						sb.setCharAt(j, '&');
+//						sb.insert(j + 1, "lt;");
+//						j += 3;
+//					} else if (sb.charAt(j) == '&') {
+//						sb.setCharAt(j, '&');
+//						sb.insert(j + 1, "amp;");
+//						j += 4;
+//					}
+//				}
+//				
+//				s.append("<pre>" + sb + "\n</pre>");
+//			}
+//		}
+//
+//		return s.toString();
+//	}
 
 	/**
 	 * Wraps the tree structure to the Document. Root becomes the root element of the Document.
@@ -265,8 +273,8 @@ public class Engine
 	
 	private boolean appendToRootNode(ArchiverTreeNode root, Node rootNode)
 	{
-		if (root.getChildCount() == 0) {
-			//            JOptionPane.showMessageDialog(null, "EngineConfig must contain at least one group. \n Parsing aborted!", "Structure invalid", JOptionPane.WARNING_MESSAGE);
+		if (root.getChildCount() == 0 || root.getChildCount() == root.getLeafCount()) {
+			JOptionPane.showMessageDialog(archiver, "EngineConfig must contain at least one not empty group. \n Parsing aborted!", "Structure invalid", JOptionPane.WARNING_MESSAGE);
 			return false;
 		}
 
@@ -276,23 +284,30 @@ public class Engine
 
 			rootNode.appendChild(getIndentNode(BREAK_TYPE));
 
-			Element level1;
+			Element level1 = null;
 
 			if (node.isLeaf()) {
 				// root property
-				if (node.getArchiverTreeUserElement() instanceof Property) {
-					level1 = doc.createElement(node.getArchiverTreeUserElement()
-						    .getName());
+			    ArchiverTreeElement elem = node.getArchiverTreeUserElement();
+				if (elem instanceof Property) {
+					level1 = doc.createElement(elem.getName());
 					rootNode.appendChild(getIndentNode(INDENT_TYPE));
 					
 					String value = ((Property)node.getArchiverTreeUserElement()).getValue();
 					if (value != null) {
 					    level1.appendChild(doc.createTextNode(value));
+					} else {
+					    if (((Property)elem).hasValue()) {
+					        JOptionPane.showMessageDialog(archiver, "Property " + elem.getName() + " has invalid value. \n Parsing aborted!", "Structure invalid", JOptionPane.WARNING_MESSAGE);
+					        return false;
+					    }
 					}
-				} else {
-					//                    JOptionPane.showMessageDialog(null, "Group " + node.getArchiverTreeUserElement().getName() + " must contain at least one channel. \n Parsing aborted!", "Structure invalid", JOptionPane.WARNING_MESSAGE);
-					return false;
 				}
+				
+//				} else {
+//					//                    JOptionPane.showMessageDialog(null, "Group " + node.getArchiverTreeUserElement().getName() + " must contain at least one channel. \n Parsing aborted!", "Structure invalid", JOptionPane.WARNING_MESSAGE);
+//					return false;
+//				}
 			} else {
 				//group 
 				level1 = doc.createElement(descriptors[1]);
@@ -307,7 +322,7 @@ public class Engine
 				level1.appendChild(nameElement);
 
 				level1.appendChild(getIndentNode(BREAK_TYPE));
-
+				
 				for (int j = 0; j < node.getChildCount(); j++) {
 					//channel
 					ArchiverTreeNode channelNode = (ArchiverTreeNode)node
@@ -326,25 +341,47 @@ public class Engine
 					level2.appendChild(getIndentNode(LONG_INDENT_TYPE));
 					level2.appendChild(channelNameElement);
 					level2.appendChild(getIndentNode(BREAK_TYPE));
-
+					
+					boolean period = false;
+					boolean scanMonitor = false;
 					for (int k = 0; k < channelNode.getChildCount(); k++) {
+					    
 						//channel property
 						ArchiverTreeNode channelProperty = (ArchiverTreeNode)channelNode
 							.getChildAt(k);
-						Element level3 = doc.createElement(channelProperty.getArchiverTreeUserElement()
-							    .getName());
+						ArchiverTreeElement elem = channelProperty.getArchiverTreeUserElement();
+						String name = elem.getName();
+						Element level3 = doc.createElement(name);
+						
+						if (name.equals(channelProperties[0])) {
+					        period = true;
+					    } else if (name.equals(channelProperties[1]) || name.equals(channelProperties[2])) {
+					        scanMonitor = true;
+					    }   
+					    
 						String value = ((Property)channelProperty
 							.getArchiverTreeUserElement()).getValue();
 
 						if (value != null) {
 							Text level3Text = doc.createTextNode(value);
 							level3.appendChild(level3Text);
+						} else {
+						    if (((Property)elem).hasValue()) {
+						        JOptionPane.showMessageDialog(archiver, "Property " + elem.getName() + " has invalid value. \n Parsing aborted!", "Structure invalid", JOptionPane.WARNING_MESSAGE);
+						        return false;
+						    }
 						}
 
 						level2.appendChild(getIndentNode(LONG_INDENT_TYPE));
 						level2.appendChild(level3);
 						level2.appendChild(getIndentNode(BREAK_TYPE));
+						
 					}
+					if (!(period & scanMonitor)) {
+					    JOptionPane.showMessageDialog(archiver, "Channel " + channelNode.getArchiverTreeUserElement()
+							    .getName() + " is missing properties. \n Parsing aborted!", "Structure invalid", JOptionPane.WARNING_MESSAGE);
+				        return false;
+				    }
 
 					level2.appendChild(getIndentNode(INDENT_TYPE));
 					level1.appendChild(level2);

@@ -14,21 +14,11 @@
 
 package com.cosylab.vdct.archiver;
 
-import org.w3c.dom.Document;
-
-import org.xml.sax.EntityResolver;
-import org.xml.sax.ErrorHandler;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -36,7 +26,6 @@ import java.io.IOException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -47,7 +36,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileFilter;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.FactoryConfigurationError;
@@ -59,6 +47,11 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Document;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 
 /**
@@ -99,6 +92,7 @@ public class Archiver extends JFrame
 		factory = DocumentBuilderFactory.newInstance();
 		factory.setValidating(true);
 		factory.setIgnoringElementContentWhitespace(true);
+		engine = new Engine(this);
 
 		try {
 			builder = factory.newDocumentBuilder();
@@ -151,12 +145,10 @@ public class Archiver extends JFrame
 
 	private JPanel getPanel()
 	{
-		engine = new Engine();
-
 		JPanel contentPane = new JPanel(new GridBagLayout());
 
 		JPanel archiverPanel = new JPanel(new GridBagLayout());
-		tree = new ArchiverTree();
+		tree = new ArchiverTree(this);
 		tree.addTreeListener(new TreeListener() {
 
             public void channelRemoved(ChannelRemovedEvent e) {
@@ -335,7 +327,7 @@ public class Archiver extends JFrame
 		if (getFileChooser().showOpenDialog(this) != JFileChooser.APPROVE_OPTION) {
 			return;
 		}
-
+		tree.reset();
 		parsingSuccessful = true;
 
 		File f = getFileChooser().getSelectedFile();
@@ -349,6 +341,8 @@ public class Archiver extends JFrame
 			
 			if (parsingSuccessful) {
 				tree.setRoot(engine.parseFromDocument(doc));
+				tree.getRoot().getArchiverTreeUserElement().setName(f.getName());
+				tree.getDefaultModel().reload();
 			}
 		} catch (IOException exception) {
 			JOptionPane.showMessageDialog(this, exception);
@@ -379,20 +373,24 @@ public class Archiver extends JFrame
 			}
 
 			Document doc = builder.newDocument();
-
-			if (engine.parseToDocument(doc,
-			        (ArchiverTreeNode)tree.getDefaultModel().getRoot())) {
+				
+			if (!engine.parseToDocument(doc,
+			        (ArchiverTreeNode)tree.getRoot())) {
+			    return;
+			} 
+//			if (engine.parseToDocument(doc,
+//			        (ArchiverTreeNode)tree.getDefaultModel().getRoot())) {
 				Transformer t = TransformerFactory.newInstance().newTransformer();
 				t.setOutputProperty("standalone", "no");
 				t.setOutputProperty("doctype-system", Engine.DTD_FILE);
 				t.transform(new DOMSource(doc),
 				    new StreamResult(new FileOutputStream(f)));
-				
-			} else {
-				JOptionPane.showMessageDialog(this,
-				    "Check the structure of the document. \n Parsing aborted!",
-				    "Structure invalid", JOptionPane.WARNING_MESSAGE);
-			}
+				tree.getRoot().getArchiverTreeUserElement().setName(f.getName());
+//			} else {
+//				JOptionPane.showMessageDialog(this,
+//				    "Check the structure of the document. \n Parsing aborted!",
+//				    "Structure invalid", JOptionPane.WARNING_MESSAGE);
+//			}
 		} catch (TransformerConfigurationException e) {
 			JOptionPane.showMessageDialog(this, e);
 		} catch (TransformerFactoryConfigurationError e) {
@@ -431,27 +429,39 @@ public class Archiver extends JFrame
 		return fileChooser;
 	}
 
+//	/**
+//	 * Adds channels to this component. Channels are added as
+//	 * ArchiverTreeChannelNodes to the ArchiverList.
+//	 *
+//	 * @param channel added record
+//	 * @param scanMonitor scan or monitor property
+//	 * @param period period property
+//	 * @param disable indicator for disable property
+//	 */
+//	public void addChannel(Channel channel, Property scanMonitor,
+//	    Property period, boolean disable)
+//	{
+//		ArchiverTreeChannelNode atcn = new ArchiverTreeChannelNode(channel);
+//		atcn.add(new ArchiverTreeNode(period));
+//		atcn.add(new ArchiverTreeNode(scanMonitor));
+//
+//		if (disable) {
+//			atcn.add(new ArchiverTreeNode(new Property("disable", false)));
+//		}
+//
+//		list.getDefaultModel().addElement(atcn);
+//	}
+	
 	/**
 	 * Adds channels to this component. Channels are added as
 	 * ArchiverTreeChannelNodes to the ArchiverList.
 	 *
-	 * @param channel added record
-	 * @param scanMonitor scan or monitor property
-	 * @param period period property
-	 * @param disable indicator for disable property
+	 * @param channel added channel
 	 */
-	public void addChannel(Channel channel, Property scanMonitor,
-	    Property period, boolean disable)
-	{
-		ArchiverTreeChannelNode atcn = new ArchiverTreeChannelNode(channel);
-		atcn.add(new ArchiverTreeNode(period));
-		atcn.add(new ArchiverTreeNode(scanMonitor));
-
-		if (disable) {
-			atcn.add(new ArchiverTreeNode(new Property("disable", false)));
-		}
-
-		list.getDefaultModel().addElement(atcn);
+	public void addChannel(Channel channel) {
+	    ArchiverTreeChannelNode atcn = new ArchiverTreeChannelNode(channel);
+	    list.getDefaultModel().addElement(atcn);
+	    
 	}
 
 	/**
@@ -467,12 +477,13 @@ public class Archiver extends JFrame
 		for (int i = 0; i < 15; i++) {
 			//			record[i] = new Channel(i + " record");
 			Channel ch = new Channel(i + " channel");
-			Property sm = new Property((Math.random() < 0.5) ? "scan" : "monitor",
-				    false);
-			Property period = new Property("period",
-				    String.valueOf(Math.random() * 10));
-			dialog.addChannel(ch, sm, period,
-			    (Math.random() < 0.5) ? true : false);
+			dialog.addChannel(ch);
+//			Property sm = new Property((Math.random() < 0.5) ? "scan" : "monitor",
+//				    false);
+//			Property period = new Property("period",
+//				    String.valueOf(Math.random() * 10));
+//			dialog.addChannel(ch, sm, period,
+//			    (Math.random() < 0.5) ? true : false);
 		}
 
 		//		dialog.addChannels(record);

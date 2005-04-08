@@ -17,9 +17,7 @@ package com.cosylab.vdct.archiver;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-
 import java.io.IOException;
-
 import java.util.Arrays;
 
 

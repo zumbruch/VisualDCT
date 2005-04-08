@@ -36,10 +36,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -47,7 +44,6 @@ import java.util.Enumeration;
 import javax.swing.AbstractCellEditor;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -82,13 +78,15 @@ public class ArchiverTree extends JTree
 	private JMenuItem[] engineItems;
 	private JMenuItem[] channelItems;
 
+	private Archiver archiver;
 	/**
 	 * Creates a new ArchiverTree object.
 	 */
-	public ArchiverTree()
+	public ArchiverTree(Archiver arc)
 	{
 		super();
 		initialize();
+		this.archiver = arc;
 	}
 
 	private void initialize()
@@ -136,6 +134,7 @@ public class ArchiverTree extends JTree
                     Property property = new Property(name, (c < 1 ? true : false));
                     ArchiverTreeNode parent = (ArchiverTreeNode) getSelectionPath().getLastPathComponent();
                     parent.add(new ArchiverTreeNode(property));
+                    sortChannelProperties((ArchiverTreeChannelNode) parent);
                     getDefaultModel().reload(parent);
                 }
 		        
@@ -143,6 +142,24 @@ public class ArchiverTree extends JTree
 		}
 		
 			
+	}
+	
+	private void sortChannelProperties(ArchiverTreeChannelNode node) {
+	    ArchiverTreeNode[] nodes = new ArchiverTreeNode[node.getChildCount()];
+	    for (int i = 0; i < nodes.length; i++) {
+	        nodes[i] = (ArchiverTreeNode) node.getChildAt(i);
+	    }
+	    
+	    node.removeAllChildren();
+	    
+	    for (int j = 0; j < Engine.channelProperties.length; j++) {
+		    for (int i = 0; i < nodes.length; i++) {
+		        String name = ((ArchiverTreeElement)nodes[i].getArchiverTreeUserElement()).getName();
+		        if (name.equals(Engine.channelProperties[j])) {
+		            node.add(nodes[i]);
+		        }
+		    }
+	    }
 	}
 	
 	/**
@@ -186,6 +203,10 @@ public class ArchiverTree extends JTree
 	{
 		this.rootNode = root;
 		getDefaultModel().setRoot(root);
+	}
+	
+	ArchiverTreeNode getRoot() {
+	    return rootNode;
 	}
 	
 	
@@ -239,25 +260,28 @@ public class ArchiverTree extends JTree
 			remove.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e)
 					{
-						ArchiverTreeNode node = (ArchiverTreeNode)getSelectionPath()
-							.getLastPathComponent();
-						ArchiverTreeElement elem = node
-							.getArchiverTreeUserElement();
+					    TreePath[] paths = getSelectionPaths();
+					    ArrayList nodesList = new ArrayList();
+					    for (int j = 0; j < paths.length; j++) {
+					        ArchiverTreeNode node = (ArchiverTreeNode)paths[j].getLastPathComponent();
+					        ArchiverTreeElement elem = node.getArchiverTreeUserElement();
 
-						if (! (elem instanceof EngineConfigRoot)) {
-							TreeNode parent = node.getParent();
-							node.removeFromParent();
-							((DefaultTreeModel)getModel()).reload(parent);
-							if (elem instanceof Group) {
-							    ArchiverTreeChannelNode[] nodes = new ArchiverTreeChannelNode[node.getChildCount()];
-							    for (int i = 0; i < nodes.length; i++) {
-							        nodes[i] = (ArchiverTreeChannelNode) node.getChildAt(i);
-							    }
-							    fireChannelRemoved(nodes);
-							} else if (elem instanceof Channel) {
-							    fireChannelRemoved(new ArchiverTreeChannelNode[] {(ArchiverTreeChannelNode) node});
-							}
-						} 						
+							if (! (elem instanceof EngineConfigRoot)) {
+								TreeNode parent = node.getParent();
+								node.removeFromParent();
+								((DefaultTreeModel)getModel()).reload(parent);
+								if (elem instanceof Group) {
+								    for (int i = 0; i < node.getChildCount(); i++) {
+								        nodesList.add((ArchiverTreeChannelNode)node.getChildAt(i));
+								    }
+								} else if (elem instanceof Channel) {
+								    nodesList.add(node);
+								}
+							} 		
+					    }
+					    ArchiverTreeChannelNode[] nodes = new ArchiverTreeChannelNode[nodesList.size()];
+					    fireChannelRemoved((ArchiverTreeChannelNode[]) nodesList.toArray(nodes));
+										
 					}
 				});
 			remove.setEnabled(false);
@@ -334,7 +358,7 @@ public class ArchiverTree extends JTree
 		        }
 	        }
 	    } else if (elem instanceof Channel) {
-	        for (int i = 0; i < channelItems.length - 2; i++) {
+	        for (int i = 0; i < channelItems.length; i+=3) {
 	            boolean exist = false;
 	            Enumeration children = node.children();
 		        while (children.hasMoreElements()) {
@@ -350,7 +374,7 @@ public class ArchiverTree extends JTree
 	        }
 	        
 	        boolean exist = false;
-	        for (int i = channelItems.length - 2; i < channelItems.length; i++) {
+	        for (int i = 1; i < channelItems.length-1; i++) {
 	            Enumeration children = node.children();
 		        while (children.hasMoreElements()) {
 		            ArchiverTreeNode child = (ArchiverTreeNode) children.nextElement();
@@ -391,16 +415,17 @@ public class ArchiverTree extends JTree
 					final TreePath[] paths = getSelectionModel()
 						.getSelectionPaths();
 					ArrayList values = new ArrayList();
-
-					for (int i = 0; i < paths.length; i++) {
-						int count = paths[i].getPathCount();
-
-						for (int j = 0; j < count; j++) {
-							Object ob = paths[i].getPathComponent(j);
-
-							if (ob != null
-							    && ob instanceof ArchiverTreeChannelNode) {
-								values.add(ob);
+					if (paths != null) {
+						for (int i = 0; i < paths.length; i++) {
+							int count = paths[i].getPathCount();
+	
+							for (int j = 0; j < count; j++) {
+								Object ob = paths[i].getPathComponent(j);
+	
+								if (ob != null
+								    && ob instanceof ArchiverTreeChannelNode) {
+									values.add(ob);
+								}
 							}
 						}
 					}
@@ -475,8 +500,8 @@ public class ArchiverTree extends JTree
 		ArchiverTreeNode group = findClosestGroupNode(getSelectionPath());
 
 		if (group == null) {
-			JOptionPane.showMessageDialog(this,
-			    "En element inside a group has to be selected.",
+			JOptionPane.showMessageDialog(archiver,
+			    "En element inside a group has to be selected \n in order to add a channel.",
 			    "Invalid selection", JOptionPane.WARNING_MESSAGE);
 
 			return false;
@@ -529,19 +554,6 @@ public class ArchiverTree extends JTree
 		return null;
 	}
 
-	/**
-	 * DOCUMENT ME!
-	 *
-	 * @param args DOCUMENT ME!
-	 */
-	public static void main(String[] args)
-	{
-		JFrame f = new JFrame();
-		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		f.setSize(500, 500);
-		f.setContentPane(new ArchiverTree());
-		f.show();
-	}
 
 	/**
 	 * <code>TreeMouseHandler</code> handles mouse events on the tree.
@@ -713,6 +725,7 @@ public class ArchiverTree extends JTree
 						if (df.equals(RecordTransferable.flavors[0])) {
 							addElements((ArchiverTreeChannelNode[])transferable
 							    .getTransferData(df), groupNode);
+							
 						}
 					} catch (UnsupportedFlavorException e) {
 						e.printStackTrace();
