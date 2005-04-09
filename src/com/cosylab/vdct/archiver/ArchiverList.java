@@ -115,7 +115,7 @@ public class ArchiverList extends JList
 	 *
 	 * @return the model
 	 */
-	DefaultListModel getDefaultModel()
+	public DefaultListModel getDefaultModel()
 	{
 		return (DefaultListModel)getModel();
 	}

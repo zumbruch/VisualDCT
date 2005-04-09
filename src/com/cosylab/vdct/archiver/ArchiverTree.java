@@ -189,7 +189,7 @@ public class ArchiverTree extends JTree
 	 *
 	 * @return the model
 	 */
-	DefaultTreeModel getDefaultModel()
+	public DefaultTreeModel getDefaultModel()
 	{
 		return (DefaultTreeModel)getModel();
 	}
@@ -200,18 +200,18 @@ public class ArchiverTree extends JTree
 	 * Sets the root for this tree.
 	 * @param root
 	 */
-	void setRoot(ArchiverTreeNode root)
+	public void setRoot(ArchiverTreeNode root)
 	{
 		this.rootNode = root;
 		getDefaultModel().setRoot(root);
 	}
 	
-	ArchiverTreeNode getRoot() {
+	public ArchiverTreeNode getRoot() {
 	    return rootNode;
 	}
 	
 	
-	void reset()
+	public void reset()
 	{
 	    stopEditing();
 	    
