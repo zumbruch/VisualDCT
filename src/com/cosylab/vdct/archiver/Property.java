@@ -54,6 +54,9 @@ public class Property extends ArchiverTreeElement
 	{
 		super(name);
 		this.hasValue = hasValue;
+		if (hasValue && value == null) {
+		    value = "0";
+		}
 		setValue(value);
 		super.isEditable = hasValue;
 	}
