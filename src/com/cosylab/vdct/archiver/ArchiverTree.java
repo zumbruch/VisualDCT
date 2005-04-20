@@ -389,8 +389,8 @@ public class ArchiverTree extends JTree
 		        }
 	        }
 	        if (!exist) {
-	            items.add(channelItems[channelItems.length - 2]);
-	            items.add(channelItems[channelItems.length - 1]);
+	            items.add(channelItems[1]);
+	            items.add(channelItems[2]);
 	        }
 	        
 	        
