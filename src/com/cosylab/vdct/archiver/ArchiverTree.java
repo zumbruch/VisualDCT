@@ -116,7 +116,11 @@ public class ArchiverTree extends JTree
 		    engineItems[i].addActionListener(new ActionListener() {
 
                 public void actionPerformed(ActionEvent e) {
-                    Property property = new Property(name, (c==6 ? false : true));
+                    boolean hasValue = c==6 ? false : true;
+                    Property property = new Property(name, hasValue);
+                    if (hasValue) {
+                        property.setValue(Engine.defaultPropertyValues[c]);
+                    }
                     rootNode.insert(new ArchiverTreeNode(property), 0);
                     getDefaultModel().reload(rootNode);
                 }
@@ -132,7 +136,11 @@ public class ArchiverTree extends JTree
 		    channelItems[i].addActionListener(new ActionListener() {
 
                 public void actionPerformed(ActionEvent e) {
-                    Property property = new Property(name, (c < 1 ? true : false));
+                    boolean hasValue = c < 1 ? true : false;
+                    Property property = new Property(name, hasValue);
+                    if (hasValue) {
+                        property.setValue(Engine.defaultPropertyValues[6]);
+                    }
                     ArchiverTreeNode parent = (ArchiverTreeNode) getSelectionPath().getLastPathComponent();
                     parent.add(new ArchiverTreeNode(property));
                     sortChannelProperties((ArchiverTreeChannelNode) parent);

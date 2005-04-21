@@ -52,6 +52,9 @@ public class Engine
 	private static final String[] descriptors = {
 			"engineconfig", "group", "channel", "name"
 		};
+	
+	static final String[] defaultPropertyValues = new String[] {"30", "20",
+	        "30", "1.0", "3", "120", "1.0"};
 
 //	private static final String[] propertyDescriptors = {
 //			"scan", "monitor", "disable", "disconnect"
