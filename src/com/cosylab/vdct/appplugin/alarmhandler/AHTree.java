@@ -271,7 +271,7 @@ public class AHTree extends AppTree
 					    for (int i = 0; i < model.size(); i++){
 					        dest.addElement(model.get(i));
 					    }
-					    handler.setExitOnClose(false);
+//					    handler.setExitOnClose(false);
 						handler.show();
 					}
 				}

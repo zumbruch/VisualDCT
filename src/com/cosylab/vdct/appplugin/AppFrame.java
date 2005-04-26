@@ -60,8 +60,8 @@ public abstract class AppFrame extends JFrame
 	protected File currentFile;
 	protected Engine engine;
 
-	private boolean exitOnClose;
-	private WindowListener exitListener;
+//	private boolean exitOnClose;
+//	private WindowListener exitListener;
 	private WindowListener disposeListener;
 	    
 
@@ -76,18 +76,17 @@ public abstract class AppFrame extends JFrame
 
 	private void initialize()
 	{
-	    exitListener = new WindowAdapter() {
-	        public void windowClosing(WindowEvent e) {
-		        if (askForSave()) {
-		            System.exit(0);
-		        } 
-	        }
-	    };
+//	    exitListener = new WindowAdapter() {
+//	        public void windowClosing(WindowEvent e) {
+//		        if (askForSave()) {
+//		            System.exit(0);
+//		        } 
+//	        }
+//	    };
 	    
 	    disposeListener = new WindowAdapter() {
 	        public void windowClosing(WindowEvent e) {
 		        if (askForSave()) {
-		            System.out.println("tetete");
 		            dispose();
 		        } 
 	        }
@@ -96,7 +95,8 @@ public abstract class AppFrame extends JFrame
 		this.setContentPane(getPanel());
 		this.setSize(500, 500);
 		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		setExitOnClose(true);
+		this.addWindowListener(disposeListener);
+//		setExitOnClose(false);
 		initialization();
 	}
 
@@ -486,23 +486,23 @@ public abstract class AppFrame extends JFrame
 		}
 	}
 	
-	public boolean getExitOnClose() {
-	    return exitOnClose;
-	}
-	
-	public void setExitOnClose(boolean exitOnClose) {
-	    if (exitOnClose == this.exitOnClose) {
-	        return;
-	    }
-	    this.exitOnClose = exitOnClose;
-	    if (exitOnClose) {
-	        this.addWindowListener(exitListener);
-			this.removeWindowListener(disposeListener);
-	    } else {
-	        this.removeWindowListener(exitListener);
-	        this.addWindowListener(disposeListener);
-	    }
-	}
+//	public boolean getExitOnClose() {
+//	    return exitOnClose;
+//	}
+//	
+//	public void setExitOnClose(boolean exitOnClose) {
+//	    if (exitOnClose == this.exitOnClose) {
+//	        return;
+//	    }
+//	    this.exitOnClose = exitOnClose;
+//	    if (exitOnClose) {
+//	        this.addWindowListener(exitListener);
+//			this.removeWindowListener(disposeListener);
+//	    } else {
+//	        this.removeWindowListener(exitListener);
+//	        this.addWindowListener(disposeListener);
+//	    }
+//	}
 }
 
 /* __oOo__ */
