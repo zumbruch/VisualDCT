@@ -72,7 +72,7 @@ public abstract class AppTree extends JTree
 	private AppTreeChannelNode[] draggedValues;
 	protected ArrayList treeListeners = new ArrayList();
 	protected AppFrame appFrame;
-
+	
 	/**
 	 * Creates a new ArchiverTree object.
 	 *

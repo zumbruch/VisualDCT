@@ -16,6 +16,7 @@ package com.cosylab.vdct.appplugin;
 
 import com.cosylab.vdct.appplugin.alarmhandler.Include;
 import com.cosylab.vdct.appplugin.alarmhandler.Text;
+import com.cosylab.vdct.appplugin.archiver.EngineConfigRoot;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -40,7 +41,7 @@ public class CellUtilities
 			return loadIcon("images/record.gif");
 		} else if (Group.class.isAssignableFrom(type)) {
 			return loadIcon("images/boxn.gif");
-		} else if (Root.class.isAssignableFrom(type)) {
+		} else if (EngineConfigRoot.class.isAssignableFrom(type)) {
 			return loadIcon("images/page.gif");
 		} else if (Include.class.isAssignableFrom(type)) {
 			return loadIcon("images/open.gif");

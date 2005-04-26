@@ -14,7 +14,8 @@
 
 package com.cosylab.vdct.appplugin.archiver;
 
-import com.cosylab.vdct.appplugin.Root;
+import com.cosylab.vdct.appplugin.AppTreeElement;
+
 
 
 /**
@@ -28,7 +29,7 @@ import com.cosylab.vdct.appplugin.Root;
  *
  * @since VERSION
  */
-public class EngineConfigRoot extends Root
+public class EngineConfigRoot extends AppTreeElement
 {
 	/**
 	 * Creates a new ArchiverEngineConfigRoot object. The name for the

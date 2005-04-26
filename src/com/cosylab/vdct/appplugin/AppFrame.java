@@ -20,6 +20,9 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
 import java.io.File;
 
@@ -57,6 +60,11 @@ public abstract class AppFrame extends JFrame
 	protected File currentFile;
 	protected Engine engine;
 
+	private boolean exitOnClose;
+	private WindowListener exitListener;
+	private WindowListener disposeListener;
+	    
+
 	/**
 	 * Creates a new ArchiverDialog object.
 	 */
@@ -68,10 +76,28 @@ public abstract class AppFrame extends JFrame
 
 	private void initialize()
 	{
-		initialization();
+	    exitListener = new WindowAdapter() {
+	        public void windowClosing(WindowEvent e) {
+		        if (askForSave()) {
+		            System.exit(0);
+		        } 
+	        }
+	    };
+	    
+	    disposeListener = new WindowAdapter() {
+	        public void windowClosing(WindowEvent e) {
+		        if (askForSave()) {
+		            System.out.println("tetete");
+		            dispose();
+		        } 
+	        }
+	    };
+	    
 		this.setContentPane(getPanel());
-		this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		this.setSize(500, 500);
+		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		setExitOnClose(true);
+		initialization();
 	}
 
 	protected abstract void initialization();
@@ -433,7 +459,7 @@ public abstract class AppFrame extends JFrame
 	 * been confirmed. Tree is reset if the user choose YES or NO, but is not
 	 * is he chooses CANCEL.
 	 *
-	 * @return true flag indicating whether the tree should be reset
+	 * @return true flag indicating whether changes have to be made (yes or no was pressed)
 	 */
 	protected synchronized boolean askForSave()
 	{
@@ -458,6 +484,24 @@ public abstract class AppFrame extends JFrame
 
 		default:return false;
 		}
+	}
+	
+	public boolean getExitOnClose() {
+	    return exitOnClose;
+	}
+	
+	public void setExitOnClose(boolean exitOnClose) {
+	    if (exitOnClose == this.exitOnClose) {
+	        return;
+	    }
+	    this.exitOnClose = exitOnClose;
+	    if (exitOnClose) {
+	        this.addWindowListener(exitListener);
+			this.removeWindowListener(disposeListener);
+	    } else {
+	        this.removeWindowListener(exitListener);
+	        this.addWindowListener(disposeListener);
+	    }
 	}
 }
 

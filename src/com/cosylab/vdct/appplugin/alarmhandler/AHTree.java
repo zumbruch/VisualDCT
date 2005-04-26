@@ -22,7 +22,6 @@ import com.cosylab.vdct.appplugin.AppTreeNode;
 import com.cosylab.vdct.appplugin.Channel;
 import com.cosylab.vdct.appplugin.Group;
 import com.cosylab.vdct.appplugin.Property;
-import com.cosylab.vdct.appplugin.Root;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -37,6 +36,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
@@ -211,19 +211,10 @@ public class AHTree extends AppTree
 					AppTreeNode parent = (AppTreeNode)imp.getParent();
 			
 					if (parent.getTreeUserElement().getName().equals(name)) {
-					    AppTreeNode[] nodes = new AppTreeNode[load.getChildCount()];
-					    for (int i = 0; i < nodes.length; i++) {
-							//TODO strange behaviour
-					        nodes[i] = (AppTreeNode) load.getChildAt(i);
-//					        parent.add(nodes[i]);
-//					        parent.add((AppTreeNode)load.getChildAt(j));
-//					        System.out.println(load.getChildAt(j));
-						}
-					    
-					    for (int i = 0; i < nodes.length; i++) {
-					        parent.add(nodes[i]);
-						}
-					    
+					    while(!load.isLeaf()) {
+					        parent.add((MutableTreeNode) load.getFirstChild());
+					    }
+				    
 					    imp.removeFromParent();
 						getDefaultModel().reload(parent);
 					} else {
@@ -280,6 +271,7 @@ public class AHTree extends AppTree
 					    for (int i = 0; i < model.size(); i++){
 					        dest.addElement(model.get(i));
 					    }
+					    handler.setExitOnClose(false);
 						handler.show();
 					}
 				}
@@ -313,26 +305,25 @@ public class AHTree extends AppTree
 							AppTreeNode node = (AppTreeNode)paths[j]
 								.getLastPathComponent();
 							AppTreeElement elem = node.getTreeUserElement();
+							
+							TreeNode parent = node.getParent();
+							node.removeFromParent();
+							((DefaultTreeModel)getModel()).reload(parent);
 
-							if (!(elem instanceof Root)) {
-								TreeNode parent = node.getParent();
-								node.removeFromParent();
-								((DefaultTreeModel)getModel()).reload(parent);
+							if (elem instanceof Group) {
+								for (int i = 0; i < node.getChildCount();
+								    i++) {
+									AppTreeNode child = (AppTreeNode)node
+										.getChildAt(i);
 
-								if (elem instanceof Group) {
-									for (int i = 0; i < node.getChildCount();
-									    i++) {
-										AppTreeNode child = (AppTreeNode)node
-											.getChildAt(i);
-
-										if (child instanceof AppTreeChannelNode) {
-											nodesList.add(child);
-										}
+									if (child instanceof AppTreeChannelNode) {
+										nodesList.add(child);
 									}
-								} else if (elem instanceof Channel) {
-									nodesList.add(node);
 								}
+							} else if (elem instanceof Channel) {
+								nodesList.add(node);
 							}
+							
 						}
 
 						AppTreeChannelNode[] nodes = new AppTreeChannelNode[nodesList
@@ -381,13 +372,9 @@ public class AHTree extends AppTree
 
 		AppTreeNode node = (AppTreeNode)path.getLastPathComponent();
 		AppTreeElement elem = node.getTreeUserElement();
-
-		if (!(elem instanceof Root)) {
-			remove.setEnabled(true);
-		} else {
-			remove.setEnabled(false);
-		}
-
+		
+		remove.setEnabled(true);
+		
 		addMenu.setEnabled(true);
 		addMenu.removeAll();
 
@@ -424,8 +411,6 @@ public class AHTree extends AppTree
 		} else if (element instanceof Group) {
 			items = new JMenuItem[22];
 			System.arraycopy(popupItems, 0, items, 0, 22);
-		} else if (element instanceof Root) {
-			items = new JMenuItem[]{ popupItems[0] };
 		} else if (element instanceof Property) {
 			String name = element.getName();
 
