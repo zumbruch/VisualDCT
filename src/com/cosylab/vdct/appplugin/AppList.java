@@ -12,7 +12,7 @@
  * OR REDISTRIBUTION OF THIS SOFTWARE.
  */
 
-package com.cosylab.vdct.archiver;
+package com.cosylab.vdct.appplugin;
 
 import java.awt.Cursor;
 import java.awt.Point;
@@ -29,11 +29,12 @@ import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetAdapter;
 import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
+
 import java.io.IOException;
+
 import java.util.Arrays;
 
 import javax.swing.DefaultListModel;
-import javax.swing.JFrame;
 import javax.swing.JList;
 
 
@@ -46,14 +47,14 @@ import javax.swing.JList;
  *
  * @since VERSION
  */
-public class ArchiverList extends JList
+public class AppList extends JList
 {
-	private ArchiverTreeChannelNode[] draggedValues;
+	private AppTreeChannelNode[] draggedValues;
 
 	/**
 	 * Creates a new ArchiverList object.
 	 */
-	public ArchiverList()
+	public AppList()
 	{
 		super();
 		initialize();
@@ -66,7 +67,6 @@ public class ArchiverList extends JList
 
 		DefaultListModel model = new DefaultListModel();
 		this.setModel(model);
-				
 	}
 
 	private void initializeAsDragSource()
@@ -126,10 +126,10 @@ public class ArchiverList extends JList
 	 *
 	 * @return selected records
 	 */
-	public ArchiverTreeChannelNode[] getSelectedRecords()
+	public AppTreeChannelNode[] getSelectedRecords()
 	{
 		Object[] objects = getSelectedValues();
-		ArchiverTreeChannelNode[] records = new ArchiverTreeChannelNode[objects.length];
+		AppTreeChannelNode[] records = new AppTreeChannelNode[objects.length];
 		System.arraycopy(objects, 0, records, 0, objects.length);
 
 		return records;
@@ -219,7 +219,7 @@ public class ArchiverList extends JList
 
 				try {
 					if (df.equals(RecordTransferable.flavors[0])) {
-						ArchiverTreeChannelNode[] nodes = (ArchiverTreeChannelNode[])transferable
+						AppTreeChannelNode[] nodes = (AppTreeChannelNode[])transferable
 							.getTransferData(df);
 
 						for (int j = 0; j < nodes.length; j++) {
@@ -236,20 +236,6 @@ public class ArchiverList extends JList
 
 			dtde.dropComplete(true);
 		}
-	}
-
-	/**
-	 * DOCUMENT ME!
-	 *
-	 * @param args DOCUMENT ME!
-	 */
-	public static void main(String[] args)
-	{
-		JFrame f = new JFrame();
-		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		f.setSize(500, 500);
-		f.setContentPane(new ArchiverList());
-		f.show();
 	}
 }
 

@@ -12,7 +12,7 @@
  * OR REDISTRIBUTION OF THIS SOFTWARE.
  */
 
-package com.cosylab.vdct.archiver;
+package com.cosylab.vdct.appplugin;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -30,13 +30,12 @@ import javax.swing.tree.TreeCellEditor;
 
 
 /**
- * <code>EditorComponent</code> is a component for editing
- * values in the ArchiverTree. Certain nodes from the tree need to present a
- * special value of the Property that they contain. This value can be edited
- * with this editor. The name of the property in the node is displayed by a JLabel,
- * while the value is displayed in the text field on the right.
- * If the node is not obliged to present a special value
- * the label is hidden.
+ * <code>EditorComponent</code> is a component for editing values in the
+ * ArchiverTree. Certain nodes from the tree need to present a special value
+ * of the Property that they contain. This value can be edited with this
+ * editor. The name of the property in the node is displayed by a JLabel,
+ * while the value is displayed in the text field on the right. If the node is
+ * not obliged to present a special value the label is hidden.
  *
  * @author <a href="mailto:jaka.bobnar@cosylab.com">Jaka Bobnar</a>
  * @version $Id$
@@ -45,8 +44,8 @@ import javax.swing.tree.TreeCellEditor;
  */
 public class EditorComponent extends JPanel
 {
-	private JLabel nameLabel;
-	private JTextField valueField;
+	protected JLabel nameLabel;
+	protected JTextField valueField;
 	private Dimension dim = new Dimension(30, 15);
 
 	/**
@@ -75,16 +74,18 @@ public class EditorComponent extends JPanel
 	}
 
 	/**
-	 * Set up the Editor according to the type of the node that the editor receive.
+	 * Set up the Editor according to the type of the node that the editor
+	 * receive.
 	 *
 	 * @param node TreeNode to be edited
 	 * @param invoker Editor that invoked this method
+	 * @param tree DOCUMENT ME!
 	 */
-	public void setup(final ArchiverTreeNode node,
-	    final TreeCellEditor invoker, final ArchiverTree tree)
+	public void setup(final AppTreeNode node, final TreeCellEditor invoker,
+	    final AppTree tree)
 	{
-		final ArchiverTreeElement element = node.getArchiverTreeUserElement();
-		
+		final AppTreeElement element = node.getTreeUserElement();
+
 		boolean property = element instanceof Property;
 		boolean hasValue = property ? ((Property)element).hasValue() : false;
 
@@ -94,26 +95,33 @@ public class EditorComponent extends JPanel
 			valueField.removeKeyListener(kl[i]);
 		}
 
-
 		if (!hasValue) {
 			KeyListener t = new KeyAdapter() {
 					public void keyPressed(KeyEvent e)
 					{
 						if (e.getKeyCode() == 10) {
-						    if (element instanceof Group) {
-						        String text = valueField.getText();
-						        if (!tree.isGroupNameUnique(text)) {
-						            JOptionPane.showMessageDialog(tree, "Group named " + text + " already exists. Rename this group.", "Invalid group name" , JOptionPane.WARNING_MESSAGE);
-						            valueField.selectAll();
-						            return;
-						        }
-						    }
+							if (element instanceof Group) {
+								String text = valueField.getText();
+
+								if (!tree.isGroupNameUnique(text)) {
+									JOptionPane.showMessageDialog(tree,
+									    "Group named " + text
+									    + " already exists. Rename this group.",
+									    "Invalid group name",
+									    JOptionPane.WARNING_MESSAGE);
+									valueField.selectAll();
+
+									return;
+								}
+							}
+
 							element.setName(valueField.getText());
 							invoker.stopCellEditing();
 						}
 					}
 				};
-			valueField.setVisible(true);	
+
+			valueField.setVisible(true);
 			valueField.addKeyListener(t);
 			valueField.setText(element.getName());
 			valueField.setPreferredSize(null);
@@ -123,29 +131,40 @@ public class EditorComponent extends JPanel
 					public void keyPressed(KeyEvent e)
 					{
 						if (e.getKeyCode() == 10) {
-						    String text = valueField.getText();
-						    try {
-						        double value = Double.parseDouble(text);
-						    } catch (Exception ex) {
-						        JOptionPane.showMessageDialog(tree, "Value of the " + element.getName() + " should be a number.", "Invalid data" , JOptionPane.WARNING_MESSAGE);
-						        valueField.selectAll();
-						        return;
-						    }
-						    
-						    ((Property)element).setValue(text);
-						    invoker.stopCellEditing();
+							String text = valueField.getText();
+
+							try {
+								double value = Double.parseDouble(text);
+							} catch (Exception ex) {
+								JOptionPane.showMessageDialog(tree,
+								    "Value of the " + element.getName()
+								    + " should be a number.", "Invalid data",
+								    JOptionPane.WARNING_MESSAGE);
+								valueField.selectAll();
+
+								return;
+							}
+
+							((Property)element).setValue(text);
+							invoker.stopCellEditing();
 						}
 					}
 				};
-			valueField.setVisible(true);	
+
+			valueField.setVisible(true);
 			valueField.addKeyListener(t);
 			valueField.setText(((Property)element).getValue());
-			valueField.setPreferredSize(dim);
+			valueField.setPreferredSize(getDimension());
 			nameLabel.setText(element.getName());
 			nameLabel.setVisible(true);
 		}
-		
+
 		valueField.selectAll();
+	}
+
+	protected Dimension getDimension()
+	{
+		return dim;
 	}
 }
 

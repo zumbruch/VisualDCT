@@ -11,33 +11,50 @@
  * _NO_ RESPONSIBILITY FOR ANY CONSEQUENCE RESULTING FROM THE USE, MODIFICATION,
  * OR REDISTRIBUTION OF THIS SOFTWARE.
  */
-package com.cosylab.vdct.archiver;
 
-import java.util.EventObject;
+package com.cosylab.vdct.appplugin;
+
+import javax.swing.tree.DefaultMutableTreeNode;
+
 
 /**
- * <code>ChannelRemovedEvent</code> ...  DOCUMENT ME!
+ * <code>ArchiverTreeNode</code> ...  DOCUMENT ME!
  *
  * @author <a href="mailto:jaka.bobnar@cosylab.com">Jaka Bobnar</a>
  * @version $Id$
- * 
+ *
  * @since VERSION
  */
-public class ChannelRemovedEvent extends EventObject {
+public class AppTreeNode extends DefaultMutableTreeNode
+{
+	/**
+	 * Creates a new ArchiverTreeNode object.
+	 */
+	public AppTreeNode()
+	{
+		this(null);
+	}
 
-    private ArchiverTreeChannelNode[] nodes = null;
-    /**
-     * TODO DOCUMENT ME!
-     * @param source
-     */
-    public ChannelRemovedEvent(Object source, ArchiverTreeChannelNode[] nodes) {
-        // TODO Auto-generated constructor stub
-        super(source);
-        this.nodes = nodes;
-    }
-    
-    public ArchiverTreeChannelNode[] getChannelNode() {
-        return nodes;
-    }
+	/**
+	 * Creates a new ArchiverTreeNode object and allows children for this node.
+	 *
+	 * @param userObject <code>TreeUserElement</code> which is wrapped in this
+	 *        node
+	 */
+	public AppTreeNode(AppTreeElement userObject)
+	{
+		super(userObject);
+	}
 
+	/**
+	 * Returns the <code>TreeUserElement</code> that is wrapped in this node.
+	 *
+	 * @return TreeUserElement
+	 */
+	public AppTreeElement getTreeUserElement()
+	{
+		return (AppTreeElement)userObject;
+	}
 }
+
+/* __oOo__ */

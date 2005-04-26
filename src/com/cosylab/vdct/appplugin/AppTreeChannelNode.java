@@ -12,53 +12,42 @@
  * OR REDISTRIBUTION OF THIS SOFTWARE.
  */
 
-package com.cosylab.vdct.archiver;
+package com.cosylab.vdct.appplugin;
 
-import javax.swing.tree.DefaultMutableTreeNode;
+import java.io.Serializable;
 
 
 /**
- * <code>ArchiverTreeGroup</code> is an extension of
- * <code>ArchiverTreeElement</code> representing the group that can be added
- * in the <code>ArchiverTree</code>.
+ * <code>ArchiverTreeRecord</code> is a tree wrapper for <code>Record</code>.
  *
  * @author <a href="mailto:jaka.bobnar@cosylab.com">Jaka Bobnar</a>
  * @version $Id$
  *
  * @since VERSION
  */
-public class Group extends ArchiverTreeElement
+public class AppTreeChannelNode extends AppTreeNode implements Serializable
 {
-	private DefaultMutableTreeNode node;
+	private Channel channel;
 
 	/**
-	 * Creates a new ArchiverTreeGroup object.
+	 * Creates a new ArchiverTreeRecordNode object.
 	 *
-	 * @param name the name of the group
+	 * @param channel <code>Record</code> which is wrapped in the node
 	 */
-	public Group(String name)
+	public AppTreeChannelNode(Channel channel)
 	{
-		super(name);
+		super(channel);
+		this.channel = channel;
 	}
 
 	/**
-	 * Sets the <code>ArchiverTreeNode</code> that this group belongs too.
+	 * Returns the <code>Record</code> of this node.
 	 *
-	 * @param node node wrapper for the group
+	 * @return the records
 	 */
-	public void setTreeNode(ArchiverTreeNode node)
+	public Channel getChannel()
 	{
-		this.node = node;
-	}
-
-	/**
-	 * Returns the <code>ArchiverTreeNode</code> of this group.
-	 *
-	 * @return node of the group
-	 */
-	public DefaultMutableTreeNode getNode()
-	{
-		return node;
+		return channel;
 	}
 }
 

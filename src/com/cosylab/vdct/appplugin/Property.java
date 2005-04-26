@@ -12,7 +12,7 @@
  * OR REDISTRIBUTION OF THIS SOFTWARE.
  */
 
-package com.cosylab.vdct.archiver;
+package com.cosylab.vdct.appplugin;
 
 /**
  * <code>Property</code> ...  DOCUMENT ME!
@@ -22,7 +22,7 @@ package com.cosylab.vdct.archiver;
  *
  * @since VERSION
  */
-public class Property extends ArchiverTreeElement
+public class Property extends AppTreeElement
 {
 	private String value;
 	private boolean hasValue;
@@ -31,8 +31,8 @@ public class Property extends ArchiverTreeElement
 	 * Creates a new Property object.
 	 *
 	 * @param name the name of the Property
-	 * @param hasValue indicator if the property will display value 
-	 * 					(if false, the value can never be set later)
+	 * @param hasValue indicator if the property will display value  (if false,
+	 *        the value can never be set later)
 	 */
 	public Property(String name, boolean hasValue)
 	{
@@ -54,10 +54,13 @@ public class Property extends ArchiverTreeElement
 	{
 		super(name);
 		this.hasValue = hasValue;
-		if (hasValue && value == null) {
-		    value = "0";
+
+		if (value == null) {
+			setValue("");
+		} else {
+			setValue(value);
 		}
-		setValue(value);
+
 		super.isEditable = hasValue;
 	}
 
@@ -72,15 +75,16 @@ public class Property extends ArchiverTreeElement
 	}
 
 	/**
-	 * Sets the value of the Property (Value can only be set if the value was given when
-	 * the Property was constructed or the hasValue parameter was true at construction).
+	 * Sets the value of the Property (Value can only be set if the value was
+	 * given when the Property was constructed or the hasValue parameter was
+	 * true at construction).
 	 *
 	 * @param value new Value
 	 */
 	public void setValue(String value)
 	{
 		if (hasValue) {
-		    this.value = value;
+			this.value = value;
 		}
 	}
 

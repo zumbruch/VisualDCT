@@ -11,20 +11,28 @@
  * _NO_ RESPONSIBILITY FOR ANY CONSEQUENCE RESULTING FROM THE USE, MODIFICATION,
  * OR REDISTRIBUTION OF THIS SOFTWARE.
  */
-package com.cosylab.vdct.archiver;
 
-import java.util.EventListener;
+package com.cosylab.vdct.appplugin;
 
 /**
- * <code>TreeListener</code> ...  DOCUMENT ME!
+ * <code>Root</code> ...  DOCUMENT ME!
  *
  * @author <a href="mailto:jaka.bobnar@cosylab.com">Jaka Bobnar</a>
  * @version $Id$
- * 
+ *
  * @since VERSION
  */
-public interface TreeListener extends EventListener {
-    
-    public void channelRemoved(ChannelRemovedEvent e);
-
+public class Root extends AppTreeElement
+{
+	/**
+	 * TODO DOCUMENT ME!
+	 *
+	 * @param name
+	 */
+	public Root(String name)
+	{
+		super(name);
+	}
 }
+
+/* __oOo__ */

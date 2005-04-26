@@ -12,12 +12,14 @@
  * OR REDISTRIBUTION OF THIS SOFTWARE.
  */
 
-package com.cosylab.vdct.archiver;
+package com.cosylab.vdct.appplugin;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+
 import java.io.IOException;
+
 import java.util.Arrays;
 
 
@@ -37,16 +39,16 @@ public class RecordTransferable implements Transferable
 {
 	/** DOCUMENT ME! */
 	public static DataFlavor[] flavors = new DataFlavor[]{
-			new DataFlavor(ArchiverTreeChannelNode.class, "EPICS Channel")
+			new DataFlavor(AppTreeChannelNode.class, "EPICS Channel")
 		};
-	private ArchiverTreeChannelNode[] channels;
+	private AppTreeChannelNode[] channels;
 
 	/**
 	 * Creates a new RecordTransferable object.
 	 *
 	 * @param channels an array of ArchiverTreeRecordNodes to be transferred
 	 */
-	public RecordTransferable(ArchiverTreeChannelNode[] channels)
+	public RecordTransferable(AppTreeChannelNode[] channels)
 	{
 		this.channels = channels;
 

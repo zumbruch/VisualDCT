@@ -12,49 +12,32 @@
  * OR REDISTRIBUTION OF THIS SOFTWARE.
  */
 
-package com.cosylab.vdct.archiver;
+package com.cosylab.vdct.appplugin.archiver;
 
-import javax.swing.tree.DefaultMutableTreeNode;
+import com.cosylab.vdct.appplugin.Root;
 
 
 /**
- * <code>ArchiverTreeNode</code> ...  DOCUMENT ME!
+ * <code>ArchiverEngineConfigRoot</code> is the root element of for the
+ * <code>ArhiverTree</code>. It holds information about all
+ * <code>ArchiverTreeGroup</code> which paths are connected to this root. This
+ * element is not  editable.
  *
  * @author <a href="mailto:jaka.bobnar@cosylab.com">Jaka Bobnar</a>
  * @version $Id$
  *
  * @since VERSION
  */
-public class ArchiverTreeNode extends DefaultMutableTreeNode
+public class EngineConfigRoot extends Root
 {
 	/**
-	 * Creates a new ArchiverTreeNode object.
+	 * Creates a new ArchiverEngineConfigRoot object. The name for the
+	 * EngineConfig should be  fileName;
 	 */
-	public ArchiverTreeNode()
+	public EngineConfigRoot()
 	{
-		this(null);
-	}
-
-	/**
-	 * Creates a new ArchiverTreeNode object and allows children for this node.
-	 *
-	 * @param userObject <code>TreeUserElement</code> which is wrapped in this
-	 *        node
-	 */
-	public ArchiverTreeNode(ArchiverTreeElement userObject)
-	{
-		super(userObject);
-	}
-
-	
-	/**
-	 * Returns the <code>TreeUserElement</code> that is wrapped in this node.
-	 *
-	 * @return TreeUserElement
-	 */
-	public ArchiverTreeElement getArchiverTreeUserElement()
-	{
-		return (ArchiverTreeElement)userObject;
+		super("EngineConfig");
+		isEditable = false;
 	}
 }
 

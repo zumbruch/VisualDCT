@@ -12,40 +12,27 @@
  * OR REDISTRIBUTION OF THIS SOFTWARE.
  */
 
-package com.cosylab.vdct.archiver;
+package com.cosylab.vdct.appplugin;
+
+import java.util.EventListener;
+
 
 /**
- * <code>ArchiverEngineConfigRoot</code> is the root element of for the
- * <code>ArhiverTree</code>. It holds information about all
- * <code>ArchiverTreeGroup</code> which paths are connected to this root. This element is not 
- * editable.
+ * <code>TreeListener</code> ...  DOCUMENT ME!
  *
  * @author <a href="mailto:jaka.bobnar@cosylab.com">Jaka Bobnar</a>
  * @version $Id$
  *
  * @since VERSION
  */
-public class EngineConfigRoot extends ArchiverTreeElement
+public interface TreeListener extends EventListener
 {
 	/**
-	 * Creates a new ArchiverEngineConfigRoot object. The name for the EngineConfig should be 
-	 * fileName;
+	 * DOCUMENT ME!
+	 *
+	 * @param e DOCUMENT ME!
 	 */
-	public EngineConfigRoot()
-	{
-		super("EngineConfig");
-		isEditable = false;
-	}
-	
-//	public String getName()
-//	{
-//		return "EngineConfig";
-//	}
-
-//	public void setName(String name)
-//	{
-//		//do nothig
-//	}
+	public void channelRemoved(ChannelRemovedEvent e);
 }
 
 /* __oOo__ */

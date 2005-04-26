@@ -12,27 +12,40 @@
  * OR REDISTRIBUTION OF THIS SOFTWARE.
  */
 
-package com.cosylab.vdct.archiver;
+package com.cosylab.vdct.appplugin.alarmhandler;
+
+import com.cosylab.vdct.appplugin.AppTreeElement;
+
 
 /**
- * <code>Record</code> represents an EPICS record
+ * <code>Include</code> ...  DOCUMENT ME!
  *
  * @author <a href="mailto:jaka.bobnar@cosylab.com">Jaka Bobnar</a>
  * @version $Id$
  *
  * @since VERSION
  */
-public class Channel extends ArchiverTreeElement
+public class Include extends AppTreeElement
 {
 	/**
-	 * Creates a new Record object.
+	 * TODO DOCUMENT ME!
 	 *
-	 * @param name name of the record
+	 * @param name
 	 */
-	public Channel(String name)
+	public Include(String name)
 	{
 		super(name);
 	}
+
+	/*
+	 *  (non-Javadoc)
+	 * @see com.cosylab.vdct.appplugin.AppTreeElement#getName()
+	 * removes the .alhInclude extension from being viewed in the tree
+	 */
+
+	//    public String getName() {
+	//        return super.getName().substring(0, super.getName().length()-11);
+	//    }
 }
 
 /* __oOo__ */

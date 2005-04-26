@@ -12,43 +12,44 @@
  * OR REDISTRIBUTION OF THIS SOFTWARE.
  */
 
-package com.cosylab.vdct.archiver;
+package com.cosylab.vdct.appplugin;
 
-import java.io.Serializable;
+import java.util.EventObject;
 
 
 /**
- * <code>ArchiverTreeRecord</code> is a tree wrapper for <code>Record</code>.
+ * <code>ChannelRemovedEvent</code> ...  DOCUMENT ME!
  *
  * @author <a href="mailto:jaka.bobnar@cosylab.com">Jaka Bobnar</a>
  * @version $Id$
  *
  * @since VERSION
  */
-public class ArchiverTreeChannelNode extends ArchiverTreeNode
-	implements Serializable
+public class ChannelRemovedEvent extends EventObject
 {
-	private Channel channel;
+	private AppTreeChannelNode[] nodes = null;
 
 	/**
-	 * Creates a new ArchiverTreeRecordNode object.
+	 * TODO DOCUMENT ME!
 	 *
-	 * @param channel <code>Record</code> which is wrapped in the node
+	 * @param source
+	 * @param nodes DOCUMENT ME!
 	 */
-	public ArchiverTreeChannelNode(Channel channel)
+	public ChannelRemovedEvent(Object source, AppTreeChannelNode[] nodes)
 	{
-		super(channel);
-		this.channel = channel;
+		// TODO Auto-generated constructor stub
+		super(source);
+		this.nodes = nodes;
 	}
 
 	/**
-	 * Returns the <code>Record</code> of this node.
+	 * DOCUMENT ME!
 	 *
-	 * @return the records
+	 * @return DOCUMENT ME!
 	 */
-	public Channel getChannel()
+	public AppTreeChannelNode[] getChannelNode()
 	{
-		return channel;
+		return nodes;
 	}
 }
 

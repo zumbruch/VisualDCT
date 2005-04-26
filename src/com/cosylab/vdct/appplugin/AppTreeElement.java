@@ -12,7 +12,7 @@
  * OR REDISTRIBUTION OF THIS SOFTWARE.
  */
 
-package com.cosylab.vdct.archiver;
+package com.cosylab.vdct.appplugin;
 
 import java.io.Serializable;
 
@@ -29,7 +29,7 @@ import java.io.Serializable;
  *
  * @since VERSION
  */
-public abstract class ArchiverTreeElement implements Serializable
+public abstract class AppTreeElement implements Serializable
 {
 	protected String name = "";
 	protected boolean isEditable = true;
@@ -39,16 +39,26 @@ public abstract class ArchiverTreeElement implements Serializable
 	 *
 	 * @param name the name of the element
 	 */
-	public ArchiverTreeElement(String name)
+	public AppTreeElement(String name)
 	{
 		setName(name);
 	}
 
+	/**
+	 * DOCUMENT ME!
+	 *
+	 * @param name DOCUMENT ME!
+	 */
 	public void setName(String name)
 	{
 		this.name = name;
 	}
 
+	/**
+	 * DOCUMENT ME!
+	 *
+	 * @return DOCUMENT ME!
+	 */
 	public String getName()
 	{
 		return name;
@@ -62,9 +72,15 @@ public abstract class ArchiverTreeElement implements Serializable
 	{
 		return getName();
 	}
-	
-	public boolean isEditable() {
-	    return isEditable;
+
+	/**
+	 * DOCUMENT ME!
+	 *
+	 * @return DOCUMENT ME!
+	 */
+	public boolean isEditable()
+	{
+		return isEditable;
 	}
 }
 
