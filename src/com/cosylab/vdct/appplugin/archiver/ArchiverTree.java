@@ -67,7 +67,7 @@ public class ArchiverTree extends AppTree
 
 		DefaultTreeModel model = new DefaultTreeModel(rootNode);
 		setModel(model);
-
+		defaultEditor.setEditorComponent(new ArchiverEditorComponent());
 		// constructs JMenuItems for adding properties to the tree
 		engineItems = new JMenuItem[ArchiverEngine.engineConfigProperties.length];
 
@@ -338,6 +338,30 @@ public class ArchiverTree extends AppTree
 		stopEditing();
 		rootNode = new AppTreeNode(new EngineConfigRoot());
 		super.reset();
+	}
+	
+	/**
+	 * Checks if there is another Group with the same name.
+	 *
+	 * @param name the name to be checked for
+	 *
+	 * @return true if a group with that name alreasy exist
+	 */
+	boolean isGroupNameUnique(String name)
+	{
+		int j = rootNode.getChildCount();
+
+		for (int i = 0; i < j; i++) {
+			AppTreeElement elem = ((AppTreeNode)rootNode.getChildAt(i))
+				.getTreeUserElement();
+			if (elem instanceof Group) {
+				if (elem.getName().equals(name)) {
+					return false;
+				}
+			}
+		}
+
+		return true;
 	}
 }
 

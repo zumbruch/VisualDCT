@@ -17,6 +17,9 @@ package com.cosylab.vdct.appplugin.alarmhandler;
 import com.cosylab.vdct.appplugin.EditorComponent;
 
 import java.awt.Dimension;
+import java.awt.FontMetrics;
+
+import sun.awt.font.FontDesignMetrics;
 
 
 /**
@@ -30,6 +33,7 @@ import java.awt.Dimension;
 public class AHEditorComponent extends EditorComponent
 {
 	private Dimension dimen = new Dimension();
+	private FontMetrics fm;
 
 	/**
 	 * TODO DOCUMENT ME!
@@ -37,15 +41,28 @@ public class AHEditorComponent extends EditorComponent
 	public AHEditorComponent()
 	{
 		super();
+		fm = new FontDesignMetrics(valueField.getFont());
 	}
 
 	protected Dimension getDimension()
 	{
+	    String text = valueField.getText();
+	    if (text != null) {
+	        int i = fm.stringWidth(text) + 10;
+	        if (i < 100) {
+	            i = 100;
+	        }
+	        dimen.width = i;
+	    } else {
+	        dimen.width = 100;
+	    }
+	    
 		dimen.height = 18;
-		dimen.width = 100;
+		
 
 		return dimen;
 	}
+	
 }
 
 /* __oOo__ */

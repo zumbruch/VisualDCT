@@ -23,7 +23,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.tree.TreeCellEditor;
@@ -47,6 +46,7 @@ public class EditorComponent extends JPanel
 	protected JLabel nameLabel;
 	protected JTextField valueField;
 	private Dimension dim = new Dimension(30, 15);
+	protected KeyListener listener;
 
 	/**
 	 * Creates a new EditorComponent object.
@@ -94,65 +94,14 @@ public class EditorComponent extends JPanel
 		for (int i = 0; i < kl.length; i++) {
 			valueField.removeKeyListener(kl[i]);
 		}
-
+		valueField.addKeyListener(getKeyListener(invoker, tree, element, hasValue));
 		if (!hasValue) {
-			KeyListener t = new KeyAdapter() {
-					public void keyPressed(KeyEvent e)
-					{
-						if (e.getKeyCode() == 10) {
-							if (element instanceof Group) {
-								String text = valueField.getText();
-
-								if (!tree.isGroupNameUnique(text)) {
-									JOptionPane.showMessageDialog(tree,
-									    "Group named " + text
-									    + " already exists. Rename this group.",
-									    "Invalid group name",
-									    JOptionPane.WARNING_MESSAGE);
-									valueField.selectAll();
-
-									return;
-								}
-							}
-
-							element.setName(valueField.getText());
-							invoker.stopCellEditing();
-						}
-					}
-				};
-
 			valueField.setVisible(true);
-			valueField.addKeyListener(t);
 			valueField.setText(element.getName());
 			valueField.setPreferredSize(null);
 			nameLabel.setVisible(false);
 		} else {
-			KeyListener t = new KeyAdapter() {
-					public void keyPressed(KeyEvent e)
-					{
-						if (e.getKeyCode() == 10) {
-							String text = valueField.getText();
-
-							try {
-								double value = Double.parseDouble(text);
-							} catch (Exception ex) {
-								JOptionPane.showMessageDialog(tree,
-								    "Value of the " + element.getName()
-								    + " should be a number.", "Invalid data",
-								    JOptionPane.WARNING_MESSAGE);
-								valueField.selectAll();
-
-								return;
-							}
-
-							((Property)element).setValue(text);
-							invoker.stopCellEditing();
-						}
-					}
-				};
-
 			valueField.setVisible(true);
-			valueField.addKeyListener(t);
 			valueField.setText(((Property)element).getValue());
 			valueField.setPreferredSize(getDimension());
 			nameLabel.setText(element.getName());
@@ -165,6 +114,36 @@ public class EditorComponent extends JPanel
 	protected Dimension getDimension()
 	{
 		return dim;
+	}
+	
+	protected KeyListener getKeyListener(final TreeCellEditor invoker, 
+	        final AppTree tree, final AppTreeElement element, boolean hasValue) {
+	    
+	    if (hasValue) {
+			listener = new KeyAdapter() {
+				public void keyPressed(KeyEvent e)
+				{
+					if (e.getKeyCode() == 10) {
+						String text = valueField.getText();
+									
+						((Property)element).setValue(text);
+						invoker.stopCellEditing();
+					}
+				}
+			};
+	    } else {
+	       listener = new KeyAdapter() {
+				public void keyPressed(KeyEvent e)
+				{
+					if (e.getKeyCode() == 10) {
+
+						element.setName(valueField.getText());
+						invoker.stopCellEditing();
+					}
+				}
+			};
+	    }
+		return listener;
 	}
 }
 
