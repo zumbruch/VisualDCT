@@ -253,6 +253,7 @@ public abstract class AppFrame extends JFrame
 					{
 						if (askForSave()) {
 							getTree().reset();
+							currentFile = null;
 						}
 					}
 				});
@@ -295,7 +296,9 @@ public abstract class AppFrame extends JFrame
 			exit.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e)
 					{
-						dispose();
+					    if (askForSave()) {
+					        dispose();
+					    }
 					}
 				});
 
