@@ -41,7 +41,9 @@ public class AHPlugin implements Plugin
 	 */
 	public void destroy()
 	{
-		handler.dispose();
+		if (handler != null) {
+			handler.dispose();
+		}
 	}
 
 	/* (non-Javadoc)
@@ -118,7 +120,9 @@ public class AHPlugin implements Plugin
 	 */
 	public void stop()
 	{
-		handler.dispose();
+		if (handler != null) {
+			handler.dispose();
+		}
 	}
 }
 

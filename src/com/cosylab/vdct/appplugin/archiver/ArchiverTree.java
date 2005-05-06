@@ -68,6 +68,7 @@ public class ArchiverTree extends AppTree
 		DefaultTreeModel model = new DefaultTreeModel(rootNode);
 		setModel(model);
 		defaultEditor.setEditorComponent(new ArchiverEditorComponent());
+
 		// constructs JMenuItems for adding properties to the tree
 		engineItems = new JMenuItem[ArchiverEngine.engineConfigProperties.length];
 
@@ -199,6 +200,7 @@ public class ArchiverTree extends AppTree
 
 		return popup;
 	}
+
 	private JMenuItem addGroup;
 	private JMenuItem remove;
 	private JMenu addProperties;
@@ -206,16 +208,16 @@ public class ArchiverTree extends AppTree
 	protected void popupInit(TreePath path)
 	{
 		if (path == null) {
-		    getPopup().removeAll();
+			getPopup().removeAll();
+
 			return;
 		}
 
 		if (popup == null) {
 			getPopup();
 		}
-		
-//		getPopup().removeAll();
 
+		//		getPopup().removeAll();
 		AppTreeNode node = (AppTreeNode)path.getLastPathComponent();
 		AppTreeElement elem = node.getTreeUserElement();
 
@@ -237,7 +239,7 @@ public class ArchiverTree extends AppTree
 				addProperties.add(item[i]);
 			}
 		}
-		
+
 		getPopup().add(addGroup);
 		getPopup().add(addProperties);
 		getPopup().add(remove);
@@ -339,7 +341,7 @@ public class ArchiverTree extends AppTree
 		rootNode = new AppTreeNode(new EngineConfigRoot());
 		super.reset();
 	}
-	
+
 	/**
 	 * Checks if there is another Group with the same name.
 	 *
@@ -354,6 +356,7 @@ public class ArchiverTree extends AppTree
 		for (int i = 0; i < j; i++) {
 			AppTreeElement elem = ((AppTreeNode)rootNode.getChildAt(i))
 				.getTreeUserElement();
+
 			if (elem instanceof Group) {
 				if (elem.getName().equals(name)) {
 					return false;

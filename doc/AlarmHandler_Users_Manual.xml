@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?xml-stylesheet type="text/xsl" href="../../Common/Documentation/Normal.xsl"?>
+
+<cosydoc xmlns="urn:schemas-cosylab-com:Document">
+
+<head>
+
+<title>Alarm handler Visual DCT Plugin</title>
+
+<info file="DOC-AlarmHandler_Users_Manual"
+	url="http://visualdct.cosylab.com/builds/VisualDCT"
+	class="doc"
+	year="2005"
+	id="XX"
+	confidentiality="public"
+	project="VisualDCT"/>
+		  
+<contributor name="Jaka Bobnar" id="jbobnar" email="jaka.bobnar@cosylab.com"/>
+					 
+<modification version="1.0" by="jbobnar" date="2005-05-04">
+<section>Created.</section>
+</modification>
+
+<scope>
+This document is a user's manual for Alarm Handler Visual DCT Plugin. It contains instructions
+how to use the plugin.
+</scope>
+		
+<audience>
+The audience of this document are the users of VisualDCT who wish to use Alarm Handler plugin.
+</audience>
+
+<reference id="visualdct"
+	   title="VisualDCT Project"
+	   href="http://visualdct.cosylab.com/"
+	   author="Matej Sekoranja"
+	   date="2002"
+	   publisher="Cosylab, Ltd."/>
+		
+<reference id="plugins"
+	   title="VisualDCT Plugins"
+	   href="http://www.cosylab.com/visualdct/builds/VisualDCT/2.4.1256/doc/DOC-VisualDCT_Plugins.html"
+	   author="Sunil Sah"
+	   date="2002"
+	   publisher="Cosylab, Ltd."/>
+
+<reference id="epics"
+	   title="EPICS Alarm Handler"
+	   href="http://www.aps.anl.gov/epics/extensions/alh/index.php"/>	
+</head>
+
+
+
+<body>
+
+<section id="Introduction" title="Introduction">
+
+<p>
+Alarm Handler Visual DCT Plugin is an application plugin which enables creating and modifying 
+EPICS Alarm Handler configuration files. Plugin allows user to organize configuration files, while
+displaying the whole hierarchical structure of the file that is currently being edited.
+</p>
+
+</section>
+
+<section id="installingAH" title="Installing Alarm Handler Plugin">
+
+	<p>
+	Alarm Handler Visual DCT Plugin is a standard Visual DCT plugin, which can be installed like
+	any other plugin. Refer to <a aref="plugins">VisualDCT Plugins</a> on
+	how to install a Visual DCT plugin.	
+	</p>
+	
+</section>
+
+<section id="usingAH" title="Using Alarm Handler Plugin">
+	
+	<section id="basics" title="Basic principles of Alarm Handler Plugin">
+		<p>
+			Alarm Handler Plugin enables user to create and modify EPICS Alarm Handler configuration
+			files. The plugin present a configuration file in a hierarchical view; this allows building
+			a configuration file visually. Groups, channels and properties can be added to the tree
+			structure according to the specifications of EPICS Alarm Handler (see <a aref="epics">EPICS Alarm Handler</a>).
+			The structure represented
+			by the tree can be saved into <i>Alarm handler configuration file</i> or <i>Alarm handler
+			include file</i>. The output data has a standard form specified by EPICS Alarm Handler.
+		</p>
+		<p>
+			The Alarm Handler Plugin can be started by selecting the AlarmHandler start from the Plugins 
+			menu of the VisualDCT. When the plugin is started it should look similar to the
+			<a aref="start">figure 1</a>.
+			<figure id="start.PNG">New configuration file. Alarm Handler Plugin window at startup.</figure>
+		</p>
+		<p>
+			There are 5 different types of items in the tree: channel, group, include, property and text.
+			Each one of these items is represented by a different icon:
+			<ul>
+				<li>
+					<img src="boxn.gif"	width="17" height="17"/> group					
+				</li>
+				<li>
+					<img src="record.gif"	width="17" height="17"/> channel					
+				</li>
+				<li>
+					<img src="open.gif"	width="17" height="17"/> include					
+				</li>
+				<li>
+					<img src="Tree16.gif"	width="17" height="17"/> property					
+				</li>
+				<li>
+					<img src="textboxn.gif"	width="17" height="17"/> text					
+				</li>
+				
+			</ul>
+		</p>
+		
+	</section>
+	<section id="using" title="Using Alarm Handler Plugin">
+		
+		<section id="addingchannels" title="Adding and moving channels">
+			<p>
+				In the <a aref="start">figure 2</a> we see an instance of the Alarm Handler Plugin window.
+				<figure id="ah.PNG">An instance of Alarm Handler configuration file</figure>
+				On the left side of the window there is a tree displaying the hierarchical structure of
+				the Alarm handler configuration file. The ride side displays all available channels that are
+				defined in currently opened database file in Visual DCT. These channels can be placed inside
+				any group that is already defined in the tree. This can be done simply by dragging the
+				channels to a desired location or by selecting a destination group in the tree and the channel
+				in the list and pressing the <i>add record to the tree</i> button. To remove a channel from
+				a certain group, select the channel and press <i>remove record from the tree</i> button, or
+				drag the channel from the tree to the list on the right side. Moving a channel from one to
+				another group can be done by dragging the channel and dropping it in the desired group.				
+			</p>	
+		</section>
+		
+		<section id="addingelements" title="Adding/removing groups and other elements">
+			<p>
+				Any element, specified in the EPICS Alarm Handler can be added to the hierarchical
+				structure. To do this, select the element which will be the parent of the new element
+				and press the right mouse button - a popup will appear (see <a aref="start">figure 3</a>).
+				By choosing <b>Add item</b> 
+				a drop down menu is shown which lists all items that can be added to the selected parent.
+				(e.g. to add a new group, select <b>GROUP</b>). 
+				After selection was made, the popup menu dissappears and the new element is added to 
+				tree. If the added element is <i>GROUP</i> or <i>INCLUDE</i> it appears as the last
+				node of its parent, while other elements are added as the last property of the parent.
+			</p>
+			<p>
+				Certain items like <b>SEVRCOMMAND</b>, <b>STATCOMMAND</b> etc. require additional
+				values/commands. After
+				the parent node (e.g. <b>SEVRCOMMAND</b>) was added, these commands should be added as well.
+				Select the parent node in the tree and add those commands like it is described
+				above.	
+			</p>
+			<p>
+				To remove an item from the tree, select <b>Remove</b> from the popup menu. This will
+				remove the item from the tree.
+				(<b>CAUTION! Removal of an item cannot be reversed. Once an item was removed, the action
+					cannot be undone.</b>)
+			</p>
+			<figure id="add.PNG">Adding elements to the tree</figure>
+			
+			<p>
+				<b>GUIDANCE</b> is another special element. Guidance can hold any text specified by
+				the user. Each Guidance item in the tree presents a <i>Guidance-End</i> block in 
+				the configuration file. To insert the text in to the block, simply add <b>TEXT</b> items
+				to the guidance node and type the text as a value of the text node. Each node will
+				be represented by a single line in the configuration file.
+			</p>
+			
+		</section>
+		<section id="editing" title="Editing tree items">
+			<p>
+				Certain items can present a specific value. These values can be edited directly in the tree.
+				Double-click the item, which value you want to change. A text editor will appear on
+				that place and a new value can be written there. <b>IMPORTANT! After a new value
+					was typed in the editor you have to confirm it by pressing the enter key on your
+					keyboard. This will store the value. If you click outside of the editor,
+					the new value is not stored, but the old one is recalled.</b>
+			</p>
+			<p>
+				There are also specific items which require names. (e.g. each group or channel should
+				have a specific name representing that item). If the item is group or channel the name
+				is displayed as the string that represents the node in the tree. Similar to this
+				the names of other properties are displayed together with the id of that property
+				(see <a aref="start">figure 4</a>). 
+				<figure id="editing.PNG">Editing tree elements can be done by a double-click</figure>
+			</p>
+			<p>
+				Another type of items are those, which have a priori defined values. These are
+				<b>SEVRCOMMAND</b>, <b>STATCOMMAND</b> and <b>BEEPSEVERITY</b>. When editing
+				values of these properties, a combo box with all possible values is displayed 
+				(see <a aref="start">figure 5</a>). To change
+				the value, select it from the box and confirm it by pressing the enter key.
+				<figure id="combo.PNG">Editing elements with a priori defined values</figure>
+			</p>
+			<p>
+				Certain commands like <b>COMMAND</b>, <b>ALIAS</b>, <b>BEEPSEVERITY</b> etc. have to
+				store only one value. This value can be defined on the node that represent that
+				command. The string that is displayed in the tree is the <i>command_id:value</i>.
+			</p>
+		</section>
+		<section id="include" title="Include files">
+			<p>
+				The Alarm Handler Plugin can be used for editing <i>.alhConfig</i> as well as 
+				<i>.alhInclude</i> files. Include files can be edited the same way as config files
+				only when saving data to a file, a different file extension should be choosen. How to include
+				a file with the help of the popup menu refer to
+				<a aref="addingelements">Adding/removing groups and other elements</a>.
+			</p>
+			<p>
+				When editing a configuration file each group can be exported to a selfstanding
+				<i>include</i> file. Select the group that you want to export and select <b>Export</b>
+				from the popup menu. A file chooser will appear on the screen; type in the name of
+				the file and press <b>Save</b> button. When a group is exported it is replaced
+				with <b>INCLUDE</b> item in the tree.
+			</p>
+			<p>
+				Similar to exporting the included file can also be imported. To import an included file
+				select the <b>INCLUDE</b> item in the tree and select <b>Import</b> from the popup menu
+				(see <a aref="start">figure 6</a>).
+				The existing <b>INCLUDE</b> item is replaced with the data from the included file. Beside
+				the import option one can also choose <b>Open</b> from the popup menu as well. This will
+				open another Alarm Handler Plugin window and the included file will be opened in that
+				window.
+				<figure id="include.PNG">Importing included files</figure>
+			</p>
+		</section>
+		<section id="file" title="File menu">
+			<p>
+				The file menu provides five different commands:
+				<ul>
+					<li>
+						<i>New</i> - creates a new empty configuration file; there is only the root 
+						group in the new configuration file
+					</li>
+					<li>
+						<i>Open</i> - shows a file chooser; a file can be selected from any location;
+						after the Open button is pressed that file is opened by the
+						Alarm Handler Plugin
+					</li>
+					<li>
+						<i>Save</i> - saves the data that is displayed in the tree to the currently 
+						opened file; if the data is saved for the first time, <i>Save as</i> is called
+					</li>
+					<li>
+						<i>Save as</i> - saves the data to the file specified in the file chooser
+					</li>
+					<li>
+						<i>Exit</i> - closes the Alarm Handler Plugin Window
+					</li>
+				</ul>
+			</p>
+		</section>
+						
+	</section>
+	
+</section>
+
+</body>
+
+</cosydoc>

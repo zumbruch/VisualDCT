@@ -94,7 +94,10 @@ public class EditorComponent extends JPanel
 		for (int i = 0; i < kl.length; i++) {
 			valueField.removeKeyListener(kl[i]);
 		}
-		valueField.addKeyListener(getKeyListener(invoker, tree, element, hasValue));
+
+		valueField.addKeyListener(getKeyListener(invoker, tree, element,
+		        hasValue));
+
 		if (!hasValue) {
 			valueField.setVisible(true);
 			valueField.setText(element.getName());
@@ -115,34 +118,34 @@ public class EditorComponent extends JPanel
 	{
 		return dim;
 	}
-	
-	protected KeyListener getKeyListener(final TreeCellEditor invoker, 
-	        final AppTree tree, final AppTreeElement element, boolean hasValue) {
-	    
-	    if (hasValue) {
-			listener = new KeyAdapter() {
-				public void keyPressed(KeyEvent e)
-				{
-					if (e.getKeyCode() == 10) {
-						String text = valueField.getText();
-									
-						((Property)element).setValue(text);
-						invoker.stopCellEditing();
-					}
-				}
-			};
-	    } else {
-	       listener = new KeyAdapter() {
-				public void keyPressed(KeyEvent e)
-				{
-					if (e.getKeyCode() == 10) {
 
-						element.setName(valueField.getText());
-						invoker.stopCellEditing();
-					}
-				}
-			};
-	    }
+	protected KeyListener getKeyListener(final TreeCellEditor invoker,
+	    final AppTree tree, final AppTreeElement element, boolean hasValue)
+	{
+		if (hasValue) {
+			listener = new KeyAdapter() {
+						public void keyPressed(KeyEvent e)
+						{
+							if (e.getKeyCode() == 10) {
+								String text = valueField.getText();
+
+								((Property)element).setValue(text);
+								invoker.stopCellEditing();
+							}
+						}
+					};
+		} else {
+			listener = new KeyAdapter() {
+						public void keyPressed(KeyEvent e)
+						{
+							if (e.getKeyCode() == 10) {
+								element.setName(valueField.getText());
+								invoker.stopCellEditing();
+							}
+						}
+					};
+		}
+
 		return listener;
 	}
 }

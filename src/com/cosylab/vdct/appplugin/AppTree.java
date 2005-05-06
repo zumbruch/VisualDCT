@@ -72,7 +72,7 @@ public abstract class AppTree extends JTree
 	private AppTreeChannelNode[] draggedValues;
 	protected ArrayList treeListeners = new ArrayList();
 	protected AppFrame appFrame;
-	
+
 	/**
 	 * Creates a new ArchiverTree object.
 	 *
@@ -337,7 +337,7 @@ public abstract class AppTree extends JTree
 		Object object;
 
 		if (path != null) {
-			for (int i = path.getPathCount() - 1; i > 0; i--) {
+			for (int i = path.getPathCount() - 1; i >= 0; i--) {
 				node = (AppTreeNode)path.getPathComponent(i);
 				object = node.getUserObject();
 
@@ -349,7 +349,6 @@ public abstract class AppTree extends JTree
 
 		return null;
 	}
-
 
 	/**
 	 * <code>TreeMouseHandler</code> handles mouse events on the tree.

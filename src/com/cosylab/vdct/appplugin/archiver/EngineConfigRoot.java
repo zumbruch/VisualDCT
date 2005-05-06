@@ -17,7 +17,6 @@ package com.cosylab.vdct.appplugin.archiver;
 import com.cosylab.vdct.appplugin.AppTreeElement;
 
 
-
 /**
  * <code>ArchiverEngineConfigRoot</code> is the root element of for the
  * <code>ArhiverTree</code>. It holds information about all

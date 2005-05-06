@@ -40,6 +40,8 @@ public class AlHandler extends AppFrame
 {
 	private FileFilter configFilter;
 	private FileFilter includeFilter;
+	static final int CONFIG = 1;
+	static final int INCLUDE = 2;
 
 	/**
 	 * TODO DOCUMENT ME!
@@ -164,6 +166,15 @@ public class AlHandler extends AppFrame
 		return fileChooser;
 	}
 
+	void setSelectedFileChooserFilter(int filter)
+	{
+		if (filter == CONFIG) {
+			getFileChooser().setFileFilter(configFilter);
+		} else if (filter == INCLUDE) {
+			getFileChooser().setFileFilter(includeFilter);
+		}
+	}
+
 	/* (non-Javadoc)
 	 * @see com.cosylab.vdct.appplugin.AppFrame#getEngine()
 	 */
@@ -192,7 +203,7 @@ public class AlHandler extends AppFrame
 		}
 
 		AppTreeNode node = getEngine().openFromFile(f);
-		
+
 		if (node != null) {
 			tree.setRoot(node);
 			tree.getDefaultModel().reload();
@@ -214,7 +225,7 @@ public class AlHandler extends AppFrame
 		AppFrame test = new AlHandler();
 
 		for (int i = 0; i < 9; i++) {
-			Channel ch = new Channel("rf " + i);
+			Channel ch = new Channel("rf" + i);
 			test.addChannel(ch);
 		}
 

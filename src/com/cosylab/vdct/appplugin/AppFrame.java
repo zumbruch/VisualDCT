@@ -60,10 +60,9 @@ public abstract class AppFrame extends JFrame
 	protected File currentFile;
 	protected Engine engine;
 
-//	private boolean exitOnClose;
-//	private WindowListener exitListener;
+	//	private boolean exitOnClose;
+	//	private WindowListener exitListener;
 	private WindowListener disposeListener;
-	    
 
 	/**
 	 * Creates a new ArchiverDialog object.
@@ -76,34 +75,45 @@ public abstract class AppFrame extends JFrame
 
 	private void initialize()
 	{
-//	    exitListener = new WindowAdapter() {
-//	        public void windowClosing(WindowEvent e) {
-//		        if (askForSave()) {
-//		            System.exit(0);
-//		        } 
-//	        }
-//	    };
-	    
-	    disposeListener = new WindowAdapter() {
-	        public void windowClosing(WindowEvent e) {
-		        if (askForSave()) {
-		            dispose();
-		        } 
-	        }
-	    };
-	    
+		//	    exitListener = new WindowAdapter() {
+		//	        public void windowClosing(WindowEvent e) {
+		//		        if (askForSave()) {
+		//		            System.exit(0);
+		//		        } 
+		//	        }
+		//	    };
+		disposeListener = new WindowAdapter() {
+					public void windowClosing(WindowEvent e)
+					{
+						if (askForSave()) {
+							dispose();
+						}
+					}
+				};
+
 		this.setContentPane(getPanel());
 		this.setSize(500, 500);
 		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		this.addWindowListener(disposeListener);
-//		setExitOnClose(false);
+
+		//		setExitOnClose(false);
 		initialization();
 	}
 
 	protected abstract void initialization();
 
+	/**
+	 * DOCUMENT ME!
+	 *
+	 * @return DOCUMENT ME!
+	 */
 	public abstract AppTree getTree();
 
+	/**
+	 * DOCUMENT ME!
+	 *
+	 * @return DOCUMENT ME!
+	 */
 	public abstract AppList getList();
 
 	private JPanel getPanel()
@@ -169,7 +179,8 @@ public abstract class AppFrame extends JFrame
 		removeFromTreeButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e)
 				{
-					AppTreeChannelNode[] records = getTree().getSelectionRecords();
+					AppTreeChannelNode[] records = getTree()
+						.getSelectionRecords();
 
 					if (records == null) {
 						return;
@@ -254,6 +265,7 @@ public abstract class AppFrame extends JFrame
 						if (askForSave()) {
 							getTree().reset();
 							currentFile = null;
+							initialization();
 						}
 					}
 				});
@@ -296,9 +308,9 @@ public abstract class AppFrame extends JFrame
 			exit.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e)
 					{
-					    if (askForSave()) {
-					        dispose();
-					    }
+						if (askForSave()) {
+							dispose();
+						}
 					}
 				});
 
@@ -335,6 +347,8 @@ public abstract class AppFrame extends JFrame
 			getTree().setRoot(node);
 			getTree().getDefaultModel().reload();
 			currentFile = f;
+			initialization();
+			setTitle(getTitle() + " [" + f.getName() + "]");
 
 			return f.getName();
 		}
@@ -404,6 +418,8 @@ public abstract class AppFrame extends JFrame
 		if (success) {
 			getTree().getDefaultModel().nodeChanged(getTree().getRoot());
 			currentFile = file;
+			initialization();
+			setTitle(getTitle() + " [" + file.getName() + "]");
 		}
 
 		return success;
@@ -437,7 +453,7 @@ public abstract class AppFrame extends JFrame
 		AppTreeChannelNode atcn = new AppTreeChannelNode(channel);
 		getList().getDefaultModel().addElement(atcn);
 	}
-	
+
 	/**
 	 * Clears the list of this frame.
 	 */
@@ -462,7 +478,8 @@ public abstract class AppFrame extends JFrame
 	 * been confirmed. Tree is reset if the user choose YES or NO, but is not
 	 * is he chooses CANCEL.
 	 *
-	 * @return true flag indicating whether changes have to be made (yes or no was pressed)
+	 * @return true flag indicating whether changes have to be made (yes or no
+	 *         was pressed)
 	 */
 	protected synchronized boolean askForSave()
 	{
@@ -481,31 +498,34 @@ public abstract class AppFrame extends JFrame
 			return true;
 		}
 
-		case JOptionPane.NO_OPTION:return true;
+		case JOptionPane.NO_OPTION:
+			return true;
 
-		case JOptionPane.CANCEL_OPTION:return false;
+		case JOptionPane.CANCEL_OPTION:
+			return false;
 
-		default:return false;
+		default:
+			return false;
 		}
 	}
-	
-//	public boolean getExitOnClose() {
-//	    return exitOnClose;
-//	}
-//	
-//	public void setExitOnClose(boolean exitOnClose) {
-//	    if (exitOnClose == this.exitOnClose) {
-//	        return;
-//	    }
-//	    this.exitOnClose = exitOnClose;
-//	    if (exitOnClose) {
-//	        this.addWindowListener(exitListener);
-//			this.removeWindowListener(disposeListener);
-//	    } else {
-//	        this.removeWindowListener(exitListener);
-//	        this.addWindowListener(disposeListener);
-//	    }
-//	}
+
+	//	public boolean getExitOnClose() {
+	//	    return exitOnClose;
+	//	}
+	//	
+	//	public void setExitOnClose(boolean exitOnClose) {
+	//	    if (exitOnClose == this.exitOnClose) {
+	//	        return;
+	//	    }
+	//	    this.exitOnClose = exitOnClose;
+	//	    if (exitOnClose) {
+	//	        this.addWindowListener(exitListener);
+	//			this.removeWindowListener(disposeListener);
+	//	    } else {
+	//	        this.removeWindowListener(exitListener);
+	//	        this.addWindowListener(disposeListener);
+	//	    }
+	//	}
 }
 
 /* __oOo__ */

@@ -208,7 +208,7 @@ public class ArchiverEngine extends Engine
 
 			return parsingSuccessful ? parseFromDocument(doc) : null;
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(frame, e);
+		    JOptionPane.showMessageDialog(frame, e);
 		}
 
 		return null;

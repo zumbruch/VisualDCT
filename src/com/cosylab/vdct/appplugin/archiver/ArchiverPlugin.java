@@ -41,7 +41,9 @@ public class ArchiverPlugin implements Plugin
 	 */
 	public void destroy()
 	{
-		archiver.dispose();
+		if (archiver != null) {
+			archiver.dispose();
+		}
 	}
 
 	/* (non-Javadoc)
@@ -118,7 +120,9 @@ public class ArchiverPlugin implements Plugin
 	 */
 	public void stop()
 	{
-		archiver.dispose();
+		if (archiver != null) {
+			archiver.dispose();
+		}
 	}
 }
 

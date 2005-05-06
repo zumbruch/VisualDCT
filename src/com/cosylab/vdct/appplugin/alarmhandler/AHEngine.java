@@ -23,10 +23,14 @@ import com.cosylab.vdct.appplugin.Engine;
 import com.cosylab.vdct.appplugin.Group;
 import com.cosylab.vdct.appplugin.Property;
 
+import java.awt.HeadlessException;
+
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
 
 import java.util.ArrayList;
@@ -45,8 +49,8 @@ import javax.swing.JOptionPane;
  */
 public class AHEngine extends Engine
 {
-	private static String comments = "#";
-	static String[] inputFormat = new String[]{
+	private final static String comments = "#";
+	final static String[] inputFormat = new String[]{
 			"CHANNEL", "GROUP", "INCLUDE", "$SEVRCOMMAND", "$STATCOMMAND",
 			"$ALARMCOUNTFILTER", "$HEARTBEATPV", "$ACKPV", "$FORCEPV",
 			"$FORCEPV CALC", "$FORCEPV_CALC", "$FORCEPV_CALC_A",
@@ -54,25 +58,30 @@ public class AHEngine extends Engine
 			"$FORCEPV_CALC_E", "$FORCEPV_CALC_F", "$SEVRPV", "$ALIAS",
 			"$COMMAND", "$BEEPSEVERITY", "$GUIDANCE", "$END"
 		};
-	static String[] propertyItems = new String[]{
+	final static String[] propertyItems = new String[]{
 			"guidanceText", "value", "seconds", "mask", "ackValue", "forceMask",
 			"forceValue", "resetValue", "severityChangeValue", "severityCommand",
 			"alarmStatusStringValue", "statusCommand", "inputCount",
 			"inputSeconds"
 		};
-	private static String[] severityCommands = new String[]{
+	final static String[] severityCommands = new String[]{
 			"UP_INVALID", "UP_MAJOR", "UP_MINOR", "UP_ANY", "DOWN_MAJOR",
 			"DOWN_MINOR", "DOWN_NO_ALARM", "DOWN_ANY", "UP_ALARM"
 		};
-	private static String[] statCommands = new String[]{
+	final static String[] statCommands = new String[]{
 			"NO_ALARM", "READ", "WRITE", "HIHI", "HIGH", "READ_ACCESS", "LOLO",
 			"LOW", "STATE", "COS", "COMM", "WRITE_ACCESS", "TIMEOUT", "HWLIMIT",
 			"CALC", "SCAN", "LINK", "SOFT", "BAD_SUB", "UDF", "DISABLE", "SIMM"
 		};
-	private static String[] beepSeverities = new String[]{
+	final static String[] beepSeverities = new String[]{
 			"MINOR", "MAJOR", "INVALID", "ERROR"
 		};
-	private static String includeExt = ".alhinclude";
+	final static String[] defaultPropertyValues = new String[]{
+			"", "", "", "", "", "", "<heartbeatPVName>", "<ackPVName>",
+			"<forcePVName>", "", "", "", "", "", "", "", "", "<sevrPVName>",
+			"<alias>", "<command>", "MINOR"
+		};
+	private final static String includeExt = ".alhinclude";
 	private AppTreeNode rootNode;
 	private ArrayList savedData = new ArrayList();
 	private AppTreeNode lastGroupOrChannelNode;
@@ -105,11 +114,18 @@ public class AHEngine extends Engine
 	 */
 	public AppTreeNode openFromFile(File f)
 	{
-		BufferedReader reader = null;
-		rootNode = null;
-		lastGroupOrChannelNode = null;
+	    boolean include = f.getAbsolutePath().toLowerCase().endsWith(includeExt);
+		
+	    BufferedReader reader = null;
+	    if(!include) {
+	        rootNode = new AppTreeNode(new Group("NULL"));
+	    } else {
+	        rootNode = null;
+	    }
+	        
+		lastGroupOrChannelNode = rootNode;
 
-		boolean include = f.getAbsolutePath().toLowerCase().endsWith(includeExt);
+		
 
 		try {
 			reader = new BufferedReader(new FileReader(f));
@@ -135,50 +151,46 @@ public class AHEngine extends Engine
 								return null;
 							}
 
-							if (line[1].equals("NULL")) {
-								rootNode = new AppTreeNode(new Group(line[2]));
-								lastGroupOrChannelNode = rootNode;
-							} else {
-								if (include) {
-									if (rootNode == null) {
-										rootNode = new AppTreeNode(new Group(
-											        line[1]));
-										lastGroupOrChannelNode = rootNode;
-									}
+							if (include) {
+								if (rootNode == null) {
+									rootNode = new AppTreeNode(new Group(
+										        line[1]));
+									lastGroupOrChannelNode = rootNode;
 								}
+							}
 
-								AppTreeNode node = new AppTreeNode(new Group(
-									        line[2]));
-								lastGroupOrChannelNode = node;
+							AppTreeNode node = new AppTreeNode(new Group(
+								        line[2]));
+							lastGroupOrChannelNode = node;
 
-								if (!include) {
-									if (!insertNode(rootNode, node, line[1])) {
+							if (!include) {
+								if (!insertNode(rootNode, node, line[1])) {
+									JOptionPane.showMessageDialog(frame,
+									    "Declaration of GROUP " + line[2]
+									    + " is invalid. \n Parent "
+									    + line[1]
+									    + " should be declared first. \n Cannot open file "
+									    + f + ".", "Invalid structure.",
+									    JOptionPane.ERROR_MESSAGE);
+
+									return null;
+								}
+							} else {
+								if (!insertNode(rootNode, node, line[1])) {
+									if (!insertNode(rootNode, node, null)) {
 										JOptionPane.showMessageDialog(frame,
-										    "Declaration of GROUP " + line[2]
-										    + " is invalid. \n Parent "
-										    + line[1]
-										    + " should be declared first. \n Cannot open file "
-										    + f + ".", "Invalid structure.",
+										    "Declaration of GROUP "
+										    + line[2]
+										    + " is invalid. \n Cannot open file "
+										    + f + ".",
+										    "Invalid structure.",
 										    JOptionPane.ERROR_MESSAGE);
 
 										return null;
 									}
-								} else {
-									if (!insertNode(rootNode, node, line[1])) {
-										if (!insertNode(rootNode, node, null)) {
-											JOptionPane.showMessageDialog(frame,
-											    "Declaration of GROUP "
-											    + line[2]
-											    + " is invalid. \n Cannot open file "
-											    + f + ".",
-											    "Invalid structure.",
-											    JOptionPane.ERROR_MESSAGE);
-
-											return null;
-										}
-									}
 								}
 							}
+
 						} else if (line[0].equals("CHANNEL")) {
 							// check for channel
 							if (line.length > 4 || line.length < 3) {
@@ -198,6 +210,10 @@ public class AHEngine extends Engine
 							if (line.length == 4) {
 								channelNode.add(new AppTreeNode(
 								        new Property("mask", line[3])));
+							}
+
+							if (rootNode == null) {
+								rootNode = new AppTreeNode(new Group(line[1]));
 							}
 
 							if (!insertNode(rootNode, channelNode, line[1])) {
@@ -226,14 +242,21 @@ public class AHEngine extends Engine
 								        line[2]));
 
 							if (!insertNode(rootNode, includeNode, line[1])) {
-								JOptionPane.showMessageDialog(frame,
-								    "Declaration of INCLUDE " + line[2]
-								    + " is invalid. \n Parent " + line[1]
-								    + " should be declared first. \n Cannot open file "
-								    + f + ".", "Invalid structure.",
-								    JOptionPane.ERROR_MESSAGE);
+								if (rootNode == null) {
+									rootNode = new AppTreeNode(new Group(
+										        line[1]));
+								}
 
-								return null;
+								if (!insertNode(rootNode, includeNode, null)) {
+									JOptionPane.showMessageDialog(frame,
+									    "Declaration of INCLUDE " + line[2]
+									    + " is invalid. \n Parent " + line[1]
+									    + " should be declared first. \n Cannot open file "
+									    + f + ".", "Invalid structure.",
+									    JOptionPane.ERROR_MESSAGE);
+
+									return null;
+								}
 							}
 						} else if (line[0].equals("$HEARTBEATPV")) {
 							//heartbeatpv
@@ -272,7 +295,8 @@ public class AHEngine extends Engine
 								break;
 							}
 
-							default:break;
+							default:
+								break;
 							}
 
 							if (!insertNode(lastGroupOrChannelNode, heartNode,
@@ -324,7 +348,8 @@ public class AHEngine extends Engine
 								break;
 							}
 
-							default:break;
+							default:
+								break;
 							}
 
 							if (!insertNode(lastGroupOrChannelNode, forceNode,
@@ -376,7 +401,8 @@ public class AHEngine extends Engine
 								break;
 							}
 
-							default:break;
+							default:
+								break;
 							}
 
 							if (!insertNode(lastGroupOrChannelNode, forceNode,
@@ -694,10 +720,24 @@ public class AHEngine extends Engine
 					}
 				}
 			}
-		} catch (Exception e) {
-			JOptionPane.showMessageDialog(frame,
-			    "File structure invalid. \n Cannot open file " + f + ".",
-			    "Invalid structure.", JOptionPane.ERROR_MESSAGE);
+		} catch (FileNotFoundException e) {
+			JOptionPane.showMessageDialog(frame, "File " + f + " not found.",
+			    "Invalid file.", JOptionPane.ERROR_MESSAGE);
+
+			return null;
+		} catch (HeadlessException e) {
+			JOptionPane.showMessageDialog(frame, "Cannot open file " + f + ".",
+			    "File error", JOptionPane.ERROR_MESSAGE);
+
+			return null;
+		} catch (NumberFormatException e) {
+			JOptionPane.showMessageDialog(frame, "Cannot open file " + f + ".",
+			    "File error", JOptionPane.ERROR_MESSAGE);
+
+			return null;
+		} catch (IOException e) {
+			JOptionPane.showMessageDialog(frame, "Cannot open file " + f + ".",
+			    "File error", JOptionPane.ERROR_MESSAGE);
 
 			return null;
 		}
@@ -739,8 +779,13 @@ public class AHEngine extends Engine
 			return true;
 		}
 
-		if (accepter.getTreeUserElement().getName().toUpperCase().equals(parent
-		        .toUpperCase())) {
+		//		if (accepter.getTreeUserElement().getName().toUpperCase().equals(parent
+		//		        .toUpperCase())) {
+		//			accepter.add(nodeToAdd);
+		//
+		//			return true;
+		//		}
+		if (accepter.getTreeUserElement().getName().equals(parent)) {
 			accepter.add(nodeToAdd);
 
 			return true;
@@ -773,7 +818,12 @@ public class AHEngine extends Engine
 		String rootName = source.getTreeUserElement().getName();
 
 		if (ext.endsWith(".alhconfig")) {
-			savedData.add(new String("GROUP NULL " + rootName));
+			if (source.getTreeUserElement().getName() != "NULL") {
+			    JOptionPane.showMessageDialog(frame,
+					    "Error saving data. \n The root group should be named NULL. \n Saving aborted!", "Saving error",
+					    JOptionPane.ERROR_MESSAGE);
+			    return false;
+			}
 		}
 
 		for (int i = 0; i < source.getChildCount(); i++) {
@@ -792,6 +842,9 @@ public class AHEngine extends Engine
 			writer.close();
 		} catch (Exception e) {
 			e.printStackTrace();
+			JOptionPane.showMessageDialog(frame,
+			    "Error saving data. \n Saving aborted!", "Saving error",
+			    JOptionPane.ERROR_MESSAGE);
 
 			return false;
 		}
@@ -835,31 +888,47 @@ public class AHEngine extends Engine
 		} else if (element instanceof Property) {
 			String name = element.getName();
 			String value = ((Property)element).getValue();
-			String data = getPropertyString(source);
+			String[] data = getPropertyString(source);
 			StringBuffer buffer = new StringBuffer();
 
 			if (name.equals("$COMMAND") || name.equals("$BEEPSEVERITY")
 			    || name.equals("$ALIAS") || name.equals("$SEVRPV")) {
 				if (value == "") {
-					//TODO
+					JOptionPane.showMessageDialog(frame,
+					    "Property " + name
+					    + " has an invalid value. \n Saving aborted!",
+					    "Structure invalid", JOptionPane.WARNING_MESSAGE);
+
 					return false;
 				}
 
 				buffer.append(name + " " + value);
 			} else if (name.equals("$HEARTBEATPV")) {
 				if (value == "") {
-					//TODO
+					JOptionPane.showMessageDialog(frame,
+					    "Property " + name
+					    + " has an invalid value. \n Saving aborted!",
+					    "Structure invalid", JOptionPane.WARNING_MESSAGE);
+
 					return false;
 				}
 
-				buffer.append(name + " " + value + " " + data);
+				buffer.append(name + " " + value);
+
+				for (int i = 0; i < data.length; i++) {
+					buffer.append(" " + data[i]);
+				}
 			} else if (name.equals("$ACKPV")) {
-				if (data == null) {
-					//TODO
+				if (data == null || data.length != 1) {
+					JOptionPane.showMessageDialog(frame,
+					    "Property " + name
+					    + " has invalid value(s) or is missing one. \n Saving aborted!",
+					    "Structure invalid", JOptionPane.WARNING_MESSAGE);
+
 					return false;
 				}
 
-				buffer.append(name + " " + value + " " + data);
+				buffer.append(name + " " + value + " " + data[0]);
 			} else if (name.equals("$FORCEPV_CALC")
 			    || name.equals("$FORCEPV_CALC_A")
 			    || name.equals("$FORCEPV_CALC_B")
@@ -867,16 +936,58 @@ public class AHEngine extends Engine
 			    || name.equals("$FORCEPV_CALC_D")
 			    || name.equals("$FORCEPV_CALC_E")
 			    || name.equals("$FORCEPV_CALC_F")) {
-				buffer.append(name + " " + data);
+				buffer.append(name);
+
+				for (int i = 0; i < data.length; i++) {
+					buffer.append(" " + data[i]);
+				}
 			} else if (name.equals("$FORCEPV CALC")
 			    || name.equals("$SEVRCOMMAND") || name.equals("$STATCOMMAND")
-			    || name.equals("$ALARMCOUNTFILTER") || name.equals("$FORCEPV")) {
-				if (data == null) {
-					//TODO
+			    || name.equals("$ALARMCOUNTFILTER")) {
+				if (data == null || data.length != 2) {
+					JOptionPane.showMessageDialog(frame,
+					    "Property " + name
+					    + " has invalid value(s) or is missing one. \n Saving aborted!",
+					    "Structure invalid", JOptionPane.WARNING_MESSAGE);
+
 					return false;
 				}
 
-				buffer.append(name + " " + data);
+				buffer.append(name);
+
+				for (int i = 0; i < data.length; i++) {
+					buffer.append(" " + data[i]);
+				}
+			} else if (name.equals("$FORCEPV")) {
+				boolean ok = false;
+
+				for (int i = 0; i < source.getChildCount(); i++) {
+					AppTreeElement e = ((AppTreeNode)source.getChildAt(i))
+						.getTreeUserElement();
+
+					if (element.getName().equals(propertyItems[5])) {
+						if (((Property)element).getValue().equals(data[0])) {
+							ok = true;
+
+							break;
+						}
+					}
+				}
+
+				if (data == null || data.length < 1 || !ok) {
+					JOptionPane.showMessageDialog(frame,
+					    "Property " + name
+					    + " has invalid value(s) or is missing one. \n Saving aborted!",
+					    "Structure invalid", JOptionPane.WARNING_MESSAGE);
+
+					return false;
+				}
+
+				buffer.append(name);
+
+				for (int i = 0; i < data.length; i++) {
+					buffer.append(" " + data[i]);
+				}
 			} else if (name.equals("$GUIDANCE")) {
 				if (value == null) {
 					buffer.append(name);
@@ -892,7 +1003,6 @@ public class AHEngine extends Engine
 
 		for (int i = 0; i < source.getChildCount(); i++) {
 			if (!save((AppTreeNode)source.getChildAt(i))) {
-				//TODO
 				return false;
 			}
 		}
@@ -901,15 +1011,17 @@ public class AHEngine extends Engine
 	}
 
 	/**
-	 * DOCUMENT ME!
+	 * Certain properties (e.g. $SEVRCOMMAND) have additional values.  Method
+	 * constructs an array of strings representing these values from the data
+	 * held by the childnodes of the node given as a parameter.
 	 *
-	 * @param node DOCUMENT ME!
+	 * @param node
 	 *
-	 * @return DOCUMENT ME!
+	 * @return string representing all values of a certain property
 	 */
-	public String getPropertyString(AppTreeNode node)
+	private String[] getPropertyString(AppTreeNode node)
 	{
-		StringBuffer buffer = new StringBuffer();
+		ArrayList buffer = new ArrayList();
 
 		for (int i = 0; i < node.getChildCount(); i++) {
 			AppTreeElement element = ((AppTreeNode)node.getChildAt(i))
@@ -917,12 +1029,18 @@ public class AHEngine extends Engine
 
 			if (element instanceof Property) {
 				if (((Property)element).hasValue()) {
-					buffer.append(((Property)element).getValue() + " ");
+				    String value = ((Property)element).getValue();
+				    if (value.length() != 0){
+				        buffer.add(value);
+				    }
+				
 				}
 			}
 		}
 
-		return new String(buffer);
+		String[] data = new String[buffer.size()];
+
+		return (String[])buffer.toArray(data);
 	}
 
 	/**
@@ -954,7 +1072,13 @@ public class AHEngine extends Engine
 				}
 
 				strings = temp;
-			} else if (com.equals("$COMMAND") || com.equals("$ALIAS")) {
+			} else if (com.equals("$COMMAND") || com.equals("$ALIAS")
+			    || com.equals("$FORCEPV_CALC") || com.equals("$FORCEPV_CALC_A")
+			    || com.equals("$FORCEPV_CALC_B")
+			    || com.equals("$FORCEPV_CALC_C")
+			    || com.equals("$FORCEPV_CALC_D")
+			    || com.equals("$FORCEPV_CALC_E")
+			    || com.equals("$FORCEPV_CALC_F") || com.equals("$SEVRPV")) {
 				temp.add(com);
 
 				StringBuffer buffer = new StringBuffer();

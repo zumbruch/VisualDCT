@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?xml-stylesheet type="text/xsl" href="../../Common/Documentation/Normal.xsl"?>
+
+<cosydoc xmlns="urn:schemas-cosylab-com:Document">
+
+<head>
+
+<title>Archiver Visual DCT Plugin</title>
+
+<info file="DOC-Archiver_Users_Manual"
+	url="http://visualdct.cosylab.com/builds/VisualDCT"
+	class="doc"
+	year="2005"
+	id="XX"
+	confidentiality="public"
+	project="VisualDCT"/>
+		  
+<contributor name="Jaka Bobnar" id="jbobnar" email="jaka.bobnar@cosylab.com"/>
+					 
+<modification version="1.0" by="jbobnar" date="2005-05-05">
+<section>Created.</section>
+</modification>
+
+<scope>
+This document is a user's manual for Archiver Visual DCT Plugin. It contains instructions
+how to use the plugin.
+</scope>
+		
+<audience>
+The audience of this document are the users of VisualDCT who wish to use Archiver plugin.
+</audience>
+
+<reference id="visualdct"
+	   title="VisualDCT Project"
+	   href="http://visualdct.cosylab.com/"
+	   author="Matej Sekoranja"
+	   date="2002"
+	   publisher="Cosylab, Ltd."/>
+		
+<reference id="plugins"
+	   title="VisualDCT Plugins"
+	   href="http://www.cosylab.com/visualdct/builds/VisualDCT/2.4.1256/doc/DOC-VisualDCT_Plugins.html"
+	   author="Sunil Sah"
+	   date="2002"
+	   publisher="Cosylab, Ltd."/>	
+	
+<reference id="epics"
+	   title="EPICS Channel Archiver"
+	   href="http://ics-web1.sns.ornl.gov/~kasemir/archiver/"/>		
+</head>
+
+<body>
+
+<section id="Introduction" title="Introduction">
+
+<p>
+Archiver Visual DCT Plugin is an application plugin which enables creating and modifying 
+EPICS Channel Archiver configuration files. Plugin allows user to organize files, while
+displaying the whole hierarchical structure of the file that is currently being edited.
+</p>
+
+</section>
+
+<section id="installingAc" title="Installing Archiver Plugin">
+
+	<p>
+	Archiver Visual DCT Plugin is a standard Visual DCT plugin, which can be installed like
+	any other plugin. Refer to <a aref="plugins">VisualDCT Plugins</a> on
+	how to install a Visual DCT plugin.	
+	</p>
+	
+</section>
+
+<section id="usingAr" title="Using Archiver Plugin">
+	
+	<section id="basics" title="Basic principles of Archiver Plugin">
+		<p>
+			Archiver Plugin enables user to create and modify EPICS Channel Archiver configuration
+			<i>XML</i> files. The plugin present a configuration file in a hierarchical view;
+			this allows building a configuration file visually. Groups, channels and properties 
+			can be added to the tree structure according to the specifications of EPICS Channel Archiver
+			(see <a aref="epics">EPICS Channel Archiver</a>).
+			The structure represented by the tree can be saved into an <i>Archiver config file</i>.
+			The output data has a standard <i>XML</i> form specified by the EPICS Channel Archiver.
+		</p>
+		<p>
+			The Archiver Plugin can be started by selecting the Archiver start from the Plugins 
+			menu of the VisualDCT. When the plugin is started it should look similar to the
+			<a aref="start.PNG">figure 1</a>.
+			<figure id="start.PNG">New config file. Archiver Plugin window at startup.</figure>
+		</p>
+		
+		<p>
+			There are 4 different types of items in the tree: channel, group, property and root.
+			Each one of these items is represented by a different icon:
+			<ul>
+				<li>
+					<img src="boxn.gif"	width="17" height="17"/> group					
+				</li>
+				<li>
+					<img src="record.gif"	width="17" height="17"/> channel					
+				</li>
+				<li>
+					<img src="Tree16.gif"	width="17" height="17"/> property					
+				</li>
+				<li>
+					<img src="page.gif"	width="17" height="17"/> root					
+				</li>
+				
+			</ul>
+		</p>
+		
+	</section>
+	<section id="using" title="Using Archiver Plugin">
+		
+		<section id="addingchannels" title="Adding and moving channels">
+			<p>
+				In the <a aref="ar.PNG">figure 2</a> we see an instance of the Archiver Plugin.
+				<figure id="ar.PNG">An instance of Archiver config file</figure>
+				On the left side of the window there is a tree displaying the hierarchical structure of
+				the Archiver config file. The ride side displays all available channels that are
+				defined in currently opened database file in Visual DCT. These channels can be placed inside
+				any group that is already defined in the tree. This can be done simply by dragging the
+				channels to a desired location or by selecting a destination group in the tree and the channel
+				in the list and pressing the <i>add record to the tree</i> button. To remove a channel from
+				a certain group, select the channel and press <i>remove record from the tree</i> button, or
+				drag the channel from the tree to the list on the right side. Moving a channel from one to
+				another group can be done by dragging the channel and dropping it in the desired group.				
+			</p>	
+		</section>
+		
+		<section id="addingelements" title="Adding/removing groups and properties">
+			<p>
+				Any element, specified in the EPICS Channel Archiver can be added to the hierarchical
+				structure. To do this, select the element which will be the parent of the new element
+				and press the right mouse button - a popup will appear (see <a aref="add.PNG">figure 3</a>).
+				If you want to add a group select <b>Add group</b>. A new group will be added as
+				a last child of the root element.
+				By choosing <b>Add property</b> 
+				a drop down menu is shown which lists all properties that can be added to the selected parent.
+				After selection was made, the popup menu dissappears and the new property is added to 
+				tree. 
+			</p>
+			<figure id="add.PNG">Adding elements to the tree</figure>
+			
+		</section>
+		<section id="editing" title="Editing tree items">
+			<p>
+				Items that are displayed in the tree can hold a specific value. Groups and Channels
+				should all have names while properties should hold values as specified in the 
+				EPICS Channel Archiver. All these values can be edited directly in the tree. 
+				By double-clicking an item in the tree, a text editor will appear on
+				that place and a new value can be written there (see <a aref="editing.PNG">figure 4</a>). <b>IMPORTANT! After a new value
+					was typed in the editor you have to confirm it by pressing the enter key on your
+					keyboard. This will store the value. If you click outside of the editor,
+					the new value is not stored, but the old one is recalled.</b>
+				<figure id="editing.PNG">Editing tree elements can be done by a double-click</figure>
+			</p>
+				
+		</section>
+		
+		<section id="file" title="File menu">
+			<p>
+				The file menu provides five different commands:
+				<ul>
+					<li>
+						<i>New</i> - creates a new empty config file; there is only the root 
+						in the new config file
+					</li>
+					<li>
+						<i>Open</i> - shows a file chooser; a file can be selected from any location;
+						after the Open button is pressed that file is opened by the
+						Archiver Plugin
+					</li>
+					<li>
+						<i>Save</i> - saves the data that is displayed in the tree to the currently 
+						opened file; if the data is saved for the first time, <i>Save as</i> is called
+					</li>
+					<li>
+						<i>Save as</i> - saves the data to the file specified in the file chooser
+					</li>
+					<li>
+						<i>Exit</i> - closes the Archiver Plugin Window
+					</li>
+				</ul>
+			</p>
+			<section id="opening" title="Opening XML files">
+				<p>
+					The Archiver Plugin xml parser uses <i>Document Type Definitions</i>. The
+					<i>dtd</i> file is <i>engineconfig.dtd</i>. This means that when you try to
+					open the archiver config file the parser looks for dtd file in the same
+					directory that the xml file is stored. If the file does not exist, parsing is
+					aborted.
+				</p>
+			</section>
+		</section>
+						
+	</section>
+	
+</section>
+
+</body>
+
+</cosydoc>
