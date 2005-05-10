@@ -60,7 +60,7 @@ public class DoubleClickProxyTest extends JFrame {
 		addMouseMotionListener(proxy);
 		
 		setSize(200,200);
-		show();
+		setVisible(true);
 		
 	}
 

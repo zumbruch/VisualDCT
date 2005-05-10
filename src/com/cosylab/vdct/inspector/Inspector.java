@@ -654,7 +654,7 @@ public static void main(java.lang.String[] args) {
 				System.exit(0);
 			};
 		});
-		aInspector.show();
+		aInspector.setVisible(true);
 		java.awt.Insets insets = aInspector.getInsets();
 		aInspector.setSize(aInspector.getWidth() + insets.left + insets.right, aInspector.getHeight() + insets.top + insets.bottom);
 		aInspector.setVisible(true);

@@ -296,7 +296,7 @@ public static void main(java.lang.String[] args) {
 				System.exit(0);
 			};
 		});
-		aAboutDialog.show();
+		aAboutDialog.setVisible(true);
 		java.awt.Insets insets = aAboutDialog.getInsets();
 		aAboutDialog.setSize(aAboutDialog.getWidth() + insets.left + insets.right, aAboutDialog.getHeight() + insets.top + insets.bottom);
 		aAboutDialog.setVisible(true);
@@ -316,7 +316,7 @@ public static void main(java.lang.String[] args) {
 	 * @see com.cosylab.gui.components.about.AboutTabReceiver#ReceiverPerform()
 	 */
 	public void receiverPerform() {
-	this.show();
+		this.setVisible(true);
 	}
 
 }

@@ -82,7 +82,7 @@ public void actionPerformed(ActionEvent event)
 
 		JDialog dialog = optionPane.createDialog(VisualDCT.getInstance(),
 			"Select a Font, Font Style, and Font Size...");
-		dialog.show();
+		dialog.setVisible(true);
 		
 		Object selectedValue = optionPane.getValue();
 		
@@ -169,7 +169,7 @@ public void showChangeTextDialog()
 
 	JDialog dialog = optionPane.createDialog(VisualDCT.getInstance(), "Text Box Content");
 	dialog.setResizable(true);
-	dialog.show();
+	dialog.setVisible(true);
 		
 	Object selectedValue = optionPane.getValue();
 		

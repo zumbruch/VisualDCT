@@ -5525,7 +5525,7 @@ public void help_TopicsMenuItem_ActionPerformed() {
 public void import_DBDMenuItem_ActionPerformed() {
 	DBDDialog dialog = getDBDDialog();
 	dialog.setLocationRelativeTo(this);
-	dialog.show();
+	dialog.setVisible(true);
 }
 /**
  * Comment

@@ -187,7 +187,7 @@ public static void main(java.lang.String[] args) {
 				System.exit(0);
 			};
 		});
-		aVisualDCTSplashScreen.show();
+		aVisualDCTSplashScreen.setVisible(true);
 		java.awt.Insets insets = aVisualDCTSplashScreen.getInsets();
 		aVisualDCTSplashScreen.setSize(aVisualDCTSplashScreen.getWidth() + insets.left + insets.right, aVisualDCTSplashScreen.getHeight() + insets.top + insets.bottom);
 		aVisualDCTSplashScreen.setVisible(true);

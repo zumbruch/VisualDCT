@@ -225,7 +225,7 @@ public static void main(java.lang.String[] args) {
 				System.exit(0);
 			};
 		});
-		aConsole.show();
+		aConsole.setVisible(true);
 		java.awt.Insets insets = aConsole.getInsets();
 		aConsole.setSize(aConsole.getWidth() + insets.left + insets.right, aConsole.getHeight() + insets.top + insets.bottom);
 		aConsole.setVisible(true);

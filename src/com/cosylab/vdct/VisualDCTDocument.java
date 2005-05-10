@@ -154,7 +154,7 @@ public static void main(java.lang.String[] args) {
 				System.exit(0);
 			};
 		});
-		aVisualDCTDocument.show();
+		aVisualDCTDocument.setVisible(true);
 		java.awt.Insets insets = aVisualDCTDocument.getInsets();
 		aVisualDCTDocument.setSize(aVisualDCTDocument.getWidth() + insets.left + insets.right, aVisualDCTDocument.getHeight() + insets.top + insets.bottom);
 		aVisualDCTDocument.setVisible(true);

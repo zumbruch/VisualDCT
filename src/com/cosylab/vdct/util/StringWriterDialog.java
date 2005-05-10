@@ -289,13 +289,13 @@ public class StringWriterDialog extends javax.swing.JDialog {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        new StringWriterDialog(new javax.swing.JFrame(), true).show();
+        new StringWriterDialog(new javax.swing.JFrame(), true).setVisible(true);
     }
     
     public String showDialog() {
 		returnValue = null;    	
     	setModal(true);
-    	show();
+    	setVisible(true);
     	
     	return returnValue;
     }

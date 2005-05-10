@@ -700,7 +700,7 @@ public static void main(java.lang.String[] args) {
 				System.exit(0);
 			};
 		});
-		aDBDDialog.show();
+		aDBDDialog.setVisible(true);
 		java.awt.Insets insets = aDBDDialog.getInsets();
 		aDBDDialog.setSize(aDBDDialog.getWidth() + insets.left + insets.right, aDBDDialog.getHeight() + insets.top + insets.bottom);
 		aDBDDialog.setVisible(true);

@@ -798,7 +798,7 @@ public static void main(java.lang.String[] args) {
 				System.exit(0);
 			};
 		});
-		aPrintPreviewFrame.show();
+		aPrintPreviewFrame.setVisible(true);
 		java.awt.Insets insets = aPrintPreviewFrame.getInsets();
 		aPrintPreviewFrame.setSize(aPrintPreviewFrame.getWidth() + insets.left + insets.right, aPrintPreviewFrame.getHeight() + insets.top + insets.bottom);
 		aPrintPreviewFrame.setVisible(true);
