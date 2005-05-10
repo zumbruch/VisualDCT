@@ -34,9 +34,11 @@ import java.net.*;
 import org.w3c.dom.*;
 import org.xml.sax.*;
 import javax.xml.parsers.*;
-
-import org.apache.crimson.tree.XmlDocument;
-//import com.sun.xml.tree.*;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 /**
 * Insert the class' description here.
@@ -234,10 +236,29 @@ public static void writeDocument(String fileName, Document doc, String publicId,
 {
 	OutputStream out = new BufferedOutputStream(new FileOutputStream(fileName));
 	
-	((XmlDocument)doc).setDoctype(publicId, systemId, dtd);
-	((XmlDocument)doc).write(out);
+	try
+	{
+
+		// Serialisation through Tranform.
+		DOMSource domSource = new DOMSource(doc);
+		StreamResult streamResult = new StreamResult(out);
+		TransformerFactory tf = TransformerFactory.newInstance();
+		Transformer serializer = tf.newTransformer();
+		serializer.setOutputProperty(OutputKeys.METHOD, "xml");
+		//serializer.setOutputProperty(OutputKeys.ENCODING, "ISO-8859-1");
+		if (systemId != null)
+			serializer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, systemId);
+		if (publicId != null)
+		serializer.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, publicId);
+		serializer.setOutputProperty(OutputKeys.INDENT, "yes");
+		serializer.transform(domSource, streamResult); 
+	}
+	catch (Throwable th) {
+		throw new RuntimeException("Transform exception.", th);
+	}
 
 	out.flush();
 	out.close();
+		
 }
 }
