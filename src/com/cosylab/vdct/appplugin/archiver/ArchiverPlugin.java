@@ -111,7 +111,7 @@ public class ArchiverPlugin implements Plugin
 			//
 		}
 
-		archiver.show();
+		archiver.setVisible(true);
 		archiver.toFront();
 	}
 

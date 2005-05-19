@@ -323,7 +323,7 @@ public class AHTree extends AppTree
 						}
 
 						//					    handler.setExitOnClose(false);
-						handler.show();
+						handler.setVisible(true);
 					}
 				}
 			});

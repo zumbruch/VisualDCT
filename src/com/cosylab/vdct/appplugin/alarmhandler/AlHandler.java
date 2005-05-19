@@ -229,7 +229,7 @@ public class AlHandler extends AppFrame
 			test.addChannel(ch);
 		}
 
-		test.show();
+		test.setVisible(true);
 	}
 }
 

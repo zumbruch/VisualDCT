@@ -111,7 +111,7 @@ public class AHPlugin implements Plugin
 			//
 		}
 
-		handler.show();
+		handler.setVisible(true);
 		handler.toFront();
 	}
 

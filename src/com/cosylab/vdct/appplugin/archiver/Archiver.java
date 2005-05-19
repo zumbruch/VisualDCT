@@ -198,7 +198,7 @@ public class Archiver extends AppFrame
 		//		for (int i = 0; i < v.size(); i++) {
 		//		    System.out.println(v.getClass());
 		//		}
-		dialog.show();
+		dialog.setVisible(true);
 	}
 }
 

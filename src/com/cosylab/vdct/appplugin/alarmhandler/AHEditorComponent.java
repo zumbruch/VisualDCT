@@ -21,6 +21,7 @@ import com.cosylab.vdct.appplugin.EditorComponent;
 import com.cosylab.vdct.appplugin.Property;
 
 import sun.awt.font.FontDesignMetrics;
+//import sun.font.FontDesignMetrics;
 
 import java.awt.Dimension;
 import java.awt.FontMetrics;
@@ -32,6 +33,8 @@ import java.awt.event.KeyListener;
 
 import javax.swing.JComboBox;
 import javax.swing.tree.TreeCellEditor;
+
+
 
 
 /**

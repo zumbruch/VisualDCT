@@ -577,6 +577,7 @@ public class ArchiverEngine extends Engine
 		}
 
 		return new TextNode();
+//		return doc.createTextNode("");
 	}
 }
 
