@@ -70,6 +70,13 @@ displaying the whole hierarchical structure of the file that is currently being 
 	how to install a Visual DCT plugin.	
 	</p>
 	
+	<p type="notice">
+	The <f>archiver jar</f> must be added to the classpath before it can be installed within the VisualDCT.
+		<p>
+		<i>java -cp VisualDCT.jar;archiver.jar com.cosylab.vdct.VisualDCT</i>
+		</p>
+	</p>
+	
 </section>
 
 <section id="usingAr" title="Using Archiver Plugin">

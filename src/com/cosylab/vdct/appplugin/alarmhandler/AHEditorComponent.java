@@ -20,7 +20,7 @@ import com.cosylab.vdct.appplugin.AppTreeNode;
 import com.cosylab.vdct.appplugin.EditorComponent;
 import com.cosylab.vdct.appplugin.Property;
 
-import sun.awt.font.FontDesignMetrics;
+//import sun.awt.font.FontDesignMetrics;
 //import sun.font.FontDesignMetrics;
 
 import java.awt.Dimension;
@@ -58,7 +58,7 @@ public class AHEditorComponent extends EditorComponent
 	public AHEditorComponent()
 	{
 		super();
-		fm = new FontDesignMetrics(valueField.getFont());
+		fm = getFontMetrics(valueField.getFont());
 		combo = new JComboBox();
 		combo.setEditable(false);
 
@@ -137,6 +137,7 @@ public class AHEditorComponent extends EditorComponent
 		String text = valueField.getText();
 
 		if (text != null) {
+		    // incompatibile fontmetrics classes in Java 1.4 and 1.5 
 			int i = fm.stringWidth(text) + 10;
 
 			if (i < 100) {
@@ -147,7 +148,7 @@ public class AHEditorComponent extends EditorComponent
 		} else {
 			dimen.width = 100;
 		}
-
+	    
 		dimen.height = 18;
 
 		return dimen;
