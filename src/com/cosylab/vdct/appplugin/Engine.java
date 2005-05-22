@@ -49,8 +49,7 @@ public abstract class Engine
 	
 	/**
 	 * 
-	 * Constructs the TreePath from the TreeNode given as parameter. Path is constructed from 
-	 * this node to the root node.
+	 * Constructs a tree path from the node in its parents.
 	 * @param last
 	 * @return
 	 */
@@ -58,10 +57,10 @@ public abstract class Engine
 	    list.clear();
 	    return recursiveConstructTreePath(last);
 	    
+	    
 	}
 	
 	private TreePath recursiveConstructTreePath(TreeNode last) {
-	    
 	    list.add(last);
 	    TreeNode node = last.getParent();
 	    if (node == null) {
@@ -72,11 +71,11 @@ public abstract class Engine
 	        }
 	        return new TreePath(path);
 	    } else {
-	        return constructTreePath(node);
+	        return recursiveConstructTreePath(node);
 	    }
-	    
 	}
-
+	
+	
 	/**
 	 * Initializes the engine.
 	 */

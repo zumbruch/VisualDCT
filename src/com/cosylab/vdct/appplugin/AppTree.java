@@ -427,7 +427,7 @@ public abstract class AppTree extends JTree
 	 */
 	public void selectError() {
 	    if (errorPath != null) {
-	        setSelectionPath(errorPath);
+	        System.out.println(errorPath);
 	    }
 	}
 	

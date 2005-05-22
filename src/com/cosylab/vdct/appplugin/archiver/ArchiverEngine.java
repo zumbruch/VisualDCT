@@ -22,8 +22,6 @@ import com.cosylab.vdct.appplugin.Engine;
 import com.cosylab.vdct.appplugin.Group;
 import com.cosylab.vdct.appplugin.Property;
 
-import org.apache.crimson.tree.TextNode;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -586,8 +584,8 @@ public class ArchiverEngine extends Engine
 			return doc.createTextNode("                ");
 		}
 
-		return new TextNode();
-//		return doc.createTextNode("");
+//		return new TextNode();
+		return doc.createTextNode("");
 	}
 }
 
