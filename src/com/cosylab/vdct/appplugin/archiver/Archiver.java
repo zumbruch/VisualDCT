@@ -132,9 +132,9 @@ public class Archiver extends AppFrame
 	 *  (non-Javadoc)
 	 * @see com.cosylab.vdct.appplugin.AppFrame#saveFile(java.io.File)
 	 */
-	public synchronized boolean saveFile(File file, AppTreeNode source)
+	public synchronized boolean saveFile(File file, AppTreeNode source, boolean changeTitle)
 	{
-		if (super.saveFile(file, source)) {
+		if (super.saveFile(file, source, changeTitle)) {
 			tree.getRoot().getTreeUserElement().setName(file.getName());
 
 			return true;

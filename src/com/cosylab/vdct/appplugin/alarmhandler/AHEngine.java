@@ -15,7 +15,6 @@
 package com.cosylab.vdct.appplugin.alarmhandler;
 
 import com.cosylab.vdct.appplugin.AppFrame;
-import com.cosylab.vdct.appplugin.AppTreeChannelNode;
 import com.cosylab.vdct.appplugin.AppTreeElement;
 import com.cosylab.vdct.appplugin.AppTreeNode;
 import com.cosylab.vdct.appplugin.Channel;
@@ -37,6 +36,7 @@ import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 import javax.swing.JOptionPane;
+import javax.swing.tree.TreePath;
 
 
 /**
@@ -203,7 +203,7 @@ public class AHEngine extends Engine
 								return null;
 							}
 
-							AppTreeChannelNode channelNode = new AppTreeChannelNode(new Channel(
+							AppTreeNode channelNode = new AppTreeNode(new Channel(
 								        line[2]));
 							lastGroupOrChannelNode = channelNode;
 
@@ -801,7 +801,7 @@ public class AHEngine extends Engine
 
 		return false;
 	}
-
+	
 	/**
 	 * Transforms tree structure into text and saves it to a file.
 	 *
@@ -813,22 +813,43 @@ public class AHEngine extends Engine
 	public boolean saveToFile(File file, AppTreeNode source)
 	{
 		savedData.clear();
-
+				
 		String ext = file.getName().toLowerCase();
 		String rootName = source.getTreeUserElement().getName();
-
+		TreePath path = null;
+		boolean skip = false;
 		if (ext.endsWith(".alhconfig")) {
 			if (source.getTreeUserElement().getName() != "NULL") {
 			    JOptionPane.showMessageDialog(frame,
 					    "Error saving data. \n The root group should be named NULL. \n Saving aborted!", "Saving error",
 					    JOptionPane.ERROR_MESSAGE);
+			    frame.getTree().setErrorSelection(constructTreePath(source));
 			    return false;
 			}
-		}
-
-		for (int i = 0; i < source.getChildCount(); i++) {
-			if (!save((AppTreeNode)source.getChildAt(i))) {
-				return false;
+			
+		} 
+		else if (ext.endsWith(".alhinclude")) {
+		    if (source.getParent() != null) {
+		        path = save(source);
+			    if (path != null) {
+			        frame.getTree().setErrorSelection(path);
+			        return false;
+			    } else {
+			        frame.getTree().setErrorSelection(null);
+			        skip = true;
+			    }
+		    }
+		} 
+		
+		if (!skip) {
+			for (int i = 0; i < source.getChildCount(); i++) {
+			    path = save((AppTreeNode)source.getChildAt(i));
+			    if (path == null) {
+			        frame.getTree().setErrorSelection(null);
+			    } else {
+			        frame.getTree().setErrorSelection(path);
+			        return false;
+			    }
 			}
 		}
 
@@ -855,17 +876,19 @@ public class AHEngine extends Engine
 	/**
 	 * Prepares data for saving. All data is collected and stored to an
 	 * ArrayList (each line is a different object in the list).
+	 * Returns the TreePath if there was a structure error.
 	 *
 	 * @param source
 	 *
 	 * @return
 	 */
-	private boolean save(AppTreeNode source)
+	private TreePath save(AppTreeNode source)
 	{
+	    
 		AppTreeElement element = source.getTreeUserElement();
 		AppTreeElement parentElem = ((AppTreeNode)source.getParent())
 			.getTreeUserElement();
-
+		
 		if (element instanceof Group) {
 			savedData.add(new String(""));
 			savedData.add(new String("GROUP " + parentElem.getName() + " "
@@ -898,8 +921,8 @@ public class AHEngine extends Engine
 					    "Property " + name
 					    + " has an invalid value. \n Saving aborted!",
 					    "Structure invalid", JOptionPane.WARNING_MESSAGE);
-
-					return false;
+					return constructTreePath(source);
+//					return false;
 				}
 
 				buffer.append(name + " " + value);
@@ -909,8 +932,8 @@ public class AHEngine extends Engine
 					    "Property " + name
 					    + " has an invalid value. \n Saving aborted!",
 					    "Structure invalid", JOptionPane.WARNING_MESSAGE);
-
-					return false;
+					return constructTreePath(source);
+//					return false;
 				}
 
 				buffer.append(name + " " + value);
@@ -924,8 +947,8 @@ public class AHEngine extends Engine
 					    "Property " + name
 					    + " has invalid value(s) or is missing one. \n Saving aborted!",
 					    "Structure invalid", JOptionPane.WARNING_MESSAGE);
-
-					return false;
+					return constructTreePath(source);
+//					return false;
 				}
 
 				buffer.append(name + " " + value + " " + data[0]);
@@ -949,8 +972,8 @@ public class AHEngine extends Engine
 					    "Property " + name
 					    + " has invalid value(s) or is missing one. \n Saving aborted!",
 					    "Structure invalid", JOptionPane.WARNING_MESSAGE);
-
-					return false;
+					return constructTreePath(source);
+//					return false;
 				}
 
 				buffer.append(name);
@@ -979,8 +1002,8 @@ public class AHEngine extends Engine
 					    "Property " + name
 					    + " has invalid value(s) or is missing one. \n Saving aborted!",
 					    "Structure invalid", JOptionPane.WARNING_MESSAGE);
-
-					return false;
+					return constructTreePath(source);
+//					return false;
 				}
 
 				buffer.append(name);
@@ -1002,12 +1025,16 @@ public class AHEngine extends Engine
 		}
 
 		for (int i = 0; i < source.getChildCount(); i++) {
-			if (!save((AppTreeNode)source.getChildAt(i))) {
-				return false;
-			}
+		    TreePath p = save((AppTreeNode)source.getChildAt(i));
+		    if (p != null) {
+		        return p;
+		    }
+//			if (!save((AppTreeNode)source.getChildAt(i))) {
+//				return false;
+//			}
 		}
 
-		return true;
+		return null;
 	}
 
 	/**
@@ -1096,6 +1123,7 @@ public class AHEngine extends Engine
 
 		return (String[])strings.toArray(s);
 	}
+
 }
 
 /* __oOo__ */

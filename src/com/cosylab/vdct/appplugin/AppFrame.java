@@ -128,7 +128,7 @@ public abstract class AppFrame extends JFrame
 		getTree().addTreeListener(new TreeListener() {
 				public void channelRemoved(ChannelRemovedEvent e)
 				{
-					AppTreeChannelNode[] nodes = e.getChannelNode();
+					AppTreeNode[] nodes = e.getNodes();
 
 					for (int i = 0; i < nodes.length; i++) {
 						getList().getDefaultModel().addElement(nodes[i]);
@@ -157,7 +157,7 @@ public abstract class AppFrame extends JFrame
 		addToTreeButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e)
 				{
-					AppTreeChannelNode[] records = getList().getSelectedRecords();
+					AppTreeNode[] records = getList().getSelectedRecords();
 
 					if (records.length != 0) {
 						boolean completed = getTree().addRecords(records);
@@ -179,7 +179,7 @@ public abstract class AppFrame extends JFrame
 		removeFromTreeButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e)
 				{
-					AppTreeChannelNode[] records = getTree()
+					AppTreeNode[] records = getTree()
 						.getSelectionRecords();
 
 					if (records == null) {
@@ -287,9 +287,9 @@ public abstract class AppFrame extends JFrame
 					public void actionPerformed(ActionEvent e)
 					{
 						if (currentFile != null) {
-							saveFile(currentFile, getTree().getRoot());
+							saveFile(currentFile, getTree().getRoot(), true);
 						} else {
-							saveFileAs(getTree().getRoot());
+							saveFileAs(getTree().getRoot(), true);
 						}
 					}
 				});
@@ -299,7 +299,7 @@ public abstract class AppFrame extends JFrame
 			saveas.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e)
 					{
-						saveFileAs(getTree().getRoot());
+						saveFileAs(getTree().getRoot(), true);
 					}
 				});
 			fileMenu.add(saveas);
@@ -385,7 +385,7 @@ public abstract class AppFrame extends JFrame
 	 *
 	 * @return
 	 */
-	public File saveFileAs(AppTreeNode source)
+	public File saveFileAs(AppTreeNode source, boolean changeTitle)
 	{
 		if (getFileChooser().showSaveDialog(this) != JFileChooser.APPROVE_OPTION) {
 			return null;
@@ -396,12 +396,13 @@ public abstract class AppFrame extends JFrame
 
 		f = addExtension(f);
 
-		if (saveFile(f, source)) {
+		if (saveFile(f, source, changeTitle)) {
 			return f;
 		}
 
 		return null;
 	}
+	
 
 	/**
 	 * Saves the AppTreeNode source's data to the specified file.
@@ -411,16 +412,19 @@ public abstract class AppFrame extends JFrame
 	 *
 	 * @return true if successful
 	 */
-	public synchronized boolean saveFile(File file, AppTreeNode source)
+	public synchronized boolean saveFile(File file, AppTreeNode source, boolean changeTitle)
 	{
 		boolean success = getEngine().saveToFile(file, source);
-
+		
 		if (success) {
 			getTree().getDefaultModel().nodeChanged(getTree().getRoot());
-			currentFile = file;
-			initialization();
-			setTitle(getTitle() + " [" + file.getName() + "]");
+			if (changeTitle) {
+			    initialization();
+			    currentFile = file;
+			    setTitle(getTitle() + " [" + file.getName() + "]");
+			}
 		}
+		getTree().selectError();
 
 		return success;
 	}
@@ -450,7 +454,7 @@ public abstract class AppFrame extends JFrame
 	 */
 	public void addChannel(Channel channel)
 	{
-		AppTreeChannelNode atcn = new AppTreeChannelNode(channel);
+		AppTreeNode atcn = new AppTreeNode(channel);
 		getList().getDefaultModel().addElement(atcn);
 	}
 
@@ -490,9 +494,9 @@ public abstract class AppFrame extends JFrame
 		switch (i) {
 		case JOptionPane.YES_OPTION: {
 			if (currentFile != null) {
-				saveFile(currentFile, getTree().getRoot());
+				saveFile(currentFile, getTree().getRoot(), true);
 			} else {
-				saveFileAs(getTree().getRoot());
+				saveFileAs(getTree().getRoot(), true);
 			}
 
 			return true;

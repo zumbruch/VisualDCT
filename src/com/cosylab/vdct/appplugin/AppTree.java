@@ -51,6 +51,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeCellEditor;
 import javax.swing.tree.TreeCellRenderer;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 
@@ -69,10 +70,15 @@ public abstract class AppTree extends JTree
 	protected AppTreeNode rootNode;
 	private CellRenderer cellRenderer;
 	protected DefaultEditor defaultEditor;
-	private AppTreeChannelNode[] draggedValues;
+	private AppTreeNode[] draggedValues = null;
+	private int[] draggedRowsIndex;
 	protected ArrayList treeListeners = new ArrayList();
 	protected AppFrame appFrame;
+	private DropTarget dropTarget;
 
+	public static final short CHANNEL_ONLY_POLICY = 1;
+	public static final short CHANNEL_GROUP_POLICY = 2;
+	private short DND_POLICY = CHANNEL_ONLY_POLICY;
 	/**
 	 * Creates a new ArchiverTree object.
 	 *
@@ -87,7 +93,7 @@ public abstract class AppTree extends JTree
 
 	private void initialize()
 	{
-		new DropTarget(this, new DropTargetTreeHandler());
+	    dropTarget = new DropTarget(this, new DropTargetTreeHandler());
 		initializeAsDragSource();
 
 		addMouseListener(new TreeMouseHandler());
@@ -97,6 +103,7 @@ public abstract class AppTree extends JTree
 		this.setEditable(true);
 		this.setCellEditor(new CellEditor(this, cellRenderer, defaultEditor));
 		initialization();
+		
 	}
 
 	protected abstract void initialization();
@@ -143,7 +150,7 @@ public abstract class AppTree extends JTree
 		getDefaultModel().reload();
 	}
 
-	protected void fireChannelRemoved(AppTreeChannelNode[] channel)
+	protected void fireChannelRemoved(AppTreeNode[] channel)
 	{
 		ChannelRemovedEvent evt = new ChannelRemovedEvent(this, channel);
 
@@ -209,27 +216,35 @@ public abstract class AppTree extends JTree
 				{
 					final TreePath[] paths = getSelectionModel()
 						.getSelectionPaths();
+					final int[] rows = getSelectionRows();
 					ArrayList values = new ArrayList();
-
+					ArrayList rowslist = new ArrayList();
+					
 					if (paths != null) {
 						for (int i = 0; i < paths.length; i++) {
-							int count = paths[i].getPathCount();
 
-							for (int j = 0; j < count; j++) {
-								Object ob = paths[i].getPathComponent(j);
+							Object ob = paths[i].getLastPathComponent();
 
-								if (ob != null
-								    && ob instanceof AppTreeChannelNode) {
-									values.add(ob);
+							if (ob != null
+								    && ob instanceof AppTreeNode) {
+								    AppTreeElement el = ((AppTreeNode) ob).getTreeUserElement();
+								    if (el instanceof Channel || el instanceof Group) {
+										values.add(ob);
+										rowslist.add(new Integer(rows[i]));
+								    }
 								}
-							}
 						}
 					}
 
-					draggedValues = new AppTreeChannelNode[values.size()];
+					draggedValues = new AppTreeNode[values.size()];
 					values.toArray(draggedValues);
-
-					Transferable transferable = new RecordTransferable(draggedValues);
+					
+					draggedRowsIndex = new int[rowslist.size()];
+					for (int i = 0; i < draggedRowsIndex.length; i++) {
+					    draggedRowsIndex[i] = ((Integer)rowslist.get(i)).intValue();
+					}
+									
+					Transferable transferable = new AppTransferable(draggedValues);
 					event.startDrag(new Cursor(Cursor.MOVE_CURSOR),
 					    transferable,
 					    new DragSourceAdapter() {
@@ -241,12 +256,16 @@ public abstract class AppTree extends JTree
 							{
 								if (dsde.getDropSuccess()) {
 									int action = dsde.getDropAction();
-
+									
 									if (action == DnDConstants.ACTION_MOVE) {
 										for (int i = 0;
 										    i < draggedValues.length; i++) {
-											((DefaultTreeModel)getModel())
-											.removeNodeFromParent((AppTreeNode)draggedValues[i]);
+										    if(draggedValues[i].isRoot()) {
+										        reset();
+										    } else {
+										        ((DefaultTreeModel)getModel())
+										        .removeNodeFromParent((AppTreeNode)draggedValues[i]);
+										    }
 										}
 									}
 								}
@@ -256,14 +275,15 @@ public abstract class AppTree extends JTree
 			});
 	}
 
+	private ArrayList recordList = new ArrayList();
 	/**
 	 * Returns all selected ArchiverTreeRecordNodes.
 	 *
 	 * @return array of ArchiverTreeRecordNode.
 	 */
-	public AppTreeChannelNode[] getSelectionRecords()
+	public AppTreeNode[] getSelectionRecords()
 	{
-		ArrayList nodes = new ArrayList();
+		recordList.clear();
 		TreePath[] paths = getSelectionPaths();
 
 		if (paths == null) {
@@ -272,15 +292,27 @@ public abstract class AppTree extends JTree
 
 		for (int i = 0; i < paths.length; i++) {
 			AppTreeNode lastNode = (AppTreeNode)paths[i].getLastPathComponent();
-
-			if (lastNode instanceof AppTreeChannelNode) {
-				nodes.add(lastNode);
-			}
+			
+			grabRecord(lastNode);
+									
 		}
 
-		AppTreeChannelNode[] recordNode = new AppTreeChannelNode[nodes.size()];
+		AppTreeNode[] recordNode = new AppTreeNode[recordList.size()];
 
-		return (AppTreeChannelNode[])nodes.toArray(recordNode);
+		return (AppTreeNode[])recordList.toArray(recordNode);
+	}
+	
+	private void grabRecord(AppTreeNode node) {
+	    
+	    if (node.getTreeUserElement() instanceof Channel) {
+			recordList.add(node);
+		}
+	    else {
+	        for (int i = 0; i < node.getChildCount(); i++) {
+	            grabRecord((AppTreeNode) node.getChildAt(i));
+	        }
+	    }
+	    
 	}
 
 	/**
@@ -291,8 +323,9 @@ public abstract class AppTree extends JTree
 	 * @return true if nodes were added, false if the selected path was not an
 	 *         AppTreeNode containing an ArchiverTreeGroup
 	 */
-	boolean addRecords(AppTreeChannelNode[] records)
+	boolean addRecords(AppTreeNode[] records)
 	{
+	    TreePath path = getSelectionPath();
 		AppTreeNode group = findClosestGroupNode(getSelectionPath());
 
 		if (group == null) {
@@ -303,24 +336,48 @@ public abstract class AppTree extends JTree
 			return false;
 		}
 
-		addElements(records, group);
-
+		addElements(records, group, path);
+		setSelectionPath(path);
 		return true;
 	}
 
 	/**
-	 * Adds ArchiverTreeRecordNodes to the parent node.
+	 * Adds ArchiverTreeNodes to the parent node.
 	 *
 	 * @param children nodes to be added
 	 * @param parent parent node for the children
 	 */
-	void addElements(AppTreeChannelNode[] children, AppTreeNode parent)
+	void addElements(AppTreeNode[] children, AppTreeNode parent, TreePath path)
 	{
-		for (int j = 0; j < children.length; j++) {
-			parent.add(children[j]);
-		}
-
+	    if (children.length == 0) {
+	        return;
+	    }
+	    int i = getChildInPath(parent, path);
+	    if (i < 0) {
+	        for (int j = 0; j < children.length; j++) {
+				parent.add(children[j]);
+			}
+	    } else {
+			for (int j = 0; j < children.length; j++) {
+				parent.insert(children[j],i);
+			}
+	    }
+	    		
 		((DefaultTreeModel)getModel()).reload(parent);
+	}
+		
+	private int getChildInPath(AppTreeNode parent, TreePath path) {
+	    
+	    Object[] nodes = path.getPath();
+	    for (int i = nodes.length-1; i >=0; i--) {
+	        for (int j = 0; j < parent.getChildCount(); j++) {
+	            if (nodes[i].equals(parent.getChildAt(j))) {
+	                return j;
+	            }
+	        }
+	    }
+	    return -1;
+	    
 	}
 
 	/**
@@ -349,6 +406,40 @@ public abstract class AppTree extends JTree
 
 		return null;
 	}
+	
+	TreePath errorPath = null;
+	
+	/**
+	 * 
+	 * Sets the path that was reported as path with error. This path is later selected, when
+	 * the saving procedure is finished.
+	 * 
+	 * @param path
+	 */
+	public void setErrorSelection(TreePath path) {
+	    this.errorPath = path;
+	}
+	
+	/**
+	 * 
+	 * Selects the path that was reported as path with error.
+	 *
+	 */
+	public void selectError() {
+	    if (errorPath != null) {
+	        setSelectionPath(errorPath);
+	    }
+	}
+	
+	/**
+	 * Sets drag&drop policy. CHANNELS_ONLY means only channels can be dropped inside a tree,
+	 * CHANNELS_GROUP means channels and groups can be dropped inside a tree.
+	 * 
+	 * @param policy
+	 */
+	public void setDnDPolicy(short policy) {
+	    DND_POLICY = policy;
+	}
 
 	/**
 	 * <code>TreeMouseHandler</code> handles mouse events on the tree.
@@ -374,12 +465,17 @@ public abstract class AppTree extends JTree
 				TreePath path = getPathForLocation(e.getX(), e.getY());
 
 				if (path != null) {
-					AppTreeNode node = (AppTreeNode)path.getLastPathComponent();
-
+				    AppTreeNode node = (AppTreeNode)path.getLastPathComponent();
+				    
+				    if (node.isRoot()) {
+				        expandPath(path);
+				    }
+				    
 					if (node.getTreeUserElement().isEditable()) {
-						AppTree.this.startEditingAtPath(path);
+					    AppTree.this.startEditingAtPath(path);
 					}
 				}
+				
 			} else if (e.getClickCount() == 1) {
 				boolean ctrlDown = (e.getModifiersEx()
 					& InputEvent.CTRL_DOWN_MASK) == InputEvent.CTRL_DOWN_MASK;
@@ -416,7 +512,7 @@ public abstract class AppTree extends JTree
 			}
 		}
 	}
-
+	
 	/**
 	 * <code>DropTargetTreeHandler</code> handles DnD-Drop events on the tree.
 	 *
@@ -434,7 +530,7 @@ public abstract class AppTree extends JTree
 			boolean accept = false;
 
 			for (int i = 0; i < f.length; i++) {
-				if (Arrays.asList(RecordTransferable.flavors).contains(f[i])) {
+				if (Arrays.asList(AppTransferable.flavors).contains(f[i])) {
 					accept = true;
 
 					break;
@@ -451,7 +547,7 @@ public abstract class AppTree extends JTree
 			boolean accept = false;
 
 			for (int i = 0; i < f.length; i++) {
-				if (Arrays.asList(RecordTransferable.flavors).contains(f[i])) {
+				if (Arrays.asList(AppTransferable.flavors).contains(f[i])) {
 					accept = true;
 
 					break;
@@ -485,6 +581,23 @@ public abstract class AppTree extends JTree
 				return;
 			}
 		}
+		
+		private boolean checkForInsideDrop(AppTreeNode groupNode) {
+		    
+		    TreePath path = constructTreePath(groupNode);
+		    
+		    while (path != null) {
+		        int dropRow = getRowForPath(path);
+		        for(int j = 0; j < draggedRowsIndex.length; j++) {
+		            if (draggedRowsIndex[j] == dropRow) {
+		                return true;
+		            }
+			    } 
+		        path = path.getParentPath();		        
+		    }
+		    return false;
+		    
+		}
 
 		/* (non-Javadoc)
 		 * @see java.awt.dnd.DropTargetListener#drop(java.awt.dnd.DropTargetDropEvent)
@@ -500,39 +613,102 @@ public abstract class AppTree extends JTree
 			dtde.acceptDrop(DnDConstants.ACTION_MOVE);
 
 			Transferable transferable = dtde.getTransferable();
-
+			
+			
+//			boolean appTrans = transferable instanceof AppTransferable;
+			
 			DataFlavor[] flavors = transferable.getTransferDataFlavors();
 
 			Point point = dtde.getLocation();
 
-			AppTreeNode groupNode = findClosestGroupNode(getClosestPathForLocation(
-				        (int)(point.getX() + 0.5), (int)(point.getY() + 0.5)));
+			TreePath path = getClosestPathForLocation(
+			        (int)(point.getX() + 0.5), (int)(point.getY() + 0.5));
+			AppTreeNode groupNode = findClosestGroupNode(path);
 
 			if (groupNode != null) {
 				for (int i = 0; i < flavors.length; i++) {
 					DataFlavor df = flavors[i];
 
 					try {
-						if (df.equals(RecordTransferable.flavors[0])) {
-							addElements((AppTreeChannelNode[])transferable
-							    .getTransferData(df), groupNode);
-						}
+						if (df.equals(AppTransferable.flavors[0])) {
+						    if (DND_POLICY == CHANNEL_GROUP_POLICY) {
+						        AppTreeNode[] nodes = (AppTreeNode[]) transferable.getTransferData(df);
+						        if (draggedRowsIndex != null) {
+						            for (int j = 0; j < nodes.length; j++) {
+							            if (checkForInsideDrop(groupNode)) {
+							                draggedRowsIndex = null;
+							                return;
+							            }
+							            addElements(new AppTreeNode[]{nodes[j]}, groupNode, path);
+								    }
+						            draggedRowsIndex = null;
+						        } else {
+						        	addElements(nodes, groupNode, path);
+						        }
+						    } else if (DND_POLICY == CHANNEL_ONLY_POLICY) {
+							    AppTreeNode[] nodes = (AppTreeNode[]) transferable.getTransferData(df);
+							    for (int j = 0; j < nodes.length; j++) {
+							        if (nodes[i].getTreeUserElement() instanceof Channel) {
+							            addElements(new AppTreeNode[]{nodes[j]}, groupNode, path);
+							        } else {
+							            JOptionPane.showMessageDialog(AppTree.this,
+											    "A group cannot be dropped there!", "Invalid drop",
+											    JOptionPane.WARNING_MESSAGE);
+							
+											return;
+							        }
+							    }
+						    }
+						    
+						   
+						} 
 					} catch (UnsupportedFlavorException e) {
 						e.printStackTrace();
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
 				}
+				expandPath(constructTreePath(groupNode));
 			} else {
-				JOptionPane.showMessageDialog(AppTree.this,
-				    "This drop is not allowed!", "Invalid drop",
-				    JOptionPane.WARNING_MESSAGE);
-
-				return;
+//			    
+//				    JOptionPane.showMessageDialog(AppTree.this,
+//					    "This drop is not allowed!", "Invalid drop",
+//					    JOptionPane.WARNING_MESSAGE);
+	
+					return;
 			}
-
 			dtde.dropComplete(true);
 		}
+	}
+	
+	
+	protected ArrayList list = new ArrayList();
+	/**
+	 * 
+	 * Constructs a tree path from the node in its parents.
+	 * @param last
+	 * @return
+	 */
+	protected TreePath constructTreePath(TreeNode last) {
+	    list.clear();
+	    return recursiveConstructTreePath(last);
+	    
+	    
+	}
+	
+	private TreePath recursiveConstructTreePath(TreeNode last) {
+	    list.add(last);
+	    TreeNode node = last.getParent();
+	    if (node == null) {
+	        Object[] path = new Object[list.size()];
+	        int size = list.size();
+	        for (int i = 0; i < size; i++) {
+	            path[i] = list.get(size-1-i);
+	        }
+	        return new TreePath(path);
+	    } else {
+	        return recursiveConstructTreePath(node);
+	    }
 	}
 
 	/**
@@ -554,9 +730,10 @@ public abstract class AppTree extends JTree
 		    boolean selected, boolean expanded, boolean leaf, int row,
 		    boolean hasFocus)
 		{
-			super.getTreeCellRendererComponent(tree, value, selected, expanded,
+
+		    super.getTreeCellRendererComponent(tree, value, selected, expanded,
 			    leaf, row, hasFocus);
-			this.setBackground(new Color(255, 255, 225));
+		    this.setBackground(new Color(255, 255, 225));
 
 			if (value instanceof AppTreeNode) {
 				AppTreeNode node = (AppTreeNode)value;

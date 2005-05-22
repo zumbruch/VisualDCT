@@ -56,9 +56,9 @@ public class ArchiverEditorComponent extends EditorComponent
 						{
 							if (e.getKeyCode() == 10) {
 								String text = valueField.getText();
-
+								double value = 1;
 								try {
-									double value = Double.parseDouble(text);
+									value = Double.parseDouble(text);
 								} catch (Exception ex) {
 									JOptionPane.showMessageDialog(tree,
 									    "Value of the " + element.getName()
@@ -69,7 +69,19 @@ public class ArchiverEditorComponent extends EditorComponent
 
 									return;
 								}
-
+								
+								if (element.getName().equals(ArchiverEngine.channelProperties[0])) {
+								    if (value < 0) {
+								        JOptionPane.showMessageDialog(tree,
+											    "Value of the " + element.getName()
+											    + " cannot be less than 0.",
+											    "Invalid data",
+											    JOptionPane.WARNING_MESSAGE);
+											valueField.selectAll();
+								        return;
+								    }
+								}
+								
 								((Property)element).setValue(text);
 								invoker.stopCellEditing();
 							}

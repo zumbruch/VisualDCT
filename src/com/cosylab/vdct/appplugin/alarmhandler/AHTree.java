@@ -16,7 +16,6 @@ package com.cosylab.vdct.appplugin.alarmhandler;
 
 import com.cosylab.vdct.appplugin.AppFrame;
 import com.cosylab.vdct.appplugin.AppTree;
-import com.cosylab.vdct.appplugin.AppTreeChannelNode;
 import com.cosylab.vdct.appplugin.AppTreeElement;
 import com.cosylab.vdct.appplugin.AppTreeNode;
 import com.cosylab.vdct.appplugin.Channel;
@@ -76,11 +75,12 @@ public class AHTree extends AppTree
 		DefaultTreeModel model = new DefaultTreeModel(rootNode);
 		setModel(model);
 		defaultEditor.setEditorComponent(new AHEditorComponent());
+		setDnDPolicy(CHANNEL_GROUP_POLICY);
 
 		popupItems = new JMenuItem[AHEngine.inputFormat.length - 1];
 
 		for (int i = 1; i <= popupItems.length; i++) {
-			final String name = (i == 23) ? "$GUIDANCE - URL"
+			final String name = (i == 22) ? "$GUIDANCE - URL"
 				: AHEngine.inputFormat[i];
 			final int c = i;
 
@@ -104,11 +104,12 @@ public class AHTree extends AppTree
 							element = new Property(name, true);
 							((Property)element).setValue(AHEngine.defaultPropertyValues[c]);
 						}
-
-						AppTreeNode parent = (AppTreeNode)getSelectionPath()
+						
+						TreePath path = getSelectionPath();
+						AppTreeNode parent = (AppTreeNode)path
 							.getLastPathComponent();
 						AppTreeNode node = new AppTreeNode(element);
-
+						
 						if (element instanceof Property) {
 							boolean added = false;
 
@@ -128,8 +129,16 @@ public class AHTree extends AppTree
 						} else {
 							parent.add(node);
 						}
-
+						expandPath(path);
+												
 						getDefaultModel().reload(parent);
+						if (c == 1 || c == 2) {
+						    startEditingAtPath(path.pathByAddingChild(node));
+						} else if (element instanceof Property) {
+						    if (((Property)element).hasValue()) {
+						        startEditingAtPath(path.pathByAddingChild(node));
+						    }
+						}
 					}
 				});
 		}
@@ -145,12 +154,14 @@ public class AHTree extends AppTree
 					public void actionPerformed(ActionEvent e)
 					{
 						AppTreeElement element = null;
-						AppTreeNode parent = (AppTreeNode)getSelectionPath()
+						TreePath path = getSelectionPath();
+						AppTreeNode parent = (AppTreeNode)path
 							.getLastPathComponent();
-
+						AppTreeNode node;
 						if (c == 0) {
 							element = new Text("<insert guidance text>");
-							parent.add(new AppTreeNode(element));
+							node = new AppTreeNode(element);
+							parent.add(node);
 						} else {
 							element = new Property(name, true);
 
@@ -159,12 +170,22 @@ public class AHTree extends AppTree
 							} else if (c == 11) {
 								((Property)element).setValue(AHEngine.statCommands[0]);
 							}
-
-							parent.insert(new AppTreeNode(element), 0);
+							node = new AppTreeNode(element);
+							parent.insert(node, 0);
 						}
 
 						sortChildren(parent);
+						expandPath(path);
 						getDefaultModel().reload(parent);
+						
+						if (c == 0) {
+						    startEditingAtPath(path.pathByAddingChild(node));
+						}
+						if (element instanceof Property) {
+						    if (((Property)element).hasValue()) {
+						        startEditingAtPath(path.pathByAddingChild(node));
+						    }
+						} 
 					}
 				});
 		}
@@ -183,8 +204,8 @@ public class AHTree extends AppTree
 
 					((AlHandler)appFrame).setSelectedFileChooserFilter(AlHandler.INCLUDE);
 
-					File f = appFrame.saveFileAs(export);
-
+					File f = appFrame.saveFileAs(export, false);
+					
 					AppTreeNode parent = (AppTreeNode)export.getParent();
 
 					//TODO is it absolute path or should the include file be in the same directory
@@ -233,7 +254,7 @@ public class AHTree extends AppTree
 								    JOptionPane.WARNING_MESSAGE);
 
 							if (i == JOptionPane.YES_OPTION) {
-								appFrame.saveFileAs(getRoot());
+								appFrame.saveFileAs(getRoot(), true);
 
 								f = appFrame.getCurrentFile();
 							} else {
@@ -253,7 +274,7 @@ public class AHTree extends AppTree
 					String name = load.getTreeUserElement().getName();
 					AppTreeNode parent = (AppTreeNode)imp.getParent();
 
-					if (parent.getTreeUserElement().getName().equals(name)) {
+					if (parent.getTreeUserElement().getName().equals(name) || name.equals("NULL")) {
 						while (!load.isLeaf()) {
 							parent.add((MutableTreeNode)load.getFirstChild());
 						}
@@ -262,7 +283,7 @@ public class AHTree extends AppTree
 						getDefaultModel().reload(parent);
 					} else {
 						JOptionPane.showMessageDialog(appFrame,
-						    "Unable to import file. /n Parent name in the included file /n does not match group "
+						    "Unable to import file. \n Parent name in the included file \n does not match group "
 						    + name + ".", "Invalid data",
 						    JOptionPane.ERROR_MESSAGE);
 					}
@@ -301,7 +322,7 @@ public class AHTree extends AppTree
 								    JOptionPane.WARNING_MESSAGE);
 
 							if (i == JOptionPane.YES_OPTION) {
-								appFrame.saveFileAs(getRoot());
+								appFrame.saveFileAs(getRoot(), true);
 
 								f = appFrame.getCurrentFile();
 							} else {
@@ -367,7 +388,7 @@ public class AHTree extends AppTree
 									AppTreeNode child = (AppTreeNode)node
 										.getChildAt(i);
 
-									if (child instanceof AppTreeChannelNode) {
+									if (child.getTreeUserElement() instanceof Channel) {
 										nodesList.add(child);
 									}
 								}
@@ -376,9 +397,9 @@ public class AHTree extends AppTree
 							}
 						}
 
-						AppTreeChannelNode[] nodes = new AppTreeChannelNode[nodesList
+						AppTreeNode[] nodes = new AppTreeNode[nodesList
 							.size()];
-						fireChannelRemoved((AppTreeChannelNode[])nodesList
+						fireChannelRemoved((AppTreeNode[])nodesList
 						    .toArray(nodes));
 					}
 				});
@@ -394,9 +415,9 @@ public class AHTree extends AppTree
 		for (int i = 0; i < node.getChildCount(); i++) {
 			AppTreeNode child = (AppTreeNode)node.getChildAt(i);
 
-			if (child instanceof AppTreeChannelNode) {
-				fireChannelRemoved(new AppTreeChannelNode[]{
-					    (AppTreeChannelNode)child
+			if (child.getTreeUserElement() instanceof Channel) {
+				fireChannelRemoved(new AppTreeNode[]{
+					    (AppTreeNode)child
 				    });
 			} else if (child.getTreeUserElement() instanceof Group) {
 				removeChannelNodes(child);
@@ -461,7 +482,7 @@ public class AHTree extends AppTree
 		if (element instanceof Include || element instanceof Text) {
 			//			return new JMenuItem[0];
 		} else if (element instanceof Group) {
-			for (int i = 0; i < 21; i++) {
+			for (int i = 0; i < 22; i++) {
 				items.add(popupItems[i]);
 			}
 		} else if (element instanceof Property) {
@@ -579,7 +600,7 @@ public class AHTree extends AppTree
 		} else if (element instanceof Channel) {
 			items.add(propertyItems[3]);
 
-			for (int i = 1; i < 21; i++) {
+			for (int i = 2; i < 21; i++) {
 				items.add(popupItems[i]);
 			}
 		}

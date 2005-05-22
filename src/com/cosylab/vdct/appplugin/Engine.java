@@ -15,6 +15,10 @@
 package com.cosylab.vdct.appplugin;
 
 import java.io.File;
+import java.util.ArrayList;
+
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 
 
 /**
@@ -39,6 +43,38 @@ public abstract class Engine
 		super();
 		this.frame = frame;
 		initialize();
+	}
+	
+	protected ArrayList list = new ArrayList();
+	
+	/**
+	 * 
+	 * Constructs the TreePath from the TreeNode given as parameter. Path is constructed from 
+	 * this node to the root node.
+	 * @param last
+	 * @return
+	 */
+	protected TreePath constructTreePath(TreeNode last) {
+	    list.clear();
+	    return recursiveConstructTreePath(last);
+	    
+	}
+	
+	private TreePath recursiveConstructTreePath(TreeNode last) {
+	    
+	    list.add(last);
+	    TreeNode node = last.getParent();
+	    if (node == null) {
+	        Object[] path = new Object[list.size()];
+	        int size = list.size();
+	        for (int i = 0; i < size; i++) {
+	            path[i] = list.get(size-1-i);
+	        }
+	        return new TreePath(path);
+	    } else {
+	        return constructTreePath(node);
+	    }
+	    
 	}
 
 	/**

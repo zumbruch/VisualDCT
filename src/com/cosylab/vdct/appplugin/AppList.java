@@ -49,7 +49,7 @@ import javax.swing.JList;
  */
 public class AppList extends JList
 {
-	private AppTreeChannelNode[] draggedValues;
+	private AppTreeNode[] draggedValues;
 
 	/**
 	 * Creates a new ArchiverList object.
@@ -84,7 +84,7 @@ public class AppList extends JList
 					draggedValues = getSelectedRecords();
 
 					//				    draggedValues = getSelectedValues();
-					Transferable transferable = new RecordTransferable(draggedValues);
+					Transferable transferable = new AppTransferable(draggedValues);
 					event.startDrag(new Cursor(Cursor.MOVE_CURSOR),
 					    transferable,
 					    new DragSourceAdapter() {
@@ -126,10 +126,10 @@ public class AppList extends JList
 	 *
 	 * @return selected records
 	 */
-	public AppTreeChannelNode[] getSelectedRecords()
+	public AppTreeNode[] getSelectedRecords()
 	{
 		Object[] objects = getSelectedValues();
-		AppTreeChannelNode[] records = new AppTreeChannelNode[objects.length];
+		AppTreeNode[] records = new AppTreeNode[objects.length];
 		System.arraycopy(objects, 0, records, 0, objects.length);
 
 		return records;
@@ -144,7 +144,7 @@ public class AppList extends JList
 			boolean accept = false;
 
 			for (int i = 0; i < f.length; i++) {
-				if (Arrays.asList(RecordTransferable.flavors).contains(f[i])) {
+				if (Arrays.asList(AppTransferable.flavors).contains(f[i])) {
 					accept = true;
 
 					break;
@@ -161,7 +161,7 @@ public class AppList extends JList
 			boolean accept = false;
 
 			for (int i = 0; i < f.length; i++) {
-				if (Arrays.asList(RecordTransferable.flavors).contains(f[i])) {
+				if (Arrays.asList(AppTransferable.flavors).contains(f[i])) {
 					accept = true;
 
 					break;
@@ -218,13 +218,25 @@ public class AppList extends JList
 				DataFlavor df = flavors[i];
 
 				try {
-					if (df.equals(RecordTransferable.flavors[0])) {
-						AppTreeChannelNode[] nodes = (AppTreeChannelNode[])transferable
+					if (df.equals(AppTransferable.flavors[0])) {
+						AppTreeNode[] nodes = (AppTreeNode[])transferable
 							.getTransferData(df);
 
 						for (int j = 0; j < nodes.length; j++) {
-							getDefaultModel().add(locationToIndex(location),
-							    nodes[j]);
+						    Point p = indexToLocation(getDefaultModel().size()-1);
+						    int index = 0;
+						    if (location.y > p.y) {
+						        index = getDefaultModel().size();
+						    } else {
+						        index = locationToIndex(location);
+						    }
+						    AppTreeElement elem = nodes[j].getTreeUserElement();
+						    if (elem instanceof Channel) {
+						        getDefaultModel().add(index,
+								    nodes[j]);
+						    } else if (elem instanceof Group) {
+						        addRecordsFromGroupNode(nodes[j], index);
+						    }
 						}
 					}
 				} catch (UnsupportedFlavorException e) {
@@ -236,6 +248,23 @@ public class AppList extends JList
 
 			dtde.dropComplete(true);
 		}
+	}
+	
+	private void addRecordsFromGroupNode(AppTreeNode groupNode, int location) {
+	    
+	    AppTreeNode node;
+	    AppTreeElement elem;
+	    for (int i = 0; i < groupNode.getChildCount(); i++) {
+	        node = (AppTreeNode) groupNode.getChildAt(i);
+	        elem = node.getTreeUserElement();
+	        if (elem instanceof Channel) {
+				getDefaultModel().add(location, node);
+	        } else if (elem instanceof Group) {
+	            addRecordsFromGroupNode(node, location);
+	        }
+	        
+	    }
+	    
 	}
 }
 

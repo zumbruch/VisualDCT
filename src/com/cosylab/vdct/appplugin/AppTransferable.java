@@ -35,26 +35,24 @@ import java.util.Arrays;
  *
  * @since VERSION
  */
-public class RecordTransferable implements Transferable
+public class AppTransferable implements Transferable
 {
 	/** DOCUMENT ME! */
 	public static DataFlavor[] flavors = new DataFlavor[]{
-			new DataFlavor(AppTreeChannelNode.class, "EPICS Channel")
+			new DataFlavor(AppTreeNode.class, "EPICS Channel"),
 		};
-	private AppTreeChannelNode[] channels;
-
+	private AppTreeNode[] nodes;
+	
 	/**
 	 * Creates a new RecordTransferable object.
 	 *
 	 * @param channels an array of ArchiverTreeRecordNodes to be transferred
 	 */
-	public RecordTransferable(AppTreeChannelNode[] channels)
+	public AppTransferable(AppTreeNode[] nodes)
 	{
-		this.channels = channels;
-
-		//	    recordsList = new ArrayList(Arrays.asList(records));
+		this.nodes = nodes;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see java.awt.datatransfer.Transferable#getTransferDataFlavors()
 	 */
@@ -78,11 +76,12 @@ public class RecordTransferable implements Transferable
 		throws UnsupportedFlavorException, IOException
 	{
 		if (isDataFlavorSupported(flavor)) {
-			return channels;
+			return nodes;
 		} else {
 			throw new UnsupportedFlavorException(flavor);
 		}
 	}
+	
 }
 
 /* __oOo__ */

@@ -27,7 +27,7 @@ import java.util.EventObject;
  */
 public class ChannelRemovedEvent extends EventObject
 {
-	private AppTreeChannelNode[] nodes = null;
+	private AppTreeNode[] nodes = null;
 
 	/**
 	 * TODO DOCUMENT ME!
@@ -35,7 +35,7 @@ public class ChannelRemovedEvent extends EventObject
 	 * @param source
 	 * @param nodes DOCUMENT ME!
 	 */
-	public ChannelRemovedEvent(Object source, AppTreeChannelNode[] nodes)
+	public ChannelRemovedEvent(Object source, AppTreeNode[] nodes)
 	{
 		// TODO Auto-generated constructor stub
 		super(source);
@@ -47,7 +47,7 @@ public class ChannelRemovedEvent extends EventObject
 	 *
 	 * @return DOCUMENT ME!
 	 */
-	public AppTreeChannelNode[] getChannelNode()
+	public AppTreeNode[] getNodes()
 	{
 		return nodes;
 	}

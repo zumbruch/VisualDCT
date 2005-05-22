@@ -15,7 +15,6 @@
 package com.cosylab.vdct.appplugin.archiver;
 
 import com.cosylab.vdct.appplugin.AppFrame;
-import com.cosylab.vdct.appplugin.AppTreeChannelNode;
 import com.cosylab.vdct.appplugin.AppTreeElement;
 import com.cosylab.vdct.appplugin.AppTreeNode;
 import com.cosylab.vdct.appplugin.Channel;
@@ -39,6 +38,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 
 import javax.swing.JOptionPane;
+import javax.swing.tree.TreePath;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -170,7 +170,6 @@ public class ArchiverEngine extends Engine
 			}
 
 			Document doc = builder.newDocument();
-
 			boolean success = parseToDocument(doc, root);
 
 			if (!success) {
@@ -267,7 +266,7 @@ public class ArchiverEngine extends Engine
 			AppTreeElement elem = getTreeElement(node);
 
 			if (elem instanceof Channel) {
-				treeNode = new AppTreeChannelNode((Channel)elem);
+				treeNode = new AppTreeNode((Channel)elem);
 			} else {
 				treeNode = new AppTreeNode(getTreeElement(node));
 			}
@@ -410,30 +409,34 @@ public class ArchiverEngine extends Engine
 	public boolean parseToDocument(Document doc, AppTreeNode root)
 	{
 		this.doc = doc;
-
+		
 		Element e = doc.createElement(descriptors[0]);
 		doc.appendChild(e);
-
-		return appendToRootNode(root, e);
-
-		//        appendChildrenToNode(e, root);
-	}
-
-	private boolean appendToRootNode(AppTreeNode root, Node rootNode)
-	{
-		if (root.getChildCount() == 0
-		    || root.getChildCount() == root.getLeafCount()) {
-			JOptionPane.showMessageDialog(frame,
-			    "EngineConfig must contain at least one not empty group. \n Parsing aborted!",
-			    "Structure invalid", JOptionPane.WARNING_MESSAGE);
-
-			return false;
+		TreePath path = appendToRootNode(root,e);
+		if (path != null) {
+		    frame.getTree().setErrorSelection(path);
+		    return false;
+		} else {
+		    frame.getTree().setErrorSelection(null);
+		    return true;
 		}
 
+	}
+
+	private TreePath appendToRootNode(AppTreeNode root, Node rootNode)
+	{
+		if (root.getChildCount() == 0) {
+		    JOptionPane.showMessageDialog(frame,
+			    "EngineConfig must contain at least one non empty group. \n Parsing aborted!",
+			    "Structure invalid", JOptionPane.WARNING_MESSAGE);
+		    return constructTreePath(root);
+//			return false;
+		}
+		
 		for (int i = 0; i < root.getChildCount(); i++) {
 			//group or property
 			AppTreeNode node = (AppTreeNode)root.getChildAt(i);
-
+			
 			rootNode.appendChild(getIndentNode(BREAK_TYPE));
 
 			Element level1 = null;
@@ -457,10 +460,16 @@ public class ArchiverEngine extends Engine
 							    "Property " + elem.getName()
 							    + " has invalid value. \n Parsing aborted!",
 							    "Structure invalid", JOptionPane.WARNING_MESSAGE);
-
-							return false;
+							return constructTreePath(node);
+//							return false;
 						}
 					}
+				} else {
+				    JOptionPane.showMessageDialog(frame,
+						    "Group " + elem.getName()
+						    + " cannot be empty. \n Parsing aborted!",
+						    "Structure invalid", JOptionPane.WARNING_MESSAGE);
+						return constructTreePath(node);
 				}
 
 				//				} else {
@@ -532,8 +541,8 @@ public class ArchiverEngine extends Engine
 								    + " has invalid value. \n Parsing aborted!",
 								    "Structure invalid",
 								    JOptionPane.WARNING_MESSAGE);
-
-								return false;
+								return constructTreePath(channelProperty);
+//								return false;
 							}
 						}
 
@@ -548,8 +557,8 @@ public class ArchiverEngine extends Engine
 						    + channelNode.getTreeUserElement().getName()
 						    + " is missing properties. \n Parsing aborted!",
 						    "Structure invalid", JOptionPane.WARNING_MESSAGE);
-
-						return false;
+						return constructTreePath(channelNode);
+//						return false;
 					}
 
 					level2.appendChild(getIndentNode(INDENT_TYPE));
@@ -563,9 +572,10 @@ public class ArchiverEngine extends Engine
 
 		rootNode.appendChild(getIndentNode(BREAK_TYPE));
 
-		return true;
+		return null;
 	}
 
+	
 	private Text getIndentNode(short type)
 	{
 		if (type == BREAK_TYPE) {

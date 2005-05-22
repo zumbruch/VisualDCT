@@ -19,7 +19,12 @@ import com.cosylab.vdct.appplugin.Channel;
 import com.cosylab.vdct.graphics.objects.Record;
 import com.cosylab.vdct.plugin.Plugin;
 import com.cosylab.vdct.plugin.PluginContext;
+import com.cosylab.vdct.plugin.PluginManager;
+import com.cosylab.vdct.plugin.PluginObject;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.Iterator;
 import java.util.Properties;
 import java.util.Vector;
 
@@ -96,7 +101,25 @@ public class AHPlugin implements Plugin
 		}
 
 		handler.clear();
-
+		
+		handler.addWindowListener(new WindowAdapter() {
+		    public void windowClosed(WindowEvent e) {
+		        
+		        Iterator pl = PluginManager.getInstance().getPlugins();
+		        while(pl.hasNext()) {
+		            Object plugin = pl.next();
+		            if (plugin instanceof PluginObject) {
+		                PluginObject plug = ((PluginObject)plugin);
+		                if (plug.getPlugin().equals(AHPlugin.this)) {
+		                    plug.stop();
+			            }
+		            }
+		        }
+		        
+		        
+		    }
+		});
+		
 		try {
 			Vector data = DataProvider.getInstance().getInspectable();
 
@@ -110,7 +133,7 @@ public class AHPlugin implements Plugin
 		} catch (Exception e) {
 			//
 		}
-
+		
 		handler.setVisible(true);
 		handler.toFront();
 	}
@@ -120,7 +143,7 @@ public class AHPlugin implements Plugin
 	 */
 	public void stop()
 	{
-		if (handler != null) {
+		if (handler != null && handler.isShowing()) {
 			handler.dispose();
 		}
 	}

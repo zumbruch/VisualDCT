@@ -55,6 +55,7 @@ public class AppTreeNode extends DefaultMutableTreeNode
 	{
 		return (AppTreeElement)userObject;
 	}
+
 }
 
 /* __oOo__ */

@@ -16,7 +16,6 @@ package com.cosylab.vdct.appplugin.archiver;
 
 import com.cosylab.vdct.appplugin.AppFrame;
 import com.cosylab.vdct.appplugin.AppTree;
-import com.cosylab.vdct.appplugin.AppTreeChannelNode;
 import com.cosylab.vdct.appplugin.AppTreeElement;
 import com.cosylab.vdct.appplugin.AppTreeNode;
 import com.cosylab.vdct.appplugin.Channel;
@@ -85,9 +84,14 @@ public class ArchiverTree extends AppTree
 						if (hasValue) {
 							property.setValue(ArchiverEngine.defaultPropertyValues[c]);
 						}
-
-						rootNode.insert(new AppTreeNode(property), 0);
+						
+						AppTreeNode node = new AppTreeNode(property);
+						rootNode.insert(node, 0);
 						getDefaultModel().reload(rootNode);
+						
+						if (property.hasValue()) {
+						    startEditingAtPath(constructTreePath(node));
+						}
 					}
 				});
 		}
@@ -107,18 +111,23 @@ public class ArchiverTree extends AppTree
 						if (hasValue) {
 							property.setValue(ArchiverEngine.defaultPropertyValues[6]);
 						}
-
-						AppTreeNode parent = (AppTreeNode)getSelectionPath()
+						TreePath path = getSelectionPath();
+						AppTreeNode parent = (AppTreeNode)path
 							.getLastPathComponent();
-						parent.add(new AppTreeNode(property));
-						sortChannelProperties((AppTreeChannelNode)parent);
+						AppTreeNode node = new AppTreeNode(property);
+						parent.add(node);
+						sortChannelProperties((AppTreeNode)parent);
 						getDefaultModel().reload(parent);
+						
+						if (property.hasValue()) {
+						    startEditingAtPath(path.pathByAddingChild(node));
+						}
 					}
 				});
 		}
 	}
 
-	private void sortChannelProperties(AppTreeChannelNode node)
+	private void sortChannelProperties(AppTreeNode node)
 	{
 		AppTreeNode[] nodes = new AppTreeNode[node.getChildCount()];
 
@@ -149,8 +158,11 @@ public class ArchiverTree extends AppTree
 			addGroup.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e)
 					{
-						rootNode.add(new AppTreeNode(new Group("<new group>")));
+					    AppTreeNode node = new AppTreeNode(new Group("<new group>"));
+						rootNode.add(node);
 						((DefaultTreeModel)getModel()).reload(rootNode);
+						startEditingAtPath(constructTreePath(node));
+						
 					}
 				});
 			popup.add(addGroup);
@@ -179,7 +191,7 @@ public class ArchiverTree extends AppTree
 								if (elem instanceof Group) {
 									for (int i = 0; i < node.getChildCount();
 									    i++) {
-										nodesList.add((AppTreeChannelNode)node
+										nodesList.add((AppTreeNode)node
 										    .getChildAt(i));
 									}
 								} else if (elem instanceof Channel) {
@@ -188,9 +200,9 @@ public class ArchiverTree extends AppTree
 							}
 						}
 
-						AppTreeChannelNode[] nodes = new AppTreeChannelNode[nodesList
+						AppTreeNode[] nodes = new AppTreeNode[nodesList
 							.size()];
-						fireChannelRemoved((AppTreeChannelNode[])nodesList
+						fireChannelRemoved((AppTreeNode[])nodesList
 						    .toArray(nodes));
 					}
 				});
