@@ -88,6 +88,7 @@ public class ArchiverTree extends AppTree
 						AppTreeNode node = new AppTreeNode(property);
 						rootNode.insert(node, 0);
 						getDefaultModel().reload(rootNode);
+						appFrame.setIsFileModified(true);
 						
 						if (property.hasValue()) {
 						    startEditingAtPath(constructTreePath(node));
@@ -118,6 +119,7 @@ public class ArchiverTree extends AppTree
 						parent.add(node);
 						sortChannelProperties((AppTreeNode)parent);
 						getDefaultModel().reload(parent);
+						appFrame.setIsFileModified(true);
 						
 						if (property.hasValue()) {
 						    startEditingAtPath(path.pathByAddingChild(node));
@@ -161,8 +163,8 @@ public class ArchiverTree extends AppTree
 					    AppTreeNode node = new AppTreeNode(new Group("<new group>"));
 						rootNode.add(node);
 						((DefaultTreeModel)getModel()).reload(rootNode);
+						appFrame.setIsFileModified(true);
 						startEditingAtPath(constructTreePath(node));
-						
 					}
 				});
 			popup.add(addGroup);

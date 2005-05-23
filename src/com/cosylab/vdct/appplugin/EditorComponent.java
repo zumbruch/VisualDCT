@@ -84,6 +84,7 @@ public class EditorComponent extends JPanel
 	public void setup(final AppTreeNode node, final TreeCellEditor invoker,
 	    final AppTree tree)
 	{
+	    tree.appFrame.setIsFileModified(true);
 		final AppTreeElement element = node.getTreeUserElement();
 
 		boolean property = element instanceof Property;

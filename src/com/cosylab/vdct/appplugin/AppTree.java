@@ -157,6 +157,7 @@ public abstract class AppTree extends JTree
 		for (int i = 0; i < treeListeners.size(); i++) {
 			((TreeListener)treeListeners.get(i)).channelRemoved(evt);
 		}
+		appFrame.setIsFileModified(true);
 	}
 
 	/**
@@ -364,6 +365,7 @@ public abstract class AppTree extends JTree
 	    }
 	    		
 		((DefaultTreeModel)getModel()).reload(parent);
+		appFrame.setIsFileModified(true);
 	}
 		
 	private int getChildInPath(AppTreeNode parent, TreePath path) {

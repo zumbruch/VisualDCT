@@ -132,6 +132,7 @@ public class AHTree extends AppTree
 						expandPath(path);
 												
 						getDefaultModel().reload(parent);
+						appFrame.setIsFileModified(true);
 						if (c == 1 || c == 2) {
 						    startEditingAtPath(path.pathByAddingChild(node));
 						} else if (element instanceof Property) {
@@ -177,6 +178,7 @@ public class AHTree extends AppTree
 						sortChildren(parent);
 						expandPath(path);
 						getDefaultModel().reload(parent);
+						appFrame.setIsFileModified(true);
 						
 						if (c == 0) {
 						    startEditingAtPath(path.pathByAddingChild(node));
@@ -221,6 +223,7 @@ public class AHTree extends AppTree
 							getDefaultModel().reload(parent);
 						}
 					}
+					appFrame.setIsFileModified(true);
 				}
 			});
 
@@ -287,6 +290,7 @@ public class AHTree extends AppTree
 						    + name + ".", "Invalid data",
 						    JOptionPane.ERROR_MESSAGE);
 					}
+					appFrame.setIsFileModified(true);
 				}
 			});
 
@@ -342,10 +346,9 @@ public class AHTree extends AppTree
 						for (int i = 0; i < model.size(); i++) {
 							dest.addElement(model.get(i));
 						}
-
-						//					    handler.setExitOnClose(false);
 						handler.setVisible(true);
 					}
+					appFrame.setIsFileModified(true);
 				}
 			});
 	}

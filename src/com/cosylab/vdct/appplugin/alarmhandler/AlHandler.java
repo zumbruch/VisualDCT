@@ -52,9 +52,9 @@ public class AlHandler extends AppFrame
 	}
 
 	/* (non-Javadoc)
-	 * @see com.cosylab.vdct.appplugin.AppFrame#initialization()
+	 * @see com.cosylab.vdct.appplugin.AppFrame#nameInitialization()
 	 */
-	protected void initialization()
+	protected void nameInitialization()
 	{
 		this.setTitle("Alarm Handler");
 	}

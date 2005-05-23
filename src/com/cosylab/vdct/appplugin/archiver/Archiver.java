@@ -50,7 +50,7 @@ public class Archiver extends AppFrame
 	 *  (non-Javadoc)
 	 * @see com.cosylab.vdct.appplugin.AppFrame#initialization()
 	 */
-	protected void initialization()
+	protected void nameInitialization()
 	{
 		this.setTitle("Archiver");
 	}

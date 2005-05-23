@@ -59,9 +59,9 @@ public abstract class AppFrame extends JFrame
 	protected JFileChooser fileChooser;
 	protected File currentFile;
 	protected Engine engine;
+	
+	private boolean isFileModified = false;
 
-	//	private boolean exitOnClose;
-	//	private WindowListener exitListener;
 	private WindowListener disposeListener;
 
 	/**
@@ -75,13 +75,7 @@ public abstract class AppFrame extends JFrame
 
 	private void initialize()
 	{
-		//	    exitListener = new WindowAdapter() {
-		//	        public void windowClosing(WindowEvent e) {
-		//		        if (askForSave()) {
-		//		            System.exit(0);
-		//		        } 
-		//	        }
-		//	    };
+
 		disposeListener = new WindowAdapter() {
 					public void windowClosing(WindowEvent e)
 					{
@@ -95,12 +89,10 @@ public abstract class AppFrame extends JFrame
 		this.setSize(500, 500);
 		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		this.addWindowListener(disposeListener);
-
-		//		setExitOnClose(false);
-		initialization();
+		nameInitialization();
 	}
-
-	protected abstract void initialization();
+	
+	protected abstract void nameInitialization();
 
 	/**
 	 * DOCUMENT ME!
@@ -265,7 +257,8 @@ public abstract class AppFrame extends JFrame
 						if (askForSave()) {
 							getTree().reset();
 							currentFile = null;
-							initialization();
+							nameInitialization();
+							setIsFileModified(false);
 						}
 					}
 				});
@@ -347,9 +340,9 @@ public abstract class AppFrame extends JFrame
 			getTree().setRoot(node);
 			getTree().getDefaultModel().reload();
 			currentFile = f;
-			initialization();
+			nameInitialization();
 			setTitle(getTitle() + " [" + f.getName() + "]");
-
+			setIsFileModified(false);
 			return f.getName();
 		}
 
@@ -366,7 +359,7 @@ public abstract class AppFrame extends JFrame
 	protected abstract boolean fileApproved(File f);
 
 	/**
-	 * If the file specified by JFileChooser doesn't have the extension this
+	 * If the file specified by JFileChooser doesn't have the extension, this
 	 * method should provide the extension. Either a new file with the same
 	 * name + extension should be created or the same file should be returned
 	 * if the appropriate extension already exists.
@@ -419,13 +412,13 @@ public abstract class AppFrame extends JFrame
 		if (success) {
 			getTree().getDefaultModel().nodeChanged(getTree().getRoot());
 			if (changeTitle) {
-			    initialization();
+			    nameInitialization();
 			    currentFile = file;
 			    setTitle(getTitle() + " [" + file.getName() + "]");
+			    setIsFileModified(false);
 			}
 		}
 		getTree().selectError();
-
 		return success;
 	}
 
@@ -480,13 +473,16 @@ public abstract class AppFrame extends JFrame
 	 * Shows a confirm dialog asking user to save data before opening a new
 	 * file. Returns true if the tree should be reset after the dialog has
 	 * been confirmed. Tree is reset if the user choose YES or NO, but is not
-	 * is he chooses CANCEL.
+	 * if he chooses CANCEL.
 	 *
-	 * @return true flag indicating whether changes have to be made (yes or no
+	 * @return flag indicating whether changes have to be made (yes or no
 	 *         was pressed)
 	 */
 	protected synchronized boolean askForSave()
 	{
+	    if (!isFileModified()) {
+	        return true; 
+	    }
 		int i = JOptionPane.showConfirmDialog(this, "Save current data?",
 			    "Caution", JOptionPane.YES_NO_CANCEL_OPTION,
 			    JOptionPane.WARNING_MESSAGE);
@@ -512,24 +508,18 @@ public abstract class AppFrame extends JFrame
 			return false;
 		}
 	}
-
-	//	public boolean getExitOnClose() {
-	//	    return exitOnClose;
-	//	}
-	//	
-	//	public void setExitOnClose(boolean exitOnClose) {
-	//	    if (exitOnClose == this.exitOnClose) {
-	//	        return;
-	//	    }
-	//	    this.exitOnClose = exitOnClose;
-	//	    if (exitOnClose) {
-	//	        this.addWindowListener(exitListener);
-	//			this.removeWindowListener(disposeListener);
-	//	    } else {
-	//	        this.removeWindowListener(exitListener);
-	//	        this.addWindowListener(disposeListener);
-	//	    }
-	//	}
+	
+	public void setIsFileModified(boolean modified) {
+	    this.isFileModified = modified;
+	    if (modified && currentFile != null) {
+	        nameInitialization();
+	        setTitle(getTitle() + " [" + currentFile.getName() + " *]");
+	    }
+	}
+	
+	public boolean isFileModified() {
+	    return this.isFileModified;
+	}
 }
 
 /* __oOo__ */
