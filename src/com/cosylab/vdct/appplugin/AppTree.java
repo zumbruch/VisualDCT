@@ -103,7 +103,7 @@ public abstract class AppTree extends JTree
 		this.setEditable(true);
 		this.setCellEditor(new CellEditor(this, cellRenderer, defaultEditor));
 		initialization();
-		
+
 	}
 
 	protected abstract void initialization();
@@ -220,7 +220,7 @@ public abstract class AppTree extends JTree
 					final int[] rows = getSelectionRows();
 					ArrayList values = new ArrayList();
 					ArrayList rowslist = new ArrayList();
-					
+
 					if (paths != null) {
 						for (int i = 0; i < paths.length; i++) {
 
@@ -239,12 +239,12 @@ public abstract class AppTree extends JTree
 
 					draggedValues = new AppTreeNode[values.size()];
 					values.toArray(draggedValues);
-					
+
 					draggedRowsIndex = new int[rowslist.size()];
 					for (int i = 0; i < draggedRowsIndex.length; i++) {
 					    draggedRowsIndex[i] = ((Integer)rowslist.get(i)).intValue();
 					}
-									
+
 					Transferable transferable = new AppTransferable(draggedValues);
 					event.startDrag(new Cursor(Cursor.MOVE_CURSOR),
 					    transferable,
@@ -257,7 +257,7 @@ public abstract class AppTree extends JTree
 							{
 								if (dsde.getDropSuccess()) {
 									int action = dsde.getDropAction();
-									
+
 									if (action == DnDConstants.ACTION_MOVE) {
 										for (int i = 0;
 										    i < draggedValues.length; i++) {
@@ -278,9 +278,9 @@ public abstract class AppTree extends JTree
 
 	private ArrayList recordList = new ArrayList();
 	/**
-	 * Returns all selected ArchiverTreeRecordNodes.
+	 * Returns all selected AppTreeNodes containing Channels as UserTreeElements.
 	 *
-	 * @return array of ArchiverTreeRecordNode.
+	 * @return array of AppTreeNode.
 	 */
 	public AppTreeNode[] getSelectionRecords()
 	{
@@ -293,18 +293,18 @@ public abstract class AppTree extends JTree
 
 		for (int i = 0; i < paths.length; i++) {
 			AppTreeNode lastNode = (AppTreeNode)paths[i].getLastPathComponent();
-			
+
 			grabRecord(lastNode);
-									
+
 		}
 
 		AppTreeNode[] recordNode = new AppTreeNode[recordList.size()];
 
 		return (AppTreeNode[])recordList.toArray(recordNode);
 	}
-	
+
 	private void grabRecord(AppTreeNode node) {
-	    
+
 	    if (node.getTreeUserElement() instanceof Channel) {
 			recordList.add(node);
 		}
@@ -313,11 +313,11 @@ public abstract class AppTree extends JTree
 	            grabRecord((AppTreeNode) node.getChildAt(i));
 	        }
 	    }
-	    
+
 	}
 
 	/**
-	 * Adds ArchiverTreeRecordNodes as records to the selected path.
+	 * Adds AppTreeNodes to the selected path.
 	 *
 	 * @param records nodes to be added
 	 *
@@ -363,13 +363,13 @@ public abstract class AppTree extends JTree
 				parent.insert(children[j],i);
 			}
 	    }
-	    		
+
 		((DefaultTreeModel)getModel()).reload(parent);
 		appFrame.setIsFileModified(true);
 	}
-		
+
 	private int getChildInPath(AppTreeNode parent, TreePath path) {
-	    
+
 	    Object[] nodes = path.getPath();
 	    for (int i = nodes.length-1; i >=0; i--) {
 	        for (int j = 0; j < parent.getChildCount(); j++) {
@@ -379,11 +379,11 @@ public abstract class AppTree extends JTree
 	        }
 	    }
 	    return -1;
-	    
+
 	}
 
 	/**
-	 * Finds the node in the path, which holds an ArchiverTreeGroup as a user
+	 * Finds the node in the path, which holds an AppTreeGroup as a user
 	 * object.
 	 *
 	 * @param path TreePath to be searched
@@ -408,35 +408,35 @@ public abstract class AppTree extends JTree
 
 		return null;
 	}
-	
-	TreePath errorPath = null;
-	
+
+	private TreePath errorPath = null;
+
 	/**
-	 * 
+	 *
 	 * Sets the path that was reported as path with error. This path is later selected, when
 	 * the saving procedure is finished.
-	 * 
+	 *
 	 * @param path
 	 */
 	public void setErrorSelection(TreePath path) {
 	    this.errorPath = path;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * Selects the path that was reported as path with error.
 	 *
 	 */
 	public void selectError() {
 	    if (errorPath != null) {
-	        System.out.println(errorPath);
+	        startEditingAtPath(errorPath);
 	    }
 	}
-	
+
 	/**
 	 * Sets drag&drop policy. CHANNELS_ONLY means only channels can be dropped inside a tree,
 	 * CHANNELS_GROUP means channels and groups can be dropped inside a tree.
-	 * 
+	 *
 	 * @param policy
 	 */
 	public void setDnDPolicy(short policy) {
@@ -468,16 +468,16 @@ public abstract class AppTree extends JTree
 
 				if (path != null) {
 				    AppTreeNode node = (AppTreeNode)path.getLastPathComponent();
-				    
+
 				    if (node.isRoot()) {
 				        expandPath(path);
 				    }
-				    
+
 					if (node.getTreeUserElement().isEditable()) {
 					    AppTree.this.startEditingAtPath(path);
 					}
 				}
-				
+
 			} else if (e.getClickCount() == 1) {
 				boolean ctrlDown = (e.getModifiersEx()
 					& InputEvent.CTRL_DOWN_MASK) == InputEvent.CTRL_DOWN_MASK;
@@ -514,7 +514,7 @@ public abstract class AppTree extends JTree
 			}
 		}
 	}
-	
+
 	/**
 	 * <code>DropTargetTreeHandler</code> handles DnD-Drop events on the tree.
 	 *
@@ -583,22 +583,22 @@ public abstract class AppTree extends JTree
 				return;
 			}
 		}
-		
+
 		private boolean checkForInsideDrop(AppTreeNode groupNode) {
-		    
+
 		    TreePath path = constructTreePath(groupNode);
-		    
+
 		    while (path != null) {
 		        int dropRow = getRowForPath(path);
 		        for(int j = 0; j < draggedRowsIndex.length; j++) {
 		            if (draggedRowsIndex[j] == dropRow) {
 		                return true;
 		            }
-			    } 
-		        path = path.getParentPath();		        
+			    }
+		        path = path.getParentPath();
 		    }
 		    return false;
-		    
+
 		}
 
 		/* (non-Javadoc)
@@ -615,10 +615,10 @@ public abstract class AppTree extends JTree
 			dtde.acceptDrop(DnDConstants.ACTION_MOVE);
 
 			Transferable transferable = dtde.getTransferable();
-			
-			
+
+
 //			boolean appTrans = transferable instanceof AppTransferable;
-			
+
 			DataFlavor[] flavors = transferable.getTransferDataFlavors();
 
 			Point point = dtde.getLocation();
@@ -656,14 +656,14 @@ public abstract class AppTree extends JTree
 							            JOptionPane.showMessageDialog(AppTree.this,
 											    "A group cannot be dropped there!", "Invalid drop",
 											    JOptionPane.WARNING_MESSAGE);
-							
+
 											return;
 							        }
 							    }
 						    }
-						    
-						   
-						} 
+
+
+						}
 					} catch (UnsupportedFlavorException e) {
 						e.printStackTrace();
 					} catch (IOException e) {
@@ -672,21 +672,21 @@ public abstract class AppTree extends JTree
 				}
 				expandPath(constructTreePath(groupNode));
 			} else {
-//			    
+//
 //				    JOptionPane.showMessageDialog(AppTree.this,
 //					    "This drop is not allowed!", "Invalid drop",
 //					    JOptionPane.WARNING_MESSAGE);
-	
+
 					return;
 			}
 			dtde.dropComplete(true);
 		}
 	}
-	
-	
+
+
 	protected ArrayList list = new ArrayList();
 	/**
-	 * 
+	 *
 	 * Constructs a tree path from the node in its parents.
 	 * @param last
 	 * @return
@@ -694,10 +694,10 @@ public abstract class AppTree extends JTree
 	protected TreePath constructTreePath(TreeNode last) {
 	    list.clear();
 	    return recursiveConstructTreePath(last);
-	    
-	    
+
+
 	}
-	
+
 	private TreePath recursiveConstructTreePath(TreeNode last) {
 	    list.add(last);
 	    TreeNode node = last.getParent();
