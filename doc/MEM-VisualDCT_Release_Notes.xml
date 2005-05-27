@@ -46,6 +46,10 @@
 			<section>Package D2 pre-release.</section>
 		</modification>
 
+                <modification version="2.4.1257" by="msekoranja" date="2005-05-27">
+                        <section>Package D2 release.</section>
+                </modification>
+
 		<scope>
 			This document is contains release notes of the current build.
 		</scope>
@@ -67,7 +71,7 @@
 			   author="Matej Sekoranja"
 			   date="2004"
 			   publisher="Cosylab, Ltd."
-			   revision="2.4.1256"/>
+			   revision="2.4.1257"/>
 
 	</head>
 	
@@ -76,22 +80,8 @@
 			<p>
 			Changes in current version:
 			<ul>
-				<li>Check for configuration files of the vdct plugins also in sys directory</li>
-				<li>FileChooser on Mac OSX</li>
-				<li>JCA debug plugin future in VDCT</li>
-				<li>DBD path/filename overlaps with the zoom level</li>
-				<li>Print with legend</li>
-				<li>Don't show fields in text area if they are links</li>
-				<li>Copy-paste a field value from a record</li>
-				<li>Search for a record in a record list</li>
-				<li>DrawingSurface canvas size</li>
-				<li>Visibility of the fields</li>
-				<li>Editable combo box</li>
-				<li>Make vdct debug work in latest jca (port to JCA2 and Pure Java CA)</li>
-				<li>Provide 'application runner plugin'</li>
-				<li>Override fields of an already imported record</li>
-				<li>New record dialog focus</li>
-				<li>... and bugfixes.</li>
+				<li>Support for Java 1.5, minor code cleanup</li>
+				<li>Alarm Handler and Archiver application plugin</li>
 			</ul>
 			</p>
 			<p>

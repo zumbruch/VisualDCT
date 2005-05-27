@@ -35,6 +35,7 @@
   <news date="2004-03-30" developer="msekoranja" title="CapFast interoperability, minor bugfixes."/>
   <news date="2004-08-30" developer="msekoranja" title="Package D1 release candidate."/>
   <news date="2004-11-18" developer="msekoranja" title="Package D2 pre-release."/>
+  <news date="2005-05-27" developer="msekoranja" title="Package D2 release."/>
  
   <!-- additional documentation -->
   <document url="http://visualdct.cosylab.com" comment="VisualDCT homepage where you can find all related manuals, articles and presentations." title="VisualDCT homepage"/>
