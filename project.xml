@@ -13,7 +13,7 @@
   <modification by="Matej Sekoranja" date="2002-07-10">Created.</modification>
   
   <developer id="msekoranja" name="Matej Sekoranja" email="matej.sekoranja_AT_cosylab.com" responsibility="implementator" />
-  <developer id="ilist" name="Ivo List" email="ivo.list_AT_cosylab.com" responsibility="implementator" />
+  <!--developer id="ilist" name="Ivo List" email="ivo.list_AT_cosylab.com" responsibility="implementator" /-->
 
   <rt bugQueue="42" projectKeyword="43" projectQueue="53" bugKeyword="21" enhancementKeyword="24">
  	<keyword id="87"/>
