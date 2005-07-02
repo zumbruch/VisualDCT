@@ -41,10 +41,13 @@ public class PathSpecification
 {
 	
 	protected ArrayList currentPath = null;
+	
+	// NOTE: currently not used
+	// this paths are added to all 'currentPath' entries
+	// since this is not what is expected by EPICS, this is not used
 	protected ArrayList addPath = null;
 	
 	protected String currentDir = null;
-	public static final char PATH_SEPARATOR = ':';
 	
 	/**
 	 */
@@ -65,14 +68,11 @@ public class PathSpecification
 		if (dirs==null || dirs.length()==0)
 			return;
 
-		// replace all to PATH_SEPARATOR
-		dirs = dirs.replace(File.pathSeparatorChar, PATH_SEPARATOR);
-		
 		int pos1 = -1;
 		int pos2 = pos1;
 		do
 		{
-			pos2 = dirs.indexOf(PATH_SEPARATOR, pos1+1);
+			pos2 = dirs.indexOf(File.pathSeparatorChar, pos1+1);
 			if (pos2==-1)
 				pos2 = dirs.length();
 
@@ -105,7 +105,8 @@ public class PathSpecification
 	 */
 	public void addAddPath(String dirs)
 	{
-		splitPath(dirs, currentDir, addPath);
+		//splitPath(dirs, currentDir, addPath);
+		splitPath(dirs, currentDir, currentPath);
 	}
 
 	/**
@@ -145,25 +146,32 @@ public class PathSpecification
 			}
 
 		}
-		 
+		
+		// not found
+		
+		// construct full path string to print out
+		
 		StringBuffer path = new StringBuffer();
 		pI = currentPath.iterator();
 		while (pI.hasNext())
 		{
 			path.append(pI.next());
-			if (pI.hasNext()) path.append(':');
+			if (pI.hasNext()) path.append(File.pathSeparatorChar);
 		}
-				
+		
+		/*
 		StringBuffer addpath = new StringBuffer();
 		pI = addPath.iterator();
 		while (pI.hasNext())
 		{
 			addpath.append(pI.next());
-			if (pI.hasNext()) addpath.append(':');
+			if (pI.hasNext()) addpath.append(File.pathSeparatorChar);
 		}
+		*/
 
 		// not found
-		throw new FileNotFoundException("File '"+fileName+"' not found (path: \""+path.toString()+"\", addpath: \""+addpath.toString()+"\").");
+		//throw new FileNotFoundException("File '"+fileName+"' not found (path: \""+path.toString()+"\", addpath: \""+addpath.toString()+"\").");
+		throw new FileNotFoundException("File '"+fileName+"' not found (path: \""+path.toString()+"\").");
 	}
 
 	/**
