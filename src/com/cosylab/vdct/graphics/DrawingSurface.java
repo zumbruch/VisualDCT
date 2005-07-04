@@ -1161,6 +1161,13 @@ public void mouseDragged(MouseEvent e) {
 
 				Movable hilitedObject = (Movable)view.getHilitedObject();
 				
+				// mark (remember) current position which is needed to create undo action
+				if (notYetDragged)
+					if (view.isSelected(hilitedObject))
+						markPositionSelection();
+					else
+						((VisibleObject)hilitedObject).markPosition();
+				
 				// initial snap to grid (if needed)
 				if (notYetDragged && Settings.getInstance().getSnapToGrid())
 					if (view.isSelected(hilitedObject))
@@ -1492,20 +1499,26 @@ public void mouseReleased(MouseEvent e) {
 					((Movable)hilitedObject).move(dx, dy);
 
 			
-			// TODO to be fixed (store initial object pos and current to calculate dx, dy)
-			dx = (int)((px-pressedX)/scale); 
-			dy = (int)((py-pressedY)/scale);
-			if (!(dx==0 && dy==0))
-				if (view.isSelected(hilitedObject))
-				{
-					ComposedAction composedAction = new ComposedAction();
-					Enumeration selected = view.getSelectedObjects().elements();
-						while (selected.hasMoreElements())
-							composedAction.addAction(new MoveAction((Movable)selected.nextElement(), dx, dy));
-					UndoManager.getInstance().addAction(composedAction);
-				}
-				else
-					addAction(new MoveAction((Movable)hilitedObject, dx, dy));
+			// create undo actions
+			if (view.isSelected(hilitedObject))
+			{
+				ComposedAction composedAction = new ComposedAction();
+				Enumeration selected = view.getSelectedObjects().elements();
+					while (selected.hasMoreElements())
+					{
+						VisibleObject o = (VisibleObject)selected.nextElement();
+						composedAction.addAction(new MoveAction((Movable)o,
+													o.getX() - o.getMarkedX(),
+													o.getY() - o.getMarkedY()));
+					}
+				UndoManager.getInstance().addAction(composedAction);
+			}
+			else
+			{
+				addAction(new MoveAction((Movable)hilitedObject, 
+							hilitedObject.getX() - hilitedObject.getMarkedX(),
+							hilitedObject.getY() - hilitedObject.getMarkedY()));
+			}
 			
 			/*ViewState.getInstance().setAsHilited(null);
 		
@@ -1592,7 +1605,7 @@ private boolean moveSelection(int dx, int dy) {
 	return ok;
 }
 /**
- * Snaps selection.
+ * Snap to grid selection.
  */
 private void snapToGridSelection() {
 	ViewState view = ViewState.getInstance();
@@ -1600,6 +1613,16 @@ private void snapToGridSelection() {
 	Enumeration selected = view.getSelectedObjects().elements();
 	while (selected.hasMoreElements())
 		((VisibleObject)selected.nextElement()).snapToGrid();
+}
+/**
+ * Mark position of selection.
+ */
+private void markPositionSelection() {
+	ViewState view = ViewState.getInstance();
+
+	Enumeration selected = view.getSelectedObjects().elements();
+	while (selected.hasMoreElements())
+		((VisibleObject)selected.nextElement()).markPosition();
 }
 /**
  * Insert the method's description here.

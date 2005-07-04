@@ -47,6 +47,10 @@ public abstract class VisibleObject implements Visitable {
 	protected int y;
 	private int width;
 	private int height;
+	
+	// to support option to mark (remember) some position
+	private int markedX;
+	private int markedY;
 
 	// scale
 	private double scale = 1;
@@ -506,6 +510,29 @@ public void snapToGrid()
 	
 	x -= mx;
 	y -= my;
+}
+
+
+/**
+ * Mark (remeber) current position.
+ */
+public void markPosition()
+{
+	markedX = x;
+	markedY = y;
+}
+
+/**
+ * @return Returns the markedX.
+ */
+public int getMarkedX() {
+	return markedX;
+}
+/**
+ * @return Returns the markedY.
+ */
+public int getMarkedY() {
+	return markedY;
 }
 
 }
