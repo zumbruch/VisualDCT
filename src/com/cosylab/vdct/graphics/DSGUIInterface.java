@@ -191,7 +191,10 @@ public Box createBox()
 	//String parentName = parentGroup.getAbsoluteName();
 	
 	Box grBox = new Box(null, parentGroup, posX, posY, posX, posY);
- 	Group.getRoot().addSubObject(grBox.getName(), grBox, true);
+	if (Settings.getInstance().getSnapToGrid())
+		grBox.snapToGrid();
+
+	Group.getRoot().addSubObject(grBox.getName(), grBox, true);
 
 	drawingSurface.repaint();
 	
@@ -211,7 +214,10 @@ public Line createLine()
 	//String parentName = parentGroup.getAbsoluteName();
 	
 	Line grLine = new Line(null, parentGroup, posX, posY, posX, posY);
- 	Group.getRoot().addSubObject(grLine.getName(), grLine, true);
+	if (Settings.getInstance().getSnapToGrid())
+		grLine.snapToGrid();
+
+	Group.getRoot().addSubObject(grLine.getName(), grLine, true);
 
 	drawingSurface.repaint();
 	
@@ -231,7 +237,10 @@ public TextBox createTextBox()
 	//String parentName = parentGroup.getAbsoluteName();
 
 	TextBox grTextBox = new TextBox(null, parentGroup, posX, posY, posX, posY);
- 	Group.getRoot().addSubObject(grTextBox.getName(), grTextBox, true);
+	if (Settings.getInstance().getSnapToGrid())
+		grTextBox.snapToGrid();
+
+	Group.getRoot().addSubObject(grTextBox.getName(), grTextBox, true);
 
 	grTextBox.setBorder(true);
 
@@ -269,6 +278,8 @@ public void createRecord(String name, String type, boolean relative) {
 							   recordData,
 							   (int)((drawingSurface.getPressedX() + view.getRx()) / scale),
 							   (int)((drawingSurface.getPressedY() + view.getRy()) / scale));
+	if (Settings.getInstance().getSnapToGrid())
+		record.snapToGrid();
 
 	Group.getRoot().addSubObject(name, record, true);
 
@@ -385,6 +396,8 @@ public void group(String groupName) {
 	if (g==null)
 	{
 		g = Group.createGroup(groupName);
+		if (Settings.getInstance().getSnapToGrid())
+			g.snapToGrid();
 		composedAction.addAction(new CreateAction(g));
 	}
 		

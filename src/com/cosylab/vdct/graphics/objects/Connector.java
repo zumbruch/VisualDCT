@@ -31,6 +31,7 @@ package com.cosylab.vdct.graphics.objects;
 import java.awt.*;
 import java.util.*;
 import com.cosylab.vdct.Constants;
+import com.cosylab.vdct.Settings;
 import com.cosylab.vdct.graphics.*;
 
 import com.cosylab.vdct.graphics.popup.*;
@@ -141,6 +142,9 @@ public Connector(String id, LinkManagerObject parent, OutLink outlink, InLink in
 		setX((inlink.getInX()+outlink.getOutX())/2);
 		setY((inlink.getInY()+outlink.getOutY())/2);
 	}
+	
+	if (Settings.getInstance().getShowGrid())
+		snapToGrid();
 	
 }
 /**
@@ -461,30 +465,6 @@ public int getQueueCount() {
 }
 /**
  * Insert the method's description here.
- * Creation date: (25.4.2001 22:13:55)
- * @return int
- */
-public int getX() {
-	int posX = super.getX();
-	if (com.cosylab.vdct.Settings.getInstance().getSnapToGrid())
-		return posX - posX % Constants.GRID_SIZE;
-	else
-		return posX;
-}
-/**
- * Insert the method's description here.
- * Creation date: (25.4.2001 22:13:55)
- * @return int
- */
-public int getY() {
-	int posY = super.getY();
-	if (com.cosylab.vdct.Settings.getInstance().getSnapToGrid())
-		return posY - posY % Constants.GRID_SIZE;
-	else
-		return posY;
-}
-/**
- * Insert the method's description here.
  * Creation date: (29.1.2001 20:05:52)
  * @return boolean
  */
@@ -508,7 +488,7 @@ public boolean isDisconnected() {
  */
 public boolean move(int dx, int dy) {
 	if (checkMove(dx, dy)) {
-		setX(super.getX()+dx); 
+		x+=dx; 
 		/*
 		if ((outlink!=null) && (inlink!=null))
 			if (((y+dy)-getOutY())*((y+dy)-getInY())>0) {	// not in between
@@ -517,7 +497,7 @@ public boolean move(int dx, int dy) {
 			else
 				y+=dy;
 		else*/
-		setY(super.getY()+dy);
+		y+=dy;
 		
 		revalidatePosition();
 		if (inlink instanceof Connector) ((Connector)inlink).revalidatePosition();

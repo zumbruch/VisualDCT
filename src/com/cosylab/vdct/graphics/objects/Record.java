@@ -109,7 +109,7 @@ public class Record
 	public final static int DBD_ORDER = 2;
 
 	private int oldNumOfFields = 0;
-
+	
 /**
  * Group constructor comment.
  * @param parent com.cosylab.vdct.graphics.objects.ContainerObject
@@ -912,30 +912,6 @@ public Vector getStartPoints() {
 	return starts;
 }
 /**
- * Insert the method's description here.
- * Creation date: (25.4.2001 22:13:55)
- * @return int
- */
-public int getX() {
-	int posX = super.getX();
-	if (com.cosylab.vdct.Settings.getInstance().getSnapToGrid())
-		return posX - posX % Constants.GRID_SIZE;
-	else
-		return posX;
-}
-/**
- * Insert the method's description here.
- * Creation date: (25.4.2001 22:13:55)
- * @return int
- */
-public int getY() {
-	int posY = super.getY();
-	if (com.cosylab.vdct.Settings.getInstance().getSnapToGrid())
-		return posY - (posY+getHeight()) % Constants.GRID_SIZE;
-	else
-		return posY;
-}
-/**
  * Returned value inicates change
  * Creation date: (21.12.2000 22:21:12)
  * @return com.cosylab.visible.objects.VisibleObject
@@ -1165,8 +1141,8 @@ public void setRecordData(VDBRecordData recordData) {
  */
 public boolean move(int dx, int dy) {
 	if (checkMove(dx, dy)) {
-		setX(super.getX()+dx);
-		setY(super.getY()+dy);
+		x+=dx;
+		y+=dy;
 		revalidatePosition();
 		moveConnectors(dx, dy);
 		return true;
@@ -1695,5 +1671,26 @@ public void updateFields() {
 	}
 	validate();
 }
+
+
+/**
+ * Snap to grid. Nearest point is taken.
+ */
+public void snapToGrid()
+{
+	int mx = x % Constants.GRID_SIZE;
+	// TODO za en piksel strize!!!
+	int my = (y+getHeight()) % Constants.GRID_SIZE;
+	
+	final int halfGrid = Constants.GRID_SIZE / 2;
+	if (mx > halfGrid)
+		mx -= Constants.GRID_SIZE;
+	if (my > halfGrid)
+		my -= Constants.GRID_SIZE;
+	
+	x -= mx;
+	y -= my;
+}
+
 
 }

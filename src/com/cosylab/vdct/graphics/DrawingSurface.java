@@ -157,6 +157,7 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 	private int pressedX, pressedY;
 	private int draggedX, draggedY;
 	private boolean resetDraggedPosition = false;
+	private boolean notYetDragged = true;
 	// modification
 	private boolean modified = false;
 	// linking
@@ -1143,8 +1144,14 @@ public void mouseDragged(MouseEvent e) {
 				break; }
 			
 			case OBJECT_MOVE : {
-				// TODO moving w/ grid enabled (if object not actually moved, because of grid, repaint is called anyway!!)
 //System.out.println("Dragged: OBJECT_MOVE");
+				
+				if (fastMove) { //fast move
+					draggedX=px; draggedY=py;
+					repaint();
+					break;			
+				} 
+
 				int rdx = px-draggedX;
 				int rdy = py-draggedY;
 				
@@ -1152,13 +1159,28 @@ public void mouseDragged(MouseEvent e) {
 				int dx = (int)(rdx/scale); 
 				int dy = (int)(rdy/scale);
 
-				if (fastMove) { //fast move
-					draggedX=px; draggedY=py;
-					repaint();
-					break;			
-				} 
-				
 				Movable hilitedObject = (Movable)view.getHilitedObject();
+				
+				// initial snap to grid (if needed)
+				if (notYetDragged && Settings.getInstance().getSnapToGrid())
+					if (view.isSelected(hilitedObject))
+						snapToGridSelection();
+					else
+						((VisibleObject)hilitedObject).snapToGrid();
+				
+				// discrete move for snapping
+				if (Settings.getInstance().getSnapToGrid())
+				{
+					dx -= dx % Constants.GRID_SIZE;
+					dy -= dy % Constants.GRID_SIZE;
+				}
+
+				if (dx == 0 && dy == 0) {
+					// needed to show the initial snap
+					if (notYetDragged)
+						repaint();
+					break;
+				}
 				
 				if (view.isSelected(hilitedObject)) {
 					if (moveSelection(dx, dy)) {			// move selection
@@ -1175,7 +1197,9 @@ public void mouseDragged(MouseEvent e) {
 					if (dx!=0) draggedX=px-(int)(rdx-dx*scale);
 					if (dy!=0) draggedY=py-(int)(rdy-dy*scale);
 				}
-				break; }
+				
+				break;
+			}
 				
 			case OBJECT_SELECTION : 
 			case ZOOM_SELECTION : 
@@ -1250,6 +1274,9 @@ public void mouseDragged(MouseEvent e) {
 			repaint();
 		}
 	}
+	
+	notYetDragged = false;
+	
 }
 	/**
 	 * Invoked when the mouse enters a component.
@@ -1309,6 +1336,7 @@ public void mouseMoved(MouseEvent e)
 	 * Invoked when a mouse button has been pressed on a component.
 	 */
 public void mousePressed(MouseEvent e) {
+	notYetDragged = true;
 	ViewState view = ViewState.getInstance();
 	int px = e.getX()-view.getX0();
 	int py = e.getY()-view.getY0();
@@ -1449,13 +1477,22 @@ public void mouseReleased(MouseEvent e) {
 			double scale = view.getScale();
 			dx = (int)(dx/scale); 
 			dy = (int)(dy/scale);
-						
+
+			if (Settings.getInstance().getSnapToGrid())
+			{
+				dx -= dx % Constants.GRID_SIZE;
+				dy -= dy % Constants.GRID_SIZE;
+			}
+
+			
 			if (!(dx==0 && dy==0))
 				if (view.isSelected(hilitedObject)) 
 					moveSelection(dx, dy);
 				else
 					((Movable)hilitedObject).move(dx, dy);
 
+			
+			// TODO to be fixed (store initial object pos and current to calculate dx, dy)
 			dx = (int)((px-pressedX)/scale); 
 			dy = (int)((py-pressedY)/scale);
 			if (!(dx==0 && dy==0))
@@ -1553,6 +1590,16 @@ private boolean moveSelection(int dx, int dy) {
 		((Movable)selected.nextElement()).move(dx, dy);
 		
 	return ok;
+}
+/**
+ * Snaps selection.
+ */
+private void snapToGridSelection() {
+	ViewState view = ViewState.getInstance();
+
+	Enumeration selected = view.getSelectedObjects().elements();
+	while (selected.hasMoreElements())
+		((VisibleObject)selected.nextElement()).snapToGrid();
 }
 /**
  * Insert the method's description here.
@@ -3081,6 +3128,9 @@ public void createTemplateInstance(String name, String type, boolean relative) {
 	//templ.setDescription(template.getDescription());
 	templ.setX((int)((getPressedX() + view.getRx()) / scale));
 	templ.setY((int)((getPressedY() + view.getRy()) / scale));
+	
+	if (Settings.getInstance().getSnapToGrid())
+		templ.snapToGrid();
 
 	UndoManager.getInstance().addAction(new CreateAction(templ));
 
@@ -3317,7 +3367,8 @@ public static void loadWhiteOnBlackColorScheme()
     Constants.SELECTION_COLOR = Color.red;
     Constants.LINK_COLOR = Color.white;
 
-    Constants.GRID_COLOR = Color.lightGray;}
+    Constants.GRID_COLOR = Color.lightGray;
+}
 
 /**
  * Loads black on white color cheme
@@ -3357,6 +3408,8 @@ public void createPort(VDBPort vdbPort) {
 	Port port = new Port(vdbPort, viewGroup,
 						   (int)((getPressedX() + view.getRx()) / scale),
 						   (int)((getPressedY() + view.getRy()) / scale));
+	if (Settings.getInstance().getSnapToGrid())
+		port.snapToGrid();
 
 	getViewGroup().addSubObject(vdbPort.getName(), port);
 
@@ -3386,6 +3439,8 @@ public void createMacro(VDBMacro vdbMacro) {
 	Macro macro = new Macro(vdbMacro, viewGroup,
 						   (int)((getPressedX() + view.getRx()) / scale),
 						   (int)((getPressedY() + view.getRy()) / scale));
+	if (Settings.getInstance().getSnapToGrid())
+		macro.snapToGrid();
 
 	getViewGroup().addSubObject(vdbMacro.getName(), macro);
 

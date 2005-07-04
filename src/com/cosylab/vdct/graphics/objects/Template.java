@@ -397,8 +397,8 @@ public class Template
 	public boolean move(int dx, int dy)
 	{
 		if (checkMove(dx, dy)) {
-			setX(super.getX()+dx);
-			setY(super.getY()+dy);			
+			x+=dx;
+			y+=dy;			
 			revalidatePosition();
 			moveConnectors(dx, dy);
 			return true;
@@ -680,33 +680,6 @@ public class Template
 	}
 	*/
 	
-	/**
-	 * Insert the method's description here.
-	 * Creation date: (25.4.2001 22:13:55)
-	 * @return int
-	 */
-	public int getX() {
-		int posX = super.getX();
-		if (com.cosylab.vdct.Settings.getInstance().getSnapToGrid())
-			return posX - posX % Constants.GRID_SIZE;
-		else
-			return posX;
-	}
-	/**
-	 * Insert the method's description here.
-	 * Creation date: (25.4.2001 22:13:55)
-	 * @return int
-	 */
-	public int getY() {
-		int posY = super.getY();
-		if (com.cosylab.vdct.Settings.getInstance().getSnapToGrid())
-			return posY - posY % Constants.GRID_SIZE;
-		else
-			return posY;
-	}
-
-
-
 
 /**
  * Returned value inicates change

@@ -150,6 +150,8 @@ public void addSubObject(String id, VisibleObject object, boolean create) {
 				Group group = new Group(this);
 				group.setX(object.getX());
 				group.setY(object.getY());
+				if (Settings.getInstance().getSnapToGrid())
+					group.snapToGrid();
 				group.setName(firstParentName);
 				group.setNamePrefix(getAbsoluteName());
 				addSubObject(firstParentName, group);
@@ -198,6 +200,8 @@ public Flexible copyToGroup(java.lang.String group) {
 			newName = StringUtils.incrementName(newName, Constants.COPY_SUFFIX);
 
 	Group g = Group.createGroup(newName);
+	if (Settings.getInstance().getSnapToGrid())
+		g.snapToGrid();
 	/*if (group.equals(getNamePrefix()) || group.equals(Constants.CLIPBOARD_NAME)) {
 		g.setX(getX()+20-view.getRx()); g.setY(getY()+20-view.getRy());
 	}
@@ -474,30 +478,6 @@ public Object getSubObject(String id) {
 }
 /**
  * Insert the method's description here.
- * Creation date: (25.4.2001 22:13:55)
- * @return int
- */
-public int getX() {
-	int posX = super.getX();
-	if (com.cosylab.vdct.Settings.getInstance().getSnapToGrid())
-		return posX - posX % Constants.GRID_SIZE;
-	else
-		return posX;
-}
-/**
- * Insert the method's description here.
- * Creation date: (25.4.2001 22:13:55)
- * @return int
- */
-public int getY() {
-	int posY = super.getY();
-	if (com.cosylab.vdct.Settings.getInstance().getSnapToGrid())
-		return posY - posY % Constants.GRID_SIZE;
-	else
-		return posY;
-}
-/**
- * Insert the method's description here.
  * Creation date: (28.1.2001 11:50:26)
  * @return boolean
  * @param name java.lang.String
@@ -629,8 +609,8 @@ public void manageLinks(boolean deep) {
  */
 public boolean move(int dx, int dy) {
 	if (checkMove(dx, dy)) {
-		setX(super.getX()+dx);
-		setY(super.getY()+dy);
+		x+=dx;
+		y+=dy;			
 		revalidatePosition();
 		return true;
 	}
@@ -671,6 +651,8 @@ public boolean moveToGroup(java.lang.String group) {
 	Group g = (Group)getRoot().findObject(group, true);
 	if (g==null) {
 		g=Group.createGroup(group);
+		if (Settings.getInstance().getSnapToGrid())
+			g.snapToGrid();
 	}
 	if (g==null) return false;
 /*	if (((Group)getParent()).localView!=null)

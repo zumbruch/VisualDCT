@@ -43,8 +43,8 @@ public abstract class VisibleObject implements Visitable {
 	private ContainerObject parent;
 	
 	// position & size
-	private int x;
-	private int y;
+	protected int x;
+	protected int y;
 	private int width;
 	private int height;
 
@@ -489,4 +489,23 @@ protected abstract void validate();
  * @return boolean
  */
 public boolean isVisible() { return true; }
+
+/**
+ * Snap to grid. Nearest point is taken.
+ */
+public void snapToGrid()
+{
+	int mx = x % Constants.GRID_SIZE;
+	int my = y % Constants.GRID_SIZE;
+	
+	final int halfGrid = Constants.GRID_SIZE / 2;
+	if (mx > halfGrid)
+		mx -= Constants.GRID_SIZE;
+	if (my > halfGrid)
+		my -= Constants.GRID_SIZE;
+	
+	x -= mx;
+	y -= my;
+}
+
 }

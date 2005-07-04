@@ -404,24 +404,6 @@ public Vertex getStartVertex()
 	return startVertex;
 }
 
-public int getX()
-{
-	int posX = super.getX();
-	if(Settings.getInstance().getSnapToGrid())
-		return posX - posX % Constants.GRID_SIZE;
-		
-	return posX;
-}
-
-public int getY()
-{
-	int posY = super.getY();
-	if(Settings.getInstance().getSnapToGrid())
-		return posY - posY % Constants.GRID_SIZE;
-		
-	return posY;
-}
-
 public boolean move(int dx, int dy)
 {
 	if(checkMove(dx, dy))
