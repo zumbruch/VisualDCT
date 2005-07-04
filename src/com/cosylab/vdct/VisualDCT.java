@@ -1764,9 +1764,26 @@ public void exitMenuItem_ActionPerformed() {
 		Settings.getInstance().save();
 		if (cmd.getGUIMenuInterface().isModified())
 		{
-			if (JOptionPane.showConfirmDialog(this, "The file has been modified. Discard changes and exit?", "Confirmation", 
-				JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE)==JOptionPane.OK_OPTION)
-			this.dispose();
+		    int choice = JOptionPane.showConfirmDialog(this, "The file has been modified. Discard changes?", "Confirmation", 
+					JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		    switch(choice) {
+
+		    	case JOptionPane.YES_OPTION: {
+		    	    this.dispose();
+		    	    break;
+		    	}
+		    	
+		    	case JOptionPane.NO_OPTION: {
+		    	    saveMenuItem_ActionPerformed();
+		    	    this.dispose();
+		    	    break;
+		    	}
+		    	
+		    	default: {
+		    	    break;
+		    	}
+		    	    
+		    }
 		}
 		else
 		{
@@ -4509,9 +4526,26 @@ private javax.swing.JMenuItem getRecentFilesMenuItem() {
 					GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
 					if (cmd!=null && cmd.getGUIMenuInterface().isModified())
 					{
-						if (JOptionPane.showConfirmDialog(VisualDCT.this, "The file has been modified. Discard changes?", "Confirmation", 
-							JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE)==JOptionPane.OK_OPTION)
-							VisualDCT.this.openDB(e.getActionCommand());
+					    int choice = JOptionPane.showConfirmDialog(VisualDCT.this, "The file has been modified. Discard changes?", "Confirmation", 
+								JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+					    switch(choice) {
+					    
+					    	case JOptionPane.YES_OPTION: {
+					    	    VisualDCT.this.openDB(e.getActionCommand());
+					    	    break;
+					    	}
+					    	
+					    	case JOptionPane.NO_OPTION: {
+					    	    saveMenuItem_ActionPerformed();
+					    	    VisualDCT.this.openDB(e.getActionCommand());
+					    	    break;
+					    	}
+					    	
+					    	default: {
+					    	    break;
+					    	}
+					    	    
+					    }
 					}
 					else
 					{
@@ -5879,13 +5913,31 @@ public void newMenuItem_ActionPerformed() {
 	GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
 	if (cmd.getGUIMenuInterface().isModified())
 	{
-		if (JOptionPane.showConfirmDialog(this, "The file has been modified. Discard changes?", "Confirmation", 
-			JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE)==JOptionPane.OK_OPTION)
-		{
-			GetGUIInterface cmd2 = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
- 			cmd2.getGUIMenuInterface().newCmd();
-			openedFile = null;
-		}
+	    
+	    int choice = JOptionPane.showConfirmDialog(this, "The file has been modified. Discard changes?", "Confirmation", 
+				JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+	    switch(choice) {
+	    
+	    	case JOptionPane.YES_OPTION: {
+	    	    GetGUIInterface cmd2 = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
+	 			cmd2.getGUIMenuInterface().newCmd();
+				openedFile = null;
+				break;
+	    	}
+	    	
+	    	case JOptionPane.NO_OPTION: {
+	    	    saveMenuItem_ActionPerformed();
+	    	    GetGUIInterface cmd2 = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
+	 			cmd2.getGUIMenuInterface().newCmd();
+				openedFile = null;
+				break;
+	    	}
+    	
+	    	default: {
+	    	    break;
+	    	}
+	    	    
+	    }
 	}
 	else
 	{
@@ -6157,9 +6209,25 @@ public void openMenuItem_ActionPerformed() {
 	GetGUIInterface cmd2 = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
 	if (cmd2.getGUIMenuInterface().isModified())
 	{
-		if (JOptionPane.showConfirmDialog(this, "The file has been modified. Discard changes?", "Confirmation", 
-			JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE)==JOptionPane.NO_OPTION)
-			return;
+	    
+	    int choice = JOptionPane.showConfirmDialog(this, "The file has been modified. Discard changes?", "Confirmation", 
+				JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+	    switch(choice) {
+	    
+	    	case JOptionPane.YES_OPTION: {
+	    	    break;
+	    	}
+	    	
+	    	case JOptionPane.NO_OPTION: {
+	    	    saveMenuItem_ActionPerformed();
+	    	    break;
+	    	}
+	    	
+	    	default: {
+	    	    return;
+	    	}
+	    	    
+	    }
 	}
 	
 	JFileChooser chooser = getfileChooser();

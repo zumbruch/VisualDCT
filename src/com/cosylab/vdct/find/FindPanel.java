@@ -139,7 +139,7 @@ public class FindPanel extends JPanel
         add(pathPanel = new FindTitle(), BorderLayout.NORTH);
         add(searchTabs = new FindTabs(), BorderLayout.CENTER);
         add(controlPanel = new FindControls(actionStart, actionStop, true), BorderLayout.SOUTH);
-
+        
     }
 
     /**
@@ -518,10 +518,10 @@ public class FindPanel extends JPanel
             //setFont(new Font("Helvetica", Font.BOLD, 10));
 
             // Add search-by-name panel
-            addTab(TAB_NAME, new FindByName());
+            addTab(TAB_NAME, new FindByName(FindPanel.this));
 
             // Add search-by-type panel
-            addTab(TAB_TYPE, new FindByType());
+            addTab(TAB_TYPE, new FindByType(FindPanel.this));
 
             // TODO add panels here...
 
@@ -770,9 +770,11 @@ class FindByName extends JPanel implements FindFilterFactory {
 
     protected JCheckBox ignoreCaseCheck = null;
 
-    FindByName() {
+    private FindPanel parent;
+    FindByName(FindPanel pan) {
         super();
         setLayout(new BorderLayout());
+        this.parent = pan;
 
         // Grid Layout
         JPanel p = new JPanel();
@@ -785,6 +787,11 @@ class FindByName extends JPanel implements FindFilterFactory {
         p.add(combo);
 
         nameField = new JTextField(12);
+        nameField.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+               parent.start();                
+            }
+        });
         //nameField.setFont(new Font("Helvetica", Font.PLAIN, 10));
         p.add(nameField);
 
@@ -931,8 +938,11 @@ class FindByType extends JPanel implements FindFilterFactory {
 
     protected JCheckBox ignoreCaseCheck = null;
 
-    FindByType() {
+    private FindPanel parent;
+    
+    FindByType(FindPanel pan) {
         super();
+        this.parent = pan;
         setLayout(new BorderLayout());
 
         // Grid Layout
@@ -946,9 +956,15 @@ class FindByType extends JPanel implements FindFilterFactory {
         p.add(combo);
 
         nameField = new JTextField(12);
+        nameField.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+               parent.start();                
+            }
+        });
+        
         //nameField.setFont(new Font("Helvetica", Font.PLAIN, 10));
         p.add(nameField);
-
+        
         // ignore case
         p.add(new JLabel("", SwingConstants.RIGHT));
 
@@ -956,7 +972,7 @@ class FindByType extends JPanel implements FindFilterFactory {
         ignoreCaseCheck.setForeground(Color.black);
         //ignoreCaseCheck.setFont(new Font("Helvetica", Font.PLAIN, 10));
         p.add(ignoreCaseCheck);
-
+        
         add(p, BorderLayout.NORTH);
     }
 
@@ -965,6 +981,8 @@ class FindByType extends JPanel implements FindFilterFactory {
         return new TypeFilter(nameField.getText(), combo.getSelectedIndex(),
                 ignoreCaseCheck.isSelected());
     }
+    
+    
 
     /**
      * Filter object for selecting files by name.
