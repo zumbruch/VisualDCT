@@ -56,6 +56,7 @@ public class Macro extends VisibleObject implements Descriptable, Movable, InLin
 	class PopupMenuHandler implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 			String action = e.getActionCommand();
+
 			/*
 			if (action.equals(colorString))
 			{			
@@ -95,6 +96,12 @@ public class Macro extends VisibleObject implements Descriptable, Movable, InLin
 				setMode(InLink.OUTPUT_MACRO_MODE);
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
+			else if (action.equals(textNorth)) {
+			    setTextPositionNorth(true);
+			}
+			else if (action.equals(textSide)) {
+			    setTextPositionNorth(false);
+			}
 			
 		}
 	}
@@ -115,6 +122,10 @@ public class Macro extends VisibleObject implements Descriptable, Movable, InLin
 	private static final String modeString = "Macro Mode";
 	private static final String inputString = "INPUT";
 	private static final String outputString = "OUTPUT";
+	
+	private static final String textPosition = "Text Position";
+	private static final String textNorth = "TOP";
+	private static final String textSide = "SIDE";
 
 	//private static final String nullString = "";
 
@@ -135,6 +146,10 @@ public class Macro extends VisibleObject implements Descriptable, Movable, InLin
 	private int r = 0;
 
  	private String lastUpdatedFullName = null;
+ 	
+ 	/** if textPositionNorth=true text is positioned on the top of 
+ 	 * the macro, if false it is on the side */
+ 	private boolean textPositionNorth = true;
 	
 /**
  * Insert the method's description here.
@@ -423,6 +438,19 @@ public java.util.Vector getItems() {
 	outputModeItem.addActionListener(al);
 	modeMenu.add(outputModeItem);
 
+	//TODO is this needed
+	JMenu textMenu = new JMenu(textPosition);
+	items.addElement(textMenu);
+
+	JRadioButtonMenuItem textNorthItem = new JRadioButtonMenuItem(textNorth, textPositionNorth);
+	textNorthItem.setEnabled(!textPositionNorth);
+	textNorthItem.addActionListener(al);
+	textMenu.add(textNorthItem);
+
+	JRadioButtonMenuItem textSideItem = new JRadioButtonMenuItem(textSide, !textPositionNorth);
+	textSideItem.setEnabled(textPositionNorth);
+	textSideItem.addActionListener(al);
+	textMenu.add(textSideItem);
 
 	/*
 	items.add(new JSeparator());
@@ -645,8 +673,18 @@ protected void validate() {
   if (font!=null)
   {
 	  FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(font);
-	  setRlabelX(rwidth/2-fm.stringWidth(getLabel())/2);
- 	  setRlabelY(-fm.getHeight()+fm.getAscent());
+	  if (textPositionNorth) {
+		  setRlabelX(rwidth/2-fm.stringWidth(getLabel())/2);
+	 	  setRlabelY(-fm.getHeight()+fm.getAscent());
+	  } else {
+	      int s = (int)(getScale()*Constants.LINK_STUB_SIZE/4.0);
+	      setRlabelY((rheight + fm.getAscent() - fm.getDescent())/2);
+	      if (isRight()) {
+	          setRlabelX(rwidth + s);
+	      } else {
+	          setRlabelX(-fm.stringWidth(getLabel())-s);
+	      }
+	  }
   }
   
   setFont(font);
@@ -661,6 +699,15 @@ protected void validate() {
 public int getMode()
 {
 	return mode;
+}
+
+public void setTextPositionNorth(boolean isTextPositionNorth) {
+    this.textPositionNorth = isTextPositionNorth;
+    validate();
+}
+
+public boolean isTextPositionNorth() {
+    return this.textPositionNorth;
 }
 
 /**

@@ -153,6 +153,7 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 	private Cursor defaultCursor = null;
 	private Cursor handCursor = null;
 	private Cursor hourCursor = null;
+	private Cursor crossCursor = null;
 	// mickeys
 	private int pressedX, pressedY;
 	private int draggedX, draggedY;
@@ -212,6 +213,7 @@ public DrawingSurface() {
 	currentCursor = defaultCursor = Cursor.getDefaultCursor();
 	handCursor = new Cursor(Cursor.HAND_CURSOR);
 	hourCursor = new Cursor(Cursor.WAIT_CURSOR);
+	crossCursor = new Cursor(Cursor.CROSSHAIR_CURSOR);
 
 	MouseEventManager.getInstance().subscribe("WorkspacePanel", this);
 
@@ -222,7 +224,7 @@ public DrawingSurface() {
 	commandManager.addCommand("LinkCommand", new LinkCommand(this));
 	commandManager.addCommand("GetPrintableInterface", new GetPrintableInterface(this));
 	commandManager.addCommand("RepaintWorkspace", new RepaintCommand(this));
-
+	
 	if (VisualDCT.getInstance() != null)
 		new Thread(this, "DrawingSurface Repaint Thread").start();
 
@@ -693,12 +695,22 @@ public boolean isFlat() {
 public boolean isModified() {
 	return modified;
 }
+
 /**
  * Insert the method's description here.
  * Creation date: (3.2.2001 13:31:09)
  */
 public void linkCommand(VisibleObject linkObject, LinkSource linkData) {
-	
+//    Cursor previous = drawingSurface.getCursor();
+//    try {
+//        drawingSurface.setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
+//    } catch (Exception e) {
+//        //
+//    } finally {
+//        drawingSurface.setCursor(previous);
+//    }
+
+    setCursor(crossCursor);
 	if (tmplink==null) {
 		
 		// start linking (store source field reference)
@@ -2910,7 +2922,7 @@ public void resize(int x0, int y0, int width, int height) {
 private void restoreCursor() {
 	SetCursorCommand cm = (SetCursorCommand)CommandManager.getInstance().getCommand("SetCursor");
 	if (cm!=null) {
-		currentCursor = previousCursor;
+	    currentCursor = previousCursor;
 		previousCursor = defaultCursor;
 		cm.setCursor(currentCursor);
 		cm.execute();
@@ -2941,12 +2953,13 @@ private void selectArea(int x1, int y1, int x2, int y2) {
 private void setCursor(Cursor cursor) {
 	SetCursorCommand cm = (SetCursorCommand)CommandManager.getInstance().getCommand("SetCursor");
 	if (cm!=null) {
-		previousCursor = currentCursor;
+	    previousCursor = currentCursor;
 		currentCursor = cursor;
 		cm.setCursor(currentCursor);
 		cm.execute();
-	}
+	} 
 }
+
 /**
  * Insert the method's description here.
  * Creation date: (1.2.2001 14:24:51)
@@ -3037,10 +3050,11 @@ public void centerObject(VisibleObject object) {
  * Creation date: (3.2.2001 16:30:14)
  */
 private void stopLinking() {
-	if (tmplink!=null) {
+    if (tmplink!=null) {
 		tmplink = null;
 		if (hiliter!=null) hiliter.terminate();
 		ViewState.getInstance().deblinkAll(); //!!!
+		setCursor(defaultCursor);
 		repaint();
 	}
 }
