@@ -697,6 +697,8 @@ public VisibleObject hiliteComponentsCheck(int x, int y) {
 	VisibleObject vo;
 	while (e.hasMoreElements()) {
 		vo = (VisibleObject)(e.nextElement());
+		if (vo instanceof TemplateEPICSLink && !vo.isVisible())
+			continue;
 		vo = vo.intersects(x, y);
 		if (vo!=null) {
 			spotted=vo;

@@ -145,6 +145,11 @@ public boolean isRight()
  * @param hilited boolean
  */
 protected void draw(Graphics g, boolean hilited) {
+	
+	// can happen, hiliting invisible link of the source
+	if (!isVisible())
+		return;
+	
 	super.draw(g, hilited);
 
 	com.cosylab.vdct.graphics.ViewState view = com.cosylab.vdct.graphics.ViewState.getInstance();
