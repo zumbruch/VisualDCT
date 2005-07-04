@@ -644,7 +644,8 @@ public Vector getLinkMenus(Enumeration vdbFields) {
 
 		while (vdbFields.hasMoreElements()) {
 			field = (VDBFieldData)(vdbFields.nextElement());
-			if (field.getValue().equals(nullString)) {
+			// do not show non-empty fields since their value will be overriden
+			if (field.getValue().equals(nullString) || field.getValue().equals(Constants.NONE)) {
 				switch (field.getType()) {
 					case DBDConstants.DBF_INLINK:
 						 menuitem = new JMenuItem(field.getName());
