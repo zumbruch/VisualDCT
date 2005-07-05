@@ -32,6 +32,7 @@ import java.awt.*;
 import java.util.*;
 import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.Settings;
+import com.cosylab.vdct.VisualDCT;
 import com.cosylab.vdct.graphics.*;
 
 import com.cosylab.vdct.graphics.popup.*;
@@ -111,14 +112,13 @@ public Connector(String id, LinkManagerObject parent, OutLink outlink, InLink in
 		setColor(((VisibleObject)outlink).getColor());
 	else
 		setColor(Constants.FRAME_COLOR);
-	
+
 	if (inlink!=null) inlink.setOutput(this, outlink);
 	if (outlink!=null) outlink.setInput(this);
 	setInput(inlink); 
 	setOutput(outlink, null);
 	setWidth(Constants.CONNECTOR_WIDTH);
 	setHeight(Constants.CONNECTOR_HEIGHT);
-
 	/// !!! better initial layout
 	// out of screen
 	if ((inlink==null) && (outlink==null)) {
@@ -139,9 +139,12 @@ public Connector(String id, LinkManagerObject parent, OutLink outlink, InLink in
 		setY(parent.getY()+parent.getHeight()/2);
 	}
 	else {
-		setX((inlink.getInX()+outlink.getOutX())/2);
+//			setX((inlink.getInX()+outlink.getOutX())/2);
+//	    System.out.println(inlink.isRight());
+	    setX(inlink.getInX());
 		setY((inlink.getInY()+outlink.getOutY())/2);
 	}
+
 	
 	if (Settings.getInstance().getShowGrid())
 		snapToGrid();
@@ -269,39 +272,41 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 	int rheight = getRheight();
 	int rrx = getRx()-view.getRx()-rwidth/2;	// position is center
 	int rry = getRy()-view.getRy()-rheight/2;
-		
-	// clipping
-	if ((!(rrx>view.getViewWidth()) || (rry>view.getViewHeight())
-	    || ((rrx+rwidth)<0) || ((rry+rheight)<0))) {
-
-		// fill or not to fill ?!!
-
-		/*
-		if (!hilited) g.setColor(getColor());
-		else g.setColor((this==view.getHilitedObject()) ? 
-						Constants.HILITE_COLOR : getColor());
-		*/
-		
-		if (view.isSelected(this))
-		{
-			g.setColor(Constants.PICK_COLOR);
-			g.fillRect(rrx, rry, rwidth, rheight);
-		}
-
-		Color c = getVisibleColor();
-		if (hilited)
-			c = (view.isHilitedObject(this)) ? Constants.HILITE_COLOR : c;
-		g.setColor(c);
-		
-		if (inlink!=null || hilited) 
-			g.drawRect(rrx, rry, rwidth, rheight);
-//		else {
-		else if (getMode()!=EXTERNAL_OUTPUT_MODE && getMode()!=EXTERNAL_INPUT_MODE)
-		{
-			g.drawLine(rrx, rry, rrx+rwidth, rry+rheight);
-			g.drawLine(rrx+rwidth, rry, rrx, rry+rheight);
-		}
 	
+	if (!VisualDCT.getInstance().isPrinting()) {
+		// clipping
+		if ((!(rrx>view.getViewWidth()) || (rry>view.getViewHeight())
+		    || ((rrx+rwidth)<0) || ((rry+rheight)<0))) {
+	
+			// fill or not to fill ?!!
+	
+			/*
+			if (!hilited) g.setColor(getColor());
+			else g.setColor((this==view.getHilitedObject()) ? 
+							Constants.HILITE_COLOR : getColor());
+			*/
+			
+			if (view.isSelected(this))
+			{
+				g.setColor(Constants.PICK_COLOR);
+				g.fillRect(rrx, rry, rwidth, rheight);
+			}
+	
+			Color c = getVisibleColor();
+			if (hilited)
+				c = (view.isHilitedObject(this)) ? Constants.HILITE_COLOR : c;
+			g.setColor(c);
+			
+			if (inlink!=null || hilited) 
+				g.drawRect(rrx, rry, rwidth, rheight);
+	//		else {
+			else if (getMode()!=EXTERNAL_OUTPUT_MODE && getMode()!=EXTERNAL_INPUT_MODE)
+			{
+				g.drawLine(rrx, rry, rrx+rwidth, rry+rheight);
+				g.drawLine(rrx+rwidth, rry, rrx, rry+rheight);
+			}
+		
+		}
 	}
 
 	if (/*!hilited &&*/ (inlink!=null || getMode()==EXTERNAL_OUTPUT_MODE || getMode()==EXTERNAL_INPUT_MODE)) {
@@ -309,9 +314,10 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 		if (hilited)
 			c = (view.isHilitedObject(this)) ? Constants.HILITE_COLOR : c;
 		g.setColor(c);
-		if (inlink!=null)
+		if (inlink!=null){
+//		    System.out.println("//////////"+getOutX());
 			LinkDrawer.drawLink(g, this, inlink, getQueueCount(), 
-								getOutX()<inlink.getInX());
+								getOutX()<inlink.getInX());}
 		else if (getOutput()!=null)
 			LinkDrawer.drawLink(g, this, null, getQueueCount(), 
 								getOutput().getOutX()<getX());
@@ -513,15 +519,16 @@ public boolean move(int dx, int dy) {
  */
 public void revalidatePosition() {
   if (inlink!=null && outlink!=null && mode!=INVISIBLE_MODE && outlink.getMode()!=INVISIBLE_MODE) { //order is important
-	if (getQueueCount()%2==0) 
-		setX((inlink.getInX()+outlink.getOutX())/2);
+    if (getQueueCount()%2==0) 
+        setX(inlink.getInX());
     else
 		setY((inlink.getInY()+outlink.getOutY())/2);
   }
-  
+
   double  Rscale = getRscale();
   setRx((int)(getX()*Rscale));
   setRy((int)(getY()*Rscale));
+  
 }
 /**
  * Insert the method's description here.

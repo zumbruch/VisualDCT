@@ -703,7 +703,7 @@ public int getMode()
 
 public void setTextPositionNorth(boolean isTextPositionNorth) {
     this.textPositionNorth = isTextPositionNorth;
-    validate();
+    unconditionalValidation();
 }
 
 public boolean isTextPositionNorth() {
@@ -857,7 +857,7 @@ public Vector getStartPoints() {
  * @return boolean
  */
 public boolean isRight() {
-	if (disconnected || outlinks.size()!=1)
+	if (disconnected || outlinks.size()==0) 
 		return true;
 	else {
 		OutLink first = (OutLink)outlinks.firstElement();
@@ -876,7 +876,7 @@ public boolean isRight() {
  * @param prevOutput com.cosylab.vdct.graphics.objects.OutLink
  */
 public void setOutput(OutLink output, OutLink prevOutput) {
-	if (prevOutput!=null) outlinks.removeElement(prevOutput);
+    if (prevOutput!=null) outlinks.removeElement(prevOutput);
 	if (!outlinks.contains(output)) {
 		outlinks.addElement(output);
 		if (outlinks.size()>0) disconnected=false;
