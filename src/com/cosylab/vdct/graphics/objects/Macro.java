@@ -358,11 +358,28 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 			}
 		}
 
-		if (getFont()!=null) {
-			//g.setColor(drawColor);
-			g.setFont(getFont());
+		Font font = FontMetricsBuffer.getInstance().getAppropriateFont(
+	  			Constants.DEFAULT_FONT, Font.PLAIN, 
+	  			getLabel(), rwidth*4, rheight);
+
+		if (font!=null)	{
+		    FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(font);
+		    if (textPositionNorth) {
+		        setRlabelX(rwidth/2-fm.stringWidth(getLabel())/2);
+		        setRlabelY(-fm.getHeight()+fm.getAscent());
+		    } else {
+		        int s = (int)(getScale()*Constants.LINK_STUB_SIZE/4.0);
+		        setRlabelY((rheight + fm.getAscent() - fm.getDescent())/2);
+		        if (isRight()) {
+		            setRlabelX(rwidth + s);
+		        } else {
+		            setRlabelX(-fm.stringWidth(getLabel())-s);
+		        }
+		    }
+		    g.setFont(getFont());
 			g.drawString(getLabel(), rrx+getRlabelX(), rry+getRlabelY());
-		}
+		}		
+		
 	}
 
 	if (false)///!!!
@@ -703,7 +720,7 @@ public int getMode()
 
 public void setTextPositionNorth(boolean isTextPositionNorth) {
     this.textPositionNorth = isTextPositionNorth;
-    unconditionalValidation();
+    DrawingSurface.getInstance().repaint();
 }
 
 public boolean isTextPositionNorth() {
@@ -861,12 +878,13 @@ public boolean isRight() {
 		return true;
 	else {
 		OutLink first = (OutLink)outlinks.firstElement();
-		if (first.getLayerID().equals(getLayerID()))
-			return !( getRightX()<first.getLeftX() ||
+		if (first.getLayerID().equals(getLayerID())) {
+			return !( getRightX() < first.getLeftX() ||
 						   (first.getLeftX()<getLeftX() && getLeftX()<first.getRightX() && first.getRightX()<getRightX()));										
 			//return (first.getOutX()<(getX()+getWidth()/2));
-		else
-			return true;
+		}
+		else 
+		    return true;
 	}
 }
 /**
@@ -877,14 +895,13 @@ public boolean isRight() {
  */
 public void setOutput(OutLink output, OutLink prevOutput) {
     if (prevOutput!=null) outlinks.removeElement(prevOutput);
-	if (!outlinks.contains(output)) {
+    if (!outlinks.contains(output)) {
 		outlinks.addElement(output);
 		if (outlinks.size()>0) disconnected=false;
 	}
 
 	if (outlinks.firstElement() instanceof VisibleObject)
 		setColor(((VisibleObject)outlinks.firstElement()).getColor());
-
 
 }
 

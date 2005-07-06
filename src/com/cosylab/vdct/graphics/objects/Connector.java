@@ -113,12 +113,22 @@ public Connector(String id, LinkManagerObject parent, OutLink outlink, InLink in
 	else
 		setColor(Constants.FRAME_COLOR);
 
+	//BugFix RT#12125&12122 by jbobnar
+	boolean z = true;
+	if (inlink != null) {
+	    if (inlink instanceof Macro)
+	        z = inlink.isRight();
+	}
+	//end bugfix
+	
 	if (inlink!=null) inlink.setOutput(this, outlink);
 	if (outlink!=null) outlink.setInput(this);
+
 	setInput(inlink); 
 	setOutput(outlink, null);
 	setWidth(Constants.CONNECTOR_WIDTH);
 	setHeight(Constants.CONNECTOR_HEIGHT);
+	
 	/// !!! better initial layout
 	// out of screen
 	if ((inlink==null) && (outlink==null)) {
@@ -139,10 +149,21 @@ public Connector(String id, LinkManagerObject parent, OutLink outlink, InLink in
 		setY(parent.getY()+parent.getHeight()/2);
 	}
 	else {
-//			setX((inlink.getInX()+outlink.getOutX())/2);
-//	    System.out.println(inlink.isRight());
-	    setX(inlink.getInX());
-		setY((inlink.getInY()+outlink.getOutY())/2);
+	    // BugFix RT#12125&12122 by jbobnar
+	    int ir = inlink.getRightX();
+	    int il = inlink.getLeftX();
+	    int or = outlink.getRightX();
+	    int ol = outlink.getLeftX();
+	    
+	    if (il > ol && ir > or && il < or && !inlink.isRight()) {
+	        setX(outlink.getOutX());
+	    }
+	    else if (ir < or && il > ol) {
+	        setX(outlink.getOutX());
+	    } else {
+	        setX(!z ? inlink.getInX() + ir - il : inlink.getInX());
+	    }
+	    setY((inlink.getInY()+outlink.getOutY())/2);
 	}
 
 	

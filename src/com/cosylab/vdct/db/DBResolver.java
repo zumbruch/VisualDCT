@@ -1048,8 +1048,18 @@ public static String processTemplateComment(DBTemplate template, EnhancedStreamT
 						tokenizer.nextToken();
 						if (tokenizer.ttype == EnhancedStreamTokenizer.TT_NUMBER) macro.setDefaultVisibility((int)tokenizer.nval);
 						else throw (new DBGParseException(errorString, tokenizer, fileName));
-
+						
+						// read macro text position if exists
+						tokenizer.nextToken();
+						if (tokenizer.ttype == EnhancedStreamTokenizer.TT_EOL) {
+						    tokenizer.pushBack();
+						    macro.setNamePositionNorth(true);
+						} else if (tokenizer.ttype == EnhancedStreamTokenizer.TT_WORD){
+						    macro.setNamePositionNorth(new Boolean(tokenizer.sval).booleanValue());
+						} else throw (new DBGParseException(errorString, tokenizer, fileName));
+						
 						macro.setHasVisual(true);
+						
 					}
 				}
 		return nullString;

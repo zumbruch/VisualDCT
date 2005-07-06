@@ -1632,7 +1632,8 @@ private static void writeTemplateData(DataOutputStream stream, NamingContext ren
 			justComma + quote + StringUtils.removeQuotes(macro.getDescription()) + quote +
 			justComma + visibleMacro.getX() + justComma + visibleMacro.getY() + 
 			justComma + StringUtils.color2string(visibleMacro.getColor()) +
-			justComma + macro.getVisibility());
+			justComma + macro.getVisibility() +
+			justComma + visibleMacro.isTextPositionNorth());
 		stream.writeBytes(ending);
 	}	
 

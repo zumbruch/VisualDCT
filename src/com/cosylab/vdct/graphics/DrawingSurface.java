@@ -3188,31 +3188,62 @@ public boolean prepareTemplateLeave()
 			JOptionPane.showMessageDialog(VisualDCT.getInstance(), "The file has to be saved first...");
 			return false;
 		}
-		else if (JOptionPane.showConfirmDialog(VisualDCT.getInstance(), "The file has been modified. Discard changes?", "Confirmation", 
-						JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE)==JOptionPane.OK_OPTION)
-		{
-			// pop old current
-			VDBTemplate backup = (VDBTemplate)templateStack.pop();
-			// reload template
-			boolean ok = reloadTemplate(Group.getEditingTemplateData());
-			// push new
-			VDBTemplate reloaded = (VDBTemplate)VDBData.getTemplates().get(backup.getId());
+		else {
+		    
+		    int select = JOptionPane.showConfirmDialog(VisualDCT.getInstance(), "The file has been modified. Discard changes?", "Confirmation", 
+						JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		    switch(select) {
 			
-			if (!ok || reloaded==null)
-			{
-				VDBData.addTemplate(backup);
-				templateStack.push(backup);
-			}
-			else
-			{
-				templateStack.push(reloaded);
-				viewGroup = reloaded.getGroup();
-			}
+		    	case JOptionPane.NO_OPTION: {
+		    	    VisualDCT.getInstance().saveMenuItem_ActionPerformed();
+		    	    VDBTemplate backup = (VDBTemplate)templateStack.pop();
+					// reload template
+					boolean ok = reloadTemplate(Group.getEditingTemplateData());
+					// push new
+					VDBTemplate reloaded = (VDBTemplate)VDBData.getTemplates().get(backup.getId());
 					
-			return true;
+					if (!ok || reloaded==null)
+					{
+						VDBData.addTemplate(backup);
+						templateStack.push(backup);
+					}
+					else
+					{
+						templateStack.push(reloaded);
+						viewGroup = reloaded.getGroup();
+					}
+							
+					return true;
+		    	}
+		    
+				case JOptionPane.YES_OPTION: {
+					// pop old current
+					VDBTemplate backup = (VDBTemplate)templateStack.pop();
+					// reload template
+					boolean ok = reloadTemplate(Group.getEditingTemplateData());
+					// push new
+					VDBTemplate reloaded = (VDBTemplate)VDBData.getTemplates().get(backup.getId());
+					
+					if (!ok || reloaded==null)
+					{
+						VDBData.addTemplate(backup);
+						templateStack.push(backup);
+					}
+					else
+					{
+						templateStack.push(reloaded);
+						viewGroup = reloaded.getGroup();
+					}
+							
+					return true;
+				}
+				
+				default: {
+				    return false;
+				}
+			}		
 		}
-		else
-			return false;
+		
 	}
 	else		
 		return true;

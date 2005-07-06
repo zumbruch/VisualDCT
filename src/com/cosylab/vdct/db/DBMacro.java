@@ -42,6 +42,7 @@ public class DBMacro extends DBComment
 	protected boolean hasVisual = false;
 	protected int x = -1;			// used for layout
 	protected int y = -1;
+	protected boolean isNamePositionNorth = true;
 	protected int mode = InLink.INPUT_MACRO_MODE;
 	protected int defaultVisibility = InspectableProperty.UNDEFINED_VISIBILITY;
 	protected java.awt.Color color = java.awt.Color.black;
@@ -198,5 +199,25 @@ public class DBMacro extends DBComment
 	{
 		this.defaultVisibility = defaultVisibility;
 	}
+
+
+    /**
+     * Sets the position of the text (if namePositionNorth is true, text is on the top
+     * of the macro otherwise it is on the side).
+     * @param namePositionNorth
+     */
+    public void setNamePositionNorth(boolean namePositionNorth) {
+        this.isNamePositionNorth = namePositionNorth;
+        
+    }
+    
+    /**
+     * 
+     * Returns the position of the text.
+     * @return
+     */
+    public boolean isNamePositionNorth() {
+        return isNamePositionNorth;
+    }
 
 }

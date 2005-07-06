@@ -404,7 +404,8 @@ private static VDBData generateTemplate(DBDData dbd, DBTemplate dbTemplate)
 									  macro.getX(), macro.getY());
 				visualMacro.setColor(macro.getColor());
 				visualMacro.setMode(macro.getMode());
-
+				visualMacro.setTextPositionNorth(macro.isNamePositionNorth());
+				
 				// delegate defaultVisibility
 				vdbMacro.setVisibility(macro.getDefaultVisibility());
 				
