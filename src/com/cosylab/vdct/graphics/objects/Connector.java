@@ -115,11 +115,18 @@ public Connector(String id, LinkManagerObject parent, OutLink outlink, InLink in
 
 	//BugFix RT#12125&12122 by jbobnar
 	boolean z = true;
+	int outX = -1;
+	int inX = -1;
 	if (inlink != null) {
 	    if (inlink instanceof Macro)
 	        z = inlink.isRight();
+	    else {
+	        outX = outlink.getOutX();
+	        inX = inlink.getInX();
+	    }
 	}
 	//end bugfix
+	
 	
 	if (inlink!=null) inlink.setOutput(this, outlink);
 	if (outlink!=null) outlink.setInput(this);
@@ -154,14 +161,23 @@ public Connector(String id, LinkManagerObject parent, OutLink outlink, InLink in
 	    int il = inlink.getLeftX();
 	    int or = outlink.getRightX();
 	    int ol = outlink.getLeftX();
-	    
-	    if (il > ol && ir > or && il < or && !inlink.isRight()) {
-	        setX(outlink.getOutX());
+	    int in = inlink.getInX();
+	    int out = outlink.getOutX();
+
+	    if (il > ol && ir > or && il <= or && !inlink.isRight()) {
+	        if (inX != in) {
+	            setX(inX + 11);
+	        } else {
+	            setX(out);
+	        }
 	    }
-	    else if (ir < or && il > ol) {
-	        setX(outlink.getOutX());
+	    else if (ir < or && il > ol ) {
+	        setX(out);
+	    } 
+	    else if ((ol > ir)){
+            setX(inX != in ? in + ir - il + 11 : in);
 	    } else {
-	        setX(!z ? inlink.getInX() + ir - il : inlink.getInX());
+	        setX(!z ? in + ir - il : in);
 	    }
 	    setY((inlink.getInY()+outlink.getOutY())/2);
 	}
