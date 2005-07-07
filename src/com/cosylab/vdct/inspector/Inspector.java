@@ -36,8 +36,15 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.table.*;
 
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
 import java.awt.event.*;
+
 import com.cosylab.vdct.Console;
+import com.cosylab.vdct.graphics.DrawingSurface;
+import com.cosylab.vdct.graphics.ViewState;
+import com.cosylab.vdct.graphics.objects.VisibleObject;
 
 /**
  * Insert the type's description here.
@@ -54,6 +61,8 @@ public class Inspector extends JDialog implements InspectableObjectsListener, In
 	private JScrollPane ivjTableScrollPane = null;
 	private JScrollPane ivjCommentScrollPane = null;
 	private JComboBox ivjObjectComboBox = null;
+	private JButton centerOnScreen;
+	
 	// inspector components
 	private InspectorTableModel tableModel;
 	private Inspectable inspectedObject = null;
@@ -380,13 +389,16 @@ private javax.swing.JPanel getJDialogContentPane() {
 			constraintsHelpLabel.insets = new java.awt.Insets(8, 8, 4, 4);
 			getJDialogContentPane().add(getHelpLabel(), constraintsHelpLabel);
 
-
 			java.awt.GridBagConstraints constraintsFrozeCheckBox = new java.awt.GridBagConstraints();
 			constraintsFrozeCheckBox.gridx = 1; constraintsFrozeCheckBox.gridy = 5;
 			constraintsFrozeCheckBox.fill = java.awt.GridBagConstraints.HORIZONTAL;
 			constraintsFrozeCheckBox.insets = new java.awt.Insets(4, 4, 4, 4);
 			getJDialogContentPane().add(getFrozeCheckBox(), constraintsFrozeCheckBox);
 
+			getJDialogContentPane().add(getCenterOnScreenButton(), new GridBagConstraints(
+			        0,5,1,1,0,0,GridBagConstraints.WEST, GridBagConstraints.NONE,
+			        new Insets(4,4,4,4),0,0));
+			
 			// user code begin {1}
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
@@ -397,6 +409,32 @@ private javax.swing.JPanel getJDialogContentPane() {
 	}
 	return ivjJDialogContentPane;
 }
+
+private JButton getCenterOnScreenButton() {
+    if (centerOnScreen == null) {
+        try {
+            centerOnScreen = new JButton("Center object");
+            centerOnScreen.setName("CenterButton");
+            centerOnScreen.setFont(new Font("dialog", 0, 12));
+            centerOnScreen.addActionListener(new ActionListener() {
+
+                public void actionPerformed(ActionEvent e) {
+                    if (inspectedObject != null) {
+                        if (inspectedObject instanceof VisibleObject) {
+                            DrawingSurface.getInstance().centerObject((VisibleObject) inspectedObject);
+                        }
+                    }
+                }
+                
+            });
+        } catch (Throwable e) {
+            handleException(e);
+        }
+    }
+    
+    return centerOnScreen;
+}
+
 /**
  * Return the ObjectComboBox property value.
  * @return javax.swing.JComboBox
@@ -550,6 +588,7 @@ private void initialize() {
 		handleException(ivjExc);
 	}
 	// user code begin {2}
+
 	updateObjectList();
 	addWindowListener(this);
 	getHelpLabel().setText("");
@@ -631,6 +670,10 @@ public void inspectObject(Inspectable object, boolean raise) {
 	initializeTabs(object.getModeNames());
 	
 	if (raise) setVisible(true);
+	if (object instanceof VisibleObject) {
+	    ViewState.getInstance().setAsHilited((VisibleObject) object);
+	    DrawingSurface.getInstance().repaint(true);
+	}
 }
 /**
  * Insert the method's description here.
@@ -745,6 +788,12 @@ public void updateProperty(InspectableProperty property) {
 	 */
 public void windowActivated(java.awt.event.WindowEvent e) {
 	InspectorManager.getInstance().fucusGained(this);
+	if (inspectedObject != null) {
+	    if (inspectedObject instanceof VisibleObject) {
+	        ViewState.getInstance().setAsHilited((VisibleObject) inspectedObject);
+	        DrawingSurface.getInstance().repaint(true);
+	    }
+	}
 }
 	/**
 	 * Invoked when a window has been closed as the result
@@ -763,7 +812,14 @@ public void windowClosing(java.awt.event.WindowEvent e) {}
 	 * window, which means that keyboard events will no longer
 	 * be delivered to the window or its subcomponents.
 	 */
-public void windowDeactivated(java.awt.event.WindowEvent e) {}
+public void windowDeactivated(java.awt.event.WindowEvent e) {
+    if (inspectedObject != null) {
+	    if (inspectedObject instanceof VisibleObject) {
+	        ViewState.getInstance().setAsHilited(null);
+	        DrawingSurface.getInstance().repaint(true);
+	    }
+	}
+}
 	/**
 	 * Invoked when a window is changed from a minimized
 	 * to a normal state.

@@ -751,16 +751,16 @@ public void linkCommand(VisibleObject linkObject, LinkSource linkData) {
 	 */
 public void mouseClicked(MouseEvent e) {
 	ViewState view = ViewState.getInstance();
+	
 	// check for drags!
 	int cx = e.getX()-view.getX0();
 	int cy = e.getY()-view.getY0();
+
 	if ((cx>0) && (cy>0) && (cx<width) && (cy<height)) {
-//		System.out.println("mouseClicked ("+cx+", "+cy+")");
 
 		VisibleObject hilited = view.getHilitedObject();
-
+		
 		if (hilited!=null) {			
-
 			boolean leftButtonPush = (e.getModifiers() & InputEvent.BUTTON1_MASK) != 0;
 
 			// linking support
@@ -823,6 +823,7 @@ public void mouseClicked(MouseEvent e) {
 					}
 					else if (hilited instanceof Inspectable) 
 						InspectorManager.getInstance().requestInspectorFor((Inspectable)hilited);
+						
 					else if (hilited instanceof Connector)
 					{
 						Connector con = (Connector)hilited;
@@ -886,8 +887,15 @@ public void mouseClicked(MouseEvent e) {
 					createBox();
 				else if(VisualDCT.getInstance().getTextBoxButtonEnabled())
 					createTextBox();
-				else
-					CommandManager.getInstance().execute("ShowNewDialog");
+				else {
+				    VisibleObject spotted = viewGroup.hiliteComponentsCheck(cx+view.getRx(), cy+view.getRy());
+			        if (view.setAsHilited(spotted))
+						repaint(true);
+			        else 
+			            CommandManager.getInstance().execute("ShowNewDialog");
+				    
+				   
+				}
 			}
 			else if (view.deselectAll()) 
 				repaint();					// deselect all
@@ -1105,6 +1113,7 @@ private void createLine()
 	grLine = manager.getManager().createLine();
 	UndoManager.getInstance().addAction(new CreateAction(grLine));
 }
+
 	/**
 	 * Invoked when a mouse button is pressed on a component and then 
 	 * dragged.  Mouse drag events will continue to be delivered to
@@ -1311,45 +1320,47 @@ public void mouseExited(MouseEvent e) {}
 	 */
 public void mouseMoved(MouseEvent e)
 {
-	ViewState view = ViewState.getInstance();
-	int cx = e.getX()-view.getX0();
-	int cy = e.getY()-view.getY0();
-	double scale = view.getScale();
-
-	if(grLine != null)
-	{
-		grLine.getEndVertex().setX((int)((cx + view.getRx()) / scale));
-		grLine.getEndVertex().setY((int)((cy + view.getRy()) / scale));
-		
-		repaint();
-	}
-	else if(grBox != null)
-	{
-		grBox.getEndVertex().setX((int)((cx + view.getRx()) / scale));
-		grBox.getEndVertex().setY((int)((cy + view.getRy()) / scale));
-		
-		repaint();
-	}
-	else if(grTextBox != null)
-	{
-		grTextBox.getEndVertex().setX((int)((cx + view.getRx()) / scale));
-		grTextBox.getEndVertex().setY((int)((cy + view.getRy()) / scale));
-		
-		repaint();
-	}
-	else
-	{
-		if ((cx>0) && (cy>0) && (cx<width) && (cy<height))
+	if (VisualDCT.getInstance().isActive()) {
+	    ViewState view = ViewState.getInstance();
+		int cx = e.getX()-view.getX0();
+		int cy = e.getY()-view.getY0();
+		double scale = view.getScale();
+	
+		if(grLine != null)
 		{
-			VisibleObject spotted = viewGroup.hiliteComponentsCheck(cx+view.getRx(), cy+view.getRy());
-			if (view.setAsHilited(spotted))
+			grLine.getEndVertex().setX((int)((cx + view.getRx()) / scale));
+			grLine.getEndVertex().setY((int)((cy + view.getRy()) / scale));
+			
+			repaint();
+		}
+		else if(grBox != null)
+		{
+			grBox.getEndVertex().setX((int)((cx + view.getRx()) / scale));
+			grBox.getEndVertex().setY((int)((cy + view.getRy()) / scale));
+			
+			repaint();
+		}
+		else if(grTextBox != null)
+		{
+			grTextBox.getEndVertex().setX((int)((cx + view.getRx()) / scale));
+			grTextBox.getEndVertex().setY((int)((cy + view.getRy()) / scale));
+			
+			repaint();
+		}
+		else
+		{
+			if ((cx>0) && (cy>0) && (cx<width) && (cy<height))
 			{
-			//drawOnlyHilitedOnce=true;
-			//repaint();
-			repaint(true);
+				VisibleObject spotted = viewGroup.hiliteComponentsCheck(cx+view.getRx(), cy+view.getRy());
+				if (view.setAsHilited(spotted))
+				{
+				//drawOnlyHilitedOnce=true;
+				//repaint();
+				repaint(true);
+				}
 			}
+		}
 	}
-}
 }
 	/**
 	 * Invoked when a mouse button has been pressed on a component.
@@ -1357,6 +1368,7 @@ public void mouseMoved(MouseEvent e)
 public void mousePressed(MouseEvent e) {
 	notYetDragged = true;
 	ViewState view = ViewState.getInstance();
+	
 	int px = e.getX()-view.getX0();
 	int py = e.getY()-view.getY0();
 	if ((px>0) && (py>0) && (px<width) && (py<height)) {
@@ -1461,6 +1473,7 @@ public void mousePressed(MouseEvent e) {
 	 */
 public void mouseReleased(MouseEvent e) {
 	ViewState view = ViewState.getInstance();
+
 	int px = e.getX()-view.getX0();
 	int py = e.getY()-view.getY0();
 
