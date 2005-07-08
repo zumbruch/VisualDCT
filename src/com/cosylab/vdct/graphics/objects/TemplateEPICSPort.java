@@ -243,6 +243,12 @@ public void destroyAndRemove() {
 
 }
 
+public void destroy()
+{
+	if (!isDestroyed())
+		destroyAndRemove();
+}
+
 /**
  * Insert the method's description here.
  * Creation date: (3.2.2001 13:07:04)
