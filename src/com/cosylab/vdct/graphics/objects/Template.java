@@ -1426,6 +1426,10 @@ public Flexible copyToGroup(java.lang.String group) {
 	// apply fields data
 	Enumeration e = subObjectsV.elements();
 	EPICSLink field; Object obj;
+	
+	// order the fields
+	theTemplateCopy.getSubObjectsV().clear();
+	
 	while (e.hasMoreElements()) {
 		obj = e.nextElement();
 		if (obj instanceof EPICSLink) {
@@ -1437,6 +1441,9 @@ public Flexible copyToGroup(java.lang.String group) {
 				fieldCopy.setColor(field.getColor());
 				fieldCopy.setRight(field.isRight());
 				fieldCopy.getFieldData().setVisibility(field.getFieldData().getVisibility());
+				
+				// put in the right order
+				theTemplateCopy.getSubObjectsV().add(fieldCopy);
 			}
 		}
 	}
