@@ -440,6 +440,14 @@ public void group(String groupName) {
  * @param file java.io.File
  */
 public void importDB(java.io.File file) throws IOException {
+	drawingSurface.importDB(file);
+}
+/**
+ * Insert the method's description here.
+ * Creation date: (4.2.2001 15:32:01)
+ * @param file java.io.File
+ */
+public void importTemplateDB(java.io.File file) throws IOException {
 	drawingSurface.open(file, true);
 }
 /**

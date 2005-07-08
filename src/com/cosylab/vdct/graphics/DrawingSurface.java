@@ -1655,7 +1655,15 @@ private void markPositionSelection() {
  * @param file java.io.File
  */
 public boolean open(File file) throws IOException {
-	return open(file, false);
+	return open(file, false, false);
+}
+/**
+ * Insert the method's description here.
+ * Creation date: (6.1.2001 22:35:40)
+ * @param file java.io.File
+ */
+public boolean open(File file, boolean importDB) throws IOException {
+	return open(file, importDB, false);
 }
 /**
  * jh
@@ -1801,20 +1809,13 @@ public boolean importFields(File file, boolean ignoreLinkFields)
  * Creation date: (6.1.2001 22:35:40)
  * @param file java.io.File
  */
-public boolean open(File file, boolean importDB) throws IOException {
+public boolean open(File file, boolean importDB, boolean importToCurrentGroup) throws IOException {
 
 	///
 	/// DBD managment
 	///
 
-	// clean list of unexisting DBDs
-	DBDEntry[] dbds = new DBDEntry[com.cosylab.vdct.DataProvider.getInstance().getCurrentDBDs().size()];
-	com.cosylab.vdct.DataProvider.getInstance().getCurrentDBDs().toArray(dbds);
-	for (int i=0; i<dbds.length; i++)
-		if (!dbds[i].getFile().exists())
-			com.cosylab.vdct.DataProvider.getInstance().getCurrentDBDs().removeElement(dbds[i]);
-		else
-			dbds[i].setSavesToFile(false);
+	cleanDBDList();
 	 
 	// check for in-coded DBDs
 	checkForIncodedDBDs(file);
@@ -1863,11 +1864,14 @@ public boolean open(File file, boolean importDB) throws IOException {
 		// check is DTYP fields are defined before any DBF_INPUT/DBF_OUTPUT fields...
 		DBData.checkDTYPfield(dbData, dbdData);
 
-		/*VDBData vdbData =*/ VDBData.generateVDBData(dbdData, dbData);
+		VDBData vdbData = VDBData.generateVDBData(dbdData, dbData);
 
-		//applyVisualData(importDB, viewGroup, dbData, vdbData);
-
-		if (!importDB)
+		if (importToCurrentGroup)
+		{
+			// import directly to workspace (current view group)
+			applyVisualData(true, viewGroup, dbData, vdbData);
+		}
+		else if (!importDB)
 		{
 			// every file is a template
 			
@@ -1946,6 +1950,28 @@ public boolean open(File file, boolean importDB) throws IOException {
 	} 
 	else
 		return false;
+}
+
+/**
+ * 
+ */
+private void cleanDBDList() {
+	// clean list of unexisting DBDs
+	DBDEntry[] dbds = new DBDEntry[com.cosylab.vdct.DataProvider.getInstance().getCurrentDBDs().size()];
+	com.cosylab.vdct.DataProvider.getInstance().getCurrentDBDs().toArray(dbds);
+	for (int i=0; i<dbds.length; i++)
+		if (!dbds[i].getFile().exists())
+			com.cosylab.vdct.DataProvider.getInstance().getCurrentDBDs().removeElement(dbds[i]);
+		else
+			dbds[i].setSavesToFile(false);
+}
+/**
+ * SEPARATE DOWN CODE TO METHODS
+ * Creation date: (6.1.2001 22:35:40)
+ * @param file java.io.File
+ */
+public boolean importDB(File file) throws IOException {
+	return open(file, true, true);
 }
 
 /**
