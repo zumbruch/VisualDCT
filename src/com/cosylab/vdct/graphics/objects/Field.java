@@ -85,14 +85,25 @@ protected void draw(Graphics g, boolean hilited) {
 	else if (view.isPicked(this)) g.setColor(Constants.PICK_COLOR);
 	else if (view.isSelected(this) || view.isBlinking(this)) g.setColor(Constants.SELECTION_COLOR);
 	else g.setColor(Constants.RECORD_COLOR);
+		
+	double Rscale = view.getScale();
+	if ((Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this)) {
+	    rwidth /= Rscale;
+        rheight /= Rscale;
+        rrx -= (rwidth - getRwidth())/2;
+        rry -= (rheight - getRheight())/2;
+        Rscale = 1.0;
+        validateFont(Rscale, rwidth, rheight);
+    }
 	
 	g.fillRect(rrx, rry, rwidth, rheight);
-	if (!hilited) g.setColor(Constants.FRAME_COLOR);
-	else g.setColor((view.isHilitedObject(this)) ? 
-					Constants.HILITE_COLOR : Constants.FRAME_COLOR);
+	Color color;
+	if (!hilited) color = Constants.FRAME_COLOR;
+	else color = (view.isHilitedObject(this)) ? Constants.HILITE_COLOR : Constants.FRAME_COLOR;
+	g.setColor(color);
 
 	g.drawRect(rrx, rry, rwidth, rheight);
-
+	
 	if (getFont()!=null) {
 		g.setFont(getFont());
 		g.drawString(getLabel(), rrx+getRlabelX(), rry+getRlabelY());
@@ -144,6 +155,32 @@ public void revalidatePosition(int nx, int ny, int n) {
 	setX(nx); setY(ny); verticalPosition=n;
 	revalidatePosition();
 }
+
+private void validateFont(double scale, int rwidth, int rheight) {
+    
+//  set appropriate font size
+    final int x0 = (int)(8*scale);		// insets
+    final int y0 = (int)(4*scale);
+
+    setLabel(fieldData.getName());
+
+  	///!!! optimize static
+
+    Font font;
+    if (rwidth<(2*x0)) font = null;
+    else
+    font = FontMetricsBuffer.getInstance().getAppropriateFont(
+  	  			Constants.DEFAULT_FONT, Font.PLAIN, 
+  	  			getLabel(), rwidth-x0, rheight-y0);
+
+    if (font!=null) {
+  	  FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(font);
+  	  setRlabelX((rwidth-fm.stringWidth(getLabel()))/2);
+   	  setRlabelY((rheight-fm.getHeight())/2+fm.getAscent());
+    }
+    
+    setFont(font);
+}
 /**
  * Insert the method's description here.
  * Creation date: (21.12.2000 20:46:35)
@@ -158,29 +195,8 @@ protected void validate() {
 
   setRwidth(rwidth);
   setRheight(rheight);
-
-  // set appropriate font size
-  final int x0 = (int)(8*scale);		// insets
-  final int y0 = (int)(4*scale);
-
-  setLabel(fieldData.getName());
-
-	///!!! optimize static
-
-  Font font;
-  if (rwidth<(2*x0)) font = null;
-  else
-  font = FontMetricsBuffer.getInstance().getAppropriateFont(
-	  			Constants.DEFAULT_FONT, Font.PLAIN, 
-	  			getLabel(), rwidth-x0, rheight-y0);
-
-  if (font!=null) {
-	  FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(font);
-	  setRlabelX((rwidth-fm.stringWidth(getLabel()))/2);
- 	  setRlabelY((rheight-fm.getHeight())/2+fm.getAscent());
-  }
+  validateFont(scale, rwidth, rheight);
   
-  setFont(font);
 
 }
 	/**

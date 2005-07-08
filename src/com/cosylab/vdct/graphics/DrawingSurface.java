@@ -1352,13 +1352,15 @@ public void mouseMoved(MouseEvent e)
 			if ((cx>0) && (cy>0) && (cx<width) && (cy<height))
 			{
 				VisibleObject spotted = viewGroup.hiliteComponentsCheck(cx+view.getRx(), cy+view.getRy());
-				if (view.setAsHilited(spotted))
+				if (view.setAsHilited(spotted,e.isShiftDown()))
 				{
 				//drawOnlyHilitedOnce=true;
 				//repaint();
 				repaint(true);
+				return;
 				}
-			}
+			} 
+			repaint();
 		}
 	}
 }
@@ -3610,6 +3612,10 @@ public void generateMacros()
 
 	//drawingSurface.setModified(true);
 	repaint();
+}
+
+public boolean isPrinting() {
+    return printing;
 }
 
 public void reset() {

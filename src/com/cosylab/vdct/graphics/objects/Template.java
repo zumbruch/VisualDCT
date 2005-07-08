@@ -168,6 +168,18 @@ public class Template
 		if ((!(rrx>view.getViewWidth()) || (rry>view.getViewHeight())
 		    || ((rrx+rwidth)<0) || ((rry+rheight)<0))) {
 	
+		    double Rscale = view.getScale();
+			if ((Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this)) {
+			    rwidth /= Rscale;
+		        rheight /= Rscale;
+		        rrx -= (rwidth - getRwidth())/2;
+		        rry -= (rheight - getRheight())/2;
+		        rrx = rrx <= 0 ? 2 : rrx;
+		        rry = rry <= 0 ? 2 : rry;
+		        validateFont(1.0, rwidth, Constants.TEMPLATE_INITIAL_HEIGHT);
+		        Rscale = 1.0;
+		    }
+			
 			if (!hilited) g.setColor(Constants.RECORD_COLOR);
 			else if (view.isPicked(this)) g.setColor(Constants.PICK_COLOR);
 			else if (view.isSelected(this) ||
@@ -257,37 +269,10 @@ public class Template
 		  // sub-components
 		  revalidateFieldsPosition();
 	}
-
-	/**
-	 * @see com.cosylab.vdct.graphics.objects.VisibleObject#validate()
-	 */
-	protected void validate()
-	{
-		
-		  // template change check
-		  VDBTemplate tmpl = (VDBTemplate)VDBData.getTemplates().get(getTemplateData().getTemplate().getId());		
-		  if (tmpl!=getTemplateData().getTemplate())
-		  {
-		  	getTemplateData().setTemplate(tmpl);
-			synchronizeLinkFields();
-		  }
-		  else
-		  {
-		  	if (getTemplateData().getTemplate().getPortsGeneratedID()!=portsID)
-				synchronizePortLinkFields();
-			if (getTemplateData().getTemplate().getMacrosGeneratedID()!=macrosID)
-				synchronizeMacroLinkFields();
-		  }
-		
-		  revalidatePosition();
-
-		  double scale = getRscale();
-		  int rwidth = (int)((getX()+getWidth())*scale)-getRx();
-		  int height = (int)(getY()*scale+Constants.TEMPLATE_INITIAL_HEIGHT)-getRy();
-
-		  initY = height;
-
-		  int irheight = (int)(scale*height);
+	
+	private int validateFont(double scale, int rwidth, int height) {
+	    
+	    int irheight = (int)(scale*height);
 
 		  // set appropriate font size
 		  int x0 = (int)(24*scale);		// insets
@@ -300,7 +285,7 @@ public class Template
 		 // height = Math.max(height, Constants.TEMPLATE_MIN_HEIGHT);
 		  int frheight = (int)(scale*height);
 
-		  rlinkY = frheight;
+//		  rlinkY = frheight;
 		  
 		  // properties
 
@@ -308,8 +293,8 @@ public class Template
 		  int yy0 = (int)(8*scale);
 
 
-  		 // !!! optimize - static
- 
+		 // !!! optimize - static
+
 		  rfieldRowHeight = (irheight-2*y0)*0.175;
 
 		  if (rwidth<(2*xx0)) fieldFont = null;
@@ -330,10 +315,7 @@ public class Template
 		  }
 
 		  int rheight = frheight + yy0 + (int)(rfieldRowHeight*templateData.getProperties().size())+ascent;
-		  setHeight((int)(rheight/scale));
-
-		  setRwidth(rwidth);
-		  setRheight(rheight);
+		  
 		
 		  // description
 
@@ -370,7 +352,44 @@ public class Template
 			  ridLabelX = (rwidth-fm.stringWidth(idlabel))/2;
 		 	  ridLabelY = (idLabelHeight-fm.getHeight())/2+fm.getAscent();
 		  }
+		  
+		  return rheight;
+	}
 
+	/**
+	 * @see com.cosylab.vdct.graphics.objects.VisibleObject#validate()
+	 */
+	protected void validate()
+	{
+		
+		  // template change check
+		  VDBTemplate tmpl = (VDBTemplate)VDBData.getTemplates().get(getTemplateData().getTemplate().getId());		
+		  if (tmpl!=getTemplateData().getTemplate())
+		  {
+		  	getTemplateData().setTemplate(tmpl);
+			synchronizeLinkFields();
+		  }
+		  else
+		  {
+		  	if (getTemplateData().getTemplate().getPortsGeneratedID()!=portsID)
+				synchronizePortLinkFields();
+			if (getTemplateData().getTemplate().getMacrosGeneratedID()!=macrosID)
+				synchronizeMacroLinkFields();
+		  }
+		
+		  revalidatePosition();
+
+		  double scale = getRscale();
+		  int rwidth = (int)((getX()+getWidth())*scale)-getRx();
+		  int height = (int)(getY()*scale+Constants.TEMPLATE_INITIAL_HEIGHT)-getRy();
+
+		  initY = height;
+		  	  
+		  int rheight = validateFont(scale, rwidth, height);
+		  
+		  setHeight((int)(rheight/scale));
+		  setRwidth(rwidth);
+		  setRheight(rheight);
 		  
 	      // sub-components
 		  revalidatePosition();

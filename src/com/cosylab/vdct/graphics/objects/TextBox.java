@@ -306,7 +306,7 @@ public void setColor(java.awt.Color color)
 public void setFont(Font parFont)
 {
 	super.setFont(parFont);
-	updateTextFont(true);
+	updateTextFont(true, getRscale());
 }
 
 public void accept(Visitor visitor)
@@ -374,6 +374,21 @@ protected void draw(Graphics g, boolean hilited)
 	if(!((posX > view.getViewWidth()) || (posY > view.getViewHeight())
 		|| ((posX + rwidth) < 0) || ((posY + rheight) < 0)))
 	{
+	    
+	    double Rscale = view.getScale();
+	    if ((Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this)) {
+	        rwidth /= Rscale;
+	        rheight /= Rscale;
+	        posX -= (rwidth - getRwidth())/2;
+	        posY -= (rheight - getRheight())/2;
+	        posX = posX <= 0 ? 2 : posX;
+	        posY = posY <= 0 ? 2 : posY;
+	        Rscale = 1.0;
+	        g.setColor(Constants.BACKGROUND_COLOR);
+	        g.fillRect(posX, posY, rwidth, rheight);
+	        updateTextFont(true, Rscale);
+	    }
+	    
 		if(view.isSelected(this))
 		{
 			g.setColor(Constants.HILITE_COLOR);
@@ -659,7 +674,7 @@ protected void validate()
 	setRwidth((int)(getWidth() * rscale));
 	setRheight((int)(getHeight() * rscale));
 
-	updateTextFont(false);
+	updateTextFont(false, getRscale());
 }
 	
 /**
@@ -683,12 +698,8 @@ public void setDescription(String description)
 	updateText();
 }
 
-/**
- */
-private void updateTextFont(boolean force)
-{
-	double Rscale = getRscale();
-	if ((force || Rscale!=fontScale) && getFont()!=null)
+private void updateTextFont(boolean force, double Rscale) {
+    if ((force || Rscale!=fontScale) && getFont()!=null)
 	{
 		fontScale = Rscale;
 		int size = (int)(getFont().getSize()*fontScale);
@@ -696,8 +707,9 @@ private void updateTextFont(boolean force)
 			return;
 		rfont = FontMetricsBuffer.getInstance().getFont(getFont().getFamily(), size, getFont().getStyle());
 		updateText();
-	}
+	}    
 }
+
 
 /**
  */

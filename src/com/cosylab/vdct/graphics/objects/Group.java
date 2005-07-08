@@ -297,6 +297,18 @@ protected void draw(Graphics g, boolean hilited) {
 	if ((!(rrx>view.getViewWidth()) || (rry>view.getViewHeight())
 	    || ((rrx+rwidth)<0) || ((rry+rheight)<0))) {
 
+	    double Rscale = view.getScale();
+		if ((Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this)) {
+	        rwidth /= Rscale;
+	        rheight /= Rscale;
+	        rrx -= (rwidth - getRwidth())/2;
+	        rry -= (rheight - getRheight())/2;
+	        rrx = rrx <= 0 ? 2 : rrx;
+	        rry = rry <= 0 ? 2 : rry;
+	        Rscale = 1.0;
+	        validateFont(Rscale, rwidth, Constants.RECORD_HEIGHT);
+	    }
+	    
 		if (!hilited) g.setColor(Constants.RECORD_COLOR);
 		else if (view.isPicked(this)) g.setColor(Constants.PICK_COLOR);
 		else if (view.isSelected(this) ||
@@ -961,6 +973,30 @@ public void unconditionalValidateSubObjects(boolean flat) {
 	}
 	
 }
+
+private void validateFont(double scale, int rwidth, int rheight) {
+    
+    
+    // set appropriate font size
+    int x0 = (int)(16*scale);		// insets
+    int y0 = (int)(8*scale);
+
+    setLabel(getName());
+
+    Font font;
+    font = FontMetricsBuffer.getInstance().getAppropriateFont(
+  	  			Constants.DEFAULT_FONT, Font.PLAIN, 
+  	  			getLabel(), rwidth-x0, rheight-y0);
+
+    if (rwidth<(2*x0)) font = null;
+    else
+    if (font!=null) {
+  	  FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(font);
+  	  setRlabelX((rwidth-fm.stringWidth(getLabel()))/2);
+   	  setRlabelY((rheight-fm.getHeight())/2+fm.getAscent());
+    }
+    setFont(font);
+}
 /**
  * Insert the method's description here.
  * Creation date: (21.12.2000 20:46:35)
@@ -973,28 +1009,7 @@ protected void validate() {
   int rheight = (int)(getHeight()*scale);
   setRwidth(rwidth);
   setRheight(rheight);
-
-  // set appropriate font size
-  int x0 = (int)(16*scale);		// insets
-  int y0 = (int)(8*scale);
-
-  setLabel(getName());
-
-  Font font;
-  font = FontMetricsBuffer.getInstance().getAppropriateFont(
-	  			Constants.DEFAULT_FONT, Font.PLAIN, 
-	  			getLabel(), rwidth-x0, rheight-y0);
-
-  if (rwidth<(2*x0)) font = null;
-  else
-  if (font!=null) {
-	  FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(font);
-	  setRlabelX((rwidth-fm.stringWidth(getLabel()))/2);
- 	  setRlabelY((rheight-fm.getHeight())/2+fm.getAscent());
-  }
-  setFont(font);
-
- 
+  validateFont(scale, rwidth, rheight); 
 }
 /**
  * Insert the method's description here.

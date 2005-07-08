@@ -190,7 +190,7 @@ public void destroy()
 protected void draw(Graphics g, boolean hilited)
 {
 	ViewState view = ViewState.getInstance();
-
+	System.out.println("test");
 	int offsetX = view.getRx();
 	int offsetY = view.getRy();
 	
@@ -199,6 +199,17 @@ protected void draw(Graphics g, boolean hilited)
 	int rwidth = getRwidth();
 	int rheight = getRheight();
 
+	double Rscale = view.getScale();
+	if ((Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this)) {
+        rwidth /= Rscale;
+        rheight /= Rscale;
+        posX -= (rwidth - getRwidth())/2;
+        posY -= (rheight - getRheight())/2;
+        posX = posX <= 0 ? 2 : posX;
+        posY = posY <= 0 ? 2 : posY;
+        Rscale = 1.0;
+    }
+	
 	if((hilited) && (!((posX > view.getViewWidth()) || (posY > view.getViewHeight())
 		|| ((posX + rwidth) < 0) || ((posY + rheight) < 0))))
 	{

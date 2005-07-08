@@ -31,7 +31,6 @@ package com.cosylab.vdct.graphics.objects;
 import java.awt.*;
 import java.util.*;
 import com.cosylab.vdct.Constants;
-import com.cosylab.vdct.VisualDCT;
 import com.cosylab.vdct.graphics.*;
 
 import com.cosylab.vdct.graphics.popup.*;
@@ -185,7 +184,9 @@ public Connector(String id, LinkManagerObject parent, OutLink outlink, InLink in
 	    }
 	    setY((inlink.getInY()+outlink.getOutY())/2);
 	}
-
+//System.out.println(inlink + " " + inlink.getClass());
+//System.out.println(outlink + " " + outlink.getClass());
+	
 	//do not snapToGrid to avoid small step in grid
 //	if (Settings.getInstance().getShowGrid())
 //		snapToGrid();
@@ -314,7 +315,7 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 	int rrx = getRx()-view.getRx()-rwidth/2;	// position is center
 	int rry = getRy()-view.getRy()-rheight/2;
 	
-	if (!VisualDCT.getInstance().isPrinting()) {
+	if (!DrawingSurface.getInstance().isPrinting()) {
 		// clipping
 		if ((!(rrx>view.getViewWidth()) || (rry>view.getViewHeight())
 		    || ((rrx+rwidth)<0) || ((rry+rheight)<0))) {
@@ -326,6 +327,16 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 			else g.setColor((this==view.getHilitedObject()) ? 
 							Constants.HILITE_COLOR : getColor());
 			*/
+		    double Rscale = view.getScale();
+		    if ((Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this)) {
+		        rwidth /= Rscale;
+		        rheight /= Rscale;
+		        rrx -= (rwidth - getRwidth())/2;
+		        rry -= (rheight - getRheight())/2;
+		        rrx = rrx <= 0 ? 1 : rrx;
+		        rry = rry <= 0 ? 1 : rry;
+		    }
+		    
 			
 			if (view.isSelected(this))
 			{

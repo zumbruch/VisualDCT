@@ -210,8 +210,6 @@ public class VisualDCT extends JFrame {
 	private PluginManagerDialog pluginManagerDialog = null;
 	
 	private ComboBoxFileChooser comboBoxFileChooser = null;
-	
-	private boolean printing = false;
 
 // shp: not final solution
 	private static VisualDCT instance = null;
@@ -6560,7 +6558,6 @@ public void printAsPostScriptMenuItem_ActionPerformed()
 
 			try
 			{	
-			    setPrinting(true);
 				PrintRequestAttributeSet printRequestAttributeSet = Page.getPrintRequestAttributeSet();
 
 				PrinterJob printerJob = PrinterJob.getPrinterJob();
@@ -6667,7 +6664,6 @@ public void printAsPostScriptMenuItem_ActionPerformed()
 			{
 				setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
 				Settings.getInstance().setShowGrid(showGrid);
-				setPrinting(false);
 				CommandManager.getInstance().execute("RepaintWorkspace");
 			}
 		}
@@ -6682,8 +6678,7 @@ public void printMenuItem_ActionPerformed() {
 	new Thread() {
 		public void run() {
 			try {
-			    setPrinting(true);
-	
+
 				PrintRequestAttributeSet printRequestAttributeSet = Page.getPrintRequestAttributeSet();
 
 				PrinterJob printerJob = PrinterJob.getPrinterJob();
@@ -6734,7 +6729,6 @@ public void printMenuItem_ActionPerformed() {
 			}
 			finally
 			{
-			    setPrinting(false);
 				setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
 			}
 		}
@@ -6748,18 +6742,13 @@ public void printPreviewMenuItem_ActionPerformed(java.awt.event.ActionEvent acti
 	if (pi!=null)
 		new Thread() {
 			public void run() {
-			    try {
-			        setPrinting(true);
-					PrintPreview pp = new PrintPreview(VisualDCT.this, pi.getPageable(), "VisualDCT Print Preview"+addedToTitle);
-					pp.setLocationRelativeTo(VisualDCT.this);
-					pp.setVisible(true);
-					Thread.yield();
-					pp.loadPreview();
-			    } catch (Exception e) {
-			        //
-			    } finally {
-			        setPrinting(false);
-			    }
+
+				PrintPreview pp = new PrintPreview(VisualDCT.this, pi.getPageable(), "VisualDCT Print Preview"+addedToTitle);
+				pp.setLocationRelativeTo(VisualDCT.this);
+				pp.setVisible(true);
+				Thread.yield();
+				pp.loadPreview();
+
 			}
 		}.start();
 }
@@ -7482,11 +7471,4 @@ public void updateLoadLabel() {
 		return comboBoxFileChooser;
 	}
 
-	public void setPrinting(boolean printing) {
-	    this.printing = printing;
-	}
-	
-	public boolean isPrinting() {
-	    return printing;
-	}
 }

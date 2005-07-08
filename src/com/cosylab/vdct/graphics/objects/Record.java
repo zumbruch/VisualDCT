@@ -293,6 +293,8 @@ public void disconnect(Linkable disconnector) {
 		outlinks.removeElement(disconnector);
 	}
 }
+
+
 /**
  * Insert the method's description here.
  * Creation date: (21.12.2000 20:46:35)
@@ -305,17 +307,31 @@ protected void draw(Graphics g, boolean hilited) {
 
 	int rrx = getRx() - view.getRx();
 	int rry = getRy() - view.getRy();
-
+	
 	int rwidth = getRwidth();
 	int rheight = getRheight();
 
 	double Rscale = getRscale();
+	
 	// clipping
 	if (!((rrx > view.getViewWidth())
 		|| (rry > view.getViewHeight())
 		|| ((rrx + rwidth) < 0)
 		|| ((rry + rheight) < 0))) {
-
+	    
+	    boolean zoom = false;
+	    if ((view.getScale() < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this)) {
+	        rwidth /= Rscale;
+	        rheight /= Rscale;
+	        rrx -= (rwidth - getRwidth())/2;
+	        rry -= (rheight - getRheight())/2;
+	        rrx = rrx <= 0 ? 2 : rrx;
+	        rry = rry <= 0 ? 2 : rry;
+	        Rscale = 1.0;
+	        validateFont(Rscale, rwidth, Constants.RECORD_HEIGHT);
+	        zoom = true;
+	    }
+	    	    
 		if (!hilited)
 			g.setColor(Constants.RECORD_COLOR);
 		else
@@ -346,8 +362,7 @@ protected void draw(Graphics g, boolean hilited) {
 		int ly = (int) (rry + recordSize);
 		g.drawLine(rrx + ox, ly, rrx + rwidth - ox, ly);
 
-
-
+		
 		// show VAL value and timestamp
 		if (inDebugMode)
 		{
@@ -377,7 +392,7 @@ protected void draw(Graphics g, boolean hilited) {
 		}
 
 		if (getFont() != null) {
-			g.setFont(getFont());
+		    g.setFont(getFont());
 			g.drawString(getLabel(), rrx + getRlabelX(), rry + getRlabelY());
 		}
 
@@ -387,7 +402,8 @@ protected void draw(Graphics g, boolean hilited) {
 		}
 
 		if (fieldFont != null) {
-			g.setFont(fieldFont);
+		    	    
+		    g.setFont(fieldFont);
 			FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(fieldFont);
 			String val;
 			VDBFieldData fd;
@@ -432,24 +448,26 @@ protected void draw(Graphics g, boolean hilited) {
 			int ccx = (int)(Rscale*getInX()- view.getRx());
 
 			int cx;
-			if (isRightSide) {
-				cx = rrx + rwidth + r;
-				g.drawOval(cx - r, cy - r, 2 * r, 2 * r);
-				g.setColor(linkColor);
-				g.drawLine(cx + 2 * r, cy, ccx, cy);
-			} else {
-				cx = rrx - r;
-				g.drawOval(cx - r, cy - r, 2 * r, 2 * r);
-				g.setColor(linkColor);
-				g.drawLine(ccx, cy, cx - 2 * r, cy);
+			if (!zoom) { 
+				if (isRightSide) {
+					cx = rrx + rwidth + r;
+					g.drawOval(cx - r, cy - r, 2 * r, 2 * r);
+					g.setColor(linkColor);
+					g.drawLine(cx + 2 * r, cy, ccx, cy);
+				} else {
+					cx = rrx - r;
+					g.drawOval(cx - r, cy - r, 2 * r, 2 * r);
+					g.setColor(linkColor);
+					g.drawLine(ccx, cy, cx - 2 * r, cy);
+				}
+//				 !!! more intergroup inlinks?!
+				LinkDrawer.drawInIntergroupLink(
+					g,
+					(OutLink) outlinks.firstElement(),
+					this,
+					isRightSide);
 			}
-
-			// !!! more intergroup inlinks?!
-			LinkDrawer.drawInIntergroupLink(
-				g,
-				(OutLink) outlinks.firstElement(),
-				this,
-				isRightSide);
+		
 		}
 
 	}
@@ -1396,6 +1414,102 @@ public String toString() {
 	// recordData.getName()+" ("+recordData.getType()+")"
 }
 
+private int validateFont(double scale, int rwidth, int rheight) {
+    
+    //  set appropriate font size
+    final int x0 = (int)(8*scale);		// insets
+    final int y0 = (int)(4*scale);
+    final int fieldRowHeight = (int)((Constants.RECORD_HEIGHT-2*4)*0.375);
+
+    Font font;
+    
+    // translate name
+    if (PluginDebugManager.isDebugState())
+    {
+  	Map macroSet = PluginDebugManager.getDebugPlugin().getMacroSet();
+  	if (macroSet != null)
+  		setLabel(VDBTemplateInstance.applyProperties(recordData.getName(), macroSet));
+  	else
+  		setLabel(recordData.getName());
+    }
+    else
+  	  setLabel(recordData.getName());
+    
+    if (rwidth<(2*x0)) font = null;
+    else
+  	  font = FontMetricsBuffer.getInstance().getAppropriateFont(
+  		  			Constants.DEFAULT_FONT, Font.PLAIN, 
+  	 	 			getLabel(), rwidth-x0, (rheight-y0)/2);
+
+    if (font!=null) {
+  	  FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(font);
+  	  setRlabelX((rwidth-fm.stringWidth(getLabel()))/2);
+   	  setRlabelY(rheight/2+(rheight/2-fm.getHeight())/2+fm.getAscent());
+    }
+    setFont(font);
+    
+    label2 = recordData.getType();
+    if (rwidth<(2*x0)) typeFont = null;
+    else
+  	  typeFont = FontMetricsBuffer.getInstance().getAppropriateFont(
+  		  			 Constants.DEFAULT_FONT, Font.PLAIN, 
+  	 	 			 label2, rwidth-x0, (rheight-y0)/2);
+
+    if (typeFont!=null) {
+  	  FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(typeFont);
+  	  rtypeLabelX = (rwidth-fm.stringWidth(label2))/2;
+   	  rtypeLabelY = (rheight/2-fm.getHeight())/2+fm.getAscent();
+    }
+
+   // !!! optimize - static
+   
+    rfieldRowHeight = (rheight-2*y0)*0.375;
+
+    // code moves record up, when fields are added and down when deleted 
+    if (oldNumOfFields != changedFields.size()) {
+    	int difference = oldNumOfFields - changedFields.size(); 
+  	oldNumOfFields = changedFields.size();
+    	//move(0, fieldRowHeight*difference);
+    	moveAsMuchAsPossibleTopUp(0, fieldRowHeight*difference);
+    }
+    
+    // increase record size for VAL value and timestamp
+    if (PluginDebugManager.isDebugState())
+    {
+  	VDBFieldData fld = getField(VAL_FIELD);
+  	if (fld != null)
+  	{
+  		validateDebug(fld);
+
+  		inDebugMode = true;
+  		rheight *= 2;
+  	}
+  	else
+  		inDebugMode = false;
+    }
+    else
+  	inDebugMode = false;
+  	
+    if (rwidth<(2*x0)) fieldFont = null;
+    else
+  	  fieldFont = FontMetricsBuffer.getInstance().getAppropriateFont(
+  		  			 Constants.DEFAULT_FONT, Font.PLAIN, 
+  	 	 			 fieldMaxStr, rwidth-x0, (int)rfieldRowHeight);
+
+    int ascent = 0;
+    //rfieldRowHeight = 0;
+    if (fieldFont!=null) {
+  	  FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(fieldFont);
+  	  rfieldLabelX = x0;
+   	  rfieldLabelY = rheight+2*fm.getAscent();
+  	  //rfieldRowHeight = fm.getHeight();
+  	  ascent = fm.getAscent();
+    }
+    rheight += y0+rfieldRowHeight*changedFields.size()+ascent;
+    
+    return rheight;
+}
+
 /**
  * Insert the method's description here.
  * Creation date: (21.12.2000 20:46:35)
@@ -1408,104 +1522,14 @@ protected void validate() {
 
   setRheight(rheight);
   setRwidth(rwidth);
-
-  // set appropriate font size
-  final int x0 = (int)(8*scale);		// insets
-  final int y0 = (int)(4*scale);
-  final int fieldRowHeight = (int)((Constants.RECORD_HEIGHT-2*4)*0.375);
-
-  Font font;
-  
-  // translate name
-  if (PluginDebugManager.isDebugState())
-  {
-	Map macroSet = PluginDebugManager.getDebugPlugin().getMacroSet();
-	if (macroSet != null)
-		setLabel(VDBTemplateInstance.applyProperties(recordData.getName(), macroSet));
-	else
-		setLabel(recordData.getName());
-  }
-  else
-	  setLabel(recordData.getName());
-  
-  if (rwidth<(2*x0)) font = null;
-  else
-	  font = FontMetricsBuffer.getInstance().getAppropriateFont(
-		  			Constants.DEFAULT_FONT, Font.PLAIN, 
-	 	 			getLabel(), rwidth-x0, (rheight-y0)/2);
-
-  if (font!=null) {
-	  FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(font);
-	  setRlabelX((rwidth-fm.stringWidth(getLabel()))/2);
- 	  setRlabelY(rheight/2+(rheight/2-fm.getHeight())/2+fm.getAscent());
-  }
-  setFont(font);
-  
-  label2 = recordData.getType();
-  if (rwidth<(2*x0)) typeFont = null;
-  else
-	  typeFont = FontMetricsBuffer.getInstance().getAppropriateFont(
-		  			 Constants.DEFAULT_FONT, Font.PLAIN, 
-	 	 			 label2, rwidth-x0, (rheight-y0)/2);
-
-  if (typeFont!=null) {
-	  FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(typeFont);
-	  rtypeLabelX = (rwidth-fm.stringWidth(label2))/2;
- 	  rtypeLabelY = (rheight/2-fm.getHeight())/2+fm.getAscent();
-  }
-
- // !!! optimize - static
  
-  rfieldRowHeight = (rheight-2*y0)*0.375;
-
-  // code moves record up, when fields are added and down when deleted 
-  if (oldNumOfFields != changedFields.size()) {
-  	int difference = oldNumOfFields - changedFields.size(); 
-	oldNumOfFields = changedFields.size();
-  	//move(0, fieldRowHeight*difference);
-  	moveAsMuchAsPossibleTopUp(0, fieldRowHeight*difference);
-  }
-  
-  // increase record size for VAL value and timestamp
-  if (PluginDebugManager.isDebugState())
-  {
-	VDBFieldData fld = getField(VAL_FIELD);
-	if (fld != null)
-	{
-		validateDebug(fld);
-
-		inDebugMode = true;
-		rheight *= 2;
-	}
-	else
-		inDebugMode = false;
-  }
-  else
-	inDebugMode = false;
-	
-  if (rwidth<(2*x0)) fieldFont = null;
-  else
-	  fieldFont = FontMetricsBuffer.getInstance().getAppropriateFont(
-		  			 Constants.DEFAULT_FONT, Font.PLAIN, 
-	 	 			 fieldMaxStr, rwidth-x0, (int)rfieldRowHeight);
-
-  int ascent = 0;
-  //rfieldRowHeight = 0;
-  if (fieldFont!=null) {
-	  FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(fieldFont);
-	  rfieldLabelX = x0;
- 	  rfieldLabelY = rheight+2*fm.getAscent();
-	  //rfieldRowHeight = fm.getHeight();
-	  ascent = fm.getAscent();
-  }
-
-  rheight += y0+rfieldRowHeight*changedFields.size()+ascent;
+  rheight = validateFont(scale, rwidth, rheight);
   setHeight((int)(rheight/scale));
 
   // round fix
   rheight = (int)((getY()+getHeight())*scale)-(int)(getY()*scale);
   setRheight(rheight);
-
+  
   // sub-components
   revalidatePosition();		// rec's height can be different
   validateFields();

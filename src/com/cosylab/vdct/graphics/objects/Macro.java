@@ -290,7 +290,18 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 		|| (rry > view.getViewHeight())
 		|| ((rrx + rwidth) < 0)
 		|| ((rry + rheight) < 0))) {
-
+	    
+	    double Rscale = view.getScale();
+	    if ((Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this)) {
+	        rwidth /= Rscale;
+	        rheight /= Rscale;
+	        rrx -= (rwidth - getRwidth())/2;
+	        rry -= (rheight - getRheight())/2;
+	        rrx = rrx <= 0 ? 2 : rrx;
+	        rry = rry <= 0 ? 2 : rry;
+	        Rscale = 1.0;
+	        validateFontAndPolygon(Rscale, rwidth, rheight);
+	    }
 	
 		Polygon poly = null;
 		if (rightSide)
@@ -585,134 +596,126 @@ public void setDescription(java.lang.String description) {}
 public void setLayerID(String id) {
 	// not needed, dynamicaly retrieved via parent
 }
+
+private void validateFontAndPolygon(double Rscale, int rwidth, int rheight) {
+    
+    leftXtranslation = 0; leftYtranslation = 0;
+    rightXtranslation = 0; rightYtranslation = 0;
+    
+    if (getMode() == InLink.OUTPUT_MACRO_MODE)
+    {
+      setWidth(Constants.GRID_SIZE);
+  	  setHeight(Constants.GRID_SIZE);
+
+  	  // left poly
+  	  leftPoly.xpoints[0]=0;
+  	  leftPoly.xpoints[1]=rwidth/2;
+  	  leftPoly.xpoints[2]=rwidth;
+  	  leftPoly.xpoints[3]=leftPoly.xpoints[2];
+  	  leftPoly.xpoints[4]=leftPoly.xpoints[1];
+  	
+  	  leftPoly.ypoints[0]=rheight/2;
+  	  leftPoly.ypoints[1]=rheight;
+  	  leftPoly.ypoints[2]=leftPoly.ypoints[1];
+  	  leftPoly.ypoints[3]=0;
+  	  leftPoly.ypoints[4]=leftPoly.ypoints[3];
+
+  	
+  	  // right poly
+  	  rightPoly.xpoints[0]=0;
+  	  rightPoly.xpoints[1]=rightPoly.xpoints[0];
+  	  rightPoly.xpoints[2]=rwidth/2;
+  	  rightPoly.xpoints[3]=rwidth;
+  	  rightPoly.xpoints[4]=rightPoly.xpoints[2];
+  	
+  	  rightPoly.ypoints[0]=0;
+  	  rightPoly.ypoints[1]=rheight;
+  	  rightPoly.ypoints[2]=rightPoly.ypoints[1];
+  	  rightPoly.ypoints[3]=rheight/2;
+  	  rightPoly.ypoints[4]=rightPoly.ypoints[0];
+    }
+    else if (getMode() == InLink.INPUT_MACRO_MODE)
+    {
+  
+  	  setWidth(Constants.GRID_SIZE);
+  	  setHeight(Constants.GRID_SIZE);
+
+  	  // left poly
+  	  leftPoly.xpoints[0]=rwidth/2;
+  	  leftPoly.xpoints[1]=0;
+  	  leftPoly.xpoints[2]=rwidth;
+  	  leftPoly.xpoints[3]=leftPoly.xpoints[2];
+  	  leftPoly.xpoints[4]=leftPoly.xpoints[1];
+  	
+  	  leftPoly.ypoints[0]=rheight/2;
+  	  leftPoly.ypoints[1]=rheight;
+  	  leftPoly.ypoints[2]=leftPoly.ypoints[1];
+  	  leftPoly.ypoints[3]=0;
+  	  leftPoly.ypoints[4]=leftPoly.ypoints[3];
+
+  	
+  	  // right poly
+  	  rightPoly.xpoints[0]=0;
+  	  rightPoly.xpoints[1]=rightPoly.xpoints[0];
+  	  rightPoly.xpoints[2]=rwidth;
+  	  rightPoly.xpoints[3]=rwidth/2;
+  	  rightPoly.xpoints[4]=rightPoly.xpoints[2];
+  	
+  	  rightPoly.ypoints[0]=0;
+  	  rightPoly.ypoints[1]=rheight;
+  	  rightPoly.ypoints[2]=rightPoly.ypoints[1];
+  	  rightPoly.ypoints[3]=rheight/2;
+  	  rightPoly.ypoints[4]=rightPoly.ypoints[0];
+    }
+
+    setLabel(getName());
+
+  	///!!! optimize static
+
+    Font font = FontMetricsBuffer.getInstance().getAppropriateFont(
+  	  			Constants.DEFAULT_FONT, Font.PLAIN, 
+  	  			getLabel(), rwidth*4, rheight);
+
+    if (font!=null)
+    {
+  	  FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(font);
+  	  if (textPositionNorth) {
+  		  setRlabelX(rwidth/2-fm.stringWidth(getLabel())/2);
+  	 	  setRlabelY(-fm.getHeight()+fm.getAscent());
+  	  } else {
+  	      int s = (int)(getScale()*Constants.LINK_STUB_SIZE/4.0);
+  	      setRlabelY((rheight + fm.getAscent() - fm.getDescent())/2);
+  	      if (isRight()) {
+  	          setRlabelX(rwidth + s);
+  	      } else {
+  	          setRlabelX(-fm.stringWidth(getLabel())-s);
+  	      }
+  	  }
+    }
+    
+    setFont(font);
+
+    r = (int)(Rscale*Constants.LINK_RADIOUS*2);
+    
+}
 /**
  * Insert the method's description here.
  * Creation date: (29.1.2001 20:05:52)
  */
 protected void validate() {
   revalidatePosition();
-
-  leftXtranslation = 0; leftYtranslation = 0;
-  rightXtranslation = 0; rightYtranslation = 0;
-  
-  int rwidth = 0;
-  int rheight = 0;
   
   double Rscale = getRscale();
+    
+  // to make it nice, do /2)*2
+  int rwidth = (int)(getWidth()*Rscale/2)*2;
+  int rheight = (int)(getHeight()*Rscale/2)*2;
   
-  if (getMode() == InLink.OUTPUT_MACRO_MODE)
-  {
-//	  setWidth(Constants.LINK_STUB_SIZE);
-//	  setHeight(Constants.LINK_STUB_SIZE);
-
-      setWidth(Constants.GRID_SIZE);
-	  setHeight(Constants.GRID_SIZE);
-	  
-	  // to make it nice, do /2)*2
-	  rwidth = (int)(getWidth()*Rscale/2)*2;
-	  rheight = (int)(getHeight()*Rscale/2)*2;
-	  
-	  setRwidth(rwidth);
-	  setRheight(rheight);
-
-	  // left poly
-	  leftPoly.xpoints[0]=0;
-	  leftPoly.xpoints[1]=rwidth/2;
-	  leftPoly.xpoints[2]=rwidth;
-	  leftPoly.xpoints[3]=leftPoly.xpoints[2];
-	  leftPoly.xpoints[4]=leftPoly.xpoints[1];
-	
-	  leftPoly.ypoints[0]=rheight/2;
-	  leftPoly.ypoints[1]=rheight;
-	  leftPoly.ypoints[2]=leftPoly.ypoints[1];
-	  leftPoly.ypoints[3]=0;
-	  leftPoly.ypoints[4]=leftPoly.ypoints[3];
-
-	
-	  // right poly
-	  rightPoly.xpoints[0]=0;
-	  rightPoly.xpoints[1]=rightPoly.xpoints[0];
-	  rightPoly.xpoints[2]=rwidth/2;
-	  rightPoly.xpoints[3]=rwidth;
-	  rightPoly.xpoints[4]=rightPoly.xpoints[2];
-	
-	  rightPoly.ypoints[0]=0;
-	  rightPoly.ypoints[1]=rheight;
-	  rightPoly.ypoints[2]=rightPoly.ypoints[1];
-	  rightPoly.ypoints[3]=rheight/2;
-	  rightPoly.ypoints[4]=rightPoly.ypoints[0];
-  }
-  else if (getMode() == InLink.INPUT_MACRO_MODE)
-  {
-//	  setWidth(Constants.LINK_STUB_SIZE);
-//	  setHeight(Constants.LINK_STUB_SIZE);
+  setRwidth(rwidth);
+  setRheight(rheight);
   
-	  setWidth(Constants.GRID_SIZE);
-	  setHeight(Constants.GRID_SIZE);
-
-	  // to make it nice, do /2)*2
-	  rwidth = (int)(getWidth()*Rscale/2)*2;
-	  rheight = (int)(getHeight()*Rscale/2)*2;
-	  
-	  setRwidth(rwidth);
-	  setRheight(rheight);
-
-	  // left poly
-	  leftPoly.xpoints[0]=rwidth/2;
-	  leftPoly.xpoints[1]=0;
-	  leftPoly.xpoints[2]=rwidth;
-	  leftPoly.xpoints[3]=leftPoly.xpoints[2];
-	  leftPoly.xpoints[4]=leftPoly.xpoints[1];
-	
-	  leftPoly.ypoints[0]=rheight/2;
-	  leftPoly.ypoints[1]=rheight;
-	  leftPoly.ypoints[2]=leftPoly.ypoints[1];
-	  leftPoly.ypoints[3]=0;
-	  leftPoly.ypoints[4]=leftPoly.ypoints[3];
-
-	
-	  // right poly
-	  rightPoly.xpoints[0]=0;
-	  rightPoly.xpoints[1]=rightPoly.xpoints[0];
-	  rightPoly.xpoints[2]=rwidth;
-	  rightPoly.xpoints[3]=rwidth/2;
-	  rightPoly.xpoints[4]=rightPoly.xpoints[2];
-	
-	  rightPoly.ypoints[0]=0;
-	  rightPoly.ypoints[1]=rheight;
-	  rightPoly.ypoints[2]=rightPoly.ypoints[1];
-	  rightPoly.ypoints[3]=rheight/2;
-	  rightPoly.ypoints[4]=rightPoly.ypoints[0];
-  }
-
-  setLabel(getName());
-
-	///!!! optimize static
-
-  Font font = FontMetricsBuffer.getInstance().getAppropriateFont(
-	  			Constants.DEFAULT_FONT, Font.PLAIN, 
-	  			getLabel(), rwidth*4, rheight);
-
-  if (font!=null)
-  {
-	  FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(font);
-	  if (textPositionNorth) {
-		  setRlabelX(rwidth/2-fm.stringWidth(getLabel())/2);
-	 	  setRlabelY(-fm.getHeight()+fm.getAscent());
-	  } else {
-	      int s = (int)(getScale()*Constants.LINK_STUB_SIZE/4.0);
-	      setRlabelY((rheight + fm.getAscent() - fm.getDescent())/2);
-	      if (isRight()) {
-	          setRlabelX(rwidth + s);
-	      } else {
-	          setRlabelX(-fm.stringWidth(getLabel())-s);
-	      }
-	  }
-  }
+  validateFontAndPolygon(Rscale, rwidth, rheight);
   
-  setFont(font);
-
-  r = (int)(Rscale*Constants.LINK_RADIOUS*2);
 
 }
 

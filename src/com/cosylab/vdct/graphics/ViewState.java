@@ -69,6 +69,8 @@ public class ViewState {
 
 	protected Vector blinkingObjects = null;
 	protected boolean blinkState = false;
+	
+	private boolean zoomOnHilited = false;
 
 	private int gridSize = (int)(com.cosylab.vdct.Constants.GRID_SIZE*scale);
 /**
@@ -328,6 +330,7 @@ public boolean moveOrigin(int dx, int dy) {
  */
 public void reset() {
 	hilitedObject = null;
+	zoomOnHilited = false;
 	selectedObjects.removeAllElements();
 	blinkingObjects.removeAllElements();
 }
@@ -354,14 +357,28 @@ public void setAsBlinking(VisibleObject object) {
 	if (!blinkingObjects.contains(object))
 		blinkingObjects.addElement(object);
 }
+
+public boolean isZoomOnHilited() {
+    return this.zoomOnHilited;
+}
+
+public boolean setAsHilited(VisibleObject object) {
+    return setAsHilited(object, false);
+}
 /**
  * Insert the method's description here.
  * Creation date: (21.12.2000 22:24:23)
  * @return boolean
  * @param object com.cosylab.vdct.graphics.objects.VisibleObject
+ * @param zoomOnHilited sets the option whether the hilited object should be zoomed in
  */
-public boolean setAsHilited(VisibleObject object) {
-	if (object!=hilitedObject) {
+public boolean setAsHilited(VisibleObject object, boolean zoomOnHilited) {
+    this.zoomOnHilited = zoomOnHilited;
+    
+    if(zoomOnHilited) DrawingSurface.getInstance().repaint();
+    
+    if (object!=hilitedObject) {
+	    	    
 		hilitedObject=object;
 		
 		//initialization
