@@ -313,7 +313,7 @@ private com.cosylab.vdct.graphics.objects.EPICSVarOutLink.PopupMenuHandler creat
 	{
 		if (outlinks.size()==0 && inlink!=null)
 		{
-			return getRightX()<inlink.getLeftX()
+			return getRightX()<=inlink.getLeftX()
 					  || (getLeftX()<inlink.getLeftX() && inlink.getLeftX()<getRightX() && getRightX()<inlink.getRightX());
 		/*	return getMaxX()<inlink.getMinX()
 						  || (inlink.getMinX()<getMinX() && getMinX() < inlink.getMaxX() && inlink.getMaxX() < getMaxX());					  */

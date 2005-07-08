@@ -384,7 +384,7 @@ public boolean isRight() {
 	else {
 		OutLink first = (OutLink)outlinks.firstElement();
 		if (first.getLayerID().equals(getLayerID()))
-			return getRightX()<first.getLeftX()
+			return getRightX()<=first.getLeftX()
 				|| (first.getLeftX()<getLeftX() && getLeftX() < first.getRightX() && first.getRightX() < getRightX());				
 			//return (first.getOutX()>(getX()+getWidth()/2));
 		else

@@ -195,7 +195,7 @@ public abstract class EPICSLinkOutIn extends EPICSLinkOut implements MultiInLink
 			outlinks!=null && outlinks.size()==1) 
 		{
 				OutLink outlink = (OutLink)outlinks.firstElement();
-				return getRightX()<outlink.getLeftX()
+				return getRightX()<=outlink.getLeftX()
 						  || (outlink.getLeftX()<getLeftX() && getLeftX() < outlink.getRightX() && outlink.getRightX() < getRightX());				
 				/* (outlink instanceof Connector) {	
 					return (outlink.getOutX()>(getX()+getWidth()/2));

@@ -483,7 +483,7 @@ public boolean isRight() {
 		!inlink.getLayerID().equals(getLayerID())) 
 		return super.isRight();
 	else {
-		return getRightX()<inlink.getLeftX()
+		return getRightX()<=inlink.getLeftX()
 		  || (getLeftX()<inlink.getLeftX() && inlink.getLeftX()<getRightX() && getRightX()<inlink.getRightX());
 		/*if (inlink instanceof Connector) {	
 			return (inlink.getInX()>(getX()+getWidth()/2));

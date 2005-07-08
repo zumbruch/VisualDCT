@@ -31,7 +31,6 @@ package com.cosylab.vdct.graphics.objects;
 import java.awt.*;
 import java.util.*;
 import com.cosylab.vdct.Constants;
-import com.cosylab.vdct.Settings;
 import com.cosylab.vdct.VisualDCT;
 import com.cosylab.vdct.graphics.*;
 
@@ -115,18 +114,21 @@ public Connector(String id, LinkManagerObject parent, OutLink outlink, InLink in
 
 	//BugFix RT#12125&12122 by jbobnar
 	boolean z = true;
+	boolean outTurn = false;
 	int outX = -1;
 	int inX = -1;
 	if (inlink != null) {
-	    if (inlink instanceof Macro)
+	    if (inlink instanceof Macro) {
 	        z = inlink.isRight();
-	    else {
+	    } else {
 	        outX = outlink.getOutX();
 	        inX = inlink.getInX();
 	    }
 	}
+	if (outlink != null) {
+	    outTurn = outlink.isRight();
+	}
 	//end bugfix
-	
 	
 	if (inlink!=null) inlink.setOutput(this, outlink);
 	if (outlink!=null) outlink.setInput(this);
@@ -165,26 +167,28 @@ public Connector(String id, LinkManagerObject parent, OutLink outlink, InLink in
 	    int out = outlink.getOutX();
 
 	    if (il > ol && ir > or && il <= or && !inlink.isRight()) {
-	        if (inX != in) {
-	            setX(inX + 11);
-	        } else {
-	            setX(out);
-	        }
+	        if (outTurn != outlink.isRight())
+	            setX((inX != in) ? inX : (inX < or) ? out : outX);
+	        else         
+	            setX((inX != in) || (outX != out) ? inX : out);
+//	        System.out.println("1");
 	    }
 	    else if (ir < or && il > ol ) {
+//	        System.out.println("2");
 	        setX(out);
 	    } 
 	    else if ((ol > ir)){
-            setX(inX != in ? in + ir - il + 11 : in);
+//	        System.out.println("3");
+            setX(inX != in ? in + ir - il : in);
 	    } else {
 	        setX(!z ? in + ir - il : in);
 	    }
 	    setY((inlink.getInY()+outlink.getOutY())/2);
 	}
 
-	
-	if (Settings.getInstance().getShowGrid())
-		snapToGrid();
+	//do not snapToGrid to avoid small step in grid
+//	if (Settings.getInstance().getShowGrid())
+//		snapToGrid();
 	
 }
 /**

@@ -602,9 +602,12 @@ protected void validate() {
   
   if (getMode() == InLink.OUTPUT_MACRO_MODE)
   {
-	  setWidth(Constants.LINK_STUB_SIZE);
-	  setHeight(Constants.LINK_STUB_SIZE);
+//	  setWidth(Constants.LINK_STUB_SIZE);
+//	  setHeight(Constants.LINK_STUB_SIZE);
 
+      setWidth(Constants.GRID_SIZE);
+	  setHeight(Constants.GRID_SIZE);
+	  
 	  // to make it nice, do /2)*2
 	  rwidth = (int)(getWidth()*Rscale/2)*2;
 	  rheight = (int)(getHeight()*Rscale/2)*2;
@@ -641,8 +644,11 @@ protected void validate() {
   }
   else if (getMode() == InLink.INPUT_MACRO_MODE)
   {
-	  setWidth(Constants.LINK_STUB_SIZE);
-	  setHeight(Constants.LINK_STUB_SIZE);
+//	  setWidth(Constants.LINK_STUB_SIZE);
+//	  setHeight(Constants.LINK_STUB_SIZE);
+  
+	  setWidth(Constants.GRID_SIZE);
+	  setHeight(Constants.GRID_SIZE);
 
 	  // to make it nice, do /2)*2
 	  rwidth = (int)(getWidth()*Rscale/2)*2;
@@ -879,9 +885,10 @@ public boolean isRight() {
 	else {
 		OutLink first = (OutLink)outlinks.firstElement();
 		if (first.getLayerID().equals(getLayerID())) {
-			return !( getRightX() < first.getLeftX() ||
-						   (first.getLeftX()<getLeftX() && getLeftX()<first.getRightX() && first.getRightX()<getRightX()));										
+		        return !( getRightX() <= first.getLeftX() ||
+					   (first.getLeftX()<getLeftX() && getLeftX()<first.getRightX() && first.getRightX()<getRightX()));										
 			//return (first.getOutX()<(getX()+getWidth()/2));
+		        
 		}
 		else 
 		    return true;
