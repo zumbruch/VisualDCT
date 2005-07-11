@@ -163,6 +163,21 @@ protected void draw(Graphics g, boolean hilited) {
 	
 	int rry = (int)(getRscale()*getInY()- view.getRy());
 	
+	double Rscale = view.getScale();
+	boolean zoom = (Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this);
+	if (zoom) {
+        int rwidth = getRwidth();
+        int rheight = getRheight();
+        rrx -= (rwidth/Rscale - rwidth)/2;
+        rry -= (rheight/Rscale - rheight)/2;
+        if (view.getRx() < 0)
+            rrx = rrx < 0 ? 2 : rrx;
+        if (view.getRy() < 0) 
+            rry = rry <= 0 ? 2 : rry;
+        validateFontAndDimension(1.0, (int)(rwidth/Rscale),(int) (rheight/Rscale));
+        Rscale = 1.0;
+    }
+	
 	if (!hilited) g.setColor(Constants.FRAME_COLOR);
 	else g.setColor((view.isHilitedObject(this)) ? 
 					Constants.HILITE_COLOR : Constants.FRAME_COLOR);

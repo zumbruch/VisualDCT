@@ -251,7 +251,7 @@ public void disconnect(Linkable disconnector) {
 protected void draw(java.awt.Graphics g, boolean hilited) {
 
 	ViewState view = ViewState.getInstance();
-
+	
 	int rrx = getRx() - view.getRx();
 	int rry = getRy() - view.getRy();
 
@@ -259,21 +259,33 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 	int rheight = getRheight();
 
 	boolean rightSide = isRight();
+	
+	if (inlink!=null)
+	{
+		// draw link
+		g.setColor(hilited && view.isHilitedObject(this) ? Constants.HILITE_COLOR : getVisibleColor());
 
+	    LinkDrawer.drawLink(g, this, inlink, getQueueCount(), rightSide);
+	}
+	
+	double Rscale = view.getScale();
+	boolean zoom = (Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this);
+	
 	// clipping
 	if (!((rrx > view.getViewWidth())
 		|| (rry > view.getViewHeight())
 		|| ((rrx + rwidth) < 0)
 		|| ((rry + rheight) < 0))) {
 
-	    double Rscale = view.getScale();
-	    if ((Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this)) {
+	    if (zoom) {
 	        rwidth /= Rscale;
 	        rheight /= Rscale;
 	        rrx -= (rwidth - getRwidth())/2;
 	        rry -= (rheight - getRheight())/2;
-	        rrx = rrx <= 0 ? 2 : rrx;
-	        rry = rry <= 0 ? 2 : rry;
+	        if (view.getRx() < 0)
+	            rrx = rrx < 0 ? 2 : rrx;
+	        if (view.getRy() < 0) 
+	            rry = rry <= 0 ? 2 : rry;
 	        Rscale = 1.0;
 	        validateFontAndPolygon(Rscale, rwidth, rheight);
 	    }
@@ -324,16 +336,7 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 			g.drawString(getLabel(), rrx+getRlabelX(), rry+getRlabelY());
 		}
 	}
-
-	if (inlink!=null)
-	{
-		// draw link
-		g.setColor(hilited && view.isHilitedObject(this) ? Constants.HILITE_COLOR : getVisibleColor());
-
-		LinkDrawer.drawLink(g, this, inlink, getQueueCount(), rightSide);
-	}
-
-		
+	
 }
 /**
  * Insert the method's description here.

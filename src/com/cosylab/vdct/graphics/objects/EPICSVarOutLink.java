@@ -209,10 +209,10 @@ private com.cosylab.vdct.graphics.objects.EPICSVarOutLink.PopupMenuHandler creat
 	
 		if (inlink!=null)
 		{
+	    
 			g.setColor(hilited && ViewState.getInstance().isHilitedObject(this) ? Constants.HILITE_COLOR : getVisibleColor());
 	
 			boolean isRightSide = isRight();
-
 			// draw missing tail
 			if (outlinks.size()==0)
 			{
@@ -226,7 +226,25 @@ private com.cosylab.vdct.graphics.objects.EPICSVarOutLink.PopupMenuHandler creat
 			
 				int rry = (int)(getRscale()*getInY()- view.getRy());
 				int linkx = (int)(getRscale()*getInX() - view.getRx());	
-		
+				
+				double Rscale = view.getScale();
+				boolean zoom = (Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this);
+				if (zoom) {
+			        int rwidth = getRwidth();
+			        int rheight = getRheight();
+			        if (isRightSide) {
+			            rrx += (rwidth/Rscale - rwidth)/2;
+			        } else {
+			            rrx -= (rwidth/Rscale - rwidth)/2;
+			        }
+			        
+			        if (view.getRx() < 0)
+			            rrx = rrx < 0 ? 2 : rrx;
+			        Rscale = 1.0;
+			        r = (int)(Rscale*Constants.LINK_RADIOUS);
+			    	rtailLen = (int)(Rscale*Constants.TAIL_LENGTH);
+			    }
+
 				if (isRightSide)
 					g.drawLine(rrx+2*r, rry, linkx, rry);
 				else 

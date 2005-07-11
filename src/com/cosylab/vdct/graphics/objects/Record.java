@@ -312,24 +312,25 @@ protected void draw(Graphics g, boolean hilited) {
 	int rheight = getRheight();
 
 	double Rscale = getRscale();
-	
+	boolean zoom = Rscale < 1.0 && view.isZoomOnHilited() && view.isHilitedObject(this);
 	// clipping
 	if (!((rrx > view.getViewWidth())
 		|| (rry > view.getViewHeight())
 		|| ((rrx + rwidth) < 0)
 		|| ((rry + rheight) < 0))) {
 	    
-	    boolean zoom = false;
-	    if ((view.getScale() < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this)) {
+	    
+	    if (zoom) {
 	        rwidth /= Rscale;
 	        rheight /= Rscale;
 	        rrx -= (rwidth - getRwidth())/2;
 	        rry -= (rheight - getRheight())/2;
-	        rrx = rrx <= 0 ? 2 : rrx;
-	        rry = rry <= 0 ? 2 : rry;
+	        if (view.getRx() < 0)
+	            rrx = rrx < 0 ? 2 : rrx;
+	        if (view.getRy() < 0) 
+	            rry = rry <= 0 ? 2 : rry;
 	        Rscale = 1.0;
 	        validateFont(Rscale, rwidth, Constants.RECORD_HEIGHT);
-	        zoom = true;
 	    }
 	    	    
 		if (!hilited)
@@ -440,15 +441,17 @@ protected void draw(Graphics g, boolean hilited) {
 			if (!(hilited && view.isHilitedObject(this)))
 				if (outlinks.firstElement() instanceof VisibleObject)
 					linkColor = ((VisibleObject) outlinks.firstElement()).getVisibleColor();
-
-			// draw link and its tail
-			boolean isRightSide = isRight();
-			int r = (int)(Constants.LINK_RADIOUS * Rscale);
-			int cy = (int)(Rscale*getInY()- view.getRy());
-			int ccx = (int)(Rscale*getInX()- view.getRx());
-
-			int cx;
+			
+			
 			if (!zoom) { 
+				// draw link and its tail
+				boolean isRightSide = isRight();
+				int r = (int)(Constants.LINK_RADIOUS * Rscale);
+				int cy = (int)(Rscale*getInY()- view.getRy());
+				int ccx = (int)(Rscale*getInX()- view.getRx());
+	
+				int cx;
+			
 				if (isRightSide) {
 					cx = rrx + rwidth + r;
 					g.drawOval(cx - r, cy - r, 2 * r, 2 * r);

@@ -39,6 +39,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
 
 import com.cosylab.vdct.Constants;
+import com.cosylab.vdct.graphics.FontMetricsBuffer;
 
 /**
  * Insert the type's description here.
@@ -102,7 +103,7 @@ public EPICSOutLink(ContainerObject parent, com.cosylab.vdct.vdb.VDBFieldData fi
  * @param hilited boolean
  */
 protected void draw(Graphics g, boolean hilited) {
-	super.draw(g, hilited);
+    
 
 	com.cosylab.vdct.graphics.ViewState view = com.cosylab.vdct.graphics.ViewState.getInstance();
 
@@ -117,15 +118,46 @@ protected void draw(Graphics g, boolean hilited) {
 
 	//int rry = getRy()+getRheight()/2-view.getRy();
 	int rry = (int)(getRscale()*getOutY()- view.getRy());
-	
-	if (!hilited) g.setColor(Constants.FRAME_COLOR);
-	else g.setColor((view.isHilitedObject(this)) ? 
-					Constants.HILITE_COLOR : Constants.FRAME_COLOR);
+
+	double Rscale = view.getScale();
+	boolean zoom = (Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this);
+	if (zoom) {
+        int rwidth = getRwidth();
+        int rheight = getRheight();
+        if (rightSide)       
+            rrx += (rwidth/Rscale - rwidth)/2;
+        else 
+            rrx -= (rwidth/Rscale - rwidth)/2;
+        if (view.getRx() < 0)
+            rrx = rrx < 0 ? 2 : rrx;
+        validateFontAndDimension(1.0, (int)(rwidth/Rscale), (int)(rheight/Rscale));
+        Rscale = 1.0;
+		arrowLength = 2*r;		
+    }
+	Color color;
+	if (!hilited) color = Constants.FRAME_COLOR;
+	else color = (view.isHilitedObject(this)) ? 
+					Constants.HILITE_COLOR : Constants.FRAME_COLOR;
 
 	if (inlink!=null) {
 
-		// draw arrow
-		g.drawLine(rrx, rry-r, rrx+arrowLength, rry-r);
+	    g.setColor(hilited && view.isHilitedObject(this) ? Constants.HILITE_COLOR : getVisibleColor());
+	    
+	    LinkDrawer.drawLink(g, this, inlink, getQueueCount(), rightSide);
+	    if (zoom && inlink instanceof VisibleObject) {
+	        ((VisibleObject)inlink).paint(g, hilited);
+	    }
+	    
+		
+		int tm = rrx;
+		if (zoom) {
+	        g.setColor(Constants.BACKGROUND_COLOR);
+		    g.fillRect(rrx+1, rry-r, arrowLength-1, 2*r);
+		}
+	    
+		g.setColor(color);
+	    // draw arrow
+	    g.drawLine(rrx, rry-r, rrx+arrowLength, rry-r);
 		g.drawLine(rrx, rry+r, rrx+arrowLength, rry+r);
 		
 		int dr=-r; 
@@ -133,6 +165,18 @@ protected void draw(Graphics g, boolean hilited) {
 			dr=-dr;
 			rrx+=arrowLength;
 		}
+		
+		if (zoom) {
+		    tm = rrx;
+	        g.setColor(Constants.BACKGROUND_COLOR);
+	        if (dr > 0) {
+	            g.fillRect(rrx, rry-r, dr, 2*r);
+	        } else {
+	            g.fillRect(rrx+dr, rry-r, -dr+1, 2*r);
+	        }
+		    g.setColor(color);
+		}
+
 		g.drawLine(rrx, rry-r, rrx+dr, rry);
 		g.drawLine(rrx, rry+r, rrx+dr, rry);
 
@@ -143,19 +187,33 @@ protected void draw(Graphics g, boolean hilited) {
 				rrx += (labelLen-realLabelLen)/2+arrowLength/2;
 			else
 				rrx += arrowLength-rtailLen+labelLen-realLabelLen;
-			g.drawString(label2, rrx, rry);
+			
+			if (zoom) {
+			    FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(font2);
+			    int l = rightSide ? fm.stringWidth(label2)+4 : tm - rrx - 1;
+			    g.setColor(Constants.BACKGROUND_COLOR);
+			    g.fillRect(rightSide ? rrx-2 : rrx - 4, rry-fm.getHeight()/2-1, l, 2*r-2);
+			    g.setColor(color);
+			}
+		    g.drawString(label2, rrx, rry);
+
 		}
 		
 		//if (inlink.getLayerID().equals(getLayerID())) 
 
-		g.setColor(hilited && view.isHilitedObject(this) ? Constants.HILITE_COLOR : getVisibleColor());
-
-		LinkDrawer.drawLink(g, this, inlink, getQueueCount(), rightSide);
+		
 	} else {
 		
  		if (getLinkCount()>0) {
 			// ports - draw tail line
 
+ 		    if (zoom) {
+ 		        g.setColor(Constants.BACKGROUND_COLOR);
+ 			    g.fillRect(rrx+1, rry-r, arrowLength-1, 2*r);
+ 			}
+ 		    
+ 			g.setColor(color);
+ 			
 			// draw arrow
 			g.drawLine(rrx, rry-r, rrx+arrowLength, rry-r);
 			g.drawLine(rrx, rry+r, rrx+arrowLength, rry+r);
@@ -165,6 +223,17 @@ protected void draw(Graphics g, boolean hilited) {
 				dr=-dr;
 				rrx+=arrowLength;
 			}
+			
+			if (zoom) {
+		        g.setColor(Constants.BACKGROUND_COLOR);
+		        if (dr > 0) {
+		            g.fillRect(rrx, rry-r, dr, 2*r);
+		        } else {
+		            g.fillRect(rrx+dr, rry-r, -dr+1, 2*r);
+		        }
+			    g.setColor(color);
+			}
+			
 			g.drawLine(rrx, rry-r, rrx+dr, rry);
 			g.drawLine(rrx, rry+r, rrx+dr, rry);
 	
@@ -185,7 +254,8 @@ protected void draw(Graphics g, boolean hilited) {
 			g.drawLine(rrx+r, rry-r, rrx-r, rry+r);
 		}
 	}
-
+	
+	super.draw(g, hilited);
 
 
 }

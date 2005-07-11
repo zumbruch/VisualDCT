@@ -579,30 +579,33 @@ private void updateLink() {
 	properties = newProperties;
 	setLabel(properties.getOptions());
 }
-/**
- * Insert the method's description here.
- * Creation date: (31.1.2001 18:27:35)
- */
-public void validate() {
-	super.validate();
-	
-	label2 = properties.getOptions();
-	labelLen = (int)(Constants.LINK_LABEL_LENGTH*getRscale());
+
+protected void validateFontAndDimension(double Rscale, int rwidth, int rheight) {
+    label2 = properties.getOptions();
+	labelLen = (int)(Constants.LINK_LABEL_LENGTH*Rscale);
 	
 	if (labelLen<15) font2 = null;
 	else {
 	  font2 = FontMetricsBuffer.getInstance().getAppropriateFont(
 		  			Constants.DEFAULT_FONT, Font.PLAIN, 
 //	 	 			label2, labelLen, getRheight());
-	 	 			maxLenStr, labelLen, getRheight());
+	 	 			maxLenStr, labelLen, rheight);
 	  if (font2!=null) {
 		  FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(font2);
 		  realLabelLen = fm.stringWidth(label2);
 		  realHalfHeight = fm.getAscent()-fm.getHeight()/2;
 	  }
 	}
-  
-
+	r = (int)(Rscale*Constants.LINK_RADIOUS);
+	rtailLen = (int)(Rscale*Constants.TAIL_LENGTH);
+}
+/**
+ * Insert the method's description here.
+ * Creation date: (31.1.2001 18:27:35)
+ */
+public void validate() {
+	super.validate();
+	validateFontAndDimension(getRscale(), getRwidth(), getRheight());
 }
 /**
  * Insert the method's description here.

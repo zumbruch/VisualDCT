@@ -169,13 +169,16 @@ public class Template
 		    || ((rrx+rwidth)<0) || ((rry+rheight)<0))) {
 	
 		    double Rscale = view.getScale();
-			if ((Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this)) {
+		    boolean zoom = (Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this);
+			if (zoom) {
 			    rwidth /= Rscale;
 		        rheight /= Rscale;
 		        rrx -= (rwidth - getRwidth())/2;
 		        rry -= (rheight - getRheight())/2;
-		        rrx = rrx <= 0 ? 2 : rrx;
-		        rry = rry <= 0 ? 2 : rry;
+		        if (view.getRx() < 0)
+		            rrx = rrx < 0 ? 2 : rrx;
+		        if (view.getRy() < 0) 
+		            rry = rry <= 0 ? 2 : rry;
 		        validateFont(1.0, rwidth, Constants.TEMPLATE_INITIAL_HEIGHT);
 		        Rscale = 1.0;
 		    }

@@ -210,13 +210,16 @@ protected void draw(Graphics g, boolean hilited)
 	int rheight = getRheight();
 	
 	double Rscale = view.getScale();
-	if ((Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this)) {
+	boolean zoom = (Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this);
+	if (zoom) {
         rwidth /= Rscale;
         rheight /= Rscale;
         posX -= (rwidth - getRwidth())/2;
         posY -= (rheight - getRheight())/2;
-        posX = posX <= 0 ? 2 : posX;
-        posY = posY <= 0 ? 2 : posY;
+        if (view.getRx() < 0)
+            posX = posX < 0 ? 2 : posX;
+        if (view.getRy() < 0) 
+            posY = posY <= 0 ? 2 : posY;
         Rscale = 1.0;
     }
 
