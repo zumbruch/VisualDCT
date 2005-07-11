@@ -396,7 +396,7 @@ private javax.swing.JPanel getJDialogContentPane() {
 			getJDialogContentPane().add(getFrozeCheckBox(), constraintsFrozeCheckBox);
 
 			getJDialogContentPane().add(getCenterOnScreenButton(), new GridBagConstraints(
-			        0,5,1,1,0,0,GridBagConstraints.WEST, GridBagConstraints.NONE,
+			        0,6,1,1,0,0,GridBagConstraints.WEST, GridBagConstraints.NONE,
 			        new Insets(4,4,4,4),0,0));
 			
 			// user code begin {1}
