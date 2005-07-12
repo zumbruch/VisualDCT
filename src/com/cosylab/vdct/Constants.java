@@ -129,6 +129,8 @@ public class Constants {
     public static final int CONNECTOR_HEIGHT = 6;
     public static final int LINK_RADIOUS = 5;
 
+    public static final int DOT_SIZE = 4;
+
     public static final int TAIL_LENGTH = 50 + 3 * LINK_RADIOUS;
     public static final int LINK_LABEL_LENGTH = TAIL_LENGTH - 3 * LINK_RADIOUS;
 

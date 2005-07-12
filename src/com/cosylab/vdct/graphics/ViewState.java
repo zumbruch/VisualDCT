@@ -73,6 +73,8 @@ public class ViewState {
 	private boolean zoomOnHilited = false;
 
 	private int gridSize = (int)(com.cosylab.vdct.Constants.GRID_SIZE*scale);
+	private int dotSize = (int)(com.cosylab.vdct.Constants.DOT_SIZE*scale);
+	
 /**
  * Insert the method's description here.
  * Creation date: (21.12.2000 21:00:31)
@@ -100,6 +102,7 @@ public ViewState(ViewState original) {
 	//this.height = original.height;
 
 	this.gridSize = (int)(com.cosylab.vdct.Constants.GRID_SIZE*scale);
+	this.dotSize = (int)(com.cosylab.vdct.Constants.DOT_SIZE*scale);
 
 }
 /**
@@ -480,7 +483,7 @@ public void setRy(int newRy) {
 public void setScale(double newScale) {
 	scale = newScale;
 	gridSize = Math.max(1, (int)(com.cosylab.vdct.Constants.GRID_SIZE*scale));
-	
+	dotSize = (int)(com.cosylab.vdct.Constants.DOT_SIZE*scale);
 }
 /**
  * Insert the method's description here.
@@ -552,4 +555,10 @@ public void setY0(int newY0) {
 		this.ry = (int)dry;
 	}
 
+	/**
+	 * @return Returns the dotSize.
+	 */
+	public int getDotSize() {
+		return dotSize;
+	}
 }

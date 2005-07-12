@@ -349,6 +349,9 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 	}
 */	
 
+	int dotSize = view.getDotSize();
+	int dotSize2 = 2*dotSize;
+	
 	if (Settings.getInstance().isWireCrossingAvoidiance())		// smart connectors
 	{
 		int vx = firstHorizontal ? x2 : x1;
@@ -384,18 +387,30 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 			g.drawLine(x1,y1,vx,y1);  // --->
 			g.drawLine(vx,y1,vx,y2); //      |
 			g.drawLine(vx,y2,x2,y2); //      <-----
-		
+
+			if (in instanceof MultiInLink && ((MultiInLink)in).getLinkCount() > 1)
+			{
+				g.fillOval(vx-dotSize, y1-dotSize, dotSize2, dotSize2);
+				g.fillOval(vx-dotSize, y2-dotSize, dotSize2, dotSize2);
+			}
+
+			// tails to be drawn to cover distance -?[ (where ? is)
+			final double rlsw = Constants.LINK_SLOT_WIDTH*scale;
 			//line for out
 			if (out instanceof Field) {
-				if (out.isRight()) g.drawLine(x1,y1,x1-(int)(((Field)out).getVerticalPosition()*Constants.LINK_SLOT_WIDTH*scale),y1);
-				else g.drawLine(x1,y1,x1+(int)(((Field)out).getVerticalPosition()*Constants.LINK_SLOT_WIDTH*scale),y1);
+				if (out.isRight())
+					g.drawLine(x1,y1,x1-(int)(((Field)out).getVerticalPosition()*rlsw),y1);
+				else 
+					g.drawLine(x1,y1,x1+(int)(((Field)out).getVerticalPosition()*rlsw),y1);
 			}
 			
 			//line for int
 			if (in instanceof Field) {
-				if (in.isRight()) g.drawLine(x2,y2,x2-(int)(((Field)in).getVerticalPosition()*Constants.LINK_SLOT_WIDTH*scale),y2);
-					else g.drawLine(x2,y2,x2+(int)(((Field)in).getVerticalPosition()*Constants.LINK_SLOT_WIDTH*scale),y2);
-				}
+				if (in.isRight()) 
+					g.drawLine(x2,y2,x2-(int)(((Field)in).getVerticalPosition()*rlsw),y2);
+				else 
+					g.drawLine(x2,y2,x2+(int)(((Field)in).getVerticalPosition()*rlsw),y2);
+			}
 		}
 	}
 	else
@@ -404,10 +419,22 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 			if (firstHorizontal) {	
 				g.drawLine(x1, y1, x2, y1);
 				g.drawLine(x2, y1, x2, y2);
+
+				if (in instanceof MultiInLink && ((MultiInLink)in).getLinkCount() > 1)
+				{
+					g.fillOval(x2-dotSize, y1-dotSize, dotSize2, dotSize2);
+					g.fillOval(x2-dotSize, y2-dotSize, dotSize2, dotSize2);
+				}
 			}
 			else {
 				g.drawLine(x1, y1, x1, y2);
 				g.drawLine(x1, y2, x2, y2);
+
+				if (in instanceof MultiInLink && ((MultiInLink)in).getLinkCount() > 1)
+				{
+					g.fillOval(x1-dotSize, y2-dotSize, dotSize2, dotSize2);
+					g.fillOval(x2-dotSize, y2-dotSize, dotSize2, dotSize2);
+				}
 			}
 	    }
 	}
