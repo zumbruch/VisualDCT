@@ -1108,7 +1108,6 @@ public void manageLinks() {
  * @param newType java.lang.String
  */
 public boolean morph(java.lang.String newType) {
-	changedFields.clear();
 	
 	//	copies VDBData
 	VDBRecordData recordData = VDBData.morphVDBRecordData(
@@ -1121,9 +1120,6 @@ public boolean morph(java.lang.String newType) {
 	
 	setRecordData(recordData);
 		
-	// update inspector
-	InspectorManager.getInstance().updateObject(this);
-	
 	return true;
 }
 
@@ -1147,12 +1143,17 @@ public void setRecordData(VDBRecordData recordData) {
 			}
 		}
 		
+		changedFields.clear();
 		Enumeration e = recordData.getFieldsV().elements();
 		while (e.hasMoreElements()) {
 			VDBFieldData fieldData = (VDBFieldData)e.nextElement();
 			fieldChanged(fieldData);
 		}
+
+		// update inspector
+		InspectorManager.getInstance().updateObject(this);
 }
+
 /**
  * Insert the method's description here.
  * Creation date: (25.12.2000 14:14:35)
