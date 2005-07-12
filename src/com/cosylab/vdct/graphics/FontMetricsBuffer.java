@@ -86,11 +86,25 @@ public static void createInstance(Graphics g) {
  * @param maxHeight int
  */
 public Font getAppropriateFont(String fontName, int style, String str, int maxWidth, int maxHeight) {
+	return getAppropriateFont(fontName, style, str, maxWidth, maxHeight, MAX_SIZE);
+}
+/**
+ * Insert the method's description here.
+ * Creation date: (25.12.2000 12:47:03)
+ * @return java.awt.Font
+ * @param fontName java.lang.String
+ * @param style int
+ * @param str java.lang.String
+ * @param maxWidth int
+ * @param maxHeight int
+ */
+public Font getAppropriateFont(String fontName, int style, String str, int maxWidth, int maxHeight, int maxSize) {
   if (graphics==null) return null;
   int size = MIN_SIZE;				// find better starting point !!!
   FontData fl = null;
   FontData fd = getFontData(fontName, size, style);
-  while ((size<=MAX_SIZE) &&
+  maxSize = Math.min(MAX_SIZE, maxSize);
+  while ((size<=maxSize) &&
 	  	 (fd.getFontMetrics().getHeight() < maxHeight) &&
 	  	 (fd.getFontMetrics().stringWidth(str) < maxWidth)) {
  	size++;

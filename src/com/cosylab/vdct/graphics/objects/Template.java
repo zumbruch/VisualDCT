@@ -326,11 +326,12 @@ public class Template
 		  
 		  setLabel(getDescription());
 		
+		  final int MAX_FONT_SIZE = 30;
 		  Font font;
 		  font = FontMetricsBuffer.getInstance().getAppropriateFont(
 			  			Constants.DEFAULT_FONT, Font.PLAIN, 
-			  			getLabel(), rwidth-x0, irheight-y0/*-idLabelHeight*/);
-		
+			  			getLabel(), rwidth-x0, irheight-y0/*-idLabelHeight*/, (int)(MAX_FONT_SIZE*scale));
+		  
 		  if (rwidth<(2*x0)) font = null;
 		  else
 		  if (font!=null) {
