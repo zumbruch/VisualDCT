@@ -139,13 +139,15 @@ public boolean consistencyCheck(com.cosylab.vdct.db.DBData db) {
 						else if (this.getDBDDeviceData(dev) == null) {
 							console.println();
 							console.print("\tWarning: Record type '"+dbRecord.getRecord_type()+"', field '"+dbdField.getName()+"':");
-							console.print(" Device '"+dev+"' is not defined DBD file. Using defaults...");
+							console.print(" Device '"+dev+"' is not defined DBD file.");
 
+							/* RT 12438 - if dbd not present, DTYP information is gone 
 						    illegalString="# field("+dbField.getName()+",\""+dbField.getValue()+"\")";
 							if (dbField.getComment()!=null)	illegalString=dbField.getComment()+"\n"+illegalString;
 							dbField.setComment(illegalString);
 							
 							dbField.setValue("");
+							*/
 						}
 					}
 					// menu check
@@ -182,7 +184,7 @@ public boolean consistencyCheck(com.cosylab.vdct.db.DBData db) {
 					isOK=false;
 					console.println();
 					console.print("\tRecord '"+dbRecord.getName()+"':");
-					console.print(" Field '"+dbField.getName()+"' in record type '"+dbRecord.getRecord_type()+"' is not defined in DBD file.");
+					console.print(" Field '"+dbField.getName()+"' in record type '"+dbRecord.getRecord_type()+"' is not defined in DBD file. Field will be commented out when saved!");
 					
 					illegalString="# illegal line - undefined field: field("+dbField.getName()+",\""+dbField.getValue()+"\")";
 					if (dbRecord.getComment()!=null) illegalString=dbRecord.getComment()+"\n"+illegalString;
