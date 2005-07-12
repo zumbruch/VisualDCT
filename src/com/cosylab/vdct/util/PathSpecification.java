@@ -47,6 +47,8 @@ public class PathSpecification
 	// since this is not what is expected by EPICS, this is not used
 	protected ArrayList addPath = null;
 	
+	protected static final String NAME_EPICS_DB_INCLUDE_PATH = "EPICS_DB_INCLUDE_PATH";
+	
 	protected String currentDir = null;
 	
 	/**
@@ -56,7 +58,13 @@ public class PathSpecification
 		currentDir = defaultPath;
 		
 		currentPath = new ArrayList();
-		currentPath.add(currentDir);
+		
+		// check if EPICS_DB_INCLUDE_PATH is available, this overrides current-directory default
+		String epicsIncludePath = System.getProperty(NAME_EPICS_DB_INCLUDE_PATH);
+		if (epicsIncludePath != null)
+			currentPath.add(epicsIncludePath);
+	    else
+	    	currentPath.add(currentDir);
 
 		addPath = new ArrayList();		
 	}
