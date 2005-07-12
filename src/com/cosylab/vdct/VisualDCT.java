@@ -32,6 +32,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.print.*;
+
 import javax.swing.*;
 import javax.swing.event.*;
 
@@ -211,6 +212,7 @@ public class VisualDCT extends JFrame {
 	
 	private ComboBoxFileChooser comboBoxFileChooser = null;
 
+	private PrintService lastPrintService = null;
 // shp: not final solution
 	private static VisualDCT instance = null;
 
@@ -6336,7 +6338,15 @@ public void pageSetupMenuItem_ActionPerformed(java.awt.event.ActionEvent actionE
 			PrintRequestAttributeSet printRequestAttributeSet = Page.getPrintRequestAttributeSet();
 		
 			PrinterJob printerJob = PrinterJob.getPrinterJob();
-		
+			
+			if (lastPrintService != null) {
+			    try {
+                    printerJob.setPrintService(lastPrintService);
+                } catch (PrinterException e) {
+                    handleException(e);
+                }
+			}
+			
 			PageFormat pageFormat = printerJob.pageDialog(printRequestAttributeSet);
 			if(pageFormat==null)
 				return;
@@ -6678,16 +6688,27 @@ public void printMenuItem_ActionPerformed() {
 	new Thread() {
 		public void run() {
 			try {
-
 				PrintRequestAttributeSet printRequestAttributeSet = Page.getPrintRequestAttributeSet();
 
 				PrinterJob printerJob = PrinterJob.getPrinterJob();
 				printerJob.setJobName(getTitle());
 				printerJob.setPageable(pi.getPageable());
-
-				if(!printerJob.printDialog(printRequestAttributeSet))
+				
+				if (lastPrintService != null) {
+				    try {
+	                    printerJob.setPrintService(lastPrintService);
+	                } catch (PrinterException e) {
+	                    handleException(e);
+	                }
+				}
+				
+				if(!printerJob.printDialog(printRequestAttributeSet)) {
+				    lastPrintService = printerJob.getPrintService();
 					return;
+				}
 
+				lastPrintService = printerJob.getPrintService();
+				
 				int pageFormatOrientation = PageFormat.PORTRAIT;
 
 				OrientationRequested orientationRequested = (OrientationRequested)
@@ -6722,7 +6743,7 @@ public void printMenuItem_ActionPerformed() {
 				
 				Thread.yield();
 				printerJob.print(printRequestAttributeSet);
-				
+								
 			} catch (PrinterException ex) {
 				ex.printStackTrace();
 				com.cosylab.vdct.Console.getInstance().println("Printing error: "+ex);
