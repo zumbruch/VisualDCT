@@ -164,8 +164,10 @@ public static void destroyChain(Linkable link, OutLink out) {
 	while (link instanceof OutLink && !(link instanceof EPICSVarOutLink) && !(link instanceof EPICSLinkOut)) {
 		out = (OutLink)link;
 		link = out.getInput();
-		if (out instanceof Connector)
-			((Connector)out).destroy();			// connectors
+		if (out instanceof Connector) {
+		    ((Connector)out).destroy();			// connectors
+		}
+			
 	}
 //	if (link instanceof EPICSLink)
 		//((VisibleObject)link).destroy();
@@ -202,9 +204,14 @@ public static String generateConnectorID(EPICSLinkOut outlink) {
 	//				  LINK_SEPARATOR+outlink.getFieldData().getName();
 	String rootName = Group.substractObjectName(outlink.getFieldData().getFullName());
 	rootName = rootName.replace(Constants.FIELD_SEPARATOR, LINK_SEPARATOR);
+
+	if (outlink instanceof TemplateEPICSMacro) {
+	    if (outlink.getParent() != null)
+	        rootName = outlink.getParent().getHashID() + Constants.FIELD_SEPARATOR + rootName;
+	}
 	
-	if (!outlink.getParent().containsObject(rootName))
-		return rootName;
+	if (!outlink.getParent().containsObject(rootName)){
+		return rootName;}
 	else {
 		String name;
 		int count = 0;

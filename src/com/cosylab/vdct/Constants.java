@@ -82,12 +82,13 @@ public class Constants {
  	public final static String VDCT_PLUGINS_FILE = "VDCT_PLUGINS_FILE";
  	public final static String PLUGINS_FILE_NAME = ".vdctplugins.xml";
  	
+ 	public final static String TEMPLATE_LINK_LOCATOR = "$";
     public /*final*/ static char GROUP_SEPARATOR = '\0';
 	public final static char HIERARCHY_SEPARATOR = ':';
     //public /*final*/ static char GROUP_SEPARATOR = ':';
     public final static char FIELD_SEPARATOR = '.';
     public final static String HARDWARE_LINK = "#";
-
+    
     public final static String UNTITLED = "Untitled";
     public final static String MAIN_GROUP = "Main group";
     public final static String TEMPLATE_GROUP = "Template";

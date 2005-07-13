@@ -100,8 +100,9 @@ public class DBResolver {
 	public static final String VDCT_INPUT_PORT = "InputPort";
 	public static final String VDCT_OUTPUT_PORT = "OutputPort";
 
-	// used format #! InputMacro(macroname, description, xpos, ypos, color, defaultVisibility)
-	// used format #! OutputMacro(macroname, description, xpos, ypos, color, defaultVisibility)
+	// used format #! InputMacro(macroname, description, xpos, ypos, color, defaultVisibility, textPositionNorth)
+	// used format #! OutputMacro(macroname, description, xpos, ypos, color, defaultVisibility, textPositionNort)
+	// textPositionNorth is optional; if exists value is true or false
 	public static final String VDCT_INPUT_MACRO = "InputMacro";
 	public static final String VDCT_OUTPUT_MACRO = "OutputMacro";
 
@@ -279,7 +280,7 @@ public static String processComment(DBData data, EnhancedStreamTokenizer tokeniz
 		if (tokenizer.ttype == EnhancedStreamTokenizer.TT_WORD) 
 
 				if (tokenizer.sval.equalsIgnoreCase(VDCTRECORD)) {
-
+				    
 					// read record_name
 					tokenizer.nextToken();
 					if ((tokenizer.ttype == EnhancedStreamTokenizer.TT_WORD)||

@@ -105,7 +105,7 @@ public class Connector extends VisibleObject implements Descriptable, InLink, Mo
 public Connector(String id, LinkManagerObject parent, OutLink outlink, InLink inlink) {
 	super(parent);
 	setID(id);
-
+	
 	if (outlink instanceof VisibleObject)
 		setColor(((VisibleObject)outlink).getColor());
 	else
@@ -120,7 +120,7 @@ public Connector(String id, LinkManagerObject parent, OutLink outlink, InLink in
 	    if (inlink instanceof Macro) {
 	        z = inlink.isRight();
 	    } else {
-	        outX = outlink.getOutX();
+	        if (outlink != null) outX = outlink.getOutX();
 	        inX = inlink.getInX();
 	    }
 	}
@@ -131,12 +131,12 @@ public Connector(String id, LinkManagerObject parent, OutLink outlink, InLink in
 	
 	if (inlink!=null) inlink.setOutput(this, outlink);
 	if (outlink!=null) outlink.setInput(this);
-
+	
 	setInput(inlink); 
 	setOutput(outlink, null);
 	setWidth(Constants.CONNECTOR_WIDTH);
 	setHeight(Constants.CONNECTOR_HEIGHT);
-	
+
 	/// !!! better initial layout
 	// out of screen
 	if ((inlink==null) && (outlink==null)) {
@@ -158,6 +158,7 @@ public Connector(String id, LinkManagerObject parent, OutLink outlink, InLink in
 	}
 	else {
 	    // BugFix RT#12125&12122 by jbobnar
+	    boolean setY = true;
 	    int ir = inlink.getRightX();
 	    int il = inlink.getLeftX();
 	    int or = outlink.getRightX();
@@ -180,16 +181,46 @@ public Connector(String id, LinkManagerObject parent, OutLink outlink, InLink in
 //	        System.out.println("3");
             setX(inX != in ? in + ir - il : in);
 	    } else {
-	        setX(!z ? in + ir - il : in);
+//	        System.out.println("4");
+	        if (!z && !(outlink instanceof TemplateEPICSMacro)) {
+	            setX(in + ir - il);
+	        } else  {
+	            if (outlink instanceof TemplateEPICSMacro && !(inlink instanceof Connector) && inlink.isRight()){
+	                setX(out);
+	            } else {
+	                setY(inlink.getInY());
+	                setY = false;
+	                setX(in);
+	            }
+	        }
+
 	    }
-	    setY((inlink.getInY()+outlink.getOutY())/2);
+	    if (setY)
+	        setY((inlink.getInY()+outlink.getOutY())/2);
 	}
-//System.out.println(inlink + " " + inlink.getClass());
-//System.out.println(outlink + " " + outlink.getClass());
+
 	
-	//do not snapToGrid to avoid small step in grid
-//	if (Settings.getInstance().getShowGrid())
+	// to avoid small steps in wires do not snap to grid
+	
+//	if (Settings.getInstance().getShowGrid()) {
+//	    int appendix = (int) (Constants.GRID_SIZE/2 + 0.5);
+//	    
+//	    if (inlink != null){
+//	        if (this.getY() > inlink.getInY()) {
+//		        setY(getY() + appendix);
+//		    } else {
+//		        setY(getY() - appendix);
+//		    }
+//	        
+//	        if (this.getX() > inlink.getInX()) {
+//	            setX(getX() + appendix);
+//	        } else {
+//	            setX(getX() - appendix);
+//	        }
+//	    }
+//	    
 //		snapToGrid();
+//	}
 	
 }
 /**
@@ -274,7 +305,7 @@ public void destroy() {
 	if (!isDestroyed()) {
 		super.destroy();
 		getParent().removeObject(ID);
-		
+
 		String inlinkStr = "";
 		String outlinkStr = "";
 		if (inlink!=null) inlinkStr=inlink.getID();
@@ -295,7 +326,7 @@ public void disconnect(Linkable disconnector) {
 		if (disconnector==inlink) inlink=null; //setInput(null);
 		if (disconnector==outlink) outlink=null; //setOutput(null, outlink);
 		if (((inlink==null) || inlink.isDisconnected()) &&
-			((outlink==null) || outlink.isDisconnected()))
+			((outlink==null) || outlink.isDisconnected())){}
 				destroy();
 	}
 }
@@ -371,16 +402,16 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 		if (hilited)
 			c = (view.isHilitedObject(this)) ? Constants.HILITE_COLOR : c;
 		g.setColor(c);
-//		if (!zoom) {
 			if (inlink!=null){
 				LinkDrawer.drawLink(g, this, inlink, getQueueCount(), 
-									getOutX()<inlink.getInX());}
-			else if (getOutput()!=null)
+									getOutX()<inlink.getInX());
+			}
+			else if (getOutput()!=null){
 				LinkDrawer.drawLink(g, this, null, getQueueCount(), 
 									getOutput().getOutX()<getX());
-//		}
-	}
-		
+			}
+	}  
+
 }
 /**
  * Insert the method's description here.
@@ -630,10 +661,10 @@ public void setOutput(OutLink output, OutLink prevOutput) {
 	if (outlink==output) return;
 	if (outlink!=null) outlink.disconnect(this);
 	outlink=output;
-	if ((inlink!=null) && (outlink!=null)) disconnected=false;
-
+	if ((inlink!=null) || (outlink!=null)) disconnected=false;
 	if (outlink instanceof VisibleObject)
 		setColor(((VisibleObject)outlink).getColor());
+
 }
 /**
  * Insert the method's description here.
@@ -722,5 +753,9 @@ public int getRightX() {
 public boolean isRight() {
 	return false;
 }
+
+//public String toString() {
+//    return getID();
+//}
 
 }
