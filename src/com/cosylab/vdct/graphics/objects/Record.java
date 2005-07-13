@@ -250,6 +250,7 @@ public Flexible copyToGroup(java.lang.String group) {
 	Group.getRoot().addSubObject(theDataCopy.getName(), theRecordCopy, true);
 	//theRecordCopy.fixEPICSOutLinks(Group.substractParentName(recordData.getName()), group);
 	theRecordCopy.manageLinks();
+	theRecordCopy.updateFields();
 	unconditionalValidation();
 
 	return theRecordCopy;
