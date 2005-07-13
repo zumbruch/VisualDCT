@@ -5818,8 +5818,7 @@ public void lineButton_ActionPerformed()
  * 		java VisualDCT  [.dbd-file]  [.db-file]
  * @param args java.lang.String[] an array of command-line arguments
  */
-public static void main(java.lang.String[] args) {
-	try {
+public static void main(final java.lang.String[] args) {
 
 		System.out.println("Loading VisualDCT v"+Version.VERSION+" build "+Version.BUILD+"...\n");
 		
@@ -5828,20 +5827,25 @@ public static void main(java.lang.String[] args) {
 			System.out.println("WARNING: Java "+javaVersion+" detected. VisualDCT requires Java "+Version.JAVA_VERSION_REQUIRED+" or newer!\n");
 
 		/* Set default directory */
-		String dir = System.getProperty("VDCT_DIR");
+		final String dir = System.getProperty("VDCT_DIR");
 		if (dir!=null && new java.io.File(dir).exists())
 			Settings.setDefaultDir(dir);
 		else
 			Settings.setDefaultDir(".");
-
-		/* Set native look and feel */
-		// UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			
+		/* Set cross-platform look and feel (e.g. MacOS LAF has bugs) */
+		try {
+			// UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+		} catch (Throwable th) {
+			th.printStackTrace();
+		}
 		
 		/* Calculate the screen size */
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
 		/* Create the splash screen */
-		VisualDCTSplashScreen aVisualDCTSplashScreen = new VisualDCTSplashScreen();
+		final VisualDCTSplashScreen aVisualDCTSplashScreen = new VisualDCTSplashScreen();
 		aVisualDCTSplashScreen.pack();
 
 		/* Center splash screen */
@@ -5853,6 +5857,10 @@ public static void main(java.lang.String[] args) {
 		aVisualDCTSplashScreen.setLocation((screenSize.width - splashScreenSize.width) / 2, (screenSize.height - splashScreenSize.height) / 2);
 		aVisualDCTSplashScreen.setVisible(true);
 		
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					
 		/* Create the frame */
 		final VisualDCT aVisualDCT = new VisualDCT();
 		aVisualDCT.setSize(Constants.VDCT_WIDTH, Constants.VDCT_HEIGHT);
@@ -5934,7 +5942,12 @@ public static void main(java.lang.String[] args) {
 		System.err.println("Exception occurred in main() of VisualDCT");
 		exception.printStackTrace(System.out);
 	}
+
+			}
+		});		
+
 }
+
 /**
  * Comment
  */
