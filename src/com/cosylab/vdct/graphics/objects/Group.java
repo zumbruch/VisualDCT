@@ -309,7 +309,7 @@ protected void draw(Graphics g, boolean hilited) {
 	        if (view.getRy() < 0) 
 	            rry = rry <= 0 ? 2 : rry;
 	        Rscale = 1.0;
-	        validateFont(Rscale, rwidth, Constants.RECORD_HEIGHT);
+	        validateFont(Rscale, rwidth, rheight);
 	    }
 	    
 		if (!hilited) g.setColor(Constants.RECORD_COLOR);
@@ -518,7 +518,7 @@ public VisibleObject hiliteComponentsCheck(int x, int y) {
 		vo = (VisibleObject)(e.nextElement());
 		vo = vo.intersects(x, y);
 		if (vo!=null) {
-			// special hanadling for connectors
+			// special handling for connectors
 			if (vo instanceof Connector)
 				return vo;
 			/*else if (view.getHilitedObject()!=vo)
@@ -1297,7 +1297,6 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 				 	if (obj instanceof Connector)
 			 		{
 			 			connector = (Connector)obj;
-
 						String target = NULL;
 						if (connector.getInput()!=null)
 							target = renamer.getResolvedName(connector.getInput().getID());
@@ -1440,19 +1439,54 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 	 			{
 						
 			 		obj = e2.nextElement();
-				 	if (obj instanceof EPICSLink)
+			 		
+				 	if (obj instanceof EPICSLinkOut)
 			 		{
-			 			field = (EPICSLink)obj;
+			 			link = (EPICSLinkOut)obj;
 
-		 				String name = field.getFieldData().getName();
-						
-					 	file.writeBytes(TEMPLATE_FIELD_START+
-		 					 quote + templateName + quote +
-		 					 comma + quote + name + quote +
-							 comma + StringUtils.color2string(field.getColor()) +
-							 comma + StringUtils.boolean2str(field.isRight()) +
-							 comma + field.getFieldData().getVisibility() +
-							 ending);
+			 			if (link.getInput()!=null)
+			 				file.writeBytes(LINK_START+
+					 			StringUtils.quoteIfMacro(
+					 			       link.getParent().getHashID() + Constants.FIELD_SEPARATOR + renamer.getResolvedName(link.getFieldData().getFullName())
+						 		) + comma + 
+				 				StringUtils.quoteIfMacro(
+					 				renamer.getResolvedName(link.getInput().getID())
+						 		) +
+								ending);
+			 			
+			 			if (obj instanceof EPICSLink)
+				 		{
+				 			field = (EPICSLink)obj;
+
+			 				String name = field.getFieldData().getName();
+							
+						 	file.writeBytes(TEMPLATE_FIELD_START+
+			 					 quote + templateName + quote +
+			 					 comma + quote + name + quote +
+								 comma + StringUtils.color2string(field.getColor()) +
+								 comma + StringUtils.boolean2str(field.isRight()) +
+								 comma + field.getFieldData().getVisibility() +
+								 ending);
+				 		}
+		 			}
+				 	else if (obj instanceof Connector)
+			 		{
+			 			connector = (Connector)obj;
+						String target = NULL;
+						if (connector.getInput()!=null)
+							target = renamer.getResolvedName(connector.getInput().getID());
+	
+			 			file.writeBytes(CONNECTOR_START+
+					 		StringUtils.quoteIfMacro(
+						 		renamer.getResolvedName(connector.getID())
+						 	) + comma +  
+					 		StringUtils.quoteIfMacro(
+						 		target
+						 	) + comma + connector.getX() + comma + connector.getY() + 
+						 	comma + StringUtils.color2string(connector.getColor()) +
+							comma + quote + /*!!!+ StringUtils.removeBegining(connector.getDescription(), path2remove) +*/ quote +
+							comma + connector.getMode() +
+							ending);
 		 			 }
 				 }					 
 

@@ -40,6 +40,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
+import javax.swing.SwingUtilities;
 import javax.swing.event.*;
 
 import com.cosylab.vdct.*;
@@ -1981,7 +1982,8 @@ public boolean importDB(File file) throws IOException {
  */
 public static void applyVisualData(boolean importDB, Group group, DBData dbData, VDBData vdbData)
 {
-	if (vdbData==null)
+ 
+    if (vdbData==null)
 		return;
 	
 	// apply visual-data && generate visual object, group hierarchy
@@ -2088,7 +2090,7 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 	
 				Template templ = new Template(null, templateInstance, false);
 				group.addSubObject(dbTemplate.getTemplateInstanceId(), templ, true);
-	
+				
 				// add fields (to preserve order)
 				e2 = dbTemplate.getTemplateFields().elements();
 				while (e2.hasMoreElements())
@@ -2098,8 +2100,9 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 					// is it macro?
 					EPICSLink templateLink = null;
 					VDBMacro macro = (VDBMacro)templ.getTemplateData().getTemplate().getMacros().get(dtf.getName());
-					if (macro!=null)
+					if (macro!=null) {
 						templateLink = templ.addMacroField(macro);
+					}
 	
 					// is it port?
 					if (templateLink==null)
@@ -2108,7 +2111,7 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 						if (port!=null)
 							templateLink = templ.addPortField(port);
 					}
-					
+										
 					// apply GUI data
 					if (templateLink != null)
 					{
@@ -2116,7 +2119,7 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 						templateLink.setRight(dtf.isRight());
 						templateLink.getFieldData().setVisibility(dtf.getVisibility());
 					}
-
+					
 				}
 				
 				// initialize rest fields (if any)
@@ -2161,10 +2164,8 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 		}
 
 
-		// update template instances links
-		Iterator i = tobeUpdated.iterator();
-		while (i.hasNext())
-			((Template)i.next()).manageLinks();
+		
+			
 
 		// add links, connectors
 		
@@ -2175,6 +2176,8 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 		String fieldName;
 		String target;
 
+		Template template;
+		Object object;
 		OutLink outlink;
 		InLink inlink;
 		Connector connector;
@@ -2189,9 +2192,116 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 			recordName = dbLink.getFieldName().substring(0, pos);
 			fieldName = dbLink.getFieldName().substring(pos + 1);
 
-			record = (Record) rootGroup.findObject(recordName, true);
-			if (record != null)
+			object =  rootGroup.findObject(recordName, true);
+			
+			
+			if (object instanceof Template) {
+			   
+			    template = (Template)object;
+				if (importDB)
+				{
+					if (blackList.contains(template))
+					{
+						Console.getInstance().println(
+							"Link "
+								+ dbLink.getFieldName()
+								+ " already exists - this definition will be ignored.");
+						continue;
+					}
+				}
+
+				// field has to be already created
+				fieldName = fieldName.substring(2, fieldName.length()-1);
+				Object unknownTarget = template.getSubObjects().get(fieldName);
+
+				if (unknownTarget instanceof OutLink)
+				{
+					outlink = (OutLink) unknownTarget;
+					
+					target = dbLink.getTargetID();
+							
+					while ((connectorData = (DBConnectorData) dbData.getConnectors().get(target))!= null)
+					{
+						connector = new Connector(target, template, null, null);
+						connector.setColor(connectorData.getColor());
+						connector.setDescription(connectorData.getDescription());
+						connector.setMode(connectorData.getMode());
+						connector.setX(connectorData.getX());
+						connector.setY(connectorData.getY());
+						template.addSubObject(connector.getID(), connector);
+						connector.setOutput(outlink, null);
+						outlink.setInput(connector);
+
+						outlink = connector;
+						target = connectorData.getTargetID();
+					}
+						
+					if (target == "null") {
+					    continue;
+					}
+					
+					InLink templateLink = (InLink)Group.getRoot().getLookupTable().get(target);
+					if (templateLink!=null)
+					{
+						templateLink.setOutput(outlink, null);
+						outlink.setInput(templateLink);
+					}
+					else if ((pos = target.lastIndexOf(Constants.FIELD_SEPARATOR)) >= 0)
+					{
+					    int z = -1;
+					    if ((z = target.lastIndexOf(Constants.TEMPLATE_FIELD_LOCATOR)) >=0) {
+					        recordName = target.substring(z + 2, pos);
+					        fieldName = target.substring(pos +1 ,target.length()-1);
+					    } else {
+					        recordName = target.substring(0, pos);
+					        fieldName = target.substring(pos + 1);
+					    }
+						
+						// remove process
+						pos = fieldName.indexOf(' ');
+						if (pos>0)
+							fieldName = fieldName.substring(0, pos);
+
+						object = rootGroup.findObject(recordName, true);
+						
+						if (object instanceof LinkManagerObject)
+						{
+							// field has to be already created
+							Object unknown = ((LinkManagerObject)object).getSubObjects().get(fieldName);
+							
+							if (unknown instanceof InLink)
+							{
+								inlink = (InLink)unknown;
+								inlink.setOutput(outlink, null);
+								outlink.setInput(inlink);
+							}
+						} 
+						
+					}
+					else
+					{
+					    final String targetfinal = target;
+					    final OutLink outlinkfinal = outlink;
+					    SwingUtilities.invokeLater(new Runnable() {
+					        /* (non-Javadoc)
+                             * @see java.lang.Runnable#run()
+                             */
+                            public void run() {
+                                Object unknown = Group.getRoot().getSubObject(targetfinal);
+                                if (unknown instanceof InLink)
+    							{
+    								InLink inlink = (InLink)unknown;
+    								inlink.setOutput(outlinkfinal, null);
+    								outlinkfinal.setInput(inlink);
+    							}
+                            }
+					    });
+					}
+				}
+			} 
+			else if (object instanceof Record)
 			{
+			    record = (Record)object;
 				if (importDB)
 				{
 					if (blackList.contains(record))
@@ -2211,12 +2321,14 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 					outlink = (OutLink) unknownTarget;
 					
 					target = dbLink.getTargetID();
+
 					pos = target.lastIndexOf(EPICSLinkOut.LINK_SEPARATOR);
 					if (pos >= 0) // connectors
 					{
+					    
 						while ((connectorData = (DBConnectorData) dbData.getConnectors().get(target))!= null)
 						{
-							connector = new Connector(target, record, null, null);
+						    connector = new Connector(target, record, null, null);
 							connector.setColor(connectorData.getColor());
 							connector.setDescription(connectorData.getDescription());
 							connector.setMode(connectorData.getMode());
@@ -2230,7 +2342,7 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 							target = connectorData.getTargetID();
 						}
 					}
-
+					
 					// is in lookup table ?
 					InLink templateLink = (InLink)Group.getRoot().getLookupTable().get(target);
 					if (templateLink!=null)
@@ -2240,6 +2352,7 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 					}
 					else if ((pos = target.lastIndexOf(Constants.FIELD_SEPARATOR)) >= 0)
 					{
+					   
 						recordName = target.substring(0, pos);
 						fieldName = target.substring(pos + 1);
 
@@ -2249,6 +2362,7 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 							fieldName = fieldName.substring(0, pos);
 
 						record = (Record) rootGroup.findObject(recordName, true);
+						
 						if (record != null)
 						{
 							// field has to be already created
@@ -2262,8 +2376,9 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 						}
 					}
 					else
-					{
+					{		
 						Record targetRecord = null;
+				
 						if ((targetRecord = (Record) rootGroup.findObject(target, true)) != null)
 						{
 							// VAL or forward link
@@ -2292,6 +2407,12 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 			}
 		}
 
+//		 update template instances links
+		Iterator i = tobeUpdated.iterator();
+		while (i.hasNext()) {
+		    ((Template)i.next()).manageLinks();
+		}
+		
 		// lines 
 		DBLine dbLine;
 		e = dbData.getLines().elements();
@@ -2342,7 +2463,7 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 
 	group.initializeLayout();
 	// call this after ports/macros fields are initialized !!
-	//group.manageLinks(true);
+//	group.manageLinks(true);
 }
 
 /**

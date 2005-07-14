@@ -207,7 +207,7 @@ public static String generateConnectorID(EPICSLinkOut outlink) {
 
 	if (outlink instanceof TemplateEPICSMacro) {
 	    if (outlink.getParent() != null)
-	        rootName = outlink.getParent().getHashID() + Constants.FIELD_SEPARATOR + rootName;
+	        rootName = outlink.getParent().getHashID() + Constants.CONNECTOR_FIELD_SEPARATOR + rootName;
 	}
 	
 	if (!outlink.getParent().containsObject(rootName)){

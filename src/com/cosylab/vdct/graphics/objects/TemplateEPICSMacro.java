@@ -169,11 +169,8 @@ protected void draw(Graphics g, boolean hilited) {
         int rwidth = getRwidth();
         int rheight = getRheight();
         rrx -= (rwidth/Rscale - rwidth)/2;
-        rry -= (rheight/Rscale - rheight)/2;
         if (view.getRx() < 0)
             rrx = rrx < 0 ? 2 : rrx;
-        if (view.getRy() < 0) 
-            rry = rry <= 0 ? 2 : rry;
         validateFontAndDimension(1.0, (int)(rwidth/Rscale),(int) (rheight/Rscale));
         Rscale = 1.0;
     }
@@ -440,8 +437,9 @@ public java.util.Vector getItems() {
 private void updateLink() {
 	LinkProperties newProperties = new LinkProperties(fieldData);
 
-	if (newProperties.getRecord()==null) {			// empty field
-		valueWithNoRecord();
+	if (newProperties.getRecord()==null) { // empty field
+	    //BugFix RT#12127 by jbobnar - do not call valueWithNoRecord();
+//		valueWithNoRecord();
 		return;
 	}
 	else if (!newProperties.getRecord().equals(properties.getRecord()) ||
@@ -591,5 +589,5 @@ public void setRight(boolean isRight)
 			fieldData.setValue(nullString);
 		}
 	}
-
+	
 }
