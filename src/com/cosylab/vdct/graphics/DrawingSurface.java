@@ -1499,6 +1499,10 @@ public void mouseReleased(MouseEvent e) {
 		case OBJECT_MOVE : {
 //System.out.println("Released: OBJECT_MOVE");
 			createNavigatorImage();
+			
+			// no move at all
+			if (notYetDragged)
+				break;
 
 			int dx = px-draggedX;
 			int dy = py-draggedY;
