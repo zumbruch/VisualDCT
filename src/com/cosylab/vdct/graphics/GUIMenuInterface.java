@@ -131,6 +131,11 @@ void openDBD(File file) throws IOException;
 void paste();
 /**
  * Insert the method's description here.
+ * Creation date: (4.2.2001 15:07:54)
+ */
+void pasteAtPosition(int pX, int pY);
+/**
+ * Insert the method's description here.
  * Creation date: (4.2.2001 15:07:19)
  */
 void print();

@@ -52,7 +52,10 @@ public class DSGUIInterface implements GUIMenuInterface, VDBInterface {
 	
 	private DrawingSurface drawingSurface;
 
+	// to remember on cut from which group object has beed cut 
 	private ArrayList pasteNames = null;
+	private double pasteX;
+	private double pasteY;
 	
 	//private static final String nullString = "";
 
@@ -163,6 +166,10 @@ public void copy() {
 		}
 	}
 	
+	// remember position for paste
+	pasteX = (minx - view.getRx()/view.getScale());
+	pasteY = (miny - view.getRy()/view.getScale());
+
 	selected = view.getSelectedObjects().elements();	
 	
 	while (selected.hasMoreElements()) {
@@ -310,6 +317,10 @@ public void cut() {
 			miny = Math.min(miny, ((VisibleObject)obj).getY());
 		}
 	}
+	
+	// remember position for paste
+	pasteX = (minx - view.getRx()/view.getScale());
+	pasteY = (miny - view.getRy()/view.getScale());
 	
 	selected = view.getSelectedObjects().elements();
 	while (selected.hasMoreElements()) {
@@ -526,19 +537,27 @@ public void openDB(java.io.File file) throws IOException {
 public void openDBD(java.io.File file) throws IOException {
 	drawingSurface.openDBD(file);
 }
+
+public void paste() {
+	// do some offset (a little trick to have snapping also done)
+	final int OFFSET = Constants.GRID_SIZE;
+	double scale = ViewState.getInstance().getScale();
+	pasteAtPosition((int)((pasteX+OFFSET)*scale), (int)((pasteY+OFFSET)*scale));
+}
+
 /**
  * Insert the method's description here.
  * Creation date: (4.2.2001 15:32:01)
  */
-public void paste() {
+public void pasteAtPosition(int pX, int pY) {
 	ViewState view = ViewState.getInstance();
 	String currentGroupName = drawingSurface.getViewGroup().getAbsoluteName();
 	int size = Group.getClipboard().getSubObjectsV().size();
 	if (size==0) return;
 
 	double scale = view.getScale();
-	int posX = (int)((drawingSurface.getPressedX() + view.getRx()) / scale);
-	int posY = (int)((drawingSurface.getPressedY() + view.getRy()) / scale);
+	int posX = (int)((pX + view.getRx()) / scale);
+	int posY = (int)((pY + view.getRy()) / scale);
 
 	Object objs[] = new Object[size];
 	Group.getClipboard().getSubObjectsV().copyInto(objs);
@@ -565,9 +584,10 @@ public void paste() {
 				}
 
 				
-				if (objs[i] instanceof Movable)
+				if (objs[i] instanceof Movable) {
 					//((Movable)objs[i]).move(view.getRx(), view.getRy());
 				   ((Movable)objs[i]).move(posX, posY);
+				}
 			}
 			else
 				view.deselectObject((VisibleObject)objs[i]);

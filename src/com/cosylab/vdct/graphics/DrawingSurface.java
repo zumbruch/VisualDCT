@@ -935,7 +935,7 @@ private void showPopup(MouseEvent e)
 			else if (action.equals(templatePropertiesString))
 				InspectorManager.getInstance().requestInspectorFor(Group.getEditingTemplateData());
 			else if (action.equals(pasteString)) {
-				((GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface")).getGUIMenuInterface().paste();
+				((GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface")).getGUIMenuInterface().pasteAtPosition(pressedX, pressedY);
 			}
 			else
 				createTemplateInstance(null, action, true);
