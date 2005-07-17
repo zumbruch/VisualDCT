@@ -248,13 +248,80 @@ public Flexible copyToGroup(java.lang.String group) {
 	Record theRecordCopy = new Record(null, theDataCopy, getX(), getY());
 	//theRecordCopy.move(20-view.getRx(), 20-view.getRy());
 	Group.getRoot().addSubObject(theDataCopy.getName(), theRecordCopy, true);
-	//theRecordCopy.fixEPICSOutLinks(Group.substractParentName(recordData.getName()), group);
+	
+	// fix only valid links where target is also selected
+	theRecordCopy.fixEPICSOutLinksOnCopy(Group.substractParentName(recordData.getName()), group);
+	// links have to be fixed here... so <group>.manageLinks() should be called
+	// for clipboard copy this is done later...
+	
 	theRecordCopy.manageLinks();
 	theRecordCopy.updateFields();
 	unconditionalValidation();
 
 	return theRecordCopy;
 }
+
+
+/**
+ * Insert the method's description here.
+ * Creation date: (5.2.2001 9:42:29)
+ * @param e java.util.Enumeration list of VDBFieldData fields
+ * @param prevGroup java.lang.String
+ * @param group java.lang.String
+ */
+public void fixEPICSOutLinksOnCopy(String prevGroup, String group) {
+	if (prevGroup.equals(group)) return;
+	
+	String prefix;
+	if (group.equals(nullString)) prefix=nullString;
+	else prefix=group+Constants.GROUP_SEPARATOR;
+
+	Enumeration e = recordData.getFieldsV().elements();
+	String old; 
+	int type; VDBFieldData field;
+	while (e.hasMoreElements()) {
+		field = (VDBFieldData)e.nextElement();
+		type = LinkProperties.getType(field);
+		if (type != LinkProperties.VARIABLE_FIELD) {
+			old = field.getValue();
+			if (!old.equals(nullString) && !old.startsWith(Constants.HARDWARE_LINK) &&
+				old.startsWith(prevGroup)) {
+				
+				LinkProperties lp = new LinkProperties(field);
+				InLink target = EPICSLinkOut.getTarget(lp, true);
+				if (target == null)
+					continue;
+				
+				// only parent can be selected
+				Object selectableObject;
+				if (target instanceof Field)
+					selectableObject = ((Field)target).getParent();
+				else
+					selectableObject = target;
+				
+					
+				// fix only selected
+				if (!ViewState.getInstance().isSelected(selectableObject))
+					continue;
+				
+				// fix ports...
+				if (selectableObject instanceof Template) {
+					Template t = (Template)selectableObject;
+					field.setValue("$(" + prefix + t.getName() + Constants.FIELD_SEPARATOR + ((TemplateEPICSPort)target).getFieldData().getName()+")");
+				}
+				// normal record fields
+				else if (prevGroup.equals(nullString))
+					field.setValue(prefix+old);
+				else
+					field.setValue(prefix+old.substring(prevGroup.length()+1));
+			}
+		}
+	}
+
+}
+
+
+
 /**
  * Insert the method's description here.
  * Creation date: (30.1.2001 11:59:21)

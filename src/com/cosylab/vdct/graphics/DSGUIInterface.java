@@ -181,6 +181,8 @@ public void copy() {
 			
 		}
 	}
+	// fix links (due to order of copying links might not be validated...)
+	Group.getClipboard().manageLinks(true);
 	view.deselectAll();
 	drawingSurface.repaint();
 }
