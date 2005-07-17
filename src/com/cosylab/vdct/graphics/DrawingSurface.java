@@ -2903,6 +2903,8 @@ private synchronized void redraw(Graphics g) {
 		(canvasSize.width!=width) || 
 		(canvasSize.height!=height)) {
 	
+		if (width == 0 || height == 0) return;
+		
 	    canvasImage = getWorkspacePanel().createImage(width, height);
 	    if (canvasImage==null) return;
 	    canvasSize = new Dimension(width, height);
