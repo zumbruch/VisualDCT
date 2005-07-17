@@ -1470,11 +1470,74 @@ public Flexible copyToGroup(java.lang.String group) {
 			}
 		}
 	}
-		
+
+	// fix only valid links where target is also selected
+	fixMacrosOnCopy(Group.substractParentName(templateData.getName()), group);
+	// links have to be fixed here... so <group>.manageLinks() should be called
+	// for clipboard copy this is done later...
+
 	theTemplateCopy.updateTemplateFields();
 	unconditionalValidation();
 	return theTemplateCopy;
 }
+
+/**
+ * Insert the method's description here.
+ * Creation date: (5.2.2001 9:42:29)
+ * @param e java.util.Enumeration list of VDBFieldData fields
+ * @param prevGroup java.lang.String
+ * @param group java.lang.String
+ */
+public void fixMacrosOnCopy(String prevGroup, String group) {
+	if (prevGroup.equals(group)) return;
+	
+	String prefix;
+	if (group.equals(nullString)) prefix=nullString;
+	else prefix=group+Constants.GROUP_SEPARATOR;
+
+	Enumeration e = subObjectsV.elements();
+	while (e.hasMoreElements()) {
+		Object obj = e.nextElement();
+		if (!(obj instanceof TemplateEPICSMacro))
+			continue;
+
+		VDBFieldData field = ((TemplateEPICSMacro)obj).getFieldData();
+		String old = field.getValue();
+		if (!old.equals(nullString) && !old.startsWith(Constants.HARDWARE_LINK) &&
+			old.startsWith(prevGroup)) {
+			
+			LinkProperties lp = new LinkProperties(field);
+			InLink target = EPICSLinkOut.getTarget(lp, true);
+			if (target == null)
+				continue;
+			
+			// only parent can be selected
+			Object selectableObject;
+			if (target instanceof Field)
+				selectableObject = ((Field)target).getParent();
+			else
+				selectableObject = target;
+			
+				
+			// fix only selected
+			if (!ViewState.getInstance().isSelected(selectableObject))
+				continue;
+			
+			// fix ports...
+			if (selectableObject instanceof Template) {
+				Template t = (Template)selectableObject;
+				field.setValue("$(" + prefix + t.getName() + Constants.FIELD_SEPARATOR + ((TemplateEPICSPort)target).getFieldData().getName()+")");
+			}
+			// normal record fields
+			else if (prevGroup.equals(nullString))
+				field.setValue(prefix+old);
+			else
+				field.setValue(prefix+old.substring(prevGroup.length()+1));
+		}
+	}
+
+}
+
 
 /**
  * @see com.cosylab.vdct.graphics.objects.Flexible#moveToGroup(String)

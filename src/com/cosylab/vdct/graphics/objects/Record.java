@@ -277,13 +277,11 @@ public void fixEPICSOutLinksOnCopy(String prevGroup, String group) {
 	else prefix=group+Constants.GROUP_SEPARATOR;
 
 	Enumeration e = recordData.getFieldsV().elements();
-	String old; 
-	int type; VDBFieldData field;
 	while (e.hasMoreElements()) {
-		field = (VDBFieldData)e.nextElement();
-		type = LinkProperties.getType(field);
-		if (type != LinkProperties.VARIABLE_FIELD) {
-			old = field.getValue();
+		VDBFieldData field = (VDBFieldData)e.nextElement();
+		//int type = LinkProperties.getType(field);
+		//if (type != LinkProperties.VARIABLE_FIELD) {
+		    String old = field.getValue();
 			if (!old.equals(nullString) && !old.startsWith(Constants.HARDWARE_LINK) &&
 				old.startsWith(prevGroup)) {
 				
@@ -315,7 +313,7 @@ public void fixEPICSOutLinksOnCopy(String prevGroup, String group) {
 				else
 					field.setValue(prefix+old.substring(prevGroup.length()+1));
 			}
-		}
+		//}
 	}
 
 }
