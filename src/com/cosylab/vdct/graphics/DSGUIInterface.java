@@ -679,6 +679,7 @@ public void morph() {
 			ShowMorphingDialog cmd = (ShowMorphingDialog)CommandManager.getInstance().getCommand("ShowMorphingDialog");
 			cmd.setName(((Morphable)objs[i]).getName());
 			cmd.setOldType(((Morphable)objs[i]).getType());
+			cmd.setTargets(((Morphable)objs[i]).getTargets());
 			cmd.execute();
 		}
 	view.deselectAll();
@@ -689,7 +690,7 @@ public void morph() {
  * Insert the method's description here.
  * Creation date: (3.5.2001 10:05:02)
  */
-public void morph(java.lang.String name, java.lang.String newType) {
+public void morph(java.lang.String name, String newType) {
 	ViewState view = ViewState.getInstance();
 	Object oldObject = Group.getRoot().findObject(name, true);
 	if (oldObject instanceof Record)
@@ -704,6 +705,26 @@ public void morph(java.lang.String name, java.lang.String newType) {
 			if (record.morph(newType))
 			{	
 				UndoManager.getInstance().addAction(new MorphAction(record, oldRecordData, record.getRecordData()));
+			
+				view.deselectObject((VisibleObject)oldObject);
+				drawingSurface.repaint();
+			}
+		} finally {
+			UndoManager.getInstance().stopMacroAction();
+		}
+	}
+	else if (oldObject instanceof Template)
+	{
+		try {
+			UndoManager.getInstance().startMacroAction();
+		
+			Template template = (Template)oldObject;
+			
+			VDBTemplateInstance oldTemplateData = template.getTemplateData();
+			
+			if (template.morph(newType))
+			{	
+				UndoManager.getInstance().addAction(new MorphTemplateAction(template, oldTemplateData, template.getTemplateData()));
 			
 				view.deselectObject((VisibleObject)oldObject);
 				drawingSurface.repaint();

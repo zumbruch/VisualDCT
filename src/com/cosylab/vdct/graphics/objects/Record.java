@@ -1220,6 +1220,13 @@ public void setRecordData(VDBRecordData recordData) {
 		InspectorManager.getInstance().updateObject(this);
 }
 
+/* (non-Javadoc)
+ * @see com.cosylab.vdct.graphics.objects.Morphable#getTargets()
+ */
+public Object[] getTargets() {
+	return DataProvider.getInstance().getRecordTypes();
+}
+
 /**
  * Insert the method's description here.
  * Creation date: (25.12.2000 14:14:35)

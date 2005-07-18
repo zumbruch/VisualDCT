@@ -257,12 +257,22 @@ public void destroyAndRemove() {
 	else
 		((LinkManagerObject)getParent()).removeInvalidLink(this);
 
+	lastUpdatedFullName = null;
 }
 
 public void destroy()
 {
 	if (!isDestroyed())
 		destroyAndRemove();
+}
+
+/**
+ * @see com.cosylab.vdct.graphics.objects.VisibleObject#setDestroyed(boolean)
+ */
+public void setDestroyed(boolean newDestroyed) {
+	super.setDestroyed(newDestroyed);
+	if (!newDestroyed)
+		updateTemplateLink();
 }
 
 /**

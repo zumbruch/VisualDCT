@@ -6055,7 +6055,7 @@ public void newRecordDialog_WindowOpened(
 
 public void morphingDialog_WindowOpened(
 	java.awt.event.WindowEvent windowEvent) {
-
+/*
 	// there can be no less types (for now)
 	Object[] names = DataProvider.getInstance().getRecordTypes();
 	JComboBox combo = getTypeComboBox2();
@@ -6076,6 +6076,7 @@ public void morphingDialog_WindowOpened(
 				combo.addItem(names[i]);
 		}
 	 }
+*/
 }
 
 /**
@@ -7263,8 +7264,13 @@ public void showNewDialog() {
 	getNewRecordDialog().setVisible(true);
 }
 
-public void showMorphingDialog(String name, String oldType) {
+public void showMorphingDialog(String name, String oldType, Object[] targets) {
 	morphingDialog_WindowOpened(null);
+	
+	getTypeComboBox2().removeAllItems();
+	for (int i = 0; i < targets.length; i++)
+		getTypeComboBox2().addItem(targets[i]);
+	
 	getNameTextLabel().setText(name);
 	getTypeComboBox2().setSelectedItem(oldType);
 	getMorphingDialog().setLocationRelativeTo(this);

@@ -44,4 +44,6 @@ boolean morph(String newType);
 String getName();
 
 String getType();
+
+Object[] getTargets();
 }

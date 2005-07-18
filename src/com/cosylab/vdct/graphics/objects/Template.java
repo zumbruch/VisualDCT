@@ -42,6 +42,7 @@ import java.util.Iterator;
 
 import javax.swing.*;
 
+import com.cosylab.vdct.Console;
 import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.Settings;
 import com.cosylab.vdct.db.DBResolver;
@@ -66,7 +67,8 @@ import com.cosylab.vdct.vdb.*;
 // TODO make serialization of macro w/o vis. rep. work, but macro is defined only as visible object?!
 public class Template
 	extends LinkManagerObject
-	implements /*Descriptable,*/ Movable, Inspectable, Popupable, Flexible, Selectable, Clipboardable, Hub, MonitoredPropertyListener, SaveInterface, SaveObject
+	implements /*Descriptable,*/ Movable, Inspectable, Popupable, Flexible, Selectable,
+				Clipboardable, Hub, MonitoredPropertyListener, SaveInterface, SaveObject, Morphable
 {
 
 	class PopupMenuHandler implements ActionListener {
@@ -363,41 +365,52 @@ public class Template
 	/**
 	 * @see com.cosylab.vdct.graphics.objects.VisibleObject#validate()
 	 */
+	private boolean validating = false;
 	protected void validate()
 	{
+		if (validating)
+			return;
 		
-		  // template change check
-		  VDBTemplate tmpl = (VDBTemplate)VDBData.getTemplates().get(getTemplateData().getTemplate().getId());		
-		  if (tmpl!=getTemplateData().getTemplate())
-		  {
-		  	getTemplateData().setTemplate(tmpl);
-			synchronizeLinkFields();
-		  }
-		  else
-		  {
-		  	if (getTemplateData().getTemplate().getPortsGeneratedID()!=portsID)
-				synchronizePortLinkFields();
-			if (getTemplateData().getTemplate().getMacrosGeneratedID()!=macrosID)
-				synchronizeMacroLinkFields();
-		  }
-		
-		  revalidatePosition();
+		try {
+			validating = true;
 
-		  double scale = getRscale();
-		  int rwidth = (int)((getX()+getWidth())*scale)-getRx();
-		  int height = (int)(getY()*scale+Constants.TEMPLATE_INITIAL_HEIGHT)-getRy();
+			  // template change check
+			  VDBTemplate tmpl = (VDBTemplate)VDBData.getTemplates().get(getTemplateData().getTemplate().getId());		
+			  if (tmpl!=getTemplateData().getTemplate())
+			  {
+			  	getTemplateData().setTemplate(tmpl);
+				synchronizeLinkFields();
+			  }
+			  else
+			  {
+			  	if (getTemplateData().getTemplate().getPortsGeneratedID()!=portsID)
+					synchronizePortLinkFields();
+				if (getTemplateData().getTemplate().getMacrosGeneratedID()!=macrosID)
+					synchronizeMacroLinkFields();
+			  }
+			
+			  revalidatePosition();
 
-		  initY = height;
-		  	  
-		  int rheight = validateFont(scale, rwidth, height);
-		  
-		  setHeight((int)(rheight/scale));
-		  setRwidth(rwidth);
-		  setRheight(rheight);
-		  
-	      // sub-components
-		  revalidatePosition();
-		  validateFields();
+			  double scale = getRscale();
+			  int rwidth = (int)((getX()+getWidth())*scale)-getRx();
+			  int height = (int)(getY()*scale+Constants.TEMPLATE_INITIAL_HEIGHT)-getRy();
+
+			  initY = height;
+			  	  
+			  int rheight = validateFont(scale, rwidth, height);
+			  
+			  setHeight((int)(rheight/scale));
+			  setRwidth(rwidth);
+			  setRheight(rheight);
+			  
+		      // sub-components
+			  revalidatePosition();
+			  validateFields();
+			  
+		}
+		finally {
+			validating = false;
+		}
 	}
 
 	/**
@@ -1037,6 +1050,11 @@ private void synchronizePortLinkFields()
 				link.destroyAndRemove();
 	
 				fields--;
+				if (link.isVisible())
+					if (link.isRight())
+						rightFields--;
+					else
+						leftFields--;
 
 				removeObject(link.getFieldData().getName());
 			}
@@ -1162,6 +1180,11 @@ private void synchronizeMacroLinkFields()
 				removeObject(link.getFieldData().getName());
 				
 				fields--;
+				if (link.isVisible())
+					if (link.isRight())
+						rightFields--;
+					else
+						leftFields--;
 				
 				// remove from properties
 				templateData.removeProperty(link.getFieldData().getName());
@@ -1417,6 +1440,15 @@ public void destroy() {
 }
 
 /**
+ * @see com.cosylab.vdct.graphics.objects.VisibleObject#setDestroyed(boolean)
+ */
+public void setDestroyed(boolean newDestroyed) {
+	super.setDestroyed(newDestroyed);
+	if (!newDestroyed)
+		undestroyFields();
+}
+
+/**
  * @see com.cosylab.vdct.graphics.objects.Flexible#copyToGroup(String)
  */
 public Flexible copyToGroup(java.lang.String group) {
@@ -1640,18 +1672,23 @@ protected void destroyFields() {
 	subObjectsV.copyInto(objs);
 	for (int i=0; i < objs.length; i++)
 	{
-		/*
-		if (objs[i] instanceof TemplateEPICSLink)
-		{
-			TemplateEPICSLink tel = (TemplateEPICSLink)objs[i];
-			tel.destroyAndRemove();
-		}
-		else
-		*/
-			((VisibleObject)objs[i]).destroy();
+		((VisibleObject)objs[i]).destroy();
 	}
 }
 
+/**
+ * Insert the method's description here.
+ * Creation date: (30.1.2001 11:59:54)
+ */
+protected void undestroyFields() {
+
+	Object[] objs = new Object[subObjectsV.size()];
+	subObjectsV.copyInto(objs);
+	for (int i=0; i < objs.length; i++)
+	{
+		((VisibleObject)objs[i]).setDestroyed(false);
+	}
+}
 
 
 
@@ -2134,5 +2171,76 @@ public void moveFieldUp(Field field) {
 	//InspectorManager.getInstance().updateObject(this);
 }
 
+/**
+ * @see com.cosylab.vdct.graphics.objects.Morphable#getType()
+ */
+public String getType() {
+	return templateData.getTemplate().getDescription();
+}
+/**
+ * @see com.cosylab.vdct.graphics.objects.Morphable#morph(java.lang.String)
+ */
+public boolean morph(String newType) {
+
+	// desc -> type
+	String type = null;
+	Enumeration templates = VDBData.getTemplates().keys();
+	while (templates.hasMoreElements())
+	{
+		String key = templates.nextElement().toString();
+		VDBTemplate t = (VDBTemplate)VDBData.getTemplates().get(key);
+		if (newType.equals(t.getDescription()))
+		{
+			type = key; break;
+		}
+	}	
+
+	if (type == null)
+		return false;
+	
+	//	copies VDBData
+	VDBTemplateInstance templateInstance = VDBData.morphVDBTemplateInstance(templateData, type, getName());
+				
+	if (templateInstance==null) {
+		Console.getInstance().println("o) Interal error: failed to morph template "+getName()+" ("+getType()+")!");
+		return false;
+	}					   
+	
+	setTemplateInstance(templateInstance);
+		
+	return true;
+}
+
+/**
+ * @param templateInstance
+ */
+public void setTemplateInstance(VDBTemplateInstance templateInstance)
+{
+		this.templateData = templateInstance;
+	
+		validate();
+
+		// update inspector
+		InspectorManager.getInstance().updateObject(this);
+}
+
+
+/**
+ * @see com.cosylab.vdct.graphics.objects.Morphable#getTargets()
+ */
+public Object[] getTargets() {
+	
+	Enumeration templates = VDBData.getTemplates().keys();
+	Object[] desc = new Object[VDBData.getTemplates().size()];
+	int i = 0;
+	while (templates.hasMoreElements())
+	{
+		String key = templates.nextElement().toString();
+		VDBTemplate t = (VDBTemplate)VDBData.getTemplates().get(key);
+		desc[i++] = t.getDescription();
+	}	
+
+	return desc;
+}
 
 }

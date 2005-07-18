@@ -647,6 +647,21 @@ public static VDBRecordData morphVDBRecordData(DBDData dbd, VDBRecordData source
 
 	return vdbRecord;
 }
+
+public static VDBTemplateInstance morphVDBTemplateInstance(VDBTemplateInstance templateData, String templateType, String templateName) {
+	
+	VDBTemplate template = (VDBTemplate)VDBData.getTemplates().get(templateType);
+	if (template==null) return null;
+	
+	VDBTemplateInstance ti = generateNewVDBTemplateInstance(templateName, template);
+
+	// copy properties
+	ti.getProperties().putAll(templateData.getProperties());
+	ti.getPropertiesV().addAll(templateData.getPropertiesV());
+	
+	return ti;
+}
+
 /**
  * Insert the method's description here.
  * Creation date: (10.1.2001 14:44:44)
