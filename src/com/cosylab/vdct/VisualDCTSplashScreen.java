@@ -200,13 +200,14 @@ public static void main(java.lang.String[] args) {
 /**
  * @see java.awt.Component#update(Graphics)
  */
-public void paint(Graphics g)
+public synchronized void paint(Graphics g)
 {
 	super.paint(g);
 	
 	// init object with Graphics ASAP
 	// !!! better solution?
 	com.cosylab.vdct.graphics.FontMetricsBuffer.createInstance(g);
+	notifyAll();
 }
 
 }

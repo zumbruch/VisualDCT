@@ -5855,7 +5855,16 @@ public static void main(final java.lang.String[] args) {
 		if (splashScreenSize.width > screenSize.width)
 				splashScreenSize.width = screenSize.width;
 		aVisualDCTSplashScreen.setLocation((screenSize.width - splashScreenSize.width) / 2, (screenSize.height - splashScreenSize.height) / 2);
-		aVisualDCTSplashScreen.setVisible(true);
+
+		// wait until it appears and FontMetricsBuffer is initialized
+		synchronized (aVisualDCTSplashScreen)
+		{
+			aVisualDCTSplashScreen.setVisible(true);
+			try {
+				aVisualDCTSplashScreen.wait();
+			} catch (InterruptedException e) {
+			}
+		}
 		
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
