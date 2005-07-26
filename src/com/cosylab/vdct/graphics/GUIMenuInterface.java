@@ -89,6 +89,13 @@ void importTemplateDB(File file) throws IOException;
 void importFields(File file) throws IOException;
 /**
  * Insert the method's description here.
+ * Creation date: (4.2.2001 15:10:27)
+ * @param file java.io.File
+ * @exception java.io.IOException The exception description.
+ */
+void importBorder(File file) throws IOException;
+/**
+ * Insert the method's description here.
  * Creation date: (4.2.2001 15:10:38)
  * @param file java.io.File
  * @exception java.io.IOException The exception description.

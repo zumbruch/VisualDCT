@@ -77,6 +77,7 @@ public class VisualDCT extends JFrame {
 	private JMenuItem ivjImport_DBMenuItem = null;
 	private JMenuItem ivjImportTemplate_DBMenuItem = null;
 	private JMenuItem ivjImportFieldsMenuItem = null;
+	private JMenuItem ivjImportBorderMenuItem = null;
 	private JPanel ivjJFrameContentPane = null;
 	private JSeparator ivjJSeparator1 = null;
 	private JSeparator ivjJSeparator10 = null;
@@ -239,6 +240,8 @@ class IvjEventHandler implements java.awt.event.ActionListener, java.awt.event.I
 				VisualDCT.this.importTemplateActionPerformed();
 			else if (e.getSource() == VisualDCT.this.getImportFieldsMenuItem())
 			    VisualDCT.this.importFieldsActionPerformed();
+			else if (e.getSource() == VisualDCT.this.getImportBorderMenuItem())
+			    VisualDCT.this.importBorderActionPerformed();
 			else if (e.getSource() == VisualDCT.this.getImport_DBDMenuItem()) 
 				connEtoC9(e);
 			else if (e.getSource() == VisualDCT.this.getSaveMenuItem()) 
@@ -2562,6 +2565,7 @@ private javax.swing.JMenu getFileMenu() {
 			ivjFileMenu.add(getImport_DBMenuItem());
 			ivjFileMenu.add(getImportFieldsMenuItem());
 			ivjFileMenu.add(getImportTemplate_DBMenuItem());
+			ivjFileMenu.add(getImportBorderMenuItem());
 			ivjFileMenu.add(getImport_DBDMenuItem());
 			ivjFileMenu.add(getJSeparator1());
 			ivjFileMenu.add(getSaveMenuItem());
@@ -2924,6 +2928,28 @@ private javax.swing.JMenuItem getImportFieldsMenuItem() {
 		}
 	}
 	return ivjImportFieldsMenuItem;
+}
+
+/**
+ * Return the ImportBorderMenuItem property value.
+ * @return javax.swing.JMenuItem
+ */
+/* WARNING: THIS METHOD WILL BE REGENERATED. */
+private javax.swing.JMenuItem getImportBorderMenuItem() {
+	if (ivjImportBorderMenuItem == null) {
+		try {
+			ivjImportBorderMenuItem = new javax.swing.JMenuItem();
+			ivjImportBorderMenuItem.setName("ImportBorderMenuItem");
+			ivjImportBorderMenuItem.setText("Import border...");
+			// user code begin {1}
+			// user code end
+		} catch (java.lang.Throwable ivjExc) {
+			// user code begin {2}
+			// user code end
+			handleException(ivjExc);
+		}
+	}
+	return ivjImportBorderMenuItem;
 }
 
 // shp: not final solution
@@ -5672,6 +5698,33 @@ public void importFieldsActionPerformed() {
 }
 
 /**
+ * Comment
+ */
+public void importBorderActionPerformed() {
+	JFileChooser chooser = getfileChooser();
+	UniversalFileFilter filter = new UniversalFileFilter(
+		new String[] {"db", "vdb"}, "EPICS DB files");
+	chooser.resetChoosableFileFilters();
+	chooser.addChoosableFileFilter(filter);
+	chooser.setDialogTitle("Import border...");
+	chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+	int retval = chooser.showOpenDialog(this);
+
+	if(retval == JFileChooser.APPROVE_OPTION) {
+	    java.io.File theFile = chooser.getSelectedFile();
+	    if(theFile != null) {
+		    GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
+		    try {
+	  		 	cmd.getGUIMenuInterface().importBorder(theFile);
+		    } catch (java.io.IOException e) {
+			    Console.getInstance().println("o) Failed to import border from DB file: '"+theFile.toString()+"'");
+			    Console.getInstance().println(e);
+		    }
+		}
+	}
+}
+
+/**
  * Initializes connections
  * @exception java.lang.Exception The exception description.
  */
@@ -5693,6 +5746,7 @@ private void initConnections() throws java.lang.Exception {
 	getOpenMenuItem().addActionListener(ivjEventHandler);
 	getImport_DBMenuItem().addActionListener(ivjEventHandler);
 	getImportFieldsMenuItem().addActionListener(ivjEventHandler);
+	getImportBorderMenuItem().addActionListener(ivjEventHandler);
 	getImportTemplate_DBMenuItem().addActionListener(ivjEventHandler);
 	getImport_DBDMenuItem().addActionListener(ivjEventHandler);
 	getSaveMenuItem().addActionListener(ivjEventHandler);

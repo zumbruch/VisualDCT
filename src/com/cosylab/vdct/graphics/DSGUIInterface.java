@@ -487,6 +487,14 @@ public void importFields(java.io.File file) throws IOException {
  * Creation date: (4.2.2001 15:32:01)
  * @param file java.io.File
  */
+public void importBorder(java.io.File file) throws IOException {
+	Console.getInstance().println("NOT IMPLEMENTED YET...");
+}
+/**
+ * Insert the method's description here.
+ * Creation date: (4.2.2001 15:32:01)
+ * @param file java.io.File
+ */
 public void importDBD(java.io.File file) throws IOException {
 	drawingSurface.openDBD(file, true);
 }
