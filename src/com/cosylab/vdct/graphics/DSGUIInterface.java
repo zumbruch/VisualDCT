@@ -56,6 +56,7 @@ public class DSGUIInterface implements GUIMenuInterface, VDBInterface {
 	private ArrayList pasteNames = null;
 	private double pasteX;
 	private double pasteY;
+	private boolean doOffsetAtPaste = false;
 	
 	//private static final String nullString = "";
 
@@ -169,7 +170,8 @@ public void copy() {
 	// remember position for paste
 	pasteX = (minx - view.getRx()/view.getScale());
 	pasteY = (miny - view.getRy()/view.getScale());
-
+	doOffsetAtPaste = true;
+	
 	selected = view.getSelectedObjects().elements();	
 	
 	while (selected.hasMoreElements()) {
@@ -323,6 +325,7 @@ public void cut() {
 	// remember position for paste
 	pasteX = (minx - view.getRx()/view.getScale());
 	pasteY = (miny - view.getRy()/view.getScale());
+	doOffsetAtPaste = false;
 	
 	selected = view.getSelectedObjects().elements();
 	while (selected.hasMoreElements()) {
@@ -340,6 +343,7 @@ public void cut() {
 		}
 	}
 	view.deselectAll();
+	view.setAsHilited(null);
 	drawingSurface.setModified(true);
 	drawingSurface.repaint();
 }
@@ -488,7 +492,7 @@ public void importFields(java.io.File file) throws IOException {
  * @param file java.io.File
  */
 public void importBorder(java.io.File file) throws IOException {
-	Console.getInstance().println("NOT IMPLEMENTED YET...");
+	drawingSurface.importBorder(file);
 }
 /**
  * Insert the method's description here.
@@ -549,10 +553,13 @@ public void openDBD(java.io.File file) throws IOException {
 }
 
 public void paste() {
-	// do some offset (a little trick to have snapping also done)
+	// do some offset (a little trick to have snapping also done) for copy only
 	final int OFFSET = Constants.GRID_SIZE;
 	double scale = ViewState.getInstance().getScale();
-	pasteAtPosition((int)((pasteX+OFFSET)*scale), (int)((pasteY+OFFSET)*scale));
+	if (doOffsetAtPaste)
+		pasteAtPosition((int)((pasteX+OFFSET)*scale), (int)((pasteY+OFFSET)*scale));
+	else
+		pasteAtPosition((int)(pasteX*scale), (int)(pasteY*scale));
 }
 
 /**

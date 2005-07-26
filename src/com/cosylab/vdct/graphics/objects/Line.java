@@ -176,6 +176,7 @@ public Flexible copyToGroup(String group)
 	Group.getRoot().addSubObject(newName, grLine, true);
 	grLine.setStartArrow(startArrow);
 	grLine.setEndArrow(endArrow);
+	grLine.setColor(getColor());
 
 	//ViewState view = ViewState.getInstance();
 	//grLine.move(20 - view.getRx(), 20 - view.getRy());
@@ -574,4 +575,17 @@ public VisibleObject intersects(int px, int py) {
 	return spotted;
 }
 	
+/* (non-Javadoc)
+ * @see com.cosylab.vdct.graphics.objects.VisibleObject#getX()
+ */
+public int getX() {
+	return Math.min(startVertex.getX(), endVertex.getX());
+}
+/* (non-Javadoc)
+ * @see com.cosylab.vdct.graphics.objects.VisibleObject#getY()
+ */
+public int getY() {
+	return Math.min(startVertex.getY(), endVertex.getY());
+}
+
 }

@@ -340,6 +340,7 @@ public Flexible copyToGroup(String group)
 						startVertex.getX(), startVertex.getY(),
 						endVertex.getX(), endVertex.getY());
 	grTextBox.setDescription(description);
+	grTextBox.setColor(getColor());
 	Group.getRoot().addSubObject(newName, grTextBox, true);
 
 	//ViewState view = ViewState.getInstance();
@@ -812,6 +813,19 @@ public VisibleObject intersects(int px, int py) {
 public boolean isBorder()
 {
 	return border;
+}
+
+/* (non-Javadoc)
+ * @see com.cosylab.vdct.graphics.objects.VisibleObject#getX()
+ */
+public int getX() {
+	return Math.min(startVertex.getX(), endVertex.getX());
+}
+/* (non-Javadoc)
+ * @see com.cosylab.vdct.graphics.objects.VisibleObject#getY()
+ */
+public int getY() {
+	return Math.min(startVertex.getY(), endVertex.getY());
 }
 
 }

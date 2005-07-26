@@ -165,6 +165,7 @@ public Flexible copyToGroup(String group)
 	Box grBox = new Box(newName, null,
 						startVertex.getX(), startVertex.getY(),
 						endVertex.getX(), endVertex.getY());
+	grBox.setColor(getColor());
 	Group.getRoot().addSubObject(newName, grBox, true);
 
 	//ViewState view = ViewState.getInstance();
@@ -190,7 +191,6 @@ public void destroy()
 protected void draw(Graphics g, boolean hilited)
 {
 	ViewState view = ViewState.getInstance();
-	System.out.println("test");
 	int offsetX = view.getRx();
 	int offsetY = view.getRy();
 	
@@ -471,4 +471,17 @@ public VisibleObject intersects(int px, int py) {
 	return spotted;
 }
 	
+/* (non-Javadoc)
+ * @see com.cosylab.vdct.graphics.objects.VisibleObject#getX()
+ */
+public int getX() {
+	return Math.min(startVertex.getX(), endVertex.getX());
+}
+/* (non-Javadoc)
+ * @see com.cosylab.vdct.graphics.objects.VisibleObject#getY()
+ */
+public int getY() {
+	return Math.min(startVertex.getY(), endVertex.getY());
+}
+
 }

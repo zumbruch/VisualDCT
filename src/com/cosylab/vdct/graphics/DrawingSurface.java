@@ -1812,6 +1812,73 @@ public boolean importFields(File file, boolean ignoreLinkFields)
 }
 
 /**
+ */
+public boolean importBorder(File file)
+{
+    boolean imported = false;
+    try
+    {
+        setCursor(hourCursor);
+
+		// load
+		DBData dbData = null;
+		/*if (getAppletBase()!=null) 	// applet
+			try
+			{
+				dbData = DBResolver.resolveDBasURL(new java.net.URL(getVDCTFrame().getAppletBase(), file.getAbsolutePath()));
+			} catch (java.net.MalformedURLException e) { Console.getInstance().println(e); }
+		else  */
+	
+		try
+		{
+			dbData = DBResolver.resolveDB(file.getAbsolutePath());
+		} 
+		catch(Exception e)
+		{
+			Console.getInstance().println(e);
+		}
+		
+	    //
+	    // override fields of record which already exist in the opened DB
+	    //
+		Group rootGroup = Group.getRoot();
+		
+        // packed undo
+        if (!imported)
+        {
+            imported = true;
+            UndoManager.getInstance().startMacroAction();
+        }
+
+        Border border = new Border(null, rootGroup);
+		applyVisualDataOfGraphicsObjects(dbData, border);
+		rootGroup.addSubObject(border.getName(), border);
+		
+		
+  		blockNavigatorRedrawOnce = false;
+   		createNavigatorImage();
+   		forceRedraw = true;
+   		repaint();
+
+		// free db memory	    
+		dbData = null;
+		System.gc();
+
+		return true;
+    }
+    catch (Throwable th) {
+        return false;
+    }
+    finally {
+        
+        if (imported)
+            UndoManager.getInstance().stopMacroAction();
+        
+		restoreCursor();
+    }
+}
+
+/**
  * SEPARATE DOWN CODE TO METHODS
  * Creation date: (6.1.2001 22:35:40)
  * @param file java.io.File
@@ -2417,48 +2484,7 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 		    ((Template)i.next()).manageLinks();
 		}
 		
-		// lines 
-		DBLine dbLine;
-		e = dbData.getLines().elements();
-		while (e.hasMoreElements())
-		{
-			dbLine = (DBLine)e.nextElement();
-			Line line = new Line(dbLine.getName(), null, dbLine.getX(), dbLine.getY(), dbLine.getX2(), dbLine.getY2());
-			line.setDashed(dbLine.isDashed());
-			line.setStartArrow(dbLine.isStartArrow());
-			line.setEndArrow(dbLine.isEndArrow());
-			line.setColor(dbLine.getColor());
-			rootGroup.addSubObject(line.getName(), line, true);
-		}
-
-		// boxes 
-		DBBox dbBox;
-		e = dbData.getBoxes().elements();
-		while (e.hasMoreElements())
-		{
-			dbBox = (DBBox)e.nextElement();
-			Box box = new Box(dbBox.getName(), null, dbBox.getX(), dbBox.getY(), dbBox.getX2(), dbBox.getY2());
-			box.setIsDashed(dbBox.isDashed());
-			box.setColor(dbBox.getColor());
-			rootGroup.addSubObject(box.getName(), box, true);
-		}
-
-		// textboxes 
-		DBTextBox dbTextBox;
-		e = dbData.getTextboxes().elements();
-		while (e.hasMoreElements())
-		{
-			dbTextBox = (DBTextBox)e.nextElement();
-			TextBox textbox = new TextBox(dbTextBox.getName(), null, dbTextBox.getX(), dbTextBox.getY(), dbTextBox.getX2(), dbTextBox.getY2());
-			textbox.setBorder(dbTextBox.getBorder());
-			
-			Font font = FontMetricsBuffer.getInstance().getFont(dbTextBox.getFontName(), dbTextBox.getFontSize(), dbTextBox.getFontStyle());
-			textbox.setFont(font);
-			
-			textbox.setDescription(dbTextBox.getDescription());
-			textbox.setColor(dbTextBox.getColor());
-			rootGroup.addSubObject(textbox.getName(), textbox, true);
-		}
+		applyVisualDataOfGraphicsObjects(dbData, rootGroup);
 
 	} catch (Exception e) {
 		Console.getInstance().println("Error occured while applying visual data!");
@@ -2470,6 +2496,55 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 //	group.manageLinks(true);
 }
 
+/**
+ * @param dbData
+ * @param container
+ */
+private static void applyVisualDataOfGraphicsObjects(DBData dbData, ContainerObject container) {
+	Enumeration e;
+	// lines 
+	DBLine dbLine;
+	e = dbData.getLines().elements();
+	while (e.hasMoreElements())
+	{
+		dbLine = (DBLine)e.nextElement();
+		Line line = new Line(dbLine.getName(), null, dbLine.getX(), dbLine.getY(), dbLine.getX2(), dbLine.getY2());
+		line.setDashed(dbLine.isDashed());
+		line.setStartArrow(dbLine.isStartArrow());
+		line.setEndArrow(dbLine.isEndArrow());
+		line.setColor(dbLine.getColor());
+		container.addSubObject(line.getName(), line, true);
+	}
+
+	// boxes 
+	DBBox dbBox;
+	e = dbData.getBoxes().elements();
+	while (e.hasMoreElements())
+	{
+		dbBox = (DBBox)e.nextElement();
+		Box box = new Box(dbBox.getName(), null, dbBox.getX(), dbBox.getY(), dbBox.getX2(), dbBox.getY2());
+		box.setIsDashed(dbBox.isDashed());
+		box.setColor(dbBox.getColor());
+		container.addSubObject(box.getName(), box, true);
+	}
+
+	// textboxes 
+	DBTextBox dbTextBox;
+	e = dbData.getTextboxes().elements();
+	while (e.hasMoreElements())
+	{
+		dbTextBox = (DBTextBox)e.nextElement();
+		TextBox textbox = new TextBox(dbTextBox.getName(), null, dbTextBox.getX(), dbTextBox.getY(), dbTextBox.getX2(), dbTextBox.getY2());
+		textbox.setBorder(dbTextBox.getBorder());
+		
+		Font font = FontMetricsBuffer.getInstance().getFont(dbTextBox.getFontName(), dbTextBox.getFontSize(), dbTextBox.getFontStyle());
+		textbox.setFont(font);
+		
+		textbox.setDescription(dbTextBox.getDescription());
+		textbox.setColor(dbTextBox.getColor());
+		container.addSubObject(textbox.getName(), textbox, true);
+	}
+}
 /**
  * Insert the method's description here.
  * Creation date: (6.1.2001 22:35:40)

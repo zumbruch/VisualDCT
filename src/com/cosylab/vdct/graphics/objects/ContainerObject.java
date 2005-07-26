@@ -88,6 +88,16 @@ public void addSubObject(String id, VisibleObject object) {
 	*/	
 	
 }
+
+/**
+ * "Helper" method (e.g. for Group).
+ * @param id
+ * @param object
+ * @param create
+ */
+public void addSubObject(String id, VisibleObject object, boolean create) {
+	addSubObject(id, object);
+}
 /**
  * Insert the method's description here.
  * Creation date: (28.1.2001 12:04:45)
