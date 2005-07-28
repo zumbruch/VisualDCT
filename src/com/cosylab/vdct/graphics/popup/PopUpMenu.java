@@ -36,10 +36,14 @@ import javax.swing.*;
 import com.cosylab.vdct.VisualDCT;
 import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.events.commands.GetGUIInterface;
+import com.cosylab.vdct.graphics.DrawingSurface;
 import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.graphics.objects.Flexible;
 import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.objects.Morphable;
+import com.cosylab.vdct.graphics.objects.MultiInLink;
+import com.cosylab.vdct.graphics.objects.Record;
+import com.cosylab.vdct.graphics.objects.Rotatable;
 import com.cosylab.vdct.graphics.objects.VisibleObject;
 import com.cosylab.vdct.plugin.popup.PluginPopupManager;
 
@@ -54,6 +58,8 @@ public class PopUpMenu extends JPopupMenu {
 	private static final int ITEMS_PER_MENU = 10;
 	private static JSeparator separator = null;
 	
+	private static final String rotateLinkString = "Rotate Link";
+	
 	private static final String cutString = "Cut";
 	private static final String copyString = "Copy";	
 	private static final String moveRenameString = "Move/Rename";
@@ -62,6 +68,7 @@ public class PopUpMenu extends JPopupMenu {
 	
 	private static final String groupString = "Group";
 	private static final String ungroupString = "Ungroup";
+
 /**
  * LinkingPopupMenu constructor comment.
  */
@@ -178,6 +185,9 @@ public void show(Object object, JComponent component, int x, int y) {
 		if (items==null) items = new Vector();
 	}		
 
+	if (object instanceof Rotatable) 
+		addRotatableItems((Rotatable)object, items);
+
 	if (object instanceof Flexible) 
 		populateWithFlexible((Flexible)object, items);
 
@@ -185,9 +195,32 @@ public void show(Object object, JComponent component, int x, int y) {
 	
 	if (object instanceof Popupable) 
 		addPluginItems(this, (Popupable)object);
-	
-//	show popup menu
+
+	//	show popup menu
 	 show(component, x, y);	
+}
+
+private void addRotatableItems(final Rotatable rot, Vector items) {
+
+	// rotate only if more than one inlink is connected
+	// if not, automatic mode is used
+	if (rot instanceof MultiInLink &&
+			((MultiInLink)rot).getLinkCount() <	2)
+		return;
+	
+	// dirty...
+	if (rot instanceof Record) items.add(new JSeparator());
+	
+	JMenuItem menuitem = new JMenuItem(rotateLinkString);
+	menuitem.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			rot.rotate();
+		    DrawingSurface.getInstance().repaint();
+		}
+	});
+	items.add(menuitem);
+	
+
 }
 
 private void populateWithFlexible(Flexible object, Vector items) {
