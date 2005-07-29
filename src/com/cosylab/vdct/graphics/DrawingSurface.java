@@ -2513,7 +2513,22 @@ private static void applyVisualDataOfGraphicsObjects(DBData dbData, ContainerObj
 		line.setStartArrow(dbLine.isStartArrow());
 		line.setEndArrow(dbLine.isEndArrow());
 		line.setColor(dbLine.getColor());
-		container.addSubObject(line.getName(), line, true);
+
+		if (dbLine.getParentBorderID() != null && !dbLine.getParentBorderID().equals("null")) {
+			Object obj = container.getSubObject(dbLine.getParentBorderID());
+			Border border;
+			if (obj instanceof Border)
+				border = (Border)obj;
+			else {
+				// lets assume that no other object with parentBorderID name does not exits
+				// create a new one
+				border = new Border(null, (Group)container);
+				container.addSubObject(border.getName(), border);
+			}
+			border.addSubObject(line.getName(), line, true);
+		}
+		else
+			container.addSubObject(line.getName(), line, true);
 	}
 
 	// boxes 
@@ -2525,7 +2540,22 @@ private static void applyVisualDataOfGraphicsObjects(DBData dbData, ContainerObj
 		Box box = new Box(dbBox.getName(), null, dbBox.getX(), dbBox.getY(), dbBox.getX2(), dbBox.getY2());
 		box.setIsDashed(dbBox.isDashed());
 		box.setColor(dbBox.getColor());
-		container.addSubObject(box.getName(), box, true);
+
+		if (dbBox.getParentBorderID() != null && !dbBox.getParentBorderID().equals("null")) {
+			Object obj = container.getSubObject(dbBox.getParentBorderID());
+			Border border;
+			if (obj instanceof Border)
+				border = (Border)obj;
+			else {
+				// lets assume that no other object with parentBorderID name does not exits
+				// create a new one
+				border = new Border(null, (Group)container);
+				container.addSubObject(border.getName(), border);
+			}
+			border.addSubObject(box.getName(), box, true);
+		}
+		else
+			container.addSubObject(box.getName(), box, true);
 	}
 
 	// textboxes 
@@ -2542,7 +2572,22 @@ private static void applyVisualDataOfGraphicsObjects(DBData dbData, ContainerObj
 		
 		textbox.setDescription(dbTextBox.getDescription());
 		textbox.setColor(dbTextBox.getColor());
-		container.addSubObject(textbox.getName(), textbox, true);
+	
+		if (dbTextBox.getParentBorderID() != null && !dbTextBox.getParentBorderID().equals("null")) {
+			Object obj = container.getSubObject(dbTextBox.getParentBorderID());
+			Border border;
+			if (obj instanceof Border)
+				border = (Border)obj;
+			else {
+				// lets assume that no other object with parentBorderID name does not exits
+				// create a new one
+				border = new Border(null, (Group)container);
+				container.addSubObject(border.getName(), border);
+			}
+			border.addSubObject(textbox.getName(), textbox, true);
+		}
+		else
+			container.addSubObject(textbox.getName(), textbox, true);
 	}
 }
 /**

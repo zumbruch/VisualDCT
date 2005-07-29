@@ -41,13 +41,14 @@ public class DBLine {
 	protected boolean startArrow;
 	protected boolean endArrow;
 	protected Color color;
+	protected String parentBorderID;
 	
 /**
  * Insert the method's description here.
  * Creation date: (23.4.2001 21:12:09)
  */
 public DBLine(String name, int x, int y, int x2, int y2, boolean dashed, 
-			   boolean startArrow, boolean endArrow, Color color)
+			   boolean startArrow, boolean endArrow, Color color, String parentBorderID)
 {
 	this.name = name;
 	this.x=x;
@@ -58,6 +59,7 @@ public DBLine(String name, int x, int y, int x2, int y2, boolean dashed,
 	this.startArrow=startArrow;
 	this.endArrow=endArrow;
 	this.color=color;
+	this.parentBorderID = parentBorderID;
 }
 
 	/**
@@ -223,4 +225,16 @@ public DBLine(String name, int x, int y, int x2, int y2, boolean dashed,
 		this.y2 = y2;
 	}
 
+	/**
+	 * @return Returns the parentBorderID.
+	 */
+	public String getParentBorderID() {
+		return parentBorderID;
+	}
+	/**
+	 * @param parentBorderID The parentBorderID to set.
+	 */
+	public void setParentBorderID(String parentBorderID) {
+		this.parentBorderID = parentBorderID;
+	}
 }

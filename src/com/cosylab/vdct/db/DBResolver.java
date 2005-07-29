@@ -101,17 +101,20 @@ public class DBResolver {
 	public static final String VDCT_OUTPUT_PORT = "OutputPort";
 
 	// used format #! InputMacro(macroname, description, xpos, ypos, color, defaultVisibility, textPositionNorth)
-	// used format #! OutputMacro(macroname, description, xpos, ypos, color, defaultVisibility, textPositionNort)
+	// used format #! OutputMacro(macroname, description, xpos, ypos, color, defaultVisibility, textPositionNorth)
 	// textPositionNorth is optional; if exists value is true or false
 	public static final String VDCT_INPUT_MACRO = "InputMacro";
 	public static final String VDCT_OUTPUT_MACRO = "OutputMacro";
 
-	// used format #! Line(name, xpos, ypos, xpos2, ypos2, dashed, startArrow, endArrow, color)
-	// used format #! Box(name, xpos, ypos, xpos2, ypos2, dashed, color)
-	// used format #! TextBox(name, xpos, ypos, xpos2, ypos2, border, fontFamilyName, fontSize, fontStyle, color, "description")
+	// used format #! Line(name, xpos, ypos, xpos2, ypos2, dashed, startArrow, endArrow, color, parentBorderID)
+	// used format #! Box(name, xpos, ypos, xpos2, ypos2, dashed, color, parentBorderID)
+	// used format #! TextBox(name, xpos, ypos, xpos2, ypos2, border, fontFamilyName, fontSize, fontStyle, color, "description", parentBorderID)
 	public static final String VDCTLINE = "Line";
 	public static final String VDCTBOX = "Box";
 	public static final String VDCTTEXTBOX = "TextBox";
+
+	// not used yet
+	//public static final String VDCTBORDER = "Border";
 
 	// incoded DBDs
  	// used format:
@@ -612,7 +615,14 @@ public static String processComment(DBData data, EnhancedStreamTokenizer tokeniz
 					if (tokenizer.ttype == EnhancedStreamTokenizer.TT_NUMBER) t=(int)tokenizer.nval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
-					data.addLine(new DBLine(str, tx, ty, tx2, ty2, dashed, startArrow, endArrow, StringUtils.int2color(t)));
+					// read parentBorderID
+					tokenizer.nextToken();
+					String parentBorderID = null;
+					if ((tokenizer.ttype == EnhancedStreamTokenizer.TT_WORD)||
+						(tokenizer.ttype == DBConstants.quoteChar)) parentBorderID=tokenizer.sval;
+					//else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					data.addLine(new DBLine(str, tx, ty, tx2, ty2, dashed, startArrow, endArrow, StringUtils.int2color(t), parentBorderID));
 				}
 
 				else if (tokenizer.sval.equalsIgnoreCase(VDCTBOX)) {
@@ -653,7 +663,14 @@ public static String processComment(DBData data, EnhancedStreamTokenizer tokeniz
 					if (tokenizer.ttype == EnhancedStreamTokenizer.TT_NUMBER) t=(int)tokenizer.nval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
-					data.addBox(new DBBox(str, tx, ty, tx2, ty2, dashed, StringUtils.int2color(t)));
+					// read parentBorderID
+					tokenizer.nextToken();
+					String parentBorderID = null;
+					if ((tokenizer.ttype == EnhancedStreamTokenizer.TT_WORD)||
+						(tokenizer.ttype == DBConstants.quoteChar)) parentBorderID=tokenizer.sval;
+					//else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					data.addBox(new DBBox(str, tx, ty, tx2, ty2, dashed, StringUtils.int2color(t), parentBorderID));
 				}
 
 				else if (tokenizer.sval.equalsIgnoreCase(VDCTTEXTBOX)) {
@@ -725,7 +742,14 @@ public static String processComment(DBData data, EnhancedStreamTokenizer tokeniz
 						(tokenizer.ttype == DBConstants.quoteChar)) desc=tokenizer.sval;
 					else throw (new DBGParseException(errorString, tokenizer, fileName));
 
-					data.addTextBox(new DBTextBox(str, tx, ty, tx2, ty2, border, str2, t2, t3, StringUtils.int2color(t), desc));
+					// read parentBorderID
+					tokenizer.nextToken();
+					String parentBorderID = null;
+					if ((tokenizer.ttype == EnhancedStreamTokenizer.TT_WORD)||
+						(tokenizer.ttype == DBConstants.quoteChar)) parentBorderID=tokenizer.sval;
+					//else throw (new DBGParseException(errorString, tokenizer, fileName));
+
+					data.addTextBox(new DBTextBox(str, tx, ty, tx2, ty2, border, str2, t2, t3, StringUtils.int2color(t), desc, parentBorderID));
 				}
 
 				else if (tokenizer.sval.equalsIgnoreCase(VDCTVIEW)) {

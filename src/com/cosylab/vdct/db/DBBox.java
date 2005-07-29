@@ -39,12 +39,13 @@ public class DBBox {
 	protected int y2;
 	protected boolean dashed;
 	protected Color color;
+	protected String parentBorderID;
 	
 /**
  * Insert the method's description here.
  * Creation date: (23.4.2001 21:12:09)
  */
-public DBBox(String name, int x, int y, int x2, int y2, boolean dashed, Color color)
+public DBBox(String name, int x, int y, int x2, int y2, boolean dashed, Color color, String parentBorderID)
 {
 	this.name = name;
 	this.x=x;
@@ -53,6 +54,7 @@ public DBBox(String name, int x, int y, int x2, int y2, boolean dashed, Color co
 	this.y2=y2;
 	this.dashed=dashed;
 	this.color=color;
+	this.parentBorderID = parentBorderID;
 }
 
 	/**
@@ -182,4 +184,16 @@ public DBBox(String name, int x, int y, int x2, int y2, boolean dashed, Color co
 		this.y2 = y2;
 	}
 
+	/**
+	 * @return Returns the parentBorderID.
+	 */
+	public String getParentBorderID() {
+		return parentBorderID;
+	}
+	/**
+	 * @param parentBorderID The parentBorderID to set.
+	 */
+	public void setParentBorderID(String parentBorderID) {
+		this.parentBorderID = parentBorderID;
+	}
 }

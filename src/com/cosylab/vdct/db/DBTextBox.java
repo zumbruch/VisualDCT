@@ -43,13 +43,14 @@ public class DBTextBox {
 	protected int fontStyle;
 	protected Color color;
 	protected String description;
+	protected String parentBorderID;
 	
 /**
  * Insert the method's description here.
  * Creation date: (23.4.2001 21:12:09)
  */
 public DBTextBox(String name, int x, int y, int x2, int y2, boolean border, String fontName, int fontSize, 
-				  int fontStyle, Color color, String description)
+				  int fontStyle, Color color, String description, String parentBorderID)
 {
 	this.name = name;
 	this.x=x;
@@ -62,6 +63,7 @@ public DBTextBox(String name, int x, int y, int x2, int y2, boolean border, Stri
 	this.fontStyle=fontStyle;
 	this.color=color;
 	this.description=description;
+	this.parentBorderID = parentBorderID;
 }
 
 	/**
@@ -272,4 +274,16 @@ public DBTextBox(String name, int x, int y, int x2, int y2, boolean border, Stri
 		this.fontStyle = fontStyle;
 	}
 
+	/**
+	 * @return Returns the parentBorderID.
+	 */
+	public String getParentBorderID() {
+		return parentBorderID;
+	}
+	/**
+	 * @param parentBorderID The parentBorderID to set.
+	 */
+	public void setParentBorderID(String parentBorderID) {
+		this.parentBorderID = parentBorderID;
+	}
 }

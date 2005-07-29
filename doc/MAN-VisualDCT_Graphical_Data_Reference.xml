@@ -145,8 +145,8 @@
 			<section id="macros" title="Macros">
 				<code language="VisualDCT" id="macrosRef">
 				  <desc>Macros field visual data</desc><![CDATA[
-			#! InputMacro(macroname, description, xpos, ypos, color, defaultVisibility)
-			#! OutputMacro(macroname, description, xpos, ypos, color, defaultVisibility)]]>
+			#! InputMacro(macroname, description, xpos, ypos, color, defaultVisibility, textPositionNorth)
+			#! OutputMacro(macroname, description, xpos, ypos, color, defaultVisibility, textPositionNorth)]]>
 				</code>
 			</section>
 
@@ -157,21 +157,21 @@
 			<section id="line" title="Line/Arrow">
 				<code language="VisualDCT" id="lineRef">
 				  <desc>Line/Arrow visual data</desc><![CDATA[
-			#! Line(id, xpos, ypos, xpos2, ypos2, dashed, startArrow, endArrow, color)]]>
+			#! Line(id, xpos, ypos, xpos2, ypos2, dashed, startArrow, endArrow, color, parentBorderID)]]>
 				</code>
 			</section>
 			
 			<section id="box" title="Box">
 				<code language="VisualDCT" id="boxRef">
 				  <desc>Box visual data</desc><![CDATA[
-			#! Box(id, xpos, ypos, xpos2, ypos2, dashed, color)]]>
+			#! Box(id, xpos, ypos, xpos2, ypos2, dashed, color, parentBorderID)]]>
 				</code>
 			</section>
 
 			<section id="textBox" title="TextBox">
 				<code language="VisualDCT" id="textBoxRef">
 				  <desc>TextBox visual data</desc><![CDATA[
-			#! TextBox(id, xpos, ypos, xpos2, ypos2, border, fontFamilyName, fontSize, fontStyle, color, "text")]]>
+			#! TextBox(id, xpos, ypos, xpos2, ypos2, border, fontFamilyName, fontSize, fontStyle, color, "text", parentBorderID)]]>
 				</code>
 			</section>
 

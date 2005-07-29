@@ -1259,6 +1259,8 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
  final String BOX_START = "#! "+DBResolver.VDCTBOX+"(";
  final String TEXTBOX_START = "#! "+DBResolver.VDCTTEXTBOX+"(";
 
+ //final String BORDER_START = "#! "+DBResolver.VDCTBORDER+"(";
+
  final String TEMPLATE_INSTANCE_START  = "#! "+DBResolver.TEMPLATE_INSTANCE+"(";
  final String TEMPLATE_FIELD_START  = "#! "+DBResolver.TEMPLATE_FIELD+"(";
 
@@ -1373,6 +1375,10 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 					 ending);
 			 	 group.writeVDCTData(file, renamer, export);
 	 		}
+ 	 	else if (obj instanceof Border)
+	 		{
+	 			Group.writeVDCTData(((Border)obj).getSubObjectsV(), file, renamer, export);
+	 		}
  	 	else if (obj instanceof Line)
  	 		{
 			 	 Line line = (Line)obj;
@@ -1386,6 +1392,7 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 				 	 comma + StringUtils.boolean2str(line.getStartArrow()) +
 				 	 comma + StringUtils.boolean2str(line.getEndArrow()) +
 				 	 comma + StringUtils.color2string(line.getColor()) +
+				 	 comma + (line.getParent() instanceof Border ? ((Border)line.getParent()).getName() : "null") +
 					 ending);
 	 		}
  	 	else if (obj instanceof Box)
@@ -1399,6 +1406,7 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 		 			 comma + box.getEndVertex().getX() + comma + box.getEndVertex().getY() + 
 				 	 comma + StringUtils.boolean2str(box.getIsDashed()) +
 				 	 comma + StringUtils.color2string(box.getColor()) +
+				 	 comma + (box.getParent() instanceof Border ?  ((Border)box.getParent()).getName() : "null") +
 					 ending);
 	 		}
 
@@ -1417,6 +1425,7 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 					 comma + box.getFont().getStyle() +	
 				 	 comma + StringUtils.color2string(box.getColor()) +
 					 comma + quote + StringUtils.removeQuotesAndLineBreaks(box.getDescription()) + quote +
+					 comma + (box.getParent() instanceof Border ?  ((Border)box.getParent()).getName() : "null") +
 					 ending);
 	 		}
 
