@@ -199,7 +199,7 @@ public void fixLinkProperties() {
  * @return java.lang.String
  * @param outlink com.cosylab.vdct.graphics.objects.EPICSLinkOut
  */
-public static String generateConnectorID(EPICSLinkOut outlink) {
+public static String generateConnectorID(EPICSLink outlink) {
 	//String rootName = Group.substractObjectName(outlink.getFieldData().getRecord().getName())+
 	//				  LINK_SEPARATOR+outlink.getFieldData().getName();
 	String rootName = Group.substractObjectName(outlink.getFieldData().getFullName());

@@ -2362,6 +2362,7 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 					{
 					    final String targetfinal = target;
 					    final OutLink outlinkfinal = outlink;
+					    /// !!!!!!!!!!!!!!!!! TODO remove
 					    SwingUtilities.invokeLater(new Runnable() {
 					        /* (non-Javadoc)
                              * @see java.lang.Runnable#run()

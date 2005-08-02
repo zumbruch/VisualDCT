@@ -226,7 +226,7 @@ public void accept(Visitor visitor) {}
  * Creation date: (4.2.2001 12:50:51)
  */
 public Connector addConnector() {
-	EPICSLinkOut start = (EPICSLinkOut)EPICSLinkOut.getStartPoint(this);
+	EPICSLink start = (EPICSLink)EPICSLinkOut.getStartPoint(this);
 	if (start==null) return null;
 	String id = EPICSLinkOut.generateConnectorID(start);
 	String inlinkStr = "";
@@ -318,7 +318,7 @@ public void disconnect(Linkable disconnector) {
 		if (disconnector==inlink) inlink=null; //setInput(null);
 		if (disconnector==outlink) outlink=null; //setOutput(null, outlink);
 		if (((inlink==null) || inlink.isDisconnected()) &&
-			((outlink==null) || outlink.isDisconnected())){}
+			((outlink==null) || outlink.isDisconnected()))
 				destroy();
 	}
 }

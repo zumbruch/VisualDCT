@@ -1331,16 +1331,18 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 								ending);
 
 			 			 }
-				 		if (obj instanceof EPICSLinkOut)
+				 		if (obj instanceof EPICSLinkOut ||
+				 	        obj instanceof EPICSVarOutLink)
 				 		{
-				 			link = (EPICSLinkOut)obj;
-				 			if (link.getInput()!=null)
+				 			EPICSLink epicsLink = (EPICSLink)obj;
+				 			OutLink outlink = (OutLink)obj;
+				 			if (outlink.getInput()!=null)
 				 				file.writeBytes(LINK_START+
 						 			StringUtils.quoteIfMacro(
-							 			renamer.getResolvedName(link.getFieldData().getFullName())
+							 			renamer.getResolvedName(epicsLink.getFieldData().getFullName())
 							 		) + comma + 
 					 				StringUtils.quoteIfMacro(
-						 				renamer.getResolvedName(link.getInput().getID())
+						 				renamer.getResolvedName(outlink.getInput().getID())
 							 		) +
 									ending);
 			 			 }

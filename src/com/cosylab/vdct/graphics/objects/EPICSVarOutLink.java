@@ -36,6 +36,8 @@ import javax.swing.*;
 import java.awt.event.*;
 
 import com.cosylab.vdct.graphics.ViewState;
+import com.cosylab.vdct.undo.CreateConnectorAction;
+import com.cosylab.vdct.undo.UndoManager;
 import com.cosylab.vdct.vdb.*;
 
 /**
@@ -56,12 +58,12 @@ public class EPICSVarOutLink extends EPICSVarLink implements OutLink
 					setColor(newColor);
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
-			else if (action.equals(addConnectorString))
+			else */if (action.equals(addConnectorString))
 			{
 				addConnector();
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
-			else*/ if (action.equals(moveUpString))
+			else if (action.equals(moveUpString))
 			{
 				((Record)getParent()).moveFieldUp(EPICSVarOutLink.this);
 			}
@@ -82,7 +84,8 @@ public class EPICSVarOutLink extends EPICSVarLink implements OutLink
 	protected LinkProperties properties = null;
 	private boolean hasEndpoint = false;
 
-	//private static final String addConnectorString = "Add connector";
+	//private static final String colorString = "Color...";
+	private static final String addConnectorString = "Add connector";
 
 	private static final String moveUpString = "Move Up";
 	private static final String moveDownString = "Move Down";
@@ -377,16 +380,21 @@ public java.util.Vector getItems() {
 
 	ActionListener al = createPopupmenuHandler();
 
-/*	JMenuItem colorItem = new JMenuItem(colorString);
+	/*
+	JMenuItem colorItem = new JMenuItem(colorString);
 	colorItem.addActionListener(al);
 	items.addElement(colorItem);
-
-	JMenuItem addItem = new JMenuItem(addConnectorString);
-	addItem.addActionListener(al);
-	items.addElement(addItem);
-
-	items.add(new JSeparator());
-*/
+	*/
+	
+	if (getInput() != null)
+	{
+		JMenuItem addItem = new JMenuItem(addConnectorString);
+		addItem.addActionListener(al);
+		items.addElement(addItem);
+	
+		items.add(new JSeparator());
+	}
+	
 	if (getParent() instanceof Record)
 	{
 		Record parRec = (Record)getParent();
@@ -419,6 +427,29 @@ public java.util.Vector getItems() {
 	items.addElement(removeItem);
 
 	return items;
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (4.2.2001 12:50:51)
+ */
+public Connector addConnector() {
+	if (inlink instanceof Connector)
+	{
+		// hack, otherwise this will destroy a chain (see Connector.disconnect)
+		return ((Connector)inlink).addConnector();
+	}
+	else
+	{
+		String id = EPICSLinkOut.generateConnectorID(this);
+		String inlinkStr = "";
+		String outlinkStr = getID();
+		if (inlink!=null) inlinkStr = inlink.getID();
+		Connector connector = new Connector(id, (LinkManagerObject)getParent(), this, getInput());
+		getParent().addSubObject(id, connector);
+		UndoManager.getInstance().addAction(new CreateConnectorAction(connector, inlinkStr, outlinkStr));
+		return connector;
+	}
 }
 
 }
