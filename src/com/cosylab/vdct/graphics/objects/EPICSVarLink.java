@@ -372,7 +372,10 @@ public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode) 
 		fieldData = ((EPICSLinkOut)e.nextElement()).getFieldData();
 		properties[i++]=getLinkSeparator();
 		properties[i++]=new GUISeparator(fieldData.getFullName());
-		properties[i++]=new FieldInfoProperty(fieldData.getRecord().getField("DTYP"));
+		if (fieldData.getRecord() != null)
+			properties[i++]=new FieldInfoProperty(fieldData.getRecord().getField("DTYP"));
+		else
+			properties[i++]=new NameValueInfoProperty("DTYP", "n/a");
 		properties[i++]=EPICSLinkOut.getFieldSeparator();
 		properties[i++]=fieldData;
 	}
