@@ -404,9 +404,6 @@ public void revalidatePosition()
 	startVertex.revalidatePosition();
 	endVertex.revalidatePosition();
 	
-	setX((((VisibleObject)startVertex).getX() + ((VisibleObject)endVertex).getX()) / 2);
-	setY(Math.min(((VisibleObject)startVertex).getY(), ((VisibleObject)endVertex).getY()));
-
 	double rscale = getRscale();
 
 	setRx((int)(getX() * rscale));
@@ -449,7 +446,6 @@ public VisibleObject hiliteComponentsCheck(int x, int y) {
 
 
 /**
- * Default impmlementation for square (must be rescaled)
  * Creation date: (19.12.2000 20:20:20)
  * @return com.cosylab.visible.objects.VisibleObject
  * @param px int

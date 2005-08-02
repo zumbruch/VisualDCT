@@ -224,14 +224,10 @@ protected void draw(Graphics g, boolean hilited)
         Rscale = 1.0;
     }
 
-	if((hilited) && (!((posX > view.getViewWidth()) || (posY > view.getViewHeight())
-		|| ((posX + rwidth) < 0) || ((posY + rheight) < 0))))
-	{
+	if (hilited)
 		g.setColor(Constants.HILITE_COLOR);
-		g.drawRect(posX, posY, rwidth, rheight);
-	}
-
-	g.setColor(getVisibleColor());
+	else
+		g.setColor(getVisibleColor());
 
 	//double scale = view.getScale();
 	
@@ -501,9 +497,6 @@ public void revalidatePosition()
 	startVertex.revalidatePosition();
 	endVertex.revalidatePosition();
 
-	setX((((VisibleObject)startVertex).getX() + ((VisibleObject)endVertex).getX()) / 2);
-	setY((((VisibleObject)startVertex).getY() + ((VisibleObject)endVertex).getY()) / 2);
-
 	double rscale = getRscale();
 
 	setRx((int)(getX() * rscale));
@@ -557,7 +550,6 @@ public VisibleObject hiliteComponentsCheck(int x, int y) {
 
 
 /**
- * Default impmlementation for square (must be rescaled)
  * Creation date: (19.12.2000 20:20:20)
  * @return com.cosylab.visible.objects.VisibleObject
  * @param px int
@@ -567,12 +559,48 @@ public VisibleObject intersects(int px, int py) {
 
 	// first check on small sub-objects like connectors
 	VisibleObject spotted = hiliteComponentsCheck(px, py);
-  	if ((spotted==null) &&
-  		(getRx()<=px) && (getRy()<=py) && 
-		((getRx()+getRwidth())>=px) && 
-		((getRy()+getRheight())>=py))
-		spotted = this;
-	return spotted;
+  	if (spotted == null) {
+
+  		final int DIST = 10;
+  		
+  		int rx = getRx();
+  		int ry = getRy();
+  		int rw = getRwidth();
+  		int rh = getRheight();
+  		boolean insideOuter = ((rx-DIST)<=px) &&
+							  ((ry-DIST)<=py) && 
+							  ((rx+rw+DIST)>=px) && 
+							  ((ry+rh+DIST)>=py);
+  		if (insideOuter)
+  		{
+ 			// square check passed... now limit only to arrow
+ 			
+ 			// vertical check
+			int px1 = startVertex.getX();
+			int px2 = endVertex.getX();
+ 			if (px1 == px2)
+ 				spotted = this;
+ 			else
+ 			{
+ 				int py1 = startVertex.getY();
+ 				int py2 = endVertex.getY();
+
+ 				double tan = (py2-py1)/(double)(px2-px1);
+ 				if (Math.abs(tan) > DIST)
+ 					spotted = this;
+ 				else
+ 				{
+	 				double expectedY = (px-px1)*tan + py1;
+	 				System.out.println(py-expectedY);
+	 				if (Math.abs(py-expectedY) <= DIST)
+		 					spotted = this;
+ 				}
+	 		}
+  		}
+  		
+  	}
+  	
+  	return spotted;
 }
 	
 /* (non-Javadoc)
@@ -587,6 +615,15 @@ public int getX() {
 public int getY() {
 	return Math.min(startVertex.getY(), endVertex.getY());
 }
+
+public int getWidth() {
+	return Math.abs(startVertex.getX() - endVertex.getX());
+}
+
+public int getHeight() {
+	return Math.abs(startVertex.getY() - endVertex.getY());
+}
+
 
 public void snapToGrid() {
 	startVertex.snapToGrid();
