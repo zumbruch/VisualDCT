@@ -359,11 +359,11 @@ public void saveConfig(Document doc, Element pluginNode)
     pluginNode.setAttribute("class", className);
 	pluginNode.setAttribute("autostart", autoStart ? "true" : "false");
 
-	Enumeration enum = properties.keys();
-	while (enum.hasMoreElements())
+	Enumeration enumer = properties.keys();
+	while (enumer.hasMoreElements())
 	{
 		Element element = (Element)doc.createElement("param");
-		String key = enum.nextElement().toString();
+		String key = enumer.nextElement().toString();
 		element.setAttribute("name", key);
 		element.setAttribute("value", properties.get(key).toString());
 		pluginNode.appendChild(element);

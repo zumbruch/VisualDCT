@@ -195,10 +195,10 @@ private static String loadTemplate(DBData data, String templateFile, String refe
 	// check central VDB repository
 	if (!alreadyLoaded)
 	{
-		Enumeration enum = VDBData.getTemplates().elements();
-		while (enum.hasMoreElements())
+		Enumeration enumer = VDBData.getTemplates().elements();
+		while (enumer.hasMoreElements())
 		{
-			VDBTemplate t = (VDBTemplate)enum.nextElement();
+			VDBTemplate t = (VDBTemplate)enumer.nextElement();
 			if (t.getFileName().equals(templateToResolve))
 			{
 				alreadyLoaded = true;

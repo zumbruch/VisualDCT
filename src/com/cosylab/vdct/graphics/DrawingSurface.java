@@ -1763,10 +1763,10 @@ public boolean importFields(File file, boolean ignoreLinkFields)
 	    // override fields of record which already exist in the opened DB
 	    //
 		Group rootGroup = Group.getRoot();
-		Enumeration enum = dbData.getRecordsV().elements();
-		while (enum.hasMoreElements())
+		Enumeration enumer = dbData.getRecordsV().elements();
+		while (enumer.hasMoreElements())
 		{
-		    DBRecordData recordData = (DBRecordData)enum.nextElement();
+		    DBRecordData recordData = (DBRecordData)enumer.nextElement();
 	
 		    // does exist?
 		    Record existingRecord = (Record)rootGroup.findObject(recordData.getName(), true);
