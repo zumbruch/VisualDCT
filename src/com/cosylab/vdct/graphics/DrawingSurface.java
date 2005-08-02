@@ -40,7 +40,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
-import javax.swing.SwingUtilities;
 import javax.swing.event.*;
 
 import com.cosylab.vdct.*;
@@ -2360,23 +2359,13 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 					}
 					else
 					{
-					    final String targetfinal = target;
-					    final OutLink outlinkfinal = outlink;
-					    /// !!!!!!!!!!!!!!!!! TODO remove
-					    SwingUtilities.invokeLater(new Runnable() {
-					        /* (non-Javadoc)
-                             * @see java.lang.Runnable#run()
-                             */
-                            public void run() {
-                                Object unknown = Group.getRoot().getSubObject(targetfinal);
-                                if (unknown instanceof InLink)
-    							{
-    								InLink inlink = (InLink)unknown;
-    								inlink.setOutput(outlinkfinal, null);
-    								outlinkfinal.setInput(inlink);
-    							}
-                            }
-					    });
+                        Object unknown = Group.getRoot().getSubObject(target);
+                        if (unknown instanceof InLink)
+						{
+							InLink inlink2 = (InLink)unknown;
+							inlink2.setOutput(outlink, null);
+							outlink.setInput(inlink2);
+						}
 					}
 				}
 			} 
