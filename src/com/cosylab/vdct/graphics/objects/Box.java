@@ -213,14 +213,10 @@ protected void draw(Graphics g, boolean hilited)
         Rscale = 1.0;
     }
 	
-	if((hilited) && (!((posX > view.getViewWidth()) || (posY > view.getViewHeight())
-		|| ((posX + rwidth) < 0) || ((posY + rheight) < 0))))
-	{
+	if (hilited)
 		g.setColor(Constants.HILITE_COLOR);
-		g.drawRect(posX, posY, rwidth, rheight);
-	}
-
-	g.setColor(getVisibleColor());
+	else
+		g.setColor(getVisibleColor());
 
 	//double scale = view.getScale();
 	
@@ -463,12 +459,32 @@ public VisibleObject intersects(int px, int py) {
 
 	// first check on small sub-objects like connectors
 	VisibleObject spotted = hiliteComponentsCheck(px, py);
-  	if ((spotted==null) &&
-  		(getRx()<=px) && (getRy()<=py) && 
-		((getRx()+getRwidth())>=px) && 
-		((getRy()+getRheight())>=py))
-		spotted = this;
-	return spotted;
+  	if (spotted == null) {
+
+  		final int DIST = 5;
+  		
+  		int rx = getRx();
+  		int ry = getRy();
+  		int rw = getRwidth();
+  		int rh = getRheight();
+  		boolean insideOuter = ((rx-DIST)<=px) &&
+							  ((ry-DIST)<=py) && 
+							  ((rx+rw+DIST)>=px) && 
+							  ((ry+rh+DIST)>=py);
+  		if (insideOuter)
+  		{
+ 	 		boolean outsideInner = !(((rx+DIST)<px) &&
+									((ry+DIST)<py) && 
+									((rx+rw-DIST)>px) && 
+									((ry+rh-DIST)>py));
+	 		
+	 		if (outsideInner)
+	 			spotted = this;
+  		}
+  		
+  	}
+  	
+  	return spotted;
 }
 	
 /* (non-Javadoc)
@@ -482,6 +498,14 @@ public int getX() {
  */
 public int getY() {
 	return Math.min(startVertex.getY(), endVertex.getY());
+}
+
+public int getWidth() {
+	return Math.abs(startVertex.getX() - endVertex.getX());
+}
+
+public int getHeight() {
+	return Math.abs(startVertex.getY() - endVertex.getY());
 }
 
 public void snapToGrid() {

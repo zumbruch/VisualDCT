@@ -518,8 +518,9 @@ public void snapToGrid()
  */
 public void markPosition()
 {
-	markedX = x;
-	markedY = y;
+	// some object override x, y
+	markedX = getX();
+	markedY = getY();
 }
 
 /**
