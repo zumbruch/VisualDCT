@@ -165,7 +165,7 @@
 	<target name="srcjar" depends="test">
 		<mkdir dir="${dir.dist}"/>
 		<jar jarfile="${dir.dist}/${project.name}-src-${build.version}.jar">
-			<fileset dir="${dir.src}" includes="src/**,VDCTBuild.xml,build.xml" excludes="**/*.class"/>
+			<fileset dir="${dir.src}" includes="src/**,VDCTBuild.xml,VDCTBuildSimple.xml,build.xml" excludes="**/*.class"/>
 		</jar>
 	</target>
 

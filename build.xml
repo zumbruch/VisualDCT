@@ -1,4 +1,4 @@
-<project name="VisualDCT" default="all" basedir=".">
+<project name="VisualDCT" default="jar" basedir=".">
 
 	<property name="project.name" value="${ant.project.name}"/>
 
@@ -24,6 +24,10 @@
 	</target>
 
 	<target name="jar">
+		<ant antfile="VDCTBuildSimple.xml" dir="." target="jar"/>
+	</target>
+
+	<target name="jarcomplex">
 		<ant antfile="VDCTBuild.xml" dir="." target="jar"/>
 	</target>
 
