@@ -267,6 +267,23 @@ public void destroy()
 }
 
 /**
+ * Insert the method's description here.
+ * Creation date: (29.1.2001 21:23:04)
+ */
+public void disconnect(Linkable disconnector) {
+	if (!disconnected && outlinks.contains(disconnector)) {
+		outlinks.removeElement(disconnector);
+		/*if (outlinks.size()==0) {
+			// do not destory port
+			//destroy();
+		}
+		else */if (outlinks.size()==1)
+			if (outlinks.firstElement() instanceof VisibleObject)
+				setColor(((VisibleObject)outlinks.firstElement()).getColor());
+	}
+}
+
+/**
  * @see com.cosylab.vdct.graphics.objects.VisibleObject#setDestroyed(boolean)
  */
 public void setDestroyed(boolean newDestroyed) {
