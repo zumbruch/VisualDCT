@@ -588,4 +588,9 @@ public int getY() {
 	return Math.min(startVertex.getY(), endVertex.getY());
 }
 
+public void snapToGrid() {
+	startVertex.snapToGrid();
+	endVertex.snapToGrid();
+}
+
 }

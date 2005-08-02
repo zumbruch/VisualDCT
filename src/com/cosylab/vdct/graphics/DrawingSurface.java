@@ -850,6 +850,9 @@ public void mouseClicked(MouseEvent e) {
 
 			if((e.getClickCount() >= 1) && (grLine != null))
 			{
+				if (Settings.getInstance().getShowGrid())
+					grLine.snapToGrid();
+				
 				grLine = null;
 
 					// cancel action
@@ -858,6 +861,9 @@ public void mouseClicked(MouseEvent e) {
 			}
 			else if((e.getClickCount() >= 1) && (grBox != null))
 			{
+				if (Settings.getInstance().getShowGrid())
+					grBox.snapToGrid();
+
 				grBox = null;
 
 					// cancel action
@@ -866,6 +872,9 @@ public void mouseClicked(MouseEvent e) {
 			}
 			else if((e.getClickCount() >= 1) && (grTextBox != null))
 			{
+				if (Settings.getInstance().getShowGrid())
+					grTextBox.snapToGrid();
+
 				grTextBox.setBorder(TextBox.getCurrentBorder());
 				grTextBox.showChangeTextDialog();
 	
