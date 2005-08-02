@@ -591,7 +591,6 @@ public VisibleObject intersects(int px, int py) {
  				else
  				{
 	 				double expectedY = (px-px1)*tan + py1;
-	 				System.out.println(py-expectedY);
 	 				if (Math.abs(py-expectedY) <= DIST)
 		 					spotted = this;
  				}
