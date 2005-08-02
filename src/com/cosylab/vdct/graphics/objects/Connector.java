@@ -31,6 +31,7 @@ package com.cosylab.vdct.graphics.objects;
 import java.awt.*;
 import java.util.*;
 import com.cosylab.vdct.Constants;
+import com.cosylab.vdct.Settings;
 import com.cosylab.vdct.graphics.*;
 
 import com.cosylab.vdct.graphics.popup.*;
@@ -199,29 +200,20 @@ public Connector(String id, LinkManagerObject parent, OutLink outlink, InLink in
 	        setY((inlink.getInY()+outlink.getOutY())/2);
 	}
 
+	// boundaries check
+	if (getX() < 0)
+		setX(0);
+	else if (getX() > ViewState.getInstance().getWidth())
+		setX(ViewState.getInstance().getWidth());
 	
-	// to avoid small steps in wires do not snap to grid
+	if (getY() < 0)
+		setY(0);
+	else if (getY() > ViewState.getInstance().getWidth())
+		setY(ViewState.getInstance().getHeight());
 	
-//	if (Settings.getInstance().getShowGrid()) {
-//	    int appendix = (int) (Constants.GRID_SIZE/2 + 0.5);
-//	    
-//	    if (inlink != null){
-//	        if (this.getY() > inlink.getInY()) {
-//		        setY(getY() + appendix);
-//		    } else {
-//		        setY(getY() - appendix);
-//		    }
-//	        
-//	        if (this.getX() > inlink.getInX()) {
-//	            setX(getX() + appendix);
-//	        } else {
-//	            setX(getX() - appendix);
-//	        }
-//	    }
-//	    
-//		snapToGrid();
-//	}
-	
+	if (Settings.getInstance().getSnapToGrid())
+		snapToGrid();
+		
 }
 /**
  * Insert the method's description here.
