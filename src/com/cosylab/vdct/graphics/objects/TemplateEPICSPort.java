@@ -73,6 +73,8 @@ public TemplateEPICSPort(ContainerObject parent, VDBFieldData fieldData) {
 		mode = visiblePort.getMode();
 
 	super.setRight(mode==OutLink.OUTPUT_PORT_MODE);
+	
+	drawOnlyOneSided = true;
 }
 
 /**

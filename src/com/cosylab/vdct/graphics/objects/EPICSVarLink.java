@@ -82,6 +82,8 @@ public class EPICSVarLink extends EPICSLink implements MultiInLink, Popupable, I
 	private static final String moveDownString = "Move Down";
 	private static final String removeString = "Remove Link";
 	private static GUISeparator linkSeparator = null;
+	
+	protected boolean drawOnlyOneSided = false;
 	 
 /**
  * EPICSVarLink constructor comment.
@@ -146,8 +148,90 @@ public void disconnect(Linkable disconnector) {
  * @param g java.awt.Graphics
  * @param hilited boolean
  */
+protected void drawOneSided(Graphics g, boolean hilited) {
+	super.draw(g, hilited);
+
+	com.cosylab.vdct.graphics.ViewState view = com.cosylab.vdct.graphics.ViewState.getInstance();
+	boolean isRightSide = isRight();
+
+	int rrx;			// rrx, rry is center
+	if (isRightSide)
+		rrx = getRx()+r+getRwidth()-view.getRx();
+	else 
+		rrx = getRx()-r-view.getRx();
+
+	//int rry = getRy()+getRheight()/2-view.getRy();
+	int rry = (int)(getRscale()*getInY()- view.getRy());
+	
+	double Rscale = view.getScale();
+	boolean zoom = (Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this);
+	if (zoom) {
+        int rwidth = getRwidth();
+        int rheight = getRheight();
+        if (isRightSide) {
+            rrx += (rwidth/Rscale - rwidth)/2+1;
+        } else {
+            rrx -= (rwidth/Rscale - rwidth)/2;
+        }
+        if (view.getRx() < 0)
+            rrx = rrx < 0 ? 2 : rrx;
+        Rscale = 1.0;
+        r = (int)(Rscale*Constants.LINK_RADIOUS);
+    	rtailLen = (int)(Rscale*Constants.TAIL_LENGTH);
+    	g.setColor(Constants.BACKGROUND_COLOR);
+    	g.fillRect(rrx-r, rry-r, 2*r,2*r);
+    }
+
+	if (!hilited) g.setColor(Constants.FRAME_COLOR);
+	else g.setColor((view.isHilitedObject(this)) ? 
+					Constants.HILITE_COLOR : Constants.FRAME_COLOR);
+
+	g.drawOval(rrx-r, rry-r, 2*r,2*r);
+	
+	if (!disconnected && (outlinks.size()>0)) {
+		/*// shorten tail if needed
+		if (outlinks.size()==1) {
+			int rlx = (int)(((OutLink)outlinks.firstElement()).getOutX()*scale);
+			if (isRightSide) {
+				if ((rrx+rtailLen)>rlx) rtailLen = rlx-rrx; 
+			} 
+			else {
+				if ((rrx-rtailLen)<rlx) rtailLen = rrx-rlx; 
+			}
+			if (rtailLen<0) rtailLen=0;
+		}*/
+
+		// tail
+		g.setColor(hilited && view.isHilitedObject(this) ? Constants.HILITE_COLOR : getVisibleColor());
+
+		int linkx = (int)(getRscale()*getInX() - view.getRx());
+
+		if (isRightSide)
+			g.drawLine(rrx+2*r, rry, linkx, rry);
+		else 
+			g.drawLine(linkx, rry, rrx-3*r, rry);
+
+		// !!! more intergroup inlinks?!
+		LinkDrawer.drawInIntergroupLink(g, (OutLink)outlinks.firstElement(), this, isRightSide);
+		
+	}
+
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (29.1.2001 22:10:37)
+ * @param g java.awt.Graphics
+ * @param hilited boolean
+ */
 protected void draw(Graphics g, boolean hilited) {
 	super.draw(g, hilited);
+	
+	if (drawOnlyOneSided)
+	{
+		drawOneSided(g, hilited);
+		return;
+	}
 
 	com.cosylab.vdct.graphics.ViewState view = com.cosylab.vdct.graphics.ViewState.getInstance();
 	boolean isRightSide = isRight();
