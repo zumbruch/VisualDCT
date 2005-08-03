@@ -574,16 +574,16 @@ public VisibleObject intersects(int px, int py) {
   		if (insideOuter)
   		{
  			// square check passed... now limit only to arrow
- 			
- 			// vertical check
-			int px1 = startVertex.getX();
-			int px2 = endVertex.getX();
+
+  			// vertical check
+			int px1 = startVertex.getRx();
+			int px2 = endVertex.getRx();
  			if (px1 == px2)
  				spotted = this;
  			else
  			{
- 				int py1 = startVertex.getY();
- 				int py2 = endVertex.getY();
+ 				int py1 = startVertex.getRy();
+ 				int py2 = endVertex.getRy();
 
  				double tan = (py2-py1)/(double)(px2-px1);
  				if (Math.abs(tan) > DIST)
