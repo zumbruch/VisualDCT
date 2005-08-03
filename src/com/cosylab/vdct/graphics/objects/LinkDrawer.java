@@ -147,7 +147,18 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 	int y2 = y1;
 	if (in!=null)
 	{
-		x2 = (int)(scale*in.getInX()-view.getRx());
+		// EPICSVarLink is double sided, take the best side
+		if (in instanceof EPICSVarLink) {
+			int lx = in.getLeftX();
+			int rx = in.getRightX();
+			if (out.getOutX() > (lx+rx)/2)
+				x2 = (int)(scale*rx-view.getRx());
+			else
+				x2 = (int)(scale*lx-view.getRx());
+		}
+		else
+			x2 = (int)(scale*in.getInX()-view.getRx());
+		
 		y2 = (int)(scale*in.getInY()-view.getRy());
 	}
 
