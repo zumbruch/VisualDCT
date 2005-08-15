@@ -39,6 +39,7 @@ public abstract class ContainerObject extends VisibleObject {
 	protected boolean useHashtable = true;
 	protected Hashtable subObjects = null;
 	protected Vector subObjectsV = null;
+//    private boolean isZoomRepaint;
 /**
  * Insert the method's description here.
  * Creation date: (21.12.2000 20:40:08)
@@ -179,4 +180,12 @@ public void updateFields() {
 			((ContainerObject)o).updateFields();	
 	}
 }
+
+//public void setZoomRepaint(boolean zoomRepaint) {
+//    isZoomRepaint = zoomRepaint;
+//}
+//
+//public boolean isZoomRepaint() {
+//    return isZoomRepaint;
+//}
 }

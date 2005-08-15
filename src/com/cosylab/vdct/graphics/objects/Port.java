@@ -252,6 +252,13 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 
 	ViewState view = ViewState.getInstance();
 	
+	double Rscale = view.getScale();
+	boolean zoom = (Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this);
+	
+	if (zoom) {
+	    zoomImage = ZoomPane.getInstance().startZooming(this,!isZoomRepaint());
+	}	
+	
 	int rrx = getRx() - view.getRx();
 	int rry = getRy() - view.getRy();
 
@@ -264,33 +271,24 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 	{
 		// draw link
 		g.setColor(hilited && view.isHilitedObject(this) ? Constants.HILITE_COLOR : getVisibleColor());
-
-	    LinkDrawer.drawLink(g, this, inlink, getQueueCount(), rightSide);
+		//TODO - draw links when zooming
+		if (!(isZoomRepaint() || getParent().isZoomRepaint() || zoom)) {
+		    LinkDrawer.drawLink(g, this, inlink, getQueueCount(), rightSide);
+		}
 	}
-	
-	double Rscale = view.getScale();
-	boolean zoom = (Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this);
 	
 	// clipping
 	if (!((rrx > view.getViewWidth())
 		|| (rry > view.getViewHeight())
 		|| ((rrx + rwidth) < 0)
-		|| ((rry + rheight) < 0))) {
+		|| ((rry + rheight) < 0)) || isZoomRepaint()) {
 
-	    if (zoom) {
-	        rwidth /= Rscale;
-	        rheight /= Rscale;
-	        rrx -= (rwidth - getRwidth())/2;
-	        rry -= (rheight - getRheight())/2;
-	        if (view.getRx() < 0)
-	            rrx = rrx < 0 ? 2 : rrx;
-	        if (view.getRy() < 0) 
-	            rry = rry <= 0 ? 2 : rry;
-	        Rscale = 1.0;
-	        validateFontAndPolygon(Rscale, rwidth, rheight);
+	    if (isZoomRepaint()) {
+	        rrx = ZoomPane.getInstance().getLeftOffset();
+	        rry = ZoomPane.getInstance().getTopOffset();
 	    }
-	
-		Polygon poly = null;
+	    
+	    Polygon poly = null;
 		if (rightSide)
 		{
 			poly = rightPoly;
@@ -336,6 +334,18 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 			g.drawString(getLabel(), rrx+getRlabelX(), rry+getRlabelY());
 		}
 	}
+	
+	if (zoom) {
+        rwidth /= Rscale;
+        rheight /= Rscale;
+        rrx -= ((rwidth - getRwidth())/2 + ZoomPane.getInstance().getLeftOffset());
+        rry -= ((rheight - getRheight())/2 + ZoomPane.getInstance().getTopOffset());
+        if (view.getRx() < 0)
+            rrx = rrx < 0 ? 2 : rrx;
+        if (view.getRy() < 0) 
+            rry = rry <= 0 ? 2 : rry;
+        g.drawImage(zoomImage, rrx,rry, ZoomPane.getInstance());
+    }
 	
 }
 /**
@@ -943,6 +953,11 @@ public int getLeftX() {
  */
 public int getRightX() {
 	return getX()+getWidth();
+}
+
+public int getTopOffset() {
+    FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(getFont());
+    return fm.getAscent();
 }
 
 }

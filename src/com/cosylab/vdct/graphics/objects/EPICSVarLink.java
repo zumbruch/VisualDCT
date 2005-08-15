@@ -149,9 +149,16 @@ public void disconnect(Linkable disconnector) {
  * @param hilited boolean
  */
 protected void drawOneSided(Graphics g, boolean hilited) {
-	super.draw(g, hilited);
+	
 
 	com.cosylab.vdct.graphics.ViewState view = com.cosylab.vdct.graphics.ViewState.getInstance();
+	double Rscale = view.getScale();
+	boolean zoom = (Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this);
+	
+	if (zoom) {
+	    zoomImage = ZoomPane.getInstance().startZooming(this,!isZoomRepaint());
+	}
+	
 	boolean isRightSide = isRight();
 
 	int rrx;			// rrx, rry is center
@@ -163,24 +170,41 @@ protected void drawOneSided(Graphics g, boolean hilited) {
 	//int rry = getRy()+getRheight()/2-view.getRy();
 	int rry = (int)(getRscale()*getInY()- view.getRy());
 	
-	double Rscale = view.getScale();
-	boolean zoom = (Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this);
-	if (zoom) {
-        int rwidth = getRwidth();
-        int rheight = getRheight();
-        if (isRightSide) {
-            rrx += (rwidth/Rscale - rwidth)/2+1;
-        } else {
-            rrx -= (rwidth/Rscale - rwidth)/2;
-        }
-        if (view.getRx() < 0)
-            rrx = rrx < 0 ? 2 : rrx;
-        Rscale = 1.0;
-        r = (int)(Rscale*Constants.LINK_RADIOUS);
-    	rtailLen = (int)(Rscale*Constants.TAIL_LENGTH);
-    	g.setColor(Constants.BACKGROUND_COLOR);
-    	g.fillRect(rrx-r, rry-r, 2*r,2*r);
+	if (getParent().isZoomRepaint()) {
+	    if (isRightSide) {
+	        rrx = getX() - getParent().getX() + getWidth() + ZoomPane.getInstance().getLeftOffset();
+	        if (this instanceof TemplateEPICSLink) {
+	            rrx += r;
+	        } 
+	    } else {
+	        rrx = getX() - getParent().getX() + ZoomPane.getInstance().getLeftOffset();
+	        if (this instanceof TemplateEPICSLink) {
+	            rrx -= r;
+	        } else {
+	            rrx -= 2*r;
+	        }
+	    }
+	    
+	    rry = getY() - getParent().getY() + ZoomPane.VERTICAL_MARGIN + getHeight()/2;
+	} else if (isZoomRepaint()) {
+	    if (isRightSide) {
+	        rrx = getWidth() + ZoomPane.getInstance().getLeftOffset();
+	        if (this instanceof TemplateEPICSLink) {
+	            rrx += r;
+	        } 
+	    } else {
+	        rrx = getX() - getParent().getX() + ZoomPane.getInstance().getLeftOffset();
+	        if (this instanceof TemplateEPICSLink) {
+	            rrx -= r;
+	        } else {
+	            rrx -= 5*r;
+	        }
+	    }
+	    	    
+        rry = ZoomPane.VERTICAL_MARGIN + getHeight()/2;
     }
+	
+	
 
 	if (!hilited) g.setColor(Constants.FRAME_COLOR);
 	else g.setColor((view.isHilitedObject(this)) ? 
@@ -206,8 +230,17 @@ protected void drawOneSided(Graphics g, boolean hilited) {
 
 		int linkx = (int)(getRscale()*getInX() - view.getRx());
 
-		if (isRightSide)
+		if (isZoomRepaint() || getParent().isZoomRepaint()) {
+		    if (isRightSide) 
+		        linkx = ZoomPane.getInstance().getWidth();
+		    else
+		        linkx = 0;
+		    
+		}
+		
+		if (isRightSide) {
 			g.drawLine(rrx+2*r, rry, linkx, rry);
+		}
 		else 
 			g.drawLine(linkx, rry, rrx-3*r, rry);
 
@@ -215,6 +248,25 @@ protected void drawOneSided(Graphics g, boolean hilited) {
 		LinkDrawer.drawInIntergroupLink(g, (OutLink)outlinks.firstElement(), this, isRightSide);
 		
 	}
+	
+	super.draw(g, hilited);
+	
+//	if (zoom) {
+//        int rwidth = getRwidth();
+//        int rheight = getRheight();
+//        if (isRightSide) {
+//            rrx += (rwidth/Rscale - rwidth)/2+1;
+//        } else {
+//            rrx -= (rwidth/Rscale - rwidth)/2;
+//        }
+//        if (view.getRx() < 0)
+//            rrx = rrx < 0 ? 2 : rrx;
+//        Rscale = 1.0;
+//        r = (int)(Rscale*Constants.LINK_RADIOUS);
+//    	rtailLen = (int)(Rscale*Constants.TAIL_LENGTH);
+//    	g.setColor(Constants.BACKGROUND_COLOR);
+//    	g.fillRect(rrx-r, rry-r, 2*r,2*r);
+//    }
 
 }
 
@@ -225,8 +277,7 @@ protected void drawOneSided(Graphics g, boolean hilited) {
  * @param hilited boolean
  */
 protected void draw(Graphics g, boolean hilited) {
-	super.draw(g, hilited);
-	
+
 	if (drawOnlyOneSided)
 	{
 		drawOneSided(g, hilited);
@@ -234,6 +285,14 @@ protected void draw(Graphics g, boolean hilited) {
 	}
 
 	com.cosylab.vdct.graphics.ViewState view = com.cosylab.vdct.graphics.ViewState.getInstance();
+	
+	double Rscale = view.getScale();
+	boolean zoom = (Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this);
+	
+	if (zoom) {
+	    zoomImage = ZoomPane.getInstance().startZooming(this,!isZoomRepaint());
+	}
+	
 	boolean isRightSide = isRight();
 
 	int rrrx = getRx()+r+getRwidth()-view.getRx();
@@ -242,28 +301,21 @@ protected void draw(Graphics g, boolean hilited) {
 	//int rry = getRy()+getRheight()/2-view.getRy();
 	int rry = (int)(getRscale()*getInY()- view.getRy());
 	
-	double Rscale = view.getScale();
-	boolean zoom = (Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this);
-	if (zoom) {
-        int rwidth = getRwidth();
-        int rheight = getRheight();
-        rrrx += (rwidth/Rscale - rwidth)/2+1;
-        rrlx -= (rwidth/Rscale - rwidth)/2;
-
-        if (view.getRx() < 0)
-            rrrx = rrrx < 0 ? 2 : rrrx;
-        
-        if (view.getRx() < 0)
-            rrlx = rrlx < 0 ? 2 : rrlx;
-
-        Rscale = 1.0;
-        r = (int)(Rscale*Constants.LINK_RADIOUS);
-    	rtailLen = (int)(Rscale*Constants.TAIL_LENGTH);
-    	g.setColor(Constants.BACKGROUND_COLOR);
-    	g.fillRect(rrrx-r, rry-r, 2*r,2*r);
-    	g.fillRect(rrlx-r, rry-r, 2*r,2*r);
+	
+	if (getParent().isZoomRepaint()) {
+        rrrx = getX() - getParent().getX() + getWidth() + ZoomPane.getInstance().getLeftOffset() + r;
+        rrlx = getX() - getParent().getX() + ZoomPane.getInstance().getLeftOffset()-r;
+	    rry = getY() - getParent().getY() + ZoomPane.VERTICAL_MARGIN + getHeight()/2;
+	} else if (isZoomRepaint()) {
+	    rrrx = getWidth() + ZoomPane.getInstance().getLeftOffset();
+        rrlx = getX() - getParent().getX() + ZoomPane.getInstance().getLeftOffset() - r;
+        if (!(this instanceof TemplateEPICSLink)) {
+            rrrx += r;
+            rrlx -= 3*r;
+        }
+        rry = ZoomPane.VERTICAL_MARGIN + getHeight()/2;
     }
-
+	
 	if (!hilited) g.setColor(Constants.FRAME_COLOR);
 	else g.setColor((view.isHilitedObject(this)) ? 
 					Constants.HILITE_COLOR : Constants.FRAME_COLOR);
@@ -294,16 +346,36 @@ protected void draw(Graphics g, boolean hilited) {
 		int linklx = (int)(getRscale()*getLeftX() - view.getRx());
 		int linkrx = (int)(getRscale()*getRightX() - view.getRx());
 
+		if (isZoomRepaint() || getParent().isZoomRepaint()) {
+		    linklx = 0;
+		    linkrx = ZoomPane.getInstance().getWidth();
+		}
 		if (hasLeftOutLink) 
 			g.drawLine(linklx, rry, rrlx-3*r, rry);
 
 		if (hasRightOutLink)
 			g.drawLine(rrrx+2*r, rry, linkrx, rry);
 
+		
 		// !!! more intergroup inlinks?!
 		LinkDrawer.drawInIntergroupLink(g, (OutLink)outlinks.firstElement(), this, isRightSide);
 		
 	}
+	super.draw(g, hilited);
+	
+//	if (zoom) {
+//        int rwidth = getRwidth();
+//        int rheight = getRheight();
+//        rrrx += (rwidth/Rscale - rwidth)/2+1;
+//        rrlx -= (rwidth/Rscale - rwidth)/2;
+//
+//        if (view.getRx() < 0)
+//            rrrx = rrrx < 0 ? 2 : rrrx;
+//        
+//        if (view.getRx() < 0)
+//            rrlx = rrlx < 0 ? 2 : rrlx;
+//        g.drawImage(zoomImage, rrlx,rry, ZoomPane.getInstance());
+//    }
 
 }
 /**
@@ -589,6 +661,17 @@ public int getLeftX() {
  */
 public Vector getOutlinks() {
 	return outlinks;
+}
+
+public int getLeftOffset() {
+    if (isRight()) return 2*r;
+    return 5*r;
+    
+}
+
+public int getRightOffset() {
+    if (!isRight()) return 2*r;
+    return 5*r;
 }
 
 

@@ -35,7 +35,6 @@ import com.cosylab.vdct.Constants;
 import javax.swing.*;
 import java.awt.event.*;
 
-import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.undo.CreateConnectorAction;
 import com.cosylab.vdct.undo.UndoManager;
 import com.cosylab.vdct.vdb.*;
@@ -208,19 +207,24 @@ private com.cosylab.vdct.graphics.objects.EPICSVarOutLink.PopupMenuHandler creat
 	 * @param hilited boolean
 	 */
 	protected void draw(Graphics g, boolean hilited) {
-		super.draw(g, hilited);
-	
 		if (inlink!=null)
 		{
-	    
-			g.setColor(hilited && ViewState.getInstance().isHilitedObject(this) ? Constants.HILITE_COLOR : getVisibleColor());
+		    com.cosylab.vdct.graphics.ViewState view = com.cosylab.vdct.graphics.ViewState.getInstance();
+			
+			double Rscale = view.getScale();
+			boolean zoom = (Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this);
+				
+			g.setColor(hilited && view.isHilitedObject(this) ? Constants.HILITE_COLOR : getVisibleColor());
 	
 			boolean isRightSide = isRight();
 			// draw missing tail
 			if (outlinks.size()==0)
 			{
-				com.cosylab.vdct.graphics.ViewState view = com.cosylab.vdct.graphics.ViewState.getInstance();
-			
+				
+				if (zoom) {
+				    zoomImage = ZoomPane.getInstance().startZooming(this,!isZoomRepaint());
+				}
+				
 				int rrx;			// rrx, rry is center
 				if (isRightSide)
 					rrx = getRx()+r+getRwidth()-view.getRx();
@@ -230,32 +234,59 @@ private com.cosylab.vdct.graphics.objects.EPICSVarOutLink.PopupMenuHandler creat
 				int rry = (int)(getRscale()*getInY()- view.getRy());
 				int linkx = (int)(getRscale()*getInX() - view.getRx());	
 				
-				double Rscale = view.getScale();
-				boolean zoom = (Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this);
-				if (zoom) {
-			        int rwidth = getRwidth();
-			        int rheight = getRheight();
-			        if (isRightSide) {
-			            rrx += (rwidth/Rscale - rwidth)/2;
-			        } else {
-			            rrx -= (rwidth/Rscale - rwidth)/2;
-			        }
-			        
-			        if (view.getRx() < 0)
-			            rrx = rrx < 0 ? 2 : rrx;
-			        Rscale = 1.0;
-			        r = (int)(Rscale*Constants.LINK_RADIOUS);
-			    	rtailLen = (int)(Rscale*Constants.TAIL_LENGTH);
-			    }
+				
+				if (getParent().isZoomRepaint()) {
+				    if (isRightSide) {
+				        rrx = getX() - getParent().getX() + getWidth() + ZoomPane.getInstance().getLeftOffset();
+				    } else {
+				        rrx = getX() - getParent().getX() + ZoomPane.getInstance().getLeftOffset()-2*r;
+				    }
+				    rry = getY() - getParent().getY() + ZoomPane.VERTICAL_MARGIN + getHeight()/2;
 
+				} else if (isZoomRepaint()) {
+				    if (isRightSide) {
+				        rrx = getWidth() + ZoomPane.getInstance().getLeftOffset();
+				    } else {
+				        rrx = getX() - getParent().getX() + ZoomPane.getInstance().getLeftOffset() - 5*r;
+				    }
+			        rry = ZoomPane.VERTICAL_MARGIN + getHeight()/2;
+			    }
+				
+				if (isZoomRepaint() || getParent().isZoomRepaint()) {
+				    if (isRightSide) 
+				        linkx = ZoomPane.getInstance().getWidth();
+				    else
+				        linkx = 0;
+				}
+				
 				if (isRightSide)
 					g.drawLine(rrx+2*r, rry, linkx, rry);
 				else 
 					g.drawLine(linkx, rry, rrx-3*r, rry);
 			}
 			
-			LinkDrawer.drawLink(g, this, inlink, getQueueCount(), isRightSide);
+			//TODO - draw links when zooming
+			if (!(isZoomRepaint() || getParent().isZoomRepaint() || zoom)) {
+			    LinkDrawer.drawLink(g, this, inlink, getQueueCount(), isRightSide);
+			}
+			
 		}
+		super.draw(g, hilited);
+//		if (zoom) {
+//	        int rwidth = getRwidth();
+//	        int rheight = getRheight();
+//	        if (isRightSide) {
+//	            rrx += (rwidth/Rscale - rwidth)/2;
+//	        } else {
+//	            rrx -= (rwidth/Rscale - rwidth)/2;
+//	        }
+//	        
+//	        if (view.getRx() < 0)
+//	            rrx = rrx < 0 ? 2 : rrx;
+//	        Rscale = 1.0;
+//	        r = (int)(Rscale*Constants.LINK_RADIOUS);
+//	    	rtailLen = (int)(Rscale*Constants.TAIL_LENGTH);
+//	    }
 	
 	}
 

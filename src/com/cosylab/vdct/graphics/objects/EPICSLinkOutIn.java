@@ -234,5 +234,17 @@ public abstract class EPICSLinkOutIn extends EPICSLinkOut implements MultiInLink
 		}
 		return starts;
 	}
+	
+	public int getLeftOffset() {
+	    if (isRight()) return 0;
+	    return Math.abs(2*r+labelLen);
+	    
+	}
+
+	public int getRightOffset() {
+	    if (!isRight()) return 0;
+	    
+	    return Math.abs(2*r + labelLen);
+	}
 
 }

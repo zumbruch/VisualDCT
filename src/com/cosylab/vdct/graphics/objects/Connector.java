@@ -338,8 +338,7 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 	int rrx = getRx()-view.getRx()-rwidth/2;	// position is center
 	int rry = getRy()-view.getRy()-rheight/2;
 	
-    double Rscale = view.getScale();
-    boolean zoom = (Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this);
+    boolean zoom = (view.getScale() < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this);
 	
 	if (!DrawingSurface.getInstance().isPrinting()) {
 		// clipping
@@ -353,17 +352,17 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 			else g.setColor((this==view.getHilitedObject()) ? 
 							Constants.HILITE_COLOR : getColor());
 			*/
-		    if (zoom) {
-		        rwidth /= Rscale;
-		        rheight /= Rscale;
-		        rrx -= (rwidth - getRwidth())/2;
-		        rry -= (rheight - getRheight())/2;
-		        if (view.getRx() < 0)
-		            rrx = rrx < 0 ? 2 : rrx;
-		        if (view.getRy() < 0) 
-		            rry = rry <= 0 ? 2 : rry;
-		        Rscale = 1.0;
-		    }
+//		    if (zoom) {
+//		        rwidth /= Rscale;
+//		        rheight /= Rscale;
+//		        rrx -= (rwidth - getRwidth())/2;
+//		        rry -= (rheight - getRheight())/2;
+//		        if (view.getRx() < 0)
+//		            rrx = rrx < 0 ? 2 : rrx;
+//		        if (view.getRy() < 0) 
+//		            rry = rry <= 0 ? 2 : rry;
+//		        Rscale = 1.0;
+//		    }
 		    
 			
 			if (view.isSelected(this))
@@ -394,6 +393,8 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 		if (hilited)
 			c = (view.isHilitedObject(this)) ? Constants.HILITE_COLOR : c;
 		g.setColor(c);
+//		TODO - draw links when zooming
+		if (!(isZoomRepaint() || getParent().isZoomRepaint() || zoom)) {	
 			if (inlink!=null){
 				LinkDrawer.drawLink(g, this, inlink, getQueueCount(), 
 									getOutX()<inlink.getInX());
@@ -402,6 +403,7 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 				LinkDrawer.drawLink(g, this, null, getQueueCount(), 
 									getOutput().getOutX()<getX());
 			}
+		}
 	}  
 
 }

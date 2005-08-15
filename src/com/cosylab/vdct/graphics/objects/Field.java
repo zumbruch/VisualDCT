@@ -71,36 +71,40 @@ public void accept(Visitor visitor) {
 protected void draw(Graphics g, boolean hilited) {
 
 	ViewState view = ViewState.getInstance();
-
+	
+	double Rscale = view.getScale();
+	boolean zoom = (Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this) && !getParent().isZoomRepaint();
+	
+	if (zoom) {
+	    zoomImage = ZoomPane.getInstance().startZooming(this,!isZoomRepaint());
+	}
+	
 	int rrx = getRx()-view.getRx();
 	int rry = getRy()-view.getRy();
 	int rwidth = getRwidth();
 	int rheight = getRheight();
 		
-	// clipping
-	if ((rrx>view.getViewWidth()) || (rry>view.getViewHeight())
-	    || ((rrx+rwidth)<0) || ((rry+rheight)<0)) return;
-
+//	if (!isZoomRepaint() || !getParent().isZoomRepaint()) {
+//		// clipping
+//		if ((rrx>view.getViewWidth()) || (rry>view.getViewHeight())
+//		    || ((rrx+rwidth)<0) || ((rry+rheight)<0)) return;
+//	}
+	
+	if (getParent().isZoomRepaint()) {
+	    rrx = getX() - getParent().getX() + ZoomPane.getInstance().getLeftOffset();
+	    rry = getY() - getParent().getY() + ZoomPane.VERTICAL_MARGIN;
+	} else if (isZoomRepaint()) {
+        rrx = ZoomPane.getInstance().getLeftOffset();
+        rry = ZoomPane.VERTICAL_MARGIN;
+    }
+	
+	
+	
 	if (!hilited) g.setColor(Constants.RECORD_COLOR);
 	else if (view.isPicked(this)) g.setColor(Constants.PICK_COLOR);
 	else if (view.isSelected(this) || view.isBlinking(this)) g.setColor(Constants.SELECTION_COLOR);
 	else g.setColor(Constants.RECORD_COLOR);
 		
-	double Rscale = view.getScale();
-	boolean zoom = (Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this);
-	if (zoom) {
-	    rwidth /= Rscale;
-        rheight /= Rscale;
-        rrx -= (rwidth - getRwidth())/2;
-        rry -= (rheight - getRheight())/2;
-        if (view.getRx() < 0)
-            rrx = rrx < 0 ? 2 : rrx;
-        if (view.getRy() < 0) 
-            rry = rry <= 0 ? 2 : rry;
-        Rscale = 1.0;
-        validateFont(Rscale, rwidth, rheight);
-    }
-	
 	g.fillRect(rrx, rry, rwidth, rheight);
 	Color color;
 	if (!hilited) color = Constants.FRAME_COLOR;
@@ -113,6 +117,18 @@ protected void draw(Graphics g, boolean hilited) {
 		g.setFont(getFont());
 		g.drawString(getLabel(), rrx+getRlabelX(), rry+getRlabelY());
 	}
+	
+	if (zoom && !isZoomRepaint()) {
+	    rwidth /= Rscale;
+        rheight /= Rscale;
+        rrx -= ((rwidth - getRwidth())/2 + ZoomPane.getInstance().getLeftOffset());
+        rry -= ((rheight - getRheight())/2 + ZoomPane.VERTICAL_MARGIN);
+        if (view.getRx() < 0)
+            rrx = rrx < 0 ? 2 : rrx;
+        if (view.getRy() < 0) 
+            rry = rry <= 0 ? 2 : rry;
+        g.drawImage(zoomImage, rrx,rry, ZoomPane.getInstance());
+    }
 
 }
 /**

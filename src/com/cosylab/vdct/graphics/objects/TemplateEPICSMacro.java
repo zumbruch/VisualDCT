@@ -150,9 +150,13 @@ protected void draw(Graphics g, boolean hilited) {
 	if (!isVisible())
 		return;
 	
-	super.draw(g, hilited);
-
 	com.cosylab.vdct.graphics.ViewState view = com.cosylab.vdct.graphics.ViewState.getInstance();
+	double Rscale = getRscale();
+	boolean zoom = Rscale < 1.0 && view.isZoomOnHilited() && view.isHilitedObject(this);
+	if (zoom) {
+	    zoomImage = ZoomPane.getInstance().startZooming(this, true);
+	}
+	
 	boolean isRightSide = isRight();
 
 	int rrx;			// rrx, rry is center
@@ -163,16 +167,15 @@ protected void draw(Graphics g, boolean hilited) {
 	
 	int rry = (int)(getRscale()*getInY()- view.getRy());
 	
-	double Rscale = view.getScale();
-	boolean zoom = (Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this);
-	if (zoom) {
-        int rwidth = getRwidth();
-        int rheight = getRheight();
-        rrx -= (rwidth/Rscale - rwidth)/2;
-        if (view.getRx() < 0)
-            rrx = rrx < 0 ? 2 : rrx;
-        validateFontAndDimension(1.0, (int)(rwidth/Rscale),(int) (rheight/Rscale));
-        Rscale = 1.0;
+	if (isZoomRepaint()) {
+	    if (isRightSide) {
+	        ZoomPane pane = ZoomPane.getInstance();
+	        rrx = pane.getWidth() - pane.getRightOffset() - getWidth();
+	    } else {
+	        rrx = ZoomPane.getInstance().getLeftOffset();
+	    }
+	    
+	    
     }
 	
 	if (!hilited) g.setColor(Constants.FRAME_COLOR);
@@ -189,7 +192,7 @@ protected void draw(Graphics g, boolean hilited) {
 	{
 		// input link
 		int arrowLength = 2*r;
-		
+
 		if (!isRightSide)
 			rrx -= arrowLength;
 
@@ -242,6 +245,18 @@ protected void draw(Graphics g, boolean hilited) {
 		g.drawLine(rrx, rry, rrx+rwidth, rry+rheight);
 		g.drawLine(rrx+rwidth, rry, rrx, rry+rheight);
 	}
+	
+	super.draw(g, hilited);
+//	if (zoom) {
+//        int rwidth = getRwidth();
+//        int rheight = getRheight();
+//        rrx -= (rwidth/Rscale - rwidth)/2;
+//        if (view.getRx() < 0)
+//            rrx = rrx < 0 ? 2 : rrx;
+//        validateFontAndDimension(1.0, (int)(rwidth/Rscale),(int) (rheight/Rscale));
+//        Rscale = 1.0;
+//        g.drawImage(zoomImage, rrx,rry, ZoomPane.getInstance());
+//    }
 }
 
 /**

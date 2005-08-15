@@ -152,6 +152,14 @@ protected void draw(Graphics g, boolean hilited) {
 	super.draw(g, hilited);
 	
 	com.cosylab.vdct.graphics.ViewState view = com.cosylab.vdct.graphics.ViewState.getInstance();
+	
+	double Rscale = view.getScale();
+	boolean zoom = (Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this);
+	
+	if (zoom) {
+	    zoomImage = ZoomPane.getInstance().startZooming(this,!isZoomRepaint());
+	}
+	
 	boolean isRightSide = isRight();
 
 	int rrx;			// rrx, rry is center
@@ -162,22 +170,15 @@ protected void draw(Graphics g, boolean hilited) {
 	
 	int rry = (int)(getRscale()*getInY()- view.getRy());
 	
-	double Rscale = view.getScale();
-	boolean zoom = (Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this);
-	if (zoom) {
-        int rwidth = getRwidth();
-        int rheight = getRheight();
-        rrx -= (rwidth/Rscale - rwidth)/2;
-        rry -= (rheight/Rscale - rheight)/2;
-        if (view.getRx() < 0)
-            rrx = rrx < 0 ? 2 : rrx;
-        if (view.getRy() < 0) 
-            rry = rry <= 0 ? 2 : rry;
-        Rscale = 1.0;
-        r = (int)(Constants.LINK_RADIOUS);
-    	rtailLen = (int)(Constants.TAIL_LENGTH);
-    }
-
+	if (isZoomRepaint()) {
+	    if (isRightSide) {
+	        ZoomPane pane = ZoomPane.getInstance();
+	        rrx = pane.getWidth() - pane.getRightOffset() - getWidth();
+	    } else {
+	        rrx = ZoomPane.getInstance().getLeftOffset();
+	    }
+	}	
+	
 	if (!hilited) g.setColor(Constants.FRAME_COLOR);
 	else g.setColor((view.isHilitedObject(this)) ? 
 					Constants.HILITE_COLOR : Constants.FRAME_COLOR);
@@ -245,6 +246,21 @@ protected void draw(Graphics g, boolean hilited) {
 		g.drawLine(rrx, rry, rrx+rwidth, rry+rheight);
 		g.drawLine(rrx+rwidth, rry, rrx, rry+rheight);
 	}
+	
+//	if (zoom) {
+//        int rwidth = getRwidth();
+//        int rheight = getRheight();
+//        rrx -= (rwidth/Rscale - rwidth)/2;
+//        rry -= (rheight/Rscale - rheight)/2;
+//        if (view.getRx() < 0)
+//            rrx = rrx < 0 ? 2 : rrx;
+//        if (view.getRy() < 0) 
+//            rry = rry <= 0 ? 2 : rry;
+//        Rscale = 1.0;
+//        r = (int)(Constants.LINK_RADIOUS);
+//    	rtailLen = (int)(Constants.TAIL_LENGTH);
+//    }
+	
 }
 
 /**

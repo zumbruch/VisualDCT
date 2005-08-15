@@ -76,6 +76,10 @@ public abstract class VisibleObject implements Visitable {
 
 	private boolean destroyed = false;
 
+	//used for blowing up the object on small zoom
+	private boolean isZoomRepaint = false;
+	protected Image zoomImage;
+	
 /**
  * Insert the method's description here.
  * Creation date: (21.12.2000 20:40:53)
@@ -534,6 +538,50 @@ public int getMarkedX() {
  */
 public int getMarkedY() {
 	return markedY;
+}
+
+
+public void setZoomRepaint(boolean zoomRepaint) {
+    isZoomRepaint = zoomRepaint;
+}
+
+/**
+ * 
+ * Returns true if the object is being repainted as blown up on small zoom.
+ * @return
+ */
+public boolean isZoomRepaint() {
+    return isZoomRepaint;
+}
+
+/**
+ * 
+ * Returns the offset in pixels(the length of additional objects (arrows, strings) drawn on
+ * the left side of this object.
+ * @return
+ */
+public int getLeftOffset() {
+    return 0;
+}
+
+/**
+ * 
+ * Returns the offset in pixels(the length of additional objects (arrows, strings) drawn on
+ * the right side of this object.
+ * @return
+ */
+public int getRightOffset() {
+    return 0;
+}
+
+/**
+ * 
+ * Returns the offset in pixels(the length of additional objects (arrows, strings) drawn above
+ * this object.
+ * @return
+ */
+public int getTopOffset() {
+    return 0;
 }
 
 }

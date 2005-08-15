@@ -288,6 +288,12 @@ protected void draw(Graphics g, boolean hilited) {
 
 	ViewState view = ViewState.getInstance();
 
+	double Rscale = getRscale();
+	boolean zoom = Rscale < 1.0 && view.isZoomOnHilited() && view.isHilitedObject(this);
+	if (zoom) {
+	    zoomImage = ZoomPane.getInstance().startZooming(this, true);
+	}	
+	
 	int rrx = getRx()-view.getRx();
 	int rry = getRy()-view.getRy();
 	int rwidth = getRwidth();
@@ -295,23 +301,13 @@ protected void draw(Graphics g, boolean hilited) {
 		
 	// clipping
 	if ((!(rrx>view.getViewWidth()) || (rry>view.getViewHeight())
-	    || ((rrx+rwidth)<0) || ((rry+rheight)<0))) {
+	    || ((rrx+rwidth)<0) || ((rry+rheight)<0)) || isZoomRepaint()) {
 
-	    double Rscale = view.getScale();
-	    boolean zoom = (Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this);
-		if (zoom) {
-	        rwidth /= Rscale;
-	        rheight /= Rscale;
-	        rrx -= (rwidth - getRwidth())/2;
-	        rry -= (rheight - getRheight())/2;
-	        if (view.getRx() < 0)
-	            rrx = rrx < 0 ? 2 : rrx;
-	        if (view.getRy() < 0) 
-	            rry = rry <= 0 ? 2 : rry;
-	        Rscale = 1.0;
-	        validateFont(Rscale, rwidth, rheight);
+	    if (isZoomRepaint()) {
+	        rrx = ZoomPane.getInstance().getLeftOffset();
+	        rry = ZoomPane.VERTICAL_MARGIN;
 	    }
-	    
+	    	    
 		if (!hilited) g.setColor(Constants.RECORD_COLOR);
 		else if (view.isPicked(this)) g.setColor(Constants.PICK_COLOR);
 		else if (view.isSelected(this) ||
@@ -331,6 +327,19 @@ protected void draw(Graphics g, boolean hilited) {
 		}
 	
 	}
+	
+	if (zoom && !isZoomRepaint()) {
+        rwidth /= Rscale;
+        rheight /= Rscale;
+        rrx -= (rwidth - getRwidth())/2;
+        rry -= (rheight - getRheight())/2;
+        if (view.getRx() < 0)
+            rrx = rrx < 0 ? 2 : rrx;
+        if (view.getRy() < 0) 
+            rry = rry <= 0 ? 2 : rry;
+        g.drawImage(zoomImage, rrx,rry, ZoomPane.getInstance());
+    }
+	
 	// paint components
 /*
 	VisualObject vo;				

@@ -360,7 +360,6 @@ public void disconnect(Linkable disconnector) {
 	}
 }
 
-
 /**
  * Insert the method's description here.
  * Creation date: (21.12.2000 20:46:35)
@@ -369,35 +368,32 @@ public void disconnect(Linkable disconnector) {
  */
 protected void draw(Graphics g, boolean hilited) {
 
-	ViewState view = ViewState.getInstance();
+    ViewState view = ViewState.getInstance();
 
+    double Rscale = getRscale();
+	boolean zoom = Rscale < 1.0 && view.isZoomOnHilited() && view.isHilitedObject(this);
+	
+	if (zoom) {
+	    zoomImage = ZoomPane.getInstance().startZooming(this, true);
+	}
+	
 	int rrx = getRx() - view.getRx();
 	int rry = getRy() - view.getRy();
-	
+		
 	int rwidth = getRwidth();
 	int rheight = getRheight();
 
-	double Rscale = getRscale();
-	boolean zoom = Rscale < 1.0 && view.isZoomOnHilited() && view.isHilitedObject(this);
 	// clipping
 	if (!((rrx > view.getViewWidth())
 		|| (rry > view.getViewHeight())
 		|| ((rrx + rwidth) < 0)
-		|| ((rry + rheight) < 0))) {
+		|| ((rry + rheight) < 0)) || isZoomRepaint()) {
 	    
-	    
-	    if (zoom) {
-	        rwidth /= Rscale;
-	        rheight /= Rscale;
-	        rrx -= (rwidth - getRwidth())/2;
-	        rry -= (rheight - getRheight())/2;
-	        if (view.getRx() < 0)
-	            rrx = rrx < 0 ? 2 : rrx;
-	        if (view.getRy() < 0) 
-	            rry = rry <= 0 ? 2 : rry;
-	        Rscale = 1.0;
-	        validateFont(Rscale, rwidth, Constants.RECORD_HEIGHT);
+	    if (isZoomRepaint()) {
+	        rrx = ZoomPane.getInstance().getLeftOffset();
+	        rry = ZoomPane.VERTICAL_MARGIN;
 	    }
+
 	    	    
 		if (!hilited)
 			g.setColor(Constants.RECORD_COLOR);
@@ -509,14 +505,19 @@ protected void draw(Graphics g, boolean hilited) {
 					linkColor = ((VisibleObject) outlinks.firstElement()).getVisibleColor();
 			
 			
-			if (!zoom) { 
+//			if (!zoom) { 
 				// draw link and its tail
 				boolean isRightSide = isRight();
 				int r = (int)(Constants.LINK_RADIOUS * Rscale);
 				int cy = (int)(Rscale*getInY()- view.getRy());
 				int ccx = (int)(Rscale*getInX()- view.getRx());
-	
 				int cx;
+				
+				if (isZoomRepaint() || getParent().isZoomRepaint()) {
+				    cy = getHeight()/2 + ZoomPane.VERTICAL_MARGIN;
+				    ccx = isRightSide ? ZoomPane.getInstance().getWidth() - 1 : 1;
+				    
+				}				
 			
 				if (isRightSide) {
 					cx = rrx + rwidth + r;
@@ -535,14 +536,30 @@ protected void draw(Graphics g, boolean hilited) {
 					(OutLink) outlinks.firstElement(),
 					this,
 					isRightSide);
-			}
+//			}
 		
 		}
 
 	}
 
-	if (!hilited)
+	if (!hilited ) {
 		paintSubObjects(g, hilited);
+	}
+	
+	if (zoom && !isZoomRepaint()) {
+	    rwidth /= Rscale;
+        rheight /= Rscale;
+        rrx -= ((rwidth - getRwidth())/2 + ZoomPane.getInstance().getLeftOffset());
+        rry -= ((rheight - getRheight())/2 + ZoomPane.VERTICAL_MARGIN);
+        if (view.getRx() < 0)
+            rrx = rrx < 0 ? 2 : rrx;
+        if (view.getRy() < 0) 
+            rry = rry <= 0 ? 2 : rry;
+        g.drawImage(zoomImage, rrx,rry, ZoomPane.getInstance());
+	}
+	
+	
+	
 
 }
 
@@ -1399,6 +1416,24 @@ public void revalidateFieldsPosition() {
   }
 
 }
+
+//private void revalidatePositionForZoom() {
+//    int nx, ny, n=0;
+//    double scale = getScale();
+//    ny = (int) (getY() - (getHeight()/scale - getHeight())/2. + getHeight()/scale);
+//    Enumeration e = subObjectsV.elements();
+//    Field field; Object obj;
+//    while (e.hasMoreElements()) {
+//	  	obj = e.nextElement();
+//	  	if (obj instanceof Field) {
+//	  		field = (Field)obj;
+//	  		nx = getX()+(getWidth()-field.getWidth())/2;
+//	  		field.revalidatePosition(nx, ny, n);
+//	  		ny+=field.getHeight()/scale;
+//	  		n++;
+//	  	}
+//    }
+//}
 /**
  * Insert the method's description here.
  * Creation date: (21.12.2000 21:22:45)
