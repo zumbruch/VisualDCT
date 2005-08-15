@@ -375,12 +375,13 @@ expand("slideMotor.vdb", slmot1) {
 						  <ol>
 						    <li>Right click on the parent record of the <kwd>INPUT</kwd>, <kwd>OUTPUT</kwd> or <kwd>FORWARD</kwd> link field</li>
 						    <li>Pop-up menu will appear, choose the appropriate link field</li>
-						    <li>The parent record will blink until the <kwd>VARIABLE</kwd> field or record if <kwd>FORWARD</kwd> link is determined; to do this, there are tree options:
+						    <li>A crosshair cursor will appear and the parent record will blink until the <kwd>VARIABLE</kwd> field or record if <kwd>FORWARD</kwd> link is determined; to do this, there are tree options:
 							    <ul>
 							      <li>left click on the record - <kwd>VAR</kwd> field is used, or record if <kwd>FORWARD</kwd> link</li>
 							      <li>left click on the field - link to clicked filed is created</li>
 							      <li>right click on the record - pop-up menu will appear allowing you to select the <kwd>VARIABLE</kwd> field</li>
 							    </ul>
+								After linking is completed cursor is changed back to normal.
 						    </li>
 						  </ol>
 					  </li>
