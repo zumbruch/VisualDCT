@@ -431,7 +431,7 @@ expand("slideMotor.vdb", slmot1) {
 						  <li><b>Main menu</b></li>
 						  <li><b>Toolbar</b> - makes access to the frequently used actions easier.</li>
 						  <li><b>Workspace with Navigator</b> - it is the main component of the VisualDCT, it provides visualization and the capability of editing the record instance database. Navigator is a miniature view of the whole workspace. Using mouse over the navigator you can easily move through the workspace.</li>
-						  <li><b>Status bar with Zoom scale slider</b> - shows the name of the active definition database and the name of the current group. Zoom scale slider is used to easily change zoom scale.</li>
+						  <li><b>Status bar with Zoom scale slider</b> - shows the name of the active definition database and the name of the current group. Zoom scale slider is used to easily change zoom scale. On small scales (less than 100%) special (<k>Shift</k> + move) zoom can be used to blow up the objects.</li>
 						</ol>
 					</p>
 				</section>
@@ -448,7 +448,10 @@ expand("slideMotor.vdb", slmot1) {
 						  <li><b>Property table</b> - name-value pair table allowing user to inspect or modify fields. Record fields are grouped according <kwd>promptgroup</kwd> field defined in definition database.</li>
 						  <li><b>Comment textarea</b> - shows record comment and allows user to modify it.</li>
 						  <li><b>Status bar</b> - provides basic help, the value of the <kwd>prompt</kwd> field defined in definition database is shown for fields and so helping uses to understand the meaning of the fields (e.g. LBRK - "Last break point").</li>
+						  <li><b>Center button</b> - centers the screen ont the inspected object</li>
 						</ol>
+						
+						Inspected object is marked as highlighted on the screen.
 					</p>
 					
 					<a id="visibility"/>
@@ -584,6 +587,7 @@ expand("slideMotor.vdb", slmot1) {
 					  <tr>											<td>left navigator column of a field</td><td>Change field visibility</td></tr>
 					  <tr>			       <td align="center"><k>Shift</k> + click</td><td>field with more than one link or template field</td><td>Rotate link</td></tr>
 					  <tr>			       <td align="center">drag</td><td>blank workspace</td><td>Zoom in selection</td></tr>
+					  <tr><td rowspan="1" align="center"> </td><td align="center"><k>Shift</k> + move + Zoom <![CDATA[<]]> 100%</td><td>any visible object</td><td>Blow up the object to 100%</td></tr>
 					  <desc>Mouse command reference</desc>
 					</table>
 				</section>
