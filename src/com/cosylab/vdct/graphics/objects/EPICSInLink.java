@@ -156,18 +156,14 @@ protected void draw(Graphics g, boolean hilited) {
 	    }
         rry = ZoomPane.VERTICAL_MARGIN + getHeight()/2;
     }
-		
+	
+			
 	if (inlink!=null) {
 	    
-	    g.setColor(hilited && view.isHilitedObject(this) ? Constants.HILITE_COLOR : getVisibleColor());
+	    g.setColor(hilited && view.isHilitedObject(this) && !zoom ? Constants.HILITE_COLOR : getVisibleColor());
 	    
-	    // TODO - draw links when zooming
-	    if (!(getParent().isZoomRepaint() || isZoomRepaint()) && !zoom) {
-	        LinkDrawer.drawLink(g, this, inlink, getQueueCount(), rightSide);
-	    }
-	        
-	        
-	    
+        LinkDrawer.drawLink(g, this, inlink, getQueueCount(), rightSide);
+    
 		g.setColor(color);
 		// draw arrow
 		g.drawLine(rrx, rry-r, rrx+arrowLength, rry-r);

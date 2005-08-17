@@ -795,7 +795,7 @@ public void mouseClicked(MouseEvent e) {
 			if (leftButtonPush)
 			{
 				if (e.isControlDown() || (e.getClickCount()==1)) {
-					if (!e.isControlDown()) {
+					if (!e.isControlDown() && !e.isShiftDown()) {
 					    view.deselectAll();			// deselect all
 						repaint();
 					}
@@ -1365,7 +1365,7 @@ public void mouseMoved(MouseEvent e)
 				{
 				//drawOnlyHilitedOnce=true;
 				//repaint();
-				repaint(true);
+				repaint();
 				return;
 				}
 			} 

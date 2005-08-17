@@ -389,12 +389,10 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 	}
 
 	if (/*!hilited &&*/ (inlink!=null || getMode()==EXTERNAL_OUTPUT_MODE || getMode()==EXTERNAL_INPUT_MODE)) {
-		Color c = getVisibleColor();
-		if (hilited)
-			c = (view.isHilitedObject(this)) ? Constants.HILITE_COLOR : c;
-		g.setColor(c);
-//		TODO - draw links when zooming
-		if (!(isZoomRepaint() || getParent().isZoomRepaint() || zoom)) {	
+
+		g.setColor(hilited && view.isHilitedObject(this) && !zoom ? Constants.HILITE_COLOR : getVisibleColor());
+
+	
 			if (inlink!=null){
 				LinkDrawer.drawLink(g, this, inlink, getQueueCount(), 
 									getOutX()<inlink.getInX());
@@ -403,7 +401,7 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 				LinkDrawer.drawLink(g, this, null, getQueueCount(), 
 									getOutput().getOutX()<getX());
 			}
-		}
+
 	}  
 
 }

@@ -270,11 +270,8 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 	if (inlink!=null)
 	{
 		// draw link
-		g.setColor(hilited && view.isHilitedObject(this) ? Constants.HILITE_COLOR : getVisibleColor());
-		//TODO - draw links when zooming
-		if (!(isZoomRepaint() || getParent().isZoomRepaint() || zoom)) {
-		    LinkDrawer.drawLink(g, this, inlink, getQueueCount(), rightSide);
-		}
+		g.setColor(hilited && view.isHilitedObject(this) && !zoom ? Constants.HILITE_COLOR : getVisibleColor());
+	    LinkDrawer.drawLink(g, this, inlink, getQueueCount(), rightSide);
 	}
 	
 	// clipping

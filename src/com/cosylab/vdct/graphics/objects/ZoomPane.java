@@ -144,7 +144,7 @@ public final class ZoomPane implements ImageObserver {
 	    }	    	 
 	    
 	    
-	    width += leftOffset + rightOffset + 2*HORIZONTAL_MARGIN +2;
+	    width += leftOffset + rightOffset + 2*HORIZONTAL_MARGIN + 2;
 	    height += topOffset + 2*VERTICAL_MARGIN;
 	    
 	    if (clearImage || zoomImage == null || imgGr == null) {

@@ -378,9 +378,13 @@ public boolean setAsHilited(VisibleObject object) {
 public boolean setAsHilited(VisibleObject object, boolean zoomOnHilited) {
     this.zoomOnHilited = zoomOnHilited;
     
-    if(zoomOnHilited) DrawingSurface.getInstance().repaint();
+    if(zoomOnHilited) {
+        DrawingSurface.getInstance().repaint();
+        hilitedObjects.clear();
+        hilitedObjects.add(hilitedObject);
+    }
     
-    if (object!=hilitedObject) {
+    if (object!=hilitedObject || hilitedObjects.size() == 1) {
 	    	    
 		hilitedObject=object;
 		
@@ -397,21 +401,24 @@ public boolean setAsHilited(VisibleObject object, boolean zoomOnHilited) {
 			outlinks = new Vector();
 			outlinks.add(((InLink)obj).getOutput());
 		}
-		if (outlinks != null)
-			for (int i=0; i<outlinks.size(); i++) {
-				obj = outlinks.elementAt(i);
-				hilitedObjects.add(obj);
-				while (obj instanceof InLink) {
-					obj = ((InLink)obj).getOutput();
+		
+		if (!zoomOnHilited) {
+			if (outlinks != null)
+				for (int i=0; i<outlinks.size(); i++) {
+					obj = outlinks.elementAt(i);
 					hilitedObjects.add(obj);
+					while (obj instanceof InLink) {
+						obj = ((InLink)obj).getOutput();
+						hilitedObjects.add(obj);
+					}
 				}
+				
+			// outLinks
+			obj = hilitedObject;
+			while (obj instanceof OutLink) {
+				obj = ((OutLink)obj).getInput();
+				hilitedObjects.add(obj);
 			}
-			
-		// outLinks
-		obj = hilitedObject;
-		while (obj instanceof OutLink) {
-			obj = ((OutLink)obj).getInput();
-			hilitedObjects.add(obj);
 		}
 		
 		return true;

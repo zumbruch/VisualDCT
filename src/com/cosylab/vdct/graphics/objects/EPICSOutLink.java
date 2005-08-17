@@ -125,41 +125,48 @@ protected void draw(Graphics g, boolean hilited) {
 	//int rry = getRy()+getRheight()/2-view.getRy();
 	int rry = (int)(getRscale()*getOutY()- view.getRy());
 
-	
+	ZoomPane pane = ZoomPane.getInstance();
 	if (getParent().isZoomRepaint()) {
 	    if (rightSide) {
-	        rrx = getX() - getParent().getX() + getWidth() + ZoomPane.getInstance().getLeftOffset();
+	        rrx = getX() - getParent().getX() + getWidth() + pane.getLeftOffset();
 	    } else {
-	        rrx = getX() - getParent().getX() + ZoomPane.getInstance().getLeftOffset()-2*r;
+	        rrx = getX() - getParent().getX() + pane.getLeftOffset()-2*r;
 	    }
 	    rry = getY() - getParent().getY() + ZoomPane.VERTICAL_MARGIN + getHeight()/2;
 	} else if (isZoomRepaint()) {
+	    
 	    if (rightSide) {
-	        rrx = getWidth() + ZoomPane.getInstance().getLeftOffset();
+	        if (this instanceof TemplateEPICSLink) {
+	            
+//	    	    rrx = pane.getWidth() - pane.getRightOffset() - getWidth();
+	            rrx = getWidth() + ZoomPane.getInstance().getLeftOffset();
+//	            System.out.println(rrx);
+	        } else {
+	            rrx = getWidth() + ZoomPane.getInstance().getLeftOffset();
+	        }
 	    } else {
-	        rrx = getX() - getParent().getX() + ZoomPane.getInstance().getLeftOffset();
+	        rrx = getX() - getParent().getX() + pane.getLeftOffset();
 	        if (this instanceof TemplateEPICSLink) {
 	            rrx -= 2*r;
 	        } else {
 	            rrx -= (2*r + Constants.ARROW_SIZE);
 	        }
 	    }
-        rry = ZoomPane.VERTICAL_MARGIN + getHeight()/2;
+        rry = pane.getTopOffset() + getHeight()/2;
     }
+	
 	
 		
 	Color color;
 	if (!hilited) color = Constants.FRAME_COLOR;
 	else color = (view.isHilitedObject(this)) ? 
 					Constants.HILITE_COLOR : Constants.FRAME_COLOR;
-
+//	|| isZoomRepaint() || getParent().isZoomRepaint()
 	if (inlink!=null) {
 
-	    g.setColor(hilited && view.isHilitedObject(this) ? Constants.HILITE_COLOR : getVisibleColor());
-	    // TODO - draw links when zooming
-	    if (!(isZoomRepaint() || getParent().isZoomRepaint() || zoom) ) {
-	        LinkDrawer.drawLink(g, this, inlink, getQueueCount(), rightSide);
-	    }
+	    g.setColor(hilited && view.isHilitedObject(this) && !zoom ? Constants.HILITE_COLOR : getVisibleColor());
+        LinkDrawer.drawLink(g, this, inlink, getQueueCount(), rightSide);
+
 //	    if (zoom && inlink instanceof VisibleObject) {
 //	        ((VisibleObject)inlink).paint(g, hilited);
 //	    }
@@ -193,10 +200,10 @@ protected void draw(Graphics g, boolean hilited) {
 		//if (inlink.getLayerID().equals(getLayerID())) 
 		
 	} else {
-		
+	    
  		if (getLinkCount()>0) {
 			// ports - draw tail line
-
+ 		    
  			g.setColor(color);
  			
 			// draw arrow

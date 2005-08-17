@@ -149,8 +149,6 @@ protected void draw(Graphics g, boolean hilited) {
 	if (!isVisible())
 		return;
 
-	super.draw(g, hilited);
-	
 	com.cosylab.vdct.graphics.ViewState view = com.cosylab.vdct.graphics.ViewState.getInstance();
 	
 	double Rscale = view.getScale();
@@ -170,13 +168,22 @@ protected void draw(Graphics g, boolean hilited) {
 	
 	int rry = (int)(getRscale()*getInY()- view.getRy());
 	
-	if (isZoomRepaint()) {
-	    if (isRightSide) {
-	        ZoomPane pane = ZoomPane.getInstance();
-	        rrx = pane.getWidth() - pane.getRightOffset() - getWidth();
+	ZoomPane pane = ZoomPane.getInstance();
+	if (getParent().isZoomRepaint()) {
+		if (isRightSide) {
+	        rrx = getX() - getParent().getX() + getWidth() + pane.getLeftOffset();
 	    } else {
-	        rrx = ZoomPane.getInstance().getLeftOffset();
+	        rrx = getX() - getParent().getX() + pane.getLeftOffset();
 	    }
+		rry = getY() - getParent().getY() + pane.getTopOffset() + getHeight()/2;
+	}
+	else if (isZoomRepaint()) {
+	    if (isRightSide) {
+	        rrx = pane.getLeftOffset() + getWidth();
+	    } else {
+	        rrx = pane.getLeftOffset();
+	    }
+	    rry = pane.getTopOffset() + getHeight()/2; 
 	}	
 	
 	if (!hilited) g.setColor(Constants.FRAME_COLOR);
@@ -246,6 +253,7 @@ protected void draw(Graphics g, boolean hilited) {
 		g.drawLine(rrx, rry, rrx+rwidth, rry+rheight);
 		g.drawLine(rrx+rwidth, rry, rrx, rry+rheight);
 	}
+	super.draw(g, hilited);
 	
 //	if (zoom) {
 //        int rwidth = getRwidth();

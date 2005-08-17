@@ -214,7 +214,7 @@ private com.cosylab.vdct.graphics.objects.EPICSVarOutLink.PopupMenuHandler creat
 			double Rscale = view.getScale();
 			boolean zoom = (Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this);
 				
-			g.setColor(hilited && view.isHilitedObject(this) ? Constants.HILITE_COLOR : getVisibleColor());
+			g.setColor(hilited && view.isHilitedObject(this) && !zoom ? Constants.HILITE_COLOR : getVisibleColor());
 	
 			boolean isRightSide = isRight();
 			// draw missing tail
@@ -265,10 +265,7 @@ private com.cosylab.vdct.graphics.objects.EPICSVarOutLink.PopupMenuHandler creat
 					g.drawLine(linkx, rry, rrx-3*r, rry);
 			}
 			
-			//TODO - draw links when zooming
-			if (!(isZoomRepaint() || getParent().isZoomRepaint() || zoom)) {
-			    LinkDrawer.drawLink(g, this, inlink, getQueueCount(), isRightSide);
-			}
+		    LinkDrawer.drawLink(g, this, inlink, getQueueCount(), isRightSide);
 			
 		}
 		super.draw(g, hilited);

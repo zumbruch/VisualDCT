@@ -167,15 +167,22 @@ protected void draw(Graphics g, boolean hilited) {
 	
 	int rry = (int)(getRscale()*getInY()- view.getRy());
 	
-	if (isZoomRepaint()) {
+	ZoomPane pane = ZoomPane.getInstance();
+	if (getParent().isZoomRepaint()) {
 	    if (isRightSide) {
-	        ZoomPane pane = ZoomPane.getInstance();
-	        rrx = pane.getWidth() - pane.getRightOffset() - getWidth();
+	        rrx = getX() - getParent().getX() + getWidth() + pane.getLeftOffset();
 	    } else {
-	        rrx = ZoomPane.getInstance().getLeftOffset();
+	        rrx = getX() - getParent().getX() + pane.getLeftOffset();
 	    }
-	    
-	    
+	    rry = getY() - getParent().getY() + pane.getTopOffset() + getHeight()/2;
+	}
+	else if (isZoomRepaint()) {
+	    if (isRightSide) {
+	        rrx = pane.getLeftOffset() + getWidth();
+	    } else {
+	        rrx = pane.getLeftOffset();
+	    }
+	    rry = pane.getTopOffset() + getHeight()/2;
     }
 	
 	if (!hilited) g.setColor(Constants.FRAME_COLOR);
@@ -210,7 +217,7 @@ protected void draw(Graphics g, boolean hilited) {
 	}
 	else if (mode == InLink.OUTPUT_MACRO_MODE)
 	{
-		// output link	
+	    // output link	
 		int arrowLength = 3*r;
 
 		if (!isRightSide)
@@ -604,5 +611,5 @@ public void setRight(boolean isRight)
 			fieldData.setValue(nullString);
 		}
 	}
-	
+		
 }
