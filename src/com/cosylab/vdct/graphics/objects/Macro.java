@@ -901,13 +901,13 @@ public boolean isRight() {
 	    int left = 0;
 	    int right = 0;
 	    for (int i = 0; i < outlinks.size(); i++) {
-	        first = (OutLink)outlinks.firstElement();
+	        first = (OutLink)outlinks.get(i);
 			if (first.getLayerID().equals(getLayerID())) {
 			    if (first.isRight()) {
 			    	if (first.getRightX() < getLeftX()){
 //			        if (!( getRightX() <= first.getLeftX() ||
 //						   (first.getLeftX()<getLeftX() && getLeftX()<first.getRightX() && first.getRightX()<getRightX()))) {
-			            right++;										
+			            right++;	
 			        } else {
 			            left++;
 			        }
