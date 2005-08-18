@@ -894,18 +894,41 @@ public Vector getStartPoints() {
  * @return boolean
  */
 public boolean isRight() {
-	if (disconnected || outlinks.size()==0) 
+	if (disconnected || outlinks.size()==0) {
 		return true;
-	else {
-		OutLink first = (OutLink)outlinks.firstElement();
-		if (first.getLayerID().equals(getLayerID())) {
-		        return !( getRightX() <= first.getLeftX() ||
-					   (first.getLeftX()<getLeftX() && getLeftX()<first.getRightX() && first.getRightX()<getRightX()));										
-			//return (first.getOutX()<(getX()+getWidth()/2));
-		        
-		}
-		else 
-		    return true;
+	} else {
+	    OutLink first;
+	    int left = 0;
+	    int right = 0;
+	    for (int i = 0; i < outlinks.size(); i++) {
+	        first = (OutLink)outlinks.firstElement();
+			if (first.getLayerID().equals(getLayerID())) {
+			    if (first.isRight()) {
+			    	if (first.getRightX() < getLeftX()){
+//			        if (!( getRightX() <= first.getLeftX() ||
+//						   (first.getLeftX()<getLeftX() && getLeftX()<first.getRightX() && first.getRightX()<getRightX()))) {
+			            right++;										
+			        } else {
+			            left++;
+			        }
+			    } else {
+			        if (first.getLeftX() > getRightX()) {
+			            left++;
+			        } else {
+			            right++;
+			        }
+			    }
+				//return (first.getOutX()<(getX()+getWidth()/2));
+			} else {
+			    right++;
+			}
+	    }
+	    if (right >= left)  {
+	        return true;
+	    }
+	    else {
+	        return false;
+	    }
 	}
 }
 /**
