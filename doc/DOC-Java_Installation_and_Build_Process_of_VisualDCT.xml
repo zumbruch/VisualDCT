@@ -30,6 +30,11 @@
 		</modification>
 		<release version="1.1" by="msekoranja" date="2002-07-10">
 		</release>
+		<modification version="1.2" by="msekoranja" date="2005-08-21">
+			<section id="build">Updated.</section>
+		</modification>
+		<release version="1.2" by="msekoranja" date="2005-08-21">
+		</release>
 
 		<scope>
 			This document is a users guide to installing the Java software necessary to perform builds of VisualDCT project.
@@ -289,12 +294,12 @@
 						VisualDCT Ant build scripts need the following external task libraries:
 						<ul>
 						  <li><a href="http://sourceforge.net/projects/junit/">JUnit Testing Framework</a></li>
-						  <li><a href="http://visualdct.cosylab.com/VisualDCT-Common/">VisualDCT-Common</a></li>
 						</ul>
 					</p>
 					<p>
-						And some optional, necessary to do VisualDCT integration builds and releases: 
+						And some optional, necessary to do VisualDCT integration builds and releases (needed only by Cosylab to generate VisualDCT WWW pages): 
 						<ul>
+						  <li><a href="http://visualdct.cosylab.com/VisualDCT-Common/">VisualDCT-Common</a></li>
 						  <li><a href="http://www.langdale.com.au/styler/">Styler ANT Task</a></li>
 						  <li><a href="http://sourceforge.net/projects/mmmysql/">MySQL JDBC driver</a></li>
 						</ul>
@@ -440,7 +445,7 @@
 					<p>
 					VisualDCT Ant build script <f>VDCTBuild.xml</f> has defined the following targets:
 					<ul>
-					  <li><b>jar</b> - builds Java ARchive (jar) file, i.e. java binaries.</li>
+					  <li><b>jar</b> - builds Java ARchive (jar) file, i.e. java binaries [default].</li>
 					  <li>*<b>all</b> - builds all (jar, tests, source jar, docs, web content)</li>
 					  <li>*<b>build</b> - builds new integration build (generates new build version, jar, tests, source jar, docs, full web content)</li>
 					  <li>*<b>release</b> - builds new release (generates new build version, jar, tests, source jar, docs, full web content)</li>
@@ -449,6 +454,12 @@
 					</p>
 					<comment by="msekoranja">* - to be used only by Cosylab.</comment>
 					<p>
+					</p>
+				</section>
+				<section id="how-to-build" title="How to build a VisualDCT.jar (for external users)">
+					<p>
+					Simply go to the VisualDCT source root directory and type <tt>ant</tt>.<br/>
+					You do not need any additional (external) libraries.
 					</p>
 				</section>
 			</section>	
