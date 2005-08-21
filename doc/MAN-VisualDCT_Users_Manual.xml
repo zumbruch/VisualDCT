@@ -37,6 +37,10 @@
 			<section>Added details on VDCT configuration to running section.</section>
 		</modification>
 
+		<modification version="1.5" by="msekoranja" date="2005-08-21">
+			<section>Added descriptions on new VDCT features.</section>
+		</modification>
+
 		<scope>
 			This document is a users manual of how to use VisualDCT and also contains some tips and ticks.
 		</scope>
@@ -58,7 +62,7 @@
 			   author="Matej Sekoranja"
 			   date="2004"
 			   publisher="Cosylab, Ltd."
-			   revision="2.4.1254"/>
+			   revision="2.5.1263"/>
 
 		<reference id="vdct_installation"
 			   title="Java Installation and Build Process of VisualDCT"
@@ -167,6 +171,13 @@
 				</code>
 			<p>
 				<kwd>VDCT_DIR</kwd> environment variable is used to define the default working directory.<br/>
+				VisualDCT als supports EPICS_DB_INCLUDE_PATH environment variable, which adds a additional
+				search path for DB files used in the hierarchy so you can store useful modules in a central location.
+			</p>
+				<code language="command line" id="cmdln">
+				  java -jar VisualDCT.jar -DEPICS_DB_INCLUDE_PATH=$EPICS_DB_INCLUDE_PATH test.dbd test.db<desc>An example of EPICS_DB_INCLUDE_PATH environment variable usage.</desc>
+				</code>
+			<p>
 				For saving configuration data Java Preferences API is used. This means configuration is kept in
 				a system depended configuration storage, e.g. registry when using Windows OS, <f>~/.java</f> (user) and <f>/etc/java</f> (system) on UNIX/Linux systems..
 			</p>
@@ -316,7 +327,7 @@ expand("slideMotor.vdb", slmot1) {
 						record's input fields, a field node will appear below the record.
 						Additionally indication of data flow direction using arrows makes fields easy to distinguish:
 						<ul>
-						  <li><b>circle</b> - <kwd>VARIABLE</kwd> fields</li>
+						  <li><b>circle</b> - <kwd>VARIABLE</kwd> fields (from version 2.5 on, <kwd>VARIABLE</kwd> fields have a circle on both sides)</li>
 						  <li><b>out-arrow</b> - <kwd>OUTPUT</kwd> and <kwd>FORWARD</kwd> fields</li>
 						  <li><b>in-arrow</b> - <kwd>INPUT</kwd> fields</li>
 						</ul>
@@ -324,6 +335,7 @@ expand("slideMotor.vdb", slmot1) {
 					<p>
 						A multi-point wire can be drawn between any two linkable fields simply by adding connectors (moveable small squares on a link line).
 						If a link is an inter-group link (link between two fields which are not in the same group), the link is represented as a line going in the screen with the target link name shown by side.
+						Wherever VisualDCT detects there is a possiblity of two wire to merge, it indicates this by drawing a small dot on the wire (at the possible point of merging). 
 					</p>
 				</section>
 
@@ -390,7 +402,26 @@ expand("slideMotor.vdb", slmot1) {
 				<comment by="msekoranja">VisualDCT uses the following rule: linking destintation is the object which value contains target name, e.g. ao001.INP (source) field contains "ao002.VAL" value (target).</comment>
 			</section>
 
-			<section id="grouping" title="Grouping">
+			<section id="morphing" title="Morphing">
+				<p>
+					VisualDCT has a capability to morph (change) record and template types, i.e. to change type and preserving all common fields. 
+					Command is accessible via <m>Edit</m>-<m>Morph</m> menu or pop-up (context) menu.
+				</p>
+			</section>
+
+			<section id="borders" title="Borders">
+				<p>
+					VisualDCT supports custom defined borders (just like the borders around mechanical and
+					electrical engineering drawings) which have author, id, name and change
+					blocks. They consist of lines, rectangles and text blocks, but no
+					records. Once merged, the block remains as a single block with text editable.<br/>
+					Borders are defined as a ordinary DB file using box, textbox and line objects. 
+					Once this DB file is imported into other DB using <m>File</m>-<m>Import border...</m> all
+					graphics objects are imported as single block with textbox editable.
+				</p>
+			</section>
+
+			<section id="grouping" title="Grouping (obsolete, replaced by hierachies)">
 				<p>
 					Grouping is based on the naming,
 					for instance record with name <i>grp1:ao001</i> belongs to group <i>grp1</i> and record <i>grp1:grp2:ao002</i>
