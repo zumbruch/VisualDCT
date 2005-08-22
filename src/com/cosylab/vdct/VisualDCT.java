@@ -6399,6 +6399,7 @@ public void openMenuItem_ActionPerformed() {
 		}
 	}
 }
+
 /**
  * Comment
  */
@@ -6411,7 +6412,7 @@ public void pageSetupMenuItem_ActionPerformed(java.awt.event.ActionEvent actionE
 		
 			if(pi == null)
 				return;
-		
+			
 			PrintRequestAttributeSet printRequestAttributeSet = Page.getPrintRequestAttributeSet();
 		
 			PrinterJob printerJob = PrinterJob.getPrinterJob();
@@ -6425,6 +6426,7 @@ public void pageSetupMenuItem_ActionPerformed(java.awt.event.ActionEvent actionE
 			}
 			
 			PageFormat pageFormat = printerJob.pageDialog(printRequestAttributeSet);
+			
 			if(pageFormat==null)
 				return;
 		
@@ -6454,9 +6456,10 @@ public void pageSetupMenuItem_ActionPerformed(java.awt.event.ActionEvent actionE
 				mediaPrintableArea.getHeight(MediaPrintableArea.INCH) * 72);
 		
 			pi.getPageable().getPageFormat(0).setPaper(paper);
-			
+						
 			// store settings 
 			com.cosylab.vdct.graphics.printing.Page.setPageFormat(pageFormat);
+			Page.setPrintRequestAttributeSet(printRequestAttributeSet);
 	//	}
 	//}.start();
 
@@ -6760,6 +6763,7 @@ public void printAsPostScriptMenuItem_ActionPerformed()
  * Comment
  */
 public void printMenuItem_ActionPerformed() {
+    Media m;
 	final GetPrintableInterface pi = (GetPrintableInterface)CommandManager.getInstance().getCommand("GetPrintableInterface");
 	if (pi!=null)
 	new Thread() {
@@ -6767,6 +6771,8 @@ public void printMenuItem_ActionPerformed() {
 			try {
 				PrintRequestAttributeSet printRequestAttributeSet = Page.getPrintRequestAttributeSet();
 
+//				HashPrintRequestAttributeSet printRequestAttributeSet = new HashPrintRequestAttributeSet();
+				
 				PrinterJob printerJob = PrinterJob.getPrinterJob();
 				printerJob.setJobName(getTitle());
 				printerJob.setPageable(pi.getPageable());
@@ -6783,7 +6789,7 @@ public void printMenuItem_ActionPerformed() {
 				    lastPrintService = printerJob.getPrintService();
 					return;
 				}
-
+				
 				lastPrintService = printerJob.getPrintService();
 				
 				int pageFormatOrientation = PageFormat.PORTRAIT;
@@ -6801,11 +6807,22 @@ public void printMenuItem_ActionPerformed() {
 				
 				pi.getPageable().getPageFormat(0).setOrientation(pageFormatOrientation);
 
+				Paper paper = pi.getPageable().getPageFormat(0).getPaper();
+				PageFormat pf = pi.getPageable().getPageFormat(0);
+				
+				Media media = (Media)printRequestAttributeSet.get(Media.class);
+				if (media instanceof MediaSizeName) {
+		        	MediaSizeName msn = (MediaSizeName)media;
+		        	MediaSize ms = MediaSize.getMediaSizeForName(msn);
+		        	double width = ms.getX (MediaSize.INCH) * 72;
+		    		double height = ms.getY (MediaSize.INCH) * 72;
+		    		
+		    		paper.setSize(width, height);
+		        }
+				
 				MediaPrintableArea mediaPrintableArea = (MediaPrintableArea)
 					printRequestAttributeSet.get(MediaPrintableArea.class);
 					
-				Paper paper = pi.getPageable().getPageFormat(0).getPaper();
-
 				paper.setImageableArea(mediaPrintableArea.getX(MediaPrintableArea.INCH) * 72.0,
 					mediaPrintableArea.getY(MediaPrintableArea.INCH) * 72.0,
 					mediaPrintableArea.getWidth(MediaPrintableArea.INCH) * 72,
@@ -6813,15 +6830,17 @@ public void printMenuItem_ActionPerformed() {
 	
 				pi.getPageable().getPageFormat(0).setPaper(paper);
 
+				
+				
 				// store settings 
 				com.cosylab.vdct.graphics.printing.Page.setPageFormat(pi.getPageable().getPageFormat(0));
-
+				Page.setPrintRequestAttributeSet(printRequestAttributeSet);
 				setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
 				
 				Thread.yield();
 				printerJob.print(printRequestAttributeSet);
 								
-			} catch (PrinterException ex) {
+			} catch (Exception ex) {
 				ex.printStackTrace();
 				com.cosylab.vdct.Console.getInstance().println("Printing error: "+ex);
 			}
