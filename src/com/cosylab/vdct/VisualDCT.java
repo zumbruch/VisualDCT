@@ -214,9 +214,11 @@ public class VisualDCT extends JFrame {
 	private ComboBoxFileChooser comboBoxFileChooser = null;
 
 	private PrintService lastPrintService = null;
+	
 // shp: not final solution
 	private static VisualDCT instance = null;
-
+	
+	
 class IvjEventHandler implements java.awt.event.ActionListener, java.awt.event.ItemListener, java.awt.event.MouseListener, java.awt.event.MouseMotionListener, java.awt.event.WindowListener {
 		public void actionPerformed(java.awt.event.ActionEvent e) {
 			if (e.getSource() == VisualDCT.this.getLeftMenuItem())
@@ -6417,6 +6419,10 @@ public void pageSetupMenuItem_ActionPerformed(java.awt.event.ActionEvent actionE
 		
 			PrinterJob printerJob = PrinterJob.getPrinterJob();
 			
+			if (lastPrintService == null) {
+			    lastPrintService = PrinterSelector.getPrinterSelector(this).getPrintService();
+			}
+			
 			if (lastPrintService != null) {
 			    try {
                     printerJob.setPrintService(lastPrintService);
@@ -6424,7 +6430,7 @@ public void pageSetupMenuItem_ActionPerformed(java.awt.event.ActionEvent actionE
                     handleException(e);
                 }
 			}
-			
+							
 			PageFormat pageFormat = printerJob.pageDialog(printRequestAttributeSet);
 			
 			if(pageFormat==null)
