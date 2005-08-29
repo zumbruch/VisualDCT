@@ -81,11 +81,11 @@ public class PrinterSelector extends JDialog implements ActionListener {
             servicesCombo = new JComboBox();
             canvas.add(servicesCombo, new GridBagConstraints(1,0,3,1,0.8,0,GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5,5,5,5), 1,1));
             
-            okButton = new JButton("SAVE");
+            okButton = new JButton("OK");
             canvas.add(okButton, new GridBagConstraints(2,1,1,1,1,0,GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5,5,5,5), 1,1));
             okButton.addActionListener(this);
             okButton.setActionCommand(OK_COMMAND);
-            cancelButton = new JButton("SKIP");
+            cancelButton = new JButton("CANCEL");
             canvas.add(cancelButton, new GridBagConstraints(3,1,1,1,1,0,GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5,5,5,5), 1,1));
             cancelButton.addActionListener(this);
             cancelButton.setActionCommand(CANCEL_COMMAND);

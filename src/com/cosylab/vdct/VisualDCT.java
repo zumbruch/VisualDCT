@@ -6419,11 +6419,11 @@ public void pageSetupMenuItem_ActionPerformed(java.awt.event.ActionEvent actionE
 		
 			PrinterJob printerJob = PrinterJob.getPrinterJob();
 			
-			if (lastPrintService == null) {
-			    lastPrintService = PrinterSelector.getPrinterSelector(this).getPrintService();
-			}
+			lastPrintService = PrinterSelector.getPrinterSelector(this).getPrintService();
 			
-			if (lastPrintService != null) {
+			if (lastPrintService == null) {
+			    return;
+			} else {
 			    try {
                     printerJob.setPrintService(lastPrintService);
                 } catch (PrinterException e) {
