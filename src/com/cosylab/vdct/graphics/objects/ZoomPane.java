@@ -58,7 +58,7 @@ public final class ZoomPane implements ImageObserver {
     
     /**
      * 
-     * Returns the left offset - distance from the left border for the first drawn object.
+     * Returns the left offset - distance from the left border to the most left object.
      * @return
      */
     public int getLeftOffset() {
@@ -67,16 +67,16 @@ public final class ZoomPane implements ImageObserver {
     
     /**
      * 
-     * Returns the right offset - distance from the right border for the first drawn object.
+     * Returns the right offset - distance from the right border to the most right object.
      * @return
      */
     public int getRightOffset() {
-        return rightOffset;
+        return rightOffset + HORIZONTAL_MARGIN;
     }
     
     /**
      * 
-     * Returns the top offset - distance from the top border for the first drawn object.
+     * Returns the top offset - distance from the top border to the object that is the closest to the top.
      * @return
      */
     public int getTopOffset() {
