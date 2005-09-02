@@ -358,7 +358,7 @@ public void delete() {
 	try	{
 	
 		UndoManager.getInstance().startMacroAction();
-	
+
 		VisibleObject obj;
 		Enumeration selected = view.getSelectedObjects().elements();
 		while (selected.hasMoreElements())
@@ -556,6 +556,8 @@ public void paste() {
 	// do some offset (a little trick to have snapping also done) for copy only
 	final int OFFSET = Constants.GRID_SIZE;
 	double scale = ViewState.getInstance().getScale();
+	double px = pasteX <= 0 ? 0 : pasteX;
+	double py = pasteY <= 0 ? 0 : pasteY;
 	if (doOffsetAtPaste)
 		pasteAtPosition((int)((pasteX+OFFSET)*scale), (int)((pasteY+OFFSET)*scale));
 	else
@@ -569,13 +571,23 @@ public void paste() {
 public void pasteAtPosition(int pX, int pY) {
 	ViewState view = ViewState.getInstance();
 	String currentGroupName = drawingSurface.getViewGroup().getAbsoluteName();
-	int size = Group.getClipboard().getSubObjectsV().size();
+	
+	Group group = Group.getClipboard();
+	
+	int size = group.getSubObjectsV().size();
 	if (size==0) return;
 
 	double scale = view.getScale();
 	int posX = (int)((pX + view.getRx()) / scale);
 	int posY = (int)((pY + view.getRy()) / scale);
 
+	posX = posX <= 0 ? 0 : posX;
+	posX = posX >= view.getWidth() - group.getAbsoulteWidth() ? view.getWidth() - group.getAbsoulteWidth() : posX;
+	posY = posY <= 0 ? 0 : posY;
+	posY = posY >= view.getHeight() - group.getAbsoulteHeight() ? view.getHeight() - group.getAbsoulteHeight() : posY;
+	
+	
+	
 	Object objs[] = new Object[size];
 	Group.getClipboard().getSubObjectsV().copyInto(objs);
 
@@ -603,7 +615,7 @@ public void pasteAtPosition(int pX, int pY) {
 				
 				if (objs[i] instanceof Movable) {
 					//((Movable)objs[i]).move(view.getRx(), view.getRy());
-				   ((Movable)objs[i]).move(posX, posY);
+				    ((Movable)objs[i]).move(posX, posY);
 				}
 			}
 			else

@@ -1878,6 +1878,42 @@ public static void setEditingTemplateData(VDBTemplate editingTemplateData)
 		return structure;
 	}
 
+	
+	public int getAbsoulteWidth() {
+	    if (subObjectsV.size() == 0) return getWidth();
+	    
+	    int tempw;
+	    
+	    VisibleObject vo = (VisibleObject) subObjectsV.get(0);
+	    int left = vo.getX();
+	    int right = vo.getX() + vo.getWidth();
+	    for (int i = 1; i < subObjectsV.size(); i++) {
+	        vo = (VisibleObject) subObjectsV.get(i);
+	        tempw = vo.getX();
+	        if (tempw < left) left = tempw;
+	        if (tempw + vo.getWidth() > right) right = tempw + vo.getWidth();
+	    }
+	    return right - left;
+	    
+	}
+	
+	public int getAbsoulteHeight() {
+	    if (subObjectsV.size() == 0) return getWidth();
+	    
+	    int temph;
+	    
+	    VisibleObject vo = (VisibleObject) subObjectsV.get(0);
+	    int upper = vo.getY();
+	    int lower = vo.getY() + vo.getHeight();
+	    for (int i = 1; i < subObjectsV.size(); i++) {
+	        vo = (VisibleObject) subObjectsV.get(i);
+	        temph = vo.getY();
+	        if (temph < upper) upper = temph;
+	        if (temph + vo.getHeight() > lower) lower = temph + vo.getHeight();
+	    }
+	    return lower - upper;
+	    
+	}
 /**
  * @param linkableMacros
  * @param macros

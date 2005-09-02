@@ -1851,17 +1851,18 @@ public boolean importBorder(File file)
 	    //
 		Group rootGroup = Group.getRoot();
 		
-        // packed undo
-        if (!imported)
-        {
-            imported = true;
-            UndoManager.getInstance().startMacroAction();
-        }
+        // packed undo - use CreateAction(VisibleObject) instead
+//        if (!imported)
+//        {
+//            imported = true;
+//            UndoManager.getInstance().startMacroAction();
+//        }
 
         Border border = new Border(null, rootGroup);
 		applyVisualDataOfGraphicsObjects(dbData, border);
 		rootGroup.addSubObject(border.getName(), border);
 		
+		UndoManager.getInstance().addAction(new CreateAction(border));
 		
   		blockNavigatorRedrawOnce = false;
    		createNavigatorImage();
@@ -1879,8 +1880,8 @@ public boolean importBorder(File file)
     }
     finally {
         
-        if (imported)
-            UndoManager.getInstance().stopMacroAction();
+//        if (imported)
+//            UndoManager.getInstance().stopMacroAction();
         
 		restoreCursor();
     }
@@ -3477,11 +3478,11 @@ public boolean prepareTemplateLeave()
 		}
 		else {
 		    
-		    int select = JOptionPane.showConfirmDialog(VisualDCT.getInstance(), "The file has been modified. Discard changes?", "Confirmation", 
+		    int select = JOptionPane.showConfirmDialog(VisualDCT.getInstance(), "The file has been modified. Save changes?", "Confirmation", 
 						JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
 		    switch(select) {
 			
-		    	case JOptionPane.NO_OPTION: {
+		    	case JOptionPane.YES_OPTION: {
 		    	    VisualDCT.getInstance().saveMenuItem_ActionPerformed();
 		    	    VDBTemplate backup = (VDBTemplate)templateStack.pop();
 					// reload template
@@ -3503,7 +3504,7 @@ public boolean prepareTemplateLeave()
 					return true;
 		    	}
 		    
-				case JOptionPane.YES_OPTION: {
+				case JOptionPane.NO_OPTION: {
 					// pop old current
 					VDBTemplate backup = (VDBTemplate)templateStack.pop();
 					// reload template
