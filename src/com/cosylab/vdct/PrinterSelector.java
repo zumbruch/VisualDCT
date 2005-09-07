@@ -85,7 +85,7 @@ public class PrinterSelector extends JDialog implements ActionListener {
             canvas.add(okButton, new GridBagConstraints(2,1,1,1,1,0,GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5,5,5,5), 1,1));
             okButton.addActionListener(this);
             okButton.setActionCommand(OK_COMMAND);
-            cancelButton = new JButton("CANCEL");
+            cancelButton = new JButton("Cancel");
             canvas.add(cancelButton, new GridBagConstraints(3,1,1,1,1,0,GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5,5,5,5), 1,1));
             cancelButton.addActionListener(this);
             cancelButton.setActionCommand(CANCEL_COMMAND);
