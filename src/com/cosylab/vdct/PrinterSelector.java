@@ -102,7 +102,7 @@ public class PrinterSelector extends JDialog implements ActionListener {
      */
     public PrintService getPrintService() {
         refresh();
-        this.show();
+        this.setVisible(true);
         return service;
     }
     
