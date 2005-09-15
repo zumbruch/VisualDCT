@@ -519,8 +519,6 @@ protected void draw(Graphics g, boolean hilited) {
 				    
 				}				
 			
-				System.out.println(view.getRy() + " " + Rscale*getInY());
-				
 				if (isRightSide) {
 					cx = rrx + rwidth + r;
 					g.drawOval(cx - r, cy - r, 2 * r, 2 * r);
