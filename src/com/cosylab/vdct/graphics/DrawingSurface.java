@@ -2054,7 +2054,7 @@ private void cleanDBDList() {
  * @param file java.io.File
  */
 public boolean importDB(File file) throws IOException {
-	return open(file, true, true);
+    return open(file, true, true);
 }
 
 /**
@@ -2081,8 +2081,11 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 		}
 
 		ArrayList blackList = null;
-		if (importDB)
+		HashMap importedList = null;
+		if (importDB) {
 			blackList = new ArrayList();
+			importedList = new HashMap();
+		}
 
 		// add records
 
@@ -2121,7 +2124,7 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 							+ " already exists - this definition will be ignored.");
 					blackList.add(record);
 					continue;
-				}
+				} 
 	
 				record = new Record(null, vdbRec, dbRec.getX(), dbRec.getY());
 				record.setRight(dbRec.isRotated());
@@ -2139,8 +2142,9 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 						field.setDescription(dbField.getDescription());
 					}
 				}
-	
+				
 				group.addSubObject(vdbRec.getName(), record, true);
+				if (importDB) importedList.put(vdbRec.getName(), record);
 
 			}
 			else if (obj instanceof VDBTemplateInstance)
@@ -2170,6 +2174,7 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 	
 				Template templ = new Template(null, templateInstance, false);
 				group.addSubObject(dbTemplate.getTemplateInstanceId(), templ, true);
+				if (importDB) importedList.put(dbTemplate.getTemplateInstanceId(), templ);
 				
 				// add fields (to preserve order)
 				e2 = dbTemplate.getTemplateFields().elements();
@@ -2485,13 +2490,19 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 		}
 		
 		applyVisualDataOfGraphicsObjects(dbData, rootGroup);
-
+		if (importDB) {
+		    boolean monitor = UndoManager.getInstance().isMonitor();
+		    UndoManager.getInstance().setMonitor(true);
+		    UndoManager.getInstance().addAction(new ImportAction(importedList, rootGroup));
+		    UndoManager.getInstance().setMonitor(monitor);
+		}
 	} catch (Exception e) {
 		Console.getInstance().println("Error occured while applying visual data!");
 		e.printStackTrace();
 	}
 
 	group.initializeLayout();
+		
 	// call this after ports/macros fields are initialized !!
 //	group.manageLinks(true);
 }
