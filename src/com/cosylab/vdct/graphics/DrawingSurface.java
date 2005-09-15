@@ -3381,6 +3381,8 @@ public void zoomArea(int x1, int y1, int x2, int y2) {
 	{
 		nscale=2.5; dfscale=2.5/scale;
 	}
+	//round to 1 digit
+	nscale = ((int)(nscale*10))/10.;
 
 	double dx = w*(xscale-dfscale)/2.0;
 	double dy = h*(yscale-dfscale)/2.0;
