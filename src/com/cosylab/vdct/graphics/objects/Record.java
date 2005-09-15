@@ -519,6 +519,8 @@ protected void draw(Graphics g, boolean hilited) {
 				    
 				}				
 			
+				System.out.println(view.getRy() + " " + Rscale*getInY());
+				
 				if (isRightSide) {
 					cx = rrx + rwidth + r;
 					g.drawOval(cx - r, cy - r, 2 * r, 2 * r);
@@ -824,7 +826,17 @@ public int getInX() {
  * @return int
  */
 public int getInY() {
-	return getY()+getHeight()/2;
+    int mid = getY() + getHeight()/2;
+    boolean equal = false;
+    int temp = mid;
+    Enumeration en = outlinks.elements();
+    while(en.hasMoreElements() && !equal) {
+        temp = ((OutLink)en.nextElement()).getOutY();
+        equal = Math.abs(temp - mid) < Constants.GRID_SIZE/2;
+    }
+    if (equal) return temp;
+    else return mid;
+//	return getY()+getHeight()/2;
 }
 /**
  * Insert the method's description here.
