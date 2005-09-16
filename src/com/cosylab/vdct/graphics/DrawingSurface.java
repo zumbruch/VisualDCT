@@ -216,6 +216,26 @@ public DrawingSurface() {
 	crossCursor = new Cursor(Cursor.CROSSHAIR_CURSOR);
 
 	MouseEventManager.getInstance().subscribe("WorkspacePanel", this);
+	KeyEventManager.getInstance().subscribe("ContentPane", new KeyAdapter() {
+	    public void keyPressed(KeyEvent e) {
+	        if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
+	            VisibleObject hil = ViewState.getInstance().getHilitedObject();
+	            if (hil != null) {
+	                ViewState.getInstance().setAsHilited(hil, true);
+	            }
+	        }
+	    }
+	    
+	    public void keyReleased(KeyEvent e) {
+	        if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
+	            VisibleObject hil = ViewState.getInstance().getHilitedObject();
+	            if (hil != null) {
+	                ViewState.getInstance().setAsHilited(hil, false);
+	                repaint();
+	            }
+	        }
+	    }
+	});
 
 	CommandManager commandManager = CommandManager.getInstance();
 	DSGUIInterface guimenu = new DSGUIInterface(this);
@@ -3896,5 +3916,4 @@ public void reset() {
 	redrawRequest = true;
 	repaint();
 }
-
 }

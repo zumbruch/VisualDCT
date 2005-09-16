@@ -3193,6 +3193,8 @@ private javax.swing.JPanel getJFrameContentPane() {
 			getJFrameContentPane().add(getStatusBarPane(), "South");
 			getJFrameContentPane().add(getworkspace(), "Center");
 			CommandManager.getInstance().addCommand("SetCursor", new SetCursorCommand(ivjJFrameContentPane));
+			KeyEventManager.getInstance().registerSubscreiber("ContentPane", ivjJFrameContentPane);
+			ivjJFrameContentPane.setFocusable(true);
 			// user code begin {1}
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
