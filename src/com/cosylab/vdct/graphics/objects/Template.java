@@ -1485,7 +1485,7 @@ public Flexible copyToGroup(java.lang.String group) {
 	//theTemplateCopy.setDescription(getTemplateData().getTemplate().getDescription());
 	theTemplateCopy.setX(getX()); theTemplateCopy.setY(getY());
 	//theTemplateCopy.move(20-view.getRx(), 20-view.getRy());
-	
+		
 	// apply fields data
 	Enumeration e = subObjectsV.elements();
 	EPICSLink field; Object obj;
@@ -1512,7 +1512,7 @@ public Flexible copyToGroup(java.lang.String group) {
 	}
 
 	// fix only valid links where target is also selected
-	fixMacrosOnCopy(Group.substractParentName(templateData.getName()), group);
+	theTemplateCopy.fixMacrosOnCopy(Group.substractParentName(templateData.getName()), group);
 	// links have to be fixed here... so <group>.manageLinks() should be called
 	// for clipboard copy this is done later...
 
