@@ -31,6 +31,8 @@ package com.cosylab.vdct;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.print.*;
 
 import javax.swing.*;
@@ -3195,6 +3197,11 @@ private javax.swing.JPanel getJFrameContentPane() {
 			CommandManager.getInstance().addCommand("SetCursor", new SetCursorCommand(ivjJFrameContentPane));
 			KeyEventManager.getInstance().registerSubscreiber("ContentPane", ivjJFrameContentPane);
 			ivjJFrameContentPane.setFocusable(true);
+			ivjJFrameContentPane.addMouseListener(new MouseAdapter() {
+			    public void mouseEntered(MouseEvent e) {
+			       ivjJFrameContentPane.requestFocus(); 
+			    }
+			});
 			// user code begin {1}
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
@@ -5314,6 +5321,11 @@ private com.cosylab.vdct.graphics.WorkspacePanel getworkspace() {
 		try {
 			ivjworkspace = new com.cosylab.vdct.graphics.WorkspacePanel();
 			ivjworkspace.setName("workspace");
+			ivjworkspace.addMouseListener(new MouseAdapter() {
+			    public void mouseEntered(MouseEvent e) {
+			       ivjJFrameContentPane.requestFocus(); 
+			    }
+			});
 			// user code begin {1}
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
