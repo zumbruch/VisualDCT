@@ -38,7 +38,6 @@ import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.events.commands.GetGUIInterface;
 import com.cosylab.vdct.graphics.DrawingSurface;
 import com.cosylab.vdct.graphics.ViewState;
-import com.cosylab.vdct.graphics.objects.EPICSVarLink;
 import com.cosylab.vdct.graphics.objects.EPICSVarOutLink;
 import com.cosylab.vdct.graphics.objects.Flexible;
 import com.cosylab.vdct.graphics.objects.Group;
@@ -187,7 +186,7 @@ public void show(Object object, JComponent component, int x, int y) {
 		if (items==null) items = new Vector();
 	}		
 
-	if (object instanceof Rotatable && !(object instanceof EPICSVarLink)) 
+	if (object instanceof Rotatable && !(object instanceof EPICSVarOutLink)) 
 		addRotatableItems((Rotatable)object, items);
 
 	if (object instanceof Flexible) 
