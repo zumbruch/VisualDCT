@@ -497,16 +497,19 @@ public class FindPanel extends JPanel
      * the controlling search engine.
      */
     class FindTabs extends JTabbedPane {
-        protected String TAB_NAME = "Name";
+        protected String NAME = "Name";
 
-        protected String TAB_TYPE = "Type";
+        protected String TYPE = "Type";
         
+        protected String TAB_CRITERIA = "Criteria";
         protected String TAB_RESULTS = "Results";
 
         protected FindResults resultsPanel = null;
 
         protected JScrollPane resultsScroller = null;
 
+        private JPanel criteriaPanel;
+        private ArrayList components = new ArrayList();
         /**
          * Construct a search tabbed pane with tab panels for seach by filename,
          * search by date, search by content and search results.
@@ -517,13 +520,15 @@ public class FindPanel extends JPanel
             setForeground(Color.black);
             //setFont(new Font("Helvetica", Font.BOLD, 10));
 
-            // Add search-by-name panel
-            addTab(TAB_NAME, new FindByName(FindPanel.this));
-
-            // Add search-by-type panel
-            addTab(TAB_TYPE, new FindByType(FindPanel.this));
-
-            // TODO add panels here...
+//            // Add search-by-name panel
+//            addTab(NAME, new FindByName(FindPanel.this));
+//
+//            // Add search-by-type panel
+//            addTab(TYPE, new FindByType(FindPanel.this));
+            
+            //all criteria on one tab
+            addTab(TAB_CRITERIA, getCriteriaPanel());
+//             TODO add panels here...
 
             // Add results panel
             resultsScroller = new JScrollPane(resultsPanel = new FindResults());
@@ -535,6 +540,29 @@ public class FindPanel extends JPanel
             addTab(TAB_RESULTS, resultsScroller);
         }
 
+        private JPanel getCriteriaPanel() {
+            criteriaPanel = new JPanel(new GridBagLayout());
+            
+            criteriaPanel.add(new JLabel(NAME),new GridBagConstraints(0,0,1,1,1,0.2,
+                    GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0,0,0,0), 1,1));
+            
+            FindByName namePanel = new FindByName(FindPanel.this);
+            components.add(namePanel);
+            criteriaPanel.add(namePanel, 
+                    new GridBagConstraints(0,1,1,1,1,1, GridBagConstraints.CENTER, 
+                            GridBagConstraints.BOTH, new Insets(0,0,0,0), 1,1));
+                        
+            criteriaPanel.add(new JLabel(TYPE),new GridBagConstraints(0,2,1,1,1,0.2,
+                    GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0,0,0,0), 1,1));
+            
+            FindByType typePanel = new FindByType(FindPanel.this);
+            components.add(typePanel);
+            criteriaPanel.add(new FindByType(FindPanel.this), 
+                    new GridBagConstraints(0,3,1,1,1,1, GridBagConstraints.CENTER, 
+                            GridBagConstraints.BOTH, new Insets(0,0,0,0), 1,1));
+            
+            return criteriaPanel;
+        }
         /**
          * Adds the specified file to the results list.
          *
@@ -554,6 +582,10 @@ public class FindPanel extends JPanel
         {
             if (resultsScroller != null)
                 setSelectedComponent(resultsScroller);
+        }
+        
+        private FindFilterFactory getFilterAt(int index) {
+            return (FindFilterFactory) components.get(index);
         }
 
         /**
@@ -579,11 +611,12 @@ public class FindPanel extends JPanel
 
             // Return an array of FindFilters
             Vector filters = new Vector();
-            for (int i = 0; i < getTabCount(); i++)
+            for (int i = 0; i < components.size(); i++)
             {
                 try
                 {
-                    FindFilterFactory fac = (FindFilterFactory) getComponentAt(i);
+//                    FindFilterFactory fac = (FindFilterFactory) getComponentAt(i);
+                    FindFilterFactory fac = getFilterAt(i);
                     FindFilter f = fac.createFindFilter();
                     if (f != null)
                         filters.addElement(f);

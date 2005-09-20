@@ -179,8 +179,11 @@ public Connector(String id, LinkManagerObject parent, OutLink outlink, InLink in
 	        setX(out);
 	    } 
 	    else if ((ol > ir)){
-//	        System.out.println("3");
-            setX(inX != in ? in + ir - il : in);
+	        System.out.println("3");
+	        if (outlink instanceof Port) {
+	            setX(in + ir - il + 5);
+	        } else 
+	            setX(inX != in ? in + ir - il : in);
 	    } else {
 //	        System.out.println("4");
 	        if (!z && !(outlink instanceof TemplateEPICSMacro)) {
@@ -226,7 +229,15 @@ public void accept(Visitor visitor) {}
  * Creation date: (4.2.2001 12:50:51)
  */
 public Connector addConnector() {
-	EPICSLink start = (EPICSLink)EPICSLinkOut.getStartPoint(this);
+    EPICSLink start = null;
+    try { 
+        start = (EPICSLink)EPICSLinkOut.getStartPoint(this);
+    } catch (ClassCastException e) {
+        //bugfix RT #12130 by jbobnar
+        //adding connectors to port links
+        start = (EPICSLink) EPICSLinkOut.getEndPoint(this);
+    }
+
 	if (start==null) return null;
 	String id = EPICSLinkOut.generateConnectorID(start);
 	String inlinkStr = "";

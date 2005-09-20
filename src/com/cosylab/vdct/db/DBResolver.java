@@ -93,9 +93,9 @@ public class DBResolver {
 	public static final String VDCTVISIBILITY = "Visibility";
 	public static final String VDCTCONNECTOR = "Connector";
 
-	// used format #! ConstantPort(portname, inLinkID, xpos, ypos, color, defaultVisibility)
-	// used format #! InputPort(portname, inLinkID, xpos, ypos, color, defaultVisibility)
-	// used format #! OutputPort(portname, inLinkID, xpos, ypos, color, defaultVisibility)
+	// used format #! ConstantPort(portname, inLinkID, xpos, ypos, color, defaultVisibility, textPositionNorth)
+	// used format #! InputPort(portname, inLinkID, xpos, ypos, color, defaultVisibility, textPositionNorth)
+	// used format #! OutputPort(portname, inLinkID, xpos, ypos, color, defaultVisibility, textPositionNorth)
 	public static final String VDCT_CONSTANT_PORT = "ConstantPort";
 	public static final String VDCT_INPUT_PORT = "InputPort";
 	public static final String VDCT_OUTPUT_PORT = "OutputPort";
@@ -1018,7 +1018,17 @@ public static String processTemplateComment(DBTemplate template, EnhancedStreamT
 						tokenizer.nextToken();
 						if (tokenizer.ttype == EnhancedStreamTokenizer.TT_NUMBER) port.setDefaultVisibility((int)tokenizer.nval);
 						else throw (new DBGParseException(errorString, tokenizer, fileName));
-
+						
+						// read macro text position if exists
+						tokenizer.nextToken();
+						if (tokenizer.ttype == EnhancedStreamTokenizer.TT_EOL) {
+						    tokenizer.pushBack();
+						    port.setNamePositionNorth(true);
+						} else if (tokenizer.ttype == EnhancedStreamTokenizer.TT_WORD){
+						    port.setNamePositionNorth(new Boolean(tokenizer.sval).booleanValue());
+						} else throw (new DBGParseException(errorString, tokenizer, fileName));
+						
+						
 						port.setHasVisual(true);
 					}
 				}

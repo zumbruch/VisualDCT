@@ -1281,10 +1281,11 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 	 			 comma + view.getScale() + ending);
  	
  Enumeration e = elements.elements();
+
  while (e.hasMoreElements()) 
  	{
 	 	obj = e.nextElement();
-	
+
 	 	if (obj instanceof Record)
 	 		{
 			 	record = (Record)obj;
@@ -1305,14 +1306,15 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 	 			while (e2.hasMoreElements())
 	 			{
 			 		obj = e2.nextElement();
+
 				 	if (obj instanceof Connector)
-			 		{
-			 			connector = (Connector)obj;
+			 		{	
+				 	    connector = (Connector)obj;
 						String target = NULL;
 						if (connector.getInput()!=null)
 							target = renamer.getResolvedName(connector.getInput().getID());
-							
-			 			file.writeBytes(CONNECTOR_START+
+						
+						file.writeBytes(CONNECTOR_START+
 					 		StringUtils.quoteIfMacro(
 						 		renamer.getResolvedName(connector.getID())
 						 	) + comma +  
@@ -1386,6 +1388,17 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 					 ending);
 			 	 group.writeVDCTData(file, renamer, export);
 	 		}
+ 	 	else if (obj instanceof Port) {
+			OutLink outlink = (OutLink)obj;
+			file.writeBytes(LINK_START+
+		 			StringUtils.quoteIfMacro(
+			 			renamer.getResolvedName(outlink.getID())
+			 		) + comma + 
+	 				StringUtils.quoteIfMacro(
+		 				renamer.getResolvedName(outlink.getInput().getID())
+			 		) +
+					ending);
+ 	 	}
  	 	else if (obj instanceof Border)
 	 		{
 	 			Group.writeVDCTData(((Border)obj).getSubObjectsV(), file, renamer, export);
@@ -1495,7 +1508,7 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 						String target = NULL;
 						if (connector.getInput()!=null)
 							target = renamer.getResolvedName(connector.getInput().getID());
-	
+						
 			 			file.writeBytes(CONNECTOR_START+
 					 		StringUtils.quoteIfMacro(
 						 		renamer.getResolvedName(connector.getID())
@@ -1659,7 +1672,8 @@ private static void writeTemplateData(DataOutputStream stream, NamingContext ren
 			justComma + StringUtils.quoteIfMacro(target) +
 			justComma + visiblePort.getX() + justComma + visiblePort.getY() + 
 			justComma + StringUtils.color2string(visiblePort.getColor()) +
-			justComma + port.getVisibility());
+			justComma + port.getVisibility() +
+			justComma + visiblePort.isTextPositionNorth());
 		stream.writeBytes(ending);
 	}	
 

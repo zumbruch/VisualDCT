@@ -374,6 +374,7 @@ private static VDBData generateTemplate(DBDData dbd, DBTemplate dbTemplate)
 									  port.getX(), port.getY());
 				visualPort.setColor(port.getColor());
 				visualPort.setMode(port.getMode());
+				visualPort.setTextPositionNorth(port.isNamePositionNorth());
 
 				// delegate defaultVisibility
 				vdbPort.setVisibility(port.getDefaultVisibility());
@@ -420,7 +421,7 @@ private static VDBData generateTemplate(DBDData dbd, DBTemplate dbTemplate)
 
 
 		VDBData.addTemplate(vt);
-
+		DrawingSurface.applyPortConnectors(vt.getGroup(), dbTemplate.getData(), vdbData);
 		return vdbData;
 	}
 	catch (Exception ex)

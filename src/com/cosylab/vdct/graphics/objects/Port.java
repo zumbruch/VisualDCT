@@ -38,6 +38,8 @@ import com.cosylab.vdct.graphics.*;
 import com.cosylab.vdct.graphics.popup.*;
 import com.cosylab.vdct.inspector.Inspectable;
 import com.cosylab.vdct.inspector.InspectableProperty;
+import com.cosylab.vdct.undo.CreateConnectorAction;
+import com.cosylab.vdct.undo.UndoManager;
 import com.cosylab.vdct.vdb.GUIHeader;
 import com.cosylab.vdct.vdb.GUISeparator;
 import com.cosylab.vdct.vdb.LinkProperties;
@@ -67,7 +69,7 @@ public class Port extends VisibleObject implements Descriptable, Movable, OutLin
 			}
 			else if (action.equals(addConnectorString))
 			{
-				//addConnector();
+				addConnector();
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
 			else if (action.equals(removeLinkString))
@@ -106,6 +108,12 @@ public class Port extends VisibleObject implements Descriptable, Movable, OutLin
 			    cmd.setData(Port.this, data);
 		 		cmd.execute();
 			}
+			else if (action.equals(textNorth)) {
+			    setTextPositionNorth(true);
+			}
+			else if (action.equals(textSide)) {
+			    setTextPositionNorth(false);
+			}
 			
 		}
 	}
@@ -128,6 +136,11 @@ public class Port extends VisibleObject implements Descriptable, Movable, OutLin
 	private static final String constantString = "CONSTANT";
 	private static final String inputString = "INPUT";
 	private static final String outputString = "OUTPUT";
+	
+	private static final String CONNECTOR_ID_START = "PORT/";
+	private static final String textPosition = "Text Position";
+	private static final String textNorth = "TOP";
+	private static final String textSide = "SIDE";
 
 	private static final String nullString = "";
 
@@ -144,6 +157,9 @@ public class Port extends VisibleObject implements Descriptable, Movable, OutLin
 	protected Polygon leftPoly;
 	protected Polygon rightPoly;
 
+	/** if textPositionNorth=true text is positioned on the top of 
+ 	 * the macro, if false it is on the side */
+ 	private boolean textPositionNorth = true;
 /**
  * Insert the method's description here.
  * Creation date: (1.2.2001 17:22:29)
@@ -325,11 +341,30 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 		g.setColor(drawColor);
 		g.drawPolygon(poly);
 		
-		if (getFont()!=null) {
-			//g.setColor(drawColor);
-			g.setFont(getFont());
+		if (getFont()!=null)	{
+		    FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(getFont());
+		    if (textPositionNorth) {
+		        setRlabelX(rwidth/2-fm.stringWidth(getLabel())/2);
+		        setRlabelY(-fm.getHeight()+fm.getAscent());
+		    } else {
+		        int s = (int)(getScale()*Constants.LINK_STUB_SIZE/4.0 + 2);
+		        setRlabelY((rheight + fm.getAscent() - fm.getDescent())/2);
+		        if (!isRight()) {
+		            setRlabelX(rwidth + s);
+		        } else {
+		            setRlabelX(-fm.stringWidth(getLabel())- s);
+		        }
+		    }
+		    g.setFont(getFont());
 			g.drawString(getLabel(), rrx+getRlabelX(), rry+getRlabelY());
-		}
+		}		
+		
+		
+		
+		
+		
+		
+		
 	}
 	
 	if (zoom) {
@@ -392,12 +427,12 @@ public java.util.Vector getItems() {
 	items.addElement(colorItem);
 
 	// no connectors for ports yet
-	/*
+	
 	JMenuItem addItem = new JMenuItem(addConnectorString);
 	addItem.setEnabled(!isDisconnected());
 	addItem.addActionListener(al);
 	items.addElement(addItem);
-	*/
+	
 	
 	// modes
 	items.addElement(new JSeparator());
@@ -421,6 +456,19 @@ public java.util.Vector getItems() {
 	modeMenu.add(outputModeItem);
 
 
+	JMenu textMenu = new JMenu(textPosition);
+	items.addElement(textMenu);
+
+	JRadioButtonMenuItem textNorthItem = new JRadioButtonMenuItem(textNorth, textPositionNorth);
+	textNorthItem.setEnabled(!textPositionNorth);
+	textNorthItem.addActionListener(al);
+	textMenu.add(textNorthItem);
+
+	JRadioButtonMenuItem textSideItem = new JRadioButtonMenuItem(textSide, !textPositionNorth);
+	textSideItem.setEnabled(textPositionNorth);
+	textSideItem.addActionListener(al);
+	textMenu.add(textSideItem);
+	
 	/*
 	items.add(new JSeparator());
 
@@ -955,6 +1003,40 @@ public int getRightX() {
 public int getTopOffset() {
     FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(getFont());
     return fm.getAscent();
+}
+
+public Connector addConnector() {
+    if (inlink instanceof Connector)
+	{
+        return ((Connector)inlink).addConnector();
+	}
+	else
+	{	
+	    ContainerObject inlinkParent = null;
+	    String id = CONNECTOR_ID_START + this.getID();
+	    if (inlink instanceof EPICSLink) {
+	        inlinkParent = ((EPICSLink)inlink).getParent();
+	    } else {
+	        return null;
+	    }
+		String inlinkStr = "";
+		String outlinkStr = getID();
+		if (inlink!=null) inlinkStr = inlink.getID();
+
+		Connector connector = new Connector(id, (LinkManagerObject)((EPICSLink)inlink).getParent(), this, getInput());
+		inlinkParent.addSubObject(id, connector);
+		UndoManager.getInstance().addAction(new CreateConnectorAction(connector, inlinkStr, outlinkStr));
+		return connector;
+	}
+}
+
+public void setTextPositionNorth(boolean isTextPositionNorth) {
+    this.textPositionNorth = isTextPositionNorth;
+    DrawingSurface.getInstance().repaint();
+}
+
+public boolean isTextPositionNorth() {
+    return this.textPositionNorth;
 }
 
 }

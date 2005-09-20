@@ -2077,6 +2077,52 @@ public boolean importDB(File file) throws IOException {
     return open(file, true, true);
 }
 
+public static void applyPortConnectors(Group group, DBData dbData, VDBData vdbData) {
+    
+    Group rootGroup = Group.getRoot();
+    int pos;
+	String portName = null;
+	String target;
+	
+	Object object = null;
+	Connector connector = null;
+	DBConnectorData connectorData;
+	DBLinkData dbLink;
+	Enumeration e = dbData.getLinks().elements();
+	
+	while (e.hasMoreElements())
+	{
+		dbLink = (DBLinkData) (e.nextElement());
+
+		pos = dbLink.getFieldName().lastIndexOf(Constants.FIELD_SEPARATOR);
+		if (pos > 0) {
+			continue;
+		} else {
+		    portName = dbLink.getFieldName();
+		}
+
+		object =  rootGroup.findObject(portName, true);
+		if (object instanceof Port) {
+		    Port port = (Port)object;
+		    
+			target = dbLink.getTargetID();
+
+			while ((connectorData = (DBConnectorData) dbData.getConnectors().get(target))!= null)
+			{
+			    connector = port.addConnector();
+				connector.setColor(connectorData.getColor());
+				connector.setDescription(connectorData.getDescription());
+				connector.setMode(connectorData.getMode());
+				connector.setX(connectorData.getX());
+				connector.setY(connectorData.getY());
+
+				target = connectorData.getTargetID();
+			}
+		}
+
+	}
+}
+
 /**
  * Insert the method's description here.
  */
@@ -2086,6 +2132,7 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
     if (vdbData==null)
 		return;
 	
+    
 	// apply visual-data && generate visual object, group hierarchy
 	try {
 
@@ -2124,12 +2171,14 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 		DBTemplateInstance dbTemplate;
 
 
-
+		
 		// add records, template instances and entries
 		Enumeration e = vdbData.getStructure().elements();
+
 		while (e.hasMoreElements())
 		{
 			Object obj = e.nextElement();
+
 			if (obj instanceof VDBRecordData)
 			{
 
@@ -2155,6 +2204,7 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 				e2 = dbRec.getVisualFieldsV().elements();
 				while (e2.hasMoreElements()) {
 					dbField = (DBFieldData) (e2.nextElement());
+					
 					if (dbField.isHasAdditionalData()) {
 						field = record.initializeLinkField(vdbRec.getField(dbField.getName()));
 						field.setColor(dbField.getColor());
@@ -2269,36 +2319,38 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 		}
 
 
-		
-			
-
 		// add links, connectors
 		
 		// !!!! fix templates links, connectors
-
+		
 		int pos;
-		String recordName;
-		String fieldName;
+		String recordName = null;
+		String fieldName = null;
 		String target;
 
 		Template template;
-		Object object;
+		Object object = null;
 		OutLink outlink;
 		InLink inlink;
 		Connector connector;
 		DBConnectorData connectorData;
 		DBLinkData dbLink;
 		e = dbData.getLinks().elements();
+
 		while (e.hasMoreElements())
 		{
 			dbLink = (DBLinkData) (e.nextElement());
 
 			pos = dbLink.getFieldName().lastIndexOf(Constants.FIELD_SEPARATOR);
-			recordName = dbLink.getFieldName().substring(0, pos);
-			fieldName = dbLink.getFieldName().substring(pos + 1);
+			if (pos > 0) {
+				recordName = dbLink.getFieldName().substring(0, pos);
+				fieldName = dbLink.getFieldName().substring(pos + 1);
+				
+			} else {
+			    recordName = dbLink.getFieldName();
+			}
 
 			object =  rootGroup.findObject(recordName, true);
-			
 			
 			if (object instanceof Template) {
 			   
@@ -2327,7 +2379,7 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 							
 					while ((connectorData = (DBConnectorData) dbData.getConnectors().get(target))!= null)
 					{
-						connector = new Connector(target, template, null, null);
+					    connector = new Connector(target, template, null, null);
 						connector.setColor(connectorData.getColor());
 						connector.setDescription(connectorData.getDescription());
 						connector.setMode(connectorData.getMode());
@@ -2501,8 +2553,10 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 					}
 				}
 			}
+			
 		}
 
+		
 //		 update template instances links
 		Iterator i = tobeUpdated.iterator();
 		while (i.hasNext()) {

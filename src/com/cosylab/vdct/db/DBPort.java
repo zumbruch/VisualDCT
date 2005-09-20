@@ -47,6 +47,7 @@ public class DBPort extends DBComment
 	protected int defaultVisibility = InspectableProperty.UNDEFINED_VISIBILITY;
 	protected java.awt.Color color = java.awt.Color.black;
 	protected String inLinkID = null;
+    private boolean isNamePositionNorth = false;
 	
 	/**
 	 * Insert the method's description here.
@@ -237,5 +238,19 @@ public class DBPort extends DBComment
 	{
 		this.defaultVisibility = defaultVisibility;
 	}
+	
+	public void setNamePositionNorth(boolean namePositionNorth) {
+        this.isNamePositionNorth = namePositionNorth;
+        
+    }
+    
+    /**
+     * 
+     * Returns the position of the text.
+     * @return
+     */
+    public boolean isNamePositionNorth() {
+        return isNamePositionNorth;
+    }
 
 }
