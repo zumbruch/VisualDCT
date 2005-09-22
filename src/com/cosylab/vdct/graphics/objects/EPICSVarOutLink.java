@@ -218,8 +218,8 @@ private com.cosylab.vdct.graphics.objects.EPICSVarOutLink.PopupMenuHandler creat
 	
 			boolean isRightSide = isRight();
 			// draw missing tail
-			if (outlinks.size()==0)
-			{
+//			if (outlinks.size()!=0)
+//			{
 				
 				if (zoom) {
 				    zoomImage = ZoomPane.getInstance().startZooming(this,!isZoomRepaint());
@@ -261,29 +261,13 @@ private com.cosylab.vdct.graphics.objects.EPICSVarOutLink.PopupMenuHandler creat
 				
 				if (isRightSide)
 					g.drawLine(rrx+2*r, rry, linkx, rry);
-				else 
+				else  
 					g.drawLine(linkx, rry, rrx-3*r, rry);
-			}
+//			}
 			
 		    LinkDrawer.drawLink(g, this, inlink, getQueueCount(), isRightSide);
-			
 		}
 		super.draw(g, hilited);
-//		if (zoom) {
-//	        int rwidth = getRwidth();
-//	        int rheight = getRheight();
-//	        if (isRightSide) {
-//	            rrx += (rwidth/Rscale - rwidth)/2;
-//	        } else {
-//	            rrx -= (rwidth/Rscale - rwidth)/2;
-//	        }
-//	        
-//	        if (view.getRx() < 0)
-//	            rrx = rrx < 0 ? 2 : rrx;
-//	        Rscale = 1.0;
-//	        r = (int)(Rscale*Constants.LINK_RADIOUS);
-//	    	rtailLen = (int)(Rscale*Constants.TAIL_LENGTH);
-//	    }
 	
 	}
 

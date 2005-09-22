@@ -250,23 +250,6 @@ protected void drawOneSided(Graphics g, boolean hilited) {
 	}
 	
 	super.draw(g, hilited);
-	
-//	if (zoom) {
-//        int rwidth = getRwidth();
-//        int rheight = getRheight();
-//        if (isRightSide) {
-//            rrx += (rwidth/Rscale - rwidth)/2+1;
-//        } else {
-//            rrx -= (rwidth/Rscale - rwidth)/2;
-//        }
-//        if (view.getRx() < 0)
-//            rrx = rrx < 0 ? 2 : rrx;
-//        Rscale = 1.0;
-//        r = (int)(Rscale*Constants.LINK_RADIOUS);
-//    	rtailLen = (int)(Rscale*Constants.TAIL_LENGTH);
-//    	g.setColor(Constants.BACKGROUND_COLOR);
-//    	g.fillRect(rrx-r, rry-r, 2*r,2*r);
-//    }
 
 }
 
@@ -350,11 +333,13 @@ protected void draw(Graphics g, boolean hilited) {
 		    linklx = 0;
 		    linkrx = ZoomPane.getInstance().getWidth();
 		}
-		if (hasLeftOutLink) 
+		if (hasLeftOutLink) {
 			g.drawLine(linklx, rry, rrlx-3*r, rry);
+		}
 
-		if (hasRightOutLink)
+		if (hasRightOutLink) {
 			g.drawLine(rrrx+2*r, rry, linkrx, rry);
+		}
 
 		
 		// !!! more intergroup inlinks?!
@@ -362,20 +347,6 @@ protected void draw(Graphics g, boolean hilited) {
 		
 	}
 	super.draw(g, hilited);
-	
-//	if (zoom) {
-//        int rwidth = getRwidth();
-//        int rheight = getRheight();
-//        rrrx += (rwidth/Rscale - rwidth)/2+1;
-//        rrlx -= (rwidth/Rscale - rwidth)/2;
-//
-//        if (view.getRx() < 0)
-//            rrrx = rrrx < 0 ? 2 : rrrx;
-//        
-//        if (view.getRx() < 0)
-//            rrlx = rrlx < 0 ? 2 : rrlx;
-//        g.drawImage(zoomImage, rrlx,rry, ZoomPane.getInstance());
-//    }
 
 }
 /**
@@ -565,17 +536,29 @@ public Vector getStartPoints() {
  * @return boolean
  */
 public boolean isRight() {
-	if (disconnected || outlinks.size()!=1)
-		return super.isRight();
-	else {
-		OutLink first = (OutLink)outlinks.firstElement();
-		if (first.getLayerID().equals(getLayerID()))
-			return getRightX()<=first.getLeftX()
-				|| (first.getLeftX()<getLeftX() && getLeftX() < first.getRightX() && first.getRightX() < getRightX());				
-			//return (first.getOutX()>(getX()+getWidth()/2));
-		else
-			return super.isRight();
+	if (disconnected || outlinks.size()!=1) {
+	    OutLink outlink;
+	    for (int i = 0; i < outlinks.size(); i++) {
+	        outlink = (OutLink) outlinks.get(i);
+	        if (isOutlinkOnRight(outlink)) return true;
+	    }
+//		return super.isRight();
+	    return false;
 	}
+	else {
+	    
+		OutLink first = (OutLink)outlinks.firstElement();
+		return isOutlinkOnRight(first);
+	}
+}
+
+private boolean isOutlinkOnRight(OutLink outlink) {
+    if (outlink.getLayerID().equals(getLayerID()))
+		return getRightX()<=outlink.getLeftX()
+			|| (outlink.getLeftX()<getLeftX() && getLeftX() < outlink.getRightX() && outlink.getRightX() < getRightX());				
+		//return (first.getOutX()>(getX()+getWidth()/2));
+	else
+		return super.isRight();
 }
 /**
  * Insert the method's description here.
