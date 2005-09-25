@@ -290,6 +290,8 @@ class IvjEventHandler implements java.awt.event.ActionListener, java.awt.event.I
 				connEtoC28(e);
 			else if (e.getSource() == VisualDCT.this.getSaveButton()) 
 				connEtoC29(e);
+			else if (e.getSource() == VisualDCT.this.getFindButton()) 
+			    VisualDCT.this.findActionPerformed();
 			else if (e.getSource() == VisualDCT.this.getUndoButton()) 
 				connEtoC30(e);
 			else if (e.getSource() == VisualDCT.this.getRedoButton()) 
@@ -2606,18 +2608,18 @@ private javax.swing.JMenu getFileMenu() {
  * @return javax.swing.JButton
  */
 /* WARNING: THIS METHOD WILL BE REGENERATED. */
-private javax.swing.JButton getFind_ReplaceButton() {
+private javax.swing.JButton getFindButton() {
 	if (ivjFind_ReplaceButton == null) {
 		try {
 			ivjFind_ReplaceButton = new javax.swing.JButton();
 			ivjFind_ReplaceButton.setName("Find_ReplaceButton");
-			ivjFind_ReplaceButton.setToolTipText("(Unused)");
+			ivjFind_ReplaceButton.setToolTipText("Find");
 			ivjFind_ReplaceButton.setText("");
 			ivjFind_ReplaceButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 			ivjFind_ReplaceButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
 			ivjFind_ReplaceButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/find.gif")));
 			ivjFind_ReplaceButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
-			ivjFind_ReplaceButton.setEnabled(false);
+			ivjFind_ReplaceButton.setEnabled(true);
 			// user code begin {1}
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
@@ -5015,7 +5017,7 @@ private javax.swing.JToolBar getToolBarPane() {
 			ivjToolBarPane.setName("ToolBarPane");
 			ivjToolBarPane.add(getOpenButton());
 			ivjToolBarPane.add(getSaveButton());
-			ivjToolBarPane.add(getFind_ReplaceButton());
+			ivjToolBarPane.add(getFindButton());
 			ivjToolBarPane.add(getUndoButton());
 			ivjToolBarPane.add(getRedoButton());
 			ivjToolBarPane.add(getCutButton());
@@ -5791,6 +5793,7 @@ private void initConnections() throws java.lang.Exception {
 	getCutButton().addActionListener(ivjEventHandler);
 	getCopyButton().addActionListener(ivjEventHandler);
 	getPasteButton().addActionListener(ivjEventHandler);
+	getFindButton().addActionListener(ivjEventHandler);
 	getLevel_UpMenuItem().addActionListener(ivjEventHandler);
 	getZoom_InMenuItem().addActionListener(ivjEventHandler);
 	getZoom_OutMenuItem().addActionListener(ivjEventHandler);
