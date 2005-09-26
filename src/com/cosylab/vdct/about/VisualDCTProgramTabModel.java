@@ -132,7 +132,7 @@ public class VisualDCTProgramTabModel implements ProgramTabModel {
 	 */
 	public String getVendor()
 	{
-		return "by Matej Sekoranja and Ivo List, Cosylab, Ltd.";
+		return "by Matej Sekoranja and Ivo List, Jaka Bobnar, Cosylab, Ltd.";
 	}
 
 	/**
