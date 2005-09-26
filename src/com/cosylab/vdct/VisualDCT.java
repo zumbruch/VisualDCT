@@ -3201,7 +3201,9 @@ private javax.swing.JPanel getJFrameContentPane() {
 			ivjJFrameContentPane.setFocusable(true);
 			ivjJFrameContentPane.addMouseListener(new MouseAdapter() {
 			    public void mouseEntered(MouseEvent e) {
-			       ivjJFrameContentPane.requestFocus(); 
+			        if (VisualDCT.this.isActive()) {	
+			            ivjJFrameContentPane.requestFocus();
+			        }
 			    }
 			});
 			// user code begin {1}
@@ -5325,7 +5327,8 @@ private com.cosylab.vdct.graphics.WorkspacePanel getworkspace() {
 			ivjworkspace.setName("workspace");
 			ivjworkspace.addMouseListener(new MouseAdapter() {
 			    public void mouseEntered(MouseEvent e) {
-			       ivjJFrameContentPane.requestFocus(); 
+			        if (VisualDCT.this.isActive()) 
+			            ivjJFrameContentPane.requestFocus(); 
 			    }
 			});
 			// user code begin {1}
