@@ -62,7 +62,8 @@ public class PathSpecification
 		// check if EPICS_DB_INCLUDE_PATH is available, this overrides current-directory default
 		String epicsIncludePath = System.getProperty(NAME_EPICS_DB_INCLUDE_PATH);
 		if (epicsIncludePath != null)
-			currentPath.add(epicsIncludePath);
+			splitPath(epicsIncludePath, currentDir, currentPath);
+			// currentPath.add(epicsIncludePath);
 	    else
 	    	currentPath.add(currentDir);
 
