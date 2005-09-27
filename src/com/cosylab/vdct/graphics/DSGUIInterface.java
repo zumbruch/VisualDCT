@@ -963,10 +963,26 @@ public void smartZoom() {
 	while (e.hasMoreElements())
 	{
 		vo = (VisibleObject)e.nextElement();
-		minX = Math.min(minX, vo.getRx());
-		minY = Math.min(minY, vo.getRy());
-		maxX = Math.max(maxX, vo.getRx()+vo.getRwidth());
-		maxY = Math.max(maxY, vo.getRy()+vo.getRheight());
+		if (vo instanceof Border)
+		{
+			Border b = (Border)vo;
+			Enumeration e2 = b.getSubObjectsV().elements();
+			while (e2.hasMoreElements())
+			{
+				vo = (VisibleObject)e2.nextElement();
+				minX = Math.min(minX, vo.getRx());
+				minY = Math.min(minY, vo.getRy());
+				maxX = Math.max(maxX, vo.getRx()+vo.getRwidth());
+				maxY = Math.max(maxY, vo.getRy()+vo.getRheight());
+			}
+		}
+		else
+		{
+			minX = Math.min(minX, vo.getRx());
+			minY = Math.min(minY, vo.getRy());
+			maxX = Math.max(maxX, vo.getRx()+vo.getRwidth());
+			maxY = Math.max(maxY, vo.getRy()+vo.getRheight());
+		}
 	}
 
 	int space = (minX+minY+maxX+maxY)/75;
