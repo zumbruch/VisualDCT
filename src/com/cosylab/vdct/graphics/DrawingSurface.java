@@ -918,11 +918,10 @@ public void mouseClicked(MouseEvent e) {
 					createTextBox();
 				else {
 				    VisibleObject spotted = viewGroup.hiliteComponentsCheck(cx+view.getRx(), cy+view.getRy());
-			        if (view.setAsHilited(spotted))
+				    if (view.setAsHilited(spotted)) 
 						repaint(true);
-			        else 
+					else
 			            CommandManager.getInstance().execute("ShowNewDialog");
-				    
 				   
 				}
 			}
@@ -3479,12 +3478,15 @@ public void zoomArea(int x1, int y1, int x2, int y2) {
 	view.setDrx(dx);
 	view.setDry(dy);
 	view.setScale(nscale);
-
 	updateWorkspaceScale();
-	
+		
 	blockNavigatorRedrawOnce = true;
 	recalculateNavigatorPosition();
-	repaint();
+
+	//after the area is centered set the appropriate scale: there could be rounding problems
+	//if the nscale is between 0.(?)5 and 0.(?+1)0 (e.g. 0.35 and 0.40)
+	nscale = ((int)(nscale*10))/10.;
+	VisualDCT.getInstance().setScale(nscale);
 }
 
 /**

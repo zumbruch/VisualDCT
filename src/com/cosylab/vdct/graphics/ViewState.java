@@ -381,12 +381,20 @@ public boolean setAsHilited(VisibleObject object, boolean zoomOnHilited) {
     if(zoomOnHilited) {
         DrawingSurface.getInstance().repaint();
         hilitedObjects.clear();
-        hilitedObjects.add(hilitedObject);
+        if (hilitedObject != null) {
+            hilitedObjects.add(hilitedObject);
+        }
+    }
+    
+    if (object == null) {
+        hilitedObjects.clear();
+        hilitedObject = null;
+        return false;
     }
     
     if (object!=hilitedObject || hilitedObjects.size() == 1) {
-	    	    
-		hilitedObject=object;
+	    
+        hilitedObject=object;
 		
 		//initialization
 		hilitedObjects.clear();
@@ -420,7 +428,6 @@ public boolean setAsHilited(VisibleObject object, boolean zoomOnHilited) {
 				hilitedObjects.add(obj);
 			}
 		}
-		
 		return true;
 	}
 	else

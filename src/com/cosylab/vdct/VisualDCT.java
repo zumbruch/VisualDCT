@@ -5896,6 +5896,12 @@ public void lineButton_ActionPerformed()
  */
 public static void main(final java.lang.String[] args) {
 
+    	if (args.length > 0) {
+    	    if (args[0].equals(Help.HELP) || args[0].equals(Help.HELP2)) {
+    	        Help.printHelpAndExit();
+    	    }
+    	}
+    
 		System.out.println("Loading VisualDCT v"+Version.VERSION+" build "+Version.BUILD+"...\n");
 		
 		String javaVersion = (String)System.getProperties().get("java.version");
@@ -6980,7 +6986,7 @@ public void save_As_GroupMenuItem_ActionPerformed() {
 		}
 		catch(java.io.IOException e)
 		{
-			Console.getInstance().println("o) Failed to save DBto file: '"
+			Console.getInstance().println("o) Failed to save DB to file: '"
 				+ theFile.toString() + "'");
 		    Console.getInstance().println(e);
 		}
@@ -7035,9 +7041,9 @@ public void generateAsGroupMenuItem_ActionPerformed() {
 		{
 		    cmd.getGUIMenuInterface().exportAsGroup(theFile);
 		}
-		catch(java.io.IOException e)
+		catch(Exception e)
 		{
-			Console.getInstance().println("o) Failed to save DBto file: '"
+			Console.getInstance().println("o) Failed to save DB to file: '"
 				+ theFile.toString() + "'");
 		    Console.getInstance().println(e);
 		}
@@ -7211,12 +7217,12 @@ public void generateMenuItem_ActionPerformed() {
 		{
 		    cmd.getGUIMenuInterface().export(theFile);
 		}
-		catch (java.io.IOException e)
+		catch (Exception e)
 		{
 	 		Console.getInstance().println("o) Failed to save DB to file: '"
 	 			+ theFile.toString() + "'");
 		    Console.getInstance().println(e);
-		}
+		} 
 	}
 }
 /**

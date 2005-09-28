@@ -179,7 +179,7 @@ public Connector(String id, LinkManagerObject parent, OutLink outlink, InLink in
 	        setX(out);
 	    } 
 	    else if ((ol > ir)){
-	        System.out.println("3");
+//	        System.out.println("3");
 	        if (outlink instanceof Port) {
 	            setX(in + ir - il + 5);
 	        } else 
