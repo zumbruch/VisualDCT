@@ -386,10 +386,9 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 			if (hilited)
 				c = (view.isHilitedObject(this)) ? Constants.HILITE_COLOR : c;
 			g.setColor(c);
-			
+
 			if (inlink!=null || hilited) 
 				g.drawRect(rrx, rry, rwidth, rheight);
-	//		else {
 			else if (getMode()!=EXTERNAL_OUTPUT_MODE && getMode()!=EXTERNAL_INPUT_MODE)
 			{
 				g.drawLine(rrx, rry, rrx+rwidth, rry+rheight);
@@ -414,7 +413,7 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 			}
 
 	}  
-
+	
 }
 /**
  * Insert the method's description here.
@@ -612,7 +611,8 @@ public boolean move(int dx, int dy) {
 public void revalidatePosition() {
   if (inlink!=null && outlink!=null && mode!=INVISIBLE_MODE && outlink.getMode()!=INVISIBLE_MODE) { //order is important
     if (getQueueCount()%2==0) 
-        setX(inlink.getInX());
+        //setX(inlink.getInX());
+		setX((inlink.getInX()+outlink.getOutX())/2);
     else
 		setY((inlink.getInY()+outlink.getOutY())/2);
   }
