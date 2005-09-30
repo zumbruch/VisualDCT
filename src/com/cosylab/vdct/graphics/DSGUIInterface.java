@@ -54,6 +54,10 @@ public class DSGUIInterface implements GUIMenuInterface, VDBInterface {
 
 	// to remember on cut from which group object has beed cut 
 	private ArrayList pasteNames = null;
+	// to remember copied objects for multiple pasting
+	private Vector copiedObjects = null;
+	private int pasteCount = 0;
+	
 	private double pasteX;
 	private double pasteY;
 	private boolean doOffsetAtPaste = false;
@@ -69,6 +73,7 @@ public DSGUIInterface(DrawingSurface drawingSurface) {
 	this.drawingSurface=drawingSurface;
 	DSGUIInterface.instance = this;
 	pasteNames = new ArrayList();
+	copiedObjects = new Vector();
 }
 /**
  * Insert the method's description here.
@@ -151,20 +156,36 @@ public java.lang.String checkRecordName(String name, boolean relative) {
  */
 public void copy() {
 	ViewState view = ViewState.getInstance();
-	if (view.getSelectedObjects().size()==0) return;
-	Group.getClipboard().destroy();
+	copy(view.getSelectedObjects(), true);
+	
+}
 
-	pasteNames.clear();
+private void copy(Vector objects, boolean firstCopy) {
+    
+    if (objects.size()==0) return;
+	Group.getClipboard().destroy();
+    
+    ViewState view = ViewState.getInstance();
+    pasteNames.clear();
+    if (firstCopy) {
+        copiedObjects.clear();
+        pasteCount = 0;
+    } else {
+        pasteCount++;
+    }
 	
 	Object obj;
-	Enumeration selected = view.getSelectedObjects().elements();
-	int minx=Integer.MAX_VALUE, miny=Integer.MAX_VALUE;
+	Enumeration selected = objects.elements();
+	
+    int minx=Integer.MAX_VALUE, miny=Integer.MAX_VALUE;
 	while (selected.hasMoreElements()) {
 		obj = selected.nextElement();
 		if (obj instanceof VisibleObject) {
 			minx = Math.min(minx, ((VisibleObject)obj).getX());
 			miny = Math.min(miny, ((VisibleObject)obj).getY());
 		}
+		if (firstCopy) 
+		    copiedObjects.add(obj);
 	}
 	
 	// remember position for paste
@@ -172,7 +193,7 @@ public void copy() {
 	pasteY = (miny - view.getRy()/view.getScale());
 	doOffsetAtPaste = true;
 	
-	selected = view.getSelectedObjects().elements();	
+	selected = objects.elements();	
 	
 	while (selected.hasMoreElements()) {
 		obj = selected.nextElement();
@@ -180,13 +201,14 @@ public void copy() {
 			Flexible copy = ((Flexible)obj).copyToGroup(Constants.CLIPBOARD_NAME);
 			if (copy instanceof Movable)
 				((Movable)copy).move(-minx, -miny);
-			
+						
 		}
 	}
 	// fix links (due to order of copying links might not be validated...)
 	Group.getClipboard().manageLinks(true);
 	view.deselectAll();
 	drawingSurface.repaint();
+	
 }
 
 public Box createBox()
@@ -305,13 +327,15 @@ public void createRecord(String name, String type, boolean relative) {
  */
 public void cut() {
 	ViewState view = ViewState.getInstance();
+	
 	if (view.getSelectedObjects().size()==0) return;
 	Group.getClipboard().destroy();
-
-	pasteNames.clear();
+    
+    pasteNames.clear();
+	copiedObjects.clear();
 	
 	Object obj;
-	Enumeration selected = view.getSelectedObjects().elements();
+	Enumeration selected = view.getSelectedObjects().elements();	
 	
 	int minx=Integer.MAX_VALUE, miny=Integer.MAX_VALUE;
 	while (selected.hasMoreElements()) {
@@ -320,6 +344,7 @@ public void cut() {
 			minx = Math.min(minx, ((VisibleObject)obj).getX());
 			miny = Math.min(miny, ((VisibleObject)obj).getY());
 		}
+		copiedObjects.add(obj);
 	}
 	
 	// remember position for paste
@@ -342,11 +367,16 @@ public void cut() {
 			}
 		}
 	}
+	
 	view.deselectAll();
 	view.setAsHilited(null);
 	drawingSurface.setModified(true);
 	drawingSurface.repaint();
+	
+	
 }
+
+
 /**
  * Insert the method's description here.
  * Creation date: (4.2.2001 15:32:01)
@@ -578,18 +608,16 @@ public void pasteAtPosition(int pX, int pY) {
 	if (size==0) return;
 
 	double scale = view.getScale();
-	int posX = (int)((pX + view.getRx()) / scale);
-	int posY = (int)((pY + view.getRy()) / scale);
+	int posX = (int)((pX + view.getRx()) / scale) + pasteCount*Constants.MULTIPLE_PASTE_GAP;
+	int posY = (int)((pY + view.getRy()) / scale) + pasteCount*Constants.MULTIPLE_PASTE_GAP;
 
 	posX = posX <= 0 ? 0 : posX;
 	posX = posX >= view.getWidth() - group.getAbsoulteWidth() ? view.getWidth() - group.getAbsoulteWidth() : posX;
 	posY = posY <= 0 ? 0 : posY;
 	posY = posY >= view.getHeight() - group.getAbsoulteHeight() ? view.getHeight() - group.getAbsoulteHeight() : posY;
 	
-	
-	
 	Object objs[] = new Object[size];
-	Group.getClipboard().getSubObjectsV().copyInto(objs);
+	group.getSubObjectsV().copyInto(objs);
 
 	for(int i=0; i<size; i++) {
 		if (objs[i] instanceof Flexible)
@@ -603,6 +631,7 @@ public void pasteAtPosition(int pX, int pY) {
 	for(int i=0; i<size; i++) {
 		if (objs[i] instanceof Flexible) {
 			flex = (Flexible)objs[i];
+			
 			if (flex.moveToGroup(currentGroupName))
 			{
 				if (isCopy)
@@ -626,6 +655,8 @@ public void pasteAtPosition(int pX, int pY) {
 	UndoManager.getInstance().addAction(composedAction);
 
 	drawingSurface.getViewGroup().manageLinks(true);
+	//recopy objects for multiple paste
+	copy(copiedObjects, false);
 	drawingSurface.repaint();
 }
 /**

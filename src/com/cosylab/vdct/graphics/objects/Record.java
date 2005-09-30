@@ -379,7 +379,7 @@ protected void draw(Graphics g, boolean hilited) {
 	
 	int rrx = getRx() - view.getRx();
 	int rry = getRy() - view.getRy();
-		
+
 	int rwidth = getRwidth();
 	int rheight = getRheight();
 
@@ -1427,23 +1427,6 @@ public void revalidateFieldsPosition() {
 
 }
 
-//private void revalidatePositionForZoom() {
-//    int nx, ny, n=0;
-//    double scale = getScale();
-//    ny = (int) (getY() - (getHeight()/scale - getHeight())/2. + getHeight()/scale);
-//    Enumeration e = subObjectsV.elements();
-//    Field field; Object obj;
-//    while (e.hasMoreElements()) {
-//	  	obj = e.nextElement();
-//	  	if (obj instanceof Field) {
-//	  		field = (Field)obj;
-//	  		nx = getX()+(getWidth()-field.getWidth())/2;
-//	  		field.revalidatePosition(nx, ny, n);
-//	  		ny+=field.getHeight()/scale;
-//	  		n++;
-//	  	}
-//    }
-//}
 /**
  * Insert the method's description here.
  * Creation date: (21.12.2000 21:22:45)
@@ -1452,6 +1435,7 @@ public void revalidatePosition() {
   double Rscale = getRscale();
   setRx((int)(getX()*Rscale));
   setRy((int)(getY()*Rscale));
+  
 
   // sub-components
   revalidateFieldsPosition();

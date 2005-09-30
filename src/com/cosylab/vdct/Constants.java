@@ -141,7 +141,8 @@ public class Constants {
     public static final int MAX_RECENT_FILES = 10;
     
 	public final static int LINK_SLOT_WIDTH = 5;
-
+	
+	public static final int MULTIPLE_PASTE_GAP = 10;
 /*
 	// white on black color scheme
     public static Color BACKGROUND_COLOR = Color.white;

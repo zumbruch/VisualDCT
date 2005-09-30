@@ -191,6 +191,7 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 
 	private Stack viewStack = null;	
 	private Stack templateStack = null;	
+	private Vector selectedConnectorsForMove = null;
 	
 /**
  * DrawingSurface constructor comment.
@@ -1380,15 +1381,40 @@ public void mouseMoved(MouseEvent e)
 			if ((cx>0) && (cy>0) && (cx<width) && (cy<height))
 			{
 				VisibleObject spotted = viewGroup.hiliteComponentsCheck(cx+view.getRx(), cy+view.getRy());
-				if (view.setAsHilited(spotted,e.isShiftDown()))
+				if (selectedConnectorsForMove != null) {
+				    for (int i = 0; i < selectedConnectorsForMove.size(); i++) {
+				        view.deselectObject((VisibleObject) selectedConnectorsForMove.get(i));
+				    }
+				    selectedConnectorsForMove = null;
+				    setCursor(Cursor.getDefaultCursor());
+				}
+				if (view.setAsHilited(spotted,e.isShiftDown()) && !(spotted instanceof Connector))
 				{
-				//drawOnlyHilitedOnce=true;
-				//repaint();
-				repaint();
-				return;
+				    //drawOnlyHilitedOnce=true;
+				    repaint();
+				} else {
+				    
+				    Vector connectors = LinkMoverUtilities.getLinkMoverUtilities().isMousePositionLinkMovable(cx+view.getRx(), cy+view.getRy());
+				    
+				    if (connectors.size() != 0) {
+					    if (connectors.size() == 1){
+					        view.setAsHilited((VisibleObject) connectors.get(0));
+					        view.setAsSelected((VisibleObject) connectors.get(0));
+					        selectedConnectorsForMove = connectors;
+					    } else if (connectors.size() == 2) {
+					        if (view.setAsHilited((VisibleObject) connectors.get(0))) {
+					            view.setAsSelected((VisibleObject) connectors.get(0));
+					            view.setAsSelected((VisibleObject) connectors.get(1));
+					            selectedConnectorsForMove = connectors;
+					        }
+					    }
+					    setCursor(LinkMoverUtilities.getLinkMoverUtilities().getCursorForMove());
+				    }
+				    repaint();
+				    
 				}
 			} 
-			repaint();
+			
 		}
 	}
 }
@@ -1587,6 +1613,15 @@ public void mouseReleased(MouseEvent e) {
 			
 			fastDrawing=false;
 			forceRedraw=true;
+			if (selectedConnectorsForMove != null) {
+			    for (int i = 0; i < selectedConnectorsForMove.size(); i++) {
+			        view.deselectObject((VisibleObject) selectedConnectorsForMove.get(i));
+			    }
+			    
+			    selectedConnectorsForMove = null;
+			    setCursor(Cursor.getDefaultCursor());
+			}
+			view.setAsHilited(viewGroup.hiliteComponentsCheck(e.getX()-view.getX0()+view.getRx(), e.getY()-view.getY0()+view.getRy()));
 			//alsoDrawHilitedOnce=true;
 			repaint();
 			break;}
@@ -3371,6 +3406,7 @@ public void setScale(double scale) {
 
 	blockNavigatorRedrawOnce = true;
 	recalculateNavigatorPosition();
+	
 	repaint();
 }
 
@@ -3655,6 +3691,8 @@ public void descendIntoTemplate(Template template)
 	if (!prepareTemplateLeave())
 		return;
 
+	ViewState.getInstance().setAsHilited(null);
+	
 	viewStack.push(viewGroup);
 	templateStack.push(template.getTemplateData().getTemplate());
 	
@@ -3667,6 +3705,7 @@ public void descendIntoTemplate(Template template)
 	templateReloadPostInit();
 
 	moveToGroup(group);
+	repaint();
 }
 
 /**
@@ -3679,6 +3718,7 @@ public void ascendFromTemplate()
 	if (!prepareTemplateLeave())
 		return;
 
+	ViewState.getInstance().setAsHilited(null);
 	viewGroup = (Group)viewStack.pop();
 	templateStack.pop();
 	
@@ -3696,6 +3736,7 @@ public void ascendFromTemplate()
 	templateReloadPostInit();
 	
 	moveToGroup(grp);	
+	repaint();
 }
 
 /**

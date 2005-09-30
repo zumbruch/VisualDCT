@@ -193,13 +193,14 @@ public Flexible copyToGroup(java.lang.String group) {
 	else
 		newName = group+Constants.GROUP_SEPARATOR+getName();
 
-	//ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance();
 		
 	while (Group.getRoot().findObject(newName, true)!=null)
 //		newName += Constants.COPY_SUFFIX;
 			newName = StringUtils.incrementName(newName, Constants.COPY_SUFFIX);
 
 	Group g = Group.createGroup(newName);
+	
 	if (Settings.getInstance().getSnapToGrid())
 		g.snapToGrid();
 	/*if (group.equals(getNamePrefix()) || group.equals(Constants.CLIPBOARD_NAME)) {
@@ -209,6 +210,12 @@ public Flexible copyToGroup(java.lang.String group) {
 		g.setX(getX()-view.getRx()); g.setY(getY()-view.getRy());
 	}*/
 
+	if (group.equals(getNamePrefix()) || group.equals(Constants.CLIPBOARD_NAME)) {
+		g.setX(getX());
+		g.setY(getY());
+	}
+
+	
 	Flexible flexible;
 	Object[] objs = new Object[getSubObjectsV().size()];
 	getSubObjectsV().copyInto(objs);
@@ -1897,7 +1904,6 @@ public static void setEditingTemplateData(VDBTemplate editingTemplateData)
 	    if (subObjectsV.size() == 0) return getWidth();
 	    
 	    int tempw;
-	    
 	    VisibleObject vo = (VisibleObject) subObjectsV.get(0);
 	    int left = vo.getX();
 	    int right = vo.getX() + vo.getWidth();
@@ -1912,7 +1918,7 @@ public static void setEditingTemplateData(VDBTemplate editingTemplateData)
 	}
 	
 	public int getAbsoulteHeight() {
-	    if (subObjectsV.size() == 0) return getWidth();
+	    if (subObjectsV.size() == 0) return getHeight();
 	    
 	    int temph;
 	    
