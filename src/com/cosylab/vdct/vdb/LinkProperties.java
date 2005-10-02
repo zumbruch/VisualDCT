@@ -371,6 +371,10 @@ private void setProperties(LinkSource fd) {
 			setProcess(defaultProcess);
 		}
 	}
+	if (getType() == FWDLINK_FIELD) {
+        if (getProcess().equals("NPP"))
+            setProcess("PP");
+    }
 
 //	if (Group.substractParentName(fd.getRecord().getName()).equals(Group.substractParentName(getRecord())))
 	if (Group.substractParentName(fd.getFullName()).equals(Group.substractParentName(getRecord())))

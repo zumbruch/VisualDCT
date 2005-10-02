@@ -47,6 +47,7 @@ public class EPICSFwdLink extends EPICSOutLink {
  */
 public EPICSFwdLink(ContainerObject parent, com.cosylab.vdct.vdb.VDBFieldData fieldData) {
 	super(parent, fieldData);
+	getLinkProperties().setProcess("PP");
 }
 
 /**
