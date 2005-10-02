@@ -17,6 +17,7 @@ import java.awt.Cursor;
 import java.util.Enumeration;
 import java.util.Vector;
 
+import com.cosylab.vdct.Console;
 import com.cosylab.vdct.graphics.DrawingSurface;
 
 /**
@@ -92,14 +93,23 @@ public class LinkMoverUtilities {
         verticalMove = false;
         Connector horizontalConnector = null;
         Connector verticalConnector = null;
+        OutLink out = null;
+        InLink in = null;
         try {
 	        for (int i = 0; i < connectors.size(); i++) {
 	            c = (Connector) connectors.get(i);
+	            out = c.getOutput();
+	            in = c.getInput();
 	            
-	            outx = ((VisibleObject)c.getOutput()).getRx();
-	            inx = ((VisibleObject)c.getInput()).getRx();
-	            outy = ((VisibleObject)c.getOutput()).getRy();
-	            iny = ((VisibleObject)c.getInput()).getRy();
+	            if (verticalMove && horizontalMove) {
+	                break;
+	            }
+	            
+	            if (!(out instanceof VisibleObject) || !(in instanceof VisibleObject)) continue;        
+	            outx = ((VisibleObject)out).getRx();
+            	outy = ((VisibleObject)out).getRy();
+            	inx = ((VisibleObject)in).getRx();
+                iny = ((VisibleObject)in).getRy();
 	            if (c.getQueueCount() %2 == 0 && 
 	                    ((outx + LINK_AREA_WIDTH >= x && inx - LINK_AREA_WIDTH <= x) ||
 	                    (outx - LINK_AREA_WIDTH <= x && inx + LINK_AREA_WIDTH >= x)) && 
@@ -119,9 +129,15 @@ public class LinkMoverUtilities {
 	                continue;
 	            }
 	        }
-        } catch (ClassCastException e) {
-            //shouldn't happen because all OutLinks and InLinks are VisibleObjects
+        }catch (Exception e) {
+            Console.getInstance().println(e);
         }
+//        } catch (ClassCastException e) {
+//            //shouldn't happen because all OutLinks and InLinks are VisibleObjects
+//        } catch (NullPointerException e) {
+//            //could happen when the connector has no input or output
+//            //do nothing
+//        }
         
         if (verticalMove && horizontalMove) {
             if (horizontalConnector.getX() <= verticalConnector.getX() && 
