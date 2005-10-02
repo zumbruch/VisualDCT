@@ -85,8 +85,9 @@ public Object getSubObject(String str) {
 		String record = str.substring(0,pos);
 		String field = str.substring(pos+1);
 			
-		obj = ((ContainerObject)group.getSubObject(record))
-			.getSubObject(field);
+		obj = (group.getSubObject(record));
+		if (obj instanceof ContainerObject)
+			((ContainerObject)obj).getSubObject(field);
 	}
 	if (obj==null) obj = parent.getSubObject(str);
 	if (obj==null) obj = group.getSubObject(str);
@@ -99,7 +100,14 @@ protected void undoAction() {
 //	inlink.setOutput(object,null);
 	
 	InLink inlink = (InLink)getSubObject(inlinkStr);
-	OutLink outlink = (OutLink)getSubObject(outlinkStr);	
+
+	Object obj = getSubObject(outlinkStr);
+	OutLink outlink;
+	if (obj instanceof OutLink)
+	    outlink = (OutLink)getSubObject(outlinkStr);
+	else {
+	    return;
+	}
 	
 	object.setInput(inlink);
 	if (inlink!=null) inlink.setOutput(object, outlink);

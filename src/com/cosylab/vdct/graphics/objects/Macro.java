@@ -226,7 +226,17 @@ public void destroy() {
 					((EPICSLinkOut)start).sourceDestroyed();
 				}
 				else if ((start instanceof EPICSVarLink)) {
-				    ((EPICSVarLink)start).destroy();
+				    
+				    if (outlink instanceof Connector) {
+				        OutLink temp; 
+				        while(outlink instanceof Connector) {
+					        temp =((Connector)outlink).getOutput();
+					        ((Connector)outlink).destroy();
+					        outlink = temp;
+					    }
+				    }
+				    start.disconnect(this);
+				    
 				}
 				else if (start!=null)
 					start.disconnect(this);
