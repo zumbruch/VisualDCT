@@ -222,8 +222,12 @@ public void destroy() {
 			for(int i=0; i<objs.length; i++) {
 				OutLink outlink = (OutLink)objs[i];
 				OutLink start = EPICSLinkOut.getStartPoint(outlink);
-				if((start instanceof EPICSLinkOut))
+				if((start instanceof EPICSLinkOut)){
 					((EPICSLinkOut)start).sourceDestroyed();
+				}
+				else if ((start instanceof EPICSVarLink)) {
+				    ((EPICSVarLink)start).destroy();
+				}
 				else if (start!=null)
 					start.disconnect(this);
 				else 
@@ -231,7 +235,7 @@ public void destroy() {
 			}
 			outlinks.clear();
 		}
-
+		
 		if (lastUpdatedFullName!=null)
 			Group.getRoot().getLookupTable().remove(data.getFullName());
 		//else
@@ -242,7 +246,7 @@ public void destroy() {
 
 		// also remove macro definition
 		data.getTemplate().removeMacro(getName());
-
+		
 
 		
 	}
