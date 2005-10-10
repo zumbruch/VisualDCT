@@ -421,7 +421,8 @@ private static VDBData generateTemplate(DBDData dbd, DBTemplate dbTemplate)
 
 
 		VDBData.addTemplate(vt);
-		DrawingSurface.applyPortConnectors(vt.getGroup(), dbTemplate.getData(), vdbData);
+		
+		DrawingSurface.applyPortAndMacroConnectors(dbTemplate.getData(), vdbData);
 		return vdbData;
 	}
 	catch (Exception ex)

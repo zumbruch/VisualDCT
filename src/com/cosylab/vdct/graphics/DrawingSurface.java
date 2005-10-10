@@ -1392,7 +1392,7 @@ public void mouseMoved(MouseEvent e)
 				{
 				    //drawOnlyHilitedOnce=true;
 				    repaint();
-				} else {
+				} else if (tmplink == null){
 				    
 				    Vector connectors = LinkMoverUtilities.getLinkMoverUtilities().isMousePositionLinkMovable(cx+view.getRx(), cy+view.getRy());
 				    
@@ -2111,15 +2111,17 @@ public boolean importDB(File file) throws IOException {
     return open(file, true, true);
 }
 
-public static void applyPortConnectors(Group group, DBData dbData, VDBData vdbData) {
+public static void applyPortAndMacroConnectors(DBData dbData, VDBData vdbData) {
     
     Group rootGroup = Group.getRoot();
     int pos;
-	String portName = null;
+	String objectName = null;
+	String fieldName = null;
 	String target;
 	
 	Object object = null;
 	Connector connector = null;
+	Template template = null;
 	DBConnectorData connectorData;
 	DBLinkData dbLink;
 	Enumeration e = dbData.getLinks().elements();
@@ -2127,15 +2129,22 @@ public static void applyPortConnectors(Group group, DBData dbData, VDBData vdbDa
 	while (e.hasMoreElements())
 	{
 		dbLink = (DBLinkData) (e.nextElement());
-
+		
 		pos = dbLink.getFieldName().lastIndexOf(Constants.FIELD_SEPARATOR);
+//		if (pos > 0) {
+//			continue;
+//		} else {
+//		    objectName = dbLink.getFieldName();
+//		}
 		if (pos > 0) {
-			continue;
+		    objectName = dbLink.getFieldName().substring(0, pos);
+			fieldName = dbLink.getFieldName().substring(pos + 1);
+			
 		} else {
-		    portName = dbLink.getFieldName();
+		    objectName = dbLink.getFieldName();
 		}
 
-		object =  rootGroup.findObject(portName, true);
+		object =  rootGroup.findObject(objectName, true);
 		if (object instanceof Port) {
 		    Port port = (Port)object;
 		    
@@ -2143,6 +2152,8 @@ public static void applyPortConnectors(Group group, DBData dbData, VDBData vdbDa
 
 			while ((connectorData = (DBConnectorData) dbData.getConnectors().get(target))!= null)
 			{
+			    //connectors were not created yet (port has a different inheritance than other
+			    //linkable objects
 			    connector = port.addConnector();
 				connector.setColor(connectorData.getColor());
 				connector.setDescription(connectorData.getDescription());
@@ -2152,10 +2163,40 @@ public static void applyPortConnectors(Group group, DBData dbData, VDBData vdbDa
 
 				target = connectorData.getTargetID();
 			}
-		}
+		} 
+		else if (object instanceof Template) {
+		    //connects the macro and Template fields if there are multiple connectors on the link
+		    template = (Template)object;
+			
+			// field has to be already created
+			fieldName = fieldName.substring(2, fieldName.length()-1);
+			Object unknownTarget = template.getSubObjects().get(fieldName);
+
+			if (unknownTarget instanceof OutLink)
+			{
+				
+				target = dbLink.getTargetID();
+						
+				while ((connectorData = (DBConnectorData) dbData.getConnectors().get(target))!= null)
+				{	
+				    //connectors were already created in the applyVisualData(...)
+				    connector = (Connector) template.getSubObject(target);
+				    target = connectorData.getTargetID();
+				}
+					
+				Object potentialMacro = rootGroup.getSubObject(target);
+			    if (potentialMacro instanceof Macro && connector != null) {
+			        connector.setInput((InLink) potentialMacro);
+					((Macro)potentialMacro).setOutput(connector, null);
+			    }
+				
+				
+			}
+		} 
 
 	}
 }
+
 
 /**
  * Insert the method's description here.
@@ -2366,7 +2407,7 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 		Object object = null;
 		OutLink outlink;
 		InLink inlink;
-		Connector connector;
+		Connector connector = null;
 		DBConnectorData connectorData;
 		DBLinkData dbLink;
 		e = dbData.getLinks().elements();
@@ -2427,6 +2468,7 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 						target = connectorData.getTargetID();
 					}
 						
+					
 					if (target == "null") {
 					    continue;
 					}
@@ -2477,7 +2519,7 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 							InLink inlink2 = (InLink)unknown;
 							inlink2.setOutput(outlink, null);
 							outlink.setInput(inlink2);
-						}
+						} 
 					}
 				}
 			} 

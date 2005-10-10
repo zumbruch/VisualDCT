@@ -50,38 +50,43 @@ public class LinkMoverUtilities {
         return linkMoverUtilities;
     }
     private LinkMoverUtilities() {}
+    
+    /**
+     * 
+     * Returns a vector of all connectors in the group. Method uses a recursive formula
+     * to search all the ContainerObjects inside the group given as a parameter.
+     * 
+     * @param group the group to be searched for the connectors
+     * @return a Vector of all connectors
+     */
+    public static Vector getAllConnectors(Group group) {
+        return getConnectors(new Vector(),group.getSubObjectsV().elements());
+    }
+    
+    private static Vector getConnectors(Vector connectors, Enumeration elements) {
+        VisibleObject o;
+        while(elements.hasMoreElements()) {
+            o = (VisibleObject) elements.nextElement();
+            if (o instanceof Connector) {
+                connectors.add(o);
+            } else if (o instanceof ContainerObject) {
+                getConnectors(connectors, ((ContainerObject)o).getSubObjectsV().elements());
+            }
+        }
+        return connectors;
+    }
     /**
      * 
      * Returns the vector containing the connectors which are moved when the links are dragged.
      * This metod returns a Vector containing one Connector if parameters define area around
      * a line or two Connectors if they define the area around the knee.
      * 
-     * @param x
-     * @param y
-     * @return
+     * @param x the absolute horizontal position of the pointer
+     * @param y the absolute vertical position of the pointer
+     * @return a Vector of the connectors that are affected by the move started at the point (x,y)
      */
     public Vector isMousePositionLinkMovable(int x, int y) {
-        Vector connectors = new Vector();
-        Enumeration elements = DrawingSurface.getInstance().getViewGroup().getSubObjectsV().elements();
-        
-        VisibleObject o;
-        Enumeration en;
-        Object obj;
-        while(elements.hasMoreElements()) {
-            o = (VisibleObject) elements.nextElement();
-            if (o instanceof Connector) {
-                connectors.add(o);
-            } else if (o instanceof ContainerObject) {
-                en = ((ContainerObject)o).getSubObjectsV().elements();
-                while(en.hasMoreElements()) {
-                    obj = en.nextElement();
-                    if (obj instanceof Connector) {
-                        connectors.add(obj);
-                    }
-                    
-                }
-            }
-        }
+        Vector connectors = getAllConnectors(DrawingSurface.getInstance().getViewGroup());
 
         Connector c;
         returnConnectors = new Vector();
@@ -160,6 +165,11 @@ public class LinkMoverUtilities {
         return returnConnectors;
     }
     
+    /**
+     * 
+     * Returns the mouse cursor for the move that was last processed.
+     * @return the appropriate cursor.
+     */
     public Cursor getCursorForMove() {
         if (horizontalMove && !verticalMove) 
             return HORIZONTAL_CURSOR;
