@@ -1628,7 +1628,8 @@ public void mouseReleased(MouseEvent e) {
 			
 		case OBJECT_SELECTION : 
 //System.out.println("Released: OBJECT_SELECTION");
-		
+		    if (!e.isControlDown())
+		        view.deselectAll();
 			fastDrawing=false;
 			selectArea(pressedX, pressedY, 
 			   		   draggedX, draggedY);
@@ -3950,14 +3951,14 @@ public void createPort(VDBPort vdbPort) {
  * Creation date: (3.2.2001 23:27:30)
  * @param name java.lang.String
  */
-public void createMacro(VDBMacro vdbMacro) {
+public Macro createMacro(VDBMacro vdbMacro) {
 	
 	// if null bring up dialog and ask for name, then create port
 	if (vdbMacro==null)
 		vdbMacro = Group.getEditingTemplateData().addMacro();
 		
 	if (vdbMacro==null)
-		return;
+		return null;
 		
 	ViewState view = ViewState.getInstance();
 	double scale = view.getScale();
@@ -3977,6 +3978,7 @@ public void createMacro(VDBMacro vdbMacro) {
 
 	//drawingSurface.setModified(true);
 	repaint();
+	return macro;
 }
 
 /**
