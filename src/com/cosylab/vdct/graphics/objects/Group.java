@@ -1064,6 +1064,7 @@ public void writeObjects(java.io.DataOutputStream file, NamingContext renamer, b
  */
 public static void writeObjects(Vector elements, java.io.DataOutputStream file, NamingContext renamer, boolean export) throws java.io.IOException {
 
+    
  Object obj;
  String name;
  Template template;
@@ -1097,6 +1098,7 @@ public static void writeObjects(Vector elements, java.io.DataOutputStream file, 
 			 	if (export) name = renamer.matchAndReplace(name);
 			 	
 				name = StringUtils.quoteIfMacro(name);
+				
 			 	// write comment
 			 	if (recordData.getComment()!=null)
 			 		file.writeBytes(nl+recordData.getComment());
@@ -1197,6 +1199,7 @@ public static void writeObjects(Vector elements, java.io.DataOutputStream file, 
 			 	 // skip templates on clipboard
 			 	 if (!template.getTemplateData().getName().startsWith(Constants.CLIPBOARD_NAME))
 			 	 	template.writeObjects(file, renamer, export);
+			 	 
 	 		}
 		else if (!export && obj instanceof DBTemplateEntry)
 			{
@@ -1397,14 +1400,16 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 	 		}
  	 	else if (obj instanceof Port) {
 			OutLink outlink = (OutLink)obj;
-			file.writeBytes(LINK_START+
-		 			StringUtils.quoteIfMacro(
-			 			renamer.getResolvedName(outlink.getID())
-			 		) + comma + 
-	 				StringUtils.quoteIfMacro(
-		 				renamer.getResolvedName(outlink.getInput().getID())
-			 		) +
-					ending);
+			if (outlink.getInput() != null) {			
+				file.writeBytes(LINK_START+
+			 			StringUtils.quoteIfMacro(
+				 			renamer.getResolvedName(outlink.getID())
+				 		) + comma + 
+		 				StringUtils.quoteIfMacro(
+			 				renamer.getResolvedName(outlink.getInput().getID())
+				 		) +
+						ending);
+			}
  	 	}
  	 	else if (obj instanceof Border)
 	 		{
@@ -1688,10 +1693,11 @@ private static void writeTemplateData(DataOutputStream stream, NamingContext ren
 	// write macro visual data
 	//
 	i = data.getMacrosV().iterator();
+	
 	while (i.hasNext())
 	{
 		VDBMacro macro = (VDBMacro)i.next();
-	
+
 		Macro visibleMacro = macro.getVisibleObject();
 		if (visibleMacro==null)
 			continue;
