@@ -37,9 +37,11 @@ import com.cosylab.vdct.graphics.*;
 import com.cosylab.vdct.graphics.popup.*;
 import com.cosylab.vdct.inspector.Inspectable;
 import com.cosylab.vdct.inspector.InspectableProperty;
+import com.cosylab.vdct.util.StringUtils;
 import com.cosylab.vdct.vdb.GUIHeader;
 import com.cosylab.vdct.vdb.GUISeparator;
 import com.cosylab.vdct.vdb.MacroDescriptionProperty;
+import com.cosylab.vdct.vdb.VDBData;
 import com.cosylab.vdct.vdb.VDBMacro;
 
 import javax.swing.*;
@@ -51,7 +53,7 @@ import java.awt.event.*;
  * Creation date: (29.1.2001 20:05:51)
  * @author Matej Sekoranja
  */
-public class Macro extends VisibleObject implements Descriptable, Movable, InLink, Popupable, Selectable, Inspectable, MultiInLink
+public class Macro extends VisibleObject implements Descriptable, Movable, InLink, Popupable, Selectable, Inspectable, MultiInLink, Flexible
 {
 	class PopupMenuHandler implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
@@ -810,6 +812,7 @@ public String getName()
  */
 public String toString()
 {
+//    return super.toString();
 	return getID();
 }
 
@@ -1066,6 +1069,119 @@ public int getRightOffset() {
             return length;
         }
     }
+}
+/* (non-Javadoc)
+ * @see com.cosylab.vdct.graphics.objects.Flexible#copyToGroup(java.lang.String)
+ */
+public Flexible copyToGroup(String group) {
+    String newName;
+	if (group.equals(Record.nullString))
+		newName = Group.substractObjectName(data.getName());
+	else
+		newName = group+Constants.GROUP_SEPARATOR+
+				  Group.substractObjectName(data.getName());
+	
+	// object with new name already exists, add suffix ///!!!
+	while (Group.getRoot().findObject(newName, true)!=null){
+			newName = StringUtils.incrementName(newName, Constants.COPY_SUFFIX);
+	}
+
+	VDBMacro theDataCopy = VDBData.copyVDBMacro(data);
+	theDataCopy.setName(newName);
+
+	Macro theMacroCopy = new Macro(theDataCopy, null, getX(), getY());
+	((Group)Group.getRoot().getSubObject(group)).addSubObject(newName, theMacroCopy, true);
+
+	Group.getRoot().manageLinks(true);
+	unconditionalValidation();
+	
+	return theMacroCopy;
+}
+
+/* (non-Javadoc)
+ * @see com.cosylab.vdct.graphics.objects.Flexible#getFlexibleName()
+ */
+public String getFlexibleName() {
+    return data.getName();
+}
+
+/* (non-Javadoc)
+ * @see com.cosylab.vdct.graphics.objects.Flexible#moveToGroup(java.lang.String)
+ */
+public boolean moveToGroup(String group) {
+	
+    Group.getEditingTemplateData().removeMacro(data);
+	//String oldName = getName();
+	String newName;
+	if (group.equals(Record.nullString)){
+		newName = Group.substractObjectName(data.getName());
+	}
+	else
+		newName = group+Constants.GROUP_SEPARATOR+
+				  Group.substractObjectName(data.getName());;
+
+	// object with new name already exists, add suffix // !!!
+	Object obj;
+	boolean renameNeeded = false;
+
+	while ((obj=Group.getRoot().findObject(newName, true))!=null)
+	{
+		if (obj==this)
+		{
+		   	data.setName(newName);
+			return true;
+		}
+		else
+		{
+			renameNeeded = true;
+			newName = StringUtils.incrementName(newName, Constants.MOVE_SUFFIX);
+		}
+	}
+
+	if (renameNeeded){
+	    rename(newName);
+	}
+
+	getParent().removeObject(Group.substractObjectName(newName));
+	setParent(null);
+	((Group)Group.getRoot().getSubObject(group)).addSubObject(newName, this, true);
+	data.setName(newName);
+
+	Group.getEditingTemplateData().addMacro(data);
+	unconditionalValidation();
+
+	return true;
+}
+/* (non-Javadoc)
+ * @see com.cosylab.vdct.graphics.objects.Flexible#rename(java.lang.String)
+ */
+public boolean rename(String newName) {
+    String newObjName = Group.substractObjectName(newName);
+	String oldObjName = Group.substractObjectName(getName());
+
+	if (!oldObjName.equals(newObjName))
+	{
+	    
+		String fullName = com.cosylab.vdct.util.StringUtils.replaceEnding(getName(), oldObjName, newObjName);
+		data.setName(fullName);
+		getParent().addSubObject(newObjName, this);
+				
+		// fix connectors IDs
+		Enumeration e = getParent().getSubObjectsV().elements();
+		Object obj; Connector connector;
+		while (e.hasMoreElements()) {
+			obj = e.nextElement();
+			if (obj instanceof Connector)
+			{
+				connector = (Connector)obj;
+				String id = connector.getID();
+				id = com.cosylab.vdct.util.StringUtils.replaceEnding(id, oldObjName, newObjName);
+				connector.setID(id);
+			}
+		}
+	}
+	
+	return true;
 }
 
 }

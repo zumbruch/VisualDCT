@@ -182,6 +182,28 @@ public static VDBRecordData copyVDBRecordData(VDBRecordData source) {
 }
 
 /**
+ * Creates a copy of the VDBMacro object.
+ * 
+ * @param source the VDBMacro to be copied
+ * @return a copy of the source
+ */
+public static VDBMacro copyVDBMacro(VDBMacro source) {
+    
+    VDBMacro vdbMacro = new VDBMacro(source.getTemplate(), source.getName(), source.getDescription());
+    vdbMacro.setVisibility(source.getVisibility());
+    return vdbMacro;
+        
+}
+
+public static VDBPort copyVDBPort(VDBPort source) {
+    
+    VDBPort vdbPort = new VDBPort(source.getTemplate(), source.getName(), source.getTarget(), source.getDescription());
+    vdbPort.setVisibility(source.getVisibility());
+    return vdbPort;
+        
+}
+
+/**
  * This method was created in VisualAge.
  * @return com.cosylab.vdct.vdb.VDBData
  * @param dbd com.cosylab.vdct.dbd.DBDData

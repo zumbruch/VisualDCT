@@ -30,6 +30,7 @@ package com.cosylab.vdct.graphics.objects;
 
 import java.awt.*;
 import java.util.*;
+
 import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.events.commands.LinkCommand;
@@ -40,10 +41,12 @@ import com.cosylab.vdct.inspector.Inspectable;
 import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.undo.CreateConnectorAction;
 import com.cosylab.vdct.undo.UndoManager;
+import com.cosylab.vdct.util.StringUtils;
 import com.cosylab.vdct.vdb.GUIHeader;
 import com.cosylab.vdct.vdb.GUISeparator;
 import com.cosylab.vdct.vdb.LinkProperties;
 import com.cosylab.vdct.vdb.PortDescriptionProperty;
+import com.cosylab.vdct.vdb.VDBData;
 import com.cosylab.vdct.vdb.VDBPort;
 
 import javax.swing.*;
@@ -55,7 +58,7 @@ import java.awt.event.*;
  * Creation date: (29.1.2001 20:05:51)
  * @author Matej Sekoranja
  */
-public class Port extends VisibleObject implements Descriptable, Movable, OutLink, Popupable, Selectable, Inspectable
+public class Port extends VisibleObject implements Descriptable, Movable, OutLink, Popupable, Selectable, Inspectable, Flexible
 {
 	class PopupMenuHandler implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
@@ -230,6 +233,7 @@ public void destroy() {
 		data.setVisibleObject(null);
 		getParent().removeObject(getName());
 		data.setValueSilently(currentValue);
+		data.getTemplate().removePort(getName());
 	}
 }
 
@@ -1037,6 +1041,120 @@ public void setTextPositionNorth(boolean isTextPositionNorth) {
 
 public boolean isTextPositionNorth() {
     return this.textPositionNorth;
+}
+
+/* (non-Javadoc)
+ * @see com.cosylab.vdct.graphics.objects.Flexible#copyToGroup(java.lang.String)
+ */
+public Flexible copyToGroup(String group) {
+    String newName;
+	if (group.equals(Record.nullString))
+		newName = Group.substractObjectName(data.getName());
+	else
+		newName = group+Constants.GROUP_SEPARATOR+
+				  Group.substractObjectName(data.getName());
+	
+	// object with new name already exists, add suffix ///!!!
+	while (Group.getRoot().findObject(newName, true)!=null){
+			newName = StringUtils.incrementName(newName, Constants.COPY_SUFFIX);
+	}
+
+	VDBPort theDataCopy = VDBData.copyVDBPort(data);
+	theDataCopy.setName(newName);
+
+	Port thePortCopy = new Port(theDataCopy, null, getX(), getY());
+	((Group)Group.getRoot().getSubObject(group)).addSubObject(newName, thePortCopy, true);
+
+	Group.getRoot().manageLinks(true);
+	unconditionalValidation();
+	
+	return thePortCopy;
+}
+
+/* (non-Javadoc)
+ * @see com.cosylab.vdct.graphics.objects.Flexible#getFlexibleName()
+ */
+public String getFlexibleName() {
+    return data.getName();
+}
+
+/* (non-Javadoc)
+ * @see com.cosylab.vdct.graphics.objects.Flexible#moveToGroup(java.lang.String)
+ */
+public boolean moveToGroup(String group) {
+	
+    Group.getEditingTemplateData().removePort(data);
+	//String oldName = getName();
+	String newName;
+	if (group.equals(Record.nullString)){
+		newName = Group.substractObjectName(data.getName());
+	}
+	else
+		newName = group+Constants.GROUP_SEPARATOR+
+				  Group.substractObjectName(data.getName());;
+
+	// object with new name already exists, add suffix // !!!
+	Object obj;
+	boolean renameNeeded = false;
+
+	while ((obj=Group.getRoot().findObject(newName, true))!=null)
+	{
+		if (obj==this)
+		{
+		   	data.setName(newName);
+			return true;
+		}
+		else
+		{
+			renameNeeded = true;
+			newName = StringUtils.incrementName(newName, Constants.MOVE_SUFFIX);
+		}
+	}
+
+	if (renameNeeded){
+	    rename(newName);
+	}
+
+	getParent().removeObject(Group.substractObjectName(newName));
+	setParent(null);
+	((Group)Group.getRoot().getSubObject(group)).addSubObject(newName, this, true);
+	data.setName(newName);
+
+	Group.getEditingTemplateData().addPort(data);
+	unconditionalValidation();
+
+	return true;
+}
+/* (non-Javadoc)
+ * @see com.cosylab.vdct.graphics.objects.Flexible#rename(java.lang.String)
+ */
+public boolean rename(String newName) {
+    String newObjName = Group.substractObjectName(newName);
+	String oldObjName = Group.substractObjectName(getName());
+
+	if (!oldObjName.equals(newObjName))
+	{
+	    
+		String fullName = com.cosylab.vdct.util.StringUtils.replaceEnding(getName(), oldObjName, newObjName);
+		data.setName(fullName);
+		getParent().addSubObject(newObjName, this);
+				
+		// fix connectors IDs
+		Enumeration e = getParent().getSubObjectsV().elements();
+		Object obj; Connector connector;
+		while (e.hasMoreElements()) {
+			obj = e.nextElement();
+			if (obj instanceof Connector)
+			{
+				connector = (Connector)obj;
+				String id = connector.getID();
+				id = com.cosylab.vdct.util.StringUtils.replaceEnding(id, oldObjName, newObjName);
+				connector.setID(id);
+			}
+		}
+	}
+	
+	return true;
 }
 
 }

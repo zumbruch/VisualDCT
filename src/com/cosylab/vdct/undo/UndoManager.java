@@ -1,5 +1,7 @@
 package com.cosylab.vdct.undo;
 
+import com.cosylab.vdct.graphics.DrawingSurface;
+
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
  * All rights reserved.
@@ -87,6 +89,7 @@ public int actions2undo() {
  * @param action epics.undo.ActionObject
  */
 public void addAction(ActionObject action) {
+
 	if (!monitor) return;
 
 	if (composedAction!=null)
@@ -234,6 +237,9 @@ public void undo() {
 		com.cosylab.vdct.graphics.DrawingSurface.getInstance().setModified(true);
 		com.cosylab.vdct.graphics.DSGUIInterface.getInstance().updateMenuItems();
 		monitor = m;
+		if (pos==lowerbound) {
+		    DrawingSurface.getInstance().setModified(false);
+		}
 	}
 }
 }
