@@ -1095,7 +1095,13 @@ public static void writeObjects(Vector elements, java.io.DataOutputStream file, 
 				if (record.getRecordData().getName().startsWith(Constants.CLIPBOARD_NAME)) continue;
 
 			 	name = renamer.getResolvedName(recordData.getName());
-			 	if (export) name = renamer.matchAndReplace(name);
+			 	if (export) 
+			 	{
+			 		name = renamer.matchAndReplace(name);
+			 		// warning if macros still exist
+			 		if (name.indexOf("$(") >= 0 || name.indexOf("${") >= 0)
+			 			Console.getInstance().println("WARNING: record name '" + name + "' is not fully resolved.");
+			 	}
 			 	
 				name = StringUtils.quoteIfMacro(name);
 				
@@ -1161,6 +1167,9 @@ public static void writeObjects(Vector elements, java.io.DataOutputStream file, 
 							if (namer.getSubstitutions()!=null && value!=null) 								
 								 value = VDBTemplateInstance.applyProperties(value, namer.getSubstitutions());*/
 							value = renamer.matchAndReplace(value);							  	 
+					 		// warning if macros still exist
+					 		if (value != null && (value.indexOf("$(") >= 0 || value.indexOf("${") >= 0))
+					 			Console.getInstance().println("WARNING: field value '" + value + "' of '" + fieldData.getFullName() + "' is not fully resolved.");
 						}
 												
 						// if value is different from init value
