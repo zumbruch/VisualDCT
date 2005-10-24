@@ -864,6 +864,7 @@ public void save(java.io.File file) throws IOException {
  
  // if ok
  drawingSurface.setModified(false);
+ UndoManager.getInstance().prepareAfterSaving();
 
  // !!!
  VisualDCT.getInstance().updateLoadLabel();	

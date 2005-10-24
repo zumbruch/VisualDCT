@@ -42,6 +42,9 @@ public class UndoManager {
 	private int pos;
 	private int first, last; 
 	private int bufferSize;
+	private boolean bufferSizeReached = false;
+	private int savedOnPos = lowerbound;
+	private int actionsAfterSave = 0;
 	private ActionObject[] actions;
 
 	private boolean monitor = false;
@@ -98,6 +101,12 @@ public void addAction(ActionObject action) {
 		//System.out.println("Composing: "+action.getDescription());
 		return;
 	}
+	
+	if ((last - savedOnPos + bufferSize)%bufferSize == actionsAfterSave) {
+	    actionsAfterSave++;
+	    if (actionsAfterSave >= bufferSize)
+	        bufferSizeReached = true;
+	}
 
 	//System.out.println("New action: "+action.getDescription());
 	com.cosylab.vdct.graphics.DrawingSurface.getInstance().setModified(true);
@@ -153,7 +162,7 @@ public static UndoManager getInstance() {
  * @param pos int
  */
 private int increment(int pos) {
-	if (pos==lowerbound) return first;
+    if (pos==lowerbound) return first;
 	else return ((pos+1) % bufferSize);
 }
 /**
@@ -188,8 +197,9 @@ public void reset() {
 	for (int i=0; i < bufferSize; i++)
 		actions[i]=null;
 	monitor = false;
-
+	bufferSizeReached=false;
 	com.cosylab.vdct.graphics.DSGUIInterface.getInstance().updateMenuItems();
+	prepareAfterSaving();
 }
 /**
  * Insert the method's description here.
@@ -237,9 +247,34 @@ public void undo() {
 		com.cosylab.vdct.graphics.DrawingSurface.getInstance().setModified(true);
 		com.cosylab.vdct.graphics.DSGUIInterface.getInstance().updateMenuItems();
 		monitor = m;
-		if (pos==lowerbound) {
-		    DrawingSurface.getInstance().setModified(false);
-		}
+		setModification();
+		
 	}
+}
+
+/**
+ * 
+ * Sets the modified tag according to the state of the opened template. If the template has
+ * (by undoing) became the same as the one that is saved tag is turned to false or 
+ * else it is true.
+ *
+ */
+private void setModification() {
+    if (pos==savedOnPos && !bufferSizeReached) {
+	    DrawingSurface.getInstance().setModified(false);
+	} else {
+	    DrawingSurface.getInstance().setModified(true);
+	}
+}
+
+/**
+ * 
+ * Sets all the counters after a file has been saved.
+ *
+ */
+public void prepareAfterSaving() {
+    savedOnPos = last; 
+    bufferSizeReached = false;
+    actionsAfterSave = 0;
 }
 }
