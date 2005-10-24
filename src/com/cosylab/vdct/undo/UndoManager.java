@@ -102,11 +102,12 @@ public void addAction(ActionObject action) {
 		return;
 	}
 	
-	if ((last - savedOnPos + bufferSize)%bufferSize == actionsAfterSave) {
+//	if ((last - savedOnPos + bufferSize)%bufferSize == actionsAfterSave) {
+//	if ((actions2undo() - savedOnPos + bufferSize)%bufferSize == actionsAfterSave) {
 	    actionsAfterSave++;
 	    if (actionsAfterSave >= bufferSize)
 	        bufferSizeReached = true;
-	}
+//	}
 
 	//System.out.println("New action: "+action.getDescription());
 	com.cosylab.vdct.graphics.DrawingSurface.getInstance().setModified(true);
@@ -186,6 +187,8 @@ public void redo() {
 		com.cosylab.vdct.graphics.DrawingSurface.getInstance().setModified(true);
 		com.cosylab.vdct.graphics.DSGUIInterface.getInstance().updateMenuItems();
 		monitor = m;
+		setModification();
+		actionsAfterSave++;
 	}
 }
 /**
@@ -248,7 +251,7 @@ public void undo() {
 		com.cosylab.vdct.graphics.DSGUIInterface.getInstance().updateMenuItems();
 		monitor = m;
 		setModification();
-		
+		actionsAfterSave--;
 	}
 }
 
@@ -273,7 +276,7 @@ private void setModification() {
  *
  */
 public void prepareAfterSaving() {
-    savedOnPos = last; 
+    savedOnPos = pos; 
     bufferSizeReached = false;
     actionsAfterSave = 0;
 }
