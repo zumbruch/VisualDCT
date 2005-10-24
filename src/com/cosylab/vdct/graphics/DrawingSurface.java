@@ -1228,8 +1228,28 @@ public void mouseDragged(MouseEvent e) {
 				// discrete move for snapping
 				if (Settings.getInstance().getSnapToGrid())
 				{
-					dx -= dx % Constants.GRID_SIZE;
+					// snap to nearest grid
+					int pdx = dx % Constants.GRID_SIZE;
+					int pdy = dy % Constants.GRID_SIZE;
+
+					final int halfGrid = Constants.GRID_SIZE / 2;
+					if (pdx > halfGrid)
+						pdx -= Constants.GRID_SIZE;
+					else if (pdx < -halfGrid)
+						pdx += Constants.GRID_SIZE;
+					if (pdy > halfGrid)
+						pdy -= Constants.GRID_SIZE;
+					else if (pdy < -halfGrid)
+						pdy += Constants.GRID_SIZE;
+					
+					dx -= pdx;
+					dy -= pdy;
+					
+					/*
+					// snap to "whole" grid move
+ 					dx -= dx % Constants.GRID_SIZE;
 					dy -= dy % Constants.GRID_SIZE;
+					 */
 				}
 
 				if (dx == 0 && dy == 0) {
