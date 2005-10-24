@@ -266,6 +266,17 @@ protected void draw(Graphics g, boolean hilited) {
 //    }
 }
 
+public int getLeftOffset() {
+    if(isRight()) return 0;
+    return ZoomPane.HORIZONTAL_MARGIN*2;
+}
+
+public int getRightOffset() {
+    if (isRight()) return ZoomPane.HORIZONTAL_MARGIN*2;
+    return 0;
+}
+
+
 public int getRightX() {
     return super.getRightX() - Constants.TAIL_LENGTH + 4*Constants.LINK_RADIOUS;
 }
