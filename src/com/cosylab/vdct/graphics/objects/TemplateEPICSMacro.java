@@ -266,6 +266,13 @@ protected void draw(Graphics g, boolean hilited) {
 //    }
 }
 
+public int getRightX() {
+    return super.getRightX() - Constants.TAIL_LENGTH + 4*Constants.LINK_RADIOUS;
+}
+
+public int getLeftX() {
+    return super.getLeftX() + Constants.TAIL_LENGTH - 4*Constants.LINK_RADIOUS;
+}
 /**
  * Insert the method's description here.
  * Creation date: (30.1.2001 11:59:21)

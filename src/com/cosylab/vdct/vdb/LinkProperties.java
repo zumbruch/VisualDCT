@@ -374,6 +374,9 @@ private void setProperties(LinkSource fd) {
 	if (getType() == FWDLINK_FIELD) {
         if (getProcess().equals("NPP"))
             setProcess("PP");
+    } else if (getType() == TEMPLATE_MACRO) {
+        setProcess("");
+        setMaximize("");
     }
 
 //	if (Group.substractParentName(fd.getRecord().getName()).equals(Group.substractParentName(getRecord())))
