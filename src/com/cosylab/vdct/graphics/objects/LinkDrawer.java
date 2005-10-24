@@ -29,6 +29,8 @@ package com.cosylab.vdct.graphics.objects;
  */
 
 import java.awt.*;
+import java.util.Enumeration;
+
 import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.Settings;
 import com.cosylab.vdct.graphics.*;
@@ -145,16 +147,22 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 	
 	int x2 = x1;
 	int y2 = y1;
+	boolean isInLeft = false;
+	int middleInX = 0;
 	if (in!=null)
 	{
 		// EPICSVarLink is double sided, take the best side
 		if (in instanceof EPICSVarOutLink) {
 			int lx = in.getLeftX();
 			int rx = in.getRightX();
-			if (out.getOutX() > (lx+rx)/2)
+			middleInX = (lx+rx)/2;
+			if (out.getOutX() > middleInX)
 				x2 = (int)(scale*rx-view.getRx());
 			else
+			{
 				x2 = (int)(scale*lx-view.getRx());
+				isInLeft = true;
+			}
 		}
 		else
 			x2 = (int)(scale*in.getInX()-view.getRx());
@@ -400,7 +408,12 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 			g.drawLine(vx,y1,vx,y2); //      |
 			g.drawLine(vx,y2,x2,y2); //      <-----
 
-			if (in instanceof MultiInLink && ((MultiInLink)in).getLinkCount() > 1)
+			boolean drawDot = in instanceof MultiInLink && ((MultiInLink)in).getLinkCount() > 1; 
+			// diff left from right size
+			if (drawDot && in instanceof EPICSVarOutLink)
+				drawDot = checkForSameSideLinks((EPICSVarOutLink)in, isInLeft, middleInX, drawDot);
+			
+			if (drawDot)
 			{
 				g.fillOval(vx-dotSize, y1-dotSize, dotSize2, dotSize2);
 				g.fillOval(vx-dotSize, y2-dotSize, dotSize2, dotSize2);
@@ -428,11 +441,17 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 	else
 	{
 	    if (in!=null) {
+	    	
+	    	boolean drawDot = in instanceof MultiInLink && ((MultiInLink)in).getLinkCount() > 1;
+			// diff left from right size
+			if (drawDot && in instanceof EPICSVarOutLink)
+				drawDot = checkForSameSideLinks((EPICSVarOutLink)in, isInLeft, middleInX, drawDot);
+	    		
 			if (firstHorizontal) {	
 				g.drawLine(x1, y1, x2, y1);
 				g.drawLine(x2, y1, x2, y2);
 
-				if (in instanceof MultiInLink && ((MultiInLink)in).getLinkCount() > 1)
+				if (drawDot)
 				{
 					g.fillOval(x2-dotSize, y1-dotSize, dotSize2, dotSize2);
 					g.fillOval(x2-dotSize, y2-dotSize, dotSize2, dotSize2);
@@ -442,7 +461,7 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 				g.drawLine(x1, y1, x1, y2);
 				g.drawLine(x1, y2, x2, y2);
 
-				if (in instanceof MultiInLink && ((MultiInLink)in).getLinkCount() > 1)
+				if (drawDot)
 				{
 					g.fillOval(x1-dotSize, y2-dotSize, dotSize2, dotSize2);
 					g.fillOval(x2-dotSize, y2-dotSize, dotSize2, dotSize2);
@@ -450,6 +469,30 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 			}
 	    }
 	}
+}
+
+/**
+ * @param in
+ * @param isInLeft
+ * @param middleInX
+ * @param drawDot
+ * @return
+ */
+private static boolean checkForSameSideLinks(EPICSVarOutLink evol, boolean isInLeft, int middleInX, boolean drawDot) {
+	Enumeration links = evol.getOutlinks().elements();
+	int count = 0;
+	while (links.hasMoreElements())
+	{
+		OutLink l = (OutLink)links.nextElement();
+		if (l.getOutX() > middleInX && !isInLeft)
+			count++;
+		else if (l.getOutX() <= middleInX && isInLeft)
+			count++;
+	}
+	
+	if (count <= 1)
+		drawDot = false;
+	return drawDot;
 }
 
 /**
