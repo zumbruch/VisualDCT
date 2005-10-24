@@ -28,6 +28,8 @@ package com.cosylab.vdct.graphics;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.StringSelection;
 import java.io.*;
 import java.util.*;
 
@@ -150,14 +152,32 @@ public java.lang.String checkRecordName(String name, boolean relative) {
 		return null;
 		
 }
+public void copyToSystemClipboard(Vector objs)
+{
+	try
+	{
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		DataOutputStream dos = new DataOutputStream(baos);
+		Group.writeObjects(objs, dos, new NamingContext(null, Group.getEditingTemplateData(), null, null, false), false);
+		Group.writeVDCTData(objs, dos, new NamingContext(null, Group.getEditingTemplateData(), null, null, false), false);
+		
+		StringSelection ss = new StringSelection(baos.toString());
+		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, ss);
+	}
+	catch (Throwable th) 
+	{
+		th.printStackTrace();
+	}
+}
+
 /**
  * Insert the method's description here.
  * Creation date: (4.2.2001 15:32:01)
  */
 public void copy() {
 	ViewState view = ViewState.getInstance();
+	//copyToSystemClipboard(view.getSelectedObjects());
 	copy(view.getSelectedObjects(), true);
-	
 }
 
 private void copy(Vector objects, boolean firstCopy) {
@@ -327,6 +347,7 @@ public void createRecord(String name, String type, boolean relative) {
  */
 public void cut() {
 	ViewState view = ViewState.getInstance();
+	//copyToSystemClipboard(view.getSelectedObjects());
 	
 	if (view.getSelectedObjects().size()==0) return;
 	Group.getClipboard().destroy();
