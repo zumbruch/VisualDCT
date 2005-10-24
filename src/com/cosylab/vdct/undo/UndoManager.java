@@ -102,12 +102,13 @@ public void addAction(ActionObject action) {
 		return;
 	}
 	
-//	if ((last - savedOnPos + bufferSize)%bufferSize == actionsAfterSave) {
-//	if ((actions2undo() - savedOnPos + bufferSize)%bufferSize == actionsAfterSave) {
+	if (actionsAfterSave >= 0){
 	    actionsAfterSave++;
 	    if (actionsAfterSave >= bufferSize)
 	        bufferSizeReached = true;
-//	}
+	} else {
+	    bufferSizeReached = true;
+	}
 
 	//System.out.println("New action: "+action.getDescription());
 	com.cosylab.vdct.graphics.DrawingSurface.getInstance().setModified(true);
