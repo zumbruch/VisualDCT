@@ -730,7 +730,6 @@ public void linkCommand(VisibleObject linkObject, LinkSource linkData) {
 //    } finally {
 //        drawingSurface.setCursor(previous);
 //    }
-
     setCursor(crossCursor);
 	if (tmplink==null) {
 		
@@ -866,6 +865,7 @@ public void mouseClicked(MouseEvent e) {
 			}
 		}
 		else {
+		    stopLinking();
 			pressedX=cx; pressedY=cy;
 
 			if((e.getClickCount() >= 1) && (grLine != null))
@@ -928,10 +928,11 @@ public void mouseClicked(MouseEvent e) {
 			}
 			else if (view.deselectAll()) 
 				repaint();					// deselect all
+			
 		}
 		
 
-		stopLinking();
+		
 			
 	}
 }
@@ -4075,4 +4076,5 @@ public void reset() {
 	redrawRequest = true;
 	repaint();
 }
+
 }

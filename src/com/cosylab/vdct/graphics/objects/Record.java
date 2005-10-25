@@ -199,7 +199,12 @@ public void accept(Visitor visitor) {
 public void addLink(Linkable link) {
 	if (!getSubObjectsV().contains(link)) {
 		Field field = (Field)link;
-		addSubObject(field.getFieldData().getName(), field);
+		if (field.getFieldData().getPositionIndex() >= 0)
+		    addSubObject(field.getFieldData().getName(), field, field.getFieldData().getPositionIndex());
+		else {
+		    addSubObject(field.getFieldData().getName(), field);
+		    field.getFieldData().setPositionIndex(subObjectsV.indexOf(field));
+		}
 		validateFields();
 		revalidateFieldsPosition();
 	}
@@ -1359,6 +1364,7 @@ private void paintSubObjects(Graphics g, boolean hilited) {
 public void removeLink(Linkable link) {
 	if (getSubObjectsV().contains(link)) {
 		Field field = (Field)link;
+		field.getFieldData().setPositionIndex(getSubObjectsV().indexOf(link));
 		removeObject(field.getFieldData().getName());
 	}
 }

@@ -62,6 +62,7 @@ public class VDBFieldData implements InspectableProperty, Debuggable, ChangableV
 	private static final String debugDefault = "###";
 	protected String debugValue = debugDefault;
 	
+	private int positionIndex = -1;
 	/**
 	 * ISO 8601 date formatter.
 	 */
@@ -573,4 +574,11 @@ public boolean isConnected() {
 	return connected;
 }
 
+public void setPositionIndex(int index) {
+    this.positionIndex = index;
+}
+
+public int getPositionIndex() {
+    return positionIndex;
+}
 }

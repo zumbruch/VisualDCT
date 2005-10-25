@@ -70,7 +70,17 @@ public ContainerObject(ContainerObject parent, boolean useHashtable) {
  * @param object com.cosylab.vdct.graphics.objects.VisibleObject
  */
 public void addSubObject(String id, VisibleObject object) {
-	if (useHashtable)
+    addSubObject(id, object, subObjectsV.size());
+
+	/*
+	if (this instanceof Group)
+		System.out.println("Added to group "+((Group)this).getAbsoluteName()+" object with id: "+id);
+	*/	
+	
+}
+
+public void addSubObject(String id, VisibleObject object, int position) {
+    if (useHashtable)
 	{
 		if (subObjects.containsKey(id))
 		{
@@ -79,15 +89,14 @@ public void addSubObject(String id, VisibleObject object) {
 		}
 		subObjects.put(id, object);
 	}
-	subObjectsV.addElement(object);
+    try {
+    	subObjectsV.add(position, object);
+    } catch (ArrayIndexOutOfBoundsException e) {
+    	subObjectsV.addElement(object);
+    }
+
 
 	if (object.getParent()==null) object.setParent(this);
-
-	/*
-	if (this instanceof Group)
-		System.out.println("Added to group "+((Group)this).getAbsoluteName()+" object with id: "+id);
-	*/	
-	
 }
 
 /**

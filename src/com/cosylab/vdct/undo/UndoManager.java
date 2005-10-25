@@ -92,7 +92,7 @@ public int actions2undo() {
  * @param action epics.undo.ActionObject
  */
 public void addAction(ActionObject action) {
-
+    
 	if (!monitor) return;
 
 	if (composedAction!=null)
@@ -102,7 +102,7 @@ public void addAction(ActionObject action) {
 		return;
 	}
 	
-	if (actionsAfterSave >= 0){
+	if (actionsAfterSave >= 0 && actionsAfterSave <= bufferSize){
 	    actionsAfterSave++;
 	    if (actionsAfterSave >= bufferSize)
 	        bufferSizeReached = true;
