@@ -233,7 +233,6 @@ public void destroy() {
 		data.setVisibleObject(null);
 		getParent().removeObject(getName());
 		data.setValueSilently(currentValue);
-		data.getTemplate().removePort(getName());
 	}
 }
 
