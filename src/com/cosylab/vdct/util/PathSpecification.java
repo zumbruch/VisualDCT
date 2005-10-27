@@ -139,6 +139,11 @@ public class PathSpecification
 		{
 			String rootPath = (String)pI.next();
 			
+			if (rootPath.equals("."))
+				rootPath = currentDir;			
+			else if (rootPath.startsWith("..") || rootPath.startsWith("."))
+				rootPath = currentDir + File.separator + rootPath;			
+
 			// check path
 			t = new File(rootPath, fileName);
 			if (t.exists())
