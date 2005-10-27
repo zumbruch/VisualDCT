@@ -109,6 +109,7 @@ public class Record
 	public final static int DBD_ORDER = 2;
 
 	private int oldNumOfFields = 0;
+	private boolean firstValidation = true;
 	
 /**
  * Group constructor comment.
@@ -1522,8 +1523,9 @@ public void setRight(boolean state) { right=state; }
  * @return java.lang.String
  */
 public String toString() {
-	return recordData.toString();
+//	return recordData.toString();
 	// recordData.getName()+" ("+recordData.getType()+")"
+    return super.toString();
 }
 
 /**
@@ -1631,6 +1633,7 @@ private int validateFont(double scale, int rwidth, int rheight) {
     return rheight;
 }
 
+int validationsCounter = 0;
 /**
  * Insert the method's description here.
  * Creation date: (21.12.2000 20:46:35)
@@ -1638,27 +1641,36 @@ private int validateFont(double scale, int rwidth, int rheight) {
 protected void validate() {
   
   int bottomy = getY() + getHeight();
+
   double scale = getRscale();
+
   int rwidth = (int)(getWidth()*scale);
   int rheight = (int)(Constants.RECORD_HEIGHT*scale);
 
   setRheight(rheight);
   setRwidth(rwidth);
- 
+
   rheight = validateFont(scale, rwidth, rheight);
   int height = (int) (rheight/scale);
   setHeight(height);
-  setY(bottomy - height);
 
-  // round fix
-  rheight = (int)((getY()+getHeight())*scale)-(int)(getY()*scale);
-  setRheight(rheight);
+  //4 validations are made when a template is opened - Y must not be reset, because the
+  //workspace is not yet fully validated
+  if(changedFields.size() > 0) {
+	  if (validationsCounter >=4)
+	      setY(bottomy-height);
+	  else 
+	      validationsCounter++;
+  }
   
+  // round fix
+  rheight = (int)((getY()+super.getHeight())*scale)-(int)(getY()*scale);
+  setRheight(rheight);
   
   // sub-components
   revalidatePosition();		// rec's height can be different
   validateFields();
- 
+
 }
 
 
