@@ -42,32 +42,34 @@ public class PathSpecification
 	
 	protected ArrayList currentPath = null;
 	
-	// NOTE: currently not used
-	// this paths are added to all 'currentPath' entries
-	// since this is not what is expected by EPICS, this is not used
-	protected ArrayList addPath = null;
-	
 	protected static final String NAME_EPICS_DB_INCLUDE_PATH = "EPICS_DB_INCLUDE_PATH";
 	
 	protected String currentDir = null;
 	
+	public PathSpecification (String defaultPath)
+	{
+		this(defaultPath, null);
+	}
+	
 	/**
 	 */
-	public PathSpecification (String defaultPath)
+	public PathSpecification (String defaultPath, PathSpecification parent)
 	{
 		currentDir = defaultPath;
 		
-		currentPath = new ArrayList();
+		if (parent == null)
+			currentPath = new ArrayList();
+		else
+			currentPath = new ArrayList(parent.currentPath);
 		
 		// check if EPICS_DB_INCLUDE_PATH is available, this overrides current-directory default
 		String epicsIncludePath = System.getProperty(NAME_EPICS_DB_INCLUDE_PATH);
 		if (epicsIncludePath != null)
-			splitPath(epicsIncludePath, currentDir, currentPath);
+			splitPath(epicsIncludePath, ".", currentPath);
 			// currentPath.add(epicsIncludePath);
 	    else
 	    	currentPath.add(currentDir);
 
-		addPath = new ArrayList();		
 	}
 	
 	/**
@@ -91,7 +93,12 @@ public class PathSpecification
 			else
 			{
 				String part = dirs.substring(pos1+1, pos2);
-				list.add(part);			
+				if (part.equals("."))
+					list.add(currentDir);			
+				else if (part.startsWith("..") || part.startsWith("."))
+					list.add(currentDir + File.separator + part);			
+				else
+					list.add(part);			
 			}	
 
 			pos1 = pos2;
@@ -138,27 +145,12 @@ public class PathSpecification
 		while (pI.hasNext())
 		{
 			String rootPath = (String)pI.next();
-			
-			if (rootPath.equals("."))
-				rootPath = currentDir;			
-			else if (rootPath.startsWith("..") || rootPath.startsWith("."))
-				rootPath = currentDir + File.separator + rootPath;			
 
 			// check path
 			t = new File(rootPath, fileName);
 			if (t.exists())
 				return t;
 				
-			// check all add paths
-			Iterator aI = addPath.iterator();
-			while (aI.hasNext())
-			{
-				String fullPath = rootPath + File.separator + (String)aI.next();
-				t = new File(fullPath, fileName);
-				if (t.exists())
-					return t;
-			}
-
 		}
 		
 		// not found
@@ -173,18 +165,7 @@ public class PathSpecification
 			if (pI.hasNext()) path.append(File.pathSeparatorChar);
 		}
 		
-		/*
-		StringBuffer addpath = new StringBuffer();
-		pI = addPath.iterator();
-		while (pI.hasNext())
-		{
-			addpath.append(pI.next());
-			if (pI.hasNext()) addpath.append(File.pathSeparatorChar);
-		}
-		*/
-
 		// not found
-		//throw new FileNotFoundException("File '"+fileName+"' not found (path: \""+path.toString()+"\", addpath: \""+addpath.toString()+"\").");
 		throw new FileNotFoundException("File '"+fileName+"' not found (path: \""+path.toString()+"\").");
 	}
 

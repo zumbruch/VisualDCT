@@ -316,7 +316,7 @@ public static void processDBD(DBDData data, EnhancedStreamTokenizer tokenizer, S
 
 					File file = paths.search4File(include_filename);
 					inctokenizer = getEnhancedStreamTokenizer(file.getAbsolutePath());
-					if (inctokenizer!=null) processDBD(data, inctokenizer, include_filename, new PathSpecification(file.getParentFile().getAbsolutePath()));
+					if (inctokenizer!=null) processDBD(data, inctokenizer, include_filename, new PathSpecification(file.getParentFile().getAbsolutePath(), paths));
 
 				}
 
@@ -448,7 +448,7 @@ public static void processFields(DBDRecordData rd, EnhancedStreamTokenizer token
 
 				File file = paths.search4File(include_filename);
 				inctokenizer = getEnhancedStreamTokenizer(file.getAbsolutePath());
-				if (inctokenizer!=null) processFields(rd, inctokenizer, include_filename, new PathSpecification(file.getParentFile().getAbsolutePath()));
+				if (inctokenizer!=null) processFields(rd, inctokenizer, include_filename, new PathSpecification(file.getParentFile().getAbsolutePath(), paths));
 
 			}	
 						
@@ -502,7 +502,7 @@ public static void processMenuChoices(DBDMenuData md, EnhancedStreamTokenizer to
 	
 				File file = paths.search4File(include_filename);
 				inctokenizer = getEnhancedStreamTokenizer(file.getAbsolutePath());
-				if (inctokenizer!=null) processMenuChoices(md, inctokenizer, include_filename, new PathSpecification(file.getParentFile().getAbsolutePath()));
+				if (inctokenizer!=null) processMenuChoices(md, inctokenizer, include_filename, new PathSpecification(file.getParentFile().getAbsolutePath(), paths));
 			}	
 						
 	/***********************************************************/

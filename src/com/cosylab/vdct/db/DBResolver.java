@@ -1280,7 +1280,7 @@ public static void processDB(DBData data, EnhancedStreamTokenizer tokenizer, Str
 	
 						File file = paths.search4File(include_filename);
 						inctokenizer = getEnhancedStreamTokenizer(file.getAbsolutePath());
-						if (inctokenizer!=null) processDB(data, inctokenizer, include_filename, new PathSpecification(file.getParentFile().getAbsolutePath()), loadStack, loadList);
+						if (inctokenizer!=null) processDB(data, inctokenizer, include_filename, new PathSpecification(file.getParentFile().getAbsolutePath(), paths), loadStack, loadList);
 					}
 				
 					/****************** path ********************/
@@ -1377,7 +1377,7 @@ public static void processMacros(DBTemplateInstance templateInstance, EnhancedSt
 
 				File file = paths.search4File(include_filename);
 				inctokenizer = getEnhancedStreamTokenizer(file.getAbsolutePath());
-				if (inctokenizer!=null) processMacros(templateInstance, inctokenizer, include_filename, new PathSpecification(file.getParentFile().getAbsolutePath()));
+				if (inctokenizer!=null) processMacros(templateInstance, inctokenizer, include_filename, new PathSpecification(file.getParentFile().getAbsolutePath(), paths));
 
 			}	
 						
@@ -1448,7 +1448,7 @@ public static void processPorts(DBTemplate template, EnhancedStreamTokenizer tok
 
 				File file = paths.search4File(include_filename);
 				inctokenizer = getEnhancedStreamTokenizer(file.getAbsolutePath());
-				if (inctokenizer!=null) processPorts(template, inctokenizer, include_filename, new PathSpecification(file.getParentFile().getAbsolutePath()));
+				if (inctokenizer!=null) processPorts(template, inctokenizer, include_filename, new PathSpecification(file.getParentFile().getAbsolutePath(), paths));
 
 			}	
 						
@@ -1508,7 +1508,7 @@ public static void processFields(DBRecordData rd, EnhancedStreamTokenizer tokeni
 
 				File file = paths.search4File(include_filename);
 				inctokenizer = getEnhancedStreamTokenizer(file.getAbsolutePath());
-				if (inctokenizer!=null) processFields(rd, inctokenizer, include_filename, new PathSpecification(file.getParentFile().getAbsolutePath()));
+				if (inctokenizer!=null) processFields(rd, inctokenizer, include_filename, new PathSpecification(file.getParentFile().getAbsolutePath(), paths));
 
 			}	
 						
