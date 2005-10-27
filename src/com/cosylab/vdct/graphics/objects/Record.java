@@ -384,7 +384,7 @@ protected void draw(Graphics g, boolean hilited) {
 	
 	int rrx = getRx() - view.getRx();
 	int rry = getRy() - view.getRy();
-
+	
 	int rwidth = getRwidth();
 	int rheight = getRheight();
 
@@ -412,7 +412,7 @@ protected void draw(Graphics g, boolean hilited) {
 					g.setColor(Constants.RECORD_COLOR);
 
 		g.fillRect(rrx, rry, rwidth, rheight);
-
+		
 		if (!hilited)
 			g.setColor(Constants.FRAME_COLOR);
 		else
@@ -1526,6 +1526,15 @@ public String toString() {
 	// recordData.getName()+" ("+recordData.getType()+")"
 }
 
+/**
+ * 
+ * Validates the font size and position.
+ * @see validate
+ * @param scale 
+ * @param rwidth 
+ * @param rheight
+ * @return the new rheight for the record
+ */
 private int validateFont(double scale, int rwidth, int rheight) {
     
     //  set appropriate font size
@@ -1627,7 +1636,8 @@ private int validateFont(double scale, int rwidth, int rheight) {
  * Creation date: (21.12.2000 20:46:35)
  */
 protected void validate() {
-
+  
+  int bottomy = getY() + getHeight();
   double scale = getRscale();
   int rwidth = (int)(getWidth()*scale);
   int rheight = (int)(Constants.RECORD_HEIGHT*scale);
@@ -1636,11 +1646,14 @@ protected void validate() {
   setRwidth(rwidth);
  
   rheight = validateFont(scale, rwidth, rheight);
-  setHeight((int)(rheight/scale));
+  int height = (int) (rheight/scale);
+  setHeight(height);
+  setY(bottomy - height);
 
   // round fix
   rheight = (int)((getY()+getHeight())*scale)-(int)(getY()*scale);
   setRheight(rheight);
+  
   
   // sub-components
   revalidatePosition();		// rec's height can be different
@@ -1808,7 +1821,6 @@ public void updateFields() {
 	validate();
 }
 
-
 /**
  * Snap to grid. Nearest point is taken.
  */
@@ -1816,7 +1828,8 @@ public void snapToGrid()
 {
 	int mx = x % Constants.GRID_SIZE;
 	// TODO za en piksel strize!!!
-	int my = (y+getHeight()) % Constants.GRID_SIZE;
+//	int my = (y+getHeight()) % Constants.GRID_SIZE;
+	int my = (getY()+getHeight()) % Constants.GRID_SIZE;
 	
 	final int halfGrid = Constants.GRID_SIZE / 2;
 	if (mx > halfGrid)
