@@ -3671,46 +3671,13 @@ public boolean prepareTemplateLeave()
 			
 		    	case JOptionPane.YES_OPTION: {
 		    	    VisualDCT.getInstance().saveMenuItem_ActionPerformed();
-		    	    VDBTemplate backup = (VDBTemplate)templateStack.pop();
-					// reload template
-					boolean ok = reloadTemplate(Group.getEditingTemplateData());
-					// push new
-					VDBTemplate reloaded = (VDBTemplate)VDBData.getTemplates().get(backup.getId());
-					
-					if (!ok || reloaded==null)
-					{
-						VDBData.addTemplate(backup);
-						templateStack.push(backup);
-					}
-					else
-					{
-						templateStack.push(reloaded);
-						viewGroup = reloaded.getGroup();
-					}
-							
-					return true;
+
+		    	    break;
 		    	}
 		    
 				case JOptionPane.NO_OPTION: {
-					// pop old current
-					VDBTemplate backup = (VDBTemplate)templateStack.pop();
-					// reload template
-					boolean ok = reloadTemplate(Group.getEditingTemplateData());
-					// push new
-					VDBTemplate reloaded = (VDBTemplate)VDBData.getTemplates().get(backup.getId());
-					
-					if (!ok || reloaded==null)
-					{
-						VDBData.addTemplate(backup);
-						templateStack.push(backup);
-					}
-					else
-					{
-						templateStack.push(reloaded);
-						viewGroup = reloaded.getGroup();
-					}
-							
-					return true;
+
+				    break;
 				}
 				
 				default: {
@@ -3720,8 +3687,28 @@ public boolean prepareTemplateLeave()
 		}
 		
 	}
-	else		
-		return true;
+	//template should be reloaded because user could save the template prior
+	//to ascending/descending into another level.
+	
+	VDBTemplate backup = (VDBTemplate)templateStack.pop();
+	// reload template
+	boolean ok = reloadTemplate(Group.getEditingTemplateData());
+	// push new
+	VDBTemplate reloaded = (VDBTemplate)VDBData.getTemplates().get(backup.getId());
+	
+	if (!ok || reloaded==null)
+	{
+		VDBData.addTemplate(backup);
+		templateStack.push(backup);
+	}
+	else
+	{
+		templateStack.push(reloaded);
+		viewGroup = reloaded.getGroup();
+	}
+	
+	return true;
+	
 }
 
 /**
@@ -3799,7 +3786,8 @@ public void ascendFromTemplate()
 	// initialize
 	templateReloadPostInit();
 	
-	moveToGroup(grp);	
+	moveToGroup(grp);
+	grp.reset(false);
 	repaint();
 }
 
@@ -3857,7 +3845,7 @@ public Stack getTemplateStack()
 /**
  */
 public boolean reloadTemplate(VDBTemplate data)
-{
+{	
 	if (data==null)
 		return true;
 	
@@ -4074,6 +4062,7 @@ public void reset() {
 	createNavigatorImage();
 	
 	redrawRequest = true;
+	viewGroup.reset(true);
 	repaint();
 }
 

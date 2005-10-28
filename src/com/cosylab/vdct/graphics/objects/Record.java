@@ -1633,9 +1633,8 @@ private int validateFont(double scale, int rwidth, int rheight) {
     return rheight;
 }
 
-public void resetValidationsCounter() {
-    System.out.println("test");
-    validationsCounter = 0;
+public void resetValidationsCounter(boolean settingsChanged) {
+    validationsCounter = settingsChanged ? -1 : 0;
 }
 
 private int validationsCounter = 0;
@@ -1659,10 +1658,10 @@ protected void validate() {
   int height = (int) (rheight/scale);
   setHeight(height);
 
-  //5 validations are made when a template is opened - Y must not be reset, because the
+  //4 validations are made when a template is opened - Y must not be reset, because the
   //workspace is not yet fully validated
   if(changedFields.size() > 0) {
-	  if (validationsCounter >=5)
+	  if (validationsCounter >=4)
 	      setY(bottomy-height);
 	  else 
 	      validationsCounter++;

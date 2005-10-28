@@ -1493,7 +1493,7 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 	 			{
 						
 			 		obj = e2.nextElement();
-			 		
+			 					 		
 				 	if (obj instanceof EPICSLinkOut)
 			 		{
 			 			link = (EPICSLinkOut)obj;
@@ -1507,22 +1507,22 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 					 				renamer.getResolvedName(link.getInput().getID())
 						 		) +
 								ending);
+			 		}
+		 			if (obj instanceof EPICSLink)
+			 		{
+			 			field = (EPICSLink)obj;
 			 			
-			 			if (obj instanceof EPICSLink)
-				 		{
-				 			field = (EPICSLink)obj;
+		 				String name = field.getFieldData().getName();
 
-			 				String name = field.getFieldData().getName();
-							
-						 	file.writeBytes(TEMPLATE_FIELD_START+
-			 					 quote + templateName + quote +
-			 					 comma + quote + name + quote +
-								 comma + StringUtils.color2string(field.getColor()) +
-								 comma + StringUtils.boolean2str(field.isRight()) +
-								 comma + field.getFieldData().getVisibility() +
-								 ending);
-				 		}
-		 			}
+					 	file.writeBytes(TEMPLATE_FIELD_START+
+		 					 quote + templateName + quote +
+		 					 comma + quote + name + quote +
+							 comma + StringUtils.color2string(field.getColor()) +
+							 comma + StringUtils.boolean2str(field.isRight()) +
+							 comma + field.getFieldData().getVisibility() +
+							 ending);
+			 		}
+		 			
 				 	else if (obj instanceof Connector)
 			 		{
 			 			connector = (Connector)obj;
@@ -1969,15 +1969,20 @@ public void generateMacros(HashMap macros, boolean deep) {
 	}
 }
 
-public void reset() {
+/**
+ * 
+ * Resets certain parameters of the subobjects (validationsCounter in Record).
+ * @param settingsChanged flag whether this method was invoked when settings (settings dialog) were changed
+ */
+public void reset(boolean settingsChanged) {
     Enumeration en = getSubObjectsV().elements();
     Object obj;
     while (en.hasMoreElements()) {
         obj = en.nextElement();
         if (obj instanceof Record) {
-            ((Record)obj).resetValidationsCounter();
+            ((Record)obj).resetValidationsCounter(settingsChanged);
         } else if (obj instanceof Group) {
-            ((Group)obj).reset();
+            ((Group)obj).reset(settingsChanged);
         }
     }
 }
