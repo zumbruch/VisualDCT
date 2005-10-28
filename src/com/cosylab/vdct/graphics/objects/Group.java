@@ -1969,4 +1969,17 @@ public void generateMacros(HashMap macros, boolean deep) {
 	}
 }
 
+public void reset() {
+    Enumeration en = getSubObjectsV().elements();
+    Object obj;
+    while (en.hasMoreElements()) {
+        obj = en.nextElement();
+        if (obj instanceof Record) {
+            ((Record)obj).resetValidationsCounter();
+        } else if (obj instanceof Group) {
+            ((Group)obj).reset();
+        }
+    }
+}
+
 }
