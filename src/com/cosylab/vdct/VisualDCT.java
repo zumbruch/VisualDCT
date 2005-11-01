@@ -6513,12 +6513,12 @@ public void pageSetupMenuItem_ActionPerformed(java.awt.event.ActionEvent actionE
 			PrintRequestAttributeSet printRequestAttributeSet = Page.getPrintRequestAttributeSet();
 		
 			PrinterJob printerJob = PrinterJob.getPrinterJob();
+			PrintService temp = PrinterSelector.getPrinterSelector(this).getPrintService(lastPrintService);
 			
-			lastPrintService = PrinterSelector.getPrinterSelector(this).getPrintService();
-			
-			if (lastPrintService == null) {
+			if (temp == null) {
 			    return;
 			} else {
+			    lastPrintService = temp;
 			    try {
                     printerJob.setPrintService(lastPrintService);
                 } catch (PrinterException e) {

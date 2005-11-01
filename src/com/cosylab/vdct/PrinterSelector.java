@@ -100,8 +100,8 @@ public class PrinterSelector extends JDialog implements ActionListener {
      * If the SKIP button is pressed method returns null.
      * @return selected PrintService.
      */
-    public PrintService getPrintService() {
-        refresh();
+    public PrintService getPrintService(PrintService previousService) {
+        refresh(previousService);
         this.setVisible(true);
         return service;
     }
@@ -121,12 +121,15 @@ public class PrinterSelector extends JDialog implements ActionListener {
         }
     }
     
-    private void refresh() {
+    private void refresh(PrintService previousService) {
         service = null;
         servicesCombo.removeAllItems();
         PrintService[] ps = PrinterJob.lookupPrintServices();
         for (int i = 0; i < ps.length; i++) {
             servicesCombo.addItem(ps[i]);
+        }
+        if (previousService != null) {
+            servicesCombo.setSelectedItem(previousService);
         }
         
     }
