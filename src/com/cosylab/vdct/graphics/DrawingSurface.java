@@ -1963,21 +1963,25 @@ public boolean importBorder(File file)
     }
 }
 
+public boolean open(File file, boolean importDB, boolean importToCurrentGroup) throws IOException {
+	return open(null, file, importDB, importToCurrentGroup);
+}
 /**
  * SEPARATE DOWN CODE TO METHODS
  * Creation date: (6.1.2001 22:35:40)
  * @param file java.io.File
  */
-public boolean open(File file, boolean importDB, boolean importToCurrentGroup) throws IOException {
+public boolean open(InputStream is, File file, boolean importDB, boolean importToCurrentGroup) throws IOException {
 
 	///
-	/// DBD managment
+	/// DBD managment (not on system clipboard import)
 	///
-
-	cleanDBDList();
+	if (file != null)
+		cleanDBDList();
 	 
 	// check for in-coded DBDs
-	checkForIncodedDBDs(file);
+	if (file != null)
+		checkForIncodedDBDs(file);
 
 
 	///
@@ -2005,9 +2009,12 @@ public boolean open(File file, boolean importDB, boolean importToCurrentGroup) t
 
 		try
 		{
-			dbData = DBResolver.resolveDB(file.getAbsolutePath());
+			if (is != null)
+				dbData = DBResolver.resolveDB(is);
+			else
+				dbData = DBResolver.resolveDB(file.getAbsolutePath());
 		} 
-		catch(Exception e)
+		catch(Throwable e)
 		{
 			Console.getInstance().println(e);
 		}

@@ -29,7 +29,9 @@ package com.cosylab.vdct.graphics;
  */
 
 import java.awt.Toolkit;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.io.*;
 import java.util.*;
 
@@ -176,9 +178,20 @@ public void copyToSystemClipboard(Vector objs)
  */
 public void copy() {
 	ViewState view = ViewState.getInstance();
-	//copyToSystemClipboard(view.getSelectedObjects());
 	copy(view.getSelectedObjects(), true);
 }
+
+/**
+ * Insert the method's description here.
+ * Creation date: (4.2.2001 15:32:01)
+ */
+public void systemCopy() {
+	ViewState view = ViewState.getInstance();
+	copyToSystemClipboard(view.getSelectedObjects());
+	view.deselectAll();
+	drawingSurface.repaint();
+}
+
 
 private void copy(Vector objects, boolean firstCopy) {
     
@@ -601,6 +614,24 @@ public void openDB(java.io.File file) throws IOException {
  */
 public void openDBD(java.io.File file) throws IOException {
 	drawingSurface.openDBD(file);
+}
+
+public void systemPaste() {
+	try
+	{
+		Transferable contents = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(this);
+ 	    boolean hasTransferableText = (contents != null) && contents.isDataFlavorSupported(DataFlavor.stringFlavor);
+ 	    if (hasTransferableText)
+ 	    {
+ 	    	String str = (String)contents.getTransferData(DataFlavor.stringFlavor);
+			ByteArrayInputStream bais = new ByteArrayInputStream(str.getBytes());
+			drawingSurface.open(bais, null, true, true);
+ 	    }
+	}
+	catch (Throwable th) 
+	{
+		th.printStackTrace();
+	}
 }
 
 public void paste() {

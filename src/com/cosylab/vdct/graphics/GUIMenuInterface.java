@@ -255,4 +255,8 @@ void ungroup();
  * Creation date: (4.2.2001 15:08:21)
  */
 void updateGroupLabel();
+
+void systemCopy();
+void systemPaste();
+
 }

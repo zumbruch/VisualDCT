@@ -31,6 +31,7 @@ package com.cosylab.vdct.db;
 import java.io.*;
 import java.util.*;
 import com.cosylab.vdct.Console;
+import com.cosylab.vdct.Settings;
 import com.cosylab.vdct.graphics.objects.InLink;
 import com.cosylab.vdct.graphics.objects.OutLink;
 import com.cosylab.vdct.util.*;
@@ -154,6 +155,25 @@ public static EnhancedStreamTokenizer getEnhancedStreamTokenizer(String fileName
 		initializeTokenizer(tokenizer);
 	} catch (IOException e) {
 		Console.getInstance().println("\no) Error occured while opening file '"+fileName+"'");
+		Console.getInstance().println(e);
+	}
+
+	return tokenizer;
+}
+/**
+ * This method was created in VisualAge.
+ * @return java.io.EnhancedStreamTokenizer
+ * @param fileName java.lang.String
+ */
+public static EnhancedStreamTokenizer getEnhancedStreamTokenizer(InputStream is) {
+
+	EnhancedStreamTokenizer tokenizer = null;
+	
+	try	{
+		tokenizer = new EnhancedStreamTokenizer(new BufferedReader(new InputStreamReader(is)));
+		initializeTokenizer(tokenizer);
+	} catch (Throwable e) {
+		Console.getInstance().println("\no) Error occured while opening stream '"+is+"'");
 		Console.getInstance().println(e);
 	}
 
@@ -1610,12 +1630,55 @@ public static DBData resolveDB(String fileName, Stack loadStack, ArrayList loadL
  * @return Vector
  * @param fileName java.lang.String
  */
+public static DBData resolveDB(InputStream is, Stack loadStack, ArrayList loadList) {
+	
+	DBData data = null; 
+	
+	EnhancedStreamTokenizer tokenizer = getEnhancedStreamTokenizer(is);
+	if (tokenizer!=null) 
+	{
+		try
+		{
+			PathSpecification paths = new PathSpecification(Settings.getDefaultDir());
+			data = new DBData("System Clipboard", "System Clipboard");
+
+			processDB(data, tokenizer, "System Clipboard", paths, loadStack, loadList);
+		}
+		catch (Exception e)
+		{
+			Console.getInstance().println(e.toString());
+			data = null;
+		}
+		finally
+		{
+			System.gc();
+		}
+	}
+	
+	return data;
+}
+
+/**
+ * This method was created in VisualAge.
+ * @return Vector
+ * @param fileName java.lang.String
+ */
 public static DBData resolveDB(String fileName) throws Exception {
 	Stack loadStack = new Stack();
 	ArrayList loadList = new ArrayList();
 	return resolveDB(fileName, loadStack, loadList);
 }
 
+/**
+ * This method was created in VisualAge.
+ * @return Vector
+ * @param fileName java.lang.String
+ */
+public static DBData resolveDB(InputStream is) throws Exception {
+	Stack loadStack = new Stack();
+	ArrayList loadList = new ArrayList();
+	return resolveDB(is, loadStack, loadList);
+}
 
 
 /**

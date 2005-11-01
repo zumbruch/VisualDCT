@@ -61,6 +61,8 @@ public class VisualDCT extends JFrame {
 	private JMenuItem ivjAbout_BoxMenuItem = null;
 	private JMenuItem ivjBase_ViewMenuItem = null;
 	private JMenuItem ivjBooks_OnlineMenuItem = null;
+	private JMenuItem ivjSystemCopyMenuItem = null;
+	private JMenuItem ivjSystemPasteMenuItem = null;
 	private JButton ivjCopyButton = null;
 	private JMenuItem ivjCopyMenuItem = null;
 	private JButton ivjCutButton = null;
@@ -268,6 +270,10 @@ class IvjEventHandler implements java.awt.event.ActionListener, java.awt.event.I
 				connEtoC18(e);
 			else if (e.getSource() == VisualDCT.this.getPasteMenuItem()) 
 				connEtoC19(e);
+			else if (e.getSource() == VisualDCT.this.getSystemCopyMenuItem()) 
+				systemCopy();
+			else if (e.getSource() == VisualDCT.this.getSystemPasteMenuItem()) 
+				systemPaste();
 			else if (e.getSource() == VisualDCT.this.getMove_RenameMenuItem()) 
 				connEtoC20(e);
 			else if (e.getSource() == VisualDCT.this.getMorphMenuItem()) 
@@ -1746,7 +1752,17 @@ private void connPtoP2SetTarget() {
 		handleException(ivjExc);
 	}
 }
-/**
+
+public void systemCopy() {
+    GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
+    cmd.getGUIMenuInterface().systemCopy();
+}
+	
+public void systemPaste() {
+    GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
+    cmd.getGUIMenuInterface().systemPaste();
+}
+	/**
  * Comment
  */
 public void copyMenuItem_ActionPerformed() {
@@ -2304,6 +2320,29 @@ private javax.swing.JMenuItem getCopyMenuItem() {
 	}
 	return ivjCopyMenuItem;
 }
+
+/**
+ * Return the CopyMenuItem property value.
+ * @return javax.swing.JMenuItem
+ */
+/* WARNING: THIS METHOD WILL BE REGENERATED. */
+private javax.swing.JMenuItem getSystemCopyMenuItem() {
+	if (ivjSystemCopyMenuItem == null) {
+		try {
+			ivjSystemCopyMenuItem = new javax.swing.JMenuItem();
+			ivjSystemCopyMenuItem.setName("SystemCopyMenuItem");
+			ivjSystemCopyMenuItem.setText("Copy to System Clipboard");
+			ivjSystemCopyMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C,java.awt.Event.CTRL_MASK|java.awt.Event.SHIFT_MASK));
+			// user code begin {1}
+			// user code end
+		} catch (java.lang.Throwable ivjExc) {
+			// user code begin {2}
+			// user code end
+			handleException(ivjExc);
+		}
+	}
+	return ivjSystemCopyMenuItem;
+}
 /**
  * Return the CutButton property value.
  * @return javax.swing.JButton
@@ -2428,6 +2467,9 @@ private javax.swing.JMenu getEditMenu() {
 			ivjEditMenu.add(getSelect_AllMenuItem());
 			ivjEditMenu.add(new JSeparator());
 			ivjEditMenu.add(getFindMenuItem());
+			ivjEditMenu.add(new JSeparator());
+			ivjEditMenu.add(getSystemCopyMenuItem());
+			ivjEditMenu.add(getSystemPasteMenuItem());
 			// user code begin {1}
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
@@ -3316,6 +3358,7 @@ private javax.swing.JSeparator getJSeparator13() {
 	}
 	return ivjJSeparator13;
 }
+
 /**
  * Return the JSeparator11 property value.
  * @return javax.swing.JSeparator
@@ -4163,6 +4206,29 @@ private javax.swing.JMenuItem getPasteMenuItem() {
 		}
 	}
 	return ivjPasteMenuItem;
+}
+/**
+ * Return the PasteMenuItem property value.
+ * @return javax.swing.JMenuItem
+ */
+/* WARNING: THIS METHOD WILL BE REGENERATED. */
+private javax.swing.JMenuItem getSystemPasteMenuItem() {
+	if (ivjSystemPasteMenuItem == null) {
+		try {
+			ivjSystemPasteMenuItem = new javax.swing.JMenuItem();
+			ivjSystemPasteMenuItem.setName("SystemPasteMenuItem");
+			//ivjSystemPasteMenuItem.setMnemonic('P');
+			ivjSystemPasteMenuItem.setText("Paste from System Clipboard");
+			ivjSystemPasteMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_V,java.awt.Event.CTRL_MASK|java.awt.Event.SHIFT_MASK));
+			// user code begin {1}
+			// user code end
+		} catch (java.lang.Throwable ivjExc) {
+			// user code begin {2}
+			// user code end
+			handleException(ivjExc);
+		}
+	}
+	return ivjSystemPasteMenuItem;
 }
 /**
  * Return the PluginManagerMenuItem property value.
@@ -5835,6 +5901,9 @@ private void initConnections() throws java.lang.Exception {
 	getLineButton().addActionListener(ivjEventHandler);
 	getBoxButton().addActionListener(ivjEventHandler);
 	getTextBoxButton().addActionListener(ivjEventHandler);
+
+	getSystemCopyMenuItem().addActionListener(ivjEventHandler);
+	getSystemPasteMenuItem().addActionListener(ivjEventHandler);
 
 	connPtoP1SetTarget();
 	connPtoP2SetTarget();
