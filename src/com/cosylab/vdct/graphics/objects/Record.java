@@ -1523,9 +1523,8 @@ public void setRight(boolean state) { right=state; }
  * @return java.lang.String
  */
 public String toString() {
-//	return recordData.toString();
+	return recordData.toString();
 	// recordData.getName()+" ("+recordData.getType()+")"
-    return super.toString();
 }
 
 /**
