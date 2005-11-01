@@ -2036,6 +2036,14 @@ public boolean open(InputStream is, File file, boolean importDB, boolean importT
 		{
 			// import directly to workspace (current view group)
 			applyVisualData(true, viewGroup, dbData, vdbData);
+			
+			// clipboard import -> needs checks
+			if (is != null)
+			{
+				viewGroup.manageLinks(true);
+				viewGroup.unconditionalValidateSubObjects(isFlat());
+			}
+
 		}
 		else if (!importDB)
 		{
