@@ -109,7 +109,7 @@ public class Record
 	public final static int DBD_ORDER = 2;
 
 	private int oldNumOfFields = 0;
-	private boolean firstValidation = true;
+
 	
 /**
  * Group constructor comment.
@@ -1629,24 +1629,26 @@ private int validateFont(double scale, int rwidth, int rheight) {
   	  ascent = fm.getAscent();
     }
     rheight += y0+rfieldRowHeight*changedFields.size()+ascent;
-    firstValidation = false;
-    
+//    firstValidation = false;
+    if (validationsCounter <=4)
+        validationsCounter++;
     return rheight;
 }
 
 public void resetValidationsCounter() {
-//    validationsCounter = settingsChanged ? -1 : 0;
-    firstValidation = true;
+//    firstValidation = true;
+    validationsCounter = 0;
 }
-
-//private int validationsCounter = 0;
+//private boolean firstValidation = true;
+private int validationsCounter = 0;
 /**
  * Insert the method's description here.
  * Creation date: (21.12.2000 20:46:35)
  */
 protected void validate() {
 
-  boolean use = super.getHeight() != 0 && !firstValidation;  
+//  boolean use = super.getHeight() != 0 && !firstValidation;
+    boolean use = super.getHeight() != 0 && validationsCounter > 3;  
   int bottomy = getY() + getHeight();
   double scale = getRscale();
 
@@ -1672,17 +1674,6 @@ protected void validate() {
 	          setY(bottomy-height);
 	  }
   }
-  
-  //4 validations are made when a template is opened - Y must not be reset, because the
-  //workspace is not yet fully validated
-  //this prevent record from moving up and down when changing scale.
-//  setHeight(height);
-//  if(changedFields.size() > 0) {
-//	  if (validationsCounter >=4)
-//	      setY(bottomy-height);
-//	  else 
-//	      validationsCounter++;
-//  }
   
   // round fix
   rheight = (int)((getY()+super.getHeight())*scale)-(int)(getY()*scale);
