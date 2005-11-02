@@ -1270,7 +1270,8 @@ public Object[] getTargets() {
 public boolean move(int dx, int dy) {
 	if (checkMove(dx, dy)) {
 		x+=dx;
-		y+=dy;
+//		y+=dy;
+		setY(getY() +dy);
 		revalidatePosition();
 		moveConnectors(dx, dy);
 		return true;
@@ -1628,23 +1629,25 @@ private int validateFont(double scale, int rwidth, int rheight) {
   	  ascent = fm.getAscent();
     }
     rheight += y0+rfieldRowHeight*changedFields.size()+ascent;
+    firstValidation = false;
     
     return rheight;
 }
 
-public void resetValidationsCounter(boolean settingsChanged) {
-    validationsCounter = settingsChanged ? -1 : 0;
+public void resetValidationsCounter() {
+//    validationsCounter = settingsChanged ? -1 : 0;
+    firstValidation = true;
 }
 
-private int validationsCounter = 0;
+//private int validationsCounter = 0;
 /**
  * Insert the method's description here.
  * Creation date: (21.12.2000 20:46:35)
  */
 protected void validate() {
-  
-  int bottomy = getY() + getHeight();
 
+  boolean use = super.getHeight() != 0 && !firstValidation;  
+  int bottomy = getY() + getHeight();
   double scale = getRscale();
 
   int rwidth = (int)(getWidth()*scale);
@@ -1655,16 +1658,31 @@ protected void validate() {
 
   rheight = validateFont(scale, rwidth, rheight);
   int height = (int) (rheight/scale);
-  setHeight(height);
-
+  if (height != 0) {
+      setHeight(height);
+	  //this prevents records from moving up and down when zooming
+      if (use){
+	      int i = bottomy % Constants.GRID_SIZE;
+	      if (i!=0 && Settings.getInstance().getSnapToGrid()) {
+	          if (i > Constants.GRID_SIZE/2.0)
+	              setY(bottomy-height + Constants.GRID_SIZE -i);
+	          else 
+	              setY(bottomy-height -i);
+	      } else
+	          setY(bottomy-height);
+	  }
+  }
+  
   //4 validations are made when a template is opened - Y must not be reset, because the
   //workspace is not yet fully validated
-  if(changedFields.size() > 0) {
-	  if (validationsCounter >=4)
-	      setY(bottomy-height);
-	  else 
-	      validationsCounter++;
-  }
+  //this prevent record from moving up and down when changing scale.
+//  setHeight(height);
+//  if(changedFields.size() > 0) {
+//	  if (validationsCounter >=4)
+//	      setY(bottomy-height);
+//	  else 
+//	      validationsCounter++;
+//  }
   
   // round fix
   rheight = (int)((getY()+super.getHeight())*scale)-(int)(getY()*scale);
@@ -1853,7 +1871,8 @@ public void snapToGrid()
 		my -= Constants.GRID_SIZE;
 	
 	x -= mx;
-	y -= my;
+//	y -= my;
+	setY(getY() -my);
 }
 
 

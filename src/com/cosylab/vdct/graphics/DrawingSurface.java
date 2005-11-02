@@ -3770,7 +3770,7 @@ public void descendIntoTemplate(Template template)
 	ViewState.getInstance().setAsHilited(null);
 	
 	if (Group.hasMacroPortsIDChanged()) {
-	    viewGroup.reset(true);
+	    viewGroup.reset();
         JOptionPane.showMessageDialog(VisualDCT.getInstance(),
                 "Macros/Ports in this template have changed. \nReload and save files that include this template to apply changes.", "Template changed!", JOptionPane.WARNING_MESSAGE);
     }
@@ -3801,7 +3801,7 @@ public void ascendFromTemplate()
 		return;
 	
 	if (Group.hasMacroPortsIDChanged()) {
-	    viewGroup.reset(true);
+	    viewGroup.reset();
         JOptionPane.showMessageDialog(VisualDCT.getInstance(),
                 "Macros/Ports in this template have changed. \nReload and save files that include this template to apply changes.", "Template changed!", JOptionPane.WARNING_MESSAGE);
     }
@@ -3824,7 +3824,7 @@ public void ascendFromTemplate()
 	templateReloadPostInit();
 	
 	moveToGroup(grp);
-	grp.reset(false);
+	grp.reset();
 	repaint();
 }
 
@@ -4099,7 +4099,7 @@ public void reset() {
 	createNavigatorImage();
 	
 	redrawRequest = true;
-	viewGroup.reset(true);
+	viewGroup.reset();
 	repaint();
 }
 

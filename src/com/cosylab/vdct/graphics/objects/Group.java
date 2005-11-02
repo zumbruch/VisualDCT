@@ -1997,15 +1997,15 @@ public void generateMacros(HashMap macros, boolean deep) {
  * Resets certain parameters of the subobjects (validationsCounter in Record).
  * @param settingsChanged flag whether this method was invoked when settings (settings dialog) were changed
  */
-public void reset(boolean settingsChanged) {
+public void reset() {
     Enumeration en = getSubObjectsV().elements();
     Object obj;
     while (en.hasMoreElements()) {
         obj = en.nextElement();
         if (obj instanceof Record) {
-            ((Record)obj).resetValidationsCounter(settingsChanged);
+            ((Record)obj).resetValidationsCounter();
         } else if (obj instanceof Group) {
-            ((Group)obj).reset(settingsChanged);
+            ((Group)obj).reset();
         }
     }
 }
