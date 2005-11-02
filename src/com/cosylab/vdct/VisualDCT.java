@@ -46,6 +46,7 @@ import com.cosylab.vdct.util.ComboBoxFileChooser;
 import com.cosylab.vdct.util.DBDEntry;
 import com.cosylab.vdct.util.UniversalFileFilter;
 import com.cosylab.vdct.vdb.VDBData;
+import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.printing.*;
 
 import com.cosylab.vdct.graphics.*;
@@ -1799,12 +1800,28 @@ public void exitMenuItem_ActionPerformed() {
 		    switch(choice) {
 
 		    	case JOptionPane.NO_OPTION: {
+		    	    if (Group.hasMacroPortsIDChanged()) {
+		    	        int check = JOptionPane.showConfirmDialog(VisualDCT.getInstance(),
+		    	                "Macros/Ports in this template have changed. \nReload and save files that include this template to apply changes. \nAre you sure you want to exit VisualDCT?", "Template changed!",
+		    	                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+		    	        if (check == JOptionPane.NO_OPTION) {
+		    	            return;
+		    	        }
+		    	    }
 		    	    this.dispose();
 		    	    break;
 		    	}
 		    	
 		    	case JOptionPane.YES_OPTION: {
 		    	    saveMenuItem_ActionPerformed();
+		    	    if (Group.hasMacroPortsIDChanged()) {
+		    	        int check = JOptionPane.showConfirmDialog(VisualDCT.getInstance(),
+		    	                "Macros/Ports in this template have changed. \nReload and save files that include this template to apply changes. \nAre you sure you want to exit VisualDCT?", "Template changed!",
+		    	                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+		    	        if (check == JOptionPane.NO_OPTION) {
+		    	            return;
+		    	        }
+		    	    }
 		    	    this.dispose();
 		    	    break;
 		    	}
@@ -1817,6 +1834,14 @@ public void exitMenuItem_ActionPerformed() {
 		}
 		else
 		{
+		    if (Group.hasMacroPortsIDChanged()) {
+    	        int check = JOptionPane.showConfirmDialog(VisualDCT.getInstance(),
+    	                "Macros/Ports in this template have changed. \nReload and save files that include this template to apply changes. \nAre you sure you want to exit VisualDCT?", "Template changed!",
+    	                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+    	        if (check == JOptionPane.NO_OPTION) {
+    	            return;
+    	        }
+    	    }
 			this.dispose();
 		}
 	}

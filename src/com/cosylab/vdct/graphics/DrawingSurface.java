@@ -193,6 +193,7 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 	private Stack templateStack = null;	
 	private Vector selectedConnectorsForMove = null;
 	
+	
 /**
  * DrawingSurface constructor comment.
  */
@@ -1973,6 +1974,7 @@ public boolean open(File file, boolean importDB, boolean importToCurrentGroup) t
  */
 public boolean open(InputStream is, File file, boolean importDB, boolean importToCurrentGroup) throws IOException {
 
+  
 	///
 	/// DBD managment (not on system clipboard import)
 	///
@@ -2091,6 +2093,10 @@ public boolean open(InputStream is, File file, boolean importDB, boolean importT
 				// found
 				if (template!=null)
 				{
+				    if (Group.hasMacroPortsIDChanged()) {
+				        JOptionPane.showMessageDialog(VisualDCT.getInstance(),
+				                "Macros/Ports in this template have changed. \nReload and save files that include this template to apply changes.", "Template changed!", JOptionPane.WARNING_MESSAGE);
+				    }
 					Group.setRoot(template.getGroup());
 					Group.setEditingTemplateData(template);
 					templateStack.push(template);
@@ -3700,27 +3706,31 @@ public boolean prepareTemplateLeave()
 				}
 			}		
 		}
+				
 		
 	}
+	
 	//template should be reloaded because user could save the template prior
-	//to ascending/descending into another level.
-	
-	VDBTemplate backup = (VDBTemplate)templateStack.pop();
-	// reload template
-	boolean ok = reloadTemplate(Group.getEditingTemplateData());
-	// push new
-	VDBTemplate reloaded = (VDBTemplate)VDBData.getTemplates().get(backup.getId());
-	
-	if (!ok || reloaded==null)
-	{
-		VDBData.addTemplate(backup);
-		templateStack.push(backup);
+	//to ascending/descending into another level
+	if (isModified() || Group.hasMacroPortsIDChanged()) {
+		VDBTemplate backup = (VDBTemplate)templateStack.pop();
+		// reload template
+		boolean ok = reloadTemplate(Group.getEditingTemplateData());
+		// push new
+		VDBTemplate reloaded = (VDBTemplate)VDBData.getTemplates().get(backup.getId());
+		
+		if (!ok || reloaded==null)
+		{
+			VDBData.addTemplate(backup);
+			templateStack.push(backup);
+		}
+		else
+		{
+			templateStack.push(reloaded);
+			viewGroup = reloaded.getGroup();
+		}
 	}
-	else
-	{
-		templateStack.push(reloaded);
-		viewGroup = reloaded.getGroup();
-	}
+	
 	
 	return true;
 	
@@ -3759,6 +3769,12 @@ public void descendIntoTemplate(Template template)
 
 	ViewState.getInstance().setAsHilited(null);
 	
+	if (Group.hasMacroPortsIDChanged()) {
+	    viewGroup.reset(true);
+        JOptionPane.showMessageDialog(VisualDCT.getInstance(),
+                "Macros/Ports in this template have changed. \nReload and save files that include this template to apply changes.", "Template changed!", JOptionPane.WARNING_MESSAGE);
+    }
+	
 	viewStack.push(viewGroup);
 	templateStack.push(template.getTemplateData().getTemplate());
 	
@@ -3783,7 +3799,13 @@ public void ascendFromTemplate()
 {
 	if (!prepareTemplateLeave())
 		return;
-
+	
+	if (Group.hasMacroPortsIDChanged()) {
+	    viewGroup.reset(true);
+        JOptionPane.showMessageDialog(VisualDCT.getInstance(),
+                "Macros/Ports in this template have changed. \nReload and save files that include this template to apply changes.", "Template changed!", JOptionPane.WARNING_MESSAGE);
+    }
+	
 	ViewState.getInstance().setAsHilited(null);
 	viewGroup = (Group)viewStack.pop();
 	templateStack.pop();

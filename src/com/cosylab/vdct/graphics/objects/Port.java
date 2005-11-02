@@ -1128,6 +1128,7 @@ public boolean moveToGroup(String group) {
  * @see com.cosylab.vdct.graphics.objects.Flexible#rename(java.lang.String)
  */
 public boolean rename(String newName) {
+    Group.getEditingTemplateData().renamePort(data, newName);
     String newObjName = Group.substractObjectName(newName);
 	String oldObjName = Group.substractObjectName(getName());
 

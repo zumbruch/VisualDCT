@@ -69,6 +69,8 @@ public class Group
 	// template instances fields lookuptable 
 	private Hashtable lookupTable = null;
 	private static VDBTemplate editingTemplateData = null;
+	private static long openTemplateMacroID = 0;
+	private static long openTemplatePortID = 0;
 
 	// contains DB structure (entry (include, path, addpath statements), record, expand)
 	protected Vector structure = null; 
@@ -1901,8 +1903,29 @@ public static VDBTemplate getEditingTemplateData()
  * @param editingTemplateData The editingTemplateData to set
  */
 public static void setEditingTemplateData(VDBTemplate editingTemplateData)
-{
+{	
 	Group.editingTemplateData = editingTemplateData;
+	if (editingTemplateData != null) {
+		openTemplateMacroID = editingTemplateData.getMacrosGeneratedID();
+		openTemplatePortID = editingTemplateData.getPortsGeneratedID();
+	} else {
+	    openTemplateMacroID = 0;
+	    openTemplatePortID = 0;
+	}
+}
+
+public static boolean hasMacroPortsIDChanged() {
+//    if (editingTemplateData == null && openTemplateMacroID == 0 && openTemplatePortID == 0) {
+//        return false;
+
+    if (openTemplateMacroID == 0 && openTemplatePortID == 0) {
+        return false;
+    }   
+    if (editingTemplateData != null)
+	    if (editingTemplateData.getMacrosGeneratedID() == openTemplateMacroID && editingTemplateData.getPortsGeneratedID() == openTemplatePortID) {
+	        return false;
+	    }
+    return true;
 }
 
 	/**
