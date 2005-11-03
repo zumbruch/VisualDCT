@@ -624,6 +624,8 @@ public void systemPaste() {
  	    if (hasTransferableText)
  	    {
  	    	String str = (String)contents.getTransferData(DataFlavor.stringFlavor);
+ 	    	if (str == null || str.length() == 0)
+ 	    		return;
 			ByteArrayInputStream bais = new ByteArrayInputStream(str.getBytes());
 			drawingSurface.open(bais, null, true, true);
  	    }
