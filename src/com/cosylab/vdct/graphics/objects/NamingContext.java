@@ -335,9 +335,9 @@ public class NamingContext {
 		// by definition from ebnfg - \0 is bad character, but occurs in groups
 		//Pattern macrop = Pattern.compile("$\\(([a-zA-Z0-9_:-]+)\\)");
 		//Pattern portp = Pattern.compile("$\\(([a-zA-Z0-9_:-]+)\\.([a-zA-Z0-9_:-]+)\\)");
-		Pattern macrop = Pattern.compile("\\$\\(([^\\.\\$]+)\\)");
+		Pattern macrop = Pattern.compile("\\$\\(([^\\.\\$\\)]+)\\)");
 		//Pattern portp = Pattern.compile("\\$\\(([^\\.\\$]+)\\.([^\\.\\$]+)\\)");
-		Pattern portp = Pattern.compile("\\$\\(([^\\.]+)\\.([^\\.]+)\\)");
+		Pattern portp = Pattern.compile("\\$\\(([^\\.\\)]+)\\.([^\\.\\)]+)\\)");
 		
 		Matcher port = portp.matcher(value);
 		StringBuffer result = new StringBuffer();
