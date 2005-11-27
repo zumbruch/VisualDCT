@@ -1073,13 +1073,13 @@ private void showPopup(MouseEvent e)
 		macroMenuItem.addActionListener(al);
 		popUp.add(macroMenuItem);
 
+		popUp.add(new JSeparator());
+		
+		JMenuItem generateMacrosMenuItem = new JMenuItem(generateMacrosString);
+		generateMacrosMenuItem.addActionListener(al);
+		popUp.add(generateMacrosMenuItem);
 	}
 
-	popUp.add(new JSeparator());
-	
-	JMenuItem generateMacrosMenuItem = new JMenuItem(generateMacrosString);
-	generateMacrosMenuItem.addActionListener(al);
-	popUp.add(generateMacrosMenuItem);
 
 	popUp.add(new JSeparator());
 
@@ -1097,6 +1097,7 @@ private void showPopup(MouseEvent e)
 
 	// every file is a template
 	//if (isTemplateMode())
+	if (Group.getEditingTemplateData()!=null)
 	{
 		popUp.add(new JSeparator());
 		JMenuItem templatePropertiesMenuItem = new JMenuItem(templatePropertiesString);
