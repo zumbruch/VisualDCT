@@ -2637,6 +2637,10 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 							if (unknown instanceof InLink)
 							{
 								inlink = (InLink)unknown;
+								// this is a "patch" for a bug (Link data is saved even if link is invalid!)
+								if (inlink instanceof EPICSLinkOut &&
+									outlink instanceof EPICSLinkOut)
+										break;
 								inlink.setOutput(outlink, null);
 								outlink.setInput(inlink);
 							}
