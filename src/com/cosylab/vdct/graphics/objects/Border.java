@@ -8,6 +8,7 @@ package com.cosylab.vdct.graphics.objects;
 
 import java.awt.Graphics;
 import java.util.Enumeration;
+import java.util.Vector;
 
 import com.cosylab.vdct.Console;
 import com.cosylab.vdct.Constants;
@@ -68,6 +69,37 @@ public class Border extends ContainerObject implements Selectable, SaveObject,
 		}
 		else
 			name = parName;	
+	}
+	
+	public Object removeObject(String id) {
+	    Object obj = super.removeObject(id);
+	    if (obj != null) {
+	        return obj;
+	    }
+	    
+	    Vector e = getSubObjectsV();
+	    VisibleObject object;
+	    for (int i = 0; i < e.size(); i++) {
+	        object = (VisibleObject) e.get(i);
+	        if (object instanceof BorderObject) {
+	            if (id.equals(((BorderObject)object).getName())) {
+	                e.remove(i);
+	            }
+	        }
+	    }
+	    return null;
+	}
+	
+	/*
+	 *  (non-Javadoc)
+	 * @see com.cosylab.vdct.graphics.objects.VisibleObject#destroy()
+	 */
+	public void destroy() {
+	    super.destroy();
+
+		if (getParent() != null) {
+		    getParent().removeObject(name);
+		}
 	}
 
 	/* (non-Javadoc)

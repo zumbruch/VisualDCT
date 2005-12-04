@@ -52,7 +52,7 @@ import com.cosylab.vdct.util.*;
  * To change this generated comment edit the template variable "typecomment":
  * Window>Preferences>Java>Templates.
  */
-public class TextBox extends VisibleObject implements Movable, Selectable, Popupable, Descriptable, Flexible,
+public class TextBox extends VisibleObject implements BorderObject, Movable, Selectable, Popupable, Descriptable, Flexible,
 	Clipboardable
 {
 

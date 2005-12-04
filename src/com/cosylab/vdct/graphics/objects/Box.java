@@ -44,7 +44,7 @@ import com.cosylab.vdct.util.*;
  * To change this generated comment edit the template variable "typecomment":
  * Window>Preferences>Java>Templates.
  */
-public class Box extends VisibleObject implements Flexible, Movable, Popupable, Selectable, Clipboardable
+public class Box extends VisibleObject implements BorderObject, Flexible, Movable, Popupable, Selectable, Clipboardable
 {
 
 class PopupMenuHandler implements ActionListener
