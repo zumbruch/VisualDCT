@@ -411,7 +411,7 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 			boolean drawDot = in instanceof MultiInLink && ((MultiInLink)in).getLinkCount() > 1; 
 			// diff left from right size
 			if (drawDot && in instanceof EPICSVarOutLink)
-				drawDot = checkForSameSideLinks((EPICSVarOutLink)in, isInLeft, middleInX, drawDot);
+				drawDot = checkForSameSideLinks((EPICSVarOutLink)in, isInLeft, middleInX);
 			
 			if (drawDot)
 			{
@@ -442,19 +442,35 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 	{
 	    if (in!=null) {
 	    	
+	    	boolean doDots = false;
 	    	boolean drawDot = in instanceof MultiInLink && ((MultiInLink)in).getLinkCount() > 1;
 			// diff left from right size
 			if (drawDot && in instanceof EPICSVarOutLink)
-				drawDot = checkForSameSideLinks((EPICSVarOutLink)in, isInLeft, middleInX, drawDot);
-	    		
+				doDots = drawDot = checkForSameSideLinks((EPICSVarOutLink)in, isInLeft, middleInX);
+
+			if (drawDot)
+			{
+				if (out instanceof Connector)
+					drawDot = checkConnectorOuterMost((EPICSVarOutLink)in, out.getOutX(), in.getInX(), isInLeft, middleInX);
+				else
+					drawDot = checkHorizontalFirstDootNeeded((EPICSVarOutLink)in, out.getOutY(), in.getInY(), isInLeft, middleInX);
+			}
+
 			if (firstHorizontal) {	
+
 				g.drawLine(x1, y1, x2, y1);
 				g.drawLine(x2, y1, x2, y2);
 
 				if (drawDot)
 				{
 					g.fillOval(x2-dotSize, y1-dotSize, dotSize2, dotSize2);
-					g.fillOval(x2-dotSize, y2-dotSize, dotSize2, dotSize2);
+				}
+				else
+				{
+					// 2 links, one above, one below case (dot needed in the middle)
+					if (doDots &&
+						checkMiddleDotNeededCase((EPICSVarOutLink)in, out.getOutY(), in.getInY(), isInLeft, middleInX))
+							g.fillOval(x2-dotSize, y2-dotSize, dotSize2, dotSize2);
 				}
 			}
 			else {
@@ -464,7 +480,7 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 				if (drawDot)
 				{
 					g.fillOval(x1-dotSize, y2-dotSize, dotSize2, dotSize2);
-					g.fillOval(x2-dotSize, y2-dotSize, dotSize2, dotSize2);
+					//g.fillOval(x2-dotSize, y2-dotSize, dotSize2, dotSize2);
 				}
 			}
 	    }
@@ -478,7 +494,8 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
  * @param drawDot
  * @return
  */
-private static boolean checkForSameSideLinks(EPICSVarOutLink evol, boolean isInLeft, int middleInX, boolean drawDot) {
+private static boolean checkForSameSideLinks(EPICSVarOutLink evol, boolean isInLeft, int middleInX) {
+	boolean drawDot = true;
 	Enumeration links = evol.getOutlinks().elements();
 	int count = 0;
 	while (links.hasMoreElements())
@@ -494,6 +511,122 @@ private static boolean checkForSameSideLinks(EPICSVarOutLink evol, boolean isInL
 		drawDot = false;
 	return drawDot;
 }
+
+/**
+ * Precondition: checkForSameSideLinks == true, i.e. at least 2 links on the same side
+ * @return
+ */
+private static boolean checkHorizontalFirstDootNeeded(EPICSVarOutLink evol, int outY, int inY, boolean isInLeft, int middleInX) {
+	
+	// allways needed
+	if (outY == inY)
+		return true;
+	
+	int count = 0;
+	int minY = inY;
+	int maxY = inY;
+	
+	Enumeration links = evol.getOutlinks().elements();
+	while (links.hasMoreElements())
+	{
+		OutLink l = (OutLink)links.nextElement();
+		int ox = l.getOutX();
+		
+		if (l instanceof Connector || // X is not the same...
+			(isInLeft && ox > middleInX) ||
+			(!isInLeft && ox <= middleInX))
+			continue; // do not count links on the other side!
+
+		count++;
+		int oy = l.getOutY();
+		if (oy < minY)
+			minY = oy;
+		else if (oy > maxY)
+			maxY = oy;
+	}
+
+	// edge
+	if (count == 1 || outY == maxY || outY == minY)
+		return false;
+			
+	return true;
+}
+
+/**
+ * Precondition: checkForSameSideLinks == true, i.e. at least 2 links on the same side
+ * @return
+ */
+private static boolean checkMiddleDotNeededCase(EPICSVarOutLink evol, int outY, int inY, boolean isInLeft, int middleInX) {
+
+	int upcount = 0;
+	int downcount = 0;
+	
+	Enumeration links = evol.getOutlinks().elements();
+	while (links.hasMoreElements())
+	{
+		OutLink l = (OutLink)links.nextElement();
+		int ox = l.getOutX();
+		if ((isInLeft && ox > middleInX) ||
+			(!isInLeft && ox <= middleInX))
+			continue; // do not count links on the other side!
+		// connector on the same side
+		if (l instanceof Connector)
+			return true;
+
+		if (l.getOutY() < inY)
+			upcount++;
+		else /*if (oy < inY)*/
+			downcount++;
+	}
+
+	// if none on the same side no dot is needed
+	if (upcount == 0 || downcount == 0)
+		return false;
+		
+	// at least one on the same side
+	if (upcount <= 1 || downcount <= 1)
+		return true;
+		
+	return false;
+}
+
+/**
+ * Precondition: checkForSameSideLinks == true, i.e. at least 2 links on the same side
+ * @return
+ */
+private static boolean checkConnectorOuterMost(EPICSVarOutLink evol, int outX, int inX, boolean isInLeft, int middleInX) {
+	
+	int minX = inX;
+	int maxX = inX;
+	
+	Enumeration links = evol.getOutlinks().elements();
+	while (links.hasMoreElements())
+	{
+		OutLink l = (OutLink)links.nextElement();
+		if (!(l instanceof Connector))
+			continue;
+		int ox = l.getOutX();
+		
+		/*
+		if ((isInLeft && ox > middleInX) ||
+			(!isInLeft && ox <= middleInX))
+			continue; // do not count links on the other side!
+			*/
+		
+		if (ox < minX)
+			minX = ox;
+		else if (ox > maxX)
+			maxX = ox;
+	}
+
+	if (isInLeft && minX == outX)
+		return false;
+	else if (!isInLeft && maxX == outX)
+		return false;
+	
+	return true;
+}
+
 
 /**
  * Creation date: (30.1.2001 14:43:02)
