@@ -7479,6 +7479,7 @@ public void showMorphingDialog(String name, String oldType, Object[] targets) {
 	for (int i = 0; i < targets.length; i++)
 		getTypeComboBox2().addItem(targets[i]);
 	
+	getMorphingOKButton().setEnabled(getTypeComboBox2().getItemCount()>0);
 	getNameTextLabel().setText(name);
 	getTypeComboBox2().setSelectedItem(oldType);
 	getMorphingDialog().setLocationRelativeTo(this);
