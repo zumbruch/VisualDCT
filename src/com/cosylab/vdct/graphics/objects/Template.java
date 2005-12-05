@@ -2239,15 +2239,17 @@ public void setTemplateInstance(VDBTemplateInstance templateInstance)
 public Object[] getTargets() {
 	
 	Enumeration templates = VDBData.getTemplates().keys();
-	Object[] desc = new Object[VDBData.getTemplates().size()];
-	int i = 0;
+	ArrayList al = new ArrayList(VDBData.getTemplates().size());
 	while (templates.hasMoreElements())
 	{
 		String key = templates.nextElement().toString();
 		VDBTemplate t = (VDBTemplate)VDBData.getTemplates().get(key);
-		desc[i++] = t.getDescription();
+		if (t != this.getTemplateData().getTemplate())
+			al.add(t.getDescription());
 	}	
 
+	Object[] desc = new Object[al.size()];
+	al.toArray(desc);
 	return desc;
 }
 
