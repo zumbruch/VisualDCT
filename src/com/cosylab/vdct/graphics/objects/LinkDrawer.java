@@ -451,7 +451,12 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 			if (drawDot)
 			{
 				if (out instanceof Connector)
-					drawDot = checkConnectorOuterMost((EPICSVarOutLink)in, out.getOutX(), in.getInX(), isInLeft, middleInX);
+				{
+					if (!firstHorizontal)
+						drawDot = checkConnectorOuterMost((EPICSVarOutLink)in, out.getOutX(), in.getInX(), isInLeft, middleInX);
+					else
+						drawDot = checkHorizontalFirstDootNeeded((EPICSVarOutLink)in, out.getOutY(), in.getInY(), isInLeft, middleInX);
+				}
 				else
 					drawDot = checkHorizontalFirstDootNeeded((EPICSVarOutLink)in, out.getOutY(), in.getInY(), isInLeft, middleInX);
 			}
@@ -531,8 +536,8 @@ private static boolean checkHorizontalFirstDootNeeded(EPICSVarOutLink evol, int 
 	{
 		OutLink l = (OutLink)links.nextElement();
 		int ox = l.getOutX();
-		
-		if (l instanceof Connector || // X is not the same...
+	
+		if ((l instanceof Connector && ((l.getQueueCount()%2)!=0)) || // X is not the same... (skip all not first horizontal connectors)
 			(isInLeft && ox > middleInX) ||
 			(!isInLeft && ox <= middleInX))
 			continue; // do not count links on the other side!
