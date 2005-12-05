@@ -557,7 +557,7 @@ public class FindPanel extends JPanel
             
             FindByType typePanel = new FindByType(FindPanel.this);
             components.add(typePanel);
-            criteriaPanel.add(new FindByType(FindPanel.this), 
+            criteriaPanel.add(typePanel, 
                     new GridBagConstraints(0,3,1,1,1,1, GridBagConstraints.CENTER, 
                             GridBagConstraints.BOTH, new Insets(0,0,0,0), 1,1));
             
