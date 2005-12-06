@@ -382,69 +382,18 @@ private static VDBData generateTemplate(DBDData dbd, DBTemplate dbTemplate)
 
 		Hashtable ports = new Hashtable();
 		Vector portsV = new Vector();
-		Enumeration keys = dbTemplate.getPorts().keys();
-		while (keys.hasMoreElements())
-		{
-			Object key = keys.nextElement();
-			DBPort port = (DBPort)dbTemplate.getPorts().get(key);
-			VDBPort vdbPort = new VDBPort(vt, port);	
-
-			// has visual
-			if (port.isHasVisual())
-			{
-				Port visualPort = new Port(vdbPort, Group.getRoot(),
-									  port.getX(), port.getY());
-				visualPort.setColor(port.getColor());
-				visualPort.setMode(port.getMode());
-				visualPort.setTextPositionNorth(port.isNamePositionNorth());
-
-				// delegate defaultVisibility
-				vdbPort.setVisibility(port.getDefaultVisibility());
-				
-				Group.getRoot().addSubObject(vdbPort.getName(), visualPort);
-			}
-
-			ports.put(key, vdbPort);
-			portsV.addElement(vdbPort);
-		}
 		vt.setPorts(ports);
 		vt.setPortsV(portsV);
 
-
 		Hashtable macros = new Hashtable();
 		Vector macrosV = new Vector();
-		keys = dbTemplate.getMacros().keys();
-		while (keys.hasMoreElements())
-		{
-			Object key = keys.nextElement();
-			DBMacro macro = (DBMacro)dbTemplate.getMacros().get(key);
-			VDBMacro vdbMacro = new VDBMacro(vt, macro);	
-
-			// has visual
-			if (macro.isHasVisual())
-			{
-				Macro visualMacro = new Macro(vdbMacro, Group.getRoot(),
-									  macro.getX(), macro.getY());
-				visualMacro.setColor(macro.getColor());
-				visualMacro.setMode(macro.getMode());
-				visualMacro.setTextPositionNorth(macro.isNamePositionNorth());
-				
-				// delegate defaultVisibility
-				vdbMacro.setVisibility(macro.getDefaultVisibility());
-				
-				Group.getRoot().addSubObject(vdbMacro.getName(), visualMacro);
-			}
-
-			macros.put(key, vdbMacro);
-			macrosV.addElement(vdbMacro);
-		}
 		vt.setMacros(macros);
 		vt.setMacrosV(macrosV);
 
+		addPortsAndMacros(dbTemplate, vt, vdbData);
 
 		VDBData.addTemplate(vt);
 		
-		DrawingSurface.applyPortAndMacroConnectors(dbTemplate.getData(), vdbData);
 		return vdbData;
 	}
 	catch (Exception ex)
@@ -463,6 +412,101 @@ private static VDBData generateTemplate(DBDData dbd, DBTemplate dbTemplate)
 	}
 	
 	return null;
+}
+/**
+ * @param dbTemplate
+ * @param vt
+ * @param vdbData
+ * @param ports
+ * @param portsV
+ * @param macros
+ * @param macrosV
+ */
+// NOTE adds to root!!!
+
+public static void addPortsAndMacros(DBTemplate dbTemplate, VDBTemplate vt, VDBData vdbData) {
+	addPortsAndMacros(dbTemplate, vt, vdbData, null);
+}
+
+public static void addPortsAndMacros(DBTemplate dbTemplate, VDBTemplate vt, VDBData vdbData, HashMap importedList) {
+	
+	Hashtable ports = vt.getPorts();
+	Vector portsV = vt.getPortsV();
+	
+	Hashtable macros = vt.getMacros();
+	Vector macrosV = vt.getMacrosV();
+	
+	Enumeration keys = dbTemplate.getPorts().keys();
+	while (keys.hasMoreElements())
+	{
+		Object key = keys.nextElement();
+		DBPort port = (DBPort)dbTemplate.getPorts().get(key);
+		VDBPort vdbPort = new VDBPort(vt, port);	
+		
+		// skip
+		if (Group.getRoot().getSubObject(vdbPort.getName())!= null)
+		{
+			Console.getInstance().println("WARNING: port with name '" + vdbPort.getName() + "' already exists, skipping its redefinition...");
+			continue;
+		}
+		
+		// has visual
+		if (port.isHasVisual())
+		{
+			Port visualPort = new Port(vdbPort, Group.getRoot(),
+								  port.getX(), port.getY());
+			visualPort.setColor(port.getColor());
+			visualPort.setMode(port.getMode());
+			visualPort.setTextPositionNorth(port.isNamePositionNorth());
+
+			// delegate defaultVisibility
+			vdbPort.setVisibility(port.getDefaultVisibility());
+			
+			Group.getRoot().addSubObject(vdbPort.getName(), visualPort);
+			if (importedList != null) importedList.put(vdbPort.getName(), visualPort);
+		}
+
+		ports.put(key, vdbPort);
+		portsV.addElement(vdbPort);
+	}
+
+
+	keys = dbTemplate.getMacros().keys();
+	while (keys.hasMoreElements())
+	{
+		Object key = keys.nextElement();
+		DBMacro macro = (DBMacro)dbTemplate.getMacros().get(key);
+		VDBMacro vdbMacro = new VDBMacro(vt, macro);	
+
+		// skip
+		if (Group.getRoot().getSubObject(vdbMacro.getName())!= null)
+		{
+			Console.getInstance().println("WARNING: macro with name '" + vdbMacro.getName() + "' already exists, skipping its redefinition...");
+			continue;
+		}
+
+		// has visual
+		if (macro.isHasVisual())
+		{
+			Macro visualMacro = new Macro(vdbMacro, Group.getRoot(),
+								  macro.getX(), macro.getY());
+			visualMacro.setColor(macro.getColor());
+			visualMacro.setMode(macro.getMode());
+			visualMacro.setTextPositionNorth(macro.isNamePositionNorth());
+			
+			// delegate defaultVisibility
+			vdbMacro.setVisibility(macro.getDefaultVisibility());
+			
+			Group.getRoot().addSubObject(vdbMacro.getName(), visualMacro);
+			if (importedList != null) importedList.put(vdbMacro.getName(), visualMacro);
+		}
+
+		macros.put(key, vdbMacro);
+		macrosV.addElement(vdbMacro);
+		
+	}
+
+	DrawingSurface.applyPortAndMacroConnectors(dbTemplate.getData(), vdbData);
 }
 /**
  * This method was created in VisualAge.

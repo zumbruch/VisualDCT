@@ -2037,11 +2037,19 @@ public boolean open(InputStream is, File file, boolean importDB, boolean importT
 
 		if (importToCurrentGroup)
 		{
+			boolean validate = (is != null);
+			
 			// import directly to workspace (current view group)
-			applyVisualData(true, viewGroup, dbData, vdbData);
+			HashMap importedList = applyVisualData(true, viewGroup, dbData, vdbData);
+			
+			if (Group.getEditingTemplateData() != null)
+			{
+				VDBData.addPortsAndMacros(dbData.getTemplateData(), Group.getEditingTemplateData(), vdbData, importedList);
+				validate = true;
+			}
 			
 			// clipboard import -> needs checks
-			if (is != null)
+			if (validate)
 			{
 				viewGroup.manageLinks(true);
 				viewGroup.unconditionalValidateSubObjects(isFlat());
@@ -2050,61 +2058,23 @@ public boolean open(InputStream is, File file, boolean importDB, boolean importT
 		}
 		else if (!importDB)
 		{
-			// every file is a template
+			// find 'first' template defined in this file (not via includes)
+			VDBTemplate template = (VDBTemplate)VDBData.getTemplates().get(dbData.getTemplateData().getId());
 			
-			
-			/*
-			// if template file start editing template
-			if (dbData.getRecords().isEmpty() &&
-				dbData.getGroups().isEmpty() &&
-				dbData.getTemplateInstances().isEmpty() &&
-				!dbData.getTemplates().isEmpty())
+			// found
+			if (template!=null)
 			{
-				// find 'first' template defined in this file (not via includes)
-				VDBTemplate template = null;
-				Enumeration te = dbData.getTemplates().keys();
-				while (te.hasMoreElements())
-				{
-					template = (VDBTemplate)VDBData.getTemplates().get(te.nextElement());
-					if (template!=null)
-					{
-						if (template.getFileName().equals(file.getAbsolutePath()))
-							break;
-						else
-							template=null;
-					}		
-				}
-				
-				// found
-				if (template!=null)
-				{
-					Group.setRoot(template.getGroup());
-					Group.setEditingTemplateData(template);
-					templateStack.push(template);
+			    if (Group.hasMacroPortsIDChanged()) {
+			        JOptionPane.showMessageDialog(VisualDCT.getInstance(),
+			                "Macros/Ports in this template have changed. \nReload and save files that include this template to apply changes.", "Template changed!", JOptionPane.WARNING_MESSAGE);
+			    }
+				Group.setRoot(template.getGroup());
+				Group.setEditingTemplateData(template);
+				templateStack.push(template);
 
-					InspectorManager.getInstance().updateObjectLists();
-					moveToGroup(template.getGroup());
-				}
+				InspectorManager.getInstance().updateObjectLists();
+				moveToGroup(template.getGroup());
 			}
-			*/
-			
-				// find 'first' template defined in this file (not via includes)
-				VDBTemplate template = (VDBTemplate)VDBData.getTemplates().get(dbData.getTemplateData().getId());
-				
-				// found
-				if (template!=null)
-				{
-				    if (Group.hasMacroPortsIDChanged()) {
-				        JOptionPane.showMessageDialog(VisualDCT.getInstance(),
-				                "Macros/Ports in this template have changed. \nReload and save files that include this template to apply changes.", "Template changed!", JOptionPane.WARNING_MESSAGE);
-				    }
-					Group.setRoot(template.getGroup());
-					Group.setEditingTemplateData(template);
-					templateStack.push(template);
-
-					InspectorManager.getInstance().updateObjectLists();
-					moveToGroup(template.getGroup());
-				}
 			
 			setModified(false);
 			viewGroup.unconditionalValidateSubObjects(isFlat());
@@ -2245,12 +2215,13 @@ public static void applyPortAndMacroConnectors(DBData dbData, VDBData vdbData) {
 /**
  * Insert the method's description here.
  */
-public static void applyVisualData(boolean importDB, Group group, DBData dbData, VDBData vdbData)
+public static HashMap applyVisualData(boolean importDB, Group group, DBData dbData, VDBData vdbData)
 {
  
     if (vdbData==null)
-		return;
+		return null;
 	
+	HashMap importedList = null;
     
 	// apply visual-data && generate visual object, group hierarchy
 	try {
@@ -2267,7 +2238,6 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 		}
 
 		ArrayList blackList = null;
-		HashMap importedList = null;
 		if (importDB) {
 			blackList = new ArrayList();
 			importedList = new HashMap();
@@ -2703,6 +2673,8 @@ public static void applyVisualData(boolean importDB, Group group, DBData dbData,
 		
 	// call this after ports/macros fields are initialized !!
 //	group.manageLinks(true);
+	
+	return importedList;
 }
 
 /**
