@@ -379,7 +379,7 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 			if (drawDot && in instanceof EPICSVarOutLink)
 				doDots = drawDot = checkForSameSideLinks((EPICSVarOutLink)in, isInLeft, middleInX);
 
-			if (drawDot)
+			if (doDots)
 			{
 				if (out instanceof Connector)
 				{
@@ -397,7 +397,7 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 				g.drawLine(x1, y1, x2, y1);
 				g.drawLine(x2, y1, x2, y2);
 
-				if (drawDot)
+				if (doDots && drawDot)
 				{
 					g.fillOval(x2-dotSize, y1-dotSize, dotSize2, dotSize2);
 				}
