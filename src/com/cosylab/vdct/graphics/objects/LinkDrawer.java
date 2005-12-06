@@ -371,75 +371,6 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 	int dotSize = view.getDotSize();
 	int dotSize2 = 2*dotSize;
 	
-	if (Settings.getInstance().isWireCrossingAvoidiance())		// smart connectors
-	{
-		int vx = firstHorizontal ? x2 : x1;
-		// unnecessary; layout is better without this
-//		if (out instanceof EPICSLink) {
-//			if (((EPICSLink)out).isRight()) {
-//				int rx=(int)(out.getRightX()*scale)  - view.getRx();
-//				if (vx<rx) vx = rx;
-//			} else {
-//				int lx=(int)(out.getLeftX()*scale)  - view.getRx();
-//				if (vx>lx) vx = lx;
-//			}
-//		}
-//		
-//		if (in instanceof EPICSLink) {
-//			if (((EPICSLink)in).isRight()) {
-//				int rx=(int)(in.getRightX()*scale)  - view.getRx();
-//				if (vx<rx) vx = rx;
-//			} else {
-//				int lx=(int)(in.getLeftX()*scale)  - view.getRx();
-//				if (vx>lx) vx = lx;
-//			}
-//		}
-		
-		/*if (in instanceof Field) {
-			int n = ((Field)in).getVerticalPosition();
-			int f = (int)(Constants.LINK_SLOT_WIDTH * n * scale);
-		
-			if (in.isRight()) vx += f; else vx -= f;
-		}	*/
-		
-		
-		if (in!=null) {
-			g.drawLine(x1,y1,vx,y1);  // --->
-			g.drawLine(vx,y1,vx,y2); //      |
-			g.drawLine(vx,y2,x2,y2); //      <-----
-
-			boolean drawDot = in instanceof MultiInLink && ((MultiInLink)in).getLinkCount() > 1; 
-			// diff left from right size
-			if (drawDot && in instanceof EPICSVarOutLink)
-				drawDot = checkForSameSideLinks((EPICSVarOutLink)in, isInLeft, middleInX);
-			
-			if (drawDot)
-			{
-				g.fillOval(vx-dotSize, y1-dotSize, dotSize2, dotSize2);
-				g.fillOval(vx-dotSize, y2-dotSize, dotSize2, dotSize2);
-			}
-
-			// tails to be drawn to cover distance -?[ (where ? is)
-			final double rlsw = Constants.LINK_SLOT_WIDTH*scale;
-			//line for out
-			if (out instanceof Field) {
-				if (out.isRight())
-					g.drawLine(x1,y1,x1-(int)(((Field)out).getVerticalPosition()*rlsw),y1);
-				else 
-					g.drawLine(x1,y1,x1+(int)(((Field)out).getVerticalPosition()*rlsw),y1);
-			}
-			
-			//line for in - unnecessary
-//			if (in instanceof Field) {
-//				if (in.isRight()) 
-//					g.drawLine(x2,y2,x2-(int)(((Field)in).getVerticalPosition()*rlsw),y2);
-//				else 
-//					g.drawLine(x2,y2,x2+(int)(((Field)in).getVerticalPosition()*rlsw),y2);
-//			}
-		}
-	}
-	else
-	{
 	    if (in!=null) {
 	    	
 	    	boolean doDots = false;
@@ -485,11 +416,25 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 				if (drawDot)
 				{
 					g.fillOval(x1-dotSize, y2-dotSize, dotSize2, dotSize2);
-					//g.fillOval(x2-dotSize, y2-dotSize, dotSize2, dotSize2);
 				}
 			}
 	    }
-	}
+	    
+	    
+	    if (Settings.getInstance().isWireCrossingAvoidiance())	
+		{
+				// diff left from right size
+				// tails to be drawn to cover distance -?[ (where ? is)
+				final double rlsw = Constants.LINK_SLOT_WIDTH*scale;
+				//line for out
+				if (out instanceof Field) {
+					if (out.isRight())
+						g.drawLine(x1,y1,x1-(int)(((Field)out).getVerticalPosition()*rlsw),y1);
+					else 
+						g.drawLine(x1,y1,x1+(int)(((Field)out).getVerticalPosition()*rlsw),y1);
+				}
+				
+		}
 }
 
 /**
