@@ -530,6 +530,8 @@ private static boolean checkHorizontalFirstDootNeeded(EPICSVarOutLink evol, int 
 	int count = 0;
 	int minY = inY;
 	int maxY = inY;
+	//int minCount = 0;
+	//int maxCount = 0;
 	
 	Enumeration links = evol.getOutlinks().elements();
 	while (links.hasMoreElements())
@@ -545,15 +547,27 @@ private static boolean checkHorizontalFirstDootNeeded(EPICSVarOutLink evol, int 
 		count++;
 		int oy = l.getOutY();
 		if (oy < minY)
+		{
 			minY = oy;
+			//minCount = 0;
+		}
+		//else if (oy == minY)
+		//	minCount++;
 		else if (oy > maxY)
+		{
 			maxY = oy;
+		//	maxCount = 0;
+		}
+		//else if (oy == maxY)
+		//	maxCount++;
 	}
 
 	// edge
-	if (count == 1 || outY == maxY || outY == minY)
+	if (count == 1 ||
+		(outY == maxY /*&& maxCount == 0*/) ||
+		(outY == minY /*&& minCount == 0*/))
 		return false;
-			
+	
 	return true;
 }
 
@@ -603,6 +617,8 @@ private static boolean checkConnectorOuterMost(EPICSVarOutLink evol, int outX, i
 	
 	int minX = inX;
 	int maxX = inX;
+	int minCount = 0;
+	int maxCount = 0;
 	
 	Enumeration links = evol.getOutlinks().elements();
 	while (links.hasMoreElements())
@@ -619,14 +635,24 @@ private static boolean checkConnectorOuterMost(EPICSVarOutLink evol, int outX, i
 			*/
 		
 		if (ox < minX)
+		{
 			minX = ox;
+			minCount = 0;
+		}
+		else if (ox == minX)
+			minCount++;
 		else if (ox > maxX)
+		{
 			maxX = ox;
+			maxCount = 0;
+		}
+		else if (ox == maxX)
+			maxCount++;
 	}
 
-	if (isInLeft && minX == outX)
+	if (isInLeft && minX == outX && minCount == 0)
 		return false;
-	else if (!isInLeft && maxX == outX)
+	else if (!isInLeft && maxX == outX && maxCount == 0)
 		return false;
 	
 	return true;
