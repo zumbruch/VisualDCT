@@ -1110,7 +1110,10 @@ public String getFlexibleName() {
  */
 public boolean moveToGroup(String group) {
 	
-    Group.getEditingTemplateData().removeMacro(data);
+	if (Group.getEditingTemplateData()==null)
+		return false;
+		
+	Group.getEditingTemplateData().removeMacro(data);
 	//String oldName = getName();
 	String newName;
 	if (group.equals(Record.nullString)){
@@ -1156,7 +1159,10 @@ public boolean moveToGroup(String group) {
  * @see com.cosylab.vdct.graphics.objects.Flexible#rename(java.lang.String)
  */
 public boolean rename(String newName) {
-    Group.getEditingTemplateData().renameMacro(data, newName);
+	if (Group.getEditingTemplateData()==null)
+		return false;
+
+	Group.getEditingTemplateData().renameMacro(data, newName);
     String newObjName = Group.substractObjectName(newName);
 	String oldObjName = Group.substractObjectName(getName());
 

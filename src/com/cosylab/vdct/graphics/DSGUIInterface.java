@@ -160,8 +160,27 @@ public void copyToSystemClipboard(Vector objs)
 	{
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(baos);
-		Group.writeObjects(objs, dos, new NamingContext(null, Group.getEditingTemplateData(), null, null, false), false);
-		Group.writeVDCTData(objs, dos, new NamingContext(null, Group.getEditingTemplateData(), null, null, false), false);
+		NamingContext nc = new NamingContext(null, Group.getEditingTemplateData(), null, null, false);
+
+		if (Group.getEditingTemplateData() != null)
+		{
+			boolean hasPortOrMacro = false;
+			Enumeration en = objs.elements();
+			while (en.hasMoreElements())
+			{
+				Object o = en.nextElement();
+				if (o instanceof Port || o instanceof Macro)
+				{
+					hasPortOrMacro = true;
+					break;
+				}
+			}
+			if (hasPortOrMacro)
+				Group.writeTemplateData(dos, nc, objs);
+		}
+		
+		Group.writeObjects(objs, dos, nc, false);
+		Group.writeVDCTData(objs, dos, nc, false);
 		
 		StringSelection ss = new StringSelection(baos.toString());
 		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, ss);

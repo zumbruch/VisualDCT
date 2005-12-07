@@ -1588,7 +1588,12 @@ private static void writeUsedDBDs(File dbFile, DataOutputStream stream) throws I
 /**
  * Insert the method's description here.
  */
-private static void writeTemplateData(DataOutputStream stream, NamingContext renamer) throws IOException
+public static void writeTemplateData(DataOutputStream stream, NamingContext renamer) throws IOException
+{
+	writeTemplateData(stream, renamer, null);
+}
+
+public static void writeTemplateData(DataOutputStream stream, NamingContext renamer, Vector allowedPortMacroSet) throws IOException
 {
 	final String nl = "\n";
 	
@@ -1625,7 +1630,9 @@ private static void writeTemplateData(DataOutputStream stream, NamingContext ren
 	while (i.hasNext())
 	{
 		VDBPort port = (VDBPort)i.next();
-	
+		if (allowedPortMacroSet != null && port.getVisibleObject() != null && !allowedPortMacroSet.contains(port.getVisibleObject()))
+			continue;
+			
 		if (port.getComment()!=null)
 			stream.writeBytes(port.getComment()+nl);
 
@@ -1657,7 +1664,10 @@ private static void writeTemplateData(DataOutputStream stream, NamingContext ren
 		Port visiblePort = port.getVisibleObject();
 		if (visiblePort==null)
 			continue;
-			
+
+		if (allowedPortMacroSet != null && !allowedPortMacroSet.contains(visiblePort))
+			continue;
+
 		// separate visual data
 		if (first)
 		{
@@ -1714,6 +1724,9 @@ private static void writeTemplateData(DataOutputStream stream, NamingContext ren
 		if (visibleMacro==null)
 			continue;
 			
+		if (allowedPortMacroSet != null && !allowedPortMacroSet.contains(visibleMacro))
+			continue;
+
 		// separate visual data
 		if (first)
 		{

@@ -1082,7 +1082,10 @@ public String getFlexibleName() {
  */
 public boolean moveToGroup(String group) {
 	
-    Group.getEditingTemplateData().removePort(data);
+	if (Group.getEditingTemplateData()==null)
+		return false;
+
+	Group.getEditingTemplateData().removePort(data);
 	//String oldName = getName();
 	String newName;
 	if (group.equals(Record.nullString)){
@@ -1128,7 +1131,10 @@ public boolean moveToGroup(String group) {
  * @see com.cosylab.vdct.graphics.objects.Flexible#rename(java.lang.String)
  */
 public boolean rename(String newName) {
-    Group.getEditingTemplateData().renamePort(data, newName);
+	if (Group.getEditingTemplateData()==null)
+		return false;
+
+	Group.getEditingTemplateData().renamePort(data, newName);
     String newObjName = Group.substractObjectName(newName);
 	String oldObjName = Group.substractObjectName(getName());
 
