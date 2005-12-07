@@ -1659,19 +1659,24 @@ protected void validate() {
   setRwidth(rwidth);
 
   rheight = validateFont(scale, rwidth, rheight);
-  int height = (int) (rheight/scale);
-  if (height != 0) {
-      setHeight(height);
-	  //this prevents records from moving up and down when zooming
-      if (use){
-	      int i = bottomy % Constants.GRID_SIZE;
-	      if (i!=0 && Settings.getInstance().getSnapToGrid()) {
-	          if (i > Constants.GRID_SIZE/2.0)
-	              setY(bottomy-height + Constants.GRID_SIZE -i);
-	          else 
-	              setY(bottomy-height -i);
-	      } else
-	          setY(bottomy-height);
+  // not navigator redraw (it should not fix height!!!)
+  // TODO hardcoded minumum scale!!!
+  if (scale >= 0.2)
+  {
+	  int height = (int) (rheight/scale);
+	  if (height != 0) {
+	      setHeight(height);
+		  //this prevents records from moving up and down when zooming
+	      if (use){
+		      int i = bottomy % Constants.GRID_SIZE;
+		      if (i!=0 && Settings.getInstance().getSnapToGrid()) {
+		          if (i > Constants.GRID_SIZE/2.0)
+		              setY(bottomy-height + Constants.GRID_SIZE -i);
+		          else 
+		              setY(bottomy-height -i);
+		      } else
+		          setY(bottomy-height);
+		  }
 	  }
   }
   
