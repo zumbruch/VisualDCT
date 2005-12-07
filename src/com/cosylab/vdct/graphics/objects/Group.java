@@ -435,6 +435,7 @@ public static Group getClipboard() {
 	if (clipboard==null) {
 		clipboard = new Group(null);
 		clipboard.setAbsoluteName(Constants.CLIPBOARD_NAME);
+		clipboard.setLookupTable(new Hashtable());
 	}
 	return clipboard;
 }

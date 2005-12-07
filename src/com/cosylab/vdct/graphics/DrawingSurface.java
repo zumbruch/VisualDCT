@@ -2037,24 +2037,49 @@ public boolean open(InputStream is, File file, boolean importDB, boolean importT
 
 		if (importToCurrentGroup)
 		{
-			boolean validate = (is != null);
-			
-			// import directly to workspace (current view group)
-			HashMap importedList = applyVisualData(true, viewGroup, dbData, vdbData);
-			
-			if (Group.getEditingTemplateData() != null)
+			Group.getClipboard().clear();
+			Group vg = viewGroup;
+			Group rg = Group.getRoot();
+			try
 			{
-				VDBData.addPortsAndMacros(dbData.getTemplateData(), Group.getEditingTemplateData(), vdbData, importedList);
-				validate = true;
+				// put all to dummy root group
+				viewGroup = new Group(null);
+				viewGroup.setAbsoluteName("");
+				viewGroup.setLookupTable(new Hashtable());
+				Group.setRoot(viewGroup);
+				
+				boolean validate = (is != null);
+				
+				// import directly to workspace (current view group)
+				// imported list needed for undo action
+				HashMap importedList = applyVisualData(true, viewGroup, dbData, vdbData);
+				
+				if (Group.getEditingTemplateData() != null)
+				{
+					VDBData.addPortsAndMacros(dbData.getTemplateData(), Group.getEditingTemplateData(), vdbData, importedList);
+					validate = true;
+				}
+				
+				// clipboard import -> needs checks
+				if (validate)
+				{
+					viewGroup.manageLinks(true);
+					viewGroup.unconditionalValidateSubObjects(isFlat());
+				}
+				
+				viewGroup.selectAllComponents();
+				
+				((GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface")).getGUIMenuInterface().cut();
+			}
+			finally
+			{
+				viewGroup = vg;
+				Group.setRoot(rg);
 			}
 			
-			// clipboard import -> needs checks
-			if (validate)
-			{
-				viewGroup.manageLinks(true);
-				viewGroup.unconditionalValidateSubObjects(isFlat());
-			}
-
+			((GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface")).getGUIMenuInterface().paste();
+			Group.getClipboard().clear();
+			
 		}
 		else if (!importDB)
 		{
