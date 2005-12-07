@@ -2053,10 +2053,12 @@ public boolean open(InputStream is, File file, boolean importDB, boolean importT
 				// import directly to workspace (current view group)
 				// imported list needed for undo action
 				HashMap importedList = applyVisualData(true, viewGroup, dbData, vdbData);
-				
-				if (Group.getEditingTemplateData() != null)
+
+				// find 'first' template defined in this file (not via includes)
+				VDBTemplate template = (VDBTemplate)VDBData.getTemplates().get(dbData.getTemplateData().getId());
+				if (template != null)
 				{
-					VDBData.addPortsAndMacros(dbData.getTemplateData(), Group.getEditingTemplateData(), vdbData, importedList);
+					VDBData.addPortsAndMacros(dbData.getTemplateData(), template, vdbData, importedList);
 					validate = true;
 				}
 				
