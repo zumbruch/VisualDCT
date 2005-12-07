@@ -378,18 +378,20 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 			// diff left from right size
 			if (drawDot && in instanceof EPICSVarOutLink)
 				doDots = drawDot = checkForSameSideLinks((EPICSVarOutLink)in, isInLeft, middleInX);
+			else 
+				doDots = in instanceof MultiInLink;
 
 			if (doDots)
 			{
 				if (out instanceof Connector)
 				{
 					if (!firstHorizontal)
-						drawDot = checkConnectorOuterMost((EPICSVarOutLink)in, out.getOutX(), in.getInX(), isInLeft, middleInX);
+						drawDot = checkConnectorOuterMost((MultiInLink)in, out.getOutX(), in.getInX(), isInLeft, middleInX);
 					else
-						drawDot = checkHorizontalFirstDootNeeded((EPICSVarOutLink)in, out.getOutY(), in.getInY(), isInLeft, middleInX);
+						drawDot = checkHorizontalFirstDootNeeded((MultiInLink)in, out.getOutY(), in.getInY(), isInLeft, middleInX);
 				}
 				else
-					drawDot = checkHorizontalFirstDootNeeded((EPICSVarOutLink)in, out.getOutY(), in.getInY(), isInLeft, middleInX);
+					drawDot = checkHorizontalFirstDootNeeded((MultiInLink)in, out.getOutY(), in.getInY(), isInLeft, middleInX);
 			}
 
 			if (firstHorizontal) {	
@@ -405,7 +407,7 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 				{
 					// 2 links, one above, one below case (dot needed in the middle)
 					if (doDots &&
-						checkMiddleDotNeededCase((EPICSVarOutLink)in, out.getOutY(), in.getInY(), isInLeft, middleInX))
+						checkMiddleDotNeededCase((MultiInLink)in, out.getOutY(), in.getInY(), isInLeft, middleInX))
 							g.fillOval(x2-dotSize, y2-dotSize, dotSize2, dotSize2);
 				}
 			}
@@ -451,6 +453,11 @@ private static boolean checkForSameSideLinks(EPICSVarOutLink evol, boolean isInL
 	while (links.hasMoreElements())
 	{
 		OutLink l = (OutLink)links.nextElement();
+		
+		// skip links from clipboards
+		if (!l.getLayerID().equals(evol.getLayerID()))
+			continue;
+		
 		if (l.getOutX() > middleInX && !isInLeft)
 			count++;
 		else if (l.getOutX() <= middleInX && isInLeft)
@@ -466,7 +473,7 @@ private static boolean checkForSameSideLinks(EPICSVarOutLink evol, boolean isInL
  * Precondition: checkForSameSideLinks == true, i.e. at least 2 links on the same side
  * @return
  */
-private static boolean checkHorizontalFirstDootNeeded(EPICSVarOutLink evol, int outY, int inY, boolean isInLeft, int middleInX) {
+private static boolean checkHorizontalFirstDootNeeded(MultiInLink evol, int outY, int inY, boolean isInLeft, int middleInX) {
 	
 	// allways needed
 	if (outY == inY)
@@ -482,6 +489,10 @@ private static boolean checkHorizontalFirstDootNeeded(EPICSVarOutLink evol, int 
 	while (links.hasMoreElements())
 	{
 		OutLink l = (OutLink)links.nextElement();
+		// skip links from clipboards
+		if (!l.getLayerID().equals(evol.getLayerID()))
+			continue;
+
 		int ox = l.getOutX();
 	
 		if ((l instanceof Connector && ((l.getQueueCount()%2)!=0)) || // X is not the same... (skip all not first horizontal connectors)
@@ -520,7 +531,7 @@ private static boolean checkHorizontalFirstDootNeeded(EPICSVarOutLink evol, int 
  * Precondition: checkForSameSideLinks == true, i.e. at least 2 links on the same side
  * @return
  */
-private static boolean checkMiddleDotNeededCase(EPICSVarOutLink evol, int outY, int inY, boolean isInLeft, int middleInX) {
+private static boolean checkMiddleDotNeededCase(MultiInLink evol, int outY, int inY, boolean isInLeft, int middleInX) {
 
 	int upcount = 0;
 	int downcount = 0;
@@ -529,6 +540,10 @@ private static boolean checkMiddleDotNeededCase(EPICSVarOutLink evol, int outY, 
 	while (links.hasMoreElements())
 	{
 		OutLink l = (OutLink)links.nextElement();
+		// skip links from clipboards
+		if (!l.getLayerID().equals(evol.getLayerID()))
+			continue;
+
 		int ox = l.getOutX();
 		if ((isInLeft && ox > middleInX) ||
 			(!isInLeft && ox <= middleInX))
@@ -558,7 +573,7 @@ private static boolean checkMiddleDotNeededCase(EPICSVarOutLink evol, int outY, 
  * Precondition: checkForSameSideLinks == true, i.e. at least 2 links on the same side
  * @return
  */
-private static boolean checkConnectorOuterMost(EPICSVarOutLink evol, int outX, int inX, boolean isInLeft, int middleInX) {
+private static boolean checkConnectorOuterMost(MultiInLink evol, int outX, int inX, boolean isInLeft, int middleInX) {
 	
 	int minX = inX;
 	int maxX = inX;
@@ -569,6 +584,10 @@ private static boolean checkConnectorOuterMost(EPICSVarOutLink evol, int outX, i
 	while (links.hasMoreElements())
 	{
 		OutLink l = (OutLink)links.nextElement();
+		// skip links from clipboards
+		if (!l.getLayerID().equals(evol.getLayerID()))
+			continue;
+
 		if (!(l instanceof Connector))
 			continue;
 		int ox = l.getOutX();
