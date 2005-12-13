@@ -165,7 +165,10 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 			}
 		}
 		else
+		{
 			x2 = (int)(scale*in.getInX()-view.getRx());
+			isInLeft = !in.isRight();
+		}
 		
 		y2 = (int)(scale*in.getInY()-view.getRy());
 	}
@@ -379,14 +382,17 @@ public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firs
 			if (drawDot && in instanceof EPICSVarOutLink)
 				doDots = drawDot = checkForSameSideLinks((EPICSVarOutLink)in, isInLeft, middleInX);
 			else 
-				doDots = in instanceof MultiInLink;
+				doDots = drawDot;
 
 			if (doDots)
 			{
 				if (out instanceof Connector)
 				{
 					if (!firstHorizontal)
-						drawDot = checkConnectorOuterMost((MultiInLink)in, out.getOutX(), in.getInX(), isInLeft, middleInX);
+					{
+						int ix = isInLeft ? in.getLeftX() : in.getRightX();
+						drawDot = checkConnectorOuterMost((MultiInLink)in, out.getOutX(), ix, isInLeft, middleInX);
+					}
 					else
 						drawDot = checkHorizontalFirstDootNeeded((MultiInLink)in, out.getOutY(), in.getInY(), isInLeft, middleInX);
 				}
@@ -550,8 +556,24 @@ private static boolean checkMiddleDotNeededCase(MultiInLink evol, int outY, int 
 			continue; // do not count links on the other side!
 		// connector on the same side
 		if (l instanceof Connector)
-			return true;
-
+		{
+			int ex;
+			if (evol instanceof EPICSVarOutLink) {
+				if (isInLeft)
+					ex = evol.getLeftX();
+				else
+					ex = evol.getRightX();
+			}
+			else
+				ex = evol.getInX();
+				
+			if ((isInLeft && ox <= ex) ||
+				(!isInLeft && ox >= ex))
+				return true;
+			else
+				continue;
+		}
+		
 		if (l.getOutY() < inY)
 			upcount++;
 		else /*if (oy < inY)*/
