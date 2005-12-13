@@ -34,6 +34,7 @@ import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Stack;
 import java.util.Vector;
 import java.util.Map;
 import java.util.Enumeration;
@@ -48,6 +49,7 @@ import com.cosylab.vdct.Settings;
 import com.cosylab.vdct.db.DBResolver;
 import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.events.commands.LinkCommand;
+import com.cosylab.vdct.graphics.DrawingSurface;
 import com.cosylab.vdct.graphics.FontMetricsBuffer;
 import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.graphics.popup.PopUpMenu;
@@ -2238,13 +2240,16 @@ public void setTemplateInstance(VDBTemplateInstance templateInstance)
  */
 public Object[] getTargets() {
 	
+	Stack tis = DrawingSurface.getInstance().getTemplateStack();
+
 	Enumeration templates = VDBData.getTemplates().keys();
 	ArrayList al = new ArrayList(VDBData.getTemplates().size());
 	while (templates.hasMoreElements())
 	{
 		String key = templates.nextElement().toString();
 		VDBTemplate t = (VDBTemplate)VDBData.getTemplates().get(key);
-		if (t != this.getTemplateData().getTemplate())
+		if (t != this.getTemplateData().getTemplate() &&
+			!tis.contains(t))	// do not allow cyclic...
 			al.add(t.getDescription());
 	}	
 
