@@ -320,10 +320,13 @@ protected void draw(Graphics g, boolean hilited) {
 		while (e.hasMoreElements() && !(hasLeftOutLink && hasRightOutLink))
 		{
 			OutLink ol = (OutLink)e.nextElement();
-			if (ol.getOutX() > mid)
-				hasRightOutLink = true;
-			else
-				hasLeftOutLink = true;
+			if (ol.getLayerID().equals(this.getLayerID()))
+			{
+				if (ol.getOutX() > mid)
+					hasRightOutLink = true;
+				else
+					hasLeftOutLink = true;
+			}
 		}
 
 		int linklx = (int)(getRscale()*getLeftX() - view.getRx());
