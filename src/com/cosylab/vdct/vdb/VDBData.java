@@ -430,6 +430,10 @@ public static void addPortsAndMacros(DBTemplate dbTemplate, VDBTemplate vt, VDBD
 
 public static void addPortsAndMacros(DBTemplate dbTemplate, VDBTemplate vt, VDBData vdbData, HashMap importedList) {
 	
+	// noop (importing into DB w/o editing template data)
+	if (importedList != null && Group.getEditingTemplateData() == null)
+		return;
+	
 	Hashtable ports = vt.getPorts();
 	Vector portsV = vt.getPortsV();
 	
