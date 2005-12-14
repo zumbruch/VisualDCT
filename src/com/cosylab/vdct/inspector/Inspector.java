@@ -43,7 +43,6 @@ import java.awt.event.*;
 
 import com.cosylab.vdct.Console;
 import com.cosylab.vdct.graphics.DrawingSurface;
-import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.graphics.objects.VisibleObject;
 
 /**
@@ -670,10 +669,13 @@ public void inspectObject(Inspectable object, boolean raise) {
 	initializeTabs(object.getModeNames());
 	
 	if (raise) setVisible(true);
+	
+	/*
 	if (object instanceof VisibleObject) {
 	    ViewState.getInstance().setAsHilited((VisibleObject) object);
 	    DrawingSurface.getInstance().repaint(true);
 	}
+	*/
 }
 /**
  * Insert the method's description here.
@@ -788,12 +790,14 @@ public void updateProperty(InspectableProperty property) {
 	 */
 public void windowActivated(java.awt.event.WindowEvent e) {
 	InspectorManager.getInstance().fucusGained(this);
+	/*
 	if (inspectedObject != null) {
 	    if (inspectedObject instanceof VisibleObject) {
 	        ViewState.getInstance().setAsHilited((VisibleObject) inspectedObject);
 	        DrawingSurface.getInstance().repaint(true);
 	    }
 	}
+	*/
 }
 	/**
 	 * Invoked when a window has been closed as the result
@@ -813,12 +817,14 @@ public void windowClosing(java.awt.event.WindowEvent e) {}
 	 * be delivered to the window or its subcomponents.
 	 */
 public void windowDeactivated(java.awt.event.WindowEvent e) {
+	/*
     if (inspectedObject != null) {
 	    if (inspectedObject instanceof VisibleObject) {
 	        ViewState.getInstance().setAsHilited(null);
 	        DrawingSurface.getInstance().repaint(true);
 	    }
 	}
+	*/
 }
 	/**
 	 * Invoked when a window is changed from a minimized
