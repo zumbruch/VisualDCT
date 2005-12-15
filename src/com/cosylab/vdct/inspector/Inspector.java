@@ -43,6 +43,7 @@ import java.awt.event.*;
 
 import com.cosylab.vdct.Console;
 import com.cosylab.vdct.graphics.DrawingSurface;
+import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.graphics.objects.VisibleObject;
 
 /**
@@ -634,6 +635,7 @@ public void inspectObject(Inspectable object) {
  * @param object com.cosylab.vdct.inspector.Inspectable
  */
 public void inspectObject(Inspectable object, boolean raise) {
+
 	closeCellEditors(true);
 	if (inspectedObject==object) return;
 	inspectedObject=object;
@@ -670,12 +672,13 @@ public void inspectObject(Inspectable object, boolean raise) {
 	
 	if (raise) setVisible(true);
 	
-	/*
-	if (object instanceof VisibleObject) {
-	    ViewState.getInstance().setAsHilited((VisibleObject) object);
-	    DrawingSurface.getInstance().repaint(true);
+	if (!updatingList)
+	{
+		if (object instanceof VisibleObject) {
+		    ViewState.getInstance().setAsHilited((VisibleObject) object);
+		    DrawingSurface.getInstance().repaint(true);
+		}
 	}
-	*/
 }
 /**
  * Insert the method's description here.
@@ -765,15 +768,25 @@ public void updateComment() {
  * Insert the method's description here.
  * Creation date: (8.1.2001 17:50:20)
  */
+private boolean updatingList = false;
 public void updateObjectList() {
-	JComboBox combo = getObjectComboBox();
-	if (combo.getItemCount()>0) combo.removeAllItems();		// !!!
-	objs = com.cosylab.vdct.DataProvider.getInstance().getInspectable();
-	Enumeration e = objs.elements();
-	while (e.hasMoreElements()) {
-		combo.addItem(e.nextElement());
+	try
+	{
+		updatingList = true;
+
+		JComboBox combo = getObjectComboBox();
+		if (combo.getItemCount()>0) combo.removeAllItems();		// !!!
+		objs = com.cosylab.vdct.DataProvider.getInstance().getInspectable();
+		Enumeration e = objs.elements();
+		while (e.hasMoreElements()) {
+			combo.addItem(e.nextElement());
+		}
+		toRemove = null;
 	}
-	toRemove = null;
+	finally
+	{
+		updatingList = false;
+	}
 }
 /**
  * Insert the method's description here.
@@ -790,14 +803,12 @@ public void updateProperty(InspectableProperty property) {
 	 */
 public void windowActivated(java.awt.event.WindowEvent e) {
 	InspectorManager.getInstance().fucusGained(this);
-	/*
 	if (inspectedObject != null) {
 	    if (inspectedObject instanceof VisibleObject) {
 	        ViewState.getInstance().setAsHilited((VisibleObject) inspectedObject);
 	        DrawingSurface.getInstance().repaint(true);
 	    }
 	}
-	*/
 }
 	/**
 	 * Invoked when a window has been closed as the result
@@ -817,14 +828,12 @@ public void windowClosing(java.awt.event.WindowEvent e) {}
 	 * be delivered to the window or its subcomponents.
 	 */
 public void windowDeactivated(java.awt.event.WindowEvent e) {
-	/*
     if (inspectedObject != null) {
 	    if (inspectedObject instanceof VisibleObject) {
 	        ViewState.getInstance().setAsHilited(null);
 	        DrawingSurface.getInstance().repaint(true);
 	    }
 	}
-	*/
 }
 	/**
 	 * Invoked when a window is changed from a minimized
