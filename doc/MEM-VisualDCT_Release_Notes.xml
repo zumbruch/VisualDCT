@@ -50,6 +50,10 @@
                         <section>Package D2 release.</section>
                 </modification>
 
+		<modification version="2.5.1270" by="msekoranja" date="2004-11-18">
+			<section>Package F release.</section>
+		</modification>
+
 		<scope>
 			This document is contains release notes of the current build.
 		</scope>
@@ -69,9 +73,9 @@
 			   title="VisualDCT latest build"
 			   href="http://visualdct.cosylab.com/builds/VisualDCT/"
 			   author="Matej Sekoranja"
-			   date="2004"
+			   date="2005"
 			   publisher="Cosylab, Ltd."
-			   revision="2.4.1257"/>
+			   revision="2.5.1270"/>
 
 	</head>
 	
@@ -79,11 +83,80 @@
 		<section id="noted" title="Release Notes">
 			<p>
 			Changes in current version:
-			<ul>
-				<li>Support for Java 1.5, minor code cleanup</li>
-				<li>Alarm Handler and Archiver application plugin</li>
-			</ul>
-			</p>
+<pre>
+    * 5037: Printing issues [resolved]
+    * 8596: Bug in Visual DCT morph [resolved]
+    * 8731: VDCT: mess with the template links [resolved]
+    * 10333: On small zoom the records should blow up to become readable [resolved]
+    * 11385: Visual DCT breaks in Mac OS 10.4 [resolved]
+    * 12121: Addpath command functionality [resolved]
+    * 12122: Macro orientation when connection more than one wire [resolved]
+          o 13367: Strange bahaviour [resolved]
+    * 12123: Issues when un-doing a move [resolved]
+    * 12124: Objects change relative distances while being dragged together [resolved]
+    * 12125: Awkward kink in wires when a connector anchor is added [resolved]
+    * 12126: Problem with hidden fields [resolved]
+    * 12127: Wire anchors on templates are not preserved when saving [resolved]
+    * 12128: Font size for template name too large [resolved]
+    * 12129: SCAN field is not a valid input when connecting from a port [resolved]
+    * 12130: Not possible to add a connection anchor point to a wire connecting a record field and an external port or macro [resolved]
+    * 12296: Problems with find feature in VisualDCT [resolved]
+    * 12369: Import of databases doesn't work [resolved]
+    * 12438: If dbd not present, DTYP information is gone [resolved]
+    * 12443: Read appInclude.dbd files with #include's [resolved]
+    * 12444: Save on traverse [resolved]
+    * 12445: Eliminate steps in wires [resolved]
+    * 12446: Move text on macros [resolved]
+    * 12447: More wiring issues [resolved]
+    * 12448: Borders [resolved]
+          o 13079: Implement import and Border graphical object [resolved]
+          o 13139: Border saving [resolved]
+          o 13140: Fix/improve graphical objects select [resolved]
+    * 12449: Improve printing [resolved]
+    * 12450: Morph a template [resolved]
+    * 12451: Visual cue when making links [resolved]
+    * 12452: Highlight which record is inspected [resolved]
+    * 12713: Hide value on copied records [resolved]
+    * 12714: Copied record set links [resolved]
+    * 12715: Position of pasted record [resolved]
+    * 12716: Records move when db is saved [resolved]
+    * 12793: Control of which side a wire connects to a record [resolved]
+    * 12794: Fields with two connectors [resolved]
+    * 12795: Building [resolved]
+          o 15039: Access to JCA CVS [resolved]
+    * 13326: Package F testing [resolved]
+    * 13345: Update VDCT documentation [resolved]
+    * 15878: Small tasks [resolved]
+    * 16218: Copy paste between VDCT windows [resolved]
+
+# 15412: Bugfixes for package F (iverstovsek) [open]
+
+    * 15413: --help or -h command line argument [resolved]
+    * 15414: Wire routing at different zooms [resolved]
+    * 15415: Multiple pasting [resolved]
+    * 15416: Pasting near edge issues [resolved]
+    * 15417: Click and drag issues on different platforms [resolved]
+    * 15418: Double click not working sometimes inside main area [resolved]
+    * 15419: Discriminate beteween external connectors to links and substitution macros [resolved]
+    * 15420: Phantom records remain when switching levels in hierarchy [resolved]
+    * 15421: Pop up a dialog box if db generation fails [resolved]
+    * 15422: Labeling of FLNKs [resolved]
+    * 15423: Inconsistent positioning of anchors [resolved]
+    * 15424: Display connectors as line segments [resolved]
+    * 15547: Linking problem [resolved]
+    * 15738: Multiple connectors on EPICSTemplateMacro [resolved]
+    * 15809: Editing info elements of records in an inspector [stalled]
+    * 15810: Snapping of graphics objects to the nearest point [resolved]
+    * 15812: Full Undo sequence should not prompt for save [resolved]
+    * 15813: Order of links after undo / redo sequence is not conserved [resolved]
+    * 15814: Do not display type of link of a port [resolved]
+    * 15815: Copy paste should work also for port and macro [resolved]
+    * 15816: Link was not made between INP and ai [resolved]
+    * 15868: Hierachy problem [resolved]
+    * 15869: Send latest version to Ken Evans to test printing on plotters [resolved]
+    * 15870: Selection does not work properly [resolved]
+</pre>
+</p>
 			<p>
 			Disabilities/missing:
 			<ul>
@@ -94,11 +167,6 @@
 			</ul>
 			</p>
 			<p>
-			Still there are quite a lot of ideas and nice features to be implemeted in the next releases:
-			<ul>
-			  <li>fix printing support</li>
-			  <li>...</li>
-			</ul>
 			</p>
 		</section>
 	</body>
