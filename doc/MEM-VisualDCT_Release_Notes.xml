@@ -50,7 +50,7 @@
                         <section>Package D2 release.</section>
                 </modification>
 
-		<modification version="2.5.1270" by="msekoranja" date="2004-11-18">
+		<modification version="2.5.1271" by="msekoranja" date="2004-11-18">
 			<section>Package F release.</section>
 		</modification>
 
@@ -75,7 +75,7 @@
 			   author="Matej Sekoranja"
 			   date="2005"
 			   publisher="Cosylab, Ltd."
-			   revision="2.5.1270"/>
+			   revision="2.5.1271"/>
 
 	</head>
 	
