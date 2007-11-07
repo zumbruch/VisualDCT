@@ -123,7 +123,8 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 	// does not refersh devices only draw a hilited object (executed only once)
 	private boolean drawOnlyHilitedOnce = false;
 	// also draws hilited objects
-	private boolean alsoDrawHilitedOnce = false;
+	// currently unsued
+	//private boolean alsoDrawHilitedOnce = false;
 	// also force one redraw (unconditional)
 	private boolean forceRedraw = false;
 	// does not redraws navigator image
@@ -387,10 +388,6 @@ public void draw(Graphics g) {
 		g.setColor(Constants.GRID_COLOR);
 		
 		if (view.isSelected(hilitedObject)) {
-			boolean ok = true;
-			int dx = draggedX-pressedX;
-			int dy = draggedY-pressedY;
-
 			Enumeration selected = view.getSelectedObjects().elements();
 			while (selected.hasMoreElements()) {
 				VisibleObject vo = (VisibleObject)selected.nextElement();
@@ -447,7 +444,9 @@ public void draw(Graphics g) {
 		}
 	}
 
-	drawOnlyHilitedOnce=alsoDrawHilitedOnce=false;
+	drawOnlyHilitedOnce = false;
+	// currently unsued
+    //alsoDrawHilitedOnce = false;
 
 
 	// restore offset
@@ -1271,7 +1270,8 @@ public void mouseDragged(MouseEvent e) {
 					}
 				}
 				else if (hilitedObject.move(dx, dy)) {
-					alsoDrawHilitedOnce = true;
+					// currently unsued
+					//alsoDrawHilitedOnce = true;
 					blockNavigatorRedrawOnce = true;	/// !!! performance
 					repaint();
 					if (dx!=0) draggedX=px-(int)(rdx-dx*scale);
@@ -1332,7 +1332,8 @@ public void mouseDragged(MouseEvent e) {
 					else
 					{
 						hilitedObject.move(mdx, mdy);
-						alsoDrawHilitedOnce=true;
+						// currently unsued
+						//alsoDrawHilitedOnce = true;
 					}
 					pressedX+=dx; pressedY+=dy;
 				} else {
@@ -1509,7 +1510,8 @@ public void mousePressed(MouseEvent e) {
 			if (e.isShiftDown() && 
 				(hilitedObject instanceof Rotatable)) {
 					((Rotatable)hilitedObject).rotate();
-					alsoDrawHilitedOnce=true;
+					// currently unsued
+					//alsoDrawHilitedOnce = true;
 					repaint();
 			}
 			else
@@ -1645,7 +1647,7 @@ public void mouseReleased(MouseEvent e) {
 			    setCursor(Cursor.getDefaultCursor());
 			}
 			view.setAsHilited(viewGroup.hiliteComponentsCheck(e.getX()-view.getX0()+view.getRx(), e.getY()-view.getY0()+view.getRy()));
-			//alsoDrawHilitedOnce=true;
+			//alsoDrawHilitedOnce = true;
 			repaint();
 			break;}
 			
@@ -1768,7 +1770,7 @@ public void checkForIncodedDBDs(File file) throws IOException
 	File relativeTo = file.getParentFile();
 	DBDEntry.setBaseDir(relativeTo);
 	
-	Console.getInstance().println();
+	com.cosylab.vdct.Console.getInstance().println();
 	
 	Vector dbds = com.cosylab.vdct.DataProvider.getInstance().getCurrentDBDs();
 	String[] dbd = DBResolver.resolveIncodedDBDs(file.getAbsolutePath());
@@ -1784,16 +1786,16 @@ public void checkForIncodedDBDs(File file) throws IOException
 			// skip if already loaded
 			if (!dbds.contains(entry))
 			{
-				Console.getInstance().println("Loading DBD file: '"+f.getAbsolutePath()+"'.");
+				com.cosylab.vdct.Console.getInstance().println("Loading DBD file: '"+f.getAbsolutePath()+"'.");
 				openDBD(f, com.cosylab.vdct.DataProvider.getInstance().getDbdDB()!=null);
 			}
 			else {			
-				Console.getInstance().println("DBD file '"+f.getAbsolutePath()+"' is already loaded.");
+				com.cosylab.vdct.Console.getInstance().println("DBD file '"+f.getAbsolutePath()+"' is already loaded.");
 			}
 		}
 		else 
 		{
-			Console.getInstance().println("DBD file not found: '"+f.getAbsolutePath()+"'.");
+			com.cosylab.vdct.Console.getInstance().println("DBD file not found: '"+f.getAbsolutePath()+"'.");
 		}
 		
 		//	replace
@@ -1824,7 +1826,7 @@ public boolean importFields(File file, boolean ignoreLinkFields)
 			try
 			{
 				dbData = DBResolver.resolveDBasURL(new java.net.URL(getVDCTFrame().getAppletBase(), file.getAbsolutePath()));
-			} catch (java.net.MalformedURLException e) { Console.getInstance().println(e); }
+			} catch (java.net.MalformedURLException e) { com.cosylab.vdct.Console.getInstance().println(e); }
 		else  */
 	
 		try
@@ -1833,7 +1835,7 @@ public boolean importFields(File file, boolean ignoreLinkFields)
 		} 
 		catch(Exception e)
 		{
-			Console.getInstance().println(e);
+			com.cosylab.vdct.Console.getInstance().println(e);
 		}
 		
 	    //
@@ -1901,7 +1903,6 @@ public boolean importFields(File file, boolean ignoreLinkFields)
  */
 public boolean importBorder(File file)
 {
-    boolean imported = false;
     try
     {
         setCursor(hourCursor);
@@ -1912,7 +1913,7 @@ public boolean importBorder(File file)
 			try
 			{
 				dbData = DBResolver.resolveDBasURL(new java.net.URL(getVDCTFrame().getAppletBase(), file.getAbsolutePath()));
-			} catch (java.net.MalformedURLException e) { Console.getInstance().println(e); }
+			} catch (java.net.MalformedURLException e) { com.cosylab.vdct.Console.getInstance().println(e); }
 		else  */
 	
 		try
@@ -1921,7 +1922,7 @@ public boolean importBorder(File file)
 		} 
 		catch(Exception e)
 		{
-			Console.getInstance().println(e);
+			com.cosylab.vdct.Console.getInstance().println(e);
 		}
 		
 	    //
@@ -2007,7 +2008,7 @@ public boolean open(InputStream is, File file, boolean importDB, boolean importT
 			try
 			{
 				dbData = DBResolver.resolveDBasURL(new java.net.URL(getVDCTFrame().getAppletBase(), file.getAbsolutePath()));
-			} catch (java.net.MalformedURLException e) { Console.getInstance().println(e); }
+			} catch (java.net.MalformedURLException e) { com.cosylab.vdct.Console.getInstance().println(e); }
 		else  */
 
 		try
@@ -2019,7 +2020,7 @@ public boolean open(InputStream is, File file, boolean importDB, boolean importT
 		} 
 		catch(Throwable e)
 		{
-			Console.getInstance().println(e);
+			com.cosylab.vdct.Console.getInstance().println(e);
 		}
 
 		// check for sucess
@@ -2303,7 +2304,7 @@ public static HashMap applyVisualData(boolean importDB, Group group, DBData dbDa
 				// check if record already exists
 				if ((record = (Record) rootGroup.findObject(vdbRec.getName(), true))
 					!= null) {
-					Console.getInstance().println(
+					com.cosylab.vdct.Console.getInstance().println(
 						"Record "
 							+ vdbRec.getName()
 							+ " already exists - this definition will be ignored.");
@@ -2343,7 +2344,7 @@ public static HashMap applyVisualData(boolean importDB, Group group, DBData dbDa
 				if (template==null)
 				{
 					/*// already issued
-					Console.getInstance().println(
+					com.cosylab.vdct.Console.getInstance().println(
 						"Template instance "+dbTemplate.getTemplateID()+" cannot be created since "
 							+ dbTemplate.getTemplateClassID()
 							+ " does not exist - this definition will be ignored.");*/
@@ -2353,7 +2354,7 @@ public static HashMap applyVisualData(boolean importDB, Group group, DBData dbDa
 				VDBTemplateInstance templateInstance = (VDBTemplateInstance)vdbData.getTemplateInstances().get(dbTemplate.getTemplateInstanceId());
 				if (templateInstance==null)
 				{
-					Console.getInstance().println(
+					com.cosylab.vdct.Console.getInstance().println(
 						"Template instance "+dbTemplate.getTemplateInstanceId()+" does not exist - this definition will be ignored.");
 					continue;
 				}			
@@ -2421,7 +2422,7 @@ public static HashMap applyVisualData(boolean importDB, Group group, DBData dbDa
 			dbGrp = (DBGroupData) (e.nextElement());
 			grp = (Group) rootGroup.findObject(dbGrp.getName(), true);
 			if (importDB && (grp != null)) {
-				Console.getInstance().println(
+				com.cosylab.vdct.Console.getInstance().println(
 					"Group "
 						+ dbGrp.getName()
 						+ " already exists - this definition will be ignored.");
@@ -2475,7 +2476,7 @@ public static HashMap applyVisualData(boolean importDB, Group group, DBData dbDa
 				{
 					if (blackList.contains(template))
 					{
-						Console.getInstance().println(
+						com.cosylab.vdct.Console.getInstance().println(
 							"Link "
 								+ dbLink.getFieldName()
 								+ " already exists - this definition will be ignored.");
@@ -2571,7 +2572,7 @@ public static HashMap applyVisualData(boolean importDB, Group group, DBData dbDa
 				{
 					if (blackList.contains(record))
 					{
-						Console.getInstance().println(
+						com.cosylab.vdct.Console.getInstance().println(
 							"Link "
 								+ dbLink.getFieldName()
 								+ " already exists - this definition will be ignored.");
@@ -2692,7 +2693,7 @@ public static HashMap applyVisualData(boolean importDB, Group group, DBData dbDa
 		    UndoManager.getInstance().setMonitor(monitor);
 		}
 	} catch (Exception e) {
-		Console.getInstance().println("Error occured while applying visual data!");
+		com.cosylab.vdct.Console.getInstance().println("Error occured while applying visual data!");
 		e.printStackTrace();
 	}
 
@@ -2815,8 +2816,8 @@ public boolean openDBD(File file, boolean importDBD) throws IOException {
 
 	if (DataProvider.getInstance().getLoadedDBDs().contains(file))
 	{
-		Console.getInstance().println();
-		Console.getInstance().println("o) DBD file '"+file.getAbsolutePath()+"' is already loaded.");
+		com.cosylab.vdct.Console.getInstance().println();
+		com.cosylab.vdct.Console.getInstance().println("o) DBD file '"+file.getAbsolutePath()+"' is already loaded.");
 		return true;
 	}
 
@@ -2830,7 +2831,7 @@ public boolean openDBD(File file, boolean importDBD) throws IOException {
 		try {
 			dbdData = DBDResolver.resolveDBDasURL(dbdData, new java.net.URL(getAppletBase(), file.getAbsolutePath()));
 		} catch (java.net.MalformedURLException e) {
-			Console.getInstance().println(e); 
+			com.cosylab.vdct.Console.getInstance().println(e); 
 		}
 	else */
 	 	dbdData = DBDResolver.resolveDBD(dbdData, file.getAbsolutePath());
@@ -3110,9 +3111,6 @@ private void printLegend(Graphics graphics, int width, int height, int page, int
 	FontMetrics fm = FontMetricsBuffer.getInstance().getFontMetrics(font);
 	int labelWidth = fm.stringWidth(label)+8, labelHeight = fm.getHeight();
 	
-	int legendWidth = navigatorWidth + Math.max(logoWidth, labelWidth),
-		legendHeight = Math.max(navigatorHeight, logoHeight+labelHeight);
-	
 	int navX, navY, labX=0, labY, logoX, logoY;
 	switch (s.getLegendPosition()) {
 		case 1:	 
@@ -3148,7 +3146,6 @@ private void printLegend(Graphics graphics, int width, int height, int page, int
 		graphics.translate(navX, navY);
 		graphics.setClip(new Rectangle(0,0,navigatorWidth, navigatorHeight));
 	
-		Dimension navigatorSize = new Dimension(navigatorWidth, navigatorHeight);
 		double xscale = navigatorWidth/(double)view.getWidth();
 		double yscale = navigatorHeight/(double)view.getHeight();
 		double nscale = Math.min(xscale, yscale);
@@ -3625,7 +3622,7 @@ public void createTemplateInstance(String name, String type, boolean relative) {
 	VDBTemplate template = (VDBTemplate)VDBData.getTemplates().get(type);
 	if (template==null)
 	{
-		Console.getInstance().println(
+		com.cosylab.vdct.Console.getInstance().println(
 			"Template instance "+name+" cannot be created since "
 				+ type
 				+ " does not exist.");
@@ -3895,7 +3892,7 @@ public boolean reloadTemplate(VDBTemplate data)
 
 	InspectorManager.getInstance().updateObjectLists();
 
-	Console.getInstance().println("Reloading template '"+data.getFileName()+"'.");	
+	com.cosylab.vdct.Console.getInstance().println("Reloading template '"+data.getFileName()+"'.");	
 	
 	// reload
 	try
@@ -3905,7 +3902,7 @@ public boolean reloadTemplate(VDBTemplate data)
 
 		if (!ok || !VDBData.getTemplates().containsKey(data.getId()))
 		{
-			Console.getInstance().println("Failed to reload template '"+data.getFileName()+"'. Using in-memory definitions...");	
+			com.cosylab.vdct.Console.getInstance().println("Failed to reload template '"+data.getFileName()+"'. Using in-memory definitions...");	
 		}
 
 		return true;
@@ -3913,8 +3910,8 @@ public boolean reloadTemplate(VDBTemplate data)
 	}
 	catch (Exception e)
 	{
-		Console.getInstance().println("Failed to reload template '"+data.getFileName()+"'. Using in-memory definitions...");	
-		Console.getInstance().println(e);
+		com.cosylab.vdct.Console.getInstance().println("Failed to reload template '"+data.getFileName()+"'. Using in-memory definitions...");	
+		com.cosylab.vdct.Console.getInstance().println(e);
 	}
 	
 	return false;
@@ -4046,7 +4043,7 @@ public void generateMacros()
 
 	final String COMMA_SEP = ", ";
 
-	Console.getInstance().println("Generating macros...");
+	com.cosylab.vdct.Console.getInstance().println("Generating macros...");
 				
 	HashMap macros = new HashMap();
 	
@@ -4061,20 +4058,20 @@ public void generateMacros()
 		Group.getEditingTemplateData().addMacro(name);
 
 		// output to console
-		Console.getInstance().print("Creating macro '"+name+"', referenced from: ");
+		com.cosylab.vdct.Console.getInstance().print("Creating macro '"+name+"', referenced from: ");
 		ArrayList al = (ArrayList)macros.get(macroName);
 		Iterator i2 = al.iterator();
 		while (i2.hasNext())
 		{
-			Console.getInstance().print(((VDBFieldData)i2.next()).getFullName());
+			com.cosylab.vdct.Console.getInstance().print(((VDBFieldData)i2.next()).getFullName());
 			if (i2.hasNext())
-				Console.getInstance().print(COMMA_SEP);
+				com.cosylab.vdct.Console.getInstance().print(COMMA_SEP);
 		}
-		Console.getInstance().println();
+		com.cosylab.vdct.Console.getInstance().println();
 	}
 
-	Console.getInstance().println(macros.size() + " macro(s) generated.");
-	Console.getInstance().println();
+	com.cosylab.vdct.Console.getInstance().println(macros.size() + " macro(s) generated.");
+	com.cosylab.vdct.Console.getInstance().println();
 
 	// repair the links
 	Group.getRoot().manageLinks(true);

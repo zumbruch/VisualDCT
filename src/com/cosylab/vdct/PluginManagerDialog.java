@@ -49,7 +49,7 @@ private void installButtonActionPerformed()
 
 	try
 	{
-		jarURL = pluginChooser.getSelectedFile().toURL();
+		jarURL = pluginChooser.getSelectedFile().toURI().toURL();
 	}
 	catch (Exception e)
 	{

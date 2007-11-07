@@ -352,7 +352,7 @@ public void createRecord(String name, String type, boolean relative) {
 	VDBRecordData recordData = VDBData.getNewVDBRecordData(
 			DataProvider.getInstance().getDbdDB(), type, name);
 	if (recordData==null) {
-		Console.getInstance().println("o) Interal error: failed to create record "+name+" ("+type+")!");
+		com.cosylab.vdct.Console.getInstance().println("o) Interal error: failed to create record "+name+" ("+type+")!");
 		return;
 	}
 
@@ -659,8 +659,6 @@ public void paste() {
 	// do some offset (a little trick to have snapping also done) for copy only
 	final int OFFSET = Constants.GRID_SIZE;
 	double scale = ViewState.getInstance().getScale();
-	double px = pasteX <= 0 ? 0 : pasteX;
-	double py = pasteY <= 0 ? 0 : pasteY;
 	if (doOffsetAtPaste)
 		pasteAtPosition((int)((pasteX+OFFSET)*scale), (int)((pasteY+OFFSET)*scale));
 	else

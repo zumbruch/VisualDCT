@@ -195,8 +195,6 @@ public Flexible copyToGroup(java.lang.String group) {
 	else
 		newName = group+Constants.GROUP_SEPARATOR+getName();
 
-	ViewState view = ViewState.getInstance();
-		
 	while (Group.getRoot().findObject(newName, true)!=null)
 //		newName += Constants.COPY_SUFFIX;
 			newName = StringUtils.incrementName(newName, Constants.COPY_SUFFIX);
