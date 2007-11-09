@@ -37,24 +37,28 @@ import javax.swing.*;
  */
 public class CommentTextArea extends JTextArea implements java.awt.event.FocusListener {
 	InspectableProperty property = null;
+	HelpDisplayer helpDisplayer = null;
 /**
  * CommentTextArea constructor comment.
  */
-public CommentTextArea() {
+public CommentTextArea(HelpDisplayer helpDisplayer) {
+	this.helpDisplayer = helpDisplayer;
 	addFocusListener(this);
 }
 	/**
 	 * Invoked when a component gains the keyboard focus.
 	 */
 public void focusGained(java.awt.event.FocusEvent e) {
-	InspectorManager.getInstance().getActiveInspector().setHelp(property.getHelp());
+	helpDisplayer.displayHelp(property.getHelp());
+	//InspectorManager.getInstance().getActiveInspector().setHelp(property.getHelp());
 }
 	/**
 	 * Invoked when a component loses the keyboard focus.
 	 */
 public void focusLost(java.awt.event.FocusEvent e) {
 	property.setValue(getText());
-	InspectorManager.getInstance().getActiveInspector().setHelp("");
+	helpDisplayer.displayHelp("");
+	//InspectorManager.getInstance().getActiveInspector().setHelp("");
 }
 /**
  * Insert the method's description here.

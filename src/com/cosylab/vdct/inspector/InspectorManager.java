@@ -37,7 +37,7 @@ import java.util.*;
  * @author Matej Sekoranja
  * !!! inspectors are not disposed !!!! (move ins.listeners in inspectors, when this is implemented);
  */
-public class InspectorManager {
+public class InspectorManager implements HelpDisplayer {
 
 	private static InspectorManager instance = null;
 	private static Frame parent = null;
@@ -233,4 +233,12 @@ public void updateProperty(Inspectable object, InspectableProperty property) {
 	}
 
 }
+
+/**
+ * Displays help text in the current active inspector. 
+ */
+public void displayHelp(String text) {
+	getActiveInspector().setHelp(text);
+}
+
 }

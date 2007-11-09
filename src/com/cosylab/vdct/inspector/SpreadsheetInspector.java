@@ -1,121 +1,220 @@
+/**
+ * Copyright (c) 2007, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ *
+ * Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer. 
+ * Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation 
+ * and/or other materials provided with the distribution. 
+ * Neither the name of the Cosylab, Ltd., Control System Laboratory nor the names
+ * of its contributors may be used to endorse or promote products derived 
+ * from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE 
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package com.cosylab.vdct.inspector;
 
-import java.awt.Frame;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import java.awt.Color;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Vector;
 
 import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 
 import com.cosylab.vdct.Console;
+import com.cosylab.vdct.DataProvider;
 import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.graphics.objects.Record;
+import com.cosylab.vdct.graphics.objects.Template;
 
-public class SpreadsheetInspector extends JDialog implements ActionListener, PropertyChangeListener {
+/**
+ * @author ssah
+ *
+ */
+public class SpreadsheetInspector extends JDialog implements HelpDisplayer {
 
-	private SpreadsheetTableModel tableModel = null;
+    private JTabbedPane tabbedPane;
 	
-    private JOptionPane optionPane;
-    private String btnString1 = "Enter";
-    private String btnString2 = "Cancel";
+	private Vector types = null;	
+	private Vector instances = null;	
+
+    /** Creates new form SettingsDialog */
+    public SpreadsheetInspector(java.awt.Frame parent, boolean modal) {
+        super(parent, modal);
+
+		loadData();
+		createGUI();
+    }
+
+    public void displayHelp(String text) {
+		// TODO: convert this to display help in a label 
+    	Console.getInstance().println(text);
+    }
     
-	public SpreadsheetInspector(Frame owner, boolean modal) {
-		super(owner, modal);
+	/** This method is called from within the constructor to
+     * initialize the form.
+     */
+    private void createGUI() {
 
         setTitle("Spreadsheet");
 
-    	tableModel = new SpreadsheetTableModel(getSelectedRecords());
-        //String[] columnNames = {"Records"};
-        /*
-        Object[][] data = {
-        	    {"Mary", "Campione",
-        	     "Snowboarding", new Integer(5), new Boolean(false)},
-        	    {"Alison", "Huml",
-        	     "Rowing", new Integer(3), new Boolean(true)},
-        	    {"Kathy", "Walrath",
-        	     "Knitting", new Integer(2), new Boolean(false)},
-        	    {"Sharon", "Zakhour",
-        	     "Speed reading", new Integer(20), new Boolean(true)},
-        	    {"Philip", "Milne",
-        	     "Pool", new Integer(10), new Boolean(false)}
-        	};
+        tabbedPane = new javax.swing.JTabbedPane();
 
-        JTable table = new JTable(data, columnNames);
-        */
-        JTable table = new JTable(tableModel);
-        JScrollPane scrollPane = new JScrollPane(table);
-        table.setFillsViewportHeight(true);
-
-        Object[] options = {btnString1, btnString2};
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         
-        optionPane = new JOptionPane(scrollPane,
-                                    JOptionPane.QUESTION_MESSAGE,
-                                    JOptionPane.YES_NO_OPTION,
-                                    null,
-                                    options,
-                                    options[0]);
+        tabbedPane.setTabLayoutPolicy(javax.swing.JTabbedPane.SCROLL_TAB_LAYOUT);
+        tabbedPane.setAutoscrolls(true);
 
-        setContentPane(optionPane);	
-
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-                public void windowClosing(WindowEvent we) {
-                    optionPane.setValue(new Integer(JOptionPane.CLOSED_OPTION));
-            }
-        });
-
-        optionPane.addPropertyChangeListener(this);
-        pack();
-     }
-
-	private Vector getSelectedRecords() {
-		Console.getInstance().print("displaying:");
+    	Enumeration typesEn = types.elements();
+    	Enumeration instancesEn = instances.elements();
+    	String type = null;
+    	Vector vector = null;
     	
-    	Vector vector = ViewState.getInstance().getSelectedObjects();
-    	Vector records = new Vector();
+    	while (typesEn.hasMoreElements() && instancesEn.hasMoreElements()) {
+    		type = (String)typesEn.nextElement();
+    		vector = (Vector)instancesEn.nextElement();
 
-    	Enumeration en = vector.elements();
-    	Object obj = null;
-    	while (en.hasMoreElements()) {
-    		obj = en.nextElement();
-    		if (obj instanceof Record) {
-    			records.add(obj);
-        		Console.getInstance().println(obj.toString());
-    		}
+    		SpreadsheetTableModel tableModel = new SpreadsheetTableModel(vector);
+        	JTable table = getTable(tableModel);
+            JScrollPane scrollPane = new JScrollPane(table);
+            tabbedPane.addTab(type, scrollPane);
     	}
-    	return records;
-	}
-	
-    public void actionPerformed(ActionEvent e) {
-        optionPane.setValue(btnString1);
+
+        getContentPane().add(tabbedPane, java.awt.BorderLayout.CENTER);
+        pack();
     }
-	
-    public void propertyChange(PropertyChangeEvent e) {
-    	String prop = e.getPropertyName();
 
-    	if (isVisible() && (e.getSource() == optionPane)
-    			&& (JOptionPane.VALUE_PROPERTY.equals(prop) ||
-    					JOptionPane.INPUT_VALUE_PROPERTY.equals(prop))) {
-    		Object value = optionPane.getValue();
+    private JTable getTable(SpreadsheetTableModel tableModel) {
 
-    		if (value == JOptionPane.UNINITIALIZED_VALUE) {
-    			return;
+    	JTable table = new javax.swing.JTable(tableModel);
+    	table.setName("ScrollPaneTable");
+    	
+    	table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+    	table.setBackground(new Color(204,204,204));
+    	table.setShowVerticalLines(true);
+    	table.setGridColor(Color.black);
+    	table.setBounds(0, 0, 200, 200);
+    	table.setRowHeight(17);
+
+        // not yet tested	
+    	// enable clipboard actions
+    	new InspectorTableClipboardAdapter(table);
+    	table.setRowSelectionAllowed(true);
+    	// note: selection is possible only on name column
+    	table.setColumnSelectionAllowed(false);
+
+    	table.setDefaultRenderer(String.class, new InspectorTableCellRenderer(
+    			table, tableModel));
+    	table.setDefaultEditor(String.class,
+    		new InspectorCellEditor(tableModel, this));
+
+    	// not yet known why necessary
+    	/*
+    	table.addMouseListener(new MouseAdapter() {
+    		public void mouseReleased(MouseEvent evt) {
+    			java.awt.Point pnt = evt.getPoint();
+    			int popupAtRow = table.rowAtPoint(pnt);
+    			int popupAtCol = -1;
+    			if ((popupAtRow != -1) && 
+    					((popupAtCol=table.columnAtPoint(pnt)) != -1)) {
+    				mouseEvent(evt, popupAtRow, popupAtCol); 
+    			}
     		}
-    		optionPane.setValue(JOptionPane.UNINITIALIZED_VALUE);
- 			dispose();
+    	});
+    	*/
+
+    	return table;
+    }
+    
+	private void loadData() {
+		Console.getInstance().print("displaying:");
+		
+    	Vector candidates = ViewState.getInstance().getSelectedObjects();
+    	if (candidates.size() == 0) {
+    		candidates = DataProvider.getInstance().getInspectable(); 
     	}
-    }	
-	
-	public static void main(String args[]) {
-        new SpreadsheetInspector(new JFrame(), true).setVisible(true);
+    	
+    	/* Store the types in vector and instances in a vector of vectors. This
+    	 * implementation uses n^2 time since the number of types is expected to
+    	 * be small.
+    	 */
+    	Enumeration enumeration = candidates.elements();
+    	Vector inspectables = new Vector();
+    	Vector inspectablesTypes = new Vector();
+    	
+    	Object object = null;
+    	Inspectable inspectable = null;
+    	String type = null;
+    	Record record = null;
+    	Template template = null;
+    	while (enumeration.hasMoreElements()) {
+    		object = enumeration.nextElement();
+    		if (!(object instanceof Inspectable)) {
+    			continue;
+    		}
+    		inspectable = (Inspectable)object;
+    		
+    		if (inspectable instanceof Template) {
+    			template = (Template)inspectable;
+    			type = template.getTemplateData().getTemplate().getId();
+    		} else if (inspectable instanceof Record) {
+    			record = (Record)inspectable;
+    			type = record.getRecordData().getType();
+    		}
+    		inspectables.add(object);
+    		inspectablesTypes.add(type);
+    	}
+
+    	types = new Vector(new HashSet(inspectablesTypes));
+    	instances = new Vector();
+    	
+    	enumeration = types.elements();
+    	while (enumeration.hasMoreElements()) {
+    		enumeration.nextElement();
+    		instances.add(new Vector());
+    	}
+    		
+    	enumeration = inspectables.elements();
+    	Enumeration typesEnumer = inspectablesTypes.elements();
+    	while (enumeration.hasMoreElements() && typesEnumer.hasMoreElements()) {
+    		inspectable = (Inspectable)enumeration.nextElement();
+    		type = (String)typesEnumer.nextElement();
+
+    		((Vector)instances.get(types.indexOf(type))).add(inspectable);
+    	}
+    	
+    	typesEnumer = instances.elements();
+    	while (typesEnumer.hasMoreElements()) {
+
+    		enumeration = ((Vector)typesEnumer.nextElement()).elements();
+        	while (enumeration.hasMoreElements()) {
+        		object = enumeration.nextElement().toString();
+        		Console.getInstance().println(object.toString());
+        	}
+    		Console.getInstance().println();
+    	}
+	}
+    
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        new SpreadsheetInspector(new javax.swing.JFrame(), true).setVisible(true);
     }
 }

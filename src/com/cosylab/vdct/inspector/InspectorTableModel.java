@@ -33,7 +33,8 @@ package com.cosylab.vdct.inspector;
  * Creation date: (6.1.2001 23:29:20)
  * @author Matej Sekoranja
  */
-public class InspectorTableModel extends javax.swing.table.AbstractTableModel {
+public class InspectorTableModel extends javax.swing.table.AbstractTableModel
+        implements PropertyTableModel {
 	private InspectableProperty[] data = null;
 	private Inspectable dataObject = null;
 	private InspectorInterface inspector = null;
@@ -73,7 +74,7 @@ public Inspectable getDataObject() {
  * @return com.cosylab.vdct.inspector.InspectableProperty
  * @param row int
  */
-public InspectableProperty getPropertyAt(int row) {
+public InspectableProperty getPropertyAt(int row, int column) {
 	return data[row];
 }
 /**

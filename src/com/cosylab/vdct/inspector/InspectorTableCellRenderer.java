@@ -47,7 +47,7 @@ public class InspectorTableCellRenderer extends DefaultTableCellRenderer {
 	private Color separatorfgColor = Color.white;
 	private Color invalidColor = Color.red;
 	private Color undefinedVisibility = new Color(128, 128, 128);
-	private InspectorTableModel tableModel;
+	private PropertyTableModel tableModel;
 	
 	private ImageIcon blankIcon = null;
 	private ImageIcon eyeIcon = null;
@@ -56,7 +56,7 @@ public class InspectorTableCellRenderer extends DefaultTableCellRenderer {
 /**
  * InspectorTableCellRenderer constructor comment.
  */
-public InspectorTableCellRenderer(JTable table, InspectorTableModel tableModel) {
+public InspectorTableCellRenderer(JTable table, PropertyTableModel tableModel) {
 	super();
 	this.tableModel=tableModel;
 	bgColor = table.getBackground();
@@ -97,11 +97,11 @@ public Component getTableCellRendererComponent(JTable table, Object value, boole
 	String str = null;
 	if (value!=null)
 		str = value.toString();
-	InspectableProperty property = tableModel.getPropertyAt(row);
+	InspectableProperty property = tableModel.getPropertyAt(row, column);
 
 	setIcon(null);
 	
-	if (tableModel.getPropertyAt(row).isSepatator()) {
+	if (tableModel.getPropertyAt(row, column).isSepatator()) {
 		super.setHorizontalAlignment(JLabel.CENTER);
 		super.setBackground(separatorbgColor);
 		super.setForeground(separatorfgColor);

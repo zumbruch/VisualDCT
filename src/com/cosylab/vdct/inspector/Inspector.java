@@ -28,18 +28,35 @@ package com.cosylab.vdct.inspector;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.util.*;
-import javax.swing.*;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowListener;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.Vector;
+
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.TableModelEvent;
-import javax.swing.table.*;
-
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-import java.awt.event.*;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableColumn;
 
 import com.cosylab.vdct.Console;
 import com.cosylab.vdct.graphics.DrawingSurface;
@@ -186,7 +203,8 @@ private javax.swing.JLabel getCommentLabel() {
 private CommentTextArea getCommentTextArea() {
 	if (ivjCommentTextArea == null) {
 		try {
-			ivjCommentTextArea = new com.cosylab.vdct.inspector.CommentTextArea();
+			ivjCommentTextArea =
+				new CommentTextArea(InspectorManager.getInstance());
 			ivjCommentTextArea.setName("CommentTextArea");
 			//ivjCommentTextArea.setBorder(new javax.swing.border.EtchedBorder());
 			// user code begin {1}
@@ -488,7 +506,9 @@ private javax.swing.JTable getScrollPaneTable() {
 			ivjScrollPaneTable.setModel(tableModel);
 			ivjScrollPaneTable.setTableHeader(null);
 			ivjScrollPaneTable.setDefaultRenderer(String.class, new InspectorTableCellRenderer(ivjScrollPaneTable, tableModel));
-			ivjScrollPaneTable.setDefaultEditor(String.class, new InspectorCellEditor(tableModel));
+			ivjScrollPaneTable.setDefaultEditor(String.class,
+				new InspectorCellEditor(tableModel,
+				InspectorManager.getInstance()));
 
 			ivjScrollPaneTable.addMouseListener(new MouseAdapter() {
 				public void mouseReleased(MouseEvent evt) {
@@ -878,7 +898,7 @@ private void mouseEvent(MouseEvent event, int row, int col)
 	boolean popupTrigger = event.getButton() == MouseEvent.BUTTON3;
 	// event.isPopupTrigger() does not work on my instalation of Linux (RH7.2, GNOME 1.4) 
 	
-	InspectableProperty property = (InspectableProperty)tableModel.getPropertyAt(row);
+	InspectableProperty property = (InspectableProperty)tableModel.getPropertyAt(row, col);
 
 	// change visibility
 	if (col==0)

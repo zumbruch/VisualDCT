@@ -47,7 +47,7 @@ public class InspectorCellEditor implements TableCellEditor, TreeCellEditor {
 
 	// intelli editor
 	protected boolean intelliEditor = false;
-	protected InspectorTableModel tableModel;
+	protected PropertyTableModel tableModel;
 
 	protected JComboBox intelliComboBox;
 	protected EditorDelegate comboDelegate;
@@ -64,6 +64,8 @@ public class InspectorCellEditor implements TableCellEditor, TreeCellEditor {
 	protected JComponent editorComponent;
 	protected EditorDelegate delegate;
 	protected int clickCountToStart = 1;
+	
+	protected HelpDisplayer helpDisplayer = null;
 
 	protected class EditorDelegate implements ActionListener, ItemListener {
 
@@ -119,9 +121,12 @@ public class InspectorCellEditor implements TableCellEditor, TreeCellEditor {
  * Insert the method's description here.
  * Creation date: (10.1.2001 16:03:29)
  */
-public InspectorCellEditor(InspectorTableModel tableModel) {
+public InspectorCellEditor(PropertyTableModel tableModel,
+		HelpDisplayer helpDisplayer) {
+	
 	intelliEditor = true;
-	this.tableModel=tableModel;
+	this.tableModel = tableModel;
+	this.helpDisplayer = helpDisplayer;
 
 	// create all components
 	// combo box
@@ -340,7 +345,8 @@ public InspectorCellEditor(InspectorTableModel tableModel) {
 	// implements javax.swing.CellEditor
 	public void cancelCellEditing() {
 		fireEditingCanceled();
-		InspectorManager.getInstance().getActiveInspector().setHelp("");
+		helpDisplayer.displayHelp("");
+		//InspectorManager.getInstance().getActiveInspector().setHelp("");
 	}
 	/*
 	 * Notify all listeners that have registered interest for
@@ -442,7 +448,7 @@ public InspectorCellEditor(InspectorTableModel tableModel) {
  * @param column int
  */
 private void setAppropriateComponent4Table(JTable table, int row, int column) {
-	InspectableProperty property = tableModel.getPropertyAt(row);
+	InspectableProperty property = tableModel.getPropertyAt(row, column);
 	String[] choices = property.getSelectableValues();
 	
 	if (choices!=null) {
@@ -491,7 +497,8 @@ private void setAppropriateComponent4Table(JTable table, int row, int column) {
 			}
 	}
 
-	InspectorManager.getInstance().getActiveInspector().setHelp(property.getHelp());
+	helpDisplayer.displayHelp(property.getHelp());
+	//InspectorManager.getInstance().getActiveInspector().setHelp(property.getHelp());
 	editorComponent.setFont(table.getFont());
 }
 	/**
@@ -510,7 +517,8 @@ private void setAppropriateComponent4Table(JTable table, int row, int column) {
 	// implements javax.swing.CellEditor
 	public boolean stopCellEditing() {
 		fireEditingStopped();
-		InspectorManager.getInstance().getActiveInspector().setHelp("");
+		helpDisplayer.displayHelp("");
+		//InspectorManager.getInstance().getActiveInspector().setHelp("");
 		return true;
 	}
 }
