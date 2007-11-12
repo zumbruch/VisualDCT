@@ -36,20 +36,20 @@ import com.cosylab.vdct.plugin.debug.PluginDebugManager;
 public class SpreadsheetTableModel extends AbstractTableModel
         implements PropertyTableModel {
 	
-	private Vector inspectables = null;
-	private int propertiesCount = 0;
-	private Inspectable firstRow = null;
+	private InspectableProperty[][] fields = null;
 	
-	public SpreadsheetTableModel(Vector inspectables)
+	public SpreadsheetTableModel(Vector inspectData)
 	        throws IllegalArgumentException {
 
-  		if (inspectables == null || inspectables.size() == 0) {
+  		if (inspectData == null || inspectData.size() == 0) {
   			throw new IllegalArgumentException(
   					"inspectables must not be empty or null");
   		}
-		this.inspectables = inspectables;
-  		firstRow = (Inspectable)inspectables.elementAt(0);
-    	propertiesCount = firstRow.getProperties(0).length;
+        int size = inspectData.size();
+    	fields = new InspectableProperty[size][];
+		for (int i = 0; i < size; i++) {
+			fields[i] = ((Inspectable)inspectData.elementAt(i)).getProperties(-1);
+		}
 	}
 
 	public Class getColumnClass(int column) {
@@ -57,34 +57,34 @@ public class SpreadsheetTableModel extends AbstractTableModel
 	}
 
 	public String getColumnName(int column) {
-		return firstRow.getProperties(0)[column].getName();
+		return getPropertyAt(0, column).getName();
 	}
 
 	public int getColumnCount() {
-		return propertiesCount;
+		return fields[0].length;
 	}
 
 	public int getRowCount() {
-		return inspectables.size();
+		return fields.length;
 	}
 	
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		Inspectable inspectable = (Inspectable)inspectables.elementAt(rowIndex);
-		return inspectable.getProperties(0)[columnIndex].getValue();
+		return fields[rowIndex][columnIndex].getValue();
 	}
 
 	public void setValueAt(Object aValue, int row, int column) {
-		Inspectable inspectable = (Inspectable)inspectables.elementAt(row);
-		inspectable.getProperties(0)[column].setValue(aValue.toString());
+		fields[row][column].setValue(aValue.toString());
 	}
 	
 	public boolean isCellEditable(int rowIndex, int columnIndex) {
 		// no editing in debug
-		return !PluginDebugManager.isDebugState();
+		if (PluginDebugManager.isDebugState()) {
+			return false;
+		}
+		return fields[rowIndex][columnIndex].isEditable();
 	}
 
 	public InspectableProperty getPropertyAt(int row, int column) {
-		Inspectable inspectable = (Inspectable)inspectables.elementAt(row);
-		return inspectable.getProperties(0)[column];
+		return fields[row][column];
 	}
 }

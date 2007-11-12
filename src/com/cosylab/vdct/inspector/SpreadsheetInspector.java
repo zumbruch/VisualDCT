@@ -27,12 +27,16 @@
  */
 package com.cosylab.vdct.inspector;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Vector;
 
+import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
@@ -54,7 +58,6 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer {
 	private Vector types = null;	
 	private Vector instances = null;	
 
-    /** Creates new form SettingsDialog */
     public SpreadsheetInspector(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
 
@@ -96,7 +99,25 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer {
             tabbedPane.addTab(type, scrollPane);
     	}
 
-        getContentPane().add(tabbedPane, java.awt.BorderLayout.CENTER);
+    	JButton button = new JButton(); 
+    	button.setMnemonic('O');
+    	button.setText("OK");
+    	button.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                dispose();
+            }
+        });
+        //tabbedPane.setPreferredSize(new Dimension(800, 480));
+
+    	
+    	JPanel panel = new JPanel();
+    	panel.setLayout(new BorderLayout());
+    	panel.add(tabbedPane, BorderLayout.NORTH);
+    	panel.add(button, BorderLayout.SOUTH);
+    	
+        getContentPane().add(panel, java.awt.BorderLayout.CENTER);
+
+        //setPreferredSize(new Dimension(800, 480));
         pack();
     }
 
@@ -144,32 +165,27 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer {
     
 	private void loadData() {
 		Console.getInstance().print("displaying:");
-		
-    	Vector candidates = ViewState.getInstance().getSelectedObjects();
-    	if (candidates.size() == 0) {
+	
+		Vector candidates = ViewState.getInstance().getSelectedObjects();
+		Vector inspectables = getSpreadsheetData(candidates);
+    	if (inspectables.size() == 0) {
     		candidates = DataProvider.getInstance().getInspectable(); 
+    		inspectables = getSpreadsheetData(candidates);
     	}
     	
     	/* Store the types in vector and instances in a vector of vectors. This
     	 * implementation uses n^2 time since the number of types is expected to
     	 * be small.
     	 */
-    	Enumeration enumeration = candidates.elements();
-    	Vector inspectables = new Vector();
+    	Enumeration enumeration = inspectables.elements();
     	Vector inspectablesTypes = new Vector();
     	
-    	Object object = null;
     	Inspectable inspectable = null;
     	String type = null;
     	Record record = null;
     	Template template = null;
     	while (enumeration.hasMoreElements()) {
-    		object = enumeration.nextElement();
-    		if (!(object instanceof Inspectable)) {
-    			continue;
-    		}
-    		inspectable = (Inspectable)object;
-    		
+    		inspectable = (Inspectable)enumeration.nextElement();
     		if (inspectable instanceof Template) {
     			template = (Template)inspectable;
     			type = template.getTemplateData().getTemplate().getId();
@@ -177,7 +193,6 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer {
     			record = (Record)inspectable;
     			type = record.getRecordData().getType();
     		}
-    		inspectables.add(object);
     		inspectablesTypes.add(type);
     	}
 
@@ -199,6 +214,7 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer {
     		((Vector)instances.get(types.indexOf(type))).add(inspectable);
     	}
     	
+    	Object object = null;
     	typesEnumer = instances.elements();
     	while (typesEnumer.hasMoreElements()) {
 
@@ -210,7 +226,28 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer {
     		Console.getInstance().println();
     	}
 	}
-    
+
+	private Vector getSpreadsheetData(Vector candidates) {
+
+		Enumeration enumeration = candidates.elements();
+    	Vector data = new Vector();
+    	
+    	Object object = null;
+    	Inspectable inspectable = null;
+    	while (enumeration.hasMoreElements()) {
+    		object = enumeration.nextElement();
+    		if (!(object instanceof Inspectable)) {
+    			continue;
+    		}
+    		inspectable = (Inspectable)object;
+    		
+    		if (inspectable instanceof Template || inspectable instanceof Record) {
+        		data.add(object);
+    		}
+    	}
+    	return data;
+	}
+
     /**
      * @param args the command line arguments
      */

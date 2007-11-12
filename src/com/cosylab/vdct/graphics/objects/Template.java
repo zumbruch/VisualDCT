@@ -28,20 +28,28 @@ package com.cosylab.vdct.graphics.objects;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.*;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Stack;
 import java.util.Vector;
-import java.util.Map;
-import java.util.Enumeration;
-import java.util.ArrayList;
-import java.util.Iterator;
 
-import javax.swing.*;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 
 import com.cosylab.vdct.Console;
 import com.cosylab.vdct.Constants;
@@ -57,9 +65,27 @@ import com.cosylab.vdct.graphics.popup.Popupable;
 import com.cosylab.vdct.inspector.Inspectable;
 import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.inspector.InspectorManager;
-import com.cosylab.vdct.undo.*;
+import com.cosylab.vdct.inspector.NameProperty;
+import com.cosylab.vdct.undo.ChangeTemplatePropertyAction;
+import com.cosylab.vdct.undo.CreateTemplatePropertyAction;
+import com.cosylab.vdct.undo.DeleteTemplatePropertyAction;
 import com.cosylab.vdct.util.StringUtils;
-import com.cosylab.vdct.vdb.*;
+import com.cosylab.vdct.vdb.CommentProperty;
+import com.cosylab.vdct.vdb.GUIHeader;
+import com.cosylab.vdct.vdb.GUISeparator;
+import com.cosylab.vdct.vdb.LinkProperties;
+import com.cosylab.vdct.vdb.MonitoredActionProperty;
+import com.cosylab.vdct.vdb.MonitoredProperty;
+import com.cosylab.vdct.vdb.MonitoredPropertyListener;
+import com.cosylab.vdct.vdb.NameValueInfoProperty;
+import com.cosylab.vdct.vdb.VDBData;
+import com.cosylab.vdct.vdb.VDBFieldData;
+import com.cosylab.vdct.vdb.VDBMacro;
+import com.cosylab.vdct.vdb.VDBPort;
+import com.cosylab.vdct.vdb.VDBTemplate;
+import com.cosylab.vdct.vdb.VDBTemplateInstance;
+import com.cosylab.vdct.vdb.VDBTemplateMacro;
+import com.cosylab.vdct.vdb.VDBTemplatePort;
 
 /**
  * Graphical representation of templates.
@@ -543,9 +569,58 @@ public class Template
 	/**
 	 * @see com.cosylab.vdct.inspector.Inspectable#getProperties(int)
 	 */
-	public InspectableProperty[] getProperties(int mode)
-	{
+	public InspectableProperty[] getProperties(int mode) {
+
 		Vector items = new Vector();
+		
+		// TODO: mode definitions in Inspectable interface 
+		if (mode == -1) {
+			items.addElement(new NameProperty("Name", this));
+			items.addElement(new NameValueInfoProperty("Template", templateData.getTemplate().getId()));
+			items.addElement(new NameValueInfoProperty("FileName", templateData.getTemplate().getFileName()));
+			
+			final String descriptionString = "Description";
+			
+			Object obj = null;
+			Enumeration e = subObjectsV.elements();
+			while (e.hasMoreElements())
+			{
+				obj = e.nextElement();
+				if (obj instanceof TemplateEPICSMacro)
+				{
+					TemplateEPICSMacro tem = (TemplateEPICSMacro)obj;
+					items.addElement(tem.getFieldData());
+					items.addElement(new NameValueInfoProperty(descriptionString, tem.getDescription()));
+				}
+			}
+
+			e = subObjectsV.elements();
+			while (e.hasMoreElements())
+			{
+				obj = e.nextElement();
+				if (obj instanceof TemplateEPICSPort)
+				{
+					TemplateEPICSPort tep = (TemplateEPICSPort)obj;
+					items.addElement(tep.getFieldData());
+					items.addElement(new NameValueInfoProperty(descriptionString, tep.getDescription()));
+				}
+			}
+
+
+	  		java.util.Iterator i = templateData.getPropertiesV().iterator();
+			while (i.hasNext())
+			{
+				String name = i.next().toString();
+				// if not already added above as macro
+				if (getSubObject(name)==null)
+				items.addElement(new MonitoredProperty(name, (String)templateData.getProperties().get(name), this));
+			}
+
+			InspectableProperty[] properties = new InspectableProperty[items.size()];
+			items.copyInto(properties);
+			return properties;
+		}
+		
 		items.addElement(GUIHeader.getDefaultHeader());
 
 		items.addElement(getTemplateSeparator());

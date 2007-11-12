@@ -498,7 +498,6 @@ private void setAppropriateComponent4Table(JTable table, int row, int column) {
 	}
 
 	helpDisplayer.displayHelp(property.getHelp());
-	//InspectorManager.getInstance().getActiveInspector().setHelp(property.getHelp());
 	editorComponent.setFont(table.getFont());
 }
 	/**
@@ -518,7 +517,6 @@ private void setAppropriateComponent4Table(JTable table, int row, int column) {
 	public boolean stopCellEditing() {
 		fireEditingStopped();
 		helpDisplayer.displayHelp("");
-		//InspectorManager.getInstance().getActiveInspector().setHelp("");
 		return true;
 	}
 }

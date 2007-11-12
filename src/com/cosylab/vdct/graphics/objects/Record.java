@@ -915,8 +915,7 @@ public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode) 
 	// to fix DBD which do not have prompt group set for VAL field 
 	final String VAL_NAME = "VAL";
 	
-	if (mode == GUI_GROUP_ORDER)
-	{
+	if (mode == GUI_GROUP_ORDER) {
 		int size = 0;
 		VDBFieldData field;	Integer key;
 		Hashtable groups = new Hashtable();
@@ -959,9 +958,8 @@ public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode) 
 		InspectableProperty[] properties = new InspectableProperty[all.size()];
 		all.copyInto(properties);
 		return properties;
-	}
-	else if ((mode == SORT_ORDER) ||
-	 		  (mode == DBD_ORDER)) {
+
+	} else if ((mode == SORT_ORDER) || (mode == DBD_ORDER)) {
 
 		VDBFieldData field;
 		Vector all = new Vector();
@@ -1003,9 +1001,30 @@ public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode) 
 				new com.cosylab.vdct.util.StringQuickSort().sort(properties, 2, properties.length-1);
 	
 		return properties;
+
+	} else if (mode == -1) {
+
+		Vector all = new Vector();
+		all.addElement(new NameProperty("Name", this));
+	
+		VDBFieldData field = null;
+	    DBDFieldData dbdField = null;
+	 	Enumeration e = ((DBDRecordData)DataProvider.getInstance().getDbdDB()
+	 			.getDBDRecordData(recordData.getType())).getFieldsV().elements();
+		while (e.hasMoreElements()) {
+			dbdField = (DBDFieldData)e.nextElement();
+			field = (VDBFieldData)recordData.getField(dbdField.getName());
+			if ((field.getGUI_type() != DBDConstants.GUI_UNDEFINED) ||
+			        field.getName().equals(VAL_NAME)) {
+			    all.addElement(field);
+			}
+		}
+		InspectableProperty[] properties = new InspectableProperty[all.size()];
+		all.copyInto(properties);
+		return properties;
+		
 	}
-	else
-		return null;
+	return null;
 }
 
 /**
