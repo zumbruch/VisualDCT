@@ -108,11 +108,13 @@ public class InspectorCellEditor implements TableCellEditor, TreeCellEditor {
 
 		// Implementing ActionListener interface
 		public void actionPerformed(ActionEvent e) {
+			helpDisplayer.displayHelp("");
 			fireEditingStopped();
 		}
 
 		// Implementing ItemListener interface
 		public void itemStateChanged(ItemEvent e) {
+			helpDisplayer.displayHelp("");
 			fireEditingStopped();
 		}
 	}
@@ -346,7 +348,6 @@ public InspectorCellEditor(PropertyTableModel tableModel,
 	public void cancelCellEditing() {
 		fireEditingCanceled();
 		helpDisplayer.displayHelp("");
-		//InspectorManager.getInstance().getActiveInspector().setHelp("");
 	}
 	/*
 	 * Notify all listeners that have registered interest for
@@ -519,4 +520,5 @@ private void setAppropriateComponent4Table(JTable table, int row, int column) {
 		helpDisplayer.displayHelp("");
 		return true;
 	}
+	
 }

@@ -27,21 +27,28 @@
  */
 package com.cosylab.vdct.inspector;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.table.TableCellEditor;
 
-import com.cosylab.vdct.Console;
 import com.cosylab.vdct.DataProvider;
 import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.graphics.objects.Record;
@@ -51,14 +58,17 @@ import com.cosylab.vdct.graphics.objects.Template;
  * @author ssah
  *
  */
-public class SpreadsheetInspector extends JDialog implements HelpDisplayer {
+public class SpreadsheetInspector extends JDialog
+        implements HelpDisplayer, ChangeListener {
 
     private JTabbedPane tabbedPane;
 	
 	private Vector types = null;	
-	private Vector instances = null;	
+	private Vector instances = null;
+	private JTable[] tables = null;
+	private JLabel helpLabel = null; 
 
-    public SpreadsheetInspector(java.awt.Frame parent, boolean modal) {
+	public SpreadsheetInspector(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
 
 		loadData();
@@ -66,68 +76,94 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer {
     }
 
     public void displayHelp(String text) {
-		// TODO: convert this to display help in a label 
-    	Console.getInstance().println(text);
+    	helpLabel.setText(text);
     }
     
 	/** This method is called from within the constructor to
      * initialize the form.
      */
     private void createGUI() {
-
-        setTitle("Spreadsheet");
-
-        tabbedPane = new javax.swing.JTabbedPane();
-
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        
-        tabbedPane.setTabLayoutPolicy(javax.swing.JTabbedPane.SCROLL_TAB_LAYOUT);
-        tabbedPane.setAutoscrolls(true);
-
-    	Enumeration typesEn = types.elements();
-    	Enumeration instancesEn = instances.elements();
-    	String type = null;
-    	Vector vector = null;
     	
-    	while (typesEn.hasMoreElements() && instancesEn.hasMoreElements()) {
-    		type = (String)typesEn.nextElement();
-    		vector = (Vector)instancesEn.nextElement();
-
-    		SpreadsheetTableModel tableModel = new SpreadsheetTableModel(vector);
-        	JTable table = getTable(tableModel);
-            JScrollPane scrollPane = new JScrollPane(table);
-            tabbedPane.addTab(type, scrollPane);
-    	}
-
+     	createTabbedPane();
     	JButton button = new JButton(); 
     	button.setMnemonic('O');
     	button.setText("OK");
     	button.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
+            	closeEditors();
                 dispose();
             }
         });
-        //tabbedPane.setPreferredSize(new Dimension(800, 480));
 
-    	
-    	JPanel panel = new JPanel();
-    	panel.setLayout(new BorderLayout());
-    	panel.add(tabbedPane, BorderLayout.NORTH);
-    	panel.add(button, BorderLayout.SOUTH);
-    	
-        getContentPane().add(panel, java.awt.BorderLayout.CENTER);
+		helpLabel = new JLabel();
+		helpLabel.setHorizontalAlignment(SwingConstants.LEFT);
+		helpLabel.setHorizontalTextPosition(SwingConstants.CENTER);
+        if (types.size() == 0) {
+        	helpLabel.setText("No objects to display.");
+        }
 
-        //setPreferredSize(new Dimension(800, 480));
-        pack();
+		
+    	JPanel panel = new JPanel(new GridBagLayout());
+
+		GridBagConstraints constraints = new GridBagConstraints();
+		constraints.gridwidth = 2;
+		constraints.weightx = 1.0;
+		constraints.weighty = 1.0;
+		constraints.fill = GridBagConstraints.BOTH;
+		constraints.insets = new Insets(4, 4, 4, 4);
+		panel.add(tabbedPane, constraints);
+
+		constraints = new GridBagConstraints();
+		constraints.gridy = 1;
+		constraints.weightx = 1.0;
+		constraints.insets = new Insets(0, 4, 4, 4);
+		panel.add(helpLabel, constraints);
+
+		constraints = new GridBagConstraints();
+		constraints.gridx = 1;
+		constraints.gridy = 1;
+		constraints.insets = new Insets(0, 0, 4, 4);
+		panel.add(button, constraints);
+
+		setTitle("Spreadsheet");
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		getContentPane().add(panel);
+		pack();
     }
 
+    private void createTabbedPane() {
+        tabbedPane = new JTabbedPane();
+
+    	tables = new JTable[types.size()];
+        Enumeration typesEn = types.elements();
+    	Enumeration instancesEn = instances.elements();
+    	String type = null;
+    	Vector vector = null;
+    	int i = 0;
+    	
+    	while (typesEn.hasMoreElements() && instancesEn.hasMoreElements()) {
+    		type = (String)typesEn.nextElement();
+    		vector = (Vector)instancesEn.nextElement();
+    		SpreadsheetTableModel tableModel = new SpreadsheetTableModel(vector);
+        	tables[i] = getTable(tableModel);
+            JScrollPane scrollPane = new JScrollPane(tables[i]);
+            tabbedPane.addTab(type, scrollPane);
+            i++;
+    	}
+
+        tabbedPane.setTabLayoutPolicy(javax.swing.JTabbedPane.SCROLL_TAB_LAYOUT);
+        tabbedPane.setAutoscrolls(true);
+        tabbedPane.addChangeListener(this);
+        tabbedPane.setPreferredSize(new Dimension(1000, 600));
+    }
+    
     private JTable getTable(SpreadsheetTableModel tableModel) {
 
     	JTable table = new javax.swing.JTable(tableModel);
     	table.setName("ScrollPaneTable");
     	
     	table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-    	table.setBackground(new Color(204,204,204));
+    	table.setBackground(new Color(204, 204, 204));
     	table.setShowVerticalLines(true);
     	table.setGridColor(Color.black);
     	table.setBounds(0, 0, 200, 200);
@@ -137,7 +173,6 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer {
     	// enable clipboard actions
     	new InspectorTableClipboardAdapter(table);
     	table.setRowSelectionAllowed(true);
-    	// note: selection is possible only on name column
     	table.setColumnSelectionAllowed(false);
 
     	table.setDefaultRenderer(String.class, new InspectorTableCellRenderer(
@@ -145,26 +180,27 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer {
     	table.setDefaultEditor(String.class,
     		new InspectorCellEditor(tableModel, this));
 
-    	// not yet known why necessary
-    	/*
-    	table.addMouseListener(new MouseAdapter() {
-    		public void mouseReleased(MouseEvent evt) {
-    			java.awt.Point pnt = evt.getPoint();
-    			int popupAtRow = table.rowAtPoint(pnt);
-    			int popupAtCol = -1;
-    			if ((popupAtRow != -1) && 
-    					((popupAtCol=table.columnAtPoint(pnt)) != -1)) {
-    				mouseEvent(evt, popupAtRow, popupAtCol); 
-    			}
-    		}
-    	});
-    	*/
-
     	return table;
+    }
+
+    /* Saves the content of open cells when tabs are changed.
+    */
+    public void stateChanged(ChangeEvent event) {
+    	closeEditors();
+    } 
+
+    private void closeEditors() {
+    	for (int i = 0; i < tables.length; i++) {
+
+    		TableCellEditor editor = tables[i].getCellEditor();
+    		if (editor != null) {
+    			editor.stopCellEditing();
+    			tables[i].editingStopped(null);
+    		}
+    	}
     }
     
 	private void loadData() {
-		Console.getInstance().print("displaying:");
 	
 		Vector candidates = ViewState.getInstance().getSelectedObjects();
 		Vector inspectables = getSpreadsheetData(candidates);
@@ -212,18 +248,6 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer {
     		type = (String)typesEnumer.nextElement();
 
     		((Vector)instances.get(types.indexOf(type))).add(inspectable);
-    	}
-    	
-    	Object object = null;
-    	typesEnumer = instances.elements();
-    	while (typesEnumer.hasMoreElements()) {
-
-    		enumeration = ((Vector)typesEnumer.nextElement()).elements();
-        	while (enumeration.hasMoreElements()) {
-        		object = enumeration.nextElement().toString();
-        		Console.getInstance().println(object.toString());
-        	}
-    		Console.getInstance().println();
     	}
 	}
 

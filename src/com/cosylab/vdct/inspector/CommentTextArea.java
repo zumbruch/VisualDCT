@@ -50,7 +50,6 @@ public CommentTextArea(HelpDisplayer helpDisplayer) {
 	 */
 public void focusGained(java.awt.event.FocusEvent e) {
 	helpDisplayer.displayHelp(property.getHelp());
-	//InspectorManager.getInstance().getActiveInspector().setHelp(property.getHelp());
 }
 	/**
 	 * Invoked when a component loses the keyboard focus.
@@ -58,7 +57,6 @@ public void focusGained(java.awt.event.FocusEvent e) {
 public void focusLost(java.awt.event.FocusEvent e) {
 	property.setValue(getText());
 	helpDisplayer.displayHelp("");
-	//InspectorManager.getInstance().getActiveInspector().setHelp("");
 }
 /**
  * Insert the method's description here.
