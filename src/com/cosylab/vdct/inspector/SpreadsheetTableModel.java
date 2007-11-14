@@ -74,6 +74,7 @@ public class SpreadsheetTableModel extends AbstractTableModel
 
 	public void setValueAt(Object aValue, int row, int column) {
 		fields[row][column].setValue(aValue.toString());
+		fireTableCellUpdated(row, column);
 	}
 	
 	public boolean isCellEditable(int rowIndex, int columnIndex) {

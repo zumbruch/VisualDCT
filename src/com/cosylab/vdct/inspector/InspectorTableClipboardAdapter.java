@@ -34,12 +34,12 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.util.StringTokenizer;
 
 import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 
+import com.cosylab.vdct.Console;
 import com.cosylab.vdct.undo.UndoManager;
 
 /**
@@ -66,7 +66,15 @@ public class InspectorTableClipboardAdapter implements ActionListener {
      * Managed table.
      */
     private JTable table;
-
+    
+    /**
+     * Stored selection data.
+     */
+    private int numOfSelRows = 0; 
+    private int numOfSelCols = 0; 
+    private int[] selRows = null; 
+    private int[] selCols = null; 
+        
     /**
      * Cut action keystroke.
      */ 
@@ -86,6 +94,12 @@ public class InspectorTableClipboardAdapter implements ActionListener {
         KeyStroke.getKeyStroke(KeyEvent.VK_V, ActionEvent.CTRL_MASK, false);
 
     /**
+     * Paste action keystroke.
+     */ 
+    private static final KeyStroke DEL_KEYSTROKE =
+        KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0, false);
+    
+    /**
      * Cut action name.
      */
     private static final String CUT_ACTION_NAME = "Cut";
@@ -101,6 +115,13 @@ public class InspectorTableClipboardAdapter implements ActionListener {
     private static final String PASTE_ACTION_NAME = "Paste";
 
     /**
+     * Delete action name.
+     */
+    private static final String DEL_ACTION_NAME = "Delete";
+
+    private static final String EMPTY_STRING = "";
+    
+    /**
      * The adapter is constructed with a JTable on which it enables
      * Cut-Copy-Paste and acts as a clipboard listener.
      * @param table table on which to enable to Cut-Copy-Paste actions.
@@ -108,10 +129,12 @@ public class InspectorTableClipboardAdapter implements ActionListener {
     public InspectorTableClipboardAdapter(JTable table) {
         this.table = table;
         
-        // register to the table 
-        table.registerKeyboardAction(this, CUT_ACTION_NAME, CUT_KEYSTROKE, JComponent.WHEN_FOCUSED);
-        table.registerKeyboardAction(this, COPY_ACTION_NAME, COPY_KEYSTROKE, JComponent.WHEN_FOCUSED);
-        table.registerKeyboardAction(this, PASTE_ACTION_NAME, PASTE_KEYSTROKE, JComponent.WHEN_FOCUSED);
+        // register to the table
+        int c = JComponent.WHEN_FOCUSED;
+        table.registerKeyboardAction(this, CUT_ACTION_NAME, CUT_KEYSTROKE, c);
+        table.registerKeyboardAction(this, COPY_ACTION_NAME, COPY_KEYSTROKE, c);
+        table.registerKeyboardAction(this, PASTE_ACTION_NAME, PASTE_KEYSTROKE, c);
+        table.registerKeyboardAction(this, DEL_ACTION_NAME, DEL_KEYSTROKE, c);
         
         // cache clipboard system
         clipboardSystem = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -132,12 +155,38 @@ public class InspectorTableClipboardAdapter implements ActionListener {
      */
     public void actionPerformed(ActionEvent e)
     {
-        if (e.getActionCommand().equals(CUT_ACTION_NAME))
+        if (e.getActionCommand().equals(CUT_ACTION_NAME)) {
             performCopy(true);
-        else if (e.getActionCommand().equals(COPY_ACTION_NAME))
+        } else if (e.getActionCommand().equals(COPY_ACTION_NAME)) {
             performCopy(false);
-        else if (e.getActionCommand().equals(PASTE_ACTION_NAME))
+        } else if (e.getActionCommand().equals(PASTE_ACTION_NAME)) {
             performPaste();
+        } else if (e.getActionCommand().equals(DEL_ACTION_NAME)) {
+            performDelete();
+        }
+    }
+    
+    private void refreshSelectionData() {
+    	numOfSelRows = table.getSelectedRowCount(); 
+        selRows = table.getSelectedRows();
+        numOfSelCols = table.getSelectedColumnCount();
+        selCols = table.getSelectedColumns();
+
+    	// converts all types of selections to intersection description
+    	if (!table.getRowSelectionAllowed() && numOfSelCols > 0) {
+    		numOfSelRows = table.getRowCount();
+            selRows = new int[numOfSelRows];
+            for (int i = 0; i < numOfSelRows; i++) {
+            	selRows[i] = i;
+            }
+    	}
+    	if (!table.getColumnSelectionAllowed() && numOfSelRows > 0) {
+    		numOfSelCols = table.getColumnCount();
+            selCols = new int[numOfSelCols];
+            for (int i = 0; i < numOfSelCols; i++) {
+            	selCols[i] = i;
+            }
+    	}
     }
 
     /**
@@ -146,26 +195,28 @@ public class InspectorTableClipboardAdapter implements ActionListener {
      */
     private void performCopy(boolean cut)
     {
-        final String EMPTY_STRING = "";
+        refreshSelectionData();
         
-        // check to ensure we have selected only a contiguous block of cells
-        int numRows = table.getSelectedRowCount();
-        int[] rowsSelected = table.getSelectedRows();
-        
-        // noop check
-        if (numRows == 0)
-            return;
-        
-        // inspector case
-        //int numCols = table.getSelectedColumnCount();
-        //int[] colsSelected = table.getSelectedColumns();
-        int numCols = 2;
-        int[] colsSelected = new int[] { 1, 2 };
-        
-        // noop check
-        if (numCols == 0)
-            return;
+        Console.getInstance().println(numOfSelRows + " " + numOfSelCols);
+        for (int i = 0; i < numOfSelRows; i++) {
+            Console.getInstance().print(selRows[i] + " ");
+        }
+        Console.getInstance().println();
+        for (int i = 0; i < numOfSelCols; i++) {
+            Console.getInstance().print(selCols[i] + " ");
+        }
+        Console.getInstance().println();
 
+        // noop check
+        if (numOfSelRows == 0 || numOfSelCols == 0) {
+            return;
+        }
+        
+        // old: inspector
+        //int numCols = 2;
+        //int[] colsSelected = new int[] { 1, 2 };
+
+        // check to ensure we have selected only a contiguous block of cells
         /*
         boolean contiguousRows = 
             (numRows-1) == (rowsSelected[rowsSelected.length - 1] - rowsSelected[0])
@@ -185,25 +236,30 @@ public class InspectorTableClipboardAdapter implements ActionListener {
         }
         */
         
+        
+        boolean cutPerformed = false;
+        
         // undo support (to pack all into one action)
-    	try
-    	{
-    	    if (cut)
-    			UndoManager.getInstance().startMacroAction();
-
+    	try {
             StringBuffer sbf = new StringBuffer();
             
     	    // construct string
-            for (int i = 0; i < numRows; i++)
-            {
-                for (int j = 0; j < numCols; j++)
-                {
-                    sbf.append(table.getValueAt(rowsSelected[i], colsSelected[j]));
-                    if (j < numCols - 1)
+            for (int i = 0; i < numOfSelRows; i++) {
+                for (int j = 0; j < numOfSelCols; j++) {
+                	int row = selRows[i];
+                	int col = selCols[j];
+                    sbf.append(table.getValueAt(row, col));
+                    if (j < numOfSelCols - 1) {
                         sbf.append("\t");
-                    // inspector case
-                    if (cut && colsSelected[j] == 2)
-                        table.setValueAt(EMPTY_STRING, rowsSelected[i], colsSelected[j]);
+                    }
+
+                    if (table.isCellEditable(row, col) && cut) {
+                        if (!cutPerformed) {
+                        	cutPerformed = true;
+                			UndoManager.getInstance().startMacroAction();
+                        }
+                        table.setValueAt(EMPTY_STRING, row, col);
+                    }    
                 }
                 sbf.append("\n");
             }
@@ -212,13 +268,11 @@ public class InspectorTableClipboardAdapter implements ActionListener {
             stringSelection = new StringSelection(sbf.toString());
             clipboardSystem = Toolkit.getDefaultToolkit().getSystemClipboard();
             clipboardSystem.setContents(stringSelection, stringSelection);
-    	}
-   		finally
-   		{
-   		    if (cut)
+    	} finally {
+   		    if (cutPerformed) {
    		        UndoManager.getInstance().stopMacroAction();
+   		    }
    		}
-        
     }
     
     /**
@@ -228,75 +282,97 @@ public class InspectorTableClipboardAdapter implements ActionListener {
      * left corner of the selection with the 1st element in the current
      * selection of the JTable.
      */
-    private void performPaste()
-    {
-        final String EMPTY_STRING = "";
+    private void performPaste() {
+        refreshSelectionData();
 
-        int startRow = (table.getSelectedRows())[0];
+        // Check whether selection exists. If it does not, currently do nothing.
+        if (numOfSelRows == 0 || numOfSelCols == 0) {
+            return;
+        }
         
-        int tableRowCount = table.getRowCount();
-        int tableColumnCount = table.getColumnCount();
+        int rowCount = table.getRowCount();
+        int columnCount = table.getColumnCount();
 
-        // inspector case
-        //int startCol = (table.getSelectedColumns())[0];
-        int startCol = 1;
-        
         boolean pasted = false;
         
         // w/ packed undo support 
-        try
-        {
-            String transferedString =
-                (String)clipboardSystem.getContents(this).getTransferData(DataFlavor.stringFlavor);
+        try {
+            String transferedString = (String)clipboardSystem.getContents(this)
+            		.getTransferData(DataFlavor.stringFlavor);
+
+            String[] rowStrings = transferedString.split("\\n");
+
+            /* Calculates the maximum fields length to foil Excel's random
+             * omission of trailing empty spaces. 
+             */ 
+            int maxCols = 0;
+            for (int i = 0; i < rowStrings.length; i++) {
+            	maxCols = Math.max(maxCols, rowStrings[i].split("\\t", -1).length);
+            }
             
-            StringTokenizer st1 = new StringTokenizer(transferedString, "\n");
-            for (int i = 0; st1.hasMoreTokens(); i++)
-            {
-                String rowString = st1.nextToken();
-                StringTokenizer st2 = new StringTokenizer(rowString, "\t");
-                int j = 0;
-                for (; st2.hasMoreTokens(); j++)
-                {
-                    String value = (String)st2.nextToken();
-                    
-                    // set value
-                    int columnToSet = startCol + j;
-                    // inspector sets only column 2
-                    if (columnToSet == 2)
-	                    if (startRow + i < tableRowCount && 
-	                        columnToSet < tableColumnCount)
-	                    {
-	                	    if (!pasted) {
-	                	        pasted = true;
-	                			UndoManager.getInstance().startMacroAction();
-	                	    }
-	                        table.setValueAt(value, startRow + i, columnToSet);
-	                    }
+            int i = 0;
+            int j = 0;
+            int row = 0;
+            int col = 0;
+            String value = null;
+            for (i = 0; i < rowStrings.length; i++) {
+                String[] fields = rowStrings[i].split("\\t", maxCols);
+                row = i + selRows[0]; 
+
+                for (j = 0; j < maxCols; j++) {
+                	col = j + selCols[0];
+                	
+	                if (row >= rowCount || col >= columnCount) {
+	                	continue;
+	                }
+               	    if (!pasted) {
+               	        pasted = true;
+               			UndoManager.getInstance().startMacroAction();
+               	    }
+               	    value = j < fields.length ? fields[j] : EMPTY_STRING; 
+                    table.setValueAt(value, row, col);
                 }
-                
-                // clear the rest
-                // only one field - inspector case
-                if (startCol + j == 2)
-                {
-            	    if (!pasted) {
-            	        pasted = true;
-            			UndoManager.getInstance().startMacroAction();
-            	    }
-                    table.setValueAt(EMPTY_STRING, startRow + i, 2);
-                }
-                
-                
             }
         } catch (Throwable th) {
             // noop
-        }
-    	finally
-    	{
-    	    if (pasted)
+        } finally {
+    	    if (pasted) {
     	        UndoManager.getInstance().stopMacroAction();
+    	    }
     	}
-    	
     }
-
+    /**
+     * Perform delete action.
+     * Deletes the content of selection.
+     */
+    private void performDelete() {
+        
+        refreshSelectionData();
+        // noop check
+        if (numOfSelRows == 0 || numOfSelCols == 0) {
+            return;
+        }
+        boolean deleted = false;
+        
+        // undo support (to pack all into one action)
+    	try {
+            for (int i = 0; i < numOfSelRows; i++) {
+                for (int j = 0; j < numOfSelCols; j++) {
+                	int row = selRows[i];
+                	int col = selCols[j];
+                    if (table.isCellEditable(row, col)) {
+                        if (!deleted) {
+                        	deleted = true;
+                			UndoManager.getInstance().startMacroAction();
+                        }
+                    	table.setValueAt(EMPTY_STRING, row, col);
+                    }    
+                }
+            }
+    	} finally {
+   		    if (deleted) {
+   		        UndoManager.getInstance().stopMacroAction();
+   		    }
+   		}
+    }
 }
-

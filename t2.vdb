@@ -58,14 +58,205 @@ record(compress, Jetomogo) {
   field(DESC, "asdasdadd")
 }
 
+record(compress, "super ime2") {
+  field(DESC, "gf212")
+  field(ASG, "gfdg")
+}
+
+record(compress, "super ime3") {
+  field(DESC, "gf212")
+  field(ASG, "gfdg")
+}
+
+record(compress, "super ime4") {
+  field(DESC, "gf212")
+  field(ASG, "gfdg")
+}
+
+record(compress, "super ime5") {
+  field(DESC, "gf212")
+  field(ASG, "gfdg")
+}
+
+record(compress, "super ime6") {
+  field(DESC, "gf212")
+  field(ASG, "gfdg")
+}
+
+record(compress, "super ime7") {
+  field(DESC, "gf212")
+  field(ASG, "gfdg")
+}
+
+record(compress, "super ime8") {
+  field(DESC, "gf212")
+  field(ASG, "gfdg")
+  field(EVNT, "gfdg")
+  field(TSEL, "<none>")
+}
+
+record(compress, "super ime9") {
+  field(DESC, "gf212")
+  field(ASG, "gfdg")
+  field(EVNT, "gfdg")
+  field(TSEL, "<none>")
+  field(PHAS, "<none>")
+}
+
+record(compress, "super ime10") {
+  field(DESC, "gf212")
+  field(ASG, "gfdg")
+  field(EVNT, "gfdg")
+  field(TSEL, "<none>")
+  field(PHAS, "<none>")
+}
+
+record(compress, "super ime11") {
+  field(DESC, "gf212")
+  field(ASG, "gfdg")
+  field(EVNT, "gfdg")
+  field(TSEL, "<none>")
+  field(PHAS, "<none>")
+}
+
+record(compress, "super ime12") {
+  field(DESC, "gf212")
+  field(ASG, "gfdg")
+  field(EVNT, "gfdg")
+  field(TSEL, "<none>")
+  field(PHAS, "<none>")
+}
+
+record(compress, "super ime13") {
+  field(DESC, "gf212")
+  field(ASG, "gfdg")
+  field(EVNT, "<none>")
+}
+
+record(compress, "super ime14") {
+  field(DESC, "gf212")
+  field(ASG, "gfdg")
+  field(PHAS, "<none>")
+  field(EVNT, "<none>")
+  field(TSEL, "<none>")
+}
+
+record(compress, "super ime15") {
+  field(DESC, "gf212")
+  field(ASG, "gfdg")
+  field(PHAS, "<none>")
+  field(EVNT, "<none>")
+  field(TSEL, "<none>")
+}
+
+record(compress, "super ime16") {
+  field(DESC, "gf212")
+  field(ASG, "gfdg")
+  field(PHAS, "<none>")
+  field(EVNT, "<none>")
+  field(TSEL, "<none>")
+}
+
+record(compress, "super ime17") {
+  field(DESC, "gf212")
+  field(ASG, "gfdg")
+  field(PHAS, "<none>")
+  field(EVNT, "<none>")
+  field(TSEL, "<none>")
+}
+
+record(compress, "super ime18") {
+  field(DESC, "gf212")
+  field(ASG, "gfdg")
+  field(PHAS, "<none>")
+  field(EVNT, "<none>")
+}
+
+record(compress, "super ime19") {
+  field(DESC, "gf212")
+  field(ASG, "gfdg")
+  field(PHAS, "<none>")
+}
+
+record(compress, "super ime20") {
+  field(DESC, "gf212")
+  field(ASG, "gfdg")
+  field(PHAS, "<none>")
+  field(EVNT, "<none>")
+}
+
+record(compress, "super ime21") {
+  field(DESC, "gf212")
+  field(ASG, "gfdg")
+  field(PHAS, "<none>")
+  field(EVNT, "<none>")
+}
+
+record(compress, "super ime22") {
+  field(DESC, "gf212")
+  field(ASG, "gfdg")
+  field(EVNT, "<none>")
+}
+
+record(compress, "super ime23") {
+  field(DESC, "gf212")
+  field(ASG, "gfdg")
+  field(EVNT, "<none>")
+}
+
+record(compress, "super ime24") {
+  field(DESC, "gf212")
+  field(ASG, "gfdg")
+}
+
+record(compress, "super ime25") {
+  field(DESC, "gf212")
+  field(ASG, "gfdg")
+}
+
+record(compress, "super ime26") {
+  field(DESC, "gf212")
+  field(ASG, "gfdg")
+}
+
+record(compress, "super ime27") {
+  field(DESC, "gf212")
+  field(ASG, "gfdg")
+}
+
+record(compress, "super ime28") {
+  field(DESC, "gf212")
+  field(ASG, "gfdg")
+}
+
+record(compress, "super ime29") {
+  field(DESC, "gf212")
+  field(ASG, "gfdg")
+}
+
+record(compress, "super ime30") {
+  field(DESC, "gf212")
+  field(ASG, "gfdg")
+}
+
+record(compress, "super ime31") {
+  field(DESC, "gf212")
+  field(ASG, "gfdg")
+}
+
+record(compress, "super ime32") {
+  field(DESC, "gf212")
+  field(ASG, "gfdg")
+}
+
 #! Further lines contain data used by VisualDCT
-#! View(2009,2173,1.0)
+#! View(2004,2156,1.0)
 
 #! TemplateInstance("test_trim2",2500,2480,0,"")
 #! TemplateField("test_trim2","simpleport",16777215,0,1)
 
-#! Record(record2,2280,2319,0,1,"record2")
-#! Record(record3,2320,2479,0,1,"record3")
+#! Record(record2,2280,2359,0,1,"record2")
+#! Record(record3,2300,2539,0,1,"record3")
 #! Record(asdasdasdasd,2040,2502,0,1,"asdasdasdasd")
 #! Record(asdasdasdasd2,2060,2442,0,1,"asdasdasdasd2")
 #! Record("123",2080,2622,0,1,"123")
@@ -76,4 +267,44 @@ record(compress, Jetomogo) {
 #! TemplateField("test_tri","simpleport",16777215,0,1)
 
 #! Record(Jetomogo,20,21,0,0,"Jetomogo")
+#! Record("super ime2",2780,2335,0,1,"super ime2")
+#! Record("super ime3",2800,2355,0,1,"super ime3")
+#! Record("super ime4",2820,2375,0,1,"super ime4")
+#! Record("super ime5",2830,2375,0,1,"super ime5")
+#! Record("super ime6",2840,2395,0,1,"super ime6")
+#! Record("super ime7",2850,2395,0,1,"super ime7")
+#! Record("super ime8",2860,2387,0,1,"super ime8")
+#! Field("super ime8.TSEL",16777215,1,"super ime8.TSEL")
+#! Record("super ime9",2870,2373,0,1,"super ime9")
+#! Field("super ime9.TSEL",16777215,1,"super ime9.TSEL")
+#! Record("super ime10",2880,2393,0,1,"super ime10")
+#! Field("super ime10.TSEL",16777215,1,"super ime10.TSEL")
+#! Record("super ime11",2890,2393,0,1,"super ime11")
+#! Field("super ime11.TSEL",16777215,1,"super ime11.TSEL")
+#! Record("super ime12",2900,2413,0,1,"super ime12")
+#! Field("super ime12.TSEL",16777215,1,"super ime12.TSEL")
+#! Record("super ime13",2910,2441,0,1,"super ime13")
+#! Record("super ime14",2920,2433,0,1,"super ime14")
+#! Field("super ime14.TSEL",16777215,1,"super ime14.TSEL")
+#! Record("super ime15",2930,2433,0,1,"super ime15")
+#! Field("super ime15.TSEL",16777215,1,"super ime15.TSEL")
+#! Record("super ime16",2940,2453,0,1,"super ime16")
+#! Field("super ime16.TSEL",16777215,1,"super ime16.TSEL")
+#! Record("super ime17",2950,2453,0,1,"super ime17")
+#! Field("super ime17.TSEL",16777215,1,"super ime17.TSEL")
+#! Record("super ime18",2960,2487,0,1,"super ime18")
+#! Record("super ime19",2970,2501,0,1,"super ime19")
+#! Record("super ime20",2980,2507,0,1,"super ime20")
+#! Record("super ime21",2990,2507,0,1,"super ime21")
+#! Record("super ime22",3000,2541,0,1,"super ime22")
+#! Record("super ime23",3010,2541,0,1,"super ime23")
+#! Record("super ime24",3020,2575,0,1,"super ime24")
+#! Record("super ime25",3030,2575,0,1,"super ime25")
+#! Record("super ime26",3040,2595,0,1,"super ime26")
+#! Record("super ime27",3050,2595,0,1,"super ime27")
+#! Record("super ime28",3060,2615,0,1,"super ime28")
+#! Record("super ime29",3070,2615,0,1,"super ime29")
+#! Record("super ime30",3080,2635,0,1,"super ime30")
+#! Record("super ime31",3090,2635,0,1,"super ime31")
+#! Record("super ime32",3100,2655,0,1,"super ime32")
 #! Box(Box0,2800,2540,2960,2680,0,16777215,null)

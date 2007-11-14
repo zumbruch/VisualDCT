@@ -102,7 +102,6 @@ public class SpreadsheetInspector extends JDialog
         	helpLabel.setText("No objects to display.");
         }
 
-		
     	JPanel panel = new JPanel(new GridBagLayout());
 
 		GridBagConstraints constraints = new GridBagConstraints();
@@ -159,7 +158,17 @@ public class SpreadsheetInspector extends JDialog
     
     private JTable getTable(SpreadsheetTableModel tableModel) {
 
-    	JTable table = new javax.swing.JTable(tableModel);
+    	JTable table = new JTable(tableModel) {
+    		// when selecting the fields in the first column, select the whole row
+    		public void changeSelection(int rowIndex, int columnIndex,
+    				boolean toggle, boolean extend) {
+    			boolean firstColumn = columnIndex == 0;
+    			if (getColumnSelectionAllowed() == firstColumn) {
+    				setColumnSelectionAllowed(!firstColumn);
+    			}
+    			super.changeSelection(rowIndex, columnIndex, toggle, extend);
+    		}
+    	};
     	table.setName("ScrollPaneTable");
     	
     	table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -172,8 +181,8 @@ public class SpreadsheetInspector extends JDialog
         // not yet tested	
     	// enable clipboard actions
     	new InspectorTableClipboardAdapter(table);
-    	table.setRowSelectionAllowed(true);
-    	table.setColumnSelectionAllowed(false);
+    	//table.setRowSelectionAllowed(true); // true
+    	//table.setColumnSelectionAllowed(false);//true
 
     	table.setDefaultRenderer(String.class, new InspectorTableCellRenderer(
     			table, tableModel));

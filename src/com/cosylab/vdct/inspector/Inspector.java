@@ -479,14 +479,13 @@ private javax.swing.JComboBox getObjectComboBox() {
  * Return the ScrollPaneTable property value.
  * @return javax.swing.JTable
  */
-/* WARNING: THIS METHOD WILL BE REGENERATED. */
 private javax.swing.JTable getScrollPaneTable() {
 	if (ivjScrollPaneTable == null) {
 		try {
 			ivjScrollPaneTable = new javax.swing.JTable();
 			ivjScrollPaneTable.setName("ScrollPaneTable");
 			getTableScrollPane().setColumnHeaderView(ivjScrollPaneTable.getTableHeader());
-			// this caused visibility icon problems when scrooling
+			// this caused visibility icon problems when scrolling
 			//getTableScrollPane().getViewport().setScrollMode(JViewport.BACKINGSTORE_SCROLL_MODE); 
 			ivjScrollPaneTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
 			ivjScrollPaneTable.setBackground(new java.awt.Color(204,204,204));
