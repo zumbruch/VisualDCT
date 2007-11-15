@@ -612,7 +612,8 @@ public class Template
 			{
 				String name = i.next().toString();
 				// if not already added above as macro
-				if (getSubObject(name)==null)
+				// test
+				//if (getSubObject(name)==null)
 				items.addElement(new MonitoredProperty(name, (String)templateData.getProperties().get(name), this));
 			}
 

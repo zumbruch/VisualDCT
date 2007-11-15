@@ -33,5 +33,27 @@ package com.cosylab.vdct.inspector;
  */
 public interface PropertyTableModel {
 	
+	/**
+	 * Defines the empty cell display type.
+	 */
+	public static final int DISP_NONE = 0;
+	/**
+	 * Defines the name cell display type.
+	 */
+	public static final int DISP_NAME = 1;
+	/**
+	 * Defines the editable value cell display type.
+	 */
+	public static final int DISP_VALUE = 2;
+	/**
+	 * Defines the visibility icon cell display type.
+	 */
+	public static final int DISP_VISIBILITY = 3;
+	
 	public InspectableProperty getPropertyAt(int row, int column);
+	
+	/**
+	 * Returns the cell display type at the given position.
+	 */
+	public int getPropertyDisplayTypeAt(int row, int column);
 }

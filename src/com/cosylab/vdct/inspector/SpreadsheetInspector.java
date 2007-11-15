@@ -29,9 +29,11 @@ package com.cosylab.vdct.inspector;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.image.BufferedImage;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Vector;
@@ -48,6 +50,7 @@ import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableColumnModel;
 
 import com.cosylab.vdct.DataProvider;
 import com.cosylab.vdct.graphics.ViewState;
@@ -85,6 +88,8 @@ public class SpreadsheetInspector extends JDialog
     private void createGUI() {
     	
      	createTabbedPane();
+     	resizeTablesColumns();
+     	
     	JButton button = new JButton(); 
     	button.setMnemonic('O');
     	button.setText("OK");
@@ -172,17 +177,14 @@ public class SpreadsheetInspector extends JDialog
     	table.setName("ScrollPaneTable");
     	
     	table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+    	table.getTableHeader().setReorderingAllowed(false);
     	table.setBackground(new Color(204, 204, 204));
     	table.setShowVerticalLines(true);
     	table.setGridColor(Color.black);
     	table.setBounds(0, 0, 200, 200);
     	table.setRowHeight(17);
 
-        // not yet tested	
-    	// enable clipboard actions
     	new InspectorTableClipboardAdapter(table);
-    	//table.setRowSelectionAllowed(true); // true
-    	//table.setColumnSelectionAllowed(false);//true
 
     	table.setDefaultRenderer(String.class, new InspectorTableCellRenderer(
     			table, tableModel));
@@ -192,6 +194,33 @@ public class SpreadsheetInspector extends JDialog
     	return table;
     }
 
+    /**
+     * Sets the widths of all columns so that the values text of all fields can
+     * be displayed. 
+     */
+    public void resizeTablesColumns() {
+    	
+    	BufferedImage image =  new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
+    	FontMetrics metrics = image.createGraphics().getFontMetrics(getFont());
+
+    	for (int i = 0; i < tables.length; i++) {
+
+    		int colCount = tables[i].getColumnCount();
+    		int rowCount = tables[i].getRowCount();
+    		TableColumnModel colModel = tables[i].getColumnModel(); 
+
+        	for (int j = 0; j < colCount; j++) {
+        		int colWidth = 32;
+            	for (int k = 0; k < rowCount; k++) {
+            		String value = tables[i].getValueAt(k, j).toString();
+                	colWidth = Math.max(colWidth, metrics.stringWidth(value));
+            		
+            	}
+            	colModel.getColumn(j).setPreferredWidth(colWidth + 32);
+        	}
+    	}
+    }
+    
     /* Saves the content of open cells when tabs are changed.
     */
     public void stateChanged(ChangeEvent event) {

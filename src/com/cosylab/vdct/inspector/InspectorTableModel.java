@@ -77,6 +77,18 @@ public Inspectable getDataObject() {
 public InspectableProperty getPropertyAt(int row, int column) {
 	return data[row];
 }
+
+public int getPropertyDisplayTypeAt(int row, int column) {
+    if (column == 0) {
+    	return PropertyTableModel.DISP_VISIBILITY;
+    } else if (column == 1) {
+    	return PropertyTableModel.DISP_NAME;
+    } else if (column == 2) {
+    	return PropertyTableModel.DISP_VALUE;
+    }
+    return PropertyTableModel.DISP_NONE;
+}
+
 /**
  * getRowCount method comment.
  */

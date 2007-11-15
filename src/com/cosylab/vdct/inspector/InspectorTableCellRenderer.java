@@ -48,114 +48,114 @@ public class InspectorTableCellRenderer extends DefaultTableCellRenderer {
 	private Color invalidColor = Color.red;
 	private Color undefinedVisibility = new Color(128, 128, 128);
 	private PropertyTableModel tableModel;
-	
+
 	private ImageIcon blankIcon = null;
 	private ImageIcon eyeIcon = null;
 	private ImageIcon noeyeIcon = null;
 
-/**
- * InspectorTableCellRenderer constructor comment.
- */
-public InspectorTableCellRenderer(JTable table, PropertyTableModel tableModel) {
-	super();
-	this.tableModel=tableModel;
-	bgColor = table.getBackground();
-	fgColor = table.getForeground();
-	selectionbgColor = table.getSelectionBackground();
-	selectionfgColor = table.getSelectionForeground();
-	separatorbgColor = table.getGridColor();
-	separatorfgColor = Color.white;
-	setFont(table.getFont());
-	setBorder(noFocusBorder);
+	/**
+	 * InspectorTableCellRenderer constructor comment.
+	 */
+	public InspectorTableCellRenderer(JTable table,
+			PropertyTableModel tableModel) {
+		super();
+		this.tableModel=tableModel;
+		bgColor = table.getBackground();
+		fgColor = table.getForeground();
+		selectionbgColor = table.getSelectionBackground();
+		selectionfgColor = table.getSelectionForeground();
+		separatorbgColor = table.getGridColor();
+		separatorfgColor = Color.white;
+		setFont(table.getFont());
+		setBorder(noFocusBorder);
 
-	try
-	{
-		blankIcon = new ImageIcon(getClass().getResource("/images/blank.gif"));
-		eyeIcon = new ImageIcon(getClass().getResource("/images/eye.gif"));
-		noeyeIcon = new ImageIcon(getClass().getResource("/images/noeye.gif"));
-	}
-	catch (Exception e)
-	{
-		System.out.println("Failed to load icons!");
-		System.out.println(e);
-		System.out.println();
-	}
-}
-
-/**
- * Insert the method's description here.
- * Creation date: (7.1.2001 11:08:56)
- * @return java.awt.Component
- * @param table javax.swing.JTable
- * @param value java.lang.Object
- * @param isSelected boolean
- * @param hasFocus boolean
- * @param row int
- * @param column int
- */
-public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-	String str = null;
-	if (value!=null)
-		str = value.toString();
-	InspectableProperty property = tableModel.getPropertyAt(row, column);
-
-	setIcon(null);
-	
-	if (tableModel.getPropertyAt(row, column).isSepatator()) {
-		super.setHorizontalAlignment(JLabel.CENTER);
-		super.setBackground(separatorbgColor);
-		super.setForeground(separatorfgColor);
-		if (column==0)
+		try
 		{
-			switch (property.getVisibility())
-			{
-				case InspectableProperty.ALWAYS_VISIBLE:
-					setIcon(eyeIcon);
-					break;
-				case InspectableProperty.NEVER_VISIBLE:
-					setIcon(noeyeIcon);
-					break;
-			}
+			blankIcon = new ImageIcon(getClass().getResource("/images/blank.gif"));
+			eyeIcon = new ImageIcon(getClass().getResource("/images/eye.gif"));
+			noeyeIcon = new ImageIcon(getClass().getResource("/images/noeye.gif"));
+		}
+		catch (Exception e)
+		{
+			System.out.println("Failed to load icons!");
+			System.out.println(e);
+			System.out.println();
 		}
 	}
-	else {
-		super.setHorizontalAlignment(JLabel.LEFT);
 
-		if (isSelected)
-			super.setBackground(selectionbgColor);
-		else
-		    super.setBackground(bgColor);
+	/**
+	 * Insert the method's description here.
+	 * Creation date: (7.1.2001 11:08:56)
+	 * @return java.awt.Component
+	 * @param table javax.swing.JTable
+	 * @param value java.lang.Object
+	 * @param isSelected boolean
+	 * @param hasFocus boolean
+	 * @param row int
+	 * @param column int
+	 */
+	public Component getTableCellRendererComponent(JTable table, Object value,
+			boolean isSelected, boolean hasFocus, int row, int column) {
+		String str = null;
+		if (value != null) {
+			str = value.toString();
+		}
+		InspectableProperty property = tableModel.getPropertyAt(row, column);
+		int dispType = tableModel.getPropertyDisplayTypeAt(row, column);
 
-		if (column==0)
-		{
-			switch (property.getVisibility())
-			{
-				case InspectableProperty.NON_DEFAULT_VISIBLE:
-					setIcon(blankIcon);
-					break;
-				case InspectableProperty.ALWAYS_VISIBLE:
+		setIcon(null);
+
+		if (tableModel.getPropertyAt(row, column).isSepatator()) {
+			super.setHorizontalAlignment(JLabel.CENTER);
+			super.setBackground(separatorbgColor);
+			super.setForeground(separatorfgColor);
+			if (dispType == PropertyTableModel.DISP_VISIBILITY) {
+				switch (property.getVisibility()) {
+				case InspectableProperty.ALWAYS_VISIBLE: {
 					setIcon(eyeIcon);
-					break;
-				case InspectableProperty.NEVER_VISIBLE:
+				} break;
+				case InspectableProperty.NEVER_VISIBLE: {
 					setIcon(noeyeIcon);
-					break;
-				default:
+				} break;
+				}
+			}
+		} else {
+			super.setHorizontalAlignment(JLabel.LEFT);
+
+			if (isSelected)
+				super.setBackground(selectionbgColor);
+			else
+				super.setBackground(bgColor);
+
+			if (dispType == PropertyTableModel.DISP_VISIBILITY) {
+				switch (property.getVisibility()) {
+				case InspectableProperty.NON_DEFAULT_VISIBLE: {
+					setIcon(blankIcon);
+				} break;
+				case InspectableProperty.ALWAYS_VISIBLE: {
+					setIcon(eyeIcon);
+				} break;
+				case InspectableProperty.NEVER_VISIBLE: {
+					setIcon(noeyeIcon);
+				} break;
+				default: {
 					super.setBackground(undefinedVisibility);
 					setIcon(blankIcon);
+				}
+				}
+			}
+
+			if (dispType == PropertyTableModel.DISP_VALUE && !property.isValid()) {
+				super.setForeground(invalidColor);
+			} else if (isSelected) { 
+				super.setForeground(selectionfgColor);
+			} else {
+				super.setForeground(fgColor);
 			}
 		}
-		
-		if (column==2 && !property.isValid())
-			super.setForeground(invalidColor);
-		else if (isSelected) 
-			super.setForeground(selectionfgColor);
-		else
-			super.setForeground(fgColor);
+		setValue(str);
+		setToolTipText(property.getToolTipText());
+
+		return this;
 	}
-	setValue(str);
-
-	setToolTipText(property.getToolTipText());
-
-	return this;
-}
 }

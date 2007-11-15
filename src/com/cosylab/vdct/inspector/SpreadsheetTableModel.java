@@ -27,6 +27,7 @@
  */
 package com.cosylab.vdct.inspector;
 
+import java.util.HashMap;
 import java.util.Vector;
 
 import javax.swing.table.AbstractTableModel;
@@ -36,7 +37,9 @@ import com.cosylab.vdct.plugin.debug.PluginDebugManager;
 public class SpreadsheetTableModel extends AbstractTableModel
         implements PropertyTableModel {
 	
+	private String[] columnNames = null;
 	private InspectableProperty[][] fields = null;
+	private EmptyProperty empty = null;
 	
 	public SpreadsheetTableModel(Vector inspectData)
 	        throws IllegalArgumentException {
@@ -45,10 +48,43 @@ public class SpreadsheetTableModel extends AbstractTableModel
   			throw new IllegalArgumentException(
   					"inspectables must not be empty or null");
   		}
+  		
+  		HashMap map = new HashMap();
         int size = inspectData.size();
+        InspectableProperty[][] properties = new InspectableProperty[size][];
+        int columnCount = 0;
+        Vector colStrings = new Vector();
+
+		for (int i = 0; i < size; i++) {
+			properties[i] = ((Inspectable)inspectData.get(i)).getProperties(-1);
+			
+			for (int j = 0; j < properties[i].length; j++) {
+				String name = properties[i][j].getName();
+				if (map.get(name) == null) {
+					map.put(name, Integer.valueOf(columnCount));
+					colStrings.add(name);
+					columnCount++;
+				}
+			}
+		}
+		columnNames = new String[columnCount];
+		colStrings.copyInto(columnNames);
+  		
+		empty = new EmptyProperty();
     	fields = new InspectableProperty[size][];
 		for (int i = 0; i < size; i++) {
-			fields[i] = ((Inspectable)inspectData.elementAt(i)).getProperties(-1);
+			fields[i] =  new InspectableProperty[columnCount];
+			for (int j = 0; j < columnCount; j++) {
+				fields[i][j] = empty;
+			}
+		}
+
+		for (int i = 0; i < size; i++) {
+			for (int j = 0; j < properties[i].length; j++) {
+				String name = properties[i][j].getName();
+				// map must contain the key 
+				fields[i][((Integer)map.get(name)).intValue()] = properties[i][j];
+			}
 		}
 	}
 
@@ -57,7 +93,7 @@ public class SpreadsheetTableModel extends AbstractTableModel
 	}
 
 	public String getColumnName(int column) {
-		return getPropertyAt(0, column).getName();
+		return columnNames[column];
 	}
 
 	public int getColumnCount() {
@@ -74,7 +110,8 @@ public class SpreadsheetTableModel extends AbstractTableModel
 
 	public void setValueAt(Object aValue, int row, int column) {
 		fields[row][column].setValue(aValue.toString());
-		fireTableCellUpdated(row, column);
+		// update the whole row as fields validity can change
+		fireTableRowsUpdated(row, row);
 	}
 	
 	public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -87,5 +124,12 @@ public class SpreadsheetTableModel extends AbstractTableModel
 
 	public InspectableProperty getPropertyAt(int row, int column) {
 		return fields[row][column];
+	}
+	
+	public int getPropertyDisplayTypeAt(int row, int column) {
+	    if (column > 0) {
+	    	return PropertyTableModel.DISP_VALUE;
+	    }
+	    return PropertyTableModel.DISP_NONE;
 	}
 }

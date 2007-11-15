@@ -37,8 +37,6 @@ import javax.swing.*;
  */
 public interface Inspectable {
 
-public static int a = 0;
-	
 /**
  * 
  * @return com.cosylab.vdct.inspector.InspectableProperty

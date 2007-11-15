@@ -56,12 +56,9 @@ public class NameProperty extends NameValueInfoProperty {
 			value = this.namedObject.getFlexibleName();
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see com.cosylab.vdct.vdb.NameValueInfoProperty#isEditable()
-	 */
-	public boolean isEditable() {
-		return flexible;
+
+	public String getHelp() {
+		return "Name";
 	}
 	
 	/* (non-Javadoc)
@@ -89,5 +86,12 @@ public class NameProperty extends NameValueInfoProperty {
 			((VisibleObject)namedObject).unconditionalValidation();
 		}
 		CommandManager.getInstance().execute("RepaintWorkspace");
+	}
+	
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.vdb.NameValueInfoProperty#isEditable()
+	 */
+	public boolean isEditable() {
+		return flexible;
 	}
 }
