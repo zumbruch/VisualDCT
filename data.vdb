@@ -46,14 +46,11 @@ record(compress, Compress_number13) {
 record(compress, Compress_number14) {
 }
 
-expand("template1.vdb", template1) {
-  macro(macro1, "prvi1")
-  macro(macro2, "drugi2")
-}
-
 expand("template1.vdb", template12) {
-  macro(macro2, "drugi")
+  macro(macro2, "")
   macro(macro3, "tretji3")
+  macro(macro1, "kaj?")
+  macro(new, "res")
 }
 
 expand("template2.vdb", template22) {
@@ -62,7 +59,23 @@ expand("template2.vdb", template22) {
 expand("template2.vdb", template23) {
 }
 
-expand("template2.vdb", template2) {
+expand("template1.vdb", template1) {
+  macro(macro1, "prvi1")
+  macro(macro2, "drugi2")
+  macro(macro3, "Mogo")
+  macro(new, "deluje")
+  macro(MacroForGroup, "do!")
+}
+
+expand("template1.vdb", template13) {
+  macro(macro2, "a")
+  macro(new, "")
+  macro(macro1, "d")
+}
+
+expand("template1.vdb", template14) {
+  macro(macro3, "a")
+  macro(macro1, "a")
 }
 
 #! Further lines contain data used by VisualDCT
@@ -82,12 +95,7 @@ expand("template2.vdb", template2) {
 #! Record(Compress_number13,2160,2322,0,1,"Compress_number13")
 #! Record(Compress_number14,2180,2342,0,1,"Compress_number14")
 
-#! TemplateInstance("template1",2360,2200,0,"")
-#! TemplateField("template1","Port1",16777215,0,1)
-#! TemplateField("template1","MacroForGroup",16777215,0,1)
-
-
-#! TemplateInstance("template12",2660,2200,0,"")
+#! TemplateInstance("template12",2600,2200,0,"")
 #! TemplateField("template12","MacroForGroup",16777215,0,1)
 #! TemplateField("template12","Port1",16777215,0,1)
 
@@ -98,5 +106,17 @@ expand("template2.vdb", template2) {
 #! TemplateInstance("template23",2800,2440,0,"")
 
 
-#! TemplateInstance("template2",2360,2440,0,"")
+#! TemplateInstance("template1",2360,2200,0,"")
+#! TemplateField("template1","Port1",16777215,0,1)
+#! TemplateField("template1","MacroForGroup",16777215,0,1)
+
+
+#! TemplateInstance("template13",2120,2440,0,"")
+#! TemplateField("template13","Port1",16777215,0,1)
+#! TemplateField("template13","MacroForGroup",16777215,0,1)
+
+
+#! TemplateInstance("template14",2340,2480,0,"")
+#! TemplateField("template14","Port1",16777215,0,1)
+#! TemplateField("template14","MacroForGroup",16777215,0,1)
 

@@ -33,13 +33,15 @@ import java.util.Vector;
 import javax.swing.table.AbstractTableModel;
 
 import com.cosylab.vdct.plugin.debug.PluginDebugManager;
+import com.cosylab.vdct.vdb.NameValueInfoProperty;
 
-public class SpreadsheetTableModel extends AbstractTableModel
-        implements PropertyTableModel {
+public class SpreadsheetTableModel extends AbstractTableModel implements PropertyTableModel {
 	
+	private HashMap colIndicesMap = null;
 	private String[] columnNames = null;
+    private Inspectable[] inspectables = null; 
 	private InspectableProperty[][] fields = null;
-	private EmptyProperty empty = null;
+	private NameValueInfoProperty emptyProperty = null;
 	
 	public SpreadsheetTableModel(Vector inspectData)
 	        throws IllegalArgumentException {
@@ -49,19 +51,27 @@ public class SpreadsheetTableModel extends AbstractTableModel
   					"inspectables must not be empty or null");
   		}
   		
-  		HashMap map = new HashMap();
         int size = inspectData.size();
         InspectableProperty[][] properties = new InspectableProperty[size][];
-        int columnCount = 0;
-        Vector colStrings = new Vector();
+        inspectables = new Inspectable[size];
+        inspectData.copyInto(inspectables);
+        int columnCount = 1;
 
+        Vector colStrings = new Vector();
+        colStrings.add("");
+  		colIndicesMap = new HashMap();
+        
 		for (int i = 0; i < size; i++) {
 			properties[i] = ((Inspectable)inspectData.get(i)).getProperties(-1);
 			
 			for (int j = 0; j < properties[i].length; j++) {
+				InspectableProperty property = properties[i][j];
+				if (property instanceof CreatorProperty) {
+					continue;
+				}
 				String name = properties[i][j].getName();
-				if (map.get(name) == null) {
-					map.put(name, Integer.valueOf(columnCount));
+				if (colIndicesMap.get(name) == null) {
+					colIndicesMap.put(name, Integer.valueOf(columnCount));
 					colStrings.add(name);
 					columnCount++;
 				}
@@ -69,22 +79,39 @@ public class SpreadsheetTableModel extends AbstractTableModel
 		}
 		columnNames = new String[columnCount];
 		colStrings.copyInto(columnNames);
-  		
-		empty = new EmptyProperty();
-    	fields = new InspectableProperty[size][];
+
+		emptyProperty = new NameValueInfoProperty("", "");
+		
+		fields = new InspectableProperty[size][];
 		for (int i = 0; i < size; i++) {
-			fields[i] =  new InspectableProperty[columnCount];
-			for (int j = 0; j < columnCount; j++) {
-				fields[i][j] = empty;
+			fields[i] = new InspectableProperty[columnCount];
+			refreshPropertiesRow(i);
+		}
+	}
+	
+	private void refreshPropertiesRow(int row) {
+		Inspectable inspectable = inspectables[row];
+
+		InspectableProperty[] properties = inspectable.getProperties(-1);
+		
+		CreatorProperty creatorProperty = null;
+		for (int i = 0; i < properties.length; i++) {
+			if (properties[i] instanceof CreatorProperty) {
+				creatorProperty = (CreatorProperty)properties[i];
+				break;
 			}
 		}
 
-		for (int i = 0; i < size; i++) {
-			for (int j = 0; j < properties[i].length; j++) {
-				String name = properties[i][j].getName();
-				// map must contain the key 
-				fields[i][((Integer)map.get(name)).intValue()] = properties[i][j];
+		for (int i = 0; i < fields[row].length; i++) {
+			fields[row][i] = (i == 0) ? emptyProperty : creatorProperty;
+		}
+		for (int i = 0; i < properties.length; i++) {
+			if (properties[i] instanceof CreatorProperty) {
+				continue;
 			}
+			String name = properties[i].getName();
+			// map must contain the key 
+			fields[row][((Integer)colIndicesMap.get(name)).intValue()] = properties[i];
 		}
 	}
 
@@ -109,8 +136,15 @@ public class SpreadsheetTableModel extends AbstractTableModel
 	}
 
 	public void setValueAt(Object aValue, int row, int column) {
-		fields[row][column].setValue(aValue.toString());
-		// update the whole row as fields validity can change
+		
+		InspectableProperty property = fields[row][column];
+
+		if (property instanceof CreatorProperty) {
+			((CreatorProperty)property).setName(columnNames[column]);
+		}
+		property.setValue(aValue.toString());
+		
+		refreshPropertiesRow(row);
 		fireTableRowsUpdated(row, row);
 	}
 	

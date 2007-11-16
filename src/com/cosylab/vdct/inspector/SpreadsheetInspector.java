@@ -35,7 +35,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.image.BufferedImage;
 import java.util.Enumeration;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Vector;
 
 import javax.swing.JButton;
@@ -45,6 +45,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
@@ -56,6 +57,7 @@ import com.cosylab.vdct.DataProvider;
 import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.graphics.objects.Record;
 import com.cosylab.vdct.graphics.objects.Template;
+import com.cosylab.vdct.vdb.VDBTemplate;
 
 /**
  * @author ssah
@@ -156,6 +158,7 @@ public class SpreadsheetInspector extends JDialog
     	}
 
         tabbedPane.setTabLayoutPolicy(javax.swing.JTabbedPane.SCROLL_TAB_LAYOUT);
+        tabbedPane.setTabPlacement(JTabbedPane.BOTTOM);
         tabbedPane.setAutoscrolls(true);
         tabbedPane.addChangeListener(this);
         tabbedPane.setPreferredSize(new Dimension(1000, 600));
@@ -167,16 +170,19 @@ public class SpreadsheetInspector extends JDialog
     		// when selecting the fields in the first column, select the whole row
     		public void changeSelection(int rowIndex, int columnIndex,
     				boolean toggle, boolean extend) {
-    			boolean firstColumn = columnIndex == 0;
-    			if (getColumnSelectionAllowed() == firstColumn) {
-    				setColumnSelectionAllowed(!firstColumn);
-    			}
+
     			super.changeSelection(rowIndex, columnIndex, toggle, extend);
+    			setColumnSelectionAllowed(true);
+    			if (getSelectedColumn() == 0) {
+    				setColumnSelectionAllowed(false);
+    			}
     		}
     	};
     	table.setName("ScrollPaneTable");
     	
     	table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+    	table.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+
     	table.getTableHeader().setReorderingAllowed(false);
     	table.setBackground(new Color(204, 204, 204));
     	table.setShowVerticalLines(true);
@@ -210,13 +216,13 @@ public class SpreadsheetInspector extends JDialog
     		TableColumnModel colModel = tables[i].getColumnModel(); 
 
         	for (int j = 0; j < colCount; j++) {
-        		int colWidth = 32;
+        		int colWidth = (j == 0) ? 0 : 48;
             	for (int k = 0; k < rowCount; k++) {
             		String value = tables[i].getValueAt(k, j).toString();
                 	colWidth = Math.max(colWidth, metrics.stringWidth(value));
             		
             	}
-            	colModel.getColumn(j).setPreferredWidth(colWidth + 32);
+            	colModel.getColumn(j).setPreferredWidth(colWidth + 16);
         	}
     	}
     }
@@ -247,10 +253,30 @@ public class SpreadsheetInspector extends JDialog
     		inspectables = getSpreadsheetData(candidates);
     	}
     	
+    	Vector records = getRecords(inspectables);
+    	Vector templates = getTemplates(inspectables);
+
+    	types = new Vector();
+    	
+    	
+    	
+		for (int i = 0; i < records.size(); i++) {
+			types.add(((Record)((Vector)records.get(i)).get(0)).getType());
+		}
+		for (int i = 0; i < templates.size(); i++) {
+			types.add(((Template)((Vector)templates.get(i)).get(0)).getTemplateData().getTemplate().getId());
+		}
+    	
+    	instances = new Vector();
+    	instances.addAll(records);
+    	instances.addAll(templates);
+    	
+    	
     	/* Store the types in vector and instances in a vector of vectors. This
     	 * implementation uses n^2 time since the number of types is expected to
     	 * be small.
     	 */
+    	/*
     	Enumeration enumeration = inspectables.elements();
     	Vector inspectablesTypes = new Vector();
     	
@@ -287,8 +313,62 @@ public class SpreadsheetInspector extends JDialog
 
     		((Vector)instances.get(types.indexOf(type))).add(inspectable);
     	}
+    	*/
+	}
+	
+	private Vector getRecords(Vector candidates) {
+
+    	Vector records = new Vector();
+
+    	HashMap typeToVector = new HashMap();    	
+    	
+		for (int i = 0; i < candidates.size(); i++) {
+    		Inspectable inspectable = (Inspectable)candidates.get(i);
+    		if (!(inspectable instanceof Record)) {
+    			continue;
+    		}
+    		String type = ((Record)inspectable).getType();
+
+    		Vector vector = (Vector)typeToVector.get(type);
+    		if (vector == null) {
+    			vector = new Vector();
+    		    records.add(vector);
+    			typeToVector.put(type, vector);
+    		}
+    		vector.add(inspectable);
+		}
+		return records;
 	}
 
+	private Vector getTemplates(Vector candidates) {
+
+    	Vector templates = new Vector();
+
+		for (int i = 0; i < candidates.size(); i++) {
+    		Inspectable inspectable = (Inspectable)candidates.get(i);
+    		if (!(inspectable instanceof Template)) {
+    			continue;
+    		}
+    		VDBTemplate template = ((Template)inspectable).getTemplateData().getTemplate();
+    		
+    		// templates must be checked by == and not by hash code or equals() method
+    		Vector vector = null;
+    		int j = 0;
+    		for (j = 0; j < templates.size(); j++) {
+    			vector = (Vector)templates.get(j);
+    			if (template == ((Template)vector.get(0)).getTemplateData().getTemplate()) {
+    				break;
+    			}
+    		}
+    		if (j == templates.size()) {
+    			vector = new Vector(); 
+    			templates.add(vector);
+    		}
+    		vector.add(inspectable);
+		}
+		return templates;
+	}
+	
 	private Vector getSpreadsheetData(Vector candidates) {
 
 		Enumeration enumeration = candidates.elements();
@@ -309,11 +389,4 @@ public class SpreadsheetInspector extends JDialog
     	}
     	return data;
 	}
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        new SpreadsheetInspector(new javax.swing.JFrame(), true).setVisible(true);
-    }
 }

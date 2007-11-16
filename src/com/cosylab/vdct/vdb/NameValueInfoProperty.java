@@ -39,7 +39,7 @@ import com.cosylab.vdct.inspector.*;
  * @author Matej Sekoranja
  */
 public class NameValueInfoProperty implements InspectableProperty {
-	private String name;
+	protected String name;
 	protected String value;
 /**
  * DTYPInfoProperty constructor comment.

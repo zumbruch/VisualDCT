@@ -62,6 +62,7 @@ import com.cosylab.vdct.graphics.FontMetricsBuffer;
 import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.graphics.popup.PopUpMenu;
 import com.cosylab.vdct.graphics.popup.Popupable;
+import com.cosylab.vdct.inspector.CreatorProperty;
 import com.cosylab.vdct.inspector.Inspectable;
 import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.inspector.InspectorManager;
@@ -69,8 +70,10 @@ import com.cosylab.vdct.inspector.NameProperty;
 import com.cosylab.vdct.undo.ChangeTemplatePropertyAction;
 import com.cosylab.vdct.undo.CreateTemplatePropertyAction;
 import com.cosylab.vdct.undo.DeleteTemplatePropertyAction;
+import com.cosylab.vdct.undo.UndoManager;
 import com.cosylab.vdct.util.StringUtils;
 import com.cosylab.vdct.vdb.CommentProperty;
+import com.cosylab.vdct.vdb.CreatorPropertyListener;
 import com.cosylab.vdct.vdb.GUIHeader;
 import com.cosylab.vdct.vdb.GUISeparator;
 import com.cosylab.vdct.vdb.LinkProperties;
@@ -96,7 +99,8 @@ import com.cosylab.vdct.vdb.VDBTemplatePort;
 public class Template
 	extends LinkManagerObject
 	implements /*Descriptable,*/ Movable, Inspectable, Popupable, Flexible, Selectable,
-				Clipboardable, Hub, MonitoredPropertyListener, SaveInterface, SaveObject, Morphable
+				Clipboardable, Hub, MonitoredPropertyListener, CreatorPropertyListener, SaveInterface, SaveObject,
+				Morphable
 {
 
 	class PopupMenuHandler implements ActionListener {
@@ -576,46 +580,28 @@ public class Template
 		// TODO: mode definitions in Inspectable interface 
 		if (mode == -1) {
 			items.addElement(new NameProperty("Name", this));
-			items.addElement(new NameValueInfoProperty("Template", templateData.getTemplate().getId()));
-			items.addElement(new NameValueInfoProperty("FileName", templateData.getTemplate().getFileName()));
-			
-			final String descriptionString = "Description";
 			
 			Object obj = null;
 			Enumeration e = subObjectsV.elements();
-			while (e.hasMoreElements())
-			{
+			while (e.hasMoreElements()) {
 				obj = e.nextElement();
-				if (obj instanceof TemplateEPICSMacro)
-				{
+				if (obj instanceof TemplateEPICSMacro) {
 					TemplateEPICSMacro tem = (TemplateEPICSMacro)obj;
 					items.addElement(tem.getFieldData());
-					items.addElement(new NameValueInfoProperty(descriptionString, tem.getDescription()));
 				}
 			}
-
-			e = subObjectsV.elements();
-			while (e.hasMoreElements())
-			{
-				obj = e.nextElement();
-				if (obj instanceof TemplateEPICSPort)
-				{
-					TemplateEPICSPort tep = (TemplateEPICSPort)obj;
-					items.addElement(tep.getFieldData());
-					items.addElement(new NameValueInfoProperty(descriptionString, tep.getDescription()));
-				}
-			}
-
 
 	  		java.util.Iterator i = templateData.getPropertiesV().iterator();
 			while (i.hasNext())
 			{
 				String name = i.next().toString();
 				// if not already added above as macro
-				// test
-				//if (getSubObject(name)==null)
+				if (getSubObject(name)==null)
 				items.addElement(new MonitoredProperty(name, (String)templateData.getProperties().get(name), this));
 			}
+
+			// callback object for adding new macros
+			items.addElement(new CreatorProperty(this));
 
 			InspectableProperty[] properties = new InspectableProperty[items.size()];
 			items.copyInto(properties);
@@ -1342,7 +1328,23 @@ public VDBFieldData getField(String name) {
 		return null;
 }
 
+/* (non-Javadoc)
+ * @see com.cosylab.vdct.vdb.CreatorPropertyListener#addProperty(java.lang.Object, java.lang.String)
+ */
+public void addProperty(String key, String value) {
 
+	if (templateData.getProperties().containsKey(key) || getSubObject(key) != null) {
+		return;
+	}
+	templateData.addProperty(key, value);
+
+	UndoManager.getInstance().addAction(new CreateTemplatePropertyAction(this, key));
+
+	updateTemplateFields();
+	InspectorManager.getInstance().updateObject(this);
+	unconditionalValidation();
+	CommandManager.getInstance().execute("RepaintWorkspace");
+}
 /**
  * @see com.cosylab.vdct.vdb.MonitoredPropertyListener#addProperty()
  */
