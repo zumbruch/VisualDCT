@@ -54,6 +54,7 @@ public SetRedoMenuItemState(VisualDCT visualDCT) {
 public void execute() {
 	visualDCT.getRedoMenuItem().setEnabled(state);
 	visualDCT.getRedoButton().setEnabled(state);
+	visualDCT.getSpreadsheetInspector().getRedoItem().setEnabled(state);
 }
 /**
  * Insert the method's description here.

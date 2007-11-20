@@ -11,39 +11,68 @@ record(compress, Compress_number2) {
 }
 
 record(compress, Compress_number3) {
+  field(EVNT, "343")
 }
 
 record(compress, Compress_number4) {
+  field(EVNT, "67547")
 }
 
 record(compress, Compress_number5) {
+  field(DESC, "Fgdg")
+  field(ASG, "Cel12")
+  field(EVNT, "343")
 }
 
 record(compress, Compress_number6) {
+  field(TSEL, "343")
+  field(DESC, "Fgdg")
+  field(ASG, "Cel22")
+  field(SCAN, "Fgdg")
+  field(PINI, "Fgdg")
 }
 
 record(compress, Compress_number7) {
+  field(TSEL, "67547")
+  field(DESC, "Dfgdf")
+  field(ASG, "Cel32")
+  field(SCAN, "Fgdg")
+  field(PINI, "Dfgdf")
 }
 
 record(compress, Compress_number8) {
+  field(TSEL, "ztrztz")
+  field(EVNT, "343")
+  field(SCAN, "Dfgdf")
 }
 
 record(compress, Compress_number9) {
+  field(TSEL, "232")
+  field(EVNT, "67547")
+  field(DESC, "Fgdg")
+  field(ASG, "Fgdg")
 }
 
 record(compress, Compress_number10) {
+  field(EVNT, "343")
+  field(DESC, "Fgdg")
+  field(ASG, "Dfgdf")
 }
 
 record(compress, Compress_number11) {
+  field(DESC, "Dfgdf")
 }
 
 record(compress, Compress_number12) {
+  field(PINI, "<nonkjkje>")
 }
 
 record(compress, Compress_number13) {
+  field(EVNT, "67547")
 }
 
 record(compress, Compress_number14) {
+  field(EVNT, "ztrztz")
 }
 
 expand("template1.vdb", template12) {
@@ -51,9 +80,11 @@ expand("template1.vdb", template12) {
   macro(macro3, "tretji3")
   macro(macro1, "kaj?")
   macro(new, "res")
+  macro(spet_novi_macro, "Nov")
 }
 
 expand("template2.vdb", template22) {
+  macro(macro, "")
 }
 
 expand("template2.vdb", template23) {
@@ -65,12 +96,14 @@ expand("template1.vdb", template1) {
   macro(macro3, "Mogo")
   macro(new, "deluje")
   macro(MacroForGroup, "do!")
+  macro(spet_novi_macro, "deluje?hihi")
 }
 
 expand("template1.vdb", template13) {
   macro(macro2, "a")
   macro(new, "")
   macro(macro1, "d")
+  macro(spet_novi_macro, "test")
 }
 
 expand("template1.vdb", template14) {
@@ -78,29 +111,90 @@ expand("template1.vdb", template14) {
   macro(macro1, "a")
 }
 
+record(ai, NewAI) {
+  field(TSEL, "#L0 A0 @")
+  field(DTYP, "Heidenhein Encoder")
+  field(SDIS, "#L0 A0 @")
+}
+
+record(ai, NewAI2) {
+  field(TSEL, "#L0 A0 @")
+  field(DTYP, "Heidenhein Encoder")
+  field(SDIS, "#L0 A0 @")
+}
+
+record(ai, NewAI3) {
+  field(TSEL, "#L0 A0 @")
+  field(DTYP, "Heidenhein Encoder")
+  field(SDIS, "#L0 A0 @")
+}
+
+record(ai, NewAI4) {
+  field(TSEL, "#L0 A0 @")
+  field(DTYP, "Heidenhein Encoder")
+  field(SDIS, "#L0 A0 @")
+}
+
+record(ai, NewAI5) {
+  field(TSEL, "#L0 A0 @")
+  field(DTYP, "Heidenhein Encoder")
+  field(SDIS, "#L0 A0 @")
+}
+
+record(ai, NewAI6) {
+  field(TSEL, "#L0 A0 @")
+  field(DTYP, "Heidenhein Encoder")
+  field(SDIS, "#L0 A0 @")
+}
+
+record(ai, NewAI7) {
+  field(TSEL, "#L0 A0 @")
+  field(DTYP, "Heidenhein Encoder")
+  field(SDIS, "#L0 A0 @")
+}
+
+record(ai, NewAI8) {
+  field(TSEL, "#L0 A0 @")
+  field(DTYP, "Heidenhein Encoder")
+  field(SDIS, "#L0 A0 @")
+}
+
+record(ai, NewAI9) {
+  field(TSEL, "#L0 A0 @")
+  field(DTYP, "Heidenhein Encoder")
+  field(SDIS, "#L0 A0 @")
+}
+
+record(ai, NewAI10) {
+  field(TSEL, "#L0 A0 @")
+  field(DTYP, "Heidenhein Encoder")
+  field(SDIS, "#L0 A0 @")
+}
+
 #! Further lines contain data used by VisualDCT
-#! View(2009,2173,1.0)
+#! View(1949,2245,1.0)
 #! Record(Compress_number1,2040,2202,0,1,"Compress_number1")
 #! Record(Compress_number2,2060,2222,0,1,"Compress_number2")
-#! Record(Compress_number3,2060,2222,0,1,"Compress_number3")
-#! Record(Compress_number4,2080,2242,0,1,"Compress_number4")
-#! Record(Compress_number5,2080,2242,0,1,"Compress_number5")
-#! Record(Compress_number6,2100,2262,0,1,"Compress_number6")
-#! Record(Compress_number7,2100,2262,0,1,"Compress_number7")
-#! Record(Compress_number8,2120,2282,0,1,"Compress_number8")
-#! Record(Compress_number9,2120,2282,0,1,"Compress_number9")
-#! Record(Compress_number10,2140,2302,0,1,"Compress_number10")
-#! Record(Compress_number11,2140,2302,0,1,"Compress_number11")
-#! Record(Compress_number12,2160,2322,0,1,"Compress_number12")
-#! Record(Compress_number13,2160,2322,0,1,"Compress_number13")
-#! Record(Compress_number14,2180,2342,0,1,"Compress_number14")
+#! Record(Compress_number3,2060,2209,0,1,"Compress_number3")
+#! Record(Compress_number4,2080,2229,0,1,"Compress_number4")
+#! Record(Compress_number5,2080,2201,0,1,"Compress_number5")
+#! Record(Compress_number6,2100,2193,0,1,"Compress_number6")
+#! Record(Compress_number7,2100,2193,0,1,"Compress_number7")
+#! Record(Compress_number8,2120,2221,0,1,"Compress_number8")
+#! Field("Compress_number8.TSEL",16777215,1,"Compress_number8.TSEL")
+#! Record(Compress_number9,2120,2207,0,1,"Compress_number9")
+#! Record(Compress_number10,2140,2261,0,1,"Compress_number10")
+#! Record(Compress_number11,2140,2289,0,1,"Compress_number11")
+#! Record(Compress_number12,2160,2309,0,1,"Compress_number12")
+#! Record(Compress_number13,2160,2309,0,1,"Compress_number13")
+#! Record(Compress_number14,2180,2329,0,1,"Compress_number14")
 
 #! TemplateInstance("template12",2600,2200,0,"")
 #! TemplateField("template12","MacroForGroup",16777215,0,1)
 #! TemplateField("template12","Port1",16777215,0,1)
 
 
-#! TemplateInstance("template22",2580,2440,0,"")
+#! TemplateInstance("template22",2600,2500,0,"")
 
 
 #! TemplateInstance("template23",2800,2440,0,"")
@@ -111,12 +205,22 @@ expand("template1.vdb", template14) {
 #! TemplateField("template1","MacroForGroup",16777215,0,1)
 
 
-#! TemplateInstance("template13",2120,2440,0,"")
-#! TemplateField("template13","Port1",16777215,0,1)
+#! TemplateInstance("template13",2080,2420,0,"")
 #! TemplateField("template13","MacroForGroup",16777215,0,1)
+#! TemplateField("template13","Port1",16777215,0,1)
 
 
 #! TemplateInstance("template14",2340,2480,0,"")
 #! TemplateField("template14","Port1",16777215,0,1)
 #! TemplateField("template14","MacroForGroup",16777215,0,1)
 
+#! Record(NewAI,2040,2681,0,1,"NewAI")
+#! Record(NewAI2,2060,2701,0,1,"NewAI2")
+#! Record(NewAI3,2070,2701,0,1,"NewAI3")
+#! Record(NewAI4,2080,2721,0,1,"NewAI4")
+#! Record(NewAI5,2090,2721,0,1,"NewAI5")
+#! Record(NewAI6,2100,2741,0,1,"NewAI6")
+#! Record(NewAI7,2110,2741,0,1,"NewAI7")
+#! Record(NewAI8,2120,2761,0,1,"NewAI8")
+#! Record(NewAI9,2130,2761,0,1,"NewAI9")
+#! Record(NewAI10,2140,2781,0,1,"NewAI10")

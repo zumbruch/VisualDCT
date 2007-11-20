@@ -27,10 +27,15 @@
  */
 package com.cosylab.vdct.inspector;
 
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Vector;
 
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumnModel;
 
 import com.cosylab.vdct.plugin.debug.PluginDebugManager;
 import com.cosylab.vdct.vdb.NameValueInfoProperty;
@@ -39,29 +44,29 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 	
 	private HashMap colIndicesMap = null;
 	private String[] columnNames = null;
-    private Inspectable[] inspectables = null; 
 	private InspectableProperty[][] fields = null;
 	private NameValueInfoProperty emptyProperty = null;
+
+	SpreadsheetRowComparator comparator = null;
 	
-	public SpreadsheetTableModel(Vector inspectData)
-	        throws IllegalArgumentException {
+	private int columnCount = 0;
+	private int rowCount = 0;
+	
+	public SpreadsheetTableModel(Vector inspectData, JTableHeader tableHeader) throws IllegalArgumentException {
 
   		if (inspectData == null || inspectData.size() == 0) {
-  			throw new IllegalArgumentException(
-  					"inspectables must not be empty or null");
+  			throw new IllegalArgumentException("inspectables must not be empty or null");
   		}
-  		
-        int size = inspectData.size();
-        InspectableProperty[][] properties = new InspectableProperty[size][];
-        inspectables = new Inspectable[size];
-        inspectData.copyInto(inspectables);
-        int columnCount = 1;
+
+        rowCount = inspectData.size();
+        InspectableProperty[][] properties = new InspectableProperty[rowCount][];
+        columnCount = 1;
 
         Vector colStrings = new Vector();
         colStrings.add("");
   		colIndicesMap = new HashMap();
         
-		for (int i = 0; i < size; i++) {
+		for (int i = 0; i < rowCount; i++) {
 			properties[i] = ((Inspectable)inspectData.get(i)).getProperties(-1);
 			
 			for (int j = 0; j < properties[i].length; j++) {
@@ -81,37 +86,50 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 		colStrings.copyInto(columnNames);
 
 		emptyProperty = new NameValueInfoProperty("", "");
-		
-		fields = new InspectableProperty[size][];
-		for (int i = 0; i < size; i++) {
-			fields[i] = new InspectableProperty[columnCount];
-			refreshPropertiesRow(i);
-		}
+		createFields(properties);
+
+		comparator = new SpreadsheetRowComparator();
+
+		tableHeader.addMouseListener(new MouseAdapter() {
+	        public void mouseClicked(MouseEvent event) {
+	            JTableHeader header = (JTableHeader)event.getSource();
+	            TableColumnModel columnModel = header.getColumnModel();
+	            int viewColumn = columnModel.getColumnIndexAtX(event.getX());
+	            int column = columnModel.getColumn(viewColumn).getModelIndex();
+	            if (column != -1) {
+	        		comparator.setColumn(column);
+	        		Arrays.sort(fields, comparator);
+	        		fireTableDataChanged(); 
+	            }
+	        }
+	    });
 	}
 	
-	private void refreshPropertiesRow(int row) {
-		Inspectable inspectable = inspectables[row];
+	private void createFields(InspectableProperty[][] properties) {
 
-		InspectableProperty[] properties = inspectable.getProperties(-1);
-		
-		CreatorProperty creatorProperty = null;
-		for (int i = 0; i < properties.length; i++) {
-			if (properties[i] instanceof CreatorProperty) {
-				creatorProperty = (CreatorProperty)properties[i];
-				break;
-			}
-		}
+		fields = new InspectableProperty[rowCount][];
+		for (int i = 0; i < rowCount; i++) {
+			fields[i] = new InspectableProperty[columnCount];
 
-		for (int i = 0; i < fields[row].length; i++) {
-			fields[row][i] = (i == 0) ? emptyProperty : creatorProperty;
-		}
-		for (int i = 0; i < properties.length; i++) {
-			if (properties[i] instanceof CreatorProperty) {
-				continue;
+			CreatorProperty creatorProperty = null;
+			for (int j = 0; j < properties[i].length; j++) {
+				if (properties[i][j] instanceof CreatorProperty) {
+					creatorProperty = (CreatorProperty)properties[i][j];
+					break;
+				}
 			}
-			String name = properties[i].getName();
-			// map must contain the key 
-			fields[row][((Integer)colIndicesMap.get(name)).intValue()] = properties[i];
+
+			for (int j = 0; j < fields[i].length; j++) {
+				fields[i][j] = (j == 0) ? emptyProperty : creatorProperty;
+			}
+			for (int j = 0; j < properties[i].length; j++) {
+				if (properties[i][j] instanceof CreatorProperty) {
+					continue;
+				}
+				String name = properties[i][j].getName();
+				// map must contain the key 
+				fields[i][((Integer)colIndicesMap.get(name)).intValue()] = properties[i][j];
+			}
 		}
 	}
 
@@ -124,11 +142,11 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 	}
 
 	public int getColumnCount() {
-		return fields[0].length;
+		return columnCount;
 	}
 
 	public int getRowCount() {
-		return fields.length;
+		return rowCount;
 	}
 	
 	public Object getValueAt(int rowIndex, int columnIndex) {
@@ -140,11 +158,13 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 		InspectableProperty property = fields[row][column];
 
 		if (property instanceof CreatorProperty) {
-			((CreatorProperty)property).setName(columnNames[column]);
+			CreatorProperty creatorProperty = (CreatorProperty)property; 
+			creatorProperty.setName(columnNames[column]);
+			creatorProperty.setValue(aValue.toString());
+			fields[row][column] = creatorProperty.getCreatedProperty(); 
+		} else {
+			property.setValue(aValue.toString());
 		}
-		property.setValue(aValue.toString());
-		
-		refreshPropertiesRow(row);
 		fireTableRowsUpdated(row, row);
 	}
 	

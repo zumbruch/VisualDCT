@@ -63,7 +63,7 @@ public class InspectorCellEditor implements TableCellEditor, TreeCellEditor {
 	
 	protected JComponent editorComponent;
 	protected EditorDelegate delegate;
-	protected int clickCountToStart = 2; // test
+	protected int clickCountToStart = 1;
 	
 	protected HelpDisplayer helpDisplayer = null;
 

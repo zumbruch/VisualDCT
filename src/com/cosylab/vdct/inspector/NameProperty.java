@@ -28,6 +28,7 @@
 package com.cosylab.vdct.inspector;
 
 import com.cosylab.vdct.events.CommandManager;
+import com.cosylab.vdct.events.commands.GetVDBManager;
 import com.cosylab.vdct.graphics.objects.Flexible;
 import com.cosylab.vdct.graphics.objects.VisibleObject;
 import com.cosylab.vdct.undo.RenameAction;
@@ -71,13 +72,17 @@ public class NameProperty extends NameValueInfoProperty {
 
 		String oldName = namedObject.getFlexibleName();
 
+		GetVDBManager manager = (GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
+		String errorMessage = manager.getManager().checkRecordName(getValue(), true);
+        if (errorMessage != null || !errorMessage.startsWith("WARNING")) {
+        	return;
+        }
 		if (!namedObject.rename(value)) {
 			return;
 		}
 		this.value = namedObject.getFlexibleName();
 
-		UndoManager.getInstance().addAction(
-				new RenameAction(namedObject, oldName, this.value));
+		UndoManager.getInstance().addAction(new RenameAction(namedObject, oldName, this.value));
 		
         // TODO: call appropriately when InspectorInterface is generalized 
         //InspectorManager.getInstance().updateProperty(visualRecord, field);

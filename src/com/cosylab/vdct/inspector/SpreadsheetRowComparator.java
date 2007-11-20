@@ -1,5 +1,3 @@
-package com.cosylab.vdct.events.commands;
-
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
  * All rights reserved.
@@ -28,40 +26,21 @@ package com.cosylab.vdct.events.commands;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import com.cosylab.vdct.events.Command;
-import com.cosylab.vdct.VisualDCT;
+package com.cosylab.vdct.inspector;
 
-/**
- * Insert the type's description here.
- * Creation date: (29.12.2000 12:37:43)
- * @author 
- */
-public class SetUndoMenuItemState extends Command {
-	private VisualDCT visualDCT;
-	private boolean state;
-/**
- * Insert the method's description here.
- * Creation date: (29.12.2000 12:37:58)
- */
+import java.util.Comparator;
 
-public SetUndoMenuItemState(VisualDCT visualDCT) {
-	this.visualDCT=visualDCT;
-}
-/**
- * Insert the method's description here.
- * Creation date: (29.12.2000 12:37:43)
- */
-public void execute() {
-	visualDCT.getUndoMenuItem().setEnabled(state);
-	visualDCT.getUndoButton().setEnabled(state);
-	visualDCT.getSpreadsheetInspector().getUndoItem().setEnabled(state);
-}
-/**
- * Insert the method's description here.
- * Creation date: (22.4.2001 18:04:29)
- * @param newState boolean
- */
-public void setState(boolean newState) {
-	state = newState;
-}
+public class SpreadsheetRowComparator implements Comparator {
+	
+    private int column = 0;
+	
+	public void setColumn(int column) {
+		this.column = column;
+	}
+	
+	public int compare(Object arg0, Object arg1) {
+		InspectableProperty[] first = (InspectableProperty[])arg0;  
+		InspectableProperty[] second = (InspectableProperty[])arg1;
+		return first[column].getValue().compareTo(second[column].getValue());
+	}
 }

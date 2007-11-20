@@ -596,8 +596,10 @@ public class Template
 			{
 				String name = i.next().toString();
 				// if not already added above as macro
-				if (getSubObject(name)==null)
-				items.addElement(new MonitoredProperty(name, (String)templateData.getProperties().get(name), this));
+				if (getSubObject(name) == null) {
+				    String value = (String)templateData.getProperties().get(name);
+					items.addElement(new MonitoredProperty(name, value, this));
+				}
 			}
 
 			// callback object for adding new macros
@@ -1331,10 +1333,10 @@ public VDBFieldData getField(String name) {
 /* (non-Javadoc)
  * @see com.cosylab.vdct.vdb.CreatorPropertyListener#addProperty(java.lang.Object, java.lang.String)
  */
-public void addProperty(String key, String value) {
+public InspectableProperty  addProperty(String key, String value) {
 
 	if (templateData.getProperties().containsKey(key) || getSubObject(key) != null) {
-		return;
+		return null;
 	}
 	templateData.addProperty(key, value);
 
@@ -1344,6 +1346,8 @@ public void addProperty(String key, String value) {
 	InspectorManager.getInstance().updateObject(this);
 	unconditionalValidation();
 	CommandManager.getInstance().execute("RepaintWorkspace");
+	
+	return new MonitoredProperty(key, value, this);
 }
 /**
  * @see com.cosylab.vdct.vdb.MonitoredPropertyListener#addProperty()

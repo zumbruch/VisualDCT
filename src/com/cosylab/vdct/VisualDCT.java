@@ -277,7 +277,8 @@ public class VisualDCT extends JFrame {
 
 	private PrintService lastPrintService = null;
 	
-// shp: not final solution
+	private SpreadsheetInspector spreadsheet = null; 
+	
 	private static VisualDCT instance = null;
 	
 	
@@ -6701,9 +6702,17 @@ public void preferences___MenuItem_ActionPerformed() {
  * Comment
  */
 public void spreadsheetMenuItemActionPerformed() {
-	SpreadsheetInspector inspector = new SpreadsheetInspector(this, true);
-	inspector.setLocationRelativeTo(this);
-	inspector.setVisible(true);
+	SpreadsheetInspector spreadsheet = getSpreadsheetInspector();
+	spreadsheet.setLocationRelativeTo(this);
+	spreadsheet.displaySpreadsheet();
+}
+
+public SpreadsheetInspector getSpreadsheetInspector() {
+	
+	if (spreadsheet == null) {
+		spreadsheet = new SpreadsheetInspector(this, true);
+	}
+	return spreadsheet;
 }
 
 public byte[] printGrid(PageFormat pageFormat, StringBuffer stringBuffer) {

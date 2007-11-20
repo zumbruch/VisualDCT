@@ -31,13 +31,17 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
 
 import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
+import javax.swing.TransferHandler;
 
 import com.cosylab.vdct.Console;
 import com.cosylab.vdct.undo.UndoManager;
@@ -50,12 +54,7 @@ import com.cosylab.vdct.undo.UndoManager;
  * @author <a href="mailto:matej.sekoranjaATcosylab.com">Matej Sekoranja</a>
  * @version $id$
  */
-public class InspectorTableClipboardAdapter implements ActionListener {
-
-    /**
-     * Clipboard string selection.
-     */
-    private StringSelection stringSelection;
+public class InspectorTableClipboardAdapter extends TransferHandler implements ActionListener {
 
     /**
      * System clipboard.
@@ -66,7 +65,7 @@ public class InspectorTableClipboardAdapter implements ActionListener {
      * Managed table.
      */
     private JTable table;
-    
+   
     /**
      * Stored selection data.
      */
@@ -135,7 +134,6 @@ public class InspectorTableClipboardAdapter implements ActionListener {
         table.registerKeyboardAction(this, COPY_ACTION_NAME, COPY_KEYSTROKE, c);
         table.registerKeyboardAction(this, PASTE_ACTION_NAME, PASTE_KEYSTROKE, c);
         table.registerKeyboardAction(this, DEL_ACTION_NAME, DEL_KEYSTROKE, c);
-        
         // cache clipboard system
         clipboardSystem = Toolkit.getDefaultToolkit().getSystemClipboard();
     }
@@ -156,9 +154,10 @@ public class InspectorTableClipboardAdapter implements ActionListener {
     public void actionPerformed(ActionEvent e)
     {
         if (e.getActionCommand().equals(CUT_ACTION_NAME)) {
-            performCopy(true);
+            performCopy();
+            performDelete();
         } else if (e.getActionCommand().equals(COPY_ACTION_NAME)) {
-            performCopy(false);
+            performCopy();
         } else if (e.getActionCommand().equals(PASTE_ACTION_NAME)) {
             performPaste();
         } else if (e.getActionCommand().equals(DEL_ACTION_NAME)) {
@@ -166,7 +165,59 @@ public class InspectorTableClipboardAdapter implements ActionListener {
         }
     }
     
-    private void refreshSelectionData() {
+    protected Transferable createTransferable(JComponent c) {
+		Console.getInstance().println("create transferable");
+        return new StringSelection(selectionToString());
+    }
+    
+    public int getSourceActions(JComponent c) {
+        return COPY_OR_MOVE;
+    }
+    
+    public boolean importData(JComponent c, Transferable t) {
+		Console.getInstance().println("import data");
+        if (canImport(c, t.getTransferDataFlavors())) {
+            try {
+                String string = (String)t.getTransferData(DataFlavor.stringFlavor);
+                stringToSelection(string);
+                return true;
+            } catch (UnsupportedFlavorException ufe) {
+            } catch (IOException ioe) {
+            }
+        }
+        return false;
+    }
+    
+    protected void exportDone(JComponent c, Transferable data, int action) {
+		Console.getInstance().println("export done");
+        //cleanup(c, action == MOVE);
+    }
+    
+    public boolean canImport(JComponent c, DataFlavor[] flavors) {
+
+		// when dropping data, use single cell selections
+    	if (!table.getColumnSelectionAllowed()) {
+	    	table.setColumnSelectionAllowed(true);
+		}
+
+    	for (int i = 0; i < flavors.length; i++) {
+            if (DataFlavor.stringFlavor.equals(flavors[i])) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+	/* (non-Javadoc)
+	 * @see javax.swing.TransferHandler#exportToClipboard(javax.swing.JComponent, java.awt.datatransfer.Clipboard, int)
+	 */
+	public void exportToClipboard(JComponent comp, Clipboard clip, int action)
+			throws IllegalStateException {
+		Console.getInstance().println("export to clipboard");
+		super.exportToClipboard(comp, clip, action);
+	}
+
+	private void refreshSelectionData() {
     	numOfSelRows = table.getSelectedRowCount(); 
         selRows = table.getSelectedRows();
         numOfSelCols = table.getSelectedColumnCount();
@@ -193,153 +244,28 @@ public class InspectorTableClipboardAdapter implements ActionListener {
      * Perform copy/cut action.
      * @param	cut		perform cut.
      */
-    private void performCopy(boolean cut)
-    {
-        refreshSelectionData();
-        
-        Console.getInstance().println(numOfSelRows + " " + numOfSelCols);
-        for (int i = 0; i < numOfSelRows; i++) {
-            Console.getInstance().print(selRows[i] + " ");
-        }
-        Console.getInstance().println();
-        for (int i = 0; i < numOfSelCols; i++) {
-            Console.getInstance().print(selCols[i] + " ");
-        }
-        Console.getInstance().println();
-
-        // noop check
-        if (numOfSelRows == 0 || numOfSelCols == 0) {
-            return;
-        }
-        
-        // old: inspector
-        //int numCols = 2;
-        //int[] colsSelected = new int[] { 1, 2 };
-
-        // check to ensure we have selected only a contiguous block of cells
-        /*
-        boolean contiguousRows = 
-            (numRows-1) == (rowsSelected[rowsSelected.length - 1] - rowsSelected[0])
-            && numRows == rowsSelected.length;
-        
-        boolean contiguousCols = 
-            (numCols-1) == (colsSelected[colsSelected.length - 1] - colsSelected[0])
-            && numCols == colsSelected.length;
-        
-        if (!(contiguousRows && contiguousCols))
-        {
-            JOptionPane.showMessageDialog(null,
-                    	"Invalid copy selection, only contiguous block of cells is allowed.",
-                    	"Invalid Copy Selection",
-                    	JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        */
-        
-        
-        boolean cutPerformed = false;
-        
-        // undo support (to pack all into one action)
-    	try {
-            StringBuffer sbf = new StringBuffer();
-            
-    	    // construct string
-            for (int i = 0; i < numOfSelRows; i++) {
-                for (int j = 0; j < numOfSelCols; j++) {
-                	int row = selRows[i];
-                	int col = selCols[j];
-                    sbf.append(table.getValueAt(row, col));
-                    if (j < numOfSelCols - 1) {
-                        sbf.append("\t");
-                    }
-
-                    if (table.isCellEditable(row, col) && cut) {
-                        if (!cutPerformed) {
-                        	cutPerformed = true;
-                			UndoManager.getInstance().startMacroAction();
-                        }
-                        table.setValueAt(EMPTY_STRING, row, col);
-                    }    
-                }
-                sbf.append("\n");
-            }
-            
-            // do the copy
-            stringSelection = new StringSelection(sbf.toString());
-            clipboardSystem = Toolkit.getDefaultToolkit().getSystemClipboard();
-            clipboardSystem.setContents(stringSelection, stringSelection);
-    	} finally {
-   		    if (cutPerformed) {
-   		        UndoManager.getInstance().stopMacroAction();
-   		    }
-   		}
+    private void performCopy() {
+    	String string = selectionToString();  
+    	if (string.equals("")) {
+    		return;
+    	}
+    	
+        StringSelection stringSelection = new StringSelection(string);
+        clipboardSystem = Toolkit.getDefaultToolkit().getSystemClipboard();
+        clipboardSystem.setContents(stringSelection, stringSelection);
     }
     
     /**
      * Perform paste action.
-     * Selections comprising non-adjacent cells result in invalid selection and
-     * then copy action cannot be performed. Paste is done by aligning the upper
-     * left corner of the selection with the 1st element in the current
-     * selection of the JTable.
      */
     private void performPaste() {
-        refreshSelectionData();
 
-        // Check whether selection exists. If it does not, currently do nothing.
-        if (numOfSelRows == 0 || numOfSelCols == 0) {
-            return;
-        }
-        
-        int rowCount = table.getRowCount();
-        int columnCount = table.getColumnCount();
-
-        boolean pasted = false;
-        
-        // w/ packed undo support 
         try {
-            String transferedString = (String)clipboardSystem.getContents(this)
-            		.getTransferData(DataFlavor.stringFlavor);
-
-            String[] rowStrings = transferedString.split("\\n");
-
-            /* Calculates the maximum fields length to foil Excel's random
-             * omission of trailing empty spaces. 
-             */ 
-            int maxCols = 0;
-            for (int i = 0; i < rowStrings.length; i++) {
-            	maxCols = Math.max(maxCols, rowStrings[i].split("\\t", -1).length);
-            }
-            
-            int i = 0;
-            int j = 0;
-            int row = 0;
-            int col = 0;
-            String value = null;
-            for (i = 0; i < rowStrings.length; i++) {
-                String[] fields = rowStrings[i].split("\\t", maxCols);
-                row = i + selRows[0]; 
-
-                for (j = 0; j < maxCols; j++) {
-                	col = j + selCols[0];
-                	
-	                if (row >= rowCount || col >= columnCount) {
-	                	continue;
-	                }
-               	    if (!pasted) {
-               	        pasted = true;
-               			UndoManager.getInstance().startMacroAction();
-               	    }
-               	    value = j < fields.length ? fields[j] : EMPTY_STRING; 
-                    table.setValueAt(value, row, col);
-                }
-            }
-        } catch (Throwable th) {
-            // noop
-        } finally {
-    	    if (pasted) {
-    	        UndoManager.getInstance().stopMacroAction();
-    	    }
-    	}
+        	String string = (String)clipboardSystem.getContents(this).getTransferData(DataFlavor.stringFlavor);
+        	stringToSelection(string);
+        } catch (UnsupportedFlavorException ufe) {
+        } catch (IOException ioe) {
+        }
     }
     /**
      * Perform delete action.
@@ -374,5 +300,107 @@ public class InspectorTableClipboardAdapter implements ActionListener {
    		        UndoManager.getInstance().stopMacroAction();
    		    }
    		}
+    }
+
+    private String selectionToString() {
+
+    	refreshSelectionData();
+        
+        // noop check
+        if (numOfSelRows == 0 || numOfSelCols == 0) {
+            return "";
+        }
+
+        StringBuffer buffer = new StringBuffer();
+
+        // construct string
+        for (int i = 0; i < numOfSelRows; i++) {
+        	for (int j = 0; j < numOfSelCols; j++) {
+        		int row = selRows[i];
+        		int col = selCols[j];
+
+        		// the first column does not contain values in inspector and spreadheet
+        		if (col == 0) {
+        			continue;
+        		}
+
+        		buffer.append(table.getValueAt(row, col));
+        		if (j < numOfSelCols - 1) {
+        			buffer.append("\t");
+        		}
+        	}
+        	buffer.append("\n");
+        }
+
+    	Console.getInstance().println("exporting:" + buffer.toString());
+        
+        return buffer.toString();
+    }
+
+    /**
+     * Selections comprising non-adjacent cells result in invalid selection and
+     * then copy action cannot be performed. Paste is done by aligning the upper
+     * left corner of the selection with the 1st element in the current
+     * selection of the JTable.
+     */
+    private void stringToSelection(String string) {
+
+    	Console.getInstance().println("importing:" + string);
+    	refreshSelectionData();
+
+        // Check whether selection exists. If it does not, currently do nothing.
+        if (numOfSelRows == 0 || numOfSelCols == 0) {
+            return;
+        }
+
+    	// skip pasting in the first column, empty with inspector and spreadsheet
+        int startCol = Math.max(selCols[0], 1);
+        int startRow = selRows[0];
+        
+        int rowCount = table.getRowCount();
+        int columnCount = table.getColumnCount();
+
+        boolean pasted = false;
+        
+        // w/ packed undo support
+        try {
+            // acknowledge trailing empty lines; the last is explicitly ignored later    
+        	String[] rowStrings = string.split("\\n", -1);
+
+            /* Calculates the maximum fields length to foil Excel's random omission of trailing empty spaces. 
+             */ 
+            int maxCols = 0;
+            for (int i = 0; i < rowStrings.length - 1; i++) {
+            	maxCols = Math.max(maxCols, rowStrings[i].split("\\t", -1).length);
+            }
+            
+            int i = 0;
+            int j = 0;
+            int row = 0;
+            int col = 0;
+            String value = null;
+            for (i = 0; i < rowStrings.length - 1; i++) {
+                String[] fields = rowStrings[i].split("\\t", maxCols);
+                row = i + startRow; 
+
+                for (j = 0; j < maxCols; j++) {
+                	col = j + startCol;
+                	
+	                if (row >= rowCount || col >= columnCount) {
+	                	continue;
+	                }
+               	    if (!pasted) {
+               	        pasted = true;
+               			UndoManager.getInstance().startMacroAction();
+               	    }
+               	    value = j < fields.length ? fields[j] : EMPTY_STRING; 
+                    table.setValueAt(value, row, col);
+                }
+            }
+    	} finally {
+    	    if (pasted) {
+    	        UndoManager.getInstance().stopMacroAction();
+    	    }
+    	}
     }
 }
