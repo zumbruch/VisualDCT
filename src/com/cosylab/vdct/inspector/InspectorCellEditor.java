@@ -449,7 +449,8 @@ public InspectorCellEditor(PropertyTableModel tableModel,
  * @param column int
  */
 private void setAppropriateComponent4Table(JTable table, int row, int column) {
-	InspectableProperty property = tableModel.getPropertyAt(row, column);
+
+	InspectableProperty property = tableModel.getPropertyAt(row, table.convertColumnIndexToModel(column));
 	String[] choices = property.getSelectableValues();
 	
 	if (choices!=null) {

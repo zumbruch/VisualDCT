@@ -875,7 +875,7 @@ public static com.cosylab.vdct.vdb.GUISeparator getPortSeparator() {
 /**
  * @see com.cosylab.vdct.inspector.Inspectable#getProperties(int)
  */
-public InspectableProperty[] getProperties(int mode)
+public InspectableProperty[] getProperties(int mode, boolean spreadsheet)
 {
 	InspectableProperty[] properties = new InspectableProperty[4];
 

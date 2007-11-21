@@ -571,56 +571,29 @@ public class Template
 	}
 
 	/**
-	 * @see com.cosylab.vdct.inspector.Inspectable#getProperties(int)
+	 * @see com.cosylab.vdct.inspector.Inspectable#getProperties(int, boolean spreadsheet)
 	 */
-	public InspectableProperty[] getProperties(int mode) {
+	public InspectableProperty[] getProperties(int mode, boolean spreadsheet) {
 
 		Vector items = new Vector();
 		
-		// TODO: mode definitions in Inspectable interface 
-		if (mode == -1) {
+		if (spreadsheet) {
 			items.addElement(new NameProperty("Name", this));
-			
-			Object obj = null;
-			Enumeration e = subObjectsV.elements();
-			while (e.hasMoreElements()) {
-				obj = e.nextElement();
-				if (obj instanceof TemplateEPICSMacro) {
-					TemplateEPICSMacro tem = (TemplateEPICSMacro)obj;
-					items.addElement(tem.getFieldData());
-				}
-			}
+		} else {
+			items.addElement(GUIHeader.getDefaultHeader());
 
-	  		java.util.Iterator i = templateData.getPropertiesV().iterator();
-			while (i.hasNext())
-			{
-				String name = i.next().toString();
-				// if not already added above as macro
-				if (getSubObject(name) == null) {
-				    String value = (String)templateData.getProperties().get(name);
-					items.addElement(new MonitoredProperty(name, value, this));
-				}
-			}
+			items.addElement(getTemplateSeparator());
+			items.addElement(new NameValueInfoProperty("Template", templateData.getTemplate().getId()));
+			items.addElement(new NameValueInfoProperty("FileName", templateData.getTemplate().getFileName()));
 
-			// callback object for adding new macros
-			items.addElement(new CreatorProperty(this));
-
-			InspectableProperty[] properties = new InspectableProperty[items.size()];
-			items.copyInto(properties);
-			return properties;
+			items.addElement(getTemplateInstanceSeparator());
 		}
-		
-		items.addElement(GUIHeader.getDefaultHeader());
-
-		items.addElement(getTemplateSeparator());
-		items.addElement(new NameValueInfoProperty("Template", templateData.getTemplate().getId()));
-		items.addElement(new NameValueInfoProperty("FileName", templateData.getTemplate().getFileName()));
-
-		items.addElement(getTemplateInstanceSeparator());
 		
 		final String descriptionString = "Description";
 		
-		items.addElement(getMacrosSeparator());
+		if (!spreadsheet) {
+		    items.addElement(getMacrosSeparator());
+		}
 		Object obj;
 		Enumeration e = subObjectsV.elements();
 		// !!! better implementation
@@ -630,30 +603,35 @@ public class Template
 			if (obj instanceof TemplateEPICSMacro)
 			{
 				TemplateEPICSMacro tem = (TemplateEPICSMacro)obj;
-				items.addElement(new GUISeparator(tem.getFieldData().getName()));
+				if (!spreadsheet) {
+     				items.addElement(new GUISeparator(tem.getFieldData().getName()));
+				}
 				items.addElement(tem.getFieldData());
-				items.addElement(new NameValueInfoProperty(descriptionString, tem.getDescription()));
+				if (!spreadsheet) {
+    				items.addElement(new NameValueInfoProperty(descriptionString, tem.getDescription()));
+				}
 			}
 		}
 
-		items.addElement(getPortsSeparator());
-		// !!! better implementation
-		e = subObjectsV.elements();
-		while (e.hasMoreElements())
-		{
-			obj = e.nextElement();
-			if (obj instanceof TemplateEPICSPort)
+		if (!spreadsheet) {
+			items.addElement(getPortsSeparator());
+			// !!! better implementation
+			e = subObjectsV.elements();
+			while (e.hasMoreElements())
 			{
-				TemplateEPICSPort tep = (TemplateEPICSPort)obj;
-				items.addElement(new GUISeparator(tep.getFieldData().getName()));
-				items.addElement(tep.getFieldData());
-				items.addElement(new NameValueInfoProperty(descriptionString, tep.getDescription()));
+				obj = e.nextElement();
+				if (obj instanceof TemplateEPICSPort)
+				{
+					TemplateEPICSPort tep = (TemplateEPICSPort)obj;
+					items.addElement(new GUISeparator(tep.getFieldData().getName()));
+					items.addElement(tep.getFieldData());
+					items.addElement(new NameValueInfoProperty(descriptionString, tep.getDescription()));
+				}
 			}
+			items.addElement(getPropertiesSeparator());
 		}
 
 		
-		items.addElement(getPropertiesSeparator());
-
   		java.util.Iterator i = templateData.getPropertiesV().iterator();
 		while (i.hasNext())
 		{
@@ -663,8 +641,13 @@ public class Template
 			items.addElement(new MonitoredProperty(name, (String)templateData.getProperties().get(name), this));
 		}
 
-		final String addString = "Add macro...";
-		items.addElement(new MonitoredActionProperty(addString, this));
+		// callback object for adding new macros
+		if (spreadsheet) {
+		    items.addElement(new CreatorProperty(this));
+		} else if (!spreadsheet) {
+			final String addString = "Add macro...";
+			items.addElement(new MonitoredActionProperty(addString, this));
+		}
 	
 		InspectableProperty[] properties = new InspectableProperty[items.size()];
 		items.copyInto(properties);

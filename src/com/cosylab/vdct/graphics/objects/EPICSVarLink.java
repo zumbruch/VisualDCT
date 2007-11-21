@@ -487,7 +487,7 @@ public OutLink getOutput() {
  * Creation date: (1.2.2001 22:22:37)
  * @return com.cosylab.vdct.inspector.InspectableProperty[]
  */
-public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode) {
+public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode, boolean spreadsheet) {
 
 	OutLink out;
 	Vector starts = new Vector();

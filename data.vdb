@@ -113,7 +113,6 @@ expand("template1.vdb", template14) {
 
 record(ai, NewAI) {
   field(TSEL, "#L0 A0 @")
-  field(DTYP, "Heidenhein Encoder")
   field(SDIS, "#L0 A0 @")
 }
 
@@ -214,7 +213,7 @@ record(ai, NewAI10) {
 #! TemplateField("template14","Port1",16777215,0,1)
 #! TemplateField("template14","MacroForGroup",16777215,0,1)
 
-#! Record(NewAI,2040,2681,0,1,"NewAI")
+#! Record(NewAI,2040,2695,0,1,"NewAI")
 #! Record(NewAI2,2060,2701,0,1,"NewAI2")
 #! Record(NewAI3,2070,2701,0,1,"NewAI3")
 #! Record(NewAI4,2080,2721,0,1,"NewAI4")

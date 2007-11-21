@@ -362,7 +362,7 @@ public int getOutY() {
  * Creation date: (1.2.2001 22:22:37)
  * @return com.cosylab.vdct.inspector.InspectableProperty[]
  */
-public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode) {
+public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode, boolean spreadsheet) {
 	InspectableProperty[] properties = new InspectableProperty[1+4];
 	properties[0]=GUIHeader.getDefaultHeader();
 	properties[1]=getRecordSeparator();

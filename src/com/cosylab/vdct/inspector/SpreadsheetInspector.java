@@ -27,17 +27,14 @@
  */
 package com.cosylab.vdct.inspector;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Event;
-import java.awt.FontMetrics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Vector;
@@ -52,16 +49,13 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableColumnModel;
 
 import com.cosylab.vdct.DataProvider;
 import com.cosylab.vdct.events.CommandManager;
@@ -81,7 +75,7 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer, Chan
 	
 	private Vector types = null;	
 	private Vector instances = null;
-	private JTable[] tables = null;
+	private SpreadsheetTable[] tables = null;
 	private JLabel helpLabel = null;
 	
 	private JMenuItem undoItem = null;
@@ -257,7 +251,7 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer, Chan
     private void createTables() {
         tabbedPane.removeAll();
 
-    	tables = new JTable[types.size()];
+    	tables = new SpreadsheetTable[types.size()];
         Enumeration typesEn = types.elements();
     	Enumeration instancesEn = instances.elements();
     	String type = null;
@@ -274,37 +268,12 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer, Chan
     	}
     }
     
-    private JTable getTable(Vector data) {
+    private SpreadsheetTable getTable(Vector data) {
 
-    	JTable table = new JTable() {
-    		// when selecting the fields in the first column, select the whole row
-    		public void changeSelection(int rowIndex, int columnIndex,
-    				boolean toggle, boolean extend) {
-    			
-    			super.changeSelection(rowIndex, columnIndex, toggle, extend);
-    			
-    			setColumnSelectionAllowed(true);
-    			if (getSelectedColumn() == 0) {
-    				setColumnSelectionAllowed(false);
-    			}
-    			
-    		}
-    	};
-    	table.setName("ScrollPaneTable");
-    	
-    	table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-    	table.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-		table.setColumnSelectionAllowed(true);
-		
-    	table.getTableHeader().setReorderingAllowed(false);
-    	table.setBackground(new Color(204, 204, 204));
-    	table.setShowVerticalLines(true);
-    	table.setGridColor(Color.black);
-    	table.setBounds(0, 0, 200, 200);
-    	table.setRowHeight(17);
-    	
-		SpreadsheetTableModel tableModel = new SpreadsheetTableModel(data, table.getTableHeader());
+    	SpreadsheetTable table = new SpreadsheetTable(data);
+		SpreadsheetTableModel tableModel = new SpreadsheetTableModel(data);
     	table.setModel(tableModel);
+    	tableModel.setTable(table);
 
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_Z, ActionEvent.CTRL_MASK, false);
 		table.registerKeyboardAction(this, undoString, keyStroke, JComponent.WHEN_FOCUSED);
@@ -328,25 +297,8 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer, Chan
      * be displayed. 
      */
     public void resizeTablesColumns() {
-    	
-    	BufferedImage image =  new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
-    	FontMetrics metrics = image.createGraphics().getFontMetrics(getFont());
-
     	for (int i = 0; i < tables.length; i++) {
-
-    		int colCount = tables[i].getColumnCount();
-    		int rowCount = tables[i].getRowCount();
-    		TableColumnModel colModel = tables[i].getColumnModel(); 
-
-        	for (int j = 0; j < colCount; j++) {
-        		int colWidth = (j == 0) ? 0 : 48;
-            	for (int k = 0; k < rowCount; k++) {
-            		String value = tables[i].getValueAt(k, j).toString();
-                	colWidth = Math.max(colWidth, metrics.stringWidth(value));
-            		
-            	}
-            	colModel.getColumn(j).setPreferredWidth(colWidth + 16);
-        	}
+    		tables[i].resizeColumns();
     	}
     }
     

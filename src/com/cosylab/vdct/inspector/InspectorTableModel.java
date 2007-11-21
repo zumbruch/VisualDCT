@@ -135,7 +135,7 @@ public boolean isCellEditable(int rowIndex, int columnIndex) {
 public void setDataObject(Inspectable object) {
 	dataObject = object;
 	if (object!=null)
-		data = object.getProperties(inspector.getMode());
+		data = object.getProperties(inspector.getMode(), false);
 	else
 		data = null;
 	fireTableDataChanged();

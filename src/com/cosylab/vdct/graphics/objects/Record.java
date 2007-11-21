@@ -910,7 +910,7 @@ public OutLink getOutput() {
  * Creation date: (11.1.2001 21:43:31)
  * @return com.cosylab.vdct.inspector.InspectableProperty[]
  */
-public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode) {
+public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode, boolean spreadsheet) {
 	
 	// to fix DBD which do not have prompt group set for VAL field 
 	final String VAL_NAME = "VAL";
@@ -945,13 +945,19 @@ public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode) 
 		grps = new com.cosylab.vdct.util.IntegerQuickSort().sortEnumeration(groups.keys());
 	
 		Vector all = new Vector();
-		all.addElement(GUIHeader.getDefaultHeader());
+		if (spreadsheet) {
+			all.addElement(new NameProperty("Name", this));
+		} else {
+		    all.addElement(GUIHeader.getDefaultHeader());
+		}
 		
 		Vector items; int grp;
 		for (int gn=0; gn < grps.length; gn++) {
 			items = (Vector)groups.get(grps[gn]);
 			grp = ((VDBFieldData)(items.firstElement())).getGUI_type();
-			all.addElement(new GUISeparator(com.cosylab.vdct.dbd.DBDResolver.getGUIString(grp)));
+			if (!spreadsheet) {
+    			all.addElement(new GUISeparator(com.cosylab.vdct.dbd.DBDResolver.getGUIString(grp)));
+			}
 			all.addAll(items);
 		}
 		
@@ -964,15 +970,19 @@ public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode) 
 		VDBFieldData field;
 		Vector all = new Vector();
 	
-		all.addElement(GUIHeader.getDefaultHeader());
+		if (spreadsheet) {
+			all.addElement(new NameProperty("Name", this));
+		} else {
+			all.addElement(GUIHeader.getDefaultHeader());
 
-		if (mode == SORT_ORDER)
-			all.addElement(getAlphaSeparator());
-		else
-			all.addElement(getDBDSeparator());
+			if (mode == SORT_ORDER) {
+				all.addElement(getAlphaSeparator());
+			} else {
+				all.addElement(getDBDSeparator());
+			}
+		}
 			
-		if (mode==DBD_ORDER)
-		{
+		if (mode==DBD_ORDER) {
 			DBDFieldData dbdField;
 		 	Enumeration e = ((DBDRecordData)DataProvider.getInstance().getDbdDB().getDBDRecordData(recordData.getType())).getFieldsV().elements();
 			while (e.hasMoreElements()) {
@@ -982,47 +992,25 @@ public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode) 
 					(field.getGUI_type()!=DBDConstants.GUI_UNDEFINED) || field.getName().equals(VAL_NAME))
 						all.addElement(field);
 			}
-		}
-		else
-		{
+		} else {
 			Enumeration e = recordData.getFieldsV().elements();
 			while (e.hasMoreElements()) {
 				field = (VDBFieldData)e.nextElement();
 				if (/*(field.getDbdData().getField_type() != com.cosylab.vdct.dbd.DBDConstants.DBF_NOACCESS) &&*/
-					(field.getGUI_type()!=DBDConstants.GUI_UNDEFINED) || field.getName().equals(VAL_NAME))
+					(field.getGUI_type()!=DBDConstants.GUI_UNDEFINED) || field.getName().equals(VAL_NAME)) {
 						all.addElement(field);
 				}
+			}
 		}				
 		InspectableProperty[] properties = new InspectableProperty[all.size()];
 		all.copyInto(properties);
 	
-		if (mode == SORT_ORDER)
-			if (properties.length>2)
-				new com.cosylab.vdct.util.StringQuickSort().sort(properties, 2, properties.length-1);
-	
-		return properties;
-
-	} else if (mode == -1) {
-
-		Vector all = new Vector();
-		all.addElement(new NameProperty("Name", this));
-	
-		VDBFieldData field = null;
-	    DBDFieldData dbdField = null;
-	 	Enumeration e = ((DBDRecordData)DataProvider.getInstance().getDbdDB()
-	 			.getDBDRecordData(recordData.getType())).getFieldsV().elements();
-		while (e.hasMoreElements()) {
-			dbdField = (DBDFieldData)e.nextElement();
-			field = (VDBFieldData)recordData.getField(dbdField.getName());
-			if ((field.getGUI_type() != DBDConstants.GUI_UNDEFINED) ||
-			        field.getName().equals(VAL_NAME)) {
-			    all.addElement(field);
-			}
+		if ((mode == SORT_ORDER) && (properties.length>2)) {
+			new com.cosylab.vdct.util.StringQuickSort().sort(properties, 2, properties.length - 1);
 		}
-		InspectableProperty[] properties = new InspectableProperty[all.size()];
-		all.copyInto(properties);
+	
 		return properties;
-		
+
 	}
 	return null;
 }

@@ -407,9 +407,9 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 	}
 	
 	/**
-	 * @see com.cosylab.vdct.inspector.Inspectable#getProperties(int)
+	 * @see com.cosylab.vdct.inspector.Inspectable#getProperties(int, boolean spreadsheet)
 	 */
-	public InspectableProperty[] getProperties(int mode)
+	public InspectableProperty[] getProperties(int mode, boolean spreadsheet)
 	{
 		Vector items = new Vector();
 		items.addElement(GUIHeader.getDefaultHeader());

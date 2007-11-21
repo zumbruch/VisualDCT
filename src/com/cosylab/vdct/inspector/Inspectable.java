@@ -58,7 +58,7 @@ public String getName();
  * 
  * @return com.cosylab.vdct.inspector.InspectableProperty[]
  */
-com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode);
+com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode, boolean spreadsheet);
 /**
  * Obtains list of all mode names for this particular property.
  * Modes are numbered from 0-n.
