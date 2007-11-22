@@ -43,7 +43,6 @@ import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.TransferHandler;
 
-import com.cosylab.vdct.Console;
 import com.cosylab.vdct.undo.UndoManager;
 
 /**
@@ -166,7 +165,6 @@ public class InspectorTableClipboardAdapter extends TransferHandler implements A
     }
     
     protected Transferable createTransferable(JComponent c) {
-		Console.getInstance().println("create transferable");
         return new StringSelection(selectionToString());
     }
     
@@ -175,7 +173,6 @@ public class InspectorTableClipboardAdapter extends TransferHandler implements A
     }
     
     public boolean importData(JComponent c, Transferable t) {
-		Console.getInstance().println("import data");
         if (canImport(c, t.getTransferDataFlavors())) {
             try {
                 String string = (String)t.getTransferData(DataFlavor.stringFlavor);
@@ -186,11 +183,6 @@ public class InspectorTableClipboardAdapter extends TransferHandler implements A
             }
         }
         return false;
-    }
-    
-    protected void exportDone(JComponent c, Transferable data, int action) {
-		Console.getInstance().println("export done");
-        //cleanup(c, action == MOVE);
     }
     
     public boolean canImport(JComponent c, DataFlavor[] flavors) {
@@ -208,15 +200,6 @@ public class InspectorTableClipboardAdapter extends TransferHandler implements A
         return false;
     }
     
-	/* (non-Javadoc)
-	 * @see javax.swing.TransferHandler#exportToClipboard(javax.swing.JComponent, java.awt.datatransfer.Clipboard, int)
-	 */
-	public void exportToClipboard(JComponent comp, Clipboard clip, int action)
-			throws IllegalStateException {
-		Console.getInstance().println("export to clipboard");
-		super.exportToClipboard(comp, clip, action);
-	}
-
 	private void refreshSelectionData() {
     	numOfSelRows = table.getSelectedRowCount(); 
         selRows = table.getSelectedRows();
@@ -332,8 +315,6 @@ public class InspectorTableClipboardAdapter extends TransferHandler implements A
         	buffer.append("\n");
         }
 
-    	Console.getInstance().println("exporting:" + buffer.toString());
-        
         return buffer.toString();
     }
 
@@ -345,7 +326,6 @@ public class InspectorTableClipboardAdapter extends TransferHandler implements A
      */
     private void stringToSelection(String string) {
 
-    	Console.getInstance().println("importing:" + string);
     	refreshSelectionData();
 
         // Check whether selection exists. If it does not, currently do nothing.

@@ -6704,7 +6704,7 @@ public void preferences___MenuItem_ActionPerformed() {
 public void spreadsheetMenuItemActionPerformed() {
 	SpreadsheetInspector spreadsheet = getSpreadsheetInspector();
 	spreadsheet.setLocationRelativeTo(this);
-	spreadsheet.displaySpreadsheet();
+	spreadsheet.setVisible(true);
 }
 
 public SpreadsheetInspector getSpreadsheetInspector() {

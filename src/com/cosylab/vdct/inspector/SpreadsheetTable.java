@@ -75,8 +75,6 @@ public class SpreadsheetTable extends JTable {
 
 	public void resizeColumns() {
     	
-    	//BufferedImage image =  new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
-    	//FontMetrics metrics = image.createGraphics().getFontMetrics(getFont());
     	FontMetrics metrics = graphics.getFontMetrics(getFont());
 
     	int colCount = getColumnCount();
@@ -93,4 +91,3 @@ public class SpreadsheetTable extends JTable {
     	}
     }
 }
-

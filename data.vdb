@@ -49,7 +49,7 @@ record(compress, Compress_number8) {
 record(compress, Compress_number9) {
   field(TSEL, "232")
   field(EVNT, "67547")
-  field(DESC, "Fgdg")
+  field(DESC, "Fg")
   field(ASG, "Fgdg")
 }
 
@@ -69,10 +69,12 @@ record(compress, Compress_number12) {
 
 record(compress, Compress_number13) {
   field(EVNT, "67547")
+  field(ASG, "Cel")
 }
 
 record(compress, Compress_number14) {
   field(EVNT, "ztrztz")
+  field(ASG, "Cell")
 }
 
 expand("template1.vdb", template12) {
@@ -117,7 +119,7 @@ record(ai, NewAI) {
 }
 
 record(ai, NewAI2) {
-  field(TSEL, "#L0 A0 @")
+  field(TSEL, "#L0 A0@")
   field(DTYP, "Heidenhein Encoder")
   field(SDIS, "#L0 A0 @")
 }
@@ -185,8 +187,8 @@ record(ai, NewAI10) {
 #! Record(Compress_number10,2140,2261,0,1,"Compress_number10")
 #! Record(Compress_number11,2140,2289,0,1,"Compress_number11")
 #! Record(Compress_number12,2160,2309,0,1,"Compress_number12")
-#! Record(Compress_number13,2160,2309,0,1,"Compress_number13")
-#! Record(Compress_number14,2180,2329,0,1,"Compress_number14")
+#! Record(Compress_number13,2160,2295,0,1,"Compress_number13")
+#! Record(Compress_number14,2180,2315,0,1,"Compress_number14")
 
 #! TemplateInstance("template12",2600,2200,0,"")
 #! TemplateField("template12","MacroForGroup",16777215,0,1)

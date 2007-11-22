@@ -56,8 +56,7 @@ public class InspectorTableCellRenderer extends DefaultTableCellRenderer {
 	/**
 	 * InspectorTableCellRenderer constructor comment.
 	 */
-	public InspectorTableCellRenderer(JTable table,
-			PropertyTableModel tableModel) {
+	public InspectorTableCellRenderer(JTable table, PropertyTableModel tableModel) {
 		super();
 		this.tableModel=tableModel;
 		bgColor = table.getBackground();
@@ -69,14 +68,11 @@ public class InspectorTableCellRenderer extends DefaultTableCellRenderer {
 		setFont(table.getFont());
 		setBorder(noFocusBorder);
 
-		try
-		{
+		try {
 			blankIcon = new ImageIcon(getClass().getResource("/images/blank.gif"));
 			eyeIcon = new ImageIcon(getClass().getResource("/images/eye.gif"));
 			noeyeIcon = new ImageIcon(getClass().getResource("/images/noeye.gif"));
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			System.out.println("Failed to load icons!");
 			System.out.println(e);
 			System.out.println();
@@ -100,12 +96,15 @@ public class InspectorTableCellRenderer extends DefaultTableCellRenderer {
 		if (value != null) {
 			str = value.toString();
 		}
-		InspectableProperty property = tableModel.getPropertyAt(row, column);
-		int dispType = tableModel.getPropertyDisplayTypeAt(row, column);
+		int modelRow = row;
+		int modelColumn = table.convertColumnIndexToModel(column);
+		
+		InspectableProperty property = tableModel.getPropertyAt(modelRow, modelColumn);
+		int dispType = tableModel.getPropertyDisplayTypeAt(modelRow, modelColumn);
 
 		setIcon(null);
 
-		if (tableModel.getPropertyAt(row, column).isSepatator()) {
+		if (property.isSepatator()) {
 			super.setHorizontalAlignment(JLabel.CENTER);
 			super.setBackground(separatorbgColor);
 			super.setForeground(separatorfgColor);
@@ -122,10 +121,11 @@ public class InspectorTableCellRenderer extends DefaultTableCellRenderer {
 		} else {
 			super.setHorizontalAlignment(JLabel.LEFT);
 
-			if (isSelected)
+			if (isSelected) {
 				super.setBackground(selectionbgColor);
-			else
+			} else {
 				super.setBackground(bgColor);
+			}
 
 			if (dispType == PropertyTableModel.DISP_VISIBILITY) {
 				switch (property.getVisibility()) {

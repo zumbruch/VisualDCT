@@ -98,20 +98,22 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer, Chan
     }
 
 	/* (non-Javadoc)
+	 * @see java.awt.Dialog#setVisible(boolean)
 	 */
-	public void displaySpreadsheet() {
-		
-		loadData();
-        if (types.size() == 0) {
-        	helpLabel.setText("No objects to display.");
+	public void setVisible(boolean b) {
+		if (b) {
+			loadData();
+	        if (types.size() == 0) {
+	        	helpLabel.setText("No objects to display.");
+	        }
+			createDynamicGUI();
+		} else {
+			closeEditors();
+	    	for (int i = 0; i < tables.length; i++) {
+	    		((SpreadsheetTableModel)tables[i].getModel()).saveView();
+	    	}
         }
-		createDynamicGUI();
-		setVisible(true);
-	}
-
-	public void hideSpreadsheet() {
-		closeEditors();
-		setVisible(false);
+		super.setVisible(b);
 	}
 	
 	public void displayHelp(String text) {
@@ -145,7 +147,7 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer, Chan
     	button.setText("OK");
     	button.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	hideSpreadsheet();
+            	setVisible(false);
             }
         });
 
@@ -203,7 +205,7 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer, Chan
 		exitItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, Event.CTRL_MASK));
 		exitItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	hideSpreadsheet();
+            	setVisible(false);
             }
         });
 
@@ -261,17 +263,17 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer, Chan
     	while (typesEn.hasMoreElements() && instancesEn.hasMoreElements()) {
     		type = (String)typesEn.nextElement();
     		vector = (Vector)instancesEn.nextElement();
-        	tables[i] = getTable(vector);
+        	tables[i] = getTable(type, vector);
             JScrollPane scrollPane = new JScrollPane(tables[i]);
             tabbedPane.addTab(type, scrollPane);
             i++;
     	}
     }
     
-    private SpreadsheetTable getTable(Vector data) {
+    private SpreadsheetTable getTable(String type, Vector data) {
 
     	SpreadsheetTable table = new SpreadsheetTable(data);
-		SpreadsheetTableModel tableModel = new SpreadsheetTableModel(data);
+		SpreadsheetTableModel tableModel = new SpreadsheetTableModel(type, data);
     	table.setModel(tableModel);
     	tableModel.setTable(table);
 
