@@ -123,8 +123,7 @@ public class InspectorCellEditor implements TableCellEditor, TreeCellEditor {
  * Insert the method's description here.
  * Creation date: (10.1.2001 16:03:29)
  */
-public InspectorCellEditor(PropertyTableModel tableModel,
-		HelpDisplayer helpDisplayer) {
+public InspectorCellEditor(PropertyTableModel tableModel, HelpDisplayer helpDisplayer) {
 	
 	intelliEditor = true;
 	this.tableModel = tableModel;

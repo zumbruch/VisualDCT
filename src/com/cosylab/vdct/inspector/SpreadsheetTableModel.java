@@ -40,12 +40,12 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
+import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-import com.cosylab.vdct.Console;
 import com.cosylab.vdct.graphics.objects.Record;
 import com.cosylab.vdct.graphics.objects.Template;
 import com.cosylab.vdct.plugin.debug.PluginDebugManager;
@@ -85,7 +85,7 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 	private static final String hideAll = "Hide all"; 
 
 	private static final String recordType = "R"; 
-	private static final String templateType = "R"; 
+	private static final String templateType = "T"; 
 	private static final String unknownType = "U"; 
 
 	private static final String customView = "Custom"; 
@@ -124,21 +124,33 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 			    		fireTableDataChanged(); 
 			    	}
 			    	
-			    	//test
-			    	for (int i = 0; i < columnCount; i++) {
-			    	    Console.getInstance().println(i + ":" + getTable().convertColumnIndexToView(i));
-			    	}
-			    	
 	            } else if (event.getButton() == MouseEvent.BUTTON3) {
 			        popUpMenuX = event.getX();
 			        popUpMenuY = event.getY();
 					popUpMenu.show(getTable(), popUpMenuX, popUpMenuY);
 			    }
 	        }
+
+	        // The first empty column must stay there. If it is about to be moved, stop it. 
+			public void mousePressed(MouseEvent event) {
+	        	JTableHeader header = getTable().getTableHeader();
+	        	if (header.getDraggedColumn().getModelIndex() == 0) {
+	        		header.setDraggedColumn(null);
+	        	}
+	        }
+	        
+	        // Put the empty column back if it was put aside during move. 
+			public void mouseReleased(MouseEvent event) {
+	        	JTable table = getTable();
+	        	int viewIndex = table.convertColumnIndexToView(0);
+	        	if (viewIndex > 0) {
+	        		table.moveColumn(viewIndex, 0);
+	        	}
+	        }
 	    });
 	    
 		table.addMouseListener(new MouseAdapter() {
-	        public void mouseClicked(MouseEvent event) {
+			public void mouseClicked(MouseEvent event) {
 			    if (event.getButton() == MouseEvent.BUTTON3) {
 			        popUpMenuX = event.getX();
 			        popUpMenuY = event.getY();
@@ -268,34 +280,6 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 					}
                 }
     		}
-    		
-    		private void updateColumnState(JCheckBoxMenuItem checkBox) {
-    			TableColumnModel columnModel = table.getTableHeader().getColumnModel();
-    			String action = checkBox.getActionCommand();
-
-    			int index = nameToDataModelIndex(action);
-    			if (index < 0) {
-    			    return;
-    			}
-
-    			if (checkBox.isSelected() && hiddenColumns[index] != null) {
-    				columnModel.addColumn(hiddenColumns[index]);
-    				hiddenColumns[index] = null;
-    				index++;
-    				while ((index < columnCount) && (hiddenColumns[index] != null)) {
-    					index++; 
-    				}
-    				if (index < columnCount) {
-    					index = dataToColumnModelIndex(index);
-    					if (index >= 0) {
-    					    columnModel.moveColumn(columnModel.getColumnCount() - 1, index);
-    					}
-    				}
-    			} else if (!checkBox.isSelected() && hiddenColumns[index] == null) {
-    				hiddenColumns[index] = columnModel.getColumn(nameToColumnModelIndex(action));
-    				columnModel.removeColumn(hiddenColumns[index]);
-    			}
-    		} 
 		};
 
 		JMenuItem menuItem = new JMenuItem(hide);
@@ -347,6 +331,34 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
    			}
     	}
     }
+
+	private void updateColumnState(JCheckBoxMenuItem checkBox) {
+		TableColumnModel columnModel = table.getTableHeader().getColumnModel();
+		String action = checkBox.getActionCommand();
+
+		int index = nameToDataModelIndex(action);
+		if (index < 0) {
+		    return;
+		}
+
+		if (checkBox.isSelected() && hiddenColumns[index] != null) {
+			columnModel.addColumn(hiddenColumns[index]);
+			hiddenColumns[index] = null;
+			index++;
+			while ((index < columnCount) && (hiddenColumns[index] != null)) {
+				index++; 
+			}
+			if (index < columnCount) {
+				index = dataToColumnModelIndex(index);
+				if (index >= 0) {
+				    columnModel.moveColumn(columnModel.getColumnCount() - 1, index);
+				}
+			}
+		} else if (!checkBox.isSelected() && hiddenColumns[index] == null) {
+			hiddenColumns[index] = columnModel.getColumn(nameToColumnModelIndex(action));
+			columnModel.removeColumn(hiddenColumns[index]);
+		}
+	} 
     
     /** Returns the index of the column in the column model or -1 if this data column is not in the column model.
      */
@@ -451,7 +463,7 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 	private void loadView() {
 		
 		String typeSign = getTypeString(inspectables[0]);
-		SpreadsheetTableViewRecord record = SpreadsheetTableViewData.getInstance().get(typeSign, dataType);
+		SpreadsheetTableViewRecord record = SpreadsheetTableViewData.getInstance().get(typeSign + dataType);
 
         // If there is no record, use default.
 		if (record == null) {
@@ -478,20 +490,28 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 		refreshProperties();
         TableColumnModel columnModel = table.getTableHeader().getColumnModel();
 
-        for (int j = 0; j < columnCount; j++) {
-        	TableColumn column = columnModel.getColumn(0);
+        // Remove all the columns except the first, which is empty.
+        for (int j = 1; j < columnCount; j++) {
+        	//test
+        	/*
+        	columnHandlers[j].setSelected(false);
+        	updateColumnState(columnHandlers[j]);
+        	*/
+        	TableColumn column = columnModel.getColumn(1);
         	hiddenColumns[j] = column; 
         	columnModel.removeColumn(column);
+        	columnHandlers[j].setSelected(false);
 		}
         
-		String[] fields = record.getFields();
+		String[] columns = record.getColumns();
 		
-        for (int j = 0; j < fields.length; j++) {
-	    	Integer integer = (Integer)colIndicesMap.get(fields[j]);
+        for (int j = 0; j < columns.length; j++) {
+	    	Integer integer = (Integer)colIndicesMap.get(columns[j]);
 		    if (integer != null) {
 		    	int i = integer.intValue();
 		    	columnModel.addColumn(hiddenColumns[i]);
 		    	hiddenColumns[i] = null;
+	        	columnHandlers[i].setSelected(true);
 		    }
         }
 	}
@@ -507,24 +527,31 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
         		break;
         	}
         }
+
+        // If the first default view, save nothing and remove the data.
+        if (defaultView && mode == 0) {
+        	SpreadsheetTableViewData.getInstance().remove(typeSign + dataType);
+        	return;
+        }
         
-        // If default view, save nothing. Otherwise, save the current visible columns. 
+        // If other default view, save just the name of the view. Otherwise, save the current visible columns. 
         String modeName = null;
-        String[] fields = null;
+        String[] columns = null;
         if (defaultView) {
         	modeName = getModeNames().get(mode).toString();
-        	fields = new String[0]; 
+        	columns = new String[0]; 
         } else {
         	modeName = customView;
             TableColumnModel columnModel = table.getTableHeader().getColumnModel();
             int columnCount = columnModel.getColumnCount();
 
-            fields = new String[columnCount]; 
-            for (int j = 0; j < columnCount; j++) {
-            	fields[j] = (String)columnModel.getColumn(j).getIdentifier();
+            // Store all but the first which is empty.
+            columns = new String[columnCount - 1]; 
+            for (int j = 0; j < columnCount - 1; j++) {
+            	columns[j] = (String)columnModel.getColumn(j + 1).getIdentifier();
     		}
         }
-        SpreadsheetTableViewRecord record = new SpreadsheetTableViewRecord(typeSign, dataType, modeName, fields); 
+        SpreadsheetTableViewRecord record = new SpreadsheetTableViewRecord(typeSign, dataType, modeName, columns); 
         SpreadsheetTableViewData.getInstance().add(record);
 	}
 	

@@ -28,6 +28,7 @@
 package com.cosylab.vdct.inspector;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -54,8 +55,7 @@ public class SpreadsheetTableViewData {
 	}
 	
 	public void add(SpreadsheetTableViewRecord record) {
-		String key = record.getType() + record.getName();
-		map.put(key, record);
+		map.put(record.getKey(), record);
 	}
 
 	/** Returns the record of the given type and name, or null if there is no such reord.
@@ -64,7 +64,15 @@ public class SpreadsheetTableViewData {
 	 * @param name
 	 * @return
 	 */
-	public SpreadsheetTableViewRecord get(String type, String name) {
-		return (SpreadsheetTableViewRecord)map.get(type + name);
+	public SpreadsheetTableViewRecord get(String key) {
+		return (SpreadsheetTableViewRecord)map.get(key);
+	}
+
+	public void remove(String key) {
+		map.remove(key);
+	}
+	
+	public Iterator getRecords() {
+		return map.values().iterator();
 	}
 }

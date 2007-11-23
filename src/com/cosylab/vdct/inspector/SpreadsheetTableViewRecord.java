@@ -36,20 +36,20 @@ public class SpreadsheetTableViewRecord {
 	private String type = null;
 	private String name = null;
 	private String modeName = null;
-	private String[] fields = null;
+	private String[] columns = null;
 
 	/**
 	 * @param type
 	 * @param name
 	 * @param modeName
-	 * @param fields
+	 * @param columns
 	 */
-	public SpreadsheetTableViewRecord(String type, String name, String modeName, String[] fields) {
+	public SpreadsheetTableViewRecord(String type, String name, String modeName, String[] columns) {
 		super();
 		this.type = type;
 		this.name = name;
 		this.modeName = modeName;
-		this.fields = fields;
+		this.columns = columns;
 	}
 
 	/**
@@ -74,9 +74,13 @@ public class SpreadsheetTableViewRecord {
 	}
 
 	/**
-	 * @return the fields
+	 * @return the columns
 	 */
-	public String[] getFields() {
-		return fields;
+	public String[] getColumns() {
+		return columns;
+	}
+	
+	public String getKey() {
+		return type + name;
 	}
 }

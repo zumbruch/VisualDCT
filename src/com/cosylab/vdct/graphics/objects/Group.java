@@ -39,6 +39,8 @@ import com.cosylab.vdct.Settings;
 import com.cosylab.vdct.Version;
 import com.cosylab.vdct.graphics.*;
 import com.cosylab.vdct.inspector.InspectableProperty;
+import com.cosylab.vdct.inspector.SpreadsheetTableViewData;
+import com.cosylab.vdct.inspector.SpreadsheetTableViewRecord;
 
 import com.cosylab.vdct.vdb.*;
 import com.cosylab.vdct.db.DBDataEntry;
@@ -1276,13 +1278,16 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
  final String quote = "\"";
  final String ending = ")"+nl;
 
- final String VIEW_START      = "#! "+DBResolver.VDCTVIEW+"(";
- final String RECORD_START    = "#! "+DBResolver.VDCTRECORD+"(";
- final String GROUP_START     = "#! "+DBResolver.VDCTGROUP+"(";
- final String FIELD_START     = "#! "+DBResolver.VDCTFIELD+"(";
- final String VISIBILITY_START= "#! "+DBResolver.VDCTVISIBILITY+"(";
- final String LINK_START      = "#! "+DBResolver.VDCTLINK+"(";
- final String CONNECTOR_START = "#! "+DBResolver.VDCTCONNECTOR+"(";
+ final String VIEW_START            = "#! " + DBResolver.VDCTVIEW + "(";
+
+ final String SPREADSHEETVIEW_START = "#! " + DBResolver.VDCTSPREADSHEETVIEW + "(";
+
+ final String RECORD_START          = "#! " + DBResolver.VDCTRECORD + "(";
+ final String GROUP_START           = "#! " + DBResolver.VDCTGROUP + "(";
+ final String FIELD_START           = "#! " + DBResolver.VDCTFIELD + "(";
+ final String VISIBILITY_START      = "#! " + DBResolver.VDCTVISIBILITY + "(";
+ final String LINK_START            = "#! " + DBResolver.VDCTLINK + "(";
+ final String CONNECTOR_START       = "#! " + DBResolver.VDCTCONNECTOR + "(";
 
  final String LINE_START = "#! "+DBResolver.VDCTLINE+"(";
  final String BOX_START = "#! "+DBResolver.VDCTBOX+"(";
@@ -1299,7 +1304,23 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 
  file.writeBytes(VIEW_START + view.getRx() + comma + view.getRy() +
 	 			 comma + view.getScale() + ending);
- 	
+ 
+ // Write the data on the spreadsheet views.
+ Iterator iterator = SpreadsheetTableViewData.getInstance().getRecords();
+ SpreadsheetTableViewRecord sprView = null; 
+ while (iterator.hasNext()) {
+	 sprView = (SpreadsheetTableViewRecord)iterator.next();
+
+     file.writeBytes(SPREADSHEETVIEW_START + sprView.getType() + comma + quote + sprView.getName() + quote);
+     file.writeBytes(comma + quote + sprView.getModeName() + quote);
+     
+     String[] columns = sprView.getColumns();
+     for (int i = 0; i < columns.length; i++) {
+         file.writeBytes(comma + quote + columns[i] + quote);
+     }
+     file.writeBytes(ending);
+ }
+ 
  Enumeration e = elements.elements();
 
  while (e.hasMoreElements()) 
