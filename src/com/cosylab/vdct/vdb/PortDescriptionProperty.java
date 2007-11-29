@@ -135,9 +135,9 @@ public class PortDescriptionProperty implements InspectableProperty {
 		}
 
 		/**
-		 * @see com.cosylab.vdct.inspector.InspectableProperty#isSepatator()
+		 * @see com.cosylab.vdct.inspector.InspectableProperty#isSeparator()
 		 */
-		public boolean isSepatator()
+		public boolean isSeparator()
 		{
 			return false;
 		}

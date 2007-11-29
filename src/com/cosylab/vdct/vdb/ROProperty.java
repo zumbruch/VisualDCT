@@ -119,8 +119,8 @@ public boolean isEditable() {
  * Creation date: (12.1.2001 22:40:34)
  * @return boolean
  */
-public boolean isSepatator() {
-	return property.isSepatator();
+public boolean isSeparator() {
+	return property.isSeparator();
 }
 /**
  * Insert the method's description here.

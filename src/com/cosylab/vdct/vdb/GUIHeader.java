@@ -120,7 +120,7 @@ public boolean isEditable() {
  * Creation date: (12.1.2001 22:40:34)
  * @return boolean
  */
-public boolean isSepatator() {
+public boolean isSeparator() {
 	return true;
 }
 /**

@@ -175,7 +175,6 @@ record(ai, NewAI10) {
 #! Further lines contain data used by VisualDCT
 #! View(1949,2245,1.0)
 #! SpreadsheetView(R,"ai","Alphabetical")
-#! SpreadsheetView(T,"template1.vdb","Custom","Name","macro1","macro2","macro3")
 #! Record(Compress_number1,2040,2202,0,1,"Compress_number1")
 #! Record(Compress_number2,2060,2222,0,1,"Compress_number2")
 #! Record(Compress_number3,2060,2209,0,1,"Compress_number3")

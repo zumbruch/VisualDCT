@@ -295,9 +295,9 @@ public class VDBPort implements InspectableProperty, Descriptable, ChangableVisi
 	}
 
 	/**
-	 * @see com.cosylab.vdct.inspector.InspectableProperty#isSepatator()
+	 * @see com.cosylab.vdct.inspector.InspectableProperty#isSeparator()
 	 */
-	public boolean isSepatator()
+	public boolean isSeparator()
 	{
 		return false;
 	}

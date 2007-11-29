@@ -101,6 +101,10 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer, Chan
 	 * @see java.awt.Dialog#setVisible(boolean)
 	 */
 	public void setVisible(boolean b) {
+		if (b == isVisible()) {
+			return;
+		}
+		
 		if (b) {
 			loadData();
 	        if (types.size() == 0) {

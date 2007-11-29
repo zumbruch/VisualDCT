@@ -96,7 +96,7 @@ public boolean isValid();
  * Creation date: (11.1.2001 21:44:32)
  * @return boolean
  */
-public boolean isSepatator();
+public boolean isSeparator();
 /**
  * Insert the method's description here.
  * Creation date: (11.1.2001 21:30:04)

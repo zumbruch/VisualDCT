@@ -194,9 +194,9 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 		}
 
 		/**
-		 * @see com.cosylab.vdct.inspector.InspectableProperty#isSepatator()
+		 * @see com.cosylab.vdct.inspector.InspectableProperty#isSeparator()
 		 */
-		public boolean isSepatator()
+		public boolean isSeparator()
 		{
 			return false;
 		}

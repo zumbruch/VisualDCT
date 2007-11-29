@@ -104,7 +104,7 @@ public class InspectorTableCellRenderer extends DefaultTableCellRenderer {
 
 		setIcon(null);
 
-		if (property.isSepatator()) {
+		if (property.isSeparator()) {
 			super.setHorizontalAlignment(JLabel.CENTER);
 			super.setBackground(separatorbgColor);
 			super.setForeground(separatorfgColor);

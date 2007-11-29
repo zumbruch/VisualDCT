@@ -85,10 +85,17 @@ public PopUpMenu() {
  */
 
 public static JMenu addItem(JMenuItem item, JMenu menu, int count) {
-  if ((count>0) && ((count%ITEMS_PER_MENU)==0)) menu=addMoreMenu(menu);
-  menu.add(item);
-  return menu;
+	return addItem(item, menu, count, ITEMS_PER_MENU);
 }
+
+public static JMenu addItem(JMenuItem item, JMenu menu, int count, int itemsPerMenu) {
+	if (count > 0 && (count % itemsPerMenu) == 0) {
+		menu = addMoreMenu(menu);
+	}
+	menu.add(item);
+	return menu;
+}
+
 /**
  * Insert the method's description here.
  * Creation date: (3.2.2001 10:39:45)

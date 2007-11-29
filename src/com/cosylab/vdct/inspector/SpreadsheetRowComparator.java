@@ -34,6 +34,12 @@ public class SpreadsheetRowComparator implements Comparator {
 	
     private int column = 0;
     private int sign = 1;
+    SpreadsheetTableModel tableModel = null;
+    
+    public SpreadsheetRowComparator(SpreadsheetTableModel tableModel) {
+    	super();
+    	this.tableModel = tableModel;
+    }
 	
 	public void setColumn(int column) {
 		this.column = column;
@@ -47,7 +53,7 @@ public class SpreadsheetRowComparator implements Comparator {
 		
 		InspectableProperty[] first = (InspectableProperty[])arg0;  
 		InspectableProperty[] second = (InspectableProperty[])arg1;
-		
+
 	    String firstString = first[column].getValue();
 	    String secondString = second[column].getValue();
 
