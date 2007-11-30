@@ -19,7 +19,7 @@ record(compress, Compress_number4) {
 }
 
 record(compress, Compress_number5) {
-  field(DESC, "Fgdg")
+  field(DESC, "Fgdg gfg g")
   field(ASG, "Cel12")
   field(EVNT, "343")
 }

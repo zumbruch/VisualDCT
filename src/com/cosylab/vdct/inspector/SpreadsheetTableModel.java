@@ -56,17 +56,17 @@ import com.cosylab.vdct.plugin.debug.PluginDebugManager;
 import com.cosylab.vdct.vdb.NameValueInfoProperty;
 
 public class SpreadsheetTableModel extends AbstractTableModel implements PropertyTableModel {
+
+    SpreadsheetInspector inspector = null;
 	
 	// Created on construction.
 	private String dataType = null;
 	private Inspectable[] inspectables = null;
 	private SpreadsheetRowComparator comparator = null;
 	private NameValueInfoProperty emptyProperty = null;
-
 	
 	private int rowCount = 0;
     private SpreadsheetTable table = null;
-	
     
 	// The following refresh on mode change. 
 	private int mode = -1;
@@ -76,13 +76,13 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
     // These are the size of the number of properties.
 	private String[] propertyNames = null;
 	private boolean[] hiddenProperties = null;
-    private boolean[] splitProperties = null;
+    private SplitData[] splitData = null;
     private JCheckBoxMenuItem[] propMenuItem = null;
 
     private JPopupMenu popUpMenu = null;
     private JMenuItem hideItem = null; 
     private JComponent hideSeparator = null; 
-	private JMenuItem splitItem = null; 
+	private JMenu splitMenu = null; 
     private JMenuItem joinItem = null;
     private JComponent splitSeparator = null; 
 	private JMenuItem sortAscItem = null; 
@@ -119,7 +119,9 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 	private static final String hideAll = "Hide all"; 
 	private static final String visibility = "Visibility"; 
 	
-	private static final String split = "Split"; 
+	private static final String split = "Split by"; 
+	private static final String whitespaces = "Whitespaces";
+	private static final String customPattern = "Custom...";
 	private static final String join = "Join"; 
 
 	private static final String recordType = "R"; 
@@ -128,11 +130,14 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 
 	private static final String customView = "Custom"; 
 	
-	public SpreadsheetTableModel(String dataType, Vector inspectData) throws IllegalArgumentException {
+	public SpreadsheetTableModel(SpreadsheetInspector inspector, String dataType, Vector inspectData) throws
+	        IllegalArgumentException {
 
   		if (inspectData == null || inspectData.size() == 0) {
   			throw new IllegalArgumentException("inspectables must not be empty or null");
   		}
+  		this.inspector = inspector; 
+  		
 		this.dataType = dataType;
   		emptyProperty = new NameValueInfoProperty("", "");
 		comparator = new SpreadsheetRowComparator(this);
@@ -166,7 +171,13 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 		propertyNames = new String[propertiesCount];
 		propStrings.copyInto(propertyNames);
 	    hiddenProperties = new boolean[propertiesCount]; 
-		splitProperties = new boolean[propertiesCount];
+		splitData = new SplitData[propertiesCount];
+		for (int j = 0; j < propertiesCount; j++) {
+		    splitData[j] = null;
+		}
+		
+		
+		
 		propToColumnIndex = new int[propertiesCount];
 		createPopupMenu();
 
@@ -200,10 +211,15 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 				int propIndex = ((Integer)propNamesIndicesMap.get(properties[i][j].getName())).intValue();
 				int col = propToColumnIndex[propIndex];
 
-				int parts = splitProperties[propIndex] ? 3 : 1;
-			    for (int p = 0; p < parts; p++) {
-					fields[i][col + p] = properties[i][j];
-			    }
+				SplitData split = splitData[propIndex]; 
+				if (split != null) {
+				    SplitPropertyGroup group = new SplitPropertyGroup(properties[i][j], split);
+				    for (int p = 0; p < split.getParts(); p++) {
+				    	fields[i][col + p] = group.getPart(p);
+				    }
+				} else {
+				    fields[i][col] = properties[i][j];
+				}
 			}
 		}
 
@@ -215,16 +231,25 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
     	columnNames = new String[columnCount];
 		for (int j = 0; j < propertiesCount; j++) {
 		    String name = propertyNames[j];
-		    int parts = splitProperties[j] ? 3 : 1;
+     		SplitData split = splitData[j]; 
+		    
 		    int col = propToColumnIndex[j];
-		    if (parts == 1) {
+		    if (split == null) {
 		    	columnNames[col] = name;
 		    } else {
-	    		columnNames[col] = "<" + name + " 1";
-		    	for (int p = 1; p < parts - 1; p++) {
-		    		columnNames[col + p] = name + " " + (p + 1);
+		    	int parts = split.getParts();
+	    		String colName = null;
+		    	for (int p = 0; p < parts; p++) {
+		    	    colName = "";
+		    	    if (p == 0) {
+		    	        colName += "<";
+		    	    }
+		    	    colName += name + " " + (p + 1);
+		    	    if (p == parts - 1) {
+		    	        colName += ">";
+		    	    }
+		    		columnNames[col + p] = colName;
 		    	}
-	    		columnNames[col + parts - 1] = name + " " + parts + ">";
 		    }
 		}
 	}
@@ -233,14 +258,14 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 		
 		columnCount = 0;
 		for (int j = 0; j < propertiesCount; j++) {
-			columnCount += splitProperties[j] ? 3 : 1;
+			columnCount += (splitData[j] != null) ? splitData[j].getParts() : 1;
 		}
 		columnToPropIndex = new int[columnCount];
 		
 		int col = 0;
 		for (int j = 0; j < propertiesCount; j++) {
 		    propToColumnIndex[j] = col;
-		    int parts = splitProperties[j] ? 3 : 1;
+		    int parts = (splitData[j] != null) ? splitData[j].getParts() : 1;
 		    for (int p = 0; p < parts; p++) {
 		    	columnToPropIndex[col] = j;
 		    	col++;
@@ -308,15 +333,18 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 
 			public void mousePressed(MouseEvent event) {
 	        	JTableHeader header = getTable().getTableHeader();
-	        	int colIndex = header.getDraggedColumn().getModelIndex(); 
-	        	if (colIndex > 0) {
-        	        // Change the dragged column to first of a split group. 
-                    int firstOfSplits = propToColumnIndex[columnToPropIndex[colIndex]];
-                    int viewIndex = getTable().convertColumnIndexToView(firstOfSplits);
-	        	    header.setDraggedColumn(header.getColumnModel().getColumn(viewIndex));
-	        	} else {
-        	        // The first empty column must stay there. If it is about to be moved, stop it. 
-	        		header.setDraggedColumn(null);
+	        	TableColumn column = header.getDraggedColumn(); 
+	        	if (column != null) {
+	        		int colIndex = column.getModelIndex();
+	        		if (colIndex > 0) {
+	        			// Change the dragged column to first of a split group. 
+	        			int firstOfSplits = propToColumnIndex[columnToPropIndex[colIndex]];
+	        			int viewIndex = getTable().convertColumnIndexToView(firstOfSplits);
+	        			header.setDraggedColumn(header.getColumnModel().getColumn(viewIndex));
+	        		} else {
+	        			// The first empty column must stay there. If it is about to be moved, stop it. 
+	        			header.setDraggedColumn(null);
+	        		}
 	        	}
 	        }
 	        
@@ -367,16 +395,33 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 			    		hiddenProperties[index] = true;
 			    		updateHiddenColumns();
 			    	}
-				} else if (action.equals(split) || action.equals(join)) {
+				} else if (action.equals(whitespaces) || action.equals(join)) {
 			    	int index = table.convertColumnIndexToModel(popUpColumn);
 			    	if (index >= 0) {
-			    		index = columnToPropIndex[index];
-			    		splitProperties[index] = action.equals(split);
+			    		int propIndex = columnToPropIndex[index];
+			    		if (action.equals(whitespaces)) {
+			    		    SplitData split = SplitData.getWhitespaceSplitData(); 
+			    		
+			    		    int maxParts = 1;
+			    		    for (int i = 0; i < rowCount; i++) {
+			    		        String value = fields[i][index].getValue();
+			    		        int parts = SplitPropertyGroup.getPartsCount(value, split);
+			    		        maxParts = Math.max(maxParts, parts);
+			    		    }
+			    		    split.setParts(maxParts);
+			    		    splitData[propIndex] = split;
+			    		} else {
+			    		    splitData[propIndex] = null;
+			    		}
 			    		refreshColumns();
 						// refresh
 						saveView();
 				    	loadView();
 			    	}
+				} else if (action.equals(customPattern)) {
+				    CustomSplitDialog dialog = inspector.getCustomSplitDialog();
+				    dialog.setLocationRelativeTo(inspector);
+                  	dialog.setVisible(true);
 				} else if (action.equals(sortAsc) || action.equals(sortDes)) {
 			    	int index = table.convertColumnIndexToModel(popUpColumn);
 			    	if (index >= 0) {
@@ -400,10 +445,10 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 						if (action.equals(list.get(i).toString())) {
 							// direct mapping
 							mode = i;
-							saveView();
-							// force refresh
-							mode = -1;
-					    	loadView();
+							refreshProperties();
+							clearColumnModel();
+	                        createDefaultColumnModel();
+	                        table.resizeColumns();
 							break;
 						}
 					}
@@ -418,9 +463,16 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 	    hideSeparator = new JSeparator(); 
     	popUpMenu.add(hideSeparator);
     	
-    	splitItem = new JMenuItem(split);
-    	splitItem.addActionListener(listener);
-    	popUpMenu.add(splitItem);
+    	splitMenu = new JMenu(split);
+    	popUpMenu.add(splitMenu);
+    	
+    	JMenuItem menuItem = new JMenuItem(whitespaces);
+    	menuItem.addActionListener(listener);
+    	splitMenu.add(menuItem);
+
+    	menuItem = new JMenuItem(customPattern);
+    	menuItem.addActionListener(listener);
+    	splitMenu.add(menuItem);
     	
     	joinItem = new JMenuItem(join);
     	joinItem.addActionListener(listener);
@@ -440,7 +492,6 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 	    sortSeparator = new JSeparator(); 
     	popUpMenu.add(sortSeparator);
     	
-    	JMenuItem menuItem = null;
     	ArrayList list = getModeNames();
 
        	for (int i = 0; i < list.size(); i++) {
@@ -488,13 +539,14 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
     
     private void displayPopupMenu(int posX, int posY) {
         popUpColumn = table.getColumnModel().getColumnIndexAtX(posX);
-        boolean first = popUpColumn == 0;
-        boolean persistant = popUpColumn <= persistantColumns;
-        boolean splitted = splitProperties[columnToPropIndex[table.convertColumnIndexToModel(popUpColumn)]];
+        int colIndex = table.convertColumnIndexToModel(popUpColumn);
+        boolean first = colIndex == 0;
+        boolean persistant = colIndex <= persistantColumns;
+        boolean splitted = splitData[columnToPropIndex[colIndex]] != null;
 
         setJComponentVisible(hideItem, !first && !persistant);
         setJComponentVisible(hideSeparator, !first && !persistant);
-        setJComponentVisible(splitItem, !first && !persistant && !splitted);
+        setJComponentVisible(splitMenu, !first && !persistant && !splitted);
         setJComponentVisible(joinItem, !first && !persistant && splitted);
         setJComponentVisible(splitSeparator, !first && !persistant);
         setJComponentVisible(sortAscItem, !first);
@@ -601,15 +653,7 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 	        refreshProperties();
 		}
 		
-		for (int j = 0; j < propertiesCount; j++) {
-    	    hiddenProperties[j] = true;
-        	propMenuItem[j].setSelected(false);
-    	}
-		
-        TableColumnModel columnModel = table.getTableHeader().getColumnModel();
-        while (columnModel.getColumnCount() > 0) {
-        	columnModel.removeColumn(columnModel.getColumn(0));
-        }
+		clearColumnModel();
 
     	if (customMode) {
     		String[] columns = record.getColumns();
@@ -624,17 +668,34 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
     		    }
             }
     	} else {
-    		for (int j = 0; j < propertiesCount; j++) {
-		    	addColumns(j);
-        	}
+    	    createDefaultColumnModel();
     	}
 		table.resizeColumns();
 	}
 	
+	private void clearColumnModel() {
+		for (int j = 0; j < propertiesCount; j++) {
+    	    hiddenProperties[j] = true;
+        	propMenuItem[j].setSelected(false);
+    	}
+		
+        TableColumnModel columnModel = table.getTableHeader().getColumnModel();
+        while (columnModel.getColumnCount() > 0) {
+        	columnModel.removeColumn(columnModel.getColumn(0));
+        }
+	}
+	
+	private void createDefaultColumnModel() {
+		for (int j = 0; j < propertiesCount; j++) {
+			addColumns(j);
+		}
+	} 
+	
 	private void addColumns(int propIndex) {
 
         TableColumnModel columnModel = table.getTableHeader().getColumnModel();
-		int parts = splitProperties[propIndex] ? 3 : 1;
+        
+		int parts = (splitData[propIndex] != null) ? splitData[propIndex].getParts() : 1;
     	int colStart = propToColumnIndex[propIndex];
     	for (int p = 0; p < parts; p++) {
 	    	// Set the identifier to the first of the split columns only. This is used when saving the order.

@@ -71,7 +71,7 @@ import com.cosylab.vdct.vdb.VDBTemplate;
  */
 public class SpreadsheetInspector extends JDialog implements HelpDisplayer, ChangeListener, ActionListener {
 
-    private JTabbedPane tabbedPane;
+    private JTabbedPane tabbedPane = null;
 	
 	private Vector types = null;	
 	private Vector instances = null;
@@ -80,6 +80,8 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer, Chan
 	
 	private JMenuItem undoItem = null;
 	private JMenuItem redoItem = null;
+	
+    private CustomSplitDialog splitDialog = null;
 	
 	private final static String undoString = "UndoAction";
 	private final static String redoString = "RedoAction";
@@ -277,7 +279,7 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer, Chan
     private SpreadsheetTable getTable(String type, Vector data) {
 
     	SpreadsheetTable table = new SpreadsheetTable(data);
-		SpreadsheetTableModel tableModel = new SpreadsheetTableModel(type, data);
+		SpreadsheetTableModel tableModel = new SpreadsheetTableModel(this, type, data);
     	table.setModel(tableModel);
     	tableModel.setTable(table);
 
@@ -329,6 +331,13 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer, Chan
             refreshTables();
     	}  
     }
+    
+    public CustomSplitDialog getCustomSplitDialog() {
+        if (splitDialog == null) {
+            splitDialog = new CustomSplitDialog(this);
+        }
+        return splitDialog;
+     }
 
     private void closeEditors() {
     	for (int i = 0; i < tables.length; i++) {
