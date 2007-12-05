@@ -5,6 +5,7 @@
 
 
 record(compress, Compress_number1) {
+  field(ASG, "  ")
 }
 
 record(compress, Compress_number2) {
@@ -61,6 +62,7 @@ record(compress, Compress_number10) {
 
 record(compress, Compress_number11) {
   field(DESC, "Dfgdf")
+  field(DTYP, "12")
 }
 
 record(compress, Compress_number12) {
@@ -74,7 +76,7 @@ record(compress, Compress_number13) {
 
 record(compress, Compress_number14) {
   field(EVNT, "ztrztz")
-  field(ASG, "Cell")
+  field(ASG, "f 4 34g")
 }
 
 expand("template1.vdb", template12) {
@@ -175,7 +177,8 @@ record(ai, NewAI10) {
 #! Further lines contain data used by VisualDCT
 #! View(1949,2245,1.0)
 #! SpreadsheetView(R,"ai","Alphabetical")
-#! Record(Compress_number1,2040,2202,0,1,"Compress_number1")
+#! SpreadsheetView(R,"compress","Custom","Name","DESC","ASG","DTYP","FLNK","SCAN","PINI","PHAS","EVNT","DISV","SDIS","DISS","PRIO","ALG","HOPR","LOPR","PREC","EGU","INP","NSAM","N","IHIL","ILIL","VAL")
+#! Record(Compress_number1,2040,2189,0,1,"Compress_number1")
 #! Record(Compress_number2,2060,2222,0,1,"Compress_number2")
 #! Record(Compress_number3,2060,2209,0,1,"Compress_number3")
 #! Record(Compress_number4,2080,2229,0,1,"Compress_number4")
@@ -186,7 +189,7 @@ record(ai, NewAI10) {
 #! Field("Compress_number8.TSEL",16777215,1,"Compress_number8.TSEL")
 #! Record(Compress_number9,2120,2207,0,1,"Compress_number9")
 #! Record(Compress_number10,2140,2261,0,1,"Compress_number10")
-#! Record(Compress_number11,2140,2289,0,1,"Compress_number11")
+#! Record(Compress_number11,2140,2275,0,1,"Compress_number11")
 #! Record(Compress_number12,2160,2309,0,1,"Compress_number12")
 #! Record(Compress_number13,2160,2295,0,1,"Compress_number13")
 #! Record(Compress_number14,2180,2315,0,1,"Compress_number14")
@@ -224,5 +227,6 @@ record(ai, NewAI10) {
 #! Record(NewAI6,2100,2741,0,1,"NewAI6")
 #! Record(NewAI7,2110,2741,0,1,"NewAI7")
 #! Record(NewAI8,2120,2761,0,1,"NewAI8")
-#! Record(NewAI9,2130,2761,0,1,"NewAI9")
-#! Record(NewAI10,2140,2781,0,1,"NewAI10")
+#! Record(NewAI9,2140,2701,0,1,"NewAI9")
+#! Record(NewAI10,2360,2747,0,1,"NewAI10")
+#! Visibility("NewAI10.INP",1)

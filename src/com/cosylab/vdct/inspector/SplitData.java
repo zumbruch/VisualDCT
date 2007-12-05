@@ -38,15 +38,15 @@ public class SplitData {
     int parts = 0;
 
 	/**
+	 * @param delimiterType
 	 * @param pattern
-	 * @param repetitions
-	 * @param parts
 	 */
     public SplitData(boolean delimiterType, String pattern) {
-    	this(delimiterType, pattern, 0);
+    	this(delimiterType, pattern, -1);
 	}
     
 	/**
+	 * @param delimiterType
 	 * @param pattern
 	 * @param repetitions
 	 * @param parts
@@ -88,5 +88,16 @@ public class SplitData {
 	 */
 	public void setParts(int parts) {
 		this.parts = parts;
+	}
+	
+	public String getDelimiterTypeString() {
+		return delimiterType ? "Delimiter" : "Pattern";
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	public String toString() {
+		return getDelimiterTypeString() + " <" + pattern + ">";
 	}
 }

@@ -49,13 +49,14 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
+import com.cosylab.vdct.Console;
 import com.cosylab.vdct.graphics.objects.Record;
 import com.cosylab.vdct.graphics.objects.Template;
 import com.cosylab.vdct.graphics.popup.PopUpMenu;
 import com.cosylab.vdct.plugin.debug.PluginDebugManager;
 import com.cosylab.vdct.vdb.NameValueInfoProperty;
 
-public class SpreadsheetTableModel extends AbstractTableModel implements PropertyTableModel {
+public class SpreadsheetTableModel extends AbstractTableModel implements PropertyTableModel, ActionListener {
 
     SpreadsheetInspector inspector = null;
 	
@@ -64,6 +65,8 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 	private Inspectable[] inspectables = null;
 	private SpreadsheetRowComparator comparator = null;
 	private NameValueInfoProperty emptyProperty = null;
+    private Vector recentSplitData = null;
+	private HashMap nameToRecentSplitDataIndex = null;
 	
 	private int rowCount = 0;
     private SpreadsheetTable table = null;
@@ -71,6 +74,7 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 	// The following refresh on mode change. 
 	private int mode = -1;
 	private int propertiesCount = 0;
+	
 	private InspectableProperty[][] properties = null;
 	private HashMap propNamesIndicesMap = null;
     // These are the size of the number of properties.
@@ -108,6 +112,9 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
     // The number of items in visibility submenus.
     private static final int visibilityMenuItemCount = 16;    
 
+    // The maximum number of recent entries for splitting columns.
+    private static final int recentSplitDataMaxCount = 8;    
+    
     private int popUpColumn = 0;
 
 	private static ArrayList defaultModes = null; 
@@ -143,6 +150,8 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 		comparator = new SpreadsheetRowComparator(this);
 		inspectables = new Inspectable[inspectData.size()];
 		inspectData.copyInto(inspectables); 
+        recentSplitData = new Vector();
+    	nameToRecentSplitDataIndex = new HashMap();
 	}
 
 	private void refreshProperties() {
@@ -244,7 +253,7 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 		    	    if (p == 0) {
 		    	        colName += "<";
 		    	    }
-		    	    colName += name + " " + (p + 1);
+		    	    colName += name + "[" + (p + 1) + "]";
 		    	    if (p == parts - 1) {
 		    	        colName += ">";
 		    	    }
@@ -379,85 +388,8 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
     private void createPopupMenu() {
     	popUpMenu = new JPopupMenu();
 
-		ActionListener listener = new ActionListener() {
-			public void actionPerformed(ActionEvent event) {
-				String action = event.getActionCommand();
-				Object source = event.getSource();
-				
-				if (source instanceof JCheckBoxMenuItem) {
-					hiddenProperties[nameToPropIndex(action)] = !((JCheckBoxMenuItem)source).isSelected();
-				    updateHiddenColumns();
-				} else if (action.equals(hide)) {
-			    	int index = table.convertColumnIndexToModel(popUpColumn);
-			    	if (index >= 0) {
-			    		index = columnToPropIndex[index];
-			    		propMenuItem[index].setSelected(false);
-			    		hiddenProperties[index] = true;
-			    		updateHiddenColumns();
-			    	}
-				} else if (action.equals(whitespaces) || action.equals(join)) {
-			    	int index = table.convertColumnIndexToModel(popUpColumn);
-			    	if (index >= 0) {
-			    		int propIndex = columnToPropIndex[index];
-			    		if (action.equals(whitespaces)) {
-			    		    SplitData split = SplitData.getWhitespaceSplitData(); 
-			    		
-			    		    int maxParts = 1;
-			    		    for (int i = 0; i < rowCount; i++) {
-			    		        String value = fields[i][index].getValue();
-			    		        int parts = SplitPropertyGroup.getPartsCount(value, split);
-			    		        maxParts = Math.max(maxParts, parts);
-			    		    }
-			    		    split.setParts(maxParts);
-			    		    splitData[propIndex] = split;
-			    		} else {
-			    		    splitData[propIndex] = null;
-			    		}
-			    		refreshColumns();
-						// refresh
-						saveView();
-				    	loadView();
-			    	}
-				} else if (action.equals(customPattern)) {
-				    CustomSplitDialog dialog = inspector.getCustomSplitDialog();
-				    dialog.setLocationRelativeTo(inspector);
-                  	dialog.setVisible(true);
-				} else if (action.equals(sortAsc) || action.equals(sortDes)) {
-			    	int index = table.convertColumnIndexToModel(popUpColumn);
-			    	if (index >= 0) {
-			    		colAscOrder[index] = action.equals(sortAsc);
-			    		comparator.setColumn(index);
-			    		comparator.setAscending(colAscOrder[index]);
-			    		Arrays.sort(fields, comparator);
-			    		fireTableDataChanged(); 
-			    	}
-				} else if (action.equals(hideAll) || action.equals(showAll)) {
-				    boolean state = action.equals(showAll);
-				    // do this on all but the first two
-				    for (int i = persistantColumns + 1; i < propMenuItem.length; i++) {
-				    	propMenuItem[i].setSelected(state);
-						hiddenProperties[i] = !state;
-				    }
-				    updateHiddenColumns();
-				} else {
-					ArrayList list = getModeNames();
-					for (int i = 0; i < list.size(); i++) {
-						if (action.equals(list.get(i).toString())) {
-							// direct mapping
-							mode = i;
-							refreshProperties();
-							clearColumnModel();
-	                        createDefaultColumnModel();
-	                        table.resizeColumns();
-							break;
-						}
-					}
-                }
-    		}
-		};
-
 		hideItem = new JMenuItem(hide);
-		hideItem.addActionListener(listener);
+		hideItem.addActionListener(this);
     	popUpMenu.add(hideItem);
 
 	    hideSeparator = new JSeparator(); 
@@ -465,28 +397,21 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
     	
     	splitMenu = new JMenu(split);
     	popUpMenu.add(splitMenu);
-    	
-    	JMenuItem menuItem = new JMenuItem(whitespaces);
-    	menuItem.addActionListener(listener);
-    	splitMenu.add(menuItem);
-
-    	menuItem = new JMenuItem(customPattern);
-    	menuItem.addActionListener(listener);
-    	splitMenu.add(menuItem);
+    	updateSplitMenu();
     	
     	joinItem = new JMenuItem(join);
-    	joinItem.addActionListener(listener);
+    	joinItem.addActionListener(this);
     	popUpMenu.add(joinItem);
     	
 	    splitSeparator = new JSeparator(); 
     	popUpMenu.add(splitSeparator);
 
 		sortAscItem = new JMenuItem(sortAsc);
-		sortAscItem.addActionListener(listener);
+		sortAscItem.addActionListener(this);
     	popUpMenu.add(sortAscItem);
 
     	sortDesItem = new JMenuItem(sortDes);
-    	sortDesItem.addActionListener(listener);
+    	sortDesItem.addActionListener(this);
     	popUpMenu.add(sortDesItem);
 
 	    sortSeparator = new JSeparator(); 
@@ -495,19 +420,19 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
     	ArrayList list = getModeNames();
 
        	for (int i = 0; i < list.size(); i++) {
-       		menuItem = new JMenuItem(list.get(i).toString());
-       		menuItem.addActionListener(listener);
+       		JMenuItem menuItem = new JMenuItem(list.get(i).toString());
+       		menuItem.addActionListener(this);
        		popUpMenu.add(menuItem);
        	}
     	
     	popUpMenu.add(new JSeparator());
 
     	JMenuItem hideAllItem = new JMenuItem(hideAll);
-    	hideAllItem.addActionListener(listener);
+    	hideAllItem.addActionListener(this);
     	popUpMenu.add(hideAllItem);
 
     	JMenuItem showAllItem = new JMenuItem(showAll);
-    	showAllItem.addActionListener(listener);
+    	showAllItem.addActionListener(this);
     	popUpMenu.add(showAllItem);
     	
     	JMenu visibilityMenu = new JMenu(visibility);
@@ -520,7 +445,7 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
    			JCheckBoxMenuItem checkBoxItem = new JCheckBoxMenuItem(propertyNames[j]);
    			propMenuItem[j] = checkBoxItem;
    			checkBoxItem.setSelected(true);
-   			checkBoxItem.addActionListener(listener);
+   			checkBoxItem.addActionListener(this);
    			
    	    	// Add check boxes for all but the unhideable and the first.
    			int itemPos = j - (persistantColumns + 1); 
@@ -536,7 +461,154 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
     		visibilityMenu.setEnabled(false);
     	}
     }
+
+	public void actionPerformed(ActionEvent event) {
+		String action = event.getActionCommand();
+		Object source = event.getSource();
+		
+		if (source instanceof JCheckBoxMenuItem) {
+			hiddenProperties[nameToPropIndex(action)] = !((JCheckBoxMenuItem)source).isSelected();
+		    updateHiddenColumns();
+		} else if (action.equals(hide)) {
+	    	int index = table.convertColumnIndexToModel(popUpColumn);
+	    	if (index >= 0) {
+	    		index = columnToPropIndex[index];
+	    		propMenuItem[index].setSelected(false);
+	    		hiddenProperties[index] = true;
+	    		updateHiddenColumns();
+	    	}
+		} else if (action.equals(whitespaces) || action.equals(customPattern)) {
+
+			int index = table.convertColumnIndexToModel(popUpColumn);
+			if (index >= 0) {
+				SplitData split = null; 
+				if (action.equals(customPattern)) {
+					CustomSplitDialog dialog = inspector.getCustomSplitDialog();
+					dialog.setLocationRelativeTo(inspector);
+					
+					if (recentSplitData.size() > 0) {
+						split = (SplitData)recentSplitData.get(0);
+					} else {
+						split = SplitData.getWhitespaceSplitData();
+					}
+					dialog.setSplitData(split);
+					// Add the data from the first row of the splitting column as starting test example. 
+                    dialog.setTestExample(fields[0][index].getValue());
+					dialog.setVisible(true);
+					split = dialog.getSplitData();
+					if (split != null) {
+						recentSplitData.add(0, split);
+						while (recentSplitData.size() > recentSplitDataMaxCount) {
+							recentSplitData.remove(recentSplitData.size() - 1);
+						}
+						updateSplitMenu();
+					}
+					
+				} else {
+				    split = SplitData.getWhitespaceSplitData();
+				}
+				if (split != null) {
+					splitColumn(index, split);
+				}
+			}
+		} else if (action.equals(join)) {
+			int index = table.convertColumnIndexToModel(popUpColumn);
+			if (index >= 0) {
+				splitData[columnToPropIndex[index]] = null;
+				refreshColumns();
+				// refresh
+				saveView();
+				loadView();
+	    	}
+		} else if (action.equals(sortAsc) || action.equals(sortDes)) {
+	    	int index = table.convertColumnIndexToModel(popUpColumn);
+	    	if (index >= 0) {
+	    		colAscOrder[index] = action.equals(sortAsc);
+	    		comparator.setColumn(index);
+	    		comparator.setAscending(colAscOrder[index]);
+	    		Arrays.sort(fields, comparator);
+	    		fireTableDataChanged(); 
+	    	}
+		} else if (action.equals(hideAll) || action.equals(showAll)) {
+		    boolean state = action.equals(showAll);
+		    // do this on all but the first two
+		    for (int i = persistantColumns + 1; i < propMenuItem.length; i++) {
+		    	propMenuItem[i].setSelected(state);
+				hiddenProperties[i] = !state;
+		    }
+		    updateHiddenColumns();
+		} else {
+			int index = table.convertColumnIndexToModel(popUpColumn);
+			if (index >= 0) {
+				Integer recentIndexObject = (Integer)nameToRecentSplitDataIndex.get(action);
+				if (recentIndexObject != null) {
+					int recentIndex = recentIndexObject.intValue();
+					// Add the used item to the top of the list.
+					SplitData data = (SplitData)recentSplitData.remove(recentIndex);
+					recentSplitData.add(0, data);
+					updateSplitMenu();
+					splitColumn(index, data);
+					return;
+				}
+			}
+			
+			ArrayList list = getModeNames();
+			for (int i = 0; i < list.size(); i++) {
+				if (action.equals(list.get(i).toString())) {
+					// direct mapping
+					mode = i;
+					refreshProperties();
+					clearColumnModel();
+                    createDefaultColumnModel();
+                    table.resizeColumns();
+					break;
+				}
+			}
+        }
+	}
+	
+	private void splitColumn(int column, SplitData data) {
+		int maxParts = 1;
+		for (int i = 0; i < rowCount; i++) {
+			String value = fields[i][column].getValue();
+			int parts = SplitPropertyGroup.getPartsCount(value, data);
+			maxParts = Math.max(maxParts, parts);
+		}
+		data.setParts(maxParts);
+		splitData[columnToPropIndex[column]] = data;
+
+		refreshColumns();
+		// refresh
+		saveView();
+		loadView();
+	}
     
+    private void updateSplitMenu() {
+    	splitMenu.removeAll();
+    	JMenuItem menuItem = new JMenuItem(whitespaces);
+    	menuItem.addActionListener(this);
+    	splitMenu.add(menuItem);
+    	splitMenu.addSeparator();
+
+    	nameToRecentSplitDataIndex.clear();
+    	
+    	for (int i = 0; i < recentSplitData.size(); i++) {
+    		String name = recentSplitData.get(i).toString();
+        	menuItem = new JMenuItem(name);
+        	menuItem.addActionListener(this);
+        	splitMenu.add(menuItem);
+        	nameToRecentSplitDataIndex.put(name, new Integer(i));
+    	}
+    	
+    	if (recentSplitData.size() > 0) {
+        	splitMenu.addSeparator();
+    	}
+
+    	menuItem = new JMenuItem(customPattern);
+    	menuItem.addActionListener(this);
+    	splitMenu.add(menuItem);
+    }
+
     private void displayPopupMenu(int posX, int posY) {
         popUpColumn = table.getColumnModel().getColumnIndexAtX(posX);
         int colIndex = table.convertColumnIndexToModel(popUpColumn);

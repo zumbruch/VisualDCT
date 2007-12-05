@@ -47,9 +47,10 @@ public class SplitPropertyPart implements InspectableProperty {
 	/**
 	 * @param partIndex
 	 * @param owner
-	 * @param partPattern
 	 * @param value
 	 * @param initValue
+	 * @param lead
+	 * @param editable
 	 */
 	public SplitPropertyPart(int partIndex, SplitPropertyGroup owner, String value, String initValue, String lead,
 			boolean editable) {

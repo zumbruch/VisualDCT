@@ -31,6 +31,7 @@ package com.cosylab.vdct.inspector;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * @author ssah
@@ -42,76 +43,116 @@ public class SplitPropertyGroup {
 	private SplitPropertyPart[] parts = null;
 	private String trail = null;
 	
-	private static final String defaultDelimiter = " ";
+	private int patternParts = 0;
+	private boolean patternMatch = true;
+	private boolean nestedGroups = false;
+	private boolean errorInPattern = false;
+	private String errorDesc = null;
 
+	private static final String defaultDelimiter = " ";
+	
 	/**
 	 * @param owner
 	 * @param splitPattern
 	 */
 	public SplitPropertyGroup(InspectableProperty owner, SplitData splitData) {
-		super();
+		this(owner.getValue(), splitData);
 		this.owner = owner;
+	}
+		
+	/**
+	 * @param value
+	 * @param splitPattern
+	 */
+	public SplitPropertyGroup(String value, SplitData splitData) {
+		super();
 		
 		boolean delimiterType = splitData.isDelimiterType();
 		String pattern = splitData.getPattern();
 		int partsCount = splitData.getParts();
 		
-		String value = owner.getValue();
 		Vector partsVector = new Vector();
 		int foundParts = 0;
-
-		String delimiter = ""; 
-		if (delimiterType) {
-			Matcher matcher = Pattern.compile(pattern).matcher(value);
-			int partStart = 0;
-			int partEnd = 0;
-			String part = "";
-			while (matcher.find()) {
-				partEnd = matcher.start();
-				part = value.substring(partStart, partEnd);
-				partStart = matcher.end();
-				partsVector.add(new SplitPropertyPart(foundParts, this, part, "", delimiter, true));
-				delimiter = matcher.group();
-				foundParts++;
-			}
-			
-			partsVector.add(new SplitPropertyPart(foundParts, this, value.substring(partStart), "", delimiter, true));
-			foundParts++;
-			trail = "";
-		} else {
-			Matcher matcher = Pattern.compile(pattern).matcher(value);
-			boolean match = matcher.matches();
-
-			
-			boolean nestedGroups = false;
-			int leadStart = 0;
-			int leadEnd = 0;
-			if (match) {
-				// First group is the whole expression, skip it.
-				int groupCount = matcher.groupCount() + 1;
-				int group = 1;
-				while (group < groupCount && foundParts < partsCount) {
-					leadEnd = matcher.start(group);
-					if (leadStart > leadEnd) {
-						nestedGroups = true;
-						break;
-					}
-					String lead = value.substring(leadStart, leadEnd);
-					leadStart = matcher.end(group);
-					partsVector.add(new SplitPropertyPart(foundParts, this, matcher.group(group), "", lead, true));
-					foundParts++;
-					group++;
-				}
-			}
-			if (match && !nestedGroups) {
-				trail = value.substring(leadStart);
-			} else {
-				partsVector.clear();
-				partsVector.add(new SplitPropertyPart(0, this, value, "", "", true));
-				foundParts = 1;
-				trail = "";
-			}	
+		
+		Pattern compiledPattern = null;
+		errorInPattern = false;
+		
+		try {
+			compiledPattern = Pattern.compile(pattern);
+		} catch (PatternSyntaxException exception) {
+			errorInPattern = true;
+			errorDesc = exception.getDescription();
 		}
+		
+		String delimiter = ""; 
+		if (!errorInPattern) {
+
+			/* If the type of splitting is by delimiter pattern, split the string by them and store the matching
+			 * delimiters.  
+			 */
+			if (delimiterType) {
+				Matcher matcher = compiledPattern.matcher(value);
+				int partStart = 0;
+				int partEnd = 0;
+				String part = "";
+				while (matcher.find() && (foundParts < partsCount - 1 || partsCount == -1)) {
+					partEnd = matcher.start();
+					part = value.substring(partStart, partEnd);
+					partStart = matcher.end();
+					partsVector.add(new SplitPropertyPart(foundParts, this, part, "", delimiter, true));
+					delimiter = matcher.group();
+					foundParts++;
+				}
+				part = value.substring(partStart);
+				partsVector.add(new SplitPropertyPart(foundParts, this, part, "", delimiter, true));
+				foundParts++;
+				if (partsCount == -1) {
+					partsCount = foundParts;
+				}
+				trail = "";
+			} else {
+				// If the type of splitting is by pattern, match it by groups and store them and inbetween strings.
+				Matcher matcher = compiledPattern.matcher(value);
+				patternMatch = matcher.matches();
+
+				int leadStart = 0;
+				int leadEnd = 0;
+				if (patternMatch) {
+					int groupCount = matcher.groupCount();
+					if (partsCount == -1) {
+						partsCount = groupCount; 
+					}
+
+					// First group is the whole expression, skip it.
+					groupCount++;
+					int group = 1;
+
+					while (group < groupCount && foundParts < partsCount) {
+						leadEnd = matcher.start(group);
+						if (leadStart > leadEnd) {
+							nestedGroups = true;
+							break;
+						}
+						String lead = value.substring(leadStart, leadEnd);
+						leadStart = matcher.end(group);
+						String groupStr = matcher.group(group);
+						partsVector.add(new SplitPropertyPart(foundParts, this, groupStr, "", lead, true));
+						foundParts++;
+						group++;
+					}
+				}
+				if (patternMatch && !nestedGroups) {
+					trail = value.substring(leadStart);
+				} else {
+					partsVector.clear();
+					partsVector.add(new SplitPropertyPart(0, this, value, "", "", true));
+					foundParts = 1;
+					trail = "";
+				}	
+			}
+		}
+		
+		patternParts = foundParts; 
 		
 		/* If there are columns remaining, fill them with empty fields with the same delimiter. If delimiter is not
 		 * known, use default.
@@ -120,7 +161,7 @@ public class SplitPropertyGroup {
 			delimiter = defaultDelimiter;
 		}
 		while (foundParts < partsCount) {
-			partsVector.add(new SplitPropertyPart(foundParts, this, "", delimiter, "", true));
+			partsVector.add(new SplitPropertyPart(foundParts, this, "", "", delimiter, true));
 			foundParts++;
 		}
 		parts = new SplitPropertyPart[partsVector.size()];
@@ -135,9 +176,15 @@ public class SplitPropertyGroup {
 		if (delimiterType) {
 			return value.split(pattern).length;
 		} else {
-			Matcher matcher = Pattern.compile(pattern).matcher(value);
-			boolean match = matcher.matches();
-			return match ? matcher.groupCount() : 0;
+			int groupCount = 0;
+			try {
+				Matcher matcher = Pattern.compile(pattern).matcher(value);
+				boolean match = matcher.matches();
+				groupCount = match ? matcher.groupCount() : 0;
+			} catch (PatternSyntaxException exception) {
+				// do nothing
+			}
+			return groupCount;
 		}
 	}
 	
@@ -158,5 +205,41 @@ public class SplitPropertyGroup {
 	
 	public SplitPropertyPart getPart(int index) {
 		return parts[index];
+	}
+
+	/** Returns the number of parts that the property value was split into using split data.  
+	 * 
+	 * @return the patternParts
+	 */
+	public int getPatternParts() {
+		return patternParts;
+	}
+
+	/**
+	 * @return the patternMatch
+	 */
+	public boolean isPatternMatch() {
+		return patternMatch;
+	}
+
+	/**
+	 * @return the nestedGroups
+	 */
+	public boolean isNestedGroups() {
+		return nestedGroups;
+	}
+
+	/**
+	 * @return the errorInPattern
+	 */
+	public boolean isErrorInPattern() {
+		return errorInPattern;
+	}
+
+	/**
+	 * @return the errorDesc
+	 */
+	public String getErrorDesc() {
+		return errorDesc;
 	}
 }
