@@ -34,6 +34,8 @@ import com.cosylab.vdct.Console;
 import com.cosylab.vdct.Settings;
 import com.cosylab.vdct.graphics.objects.InLink;
 import com.cosylab.vdct.graphics.objects.OutLink;
+import com.cosylab.vdct.inspector.SplitData;
+import com.cosylab.vdct.inspector.SpreadsheetRowOrder;
 import com.cosylab.vdct.inspector.SpreadsheetTableViewData;
 import com.cosylab.vdct.inspector.SpreadsheetTableViewRecord;
 import com.cosylab.vdct.util.*;
@@ -88,7 +90,11 @@ public class DBResolver {
 	// used format #! Connector(id, outLinkID, xpos, ypos, color, "description")
 	//	 eg.       #! Record(ts:fanOut0, 124, 432, 324568, 0, "fanOut record")
 	public static final String VDCTVIEW = "View";
-	public static final String VDCTSPREADSHEETVIEW = "SpreadsheetView";
+	public static final String VDCTSPREADSHEET_VIEW = "SpreadsheetView";
+	public static final String VDCTSPREADSHEET_COLUMN = "Col";
+	public static final String VDCTSPREADSHEET_ROWORDER = "RowOrder";
+	public static final String VDCTSPREADSHEET_SPLITCOLUMN = "SplitCol";
+	public static final String VDCTSPREADSHEET_RECENTSPLIT = "RecentSplit";
 	public static final String VDCTRECORD = "Record";
 	public static final String VDCTGROUP = "Group";
 	public static final String VDCTFIELD = "Field";
@@ -795,7 +801,7 @@ public static String processComment(DBData data, EnhancedStreamTokenizer tokeniz
 					data.setView(new DBView(t, t2, scale));
 									
 				}
-				else if (tokenizer.sval.equalsIgnoreCase(VDCTSPREADSHEETVIEW)) {
+				else if (tokenizer.sval.equalsIgnoreCase(VDCTSPREADSHEET_VIEW)) {
 					
 					// Read type. 
 					String type = null;
@@ -827,24 +833,118 @@ public static String processComment(DBData data, EnhancedStreamTokenizer tokeniz
 						throw (new DBGParseException(errorString, tokenizer, fileName));
 					}
 
-					// Read column names.
-					Vector columnNames = new Vector();
+					// Read properties.
+					SpreadsheetRowOrder rowOrder = null;
+					Vector columnsVector = new Vector();
+					Vector splitColumnsVector = new Vector();
+					Vector recentSplitsVector = new Vector();
 					tokenizer.nextToken();
     			 	while (tokenizer.ttype != EnhancedStreamTokenizer.TT_EOL &&
 				 		    tokenizer.ttype != EnhancedStreamTokenizer.TT_EOF) {
-    					if (tokenizer.ttype == EnhancedStreamTokenizer.TT_WORD ||
-    							tokenizer.ttype == DBConstants.quoteChar) {
-    						 columnNames.add(tokenizer.sval);
-    					} else {
+
+    			 		 if (tokenizer.sval.equalsIgnoreCase(VDCTSPREADSHEET_ROWORDER)) {
+     			 			tokenizer.nextToken();
+     			 			String columnName = null;
+     			 			if (tokenizer.ttype == EnhancedStreamTokenizer.TT_WORD ||
+     			 					tokenizer.ttype == DBConstants.quoteChar) {
+     			 				columnName = tokenizer.sval;
+     			 			} else {
+     			 				throw (new DBGParseException(errorString, tokenizer, fileName));
+     			 			}
+     			 			
+     			 			tokenizer.nextToken();
+     			 			int splitIndex = 0;
+     			 			if (tokenizer.ttype == EnhancedStreamTokenizer.TT_NUMBER) {
+     			 				splitIndex = (int)tokenizer.nval;
+     			 			} else {
+     			 				throw (new DBGParseException(errorString, tokenizer, fileName));
+     			 			}
+     			 			
+     			 			tokenizer.nextToken();
+     			 			String ascOrder = null;
+     			 			if (tokenizer.ttype == EnhancedStreamTokenizer.TT_WORD ||
+     			 					tokenizer.ttype == DBConstants.quoteChar) {
+     			 				ascOrder = tokenizer.sval;
+     			 			} else {
+     			 				throw (new DBGParseException(errorString, tokenizer, fileName));
+     			 			}
+     			 			rowOrder = new SpreadsheetRowOrder(columnName, splitIndex, ascOrder);
+
+     			 	    } else if (tokenizer.sval.equalsIgnoreCase(VDCTSPREADSHEET_COLUMN)) {
+    			 			tokenizer.nextToken();
+    			 			if (tokenizer.ttype == EnhancedStreamTokenizer.TT_WORD ||
+    			 					tokenizer.ttype == DBConstants.quoteChar) {
+    			 				columnsVector.add(tokenizer.sval);
+    			 			} else {
+    			 				throw (new DBGParseException(errorString, tokenizer, fileName));
+    			 			}
+    			 	    } else if (tokenizer.sval.equalsIgnoreCase(VDCTSPREADSHEET_SPLITCOLUMN)) {
+    			 			tokenizer.nextToken();
+    			 			String columnName = null;
+    			 			if (tokenizer.ttype == EnhancedStreamTokenizer.TT_WORD ||
+    			 					tokenizer.ttype == DBConstants.quoteChar) {
+    			 				columnName = tokenizer.sval;
+    			 			} else {
+    			 				throw (new DBGParseException(errorString, tokenizer, fileName));
+    			 			}
+    			 			
+    			 			tokenizer.nextToken();
+    			 			String delimiterTypeString = null;
+    			 			if (tokenizer.ttype == EnhancedStreamTokenizer.TT_WORD ||
+    			 					tokenizer.ttype == DBConstants.quoteChar) {
+    			 				delimiterTypeString = tokenizer.sval;
+    			 			} else {
+    			 				throw (new DBGParseException(errorString, tokenizer, fileName));
+    			 			}
+    			 			
+    			 			tokenizer.nextToken();
+    			 			String pattern = null;
+    			 			if (tokenizer.ttype == EnhancedStreamTokenizer.TT_WORD ||
+    			 					tokenizer.ttype == DBConstants.quoteChar) {
+    			 				pattern = tokenizer.sval;
+    			 			} else {
+    			 				throw (new DBGParseException(errorString, tokenizer, fileName));
+    			 			}
+    			 			splitColumnsVector.add(new SplitData(columnName, delimiterTypeString, pattern));
+
+    			 	    } else if (tokenizer.sval.equalsIgnoreCase(VDCTSPREADSHEET_RECENTSPLIT)) {
+    			 			tokenizer.nextToken();
+    			 			String delimiterTypeString = null;
+    			 			if (tokenizer.ttype == EnhancedStreamTokenizer.TT_WORD ||
+    			 					tokenizer.ttype == DBConstants.quoteChar) {
+    			 				delimiterTypeString = tokenizer.sval;
+    			 			} else {
+    			 				throw (new DBGParseException(errorString, tokenizer, fileName));
+    			 			}
+    			 			
+    			 			tokenizer.nextToken();
+    			 			String pattern = null;
+    			 			if (tokenizer.ttype == EnhancedStreamTokenizer.TT_WORD ||
+    			 					tokenizer.ttype == DBConstants.quoteChar) {
+    			 				pattern = tokenizer.sval;
+    			 			} else {
+    			 				throw (new DBGParseException(errorString, tokenizer, fileName));
+    			 			}
+    			 			recentSplitsVector.add(new SplitData(delimiterTypeString, pattern));
+    			 	    } else{
     						throw (new DBGParseException(errorString, tokenizer, fileName));
-    					}
-    					tokenizer.nextToken();
+    			 	    }
+
+    			 		tokenizer.nextToken();
     			 	}
-    			 	String[] columns = new String[columnNames.size()];
-    			 	columnNames.copyInto(columns);
+    			 	String[] columns = new String[columnsVector.size()];
+    			 	columnsVector.copyInto(columns);
+    			 	SplitData[] splitColumns = new SplitData[splitColumnsVector.size()];
+    			 	splitColumnsVector.copyInto(splitColumns);
+    			 	SplitData[] recentSplits = new SplitData[recentSplitsVector.size()];
+    			 	recentSplitsVector.copyInto(recentSplits);
     			 	
-					SpreadsheetTableViewRecord sprView = new SpreadsheetTableViewRecord(type, name, modeName, columns);
-    			 	SpreadsheetTableViewData.getInstance().add(sprView);
+					SpreadsheetTableViewRecord viewRecord = new SpreadsheetTableViewRecord(type, name, modeName);
+					viewRecord.setRowOrder(rowOrder);
+					viewRecord.setColumns(columns);
+					viewRecord.setSplitColumns(splitColumns);
+					viewRecord.setRecentSplits(recentSplits);
+    			 	SpreadsheetTableViewData.getInstance().add(viewRecord);
 			
 				} else if (tokenizer.sval.equalsIgnoreCase(VDCTSKIP)) {
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
+ * Copyright (c) 2007, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -25,54 +25,75 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.cosylab.vdct.inspector;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+package com.cosylab.vdct.inspector;
 
 /**
  * @author ssah
+ *
  */
-public class SpreadsheetTableViewData {
+public class SpreadsheetRowOrder {
 
-	private static SpreadsheetTableViewData data = null;
+	private String columnName = null;
+	private int columnSplitIndex = 0;
+	private boolean ascending = true;
 	
-	private Map map = null;
-	/**
-	 * 
+    private static final String ascendingString = "Ascending";
+    private static final String descendingString = "Descending";
+
+    /**
+	 * @param columnName
+	 * @param columnSplitIndex
+	 * @param ascending
 	 */
-	private SpreadsheetTableViewData() {
+	public SpreadsheetRowOrder(String columnName, int columnSplitIndex, String ascending) {
+		this(columnName, columnSplitIndex, isAscending(ascending));
+	}
+    
+    /**
+	 * @param columnName
+	 * @param columnSplitIndex
+	 * @param ascending
+	 */
+	public SpreadsheetRowOrder(String columnName, int columnSplitIndex, boolean ascending) {
 		super();
-		map = new HashMap();
-	}
-	
-	public static SpreadsheetTableViewData getInstance() {
-		if (data == null) {
-			data = new SpreadsheetTableViewData(); 
-		}
-		return data ;
-	}
-	
-	public void add(SpreadsheetTableViewRecord record) {
-		map.put(record.getKey(), record);
+		this.columnName = columnName;
+		this.columnSplitIndex = columnSplitIndex;
+		this.ascending = ascending;
 	}
 
-	/** Returns the record of the given type and name, or null if there is no such record.
-	 * 
-	 * @param type
-	 * @param name
-	 * @return
+	/**
+	 * @return the orderedColumnName
 	 */
-	public SpreadsheetTableViewRecord get(String key) {
-		return (SpreadsheetTableViewRecord)map.get(key);
+	public String getColumnName() {
+		return columnName;
 	}
 
-	public void remove(String key) {
-		map.remove(key);
+	/**
+	 * @return the orderedColumnSplitIndex
+	 */
+	public int getColumnSplitIndex() {
+		return columnSplitIndex;
 	}
-	
-	public Iterator getRecords() {
-		return map.values().iterator();
+
+	/**
+	 * @return the orderAscending
+	 */
+	public boolean isAscending() {
+		return ascending;
+	}
+
+	/**
+	 * @return the orderAscending
+	 */
+	public String getAscendingString() {
+		return ascending ? ascendingString : descendingString;
+	}
+
+	/**
+	 * @param ascending the orderAscending to set
+	 */
+	public static boolean isAscending(String orderAscendingString) {
+		return orderAscendingString.equals(ascendingString);
 	}
 }

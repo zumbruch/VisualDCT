@@ -28,27 +28,45 @@ package com.cosylab.vdct.graphics.objects;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.awt.*;
-import java.io.*;
-import java.util.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.io.BufferedOutputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Vector;
 
 import com.cosylab.vdct.Console;
 import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.DataProvider;
 import com.cosylab.vdct.Settings;
 import com.cosylab.vdct.Version;
-import com.cosylab.vdct.graphics.*;
-import com.cosylab.vdct.inspector.InspectableProperty;
-import com.cosylab.vdct.inspector.SpreadsheetTableViewData;
-import com.cosylab.vdct.inspector.SpreadsheetTableViewRecord;
-
-import com.cosylab.vdct.vdb.*;
 import com.cosylab.vdct.db.DBDataEntry;
 import com.cosylab.vdct.db.DBEntry;
 import com.cosylab.vdct.db.DBResolver;
 import com.cosylab.vdct.db.DBTemplateEntry;
 import com.cosylab.vdct.dbd.DBDConstants;
-import com.cosylab.vdct.util.*;
+import com.cosylab.vdct.graphics.FontMetricsBuffer;
+import com.cosylab.vdct.graphics.ViewState;
+import com.cosylab.vdct.inspector.InspectableProperty;
+import com.cosylab.vdct.inspector.SplitData;
+import com.cosylab.vdct.inspector.SpreadsheetRowOrder;
+import com.cosylab.vdct.inspector.SpreadsheetTableViewData;
+import com.cosylab.vdct.inspector.SpreadsheetTableViewRecord;
+import com.cosylab.vdct.util.DBDEntry;
+import com.cosylab.vdct.util.StringUtils;
+import com.cosylab.vdct.vdb.VDBFieldData;
+import com.cosylab.vdct.vdb.VDBMacro;
+import com.cosylab.vdct.vdb.VDBPort;
+import com.cosylab.vdct.vdb.VDBRecordData;
+import com.cosylab.vdct.vdb.VDBTemplate;
 
 /**
  * Insert the type's description here.
@@ -1280,7 +1298,11 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 
  final String VIEW_START            = "#! " + DBResolver.VDCTVIEW + "(";
 
- final String SPREADSHEETVIEW_START = "#! " + DBResolver.VDCTSPREADSHEETVIEW + "(";
+ final String SPREADSHEET_VIEW_START = "#! " + DBResolver.VDCTSPREADSHEET_VIEW + "(";
+ final String SPREADSHEET_ROWORDER_START = DBResolver.VDCTSPREADSHEET_ROWORDER + "(";
+ final String SPREADSHEET_COLUMN_START = DBResolver.VDCTSPREADSHEET_COLUMN + "(";
+ final String SPREADSHEET_SPLITCOLUMN_START = DBResolver.VDCTSPREADSHEET_SPLITCOLUMN + "(";
+ final String SPREADSHEET_RECENTSPLIT_START = DBResolver.VDCTSPREADSHEET_RECENTSPLIT + "(";
 
  final String RECORD_START          = "#! " + DBResolver.VDCTRECORD + "(";
  final String GROUP_START           = "#! " + DBResolver.VDCTGROUP + "(";
@@ -1311,13 +1333,46 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
  while (iterator.hasNext()) {
 	 sprView = (SpreadsheetTableViewRecord)iterator.next();
 
-     file.writeBytes(SPREADSHEETVIEW_START + sprView.getType() + comma + quote + sprView.getName() + quote);
+     file.writeBytes(SPREADSHEET_VIEW_START + sprView.getType() + comma + quote + sprView.getName() + quote);
      file.writeBytes(comma + quote + sprView.getModeName() + quote);
      
-     String[] columns = sprView.getColumns();
-     for (int i = 0; i < columns.length; i++) {
-         file.writeBytes(comma + quote + columns[i] + quote);
+     SpreadsheetRowOrder rowOrder = sprView.getRowOrder();
+     if (rowOrder != null) {
+		 file.writeBytes(comma + SPREADSHEET_ROWORDER_START);
+		 file.writeBytes(quote + rowOrder.getColumnName() + quote);
+		 file.writeBytes(comma + rowOrder.getColumnSplitIndex());
+		 file.writeBytes(comma + quote + rowOrder.getAscendingString() + quote);
+		 file.writeBytes(")");
      }
+     
+     String[] columns = sprView.getColumns();
+     if (columns != null) {
+    	 for (int i = 0; i < columns.length; i++) {
+    		 file.writeBytes(comma + SPREADSHEET_COLUMN_START + quote + columns[i] + "\")");
+    	 }
+     }
+
+     SplitData[] splitColumns = sprView.getSplitColumns();
+     if (splitColumns != null) {
+    	 for (int i = 0; i < splitColumns.length; i++) {
+    		 file.writeBytes(comma + SPREADSHEET_SPLITCOLUMN_START);
+    		 file.writeBytes(quote + splitColumns[i].getName() + quote);
+    		 file.writeBytes(comma + quote + splitColumns[i].getDelimiterTypeString() + quote);
+    		 file.writeBytes(comma + quote + splitColumns[i].getPattern() + quote);
+    		 file.writeBytes(")");
+    	 }
+     }
+
+     SplitData[] recentSplits = sprView.getRecentSplits();
+     if (recentSplits != null) {
+    	 for (int i = 0; i < recentSplits.length; i++) {
+    		 file.writeBytes(comma + SPREADSHEET_RECENTSPLIT_START);
+    		 file.writeBytes(quote + recentSplits[i].getDelimiterTypeString() + quote);
+    		 file.writeBytes(comma + quote + recentSplits[i].getPattern() + quote);
+    		 file.writeBytes(")");
+    	 }
+     }
+     
      file.writeBytes(ending);
  }
  

@@ -20,7 +20,7 @@ record(compress, Compress_number4) {
 }
 
 record(compress, Compress_number5) {
-  field(DESC, "Fgdg gfg g")
+  field(DESC, "Fg\")
   field(ASG, "Cel12")
   field(EVNT, "343")
 }
@@ -74,11 +74,6 @@ record(compress, Compress_number13) {
   field(ASG, "Cel")
 }
 
-record(compress, Compress_number14) {
-  field(EVNT, "ztrztz")
-  field(ASG, "f 4 34g")
-}
-
 expand("template1.vdb", template12) {
   macro(macro2, "")
   macro(macro3, "tretji3")
@@ -97,7 +92,7 @@ expand("template2.vdb", template23) {
 expand("template1.vdb", template1) {
   macro(macro1, "prvi1")
   macro(macro2, "drugi2")
-  macro(macro3, "Mogo")
+  macro(macro3, "Mogo g")
   macro(new, "deluje")
   macro(MacroForGroup, "do!")
   macro(spet_novi_macro, "deluje?hihi")
@@ -108,6 +103,7 @@ expand("template1.vdb", template13) {
   macro(new, "")
   macro(macro1, "d")
   macro(spet_novi_macro, "test")
+  macro(macro3, "56 h")
 }
 
 expand("template1.vdb", template14) {
@@ -115,69 +111,96 @@ expand("template1.vdb", template14) {
   macro(macro1, "a")
 }
 
-record(ai, NewAI) {
-  field(TSEL, "#L0 A0 @")
-  field(SDIS, "#L0 A0 @")
-}
-
 record(ai, NewAI2) {
-  field(TSEL, "#L0 A0@")
-  field(DTYP, "Heidenhein Encoder")
+  field(TSEL, "#L1 A3 ")
+  field(DTYP, "<none>1")
   field(SDIS, "#L0 A0 @")
+  field(FLNK, "1")
+  field(INP, "#L3 A5 @g6")
 }
 
 record(ai, NewAI3) {
-  field(TSEL, "#L0 A0 @")
-  field(DTYP, "Heidenhein Encoder")
+  field(TSEL, "#L2 A6 @")
+  field(DTYP, "<none>2")
   field(SDIS, "#L0 A0 @")
+  field(FLNK, "2")
+  field(INP, "#L4 A6 @g7")
 }
 
 record(ai, NewAI4) {
-  field(TSEL, "#L0 A0 @")
-  field(DTYP, "Heidenhein Encoder")
+  field(TSEL, "#L3 A9 @")
+  field(DTYP, "<none>3")
   field(SDIS, "#L0 A0 @")
+  field(FLNK, "3")
+  field(INP, "#L5 A7 @g8")
 }
 
-record(ai, NewAI5) {
-  field(TSEL, "#L0 A0 @")
-  field(DTYP, "Heidenhein Encoder")
-  field(SDIS, "#L0 A0 @")
+record(compress, Compress_number14) {
+  field(EVNT, "ztrztz")
+  field(ASG, "f 4 34g")
 }
 
-record(ai, NewAI6) {
+record(ai, NewAI0) {
   field(TSEL, "#L0 A0 @")
-  field(DTYP, "Heidenhein Encoder")
   field(SDIS, "#L0 A0 @")
+  field(DTYP, "<none>0")
+  field(FLNK, "0")
+  field(INP, "#L2 A4 @g5")
 }
 
-record(ai, NewAI7) {
-  field(TSEL, "#L0 A0 @")
-  field(DTYP, "Heidenhein Encoder")
+record(ai, NewAI12) {
+  field(TSEL, "#L4 A12 @")
+  field(DTYP, "<none>4")
   field(SDIS, "#L0 A0 @")
+  field(FLNK, "4")
+  field(INP, "#L6 A8 @g9")
 }
 
-record(ai, NewAI8) {
-  field(TSEL, "#L0 A0 @")
-  field(DTYP, "Heidenhein Encoder")
+record(ai, NewAI15) {
+  field(TSEL, "#L5 A15 @")
+  field(DTYP, "<none>5")
   field(SDIS, "#L0 A0 @")
+  field(FLNK, "5")
+  field(INP, "#L7 A9 @g10")
+  field(SIOL, "#L0 A0 @g5")
 }
 
-record(ai, NewAI9) {
-  field(TSEL, "#L0 A0 @")
-  field(DTYP, "Heidenhein Encoder")
+record(ai, NewAI18) {
+  field(TSEL, "#L6 A18 @")
   field(SDIS, "#L0 A0 @")
+  field(FLNK, "6")
+  field(INP, "#L8 A10 @g11")
 }
 
-record(ai, NewAI10) {
-  field(TSEL, "#L0 A0 @")
-  field(DTYP, "Heidenhein Encoder")
+record(ai, NewAI21) {
+  field(TSEL, "#L7 A21 @")
+  field(DTYP, "<none>7")
   field(SDIS, "#L0 A0 @")
+  field(FLNK, "7")
+  field(INP, "#L9 A11 @g12")
+}
+
+record(ai, NewAI24) {
+  field(TSEL, "#L8 A24 @")
+  field(DTYP, "<none>8")
+  field(SDIS, "#L0 A0 @")
+  field(FLNK, "8")
+  field(INP, "#L10 A12 @g13")
+}
+
+record(ai, NewAI27) {
+  field(TSEL, "#L9 A27 @")
+  field(DTYP, "<none>9")
+  field(SDIS, "#L0 A0 @")
+  field(INP, "#L11 A13 @g14")
+  field(FLNK, "9")
 }
 
 #! Further lines contain data used by VisualDCT
-#! View(1949,2245,1.0)
-#! SpreadsheetView(R,"ai","Alphabetical")
-#! SpreadsheetView(R,"compress","Custom","Name","DESC","ASG","DTYP","FLNK","SCAN","PINI","PHAS","EVNT","DISV","SDIS","DISS","PRIO","ALG","HOPR","LOPR","PREC","EGU","INP","NSAM","N","IHIL","ILIL","VAL")
+#! View(1977,2180,1.0)
+#! SpreadsheetView(R,"ai","Group",SplitCol("INP","Delimiter","\s+"),SplitCol("TSEL","Delimiter","\s+"))
+#! SpreadsheetView(T,"template1.vdb","Default view",RowOrder("new",0,"Ascending"))
+#! SpreadsheetView(R,"compress","Group",RowOrder("SCAN",0,"Descending"),SplitCol("SCAN","Delimiter","g"),RecentSplit("Delimiter","g"),RecentSplit("Delimiter","o"))
 #! Record(Compress_number1,2040,2189,0,1,"Compress_number1")
 #! Record(Compress_number2,2060,2222,0,1,"Compress_number2")
 #! Record(Compress_number3,2060,2209,0,1,"Compress_number3")
@@ -192,7 +215,6 @@ record(ai, NewAI10) {
 #! Record(Compress_number11,2140,2275,0,1,"Compress_number11")
 #! Record(Compress_number12,2160,2309,0,1,"Compress_number12")
 #! Record(Compress_number13,2160,2295,0,1,"Compress_number13")
-#! Record(Compress_number14,2180,2315,0,1,"Compress_number14")
 
 #! TemplateInstance("template12",2600,2200,0,"")
 #! TemplateField("template12","MacroForGroup",16777215,0,1)
@@ -219,14 +241,15 @@ record(ai, NewAI10) {
 #! TemplateField("template14","Port1",16777215,0,1)
 #! TemplateField("template14","MacroForGroup",16777215,0,1)
 
-#! Record(NewAI,2040,2695,0,1,"NewAI")
-#! Record(NewAI2,2060,2701,0,1,"NewAI2")
-#! Record(NewAI3,2070,2701,0,1,"NewAI3")
-#! Record(NewAI4,2080,2721,0,1,"NewAI4")
-#! Record(NewAI5,2090,2721,0,1,"NewAI5")
-#! Record(NewAI6,2100,2741,0,1,"NewAI6")
-#! Record(NewAI7,2110,2741,0,1,"NewAI7")
-#! Record(NewAI8,2120,2761,0,1,"NewAI8")
-#! Record(NewAI9,2140,2701,0,1,"NewAI9")
-#! Record(NewAI10,2360,2747,0,1,"NewAI10")
-#! Visibility("NewAI10.INP",1)
+#! Record(NewAI2,2060,2673,0,1,"NewAI2")
+#! Record(NewAI3,2070,2673,0,1,"NewAI3")
+#! Record(NewAI4,2080,2693,0,1,"NewAI4")
+#! Record(Compress_number14,2180,2315,0,1,"Compress_number14")
+#! Record(NewAI0,2040,2653,0,1,"NewAI0")
+#! Record(NewAI12,2090,2693,0,1,"NewAI12")
+#! Record(NewAI15,2100,2699,0,1,"NewAI15")
+#! Record(NewAI18,2110,2727,0,1,"NewAI18")
+#! Record(NewAI21,2120,2733,0,1,"NewAI21")
+#! Record(NewAI24,2140,2673,0,1,"NewAI24")
+#! Record(NewAI27,2360,2733,0,1,"NewAI27")
+#! Visibility("NewAI27.INP",1)

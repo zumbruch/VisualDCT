@@ -57,11 +57,11 @@ public class SpreadsheetRowComparator implements Comparator {
 	    String firstString = first[column].getValue();
 	    String secondString = second[column].getValue();
 
-	    String firstName = removeNumberAtEnd(firstString);
-	    String secondName = removeNumberAtEnd(secondString);
+	    String firstName = SplitData.removeValueAtEnd(firstString);
+	    String secondName = SplitData.removeValueAtEnd(secondString);
 	    
-	    int firstNumber = extractValueAtEnd(firstString);
-	    int secondNumber = extractValueAtEnd(secondString);
+	    int firstNumber = SplitData.extractValueAtEnd(firstString);
+	    int secondNumber = SplitData.extractValueAtEnd(secondString);
 
 		int nameComp = firstName.compareTo(secondName); 
         if (nameComp != 0) {
@@ -70,32 +70,5 @@ public class SpreadsheetRowComparator implements Comparator {
         }
         // names with no number are displayed before any with numbers
 		return sign * (firstNumber - secondNumber); 
-	}
-	
-	/** Returns the number at the end of the given string. If there is no such number, it returns -1.
-	 */
-    private int extractValueAtEnd(String string) {
-		int value = -1;
-    	int j = string.length() - 1;
-		while (j >= 0 && Character.isDigit(string.charAt(j))) {
-			j--;
-		}
-		if (j < string.length() - 1) {
-			try {
-	  		    value = Integer.parseInt(string.substring(j + 1, string.length()));
-			} catch (NumberFormatException exception) {
-				// nothing
-			}
-		}
-		return value;
-	}
-	/** Returns the number at the end of the given string. If there is no such number, it returns -1.
-	 */
-    private String removeNumberAtEnd(String string) {
-    	int j = string.length() - 1;
-		while (j >= 0 && Character.isDigit(string.charAt(j))) {
-			j--;
-		}
-		return string.substring(0, j + 1);
 	}
 }

@@ -36,22 +36,24 @@ public class SpreadsheetTableViewRecord {
 	private String type = null;
 	private String name = null;
 	private String modeName = null;
+
+	private SpreadsheetRowOrder rowOrder = null;
 	private String[] columns = null;
+	private SplitData[] splitColumns = null;
+	private SplitData[] recentSplits = null;
 
 	/**
 	 * @param type
 	 * @param name
 	 * @param modeName
-	 * @param columns
 	 */
-	public SpreadsheetTableViewRecord(String type, String name, String modeName, String[] columns) {
+	public SpreadsheetTableViewRecord(String type, String name, String modeName) {
 		super();
 		this.type = type;
 		this.name = name;
 		this.modeName = modeName;
-		this.columns = columns;
 	}
-
+	
 	/**
 	 * @return the type
 	 */
@@ -74,13 +76,83 @@ public class SpreadsheetTableViewRecord {
 	}
 
 	/**
+	 * @return the rowOrder
+	 */
+	public SpreadsheetRowOrder getRowOrder() {
+		return rowOrder;
+	}
+
+	/**
+	 * @param rowOrder the rowOrder to set
+	 */
+	public void setRowOrder(SpreadsheetRowOrder rowOrder) {
+		this.rowOrder = rowOrder;
+	}
+
+	/**
 	 * @return the columns
 	 */
 	public String[] getColumns() {
 		return columns;
 	}
 	
+	/**
+	 * @return the splitColumns
+	 */
+	public SplitData[] getSplitColumns() {
+		return splitColumns;
+	}
+
 	public String getKey() {
 		return type + name;
+	}
+
+	/**
+	 * @return the recentSplits
+	 */
+	public SplitData[] getRecentSplits() {
+		return recentSplits;
+	}
+
+	/**
+	 * @param recentSplits the recentSplits to set
+	 */
+	public void setRecentSplits(SplitData[] recentSplits) {
+		this.recentSplits = recentSplits;
+	}
+
+	/**
+	 * @param type the type to set
+	 */
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	/**
+	 * @param name the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	/**
+	 * @param modeName the modeName to set
+	 */
+	public void setModeName(String modeName) {
+		this.modeName = modeName;
+	}
+
+	/**
+	 * @param columns the columns to set
+	 */
+	public void setColumns(String[] columns) {
+		this.columns = columns;
+	}
+
+	/**
+	 * @param splitColumns the splitColumns to set
+	 */
+	public void setSplitColumns(SplitData[] splitColumns) {
+		this.splitColumns = splitColumns;
 	}
 }

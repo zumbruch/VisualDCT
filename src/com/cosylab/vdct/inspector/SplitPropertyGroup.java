@@ -203,6 +203,13 @@ public class SplitPropertyGroup {
 		return owner;
 	}
 	
+	/**
+	 * @param owner the owner to set
+	 */
+	public void setOwner(InspectableProperty owner) {
+		this.owner = owner;
+	}
+
 	public SplitPropertyPart getPart(int index) {
 		return parts[index];
 	}

@@ -176,4 +176,11 @@ public class SplitPropertyPart implements InspectableProperty {
 	public String getLead() {
 		return lead;
 	}
+
+	/**
+	 * @return the owner
+	 */
+	public SplitPropertyGroup getOwner() {
+		return owner;
+	}
 }

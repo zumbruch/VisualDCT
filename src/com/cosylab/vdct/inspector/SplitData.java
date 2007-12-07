@@ -33,9 +33,13 @@ package com.cosylab.vdct.inspector;
  *
  */
 public class SplitData {
+	private String name = null;
     boolean delimiterType = false;
     private String pattern = null;
-    int parts = 0;
+    int parts = -1;
+    
+    private static final String delimiterString = "Delimiter";
+    private static final String patternString = "Pattern";
 
 	/**
 	 * @param delimiterType
@@ -48,11 +52,38 @@ public class SplitData {
 	/**
 	 * @param delimiterType
 	 * @param pattern
-	 * @param repetitions
+	 */
+    public SplitData(String delimiterType, String pattern) {
+    	this(isDelimiterType(delimiterType), pattern, -1);
+	}
+    
+	/**
+	 * @param delimiterType
+	 * @param pattern
 	 * @param parts
 	 */
     public SplitData(boolean delimiterType, String pattern, int parts) {
+		this(null, delimiterType, pattern, parts);
+	}
+
+	/**
+	 * @param name
+	 * @param delimiterType
+	 * @param pattern
+	 */
+    public SplitData(String name, String delimiterType, String pattern) {
+    	this(name, isDelimiterType(delimiterType), pattern, -1);
+	}
+    
+	/**
+	 * @param name
+	 * @param delimiterType
+	 * @param pattern
+	 * @param parts
+	 */
+    public SplitData(String name, boolean delimiterType, String pattern, int parts) {
 		super();
+		this.name = name;
 		this.pattern = pattern;
 		this.delimiterType = delimiterType;
 		this.parts = parts;
@@ -63,12 +94,28 @@ public class SplitData {
     }
 
 	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * @param name the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	/**
 	 * @return the delimiterType
 	 */
 	public boolean isDelimiterType() {
 		return delimiterType;
 	}
 
+	
+	
 	/**
 	 * @return the pattern
 	 */
@@ -91,13 +138,44 @@ public class SplitData {
 	}
 	
 	public String getDelimiterTypeString() {
-		return delimiterType ? "Delimiter" : "Pattern";
+		return delimiterType ? delimiterString : patternString;
 	}
 
+	private static boolean isDelimiterType(String delimiterTypeString) {
+		return delimiterTypeString.equals(delimiterString);
+	}
+	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
 		return getDelimiterTypeString() + " <" + pattern + ">";
+	}
+	
+	/** Returns the number at the end of the given string. If there is no such number, it returns -1.
+	 */
+    public static int extractValueAtEnd(String string) {
+		int value = -1;
+    	int j = string.length() - 1;
+		while (j >= 0 && Character.isDigit(string.charAt(j))) {
+			j--;
+		}
+		if (j < string.length() - 1) {
+			try {
+	  		    value = Integer.parseInt(string.substring(j + 1, string.length()));
+			} catch (NumberFormatException exception) {
+				// nothing
+			}
+		}
+		return value;
+	}
+	/** Returns the string without the trailing number, or the string itself if there is no number at the end.
+	 */
+    public static String removeValueAtEnd(String string) {
+    	int j = string.length() - 1;
+		while (j >= 0 && Character.isDigit(string.charAt(j))) {
+			j--;
+		}
+		return string.substring(0, j + 1);
 	}
 }

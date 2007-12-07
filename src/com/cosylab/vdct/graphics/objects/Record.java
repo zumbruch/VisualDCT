@@ -1006,7 +1006,8 @@ public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode, 
 		all.copyInto(properties);
 	
 		if ((mode == SORT_ORDER) && (properties.length>2)) {
-			new com.cosylab.vdct.util.StringQuickSort().sort(properties, 2, properties.length - 1);
+			int startIndex = spreadsheet ? 1 : 2;
+			new com.cosylab.vdct.util.StringQuickSort().sort(properties, startIndex, properties.length - 1);
 		}
 	
 		return properties;
