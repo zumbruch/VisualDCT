@@ -92,6 +92,7 @@ public class DBResolver {
 	public static final String VDCTVIEW = "View";
 	public static final String VDCTSPREADSHEET_VIEW = "SpreadsheetView";
 	public static final String VDCTSPREADSHEET_COLUMN = "Col";
+	public static final String VDCTSPREADSHEET_HIDDENROW = "HiddenRow";
 	public static final String VDCTSPREADSHEET_ROWORDER = "RowOrder";
 	public static final String VDCTSPREADSHEET_SPLITCOLUMN = "SplitCol";
 	public static final String VDCTSPREADSHEET_RECENTSPLIT = "RecentSplit";
@@ -833,10 +834,21 @@ public static String processComment(DBData data, EnhancedStreamTokenizer tokeniz
 						throw (new DBGParseException(errorString, tokenizer, fileName));
 					}
 
+					// Read showAllRows setting. 
+					String showAllRowsString = null;
+					tokenizer.nextToken();
+					if (tokenizer.ttype == EnhancedStreamTokenizer.TT_WORD ||
+							tokenizer.ttype == DBConstants.quoteChar) {
+						showAllRowsString = tokenizer.sval;
+					} else {
+						throw (new DBGParseException(errorString, tokenizer, fileName));
+					}
+					
 					// Read properties.
 					SpreadsheetRowOrder rowOrder = null;
 					Vector columnsVector = new Vector();
 					Vector splitColumnsVector = new Vector();
+					Vector hiddenRowsVector = new Vector();
 					Vector recentSplitsVector = new Vector();
 					tokenizer.nextToken();
     			 	while (tokenizer.ttype != EnhancedStreamTokenizer.TT_EOL &&
@@ -870,11 +882,19 @@ public static String processComment(DBData data, EnhancedStreamTokenizer tokeniz
      			 			}
      			 			rowOrder = new SpreadsheetRowOrder(columnName, splitIndex, ascOrder);
 
-     			 	    } else if (tokenizer.sval.equalsIgnoreCase(VDCTSPREADSHEET_COLUMN)) {
+      			 	    } else if (tokenizer.sval.equalsIgnoreCase(VDCTSPREADSHEET_COLUMN)) {
     			 			tokenizer.nextToken();
     			 			if (tokenizer.ttype == EnhancedStreamTokenizer.TT_WORD ||
     			 					tokenizer.ttype == DBConstants.quoteChar) {
     			 				columnsVector.add(tokenizer.sval);
+    			 			} else {
+    			 				throw (new DBGParseException(errorString, tokenizer, fileName));
+    			 			}
+     			 	    } else if (tokenizer.sval.equalsIgnoreCase(VDCTSPREADSHEET_HIDDENROW)) {
+    			 			tokenizer.nextToken();
+    			 			if (tokenizer.ttype == EnhancedStreamTokenizer.TT_WORD ||
+    			 					tokenizer.ttype == DBConstants.quoteChar) {
+    			 				hiddenRowsVector.add(tokenizer.sval);
     			 			} else {
     			 				throw (new DBGParseException(errorString, tokenizer, fileName));
     			 			}
@@ -936,13 +956,17 @@ public static String processComment(DBData data, EnhancedStreamTokenizer tokeniz
     			 	columnsVector.copyInto(columns);
     			 	SplitData[] splitColumns = new SplitData[splitColumnsVector.size()];
     			 	splitColumnsVector.copyInto(splitColumns);
+    			 	String[] hiddenRows = new String[hiddenRowsVector.size()];
+    			 	hiddenRowsVector.copyInto(hiddenRows);
     			 	SplitData[] recentSplits = new SplitData[recentSplitsVector.size()];
     			 	recentSplitsVector.copyInto(recentSplits);
     			 	
-					SpreadsheetTableViewRecord viewRecord = new SpreadsheetTableViewRecord(type, name, modeName);
+					SpreadsheetTableViewRecord viewRecord =
+						new SpreadsheetTableViewRecord(type, name, modeName, showAllRowsString);
 					viewRecord.setRowOrder(rowOrder);
 					viewRecord.setColumns(columns);
 					viewRecord.setSplitColumns(splitColumns);
+					viewRecord.setHiddenRows(hiddenRows);
 					viewRecord.setRecentSplits(recentSplits);
     			 	SpreadsheetTableViewData.getInstance().add(viewRecord);
 			

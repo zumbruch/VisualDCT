@@ -95,7 +95,7 @@ public class SplitPropertyGroup {
 				int partStart = 0;
 				int partEnd = 0;
 				String part = "";
-				while (matcher.find() && (foundParts < partsCount - 1 || partsCount == -1)) {
+				while ((foundParts < partsCount - 1 || partsCount == -1) && matcher.find()) {
 					partEnd = matcher.start();
 					part = value.substring(partStart, partEnd);
 					partStart = matcher.end();
@@ -103,15 +103,24 @@ public class SplitPropertyGroup {
 					delimiter = matcher.group();
 					foundParts++;
 				}
-				part = value.substring(partStart);
-				partsVector.add(new SplitPropertyPart(foundParts, this, part, "", delimiter, true));
+				// If there are trailing delimiters, add them under trail. 
+				if (matcher.find()) {
+					partEnd = matcher.start();
+					part = value.substring(partStart, partEnd);
+					partStart = matcher.end();
+					partsVector.add(new SplitPropertyPart(foundParts, this, part, "", delimiter, true));
+					trail = value.substring(partStart);
+				} else {
+					part = value.substring(partStart);
+					partsVector.add(new SplitPropertyPart(foundParts, this, part, "", delimiter, true));
+					trail = "";
+				}
 				foundParts++;
 				if (partsCount == -1) {
 					partsCount = foundParts;
 				}
-				trail = "";
 			} else {
-				// If the type of splitting is by pattern, match it by groups and store them and inbetween strings.
+				// If the type of splitting is by pattern, match it by groups and store them and in-between strings.
 				Matcher matcher = compiledPattern.matcher(value);
 				patternMatch = matcher.matches();
 

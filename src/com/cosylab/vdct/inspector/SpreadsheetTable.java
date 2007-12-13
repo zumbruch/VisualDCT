@@ -44,6 +44,8 @@ import javax.swing.table.TableColumnModel;
 public class SpreadsheetTable extends JTable {
 	
     private static Graphics2D graphics = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB).createGraphics();
+    
+    SpreadsheetTableModel spreadsheetModel = null;
 	
 	public SpreadsheetTable(Vector data) {
 		super();
@@ -52,8 +54,6 @@ public class SpreadsheetTable extends JTable {
 	    setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 	    setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 	    setColumnSelectionAllowed(true);
-	    
-	    //getTableHeader().setReorderingAllowed(false);
 	    setBackground(new Color(204, 204, 204));
 	    setShowVerticalLines(true);
 	    setGridColor(Color.black);
@@ -73,6 +73,19 @@ public class SpreadsheetTable extends JTable {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.swing.JTable#setModel(javax.swing.table.TableModel)
+	 */
+	public void setModel(SpreadsheetTableModel spreadsheetModel) {
+		this.spreadsheetModel = spreadsheetModel;
+		super.setModel(spreadsheetModel);
+	}
+
+	public void refresh() {
+		spreadsheetModel.refresh();
+		repaint();
+	}
+	
 	public void resizeColumns() {
     	
     	FontMetrics metrics = graphics.getFontMetrics(getFont());

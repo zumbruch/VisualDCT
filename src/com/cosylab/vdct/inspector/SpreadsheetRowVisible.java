@@ -25,47 +25,37 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package com.cosylab.vdct.inspector;
 
-/** Interface for accessing properties from a table. 
+import com.cosylab.vdct.vdb.NameValueInfoProperty;
+
+/**
  * @author ssah
  *
  */
-public interface PropertyTableModel {
-	
-	/**
-	 * Defines the empty cell display type.
-	 */
-	public static final int DISP_NONE = 0;
-	/**
-	 * Defines the name cell display type.
-	 */
-	public static final int DISP_NAME = 1;
-	/**
-	 * Defines the editable value cell display type.
-	 */
-	public static final int DISP_VALUE = 2;
-	/**
-	 * Defines the visibility icon cell display type.
-	 */
-	public static final int DISP_VISIBILITY = 3;
-	
-	/**
-	 * The header display types, text, eye icon, or nothing.
-	 */
-	public static final int HEADERDISP_TEXT = 0;
-	public static final int HEADERDISP_EYE = 1;
-	public static final int HEADERDISP_NONE = 2;
+public class SpreadsheetRowVisible extends NameValueInfoProperty {
 
-	public InspectableProperty getPropertyAt(int row, int column);
+	boolean visible = true;
 	
 	/**
-	 * Returns the cell display type DISP_* at the given position.
+	 * @param visible
 	 */
-	public int getPropertyDisplayTypeAt(int row, int column);
+	public SpreadsheetRowVisible(boolean visible) {
+		super("", "");
+	}
 
 	/**
-	 * Returns the header display type HEADERDISP_* at the given position.
+	 * @param visible the visible to set
 	 */
-	public int getHeaderDisplayType(int column);
+	public void setVisible(boolean visible) {
+		this.visible = visible;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.vdb.NameValueInfoProperty#getVisibility()
+	 */
+	public int getVisibility() {
+		return visible ? NON_DEFAULT_VISIBLE : NEVER_VISIBLE;
+	}
 }

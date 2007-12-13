@@ -99,6 +99,44 @@ public class InspectorTableCellRenderer extends DefaultTableCellRenderer {
 		int modelRow = row;
 		int modelColumn = table.convertColumnIndexToModel(column);
 		
+		// If row is negative, assume you are rendering the column header.
+		if (row < 0) {
+			super.setHorizontalAlignment(JLabel.CENTER);
+			
+			switch (tableModel.getHeaderDisplayType(modelColumn)) {
+			case PropertyTableModel.HEADERDISP_TEXT: {
+				super.setBackground(separatorbgColor);
+				super.setForeground(separatorfgColor);
+				setBorder(null);
+				setText(str);
+				setIcon(null);
+			} break;
+			case PropertyTableModel.HEADERDISP_EYE: {
+				super.setBackground(bgColor);
+				super.setForeground(fgColor);
+				setBorder(UIManager.getBorder("TableHeader.cellBorder"));
+				setText(null);
+				setIcon(eyeIcon);
+			} break;
+			case PropertyTableModel.HEADERDISP_NONE: {
+				super.setBackground(bgColor);
+				super.setForeground(fgColor);
+				setBorder(UIManager.getBorder("TableHeader.cellBorder"));
+				setText(null);
+				setIcon(null);
+			} break;
+			default: {
+				super.setBackground(separatorbgColor);
+				super.setForeground(separatorfgColor);
+				setBorder(null);
+				setText(null);
+                setIcon(null);
+			}
+			}
+			return this;
+		}
+		setBorder(null);
+		
 		InspectableProperty property = tableModel.getPropertyAt(modelRow, modelColumn);
 		int dispType = tableModel.getPropertyDisplayTypeAt(modelRow, modelColumn);
 

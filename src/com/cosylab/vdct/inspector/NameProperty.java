@@ -27,7 +27,6 @@
  */
 package com.cosylab.vdct.inspector;
 
-import com.cosylab.vdct.Console;
 import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.events.commands.GetVDBManager;
 import com.cosylab.vdct.graphics.objects.Flexible;
@@ -72,11 +71,14 @@ public class NameProperty extends NameValueInfoProperty {
 		}
 
 		String oldName = namedObject.getFlexibleName();
+		
+		// Do nothing if the name is the same.
+		if (value.equals(oldName)) {
+			return;
+		}
+		
 		GetVDBManager manager = (GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
 		String errorMessage = manager.getManager().checkRecordName(value, true);
-		if (errorMessage != null) {
-			Console.getInstance().println(errorMessage);
-		}
         if (errorMessage != null && !errorMessage.startsWith("WARNING")) {
         	return;
         }

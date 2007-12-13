@@ -1301,6 +1301,7 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
  final String SPREADSHEET_VIEW_START = "#! " + DBResolver.VDCTSPREADSHEET_VIEW + "(";
  final String SPREADSHEET_ROWORDER_START = DBResolver.VDCTSPREADSHEET_ROWORDER + "(";
  final String SPREADSHEET_COLUMN_START = DBResolver.VDCTSPREADSHEET_COLUMN + "(";
+ final String SPREADSHEET_ROW_START = DBResolver.VDCTSPREADSHEET_HIDDENROW + "(";
  final String SPREADSHEET_SPLITCOLUMN_START = DBResolver.VDCTSPREADSHEET_SPLITCOLUMN + "(";
  final String SPREADSHEET_RECENTSPLIT_START = DBResolver.VDCTSPREADSHEET_RECENTSPLIT + "(";
 
@@ -1335,6 +1336,7 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 
      file.writeBytes(SPREADSHEET_VIEW_START + sprView.getType() + comma + quote + sprView.getName() + quote);
      file.writeBytes(comma + quote + sprView.getModeName() + quote);
+     file.writeBytes(comma + quote + sprView.getShowAllRowsString() + quote);
      
      SpreadsheetRowOrder rowOrder = sprView.getRowOrder();
      if (rowOrder != null) {
@@ -1349,6 +1351,13 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
      if (columns != null) {
     	 for (int i = 0; i < columns.length; i++) {
     		 file.writeBytes(comma + SPREADSHEET_COLUMN_START + quote + columns[i] + "\")");
+    	 }
+     }
+
+     String[] rows = sprView.getHiddenRows();
+     if (rows != null) {
+    	 for (int i = 0; i < rows.length; i++) {
+    		 file.writeBytes(comma + SPREADSHEET_ROW_START + quote + rows[i] + "\")");
     	 }
      }
 

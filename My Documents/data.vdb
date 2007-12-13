@@ -36,7 +36,7 @@ record(compress, Compress_number6) {
 record(compress, Compress_number7) {
   field(TSEL, "67547")
   field(DESC, "Dfgdf")
-  field(ASG, "Cel32")
+  field(ASG, "Cel3\")
   field(SCAN, "Fgdg")
   field(PINI, "Dfgdf")
 }
@@ -135,11 +135,6 @@ record(ai, NewAI4) {
   field(INP, "#L5 A7 @g8")
 }
 
-record(compress, Compress_number14) {
-  field(EVNT, "ztrztz")
-  field(ASG, "f 4 34g")
-}
-
 record(ai, NewAI0) {
   field(TSEL, "#L0 A0 @")
   field(SDIS, "#L0 A0 @")
@@ -196,11 +191,14 @@ record(ai, NewAI27) {
   field(FLNK, "9")
 }
 
+record(compress, Compress_number14) {
+  field(EVNT, "ztrztz")
+  field(ASG, "f 4 34g")
+}
+
 #! Further lines contain data used by VisualDCT
 #! View(1977,2180,1.0)
-#! SpreadsheetView(R,"ai","Group",SplitCol("INP","Delimiter","\s+"),SplitCol("TSEL","Delimiter","\s+"))
-#! SpreadsheetView(T,"template1.vdb","Default view",RowOrder("new",0,"Ascending"))
-#! SpreadsheetView(R,"compress","Group",RowOrder("SCAN",0,"Descending"),SplitCol("SCAN","Delimiter","g"),RecentSplit("Delimiter","g"),RecentSplit("Delimiter","o"))
+#! SpreadsheetView(R,"compress","Group","false",HiddenRow("Compress_number1"),HiddenRow("Compress_number11"),HiddenRow("Compress_number12"),HiddenRow("Compress_number13"),HiddenRow("Compress_number14"))
 #! Record(Compress_number1,2040,2189,0,1,"Compress_number1")
 #! Record(Compress_number2,2060,2222,0,1,"Compress_number2")
 #! Record(Compress_number3,2060,2209,0,1,"Compress_number3")
@@ -244,7 +242,6 @@ record(ai, NewAI27) {
 #! Record(NewAI2,2060,2673,0,1,"NewAI2")
 #! Record(NewAI3,2070,2673,0,1,"NewAI3")
 #! Record(NewAI4,2080,2693,0,1,"NewAI4")
-#! Record(Compress_number14,2180,2315,0,1,"Compress_number14")
 #! Record(NewAI0,2040,2653,0,1,"NewAI0")
 #! Record(NewAI12,2090,2693,0,1,"NewAI12")
 #! Record(NewAI15,2100,2699,0,1,"NewAI15")
@@ -253,3 +250,4 @@ record(ai, NewAI27) {
 #! Record(NewAI24,2140,2673,0,1,"NewAI24")
 #! Record(NewAI27,2360,2733,0,1,"NewAI27")
 #! Visibility("NewAI27.INP",1)
+#! Record(Compress_number14,2180,2315,0,1,"Compress_number14")

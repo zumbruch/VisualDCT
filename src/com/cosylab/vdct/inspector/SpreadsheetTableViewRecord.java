@@ -36,22 +36,39 @@ public class SpreadsheetTableViewRecord {
 	private String type = null;
 	private String name = null;
 	private String modeName = null;
+	private boolean showAllRows = false;
 
 	private SpreadsheetRowOrder rowOrder = null;
 	private String[] columns = null;
 	private SplitData[] splitColumns = null;
+	private String[] hiddenRows = null;
 	private SplitData[] recentSplits = null;
+	
+	private static final String TRUE = "true";  
+	private static final String FALSE = "false";  
 
 	/**
 	 * @param type
 	 * @param name
 	 * @param modeName
+	 * @param showAllRows
 	 */
-	public SpreadsheetTableViewRecord(String type, String name, String modeName) {
+	public SpreadsheetTableViewRecord(String type, String name, String modeName, String showAllRowsString) {
+		this(type, name, modeName, isShowAllRowsString(showAllRowsString));
+	}
+	
+	/**
+	 * @param type
+	 * @param name
+	 * @param modeName
+	 * @param showAllRows
+	 */
+	public SpreadsheetTableViewRecord(String type, String name, String modeName, boolean showAllRows) {
 		super();
 		this.type = type;
 		this.name = name;
 		this.modeName = modeName;
+		this.showAllRows = showAllRows;
 	}
 	
 	/**
@@ -74,7 +91,32 @@ public class SpreadsheetTableViewRecord {
 	public String getModeName() {
 		return modeName;
 	}
+	
+	/**
+	 * @return the showAllRows
+	 */
+	public boolean isShowAllRows() {
+		return showAllRows;
+	}
 
+	/**
+	 * @param showAllRows the showAllRows to set
+	 */
+	public void setShowAllRows(boolean showAllRows) {
+		this.showAllRows = showAllRows;
+	}
+	
+	public String getShowAllRowsString() {
+		return showAllRows ? TRUE : FALSE;
+	}
+
+	/**
+	 * @param showAllRows the showAllRows to set
+	 */
+	public static boolean isShowAllRowsString(String showAllRows) {
+		return showAllRows.equals(TRUE);
+	}
+	
 	/**
 	 * @return the rowOrder
 	 */
@@ -154,5 +196,19 @@ public class SpreadsheetTableViewRecord {
 	 */
 	public void setSplitColumns(SplitData[] splitColumns) {
 		this.splitColumns = splitColumns;
+	}
+
+	/**
+	 * @return the rows
+	 */
+	public String[] getHiddenRows() {
+		return hiddenRows;
+	}
+
+	/**
+	 * @param rows the rows to set
+	 */
+	public void setHiddenRows(String[] rows) {
+		this.hiddenRows = rows;
 	}
 }

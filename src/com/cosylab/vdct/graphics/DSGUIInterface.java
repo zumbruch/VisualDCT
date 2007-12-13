@@ -138,21 +138,19 @@ public java.lang.String checkGroupName(String name, boolean relative) {
  */
 public java.lang.String checkRecordName(String name, boolean relative) {
 
-	if (name.trim().length()==0) {
+	if (name.trim().length() == 0) {
 		return "Empty name!";
-	}	
-	else if (name.indexOf(' ')!=-1) return "No spaces allowed!";
-
-	else if (!relative && (Group.getRoot().findObject(name, true)!=null)) 
+	} else if (name.indexOf(' ') != -1) {
+		return "No spaces allowed!";
+	} else if (name.indexOf('"') != -1) {
+		return "No quotes allowed!";
+	} else if ((!relative && Group.getRoot().findObject(name, true) != null) ||
+			(relative && drawingSurface.getViewGroup().findObject(name, true) != null)) { 
 		return "Name already exists!";
-	else if (relative && (drawingSurface.getViewGroup().findObject(name, true)!=null)) 
-		return "Name already exists!";
-	else if (name.length()>Settings.getInstance().getRecordLength()) {
+	} else if (name.length()>Settings.getInstance().getRecordLength()) {
 		return "WARNING: Name length is "+name.length()+" characters!";
 	}
-	else
-		return null;
-		
+	return null;
 }
 public void copyToSystemClipboard(Vector objs)
 {

@@ -113,8 +113,6 @@ public class SplitData {
 	public boolean isDelimiterType() {
 		return delimiterType;
 	}
-
-	
 	
 	/**
 	 * @return the pattern

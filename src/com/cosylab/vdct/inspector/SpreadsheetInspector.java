@@ -252,7 +252,7 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer, Chan
     
     private void refreshTables() {
     	for (int i = 0; i < tables.length; i++) {
-    		tables[i].repaint();
+    		tables[i].refresh();
     	}
     }
     
@@ -269,19 +269,20 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer, Chan
     	while (typesEn.hasMoreElements() && instancesEn.hasMoreElements()) {
     		type = (String)typesEn.nextElement();
     		vector = (Vector)instancesEn.nextElement();
-        	tables[i] = getTable(type, vector);
-            JScrollPane scrollPane = new JScrollPane(tables[i]);
+
+            JScrollPane scrollPane = new JScrollPane();
+    		tables[i] = getTable(type, vector, scrollPane);
+            scrollPane.setViewportView(tables[i]);
             tabbedPane.addTab(type, scrollPane);
             i++;
     	}
     }
     
-    private SpreadsheetTable getTable(String type, Vector data) {
+    private SpreadsheetTable getTable(String type, Vector data, JScrollPane scrollPane) {
 
     	SpreadsheetTable table = new SpreadsheetTable(data);
 		SpreadsheetTableModel tableModel = new SpreadsheetTableModel(this, type, data);
     	table.setModel(tableModel);
-    	tableModel.setTable(table);
 
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_Z, ActionEvent.CTRL_MASK, false);
 		table.registerKeyboardAction(this, undoString, keyStroke, JComponent.WHEN_FOCUSED);
@@ -297,6 +298,8 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer, Chan
     	table.setDefaultRenderer(String.class, new InspectorTableCellRenderer(table, tableModel));
     	table.setDefaultEditor(String.class, editor);
 
+    	tableModel.setTable(table, scrollPane);
+    	
     	return table;
     }
 

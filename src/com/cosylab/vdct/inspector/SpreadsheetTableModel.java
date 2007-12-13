@@ -28,6 +28,7 @@ package com.cosylab.vdct.inspector;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -42,6 +43,7 @@ import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
@@ -53,34 +55,36 @@ import com.cosylab.vdct.graphics.objects.Record;
 import com.cosylab.vdct.graphics.objects.Template;
 import com.cosylab.vdct.graphics.popup.PopUpMenu;
 import com.cosylab.vdct.plugin.debug.PluginDebugManager;
-import com.cosylab.vdct.vdb.NameValueInfoProperty;
+import com.cosylab.vdct.undo.UndoManager;
 
 public class SpreadsheetTableModel extends AbstractTableModel implements PropertyTableModel, ActionListener {
 
     SpreadsheetInspector inspector = null;
 	
-	// Created on construction.
 	private String dataType = null;
 	private Inspectable[] inspectables = null;
 	private SpreadsheetRowComparator comparator = null;
-	private NameValueInfoProperty emptyProperty = null;
     private Vector recentSplitData = null;
 	private HashMap nameToRecentSplitDataIndex = null;
 	
 	private int modelRowCount = 0;
     private SpreadsheetTable table = null;
+    private JScrollPane pane = null;
+    private boolean showAllRows = true;
     
-	// The following refresh on mode change. 
 	private int mode = -1;
+	private int propertiesRowCount = 0;
 	private int propertiesColumnCount = 0;
 	
 	private InspectableProperty[][] properties = null;
 	private HashMap nameToPropertiesColumnIndex = null;
+	private HashMap nameToPropertiesRowIndex = null;
 	private String[] propertiesColumnNames = null;
+	private boolean[] propertiesRowVisibilities = null;
 	private boolean[] propertiesColumnVisibilities = null;
     private SplitData[] propertiesColumnSplitData = null;
     private JCheckBoxMenuItem[] propertiesColumnMenuItem = null;
-
+    
     private JPopupMenu popUpMenu = null;
     private JMenuItem hideItem = null; 
     private JComponent hideSeparator = null; 
@@ -89,21 +93,25 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
     private JComponent splitSeparator = null; 
 	private JMenuItem sortAscItem = null; 
 	private JMenuItem sortDesItem = null; 
-    private JComponent sortSeparator = null; 
+    private JComponent sortSeparator = null;
+    private JMenuItem showAllRowsItem = null;
     private JMenuItem extendCountersItem = null;
     
-	// The following refresh on column number change.
     private int propertiesToModelColumnIndex[] = null;
     private int modelToPropertiesColumnIndex[] = null;
-
+    
     private int modelColumnCount = 0;
 	private InspectableProperty[][] model = null;
     // These are the size of the number of columns.
 	private String[] modelColumnNames = null;
 
     // The current sorted state.
-    private int sortedModelColumn = -1;
+    private int sortedPropertiesColumn = -1;
+    private int sortedSplitIndex = 0;
     private boolean sortedOrderAsc = true;     
+
+    // The name of the column that contains the row names.  
+    private static final String propertiesNamesColumn = "Name";
     
     // The number of starting columns that should not be hidden or split. Currently this is only the name.
     private static final int solidPropertiesColumnCount = 1;    
@@ -114,50 +122,61 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
     // The maximum number of recent entries for splitting columns.
     private static final int recentSplitDataMaxCount = 8;    
     
-    private int popUpColumn = 0;
+    private int popUpModelRow = -1;
+    private int popUpModelColumn = -1;
 
 	private static ArrayList defaultModes = null; 
 	
-	private static final String hide = "Hide"; 
+	private static final String hide = "Hide column"; 
 	private static final String sortAsc = "Sort ascending"; 
 	private static final String sortDes = "Sort descending"; 
-	private static final String showAll = "Show all"; 
-	private static final String hideAll = "Hide all"; 
-	private static final String visibility = "Visibility"; 
+	private static final String showAll = "Show all columns"; 
+	private static final String hideAll = "Hide all columns"; 
+	private static final String visibility = "Column visibility"; 
 	private static final String extendCounters = "Increase counters"; 
+	private static final String showAllRowsString = "Show all rows"; 
 	
-	private static final String split = "Split by"; 
+	private static final String split = "Split column by"; 
 	private static final String whitespaces = "Whitespaces";
 	private static final String customPattern = "Custom...";
-	private static final String join = "Join"; 
+	private static final String join = "Join columns"; 
 
+	private static final String hideRow = "Hide row"; 
+	
 	private static final String recordType = "R"; 
 	private static final String templateType = "T"; 
 	private static final String unknownType = "U"; 
 
 	public SpreadsheetTableModel(SpreadsheetInspector inspector, String dataType, Vector inspectData) throws
 	        IllegalArgumentException {
-
+		
   		if (inspectData == null || inspectData.size() == 0) {
   			throw new IllegalArgumentException("inspectables must not be empty or null");
   		}
   		this.inspector = inspector; 
   		
 		this.dataType = dataType;
-  		emptyProperty = new NameValueInfoProperty("", "");
 		comparator = new SpreadsheetRowComparator(this);
 		inspectables = new Inspectable[inspectData.size()];
 		inspectData.copyInto(inspectables); 
         recentSplitData = new Vector();
     	nameToRecentSplitDataIndex = new HashMap();
+
+        propertiesRowCount = inspectables.length;
 	}
 
+	public void refresh() {
+		saveView();
+		refreshProperties();
+		loadView();
+	}
+	
 	private void refreshProperties() {
 
         // Get the properties of all inspectable objects and store the first creator property of each.
-		InspectableProperty[][] inspectableProperties = new InspectableProperty[modelRowCount][];
-        InspectableProperty[] creatorProperties = new InspectableProperty[modelRowCount];
-        for (int i = 0; i < modelRowCount; i++) {
+		InspectableProperty[][] inspectableProperties = new InspectableProperty[propertiesRowCount][];
+        InspectableProperty[] creatorProperties = new InspectableProperty[propertiesRowCount];
+        for (int i = 0; i < propertiesRowCount; i++) {
         	inspectableProperties[i] = inspectables[i].getProperties(mode, true);
 			for (int j = 0; j < inspectableProperties[i].length; j++) {
 				InspectableProperty property = inspectableProperties[i][j];
@@ -174,17 +193,16 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
         // Add an empty first one.
         propertiesColumnCount = 1;
         propStrings.add("");
-        for (int i = 0; i < modelRowCount; i++) {
+        for (int i = 0; i < propertiesRowCount; i++) {
 			for (int j = 0; j < inspectableProperties[i].length; j++) {
 				InspectableProperty property = inspectableProperties[i][j];
-				if (property instanceof CreatorProperty) {
-					continue;
-				}
-				String name = property.getName();
-				if (nameToPropertiesColumnIndex.get(name) == null) {
-					nameToPropertiesColumnIndex.put(name, Integer.valueOf(String.valueOf(propertiesColumnCount)));
-					propStrings.add(name);
-					propertiesColumnCount++;
+				if (!(property instanceof CreatorProperty)) {
+					String name = property.getName();
+					if (nameToPropertiesColumnIndex.get(name) == null) {
+						nameToPropertiesColumnIndex.put(name, Integer.valueOf(String.valueOf(propertiesColumnCount)));
+						propStrings.add(name);
+						propertiesColumnCount++;
+					}
 				}
 			}
 		}
@@ -192,12 +210,13 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 		propStrings.copyInto(propertiesColumnNames);
 
 		// Copy the properties into a rectangle shaped table. Empty spaces are filled with creator properties.
-		properties = new InspectableProperty[modelRowCount][];
-		for (int i = 0; i < modelRowCount; i++) {
+		properties = new InspectableProperty[propertiesRowCount][];
+		for (int i = 0; i < propertiesRowCount; i++) {
 			properties[i] = new InspectableProperty[propertiesColumnCount];
 
+			SpreadsheetRowVisible visibilityProperty = new SpreadsheetRowVisible(true);
 			for (int j = 0; j < propertiesColumnCount; j++) {
-				properties[i][j] = (j == 0) ? emptyProperty : creatorProperties[i];
+				properties[i][j] = (j == 0) ? visibilityProperty : creatorProperties[i];
 			}
 			
 			for (int j = 0; j < inspectableProperties[i].length; j++) {
@@ -209,6 +228,15 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 			}
 		}
 
+  		// Create a name to row translation table.
+		nameToPropertiesRowIndex = new HashMap();
+		int nameColumn = nameToPropertiesColumnIndex(propertiesNamesColumn);
+		if (nameColumn >= 0) {
+			for (int i = 0; i < propertiesRowCount; i++) {
+				nameToPropertiesRowIndex.put(properties[i][nameColumn].getValue(), new Integer(i));
+			}
+		}
+		
 	    // Prepare space for properties column data.
 		propertiesColumnVisibilities = new boolean[propertiesColumnCount]; 
 		propertiesColumnSplitData = new SplitData[propertiesColumnCount];
@@ -216,29 +244,38 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 			propertiesColumnVisibilities[j] = false;
 		    propertiesColumnSplitData[j] = null;
 		}
+
+		// Prepare space for row data.
+		propertiesRowVisibilities = new boolean[propertiesRowCount]; 
+		for (int i = 0; i < propertiesRowCount; i++) {
+			propertiesRowVisibilities[i] = true;
+		}
+		
 		createPopupMenu();
 
 		refreshModel();
 	}
 	
 	private void refreshModel() {
-		
-		// Calculate the required parts to which the a specific column must be split into.
-		for (int j = 0; j < propertiesColumnCount; j++) {
-			SplitData split = propertiesColumnSplitData[j];
-			if (split != null) {
-				int maxParts = 1;
-				for (int i = 0; i < modelRowCount; i++) {
-					String value = properties[i][j].getValue();
-					int parts = SplitPropertyGroup.getPartsCount(value, split);
-					maxParts = Math.max(maxParts, parts);
-				}
-				split.setParts(maxParts);
+		updateSplitData();
+        
+		// Create a translation table from visible to all rows.
+		modelRowCount = 0; 
+		for (int i = 0; i < propertiesRowCount; i++) {
+			if (showAllRows || propertiesRowVisibilities[i]) {
+				modelRowCount++;
 			}
 		}
 		
-		createSplitTranslationTables();
-
+		int[] modelToPropertiesRowIndex = new int[modelRowCount];
+		int modelRow = 0; 
+		for (int i = 0; i < propertiesRowCount; i++) {
+			if (showAllRows || propertiesRowVisibilities[i]) {
+				modelToPropertiesRowIndex[modelRow] = i;
+				modelRow++;
+			}
+		}
+		
 		model = new InspectableProperty[modelRowCount][];
 		for (int i = 0; i < modelRowCount; i++) {
 			model[i] = new InspectableProperty[modelColumnCount];
@@ -269,7 +306,8 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 				}
 				
 				for (int i = 0; i < modelRowCount; i++) {
-					SplitPropertyGroup group = new SplitPropertyGroup(properties[i][j], split);
+					int propertyRow = modelToPropertiesRowIndex[i];
+					SplitPropertyGroup group = new SplitPropertyGroup(properties[propertyRow][j], split);
 					for (int p = 0; p < parts; p++) {
 						model[i][modelJ + p] = group.getPart(p);
 					}
@@ -277,14 +315,30 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 			} else {
 		    	modelColumnNames[modelJ] = name;
 				for (int i = 0; i < modelRowCount; i++) {
-					model[i][modelJ] = properties[i][j];
+					model[i][modelJ] = properties[modelToPropertiesRowIndex[i]][j];
 				}
             }
 		}
+		sortModelRows();
 	}
 	
-	private void createSplitTranslationTables() {
+	private void updateSplitData() {
+
+		// Calculate the required parts to which the a specific column must be split into.
+		for (int j = 0; j < propertiesColumnCount; j++) {
+			SplitData split = propertiesColumnSplitData[j];
+			if (split != null) {
+				int maxParts = 1;
+				for (int i = 0; i < propertiesRowCount; i++) {
+					String value = properties[i][j].getValue();
+					int parts = SplitPropertyGroup.getPartsCount(value, split);
+					maxParts = Math.max(maxParts, parts);
+				}
+				split.setParts(maxParts);
+			}
+		}
 		
+		// Create split translation tables.
 		modelColumnCount = 0;
 		for (int j = 0; j < propertiesColumnCount; j++) {
 			modelColumnCount += (propertiesColumnSplitData[j] != null) ? propertiesColumnSplitData[j].getParts() : 1;
@@ -338,8 +392,13 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 	    return table;
 	}
 
-	public void setTable(SpreadsheetTable table) {
+	public JScrollPane getTableScrollPane() {
+	    return pane;
+	}
+	
+	public void setTable(SpreadsheetTable table, JScrollPane pane) {
 	    this.table = table;
+	    this.pane = pane;
 	    
 		table.getTableHeader().addMouseListener(new MouseAdapter() {
 			
@@ -352,17 +411,17 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 			    	JTable table = getTable();
 			        int columnIndex = table.getColumnModel().getColumnIndexAtX(event.getX());
 			    	int index = table.convertColumnIndexToModel(columnIndex);
-			    	if (index >= 0) {
-			    		if (sortedModelColumn == index) {
-			    			sortedOrderAsc = !sortedOrderAsc; 
-			    		} else {
-				    		sortedModelColumn = index;
-				    		sortedOrderAsc = true;
-			    		}
-				    	sortModelRows();
+			    	if (index >= 1) {
+			    		updateSortedColumn(index);
+			    	} else if (index == 0) {
+						setShowAllRows(!showAllRows);
 			    	}
 	            } else if (event.getButton() == MouseEvent.BUTTON3) {
-	            	displayPopupMenu(event.getX(), event.getY());
+			    	Point point = event.getPoint();
+			    	JTable table = getTable();
+			        popUpModelRow = table.rowAtPoint(point);
+			        popUpModelColumn = table.convertColumnIndexToModel(table.columnAtPoint(point));
+	            	displayPopupMenu(table, event.getX(), event.getY());
 			    }
 	        }
 
@@ -405,17 +464,66 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 			    }
 	        }
 		});
-	    
+		
 		table.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent event) {
-			    if (event.getButton() == MouseEvent.BUTTON3) {
-			    	displayPopupMenu(event.getX(), event.getY());
+			    //: TODO complete this
+				if (event.getButton() == MouseEvent.BUTTON1) {
+			    	System.out.println("Click: " + event.getClickCount());
+			    }
+
+				if (event.getButton() == MouseEvent.BUTTON3) {
+			    	Point point = event.getPoint();
+			    	
+			    	JTable table = getTable();
+			        popUpModelRow = table.rowAtPoint(point);
+			        popUpModelColumn = table.convertColumnIndexToModel(table.columnAtPoint(point));
+			        
+			        if (popUpModelRow >= 0 && popUpModelColumn == 0) {
+			        	
+		        		/* If all rows are shown, at the right click, switch the row visibility instantly. If only
+		        		 * unhidden rows are shown, instead bring up a popup menu with the hide command. 
+		        		 */
+			        	if (showAllRows) {
+		        			int propertyIndex = modelToPropertiesRowIndex(popUpModelRow);
+		        			boolean state = !propertiesRowVisibilities[propertyIndex];
+		        			propertiesRowVisibilities[propertyIndex] = state;
+		        			((SpreadsheetRowVisible)properties[propertyIndex][0]).setVisible(state);
+	        				fireTableCellUpdated(popUpModelRow, 0);
+			        	} else {
+			        		JPopupMenu popupMenu = new JPopupMenu();
+			        		JMenuItem menuItem = new JMenuItem(hideRow);
+			        		menuItem.addActionListener(new ActionListener() {
+			        			public void actionPerformed(ActionEvent event) {
+			        				int propertyIndex = modelToPropertiesRowIndex(popUpModelRow);
+				        			boolean state = !propertiesRowVisibilities[propertyIndex];
+				        			propertiesRowVisibilities[propertyIndex] = state;
+				        			((SpreadsheetRowVisible)properties[propertyIndex][0]).setVisible(state);
+			        				refreshModel();
+			        				fireTableDataChanged();
+			        			}
+			        		});
+			        		popupMenu.add(menuItem);
+			        		popupMenu.show(table, event.getX(), event.getY());
+			        	}
+			        } else {
+				    	displayPopupMenu(table, event.getX(), event.getY());
+			        }
+			    }
+	        }
+		}); 
+
+		pane.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent event) {
+				if (event.getButton() == MouseEvent.BUTTON3) {
+			        popUpModelRow = -1;
+			        popUpModelColumn = -1;
+					displayPopupMenu(getTableScrollPane(), event.getX(), event.getY());
 			    }
 	        }
 		});
-
-        modelRowCount = inspectables.length;
-        loadView();
+		
+		loadView();
 	}
 
     private void createPopupMenu() {
@@ -453,7 +561,9 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
     	ArrayList list = getModeNames();
 
        	for (int i = 0; i < list.size(); i++) {
-       		JMenuItem menuItem = new JMenuItem(list.get(i).toString());
+       		String action = list.get(i).toString();
+       		JMenuItem menuItem = new JMenuItem(action + " columns");
+       		menuItem.setActionCommand(action);
        		menuItem.addActionListener(this);
        		popUpMenu.add(menuItem);
        	}
@@ -496,6 +606,11 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 
     	popUpMenu.addSeparator();
     	
+    	showAllRowsItem = new JCheckBoxMenuItem(showAllRowsString);
+    	showAllRowsItem.setSelected(showAllRows);
+    	showAllRowsItem.addActionListener(this);
+    	popUpMenu.add(showAllRowsItem);
+    	
     	extendCountersItem = new JMenuItem(extendCounters);
     	extendCountersItem.addActionListener(this);
     	popUpMenu.add(extendCountersItem);
@@ -505,20 +620,16 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 		String action = event.getActionCommand();
 		Object source = event.getSource();
 		
-		if (source instanceof JCheckBoxMenuItem) {
-			propertiesColumnVisibilities[nameToPropertiesColumnIndex(action)] = ((JCheckBoxMenuItem)source).isSelected();
-		    updateColumnVisibility();
-		} else if (action.equals(hide)) {
-	    	int index = table.convertColumnIndexToModel(popUpColumn);
-	    	if (index >= 0) {
-	    		index = modelToPropertiesColumnIndex[index];
-	    		propertiesColumnMenuItem[index].setSelected(false);
-	    		propertiesColumnVisibilities[index] = false;
+		if (action.equals(hide)) {
+	    	if (popUpModelColumn >= 0) {
+	    		int propertiesColumn = modelToPropertiesColumnIndex[popUpModelColumn];
+	    		propertiesColumnMenuItem[propertiesColumn].setSelected(false);
+	    		propertiesColumnVisibilities[propertiesColumn] = false;
 	    		updateColumnVisibility();
 	    	}
 		} else if (action.equals(whitespaces) || action.equals(customPattern)) {
 
-			int index = table.convertColumnIndexToModel(popUpColumn);
+			int index = popUpModelColumn;
 			if (index >= 0) {
 				SplitData split = null; 
 				if (action.equals(customPattern)) {
@@ -531,8 +642,11 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 						split = SplitData.getWhitespaceSplitData();
 					}
 					dialog.setSplitData(split);
-					// Add the data from the first row of the splitting column as starting test example. 
-                    dialog.setTestExample(model[0][index].getValue());
+					/* Add the data from the first row of the splitting column as starting test example. If no visible
+					 * rows, add from the first among all.
+					 */
+					InspectableProperty testProperty = (modelRowCount >= 0) ? model[0][index] : properties[0][index];
+                    dialog.setTestExample(testProperty.getValue());
 					dialog.setVisible(true);
 					split = dialog.getSplitData();
 					if (split != null) {
@@ -557,24 +671,16 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 				}
 			}
 		} else if (action.equals(join)) {
-			int index = table.convertColumnIndexToModel(popUpColumn);
-			if (index >= 0) {
-				propertiesColumnSplitData[modelToPropertiesColumnIndex[index]] = null;
+			if (popUpModelColumn >= 0) {
+				propertiesColumnSplitData[modelToPropertiesColumnIndex[popUpModelColumn]] = null;
 				refreshModel();
 				// refresh
 				saveView();
 				loadView();
 	    	}
 		} else if (action.equals(sortAsc) || action.equals(sortDes)) {
-	    	int index = table.convertColumnIndexToModel(popUpColumn);
-	    	if (index >= 0) {
-	    		if (sortedModelColumn == index) {
-	    			sortedOrderAsc = !sortedOrderAsc; 
-	    		} else {
-		    		sortedModelColumn = index;
-		    		sortedOrderAsc = true;
-	    		}
-		    	sortModelRows();
+	    	if (popUpModelColumn >= 0) {
+	    		updateSortedColumn(popUpModelColumn);
 	    	}
 		} else if (action.equals(hideAll) || action.equals(showAll)) {
 		    boolean state = action.equals(showAll);
@@ -584,11 +690,16 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 				propertiesColumnVisibilities[i] = state;
 		    }
 		    updateColumnVisibility();
+		} else if (action.equals(showAllRowsString)) {
+			setShowAllRows(((JCheckBoxMenuItem)source).isSelected());
 		} else if (action.equals(extendCounters)) {
 			extendCounters(table.getSelectedRows(), table.getSelectedColumns());
+		} else if (source instanceof JCheckBoxMenuItem) {
+			propertiesColumnVisibilities[nameToPropertiesColumnIndex(action)] =
+				((JCheckBoxMenuItem)source).isSelected();
+		    updateColumnVisibility();
 		} else {
-			int index = table.convertColumnIndexToModel(popUpColumn);
-			if (index >= 0) {
+			if (popUpModelColumn >= 0) {
 				Integer recentIndexObject = (Integer)nameToRecentSplitDataIndex.get(action);
 				if (recentIndexObject != null) {
 					int recentIndex = recentIndexObject.intValue();
@@ -596,7 +707,11 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 					SplitData data = (SplitData)recentSplitData.remove(recentIndex);
 					recentSplitData.add(0, data);
 					updateSplitMenu();
-					propertiesColumnSplitData[modelToPropertiesColumnIndex[index]] = data;
+
+					int propertiesColumnIndex = modelToPropertiesColumnIndex[popUpModelColumn]; 
+					String name = propertiesColumnNames[propertiesColumnIndex];
+					SplitData split = new SplitData(name, data.getDelimiterTypeString(), data.getPattern());
+					propertiesColumnSplitData[propertiesColumnIndex] = split;
 					refreshModel();
 					// refresh
 					saveView();
@@ -620,9 +735,31 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
         }
 	}
 	
+	private void setShowAllRows(boolean state) {
+		showAllRows = state;
+		showAllRowsItem.setSelected(state);
+		refreshModel();
+		table.getTableHeader().repaint();
+		fireTableDataChanged();
+	}
+	
+	private void updateSortedColumn(int modelColumn) {
+		int newSortedPropertiesColumn = modelToPropertiesColumnIndex[modelColumn];
+		int newSortedSplitIndex = modelColumn - propertiesToModelColumnIndex[newSortedPropertiesColumn];
+
+		if (sortedPropertiesColumn == newSortedPropertiesColumn && sortedSplitIndex == newSortedSplitIndex) {
+			sortedOrderAsc = !sortedOrderAsc;
+		} else {
+			sortedPropertiesColumn = newSortedPropertiesColumn;
+			sortedSplitIndex = newSortedSplitIndex;
+    		sortedOrderAsc = true;
+        }
+		sortModelRows();
+	}
+	
 	private void sortModelRows() {
-		if (sortedModelColumn >= 0) {
-			comparator.setColumn(sortedModelColumn);
+		if (sortedPropertiesColumn >= 0) {
+			comparator.setColumn(propertiesToModelColumnIndex[sortedPropertiesColumn] + sortedSplitIndex);
 			comparator.setAscending(sortedOrderAsc);
 			Arrays.sort(model, comparator);
 			fireTableDataChanged();
@@ -655,25 +792,30 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
     	splitMenu.add(menuItem);
     }
 
-    private void displayPopupMenu(int posX, int posY) {
-        popUpColumn = table.getColumnModel().getColumnIndexAtX(posX);
-        int colIndex = table.convertColumnIndexToModel(popUpColumn);
-        boolean first = colIndex == 0;
-        boolean persistant = colIndex <= solidPropertiesColumnCount;
-        boolean splitted = propertiesColumnSplitData[modelToPropertiesColumnIndex[colIndex]] != null;
+    private void displayPopupMenu(JComponent component, int posX, int posY) {
+        boolean inTable = popUpModelRow >= 0 && popUpModelColumn >= 0;
+        boolean first = popUpModelColumn == 0;
+        boolean persistant = popUpModelColumn <= solidPropertiesColumnCount;
+        boolean splitted = false;
+        if (inTable) {
+        	splitted = propertiesColumnSplitData[modelToPropertiesColumnIndex[popUpModelColumn]] != null;
+        }
         
-        setJComponentVisible(hideItem, !first && !persistant);
-        setJComponentVisible(hideSeparator, !first && !persistant);
-        setJComponentVisible(splitMenu, !first && !persistant && !splitted);
-        setJComponentVisible(joinItem, !first && !persistant && splitted);
-        setJComponentVisible(splitSeparator, !first && !persistant);
-        setJComponentVisible(sortAscItem, !first);
-        setJComponentVisible(sortDesItem, !first);
-        setJComponentVisible(sortSeparator, !first);
+        boolean manipulatable = inTable && !first && !persistant; 
+        boolean sortable = inTable && !first;
+        
+        setJComponentVisible(hideItem, manipulatable);
+        setJComponentVisible(hideSeparator, manipulatable);
+        setJComponentVisible(splitMenu, manipulatable && !splitted);
+        setJComponentVisible(joinItem, manipulatable && splitted);
+        setJComponentVisible(splitSeparator, manipulatable);
+        setJComponentVisible(sortAscItem, sortable);
+        setJComponentVisible(sortDesItem, sortable);
+        setJComponentVisible(sortSeparator, sortable);
         
         extendCountersItem.setEnabled(table.getSelectedColumnCount() >= 1 && table.getSelectedRowCount() >= 2);
         
-        popUpMenu.show(table, posX, posY);
+        popUpMenu.show(component, posX, posY);
     }
     
     private void setJComponentVisible(JComponent component, boolean visible) {
@@ -682,11 +824,26 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
     	}
     }
 	
+    /** Returns the index of the named data row or -1 if there is none.
+     */
+    private int nameToPropertiesRowIndex(String name) {
+    	Integer index = (Integer)nameToPropertiesRowIndex.get(name);
+        return (index != null) ? index.intValue() : -1;
+    }
     /** Returns the index of the named data column or -1 if there is none.
      */
     private int nameToPropertiesColumnIndex(String name) {
     	Integer index = (Integer)nameToPropertiesColumnIndex.get(name);
         return (index != null) ? index.intValue() : -1;
+    }
+    
+    private int modelToPropertiesRowIndex(int modelRow) {
+    	int propertiesNamesColumnIndex = nameToPropertiesColumnIndex(propertiesNamesColumn);
+    	if (propertiesNamesColumnIndex == -1) {
+    		return -1;
+    	}
+    	String rowName = model[modelRow][propertiesToModelColumnIndex[propertiesNamesColumnIndex]].getValue();
+    	return nameToPropertiesRowIndex(rowName);
     }
     
 	public Class getColumnClass(int column) {
@@ -708,6 +865,15 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 	public void setValueAt(Object aValue, int row, int column) {
 		
 		InspectableProperty property = model[row][column];
+
+		int propertiesRow = modelToPropertiesRowIndex(row);
+		
+		// If a name changes, remove the old name.
+		int propertiesColumn = modelToPropertiesColumnIndex[column];
+		int propertiesNamesColumnIndex = nameToPropertiesColumnIndex(propertiesNamesColumn);
+		if (propertiesColumn == propertiesNamesColumnIndex) {
+			nameToPropertiesRowIndex.remove(property.getValue());
+		}
 		
 		/* Check if the property is a creator property that creates a new property on the inspectable object. If the
 		 * current property is a split part, check if the owner is a creator property. If it is, get the newly created
@@ -721,7 +887,6 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 		if (property instanceof CreatorProperty) {
 			CreatorProperty creatorProperty = (CreatorProperty)property; 
 
-			int propertiesColumn = modelToPropertiesColumnIndex[column]; 
 			creatorProperty.setName(propertiesColumnNames[propertiesColumn]);
 			creatorProperty.setValue(aValue.toString());
 			property = creatorProperty.getCreatedProperty();
@@ -731,11 +896,18 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 			} else {
 				model[row][column] = property; 
 			}
-			properties[row][propertiesColumn] = property; 
+
+			properties[propertiesRow][propertiesColumn] = property; 
 			
 		} else {
 			model[row][column].setValue(aValue.toString());
 		}
+		
+		// If the name was changed, add the new name.
+		if (propertiesColumn == propertiesNamesColumnIndex) {
+   			nameToPropertiesRowIndex.put(model[row][column].getValue(), new Integer(propertiesRow));
+		}
+		
 		fireTableRowsUpdated(row, row);
 	}
 	
@@ -752,10 +924,14 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 	}
 	
 	public int getPropertyDisplayTypeAt(int row, int column) {
+	    return (column > 0) ? PropertyTableModel.DISP_VALUE : PropertyTableModel.DISP_VISIBILITY;
+	}
+	
+	public int getHeaderDisplayType(int column) {
 	    if (column > 0) {
-	    	return PropertyTableModel.DISP_VALUE;
+	    	return PropertyTableModel.HEADERDISP_TEXT;
 	    }
-	    return PropertyTableModel.DISP_NONE;
+	    return showAllRows ? PropertyTableModel.HEADERDISP_EYE : PropertyTableModel.HEADERDISP_NONE;
 	}
 
 	private String getTypeString(Inspectable inspectable) {
@@ -768,6 +944,8 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 	}
 	
 	private void extendCounters(int[] rows, int[] viewColumns) {
+		
+		UndoManager.getInstance().startMacroAction();
 		for (int c = 0; c < viewColumns.length; c++) {
 			int modelColumn = table.convertColumnIndexToModel(viewColumns[c]);
 			
@@ -776,21 +954,25 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 			String baseString = SplitData.removeValueAtEnd(firstEntry);
 			int firstValue = SplitData.extractValueAtEnd(firstEntry);
 			int secondValue = SplitData.extractValueAtEnd(secondEntry);
+
 			// Assume base at 0 and step 1 if values are absent.
-			int value = 0;
-			int step = 1;
-			if (firstValue != -1) {
-				value = firstValue;
+			if (firstValue == -1) {
+				firstValue = 0;
 			}
-			if (secondValue != -1) {
-				step = secondValue - firstValue;
+			if (secondValue == -1 || secondValue == firstValue) {
+				secondValue = firstValue + 1;
 			}
+			
+			int value = firstValue;
+			int step = secondValue - firstValue;
+
 			for (int r = 0; r < rows.length; r++) {
 				model[rows[r]][modelColumn].setValue(baseString + value);
 				value += step;
 				fireTableCellUpdated(rows[r], modelColumn);
 			}
 		}
+        UndoManager.getInstance().stopMacroAction();
 	}
 	
 	private void loadView() {
@@ -816,7 +998,7 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 			mode = newMode;
 	        refreshProperties();
 		}
-
+		
 		clearColumnModel();
 		
 		// If no record, make default model.
@@ -825,6 +1007,27 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
     		table.resizeColumns();
 			return;
 		}
+		
+		if (showAllRows != record.isShowAllRows()) {
+			showAllRows = record.isShowAllRows();
+			table.getTableHeader().repaint();
+		}
+		
+    	// If no rows, assume all are visible. 
+        for (int i = 0; i < propertiesRowCount; i++) {
+        	propertiesRowVisibilities[i] = true;
+			((SpreadsheetRowVisible)properties[i][0]).setVisible(true);
+        }
+		String[] rows = record.getHiddenRows();
+		if (rows != null && rows.length > 0) {
+            for (int i = 0; i < rows.length; i++) {
+            	int propertiesIndex = nameToPropertiesRowIndex(rows[i]);
+            	if (propertiesIndex >= 0) {
+            		propertiesRowVisibilities[propertiesIndex] = false;
+        			((SpreadsheetRowVisible)properties[propertiesIndex][0]).setVisible(false);
+            	}
+            }
+    	}
 		
 		// Set the split data and refresh the model.
     	for (int j = 0; j < propertiesColumnCount; j++) {
@@ -838,8 +1041,8 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
     				propertiesColumnSplitData[index] = splitColumns[j];
     			}
     		}
-    		refreshModel();
     	}
+		refreshModel();
     	
     	SplitData[] recentSplits = record.getRecentSplits();
     	if (recentSplits != null) {
@@ -860,8 +1063,8 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
         		if (splitData == null || splitIndex >= splitData.getParts()) {
         			splitIndex = 0;
         		}
-        		
-        		sortedModelColumn = propertiesToModelColumnIndex[index] + splitIndex;
+        		sortedPropertiesColumn = index;
+        		sortedSplitIndex = splitIndex;
         		sortedOrderAsc = rowOrder.isAscending();
         		sortModelRows();
         	}
@@ -923,6 +1126,7 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 	private TableColumn createColumn(int colIndex, boolean identifier) {
 		TableColumn column = new TableColumn();
 		column.setModelIndex(colIndex);
+		column.setHeaderRenderer(table.getDefaultRenderer(String.class));
 		column.setIdentifier(identifier ? propertiesColumnNames[modelToPropertiesColumnIndex[colIndex]] : null);
 		column.setHeaderValue(modelColumnNames[colIndex]);
 		return column;
@@ -932,10 +1136,12 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 		String typeSign = getTypeString(inspectables[0]);
 		
 		// Determine if the current column visibility/order and splitting is default.
-		boolean defaultNoSortOrder = (sortedModelColumn == -1);
+		boolean defaultNoSortOrder = (sortedPropertiesColumn == -1);
 		boolean defaultColumnVisibilityAndOrder = true;
 		boolean defaultNoColumnSplit = true;
 		boolean defaultNoRecentSplits = recentSplitData.isEmpty();
+		boolean defaultRowVisibility = true;
+		
 		int prevColumnViewPosition = -1; 
         for (int j = 0; j < propertiesColumnCount; j++) {
         	int columnViewPosition = table.convertColumnIndexToView(propertiesToModelColumnIndex[j]);
@@ -948,29 +1154,33 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
         		defaultNoColumnSplit = false;
         	}
         }
+        for (int i = 0; i < propertiesRowCount; i++) {
+        	if (!propertiesRowVisibilities[i]) {
+        		defaultRowVisibility = false;
+        		break;
+        	}
+        }
         
         boolean allDefault = defaultNoSortOrder && defaultColumnVisibilityAndOrder && defaultNoColumnSplit
-        	&& defaultNoRecentSplits; 
+        	&& defaultNoRecentSplits && defaultRowVisibility; 
 
-        // If the first mode and default, save nothing and remove the data.
-        if (allDefault && mode == 0) {
+        // If everything is default, save nothing and remove the data.
+        if (allDefault && mode == 0 && showAllRows) {
         	SpreadsheetTableViewData.getInstance().remove(typeSign + dataType);
         	return;
         }
 
         // If other modes, save an entry with all data that is not default. 
         String modeName = getModeNames().get(mode).toString();
-        SpreadsheetTableViewRecord viewRecord = new SpreadsheetTableViewRecord(typeSign, dataType, modeName);
+        SpreadsheetTableViewRecord viewRecord =
+        	new SpreadsheetTableViewRecord(typeSign, dataType, modeName, showAllRows);
         
         if (!defaultNoSortOrder) {
-        	int sortedPropertiesColumn = modelToPropertiesColumnIndex[sortedModelColumn];
-        	int splitIndex = sortedModelColumn - propertiesToModelColumnIndex[sortedPropertiesColumn];
         	String name = propertiesColumnNames[sortedPropertiesColumn];
-        	viewRecord.setRowOrder(new SpreadsheetRowOrder(name, splitIndex, sortedOrderAsc));
+        	viewRecord.setRowOrder(new SpreadsheetRowOrder(name, sortedSplitIndex, sortedOrderAsc));
         }
         
         if (!defaultColumnVisibilityAndOrder) {
-            String[] columns = null;
         	Vector columnStrings = new Vector();
 
         	TableColumnModel columnModel = table.getTableHeader().getColumnModel();
@@ -982,11 +1192,11 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
         		    columnStrings.add(name);
             	}
     		}
-            columns = new String[columnStrings.size()]; 
+            String[] columns = new String[columnStrings.size()]; 
             columnStrings.copyInto(columns);
     		viewRecord.setColumns(columns);
         }
-        
+
         if (!defaultNoColumnSplit) {
             SplitData[] splitColumns = null;
         	Vector splitColumnVector = new Vector();
@@ -998,6 +1208,21 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
         	splitColumns = new SplitData[splitColumnVector.size()]; 
             splitColumnVector.copyInto(splitColumns);
     		viewRecord.setSplitColumns(splitColumns);
+        }
+        
+        if (!defaultRowVisibility) {
+    		Vector rowsStrings = new Vector();
+        	int namesIndex = nameToPropertiesColumnIndex(propertiesNamesColumn);
+        	if (namesIndex >= 0) {
+        		for (int i = 0; i < propertiesRowCount; i++) {
+        			if (!propertiesRowVisibilities[i]) {
+        				rowsStrings.add(properties[i][namesIndex].getValue());
+        			}
+        		}
+            }
+        	String[] rows = new String[rowsStrings.size()]; 
+            rowsStrings.copyInto(rows);
+    		viewRecord.setHiddenRows(rows);
         }
 
         if (!defaultNoRecentSplits) {

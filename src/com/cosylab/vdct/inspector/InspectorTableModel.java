@@ -89,6 +89,9 @@ public int getPropertyDisplayTypeAt(int row, int column) {
     return PropertyTableModel.DISP_NONE;
 }
 
+public int getHeaderDisplayType(int column) {
+	return PropertyTableModel.HEADERDISP_TEXT;
+}
 /**
  * getRowCount method comment.
  */
