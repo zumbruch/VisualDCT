@@ -1334,9 +1334,11 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
  while (iterator.hasNext()) {
 	 sprView = (SpreadsheetTableViewRecord)iterator.next();
 
-     file.writeBytes(SPREADSHEET_VIEW_START + sprView.getType() + comma + quote + sprView.getName() + quote);
+     file.writeBytes(SPREADSHEET_VIEW_START + sprView.getType());
+     file.writeBytes(comma + quote + sprView.getName() + quote);
      file.writeBytes(comma + quote + sprView.getModeName() + quote);
      file.writeBytes(comma + quote + sprView.getShowAllRowsString() + quote);
+     file.writeBytes(comma + sprView.getBackgroundColor());
      
      SpreadsheetRowOrder rowOrder = sprView.getRowOrder();
      if (rowOrder != null) {

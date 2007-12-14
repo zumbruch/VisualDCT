@@ -60,11 +60,13 @@ public class InspectorCellEditor implements TableCellEditor, TreeCellEditor {
 	protected JTextField intelliFormattedTextField;
 	protected EditorDelegate formattedTextfieldDelegate;
 	protected Pattern pattern;
-	
+
 	protected JComponent editorComponent;
 	protected EditorDelegate delegate;
 	protected int clickCountToStart = 1;
-	
+
+	protected EditorDelegate emptyDelegate = null;
+
 	protected HelpDisplayer helpDisplayer = null;
 
 	protected class EditorDelegate implements ActionListener, ItemListener {
@@ -84,10 +86,10 @@ public class InspectorCellEditor implements TableCellEditor, TreeCellEditor {
 		public boolean isCellEditable(EventObject anEvent) {
 			return true;
 		}
-		
+
 		/** Unfortunately, restrictions on API changes force us to 
-		  * declare this method package private. 
-		  */
+		 * declare this method package private. 
+		 */
 		boolean shouldSelectCell(EventObject anEvent) { 
 			return true; 
 		}
@@ -104,7 +106,7 @@ public class InspectorCellEditor implements TableCellEditor, TreeCellEditor {
 		}
 
 		/** Not implemented. */
-	   	public void cancelCellEditing() {}
+		public void cancelCellEditing() {}
 
 		// Implementing ActionListener interface
 		public void actionPerformed(ActionEvent e) {
@@ -119,23 +121,23 @@ public class InspectorCellEditor implements TableCellEditor, TreeCellEditor {
 		}
 	}
 
-/**
- * Insert the method's description here.
- * Creation date: (10.1.2001 16:03:29)
- */
-public InspectorCellEditor(PropertyTableModel tableModel, HelpDisplayer helpDisplayer) {
-	
-	intelliEditor = true;
-	this.tableModel = tableModel;
-	this.helpDisplayer = helpDisplayer;
+	/**
+	 * Insert the method's description here.
+	 * Creation date: (10.1.2001 16:03:29)
+	 */
+	public InspectorCellEditor(PropertyTableModel tableModel, HelpDisplayer helpDisplayer) {
 
-	// create all components
-	// combo box
+		intelliEditor = true;
+		this.tableModel = tableModel;
+		this.helpDisplayer = helpDisplayer;
+
+		// create all components
+		// combo box
 		intelliComboBox = new JComboBox();
 		intelliComboBox.setBorder(null);
 		intelliComboBox.setEditor(new BorderlessComboBoxEditor());
 		comboDelegate = new EditorDelegate() {
-			
+
 			public void setValue(Object value) {
 				intelliComboBox.setSelectedItem(value);
 			}
@@ -143,7 +145,7 @@ public InspectorCellEditor(PropertyTableModel tableModel, HelpDisplayer helpDisp
 			public Object getCellEditorValue() {
 				return intelliComboBox.getSelectedItem();
 			}
-				
+
 			boolean shouldSelectCell(EventObject anEvent) { 
 				if (anEvent instanceof MouseEvent) { 
 					MouseEvent e = (MouseEvent)anEvent;
@@ -151,15 +153,15 @@ public InspectorCellEditor(PropertyTableModel tableModel, HelpDisplayer helpDisp
 				}
 				return true;
 			}
-			
+
 		};
 		intelliComboBox.addActionListener(comboDelegate);
 
-	// textfield
+		// textfield
 		intelliTextField = new JTextField();
 		intelliTextField.setBorder(null);
 		textfieldDelegate = new EditorDelegate() {
-			
+
 			public void setValue(Object value) {
 				intelliTextField.setText((value != null) ? value.toString() : "");
 			}
@@ -167,10 +169,10 @@ public InspectorCellEditor(PropertyTableModel tableModel, HelpDisplayer helpDisp
 			public Object getCellEditorValue() {
 				return intelliTextField.getText();
 			}
-			
+
 		};
 		intelliTextField.addActionListener(textfieldDelegate);
-/*
+		/*
 		// formattedtexffield
 		formatter = new RegexFormatter();
 		formatter.setAllowsInvalid(true);
@@ -178,11 +180,11 @@ public InspectorCellEditor(PropertyTableModel tableModel, HelpDisplayer helpDisp
 	    formatter.setCommitsOnValidEdit(false);
 		intelliFormattedTextField = new JFormattedTextField(formatter);
 		intelliFormattedTextField.setFocusLostBehavior(JFormattedTextField.PERSIST);
-*/	
+		 */	
 		intelliFormattedTextField = new JTextField();
 		intelliFormattedTextField.setBorder(null);
 		formattedTextfieldDelegate = new EditorDelegate() {
-			
+
 			public void setValue(Object value) {
 				intelliFormattedTextField.setText((value != null) ? value.toString() : "");
 			}
@@ -190,13 +192,13 @@ public InspectorCellEditor(PropertyTableModel tableModel, HelpDisplayer helpDisp
 			public Object getCellEditorValue() {
 				return intelliFormattedTextField.getText();
 			}
-			
+
 		};
 		intelliFormattedTextField.addActionListener(formattedTextfieldDelegate);
 
 		// coloring
 //		intelliFormattedTextField.addPropertyChangeListener(new PropertyChangeListener() {
-/*		    public void propertyChange(PropertyChangeEvent pce) {
+		/*		    public void propertyChange(PropertyChangeEvent pce) {
 		        if ("editValid".equals(pce.getPropertyName()))
 		        {
 		        	if (intelliFormattedTextField.isEditValid())
@@ -205,7 +207,7 @@ public InspectorCellEditor(PropertyTableModel tableModel, HelpDisplayer helpDisp
 		        		intelliFormattedTextField.setForeground(Color.red);
 		        }
 		    }*/
-/*		    public void propertyChange(PropertyChangeEvent pce) {
+		/*		    public void propertyChange(PropertyChangeEvent pce) {
 		    	   System.out.println(pce.getPropertyName());
 		    	   Matcher m = pattern.matcher(intelliFormattedTextField.getText());
 		        	if (m.matches())
@@ -214,23 +216,24 @@ public InspectorCellEditor(PropertyTableModel tableModel, HelpDisplayer helpDisp
 		        		intelliFormattedTextField.setForeground(Color.red);
 		    }
 		});
-*/
+		 */
 
 		intelliFormattedTextField.getDocument().addDocumentListener(new DocumentListener() {
 			private void check()
 			{
-		    	   Matcher m = pattern.matcher(intelliFormattedTextField.getText());
-		        	if (m.matches())
-		        		intelliFormattedTextField.setForeground(Color.black);
-		        	else
-		        		intelliFormattedTextField.setForeground(Color.red);
+				Matcher m = pattern.matcher(intelliFormattedTextField.getText());
+				if (m.matches())
+					intelliFormattedTextField.setForeground(Color.black);
+				else
+					intelliFormattedTextField.setForeground(Color.red);
 			}
 			public void changedUpdate(DocumentEvent e) {}
 			public void insertUpdate(DocumentEvent e) { check(); }
 			public void removeUpdate(DocumentEvent e) { check(); }
-		});		
+		});
 
-}
+		emptyDelegate = new EditorDelegate();
+	}
 	/**
 	 * Constructs a InspectorCellEditor object that uses a check box.
 	 *
@@ -239,13 +242,13 @@ public InspectorCellEditor(PropertyTableModel tableModel, HelpDisplayer helpDisp
 	public InspectorCellEditor(final JCheckBox checkBox) {
 		editorComponent = checkBox;
 		delegate = new EditorDelegate() {
-			
+
 			public void setValue(Object value) { 
 				boolean selected = false; 
 				if (value instanceof Boolean)
-		    			selected = ((Boolean)value).booleanValue();
+					selected = ((Boolean)value).booleanValue();
 				else if (value instanceof String)
-			    		selected = value.equals("true");
+					selected = value.equals("true");
 				checkBox.setSelected(selected);
 			}
 
@@ -264,7 +267,7 @@ public InspectorCellEditor(PropertyTableModel tableModel, HelpDisplayer helpDisp
 		comboBox.setEditor(new BorderlessComboBoxEditor());
 		editorComponent = comboBox;
 		delegate = new EditorDelegate() {
-			
+
 			public void setValue(Object value) {
 				comboBox.setSelectedItem(value);
 			}
@@ -272,7 +275,7 @@ public InspectorCellEditor(PropertyTableModel tableModel, HelpDisplayer helpDisp
 			public Object getCellEditorValue() {
 				return comboBox.getSelectedItem();
 			}
-				
+
 			boolean shouldSelectCell(EventObject anEvent) { 
 				if (anEvent instanceof MouseEvent) { 
 					MouseEvent e = (MouseEvent)anEvent;
@@ -280,7 +283,7 @@ public InspectorCellEditor(PropertyTableModel tableModel, HelpDisplayer helpDisp
 				}
 				return true;
 			}
-			
+
 		};
 		comboBox.addActionListener(delegate);
 	}
@@ -292,7 +295,7 @@ public InspectorCellEditor(PropertyTableModel tableModel, HelpDisplayer helpDisp
 	public InspectorCellEditor(final JTextField textField) {
 		editorComponent = textField;
 		delegate = new EditorDelegate() {
-			
+
 			public void setValue(Object value) {
 				textField.setText((value != null) ? value.toString() : "");
 			}
@@ -300,7 +303,7 @@ public InspectorCellEditor(PropertyTableModel tableModel, HelpDisplayer helpDisp
 			public Object getCellEditorValue() {
 				return textField.getText();
 			}
-			
+
 		};
 		textField.addActionListener(delegate);
 	}
@@ -313,7 +316,7 @@ public InspectorCellEditor(PropertyTableModel tableModel, HelpDisplayer helpDisp
 	/*public InspectorCellEditor(final JFormattedTextField formattedTextField) {
 		editorComponent = formattedTextField;
 		delegate = new EditorDelegate() {
-			
+
 			public void setValue(Object value) {
 				formattedTextField.setText((value != null) ? value.toString() : "");
 			}
@@ -321,7 +324,7 @@ public InspectorCellEditor(PropertyTableModel tableModel, HelpDisplayer helpDisp
 			public Object getCellEditorValue() {
 				return formattedTextField.getText();
 			}
-			
+
 		};
 		formattedTextField.addActionListener(delegate);
 		// coloring
@@ -339,7 +342,7 @@ public InspectorCellEditor(PropertyTableModel tableModel, HelpDisplayer helpDisp
 		formatter = (RegexFormatter)formattedTextField.getFormatter();
 	}
 
-*/	// implements javax.swing.CellEditor
+	 */	// implements javax.swing.CellEditor
 	public void addCellEditorListener(CellEditorListener l) {
 		listenerList.add(CellEditorListener.class, l);
 	}
@@ -362,12 +365,12 @@ public InspectorCellEditor(PropertyTableModel tableModel, HelpDisplayer helpDisp
 		// Process the listeners last to first, notifying
 		// those that are interested in this event
 		for (int i = listeners.length-2; i>=0; i-=2) {
-	       if (listeners[i]==CellEditorListener.class) {
-			// Lazily create the event:
-			if (changeEvent == null)
-		    	changeEvent = new ChangeEvent(this);
-			((CellEditorListener)listeners[i+1]).editingCanceled(changeEvent);
-	       }	       
+			if (listeners[i]==CellEditorListener.class) {
+				// Lazily create the event:
+				if (changeEvent == null)
+					changeEvent = new ChangeEvent(this);
+				((CellEditorListener)listeners[i+1]).editingCanceled(changeEvent);
+			}	       
 		}
 	}
 	/*
@@ -384,12 +387,12 @@ public InspectorCellEditor(PropertyTableModel tableModel, HelpDisplayer helpDisp
 		// Process the listeners last to first, notifying
 		// those that are interested in this event
 		for (int i = listeners.length-2; i>=0; i-=2) {
-		   if (listeners[i]==CellEditorListener.class) {
-			// Lazily create the event:
-			if (changeEvent == null)
-		    	changeEvent = new ChangeEvent(this);
-			((CellEditorListener)listeners[i+1]).editingStopped(changeEvent);
-	   	   }	       
+			if (listeners[i]==CellEditorListener.class) {
+				// Lazily create the event:
+				if (changeEvent == null)
+					changeEvent = new ChangeEvent(this);
+				((CellEditorListener)listeners[i+1]).editingStopped(changeEvent);
+			}	       
 		}
 	}
 	// implements javax.swing.CellEditor
@@ -413,18 +416,19 @@ public InspectorCellEditor(PropertyTableModel tableModel, HelpDisplayer helpDisp
 	}
 	// implements javax.swing.table.TableCellEditor
 	public Component getTableCellEditorComponent(JTable table, Object value,
-						 boolean isSelected, int row, int column) {
+			boolean isSelected, int row, int column) {
+
 		if (intelliEditor) setAppropriateComponent4Table(table, row, column);
 		//delegate.setValue(value);
 		return editorComponent;
 	}
 	// implements javax.swing.tree.TreeCellEditor
 	public Component getTreeCellEditorComponent(JTree tree, Object value,
-						boolean isSelected,
-						boolean expanded,
-						boolean leaf, int row) {
+			boolean isSelected,
+			boolean expanded,
+			boolean leaf, int row) {
 		String stringValue = tree.convertValueToText(value, isSelected,
-					    expanded, leaf, row, false);
+				expanded, leaf, row, false);
 
 		// intelliEditor not supported
 		delegate.setValue(stringValue);
@@ -441,18 +445,18 @@ public InspectorCellEditor(PropertyTableModel tableModel, HelpDisplayer helpDisp
 	public void removeCellEditorListener(CellEditorListener l) {
 		listenerList.remove(CellEditorListener.class, l);
 	}
-/**
- * Insert the method's description here.
- * Creation date: (10.1.2001 16:17:33)
- * @param row int
- * @param column int
- */
-private void setAppropriateComponent4Table(JTable table, int row, int column) {
+	/**
+	 * Insert the method's description here.
+	 * Creation date: (10.1.2001 16:17:33)
+	 * @param row int
+	 * @param column int
+	 */
+	private void setAppropriateComponent4Table(JTable table, int row, int column) {
 
-	InspectableProperty property = tableModel.getPropertyAt(row, table.convertColumnIndexToModel(column));
-	String[] choices = property.getSelectableValues();
-	
-	if (choices!=null) {
+		InspectableProperty property = tableModel.getPropertyAt(row, table.convertColumnIndexToModel(column));
+		String[] choices = property.getSelectableValues();
+
+		if (choices!=null) {
 			editorComponent = intelliComboBox;
 			delegate = comboDelegate;
 			if (intelliComboBox.getItemCount()>0)
@@ -460,12 +464,12 @@ private void setAppropriateComponent4Table(JTable table, int row, int column) {
 
 			for (int i=0; i<choices.length; i++)
 				intelliComboBox.addItem(choices[i]);
-		
+
 			intelliComboBox.setToolTipText(property.getToolTipText());
 			intelliComboBox.setEditable(property.allowsOtherValues());
 			intelliComboBox.setSelectedItem(property.getValue());
-	}
-	else {
+		}
+		else {
 			final String allChars = ".*";
 			Pattern pattern = property.getEditPattern();
 			if (pattern!=null && !pattern.pattern().equals(allChars))
@@ -481,10 +485,10 @@ private void setAppropriateComponent4Table(JTable table, int row, int column) {
 					intelliFormattedTextField.setText(val);
 				else
 				{	val = property.getInitValue();
-					if (val!=null)
-						intelliFormattedTextField.setText(val);
-					else
-						intelliFormattedTextField.setText(property.getValue());
+				if (val!=null)
+					intelliFormattedTextField.setText(val);
+				else
+					intelliFormattedTextField.setText(property.getValue());
 				}
 				intelliFormattedTextField.setToolTipText(property.getToolTipText());
 			}
@@ -496,11 +500,11 @@ private void setAppropriateComponent4Table(JTable table, int row, int column) {
 				intelliTextField.setText(property.getValue());
 				intelliTextField.setToolTipText(property.getToolTipText());
 			}
-	}
+		}
 
-	helpDisplayer.displayHelp(property.getHelp());
-	editorComponent.setFont(table.getFont());
-}
+		helpDisplayer.displayHelp(property.getHelp());
+		editorComponent.setFont(table.getFont());
+	}
 	/**
 	 * Specifies the number of clicks needed to start editing.
 	 *
@@ -520,5 +524,5 @@ private void setAppropriateComponent4Table(JTable table, int row, int column) {
 		helpDisplayer.displayHelp("");
 		return true;
 	}
-	
+
 }

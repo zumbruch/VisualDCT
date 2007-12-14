@@ -71,6 +71,11 @@ public class SplitPropertyGroup {
 		String pattern = splitData.getPattern();
 		int partsCount = splitData.getParts();
 		
+		// TODO: test
+		if (value == null) {
+			value = "";
+		}
+		
 		Vector partsVector = new Vector();
 		int foundParts = 0;
 		
@@ -103,8 +108,8 @@ public class SplitPropertyGroup {
 					delimiter = matcher.group();
 					foundParts++;
 				}
-				// If there are trailing delimiters, add them under trail. 
-				if (matcher.find()) {
+				// If there are trailing delimiters, add them under trail.
+				if ((foundParts >= partsCount - 1 && partsCount != -1) && matcher.find()) {
 					partEnd = matcher.start();
 					part = value.substring(partStart, partEnd);
 					partStart = matcher.end();
@@ -179,6 +184,9 @@ public class SplitPropertyGroup {
 
 	static int getPartsCount(String value, SplitData splitData) {
 		
+		if (value == null) {
+			value = "";
+		}
 		boolean delimiterType = splitData.isDelimiterType();
 		String pattern = splitData.getPattern();
 		

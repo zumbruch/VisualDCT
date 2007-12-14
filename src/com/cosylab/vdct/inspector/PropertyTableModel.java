@@ -27,6 +27,7 @@
  */
 package com.cosylab.vdct.inspector;
 
+
 /** Interface for accessing properties from a table. 
  * @author ssah
  *

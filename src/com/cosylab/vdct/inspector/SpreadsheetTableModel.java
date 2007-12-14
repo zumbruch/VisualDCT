@@ -28,6 +28,7 @@ package com.cosylab.vdct.inspector;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -35,10 +36,13 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EventObject;
 import java.util.HashMap;
 import java.util.Vector;
 
+import javax.swing.DefaultCellEditor;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JColorChooser;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -46,16 +50,19 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
+import com.cosylab.vdct.graphics.ColorChooser;//
 import com.cosylab.vdct.graphics.objects.Record;
 import com.cosylab.vdct.graphics.objects.Template;
 import com.cosylab.vdct.graphics.popup.PopUpMenu;
 import com.cosylab.vdct.plugin.debug.PluginDebugManager;
 import com.cosylab.vdct.undo.UndoManager;
+import com.cosylab.vdct.vdb.CommentProperty;
 
 public class SpreadsheetTableModel extends AbstractTableModel implements PropertyTableModel, ActionListener {
 
@@ -71,6 +78,8 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
     private SpreadsheetTable table = null;
     private JScrollPane pane = null;
     private boolean showAllRows = true;
+    private Color defaultBackground = null;
+    private Color background = null;
     
 	private int mode = -1;
 	private int propertiesRowCount = 0;
@@ -87,22 +96,19 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
     
     private JPopupMenu popUpMenu = null;
     private JMenuItem hideItem = null; 
-    private JComponent hideSeparator = null; 
 	private JMenu splitMenu = null; 
     private JMenuItem joinItem = null;
-    private JComponent splitSeparator = null; 
 	private JMenuItem sortAscItem = null; 
 	private JMenuItem sortDesItem = null; 
     private JComponent sortSeparator = null;
     private JMenuItem showAllRowsItem = null;
     private JMenuItem extendCountersItem = null;
-    
+
     private int propertiesToModelColumnIndex[] = null;
     private int modelToPropertiesColumnIndex[] = null;
     
     private int modelColumnCount = 0;
 	private InspectableProperty[][] model = null;
-    // These are the size of the number of columns.
 	private String[] modelColumnNames = null;
 
     // The current sorted state.
@@ -113,7 +119,10 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
     // The name of the column that contains the row names.  
     private static final String propertiesNamesColumn = "Name";
     
-    // The number of starting columns that should not be hidden or split. Currently this is only the name.
+    // The name of the column that contains the comments.  
+    private static final String propertiesCommentsColumn = "Comment";
+    
+    // The number of starting columns that should not be hidden or split. Currently this is the name.
     private static final int solidPropertiesColumnCount = 1;    
 
     // The number of items in visibility submenus.
@@ -134,7 +143,9 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 	private static final String hideAll = "Hide all columns"; 
 	private static final String visibility = "Column visibility"; 
 	private static final String extendCounters = "Increase counters"; 
-	private static final String showAllRowsString = "Show all rows"; 
+	private static final String showAllRowsString = "Show all rows";
+	private static final String backgroundColorString = "Set background color...";
+	private static final String defaultColorString = "Default background color";
 	
 	private static final String split = "Split column by"; 
 	private static final String whitespaces = "Whitespaces";
@@ -142,10 +153,12 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 	private static final String join = "Join columns"; 
 
 	private static final String hideRow = "Hide row"; 
+
+    private static final String colorChooserTitle = "Set the table background color";
 	
 	private static final String recordType = "R"; 
 	private static final String templateType = "T"; 
-	private static final String unknownType = "U"; 
+	private static final String unknownType = "U";
 
 	public SpreadsheetTableModel(SpreadsheetInspector inspector, String dataType, Vector inspectData) throws
 	        IllegalArgumentException {
@@ -161,7 +174,6 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 		inspectData.copyInto(inspectables); 
         recentSplitData = new Vector();
     	nameToRecentSplitDataIndex = new HashMap();
-
         propertiesRowCount = inspectables.length;
 	}
 
@@ -190,9 +202,13 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 		// Count the number of columns required by matching the properties by their names.
   		nameToPropertiesColumnIndex = new HashMap();
         Vector propStrings = new Vector();
-        // Add an empty first one.
-        propertiesColumnCount = 1;
+        // Add the starting fixed columns.
         propStrings.add("");
+        propStrings.add(propertiesNamesColumn);
+		nameToPropertiesColumnIndex.put(propertiesNamesColumn, new Integer(1));
+        propStrings.add(propertiesCommentsColumn);
+		nameToPropertiesColumnIndex.put(propertiesCommentsColumn, new Integer(2));
+        propertiesColumnCount = 3;
         for (int i = 0; i < propertiesRowCount; i++) {
 			for (int j = 0; j < inspectableProperties[i].length; j++) {
 				InspectableProperty property = inspectableProperties[i][j];
@@ -216,7 +232,13 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 
 			SpreadsheetRowVisible visibilityProperty = new SpreadsheetRowVisible(true);
 			for (int j = 0; j < propertiesColumnCount; j++) {
-				properties[i][j] = (j == 0) ? visibilityProperty : creatorProperties[i];
+				if (j == 0) {
+				    properties[i][j] = visibilityProperty;
+				} else if (propertiesColumnNames[j].equals(propertiesCommentsColumn)) {
+				    properties[i][j] = inspectables[i].getCommentProperty();
+				} else {
+				    properties[i][j] = creatorProperties[i];
+				}
 			}
 			
 			for (int j = 0; j < inspectableProperties[i].length; j++) {
@@ -400,6 +422,10 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 	    this.table = table;
 	    this.pane = pane;
 	    
+	    defaultBackground = table.getBackground();
+	    background = defaultBackground;
+	    updateBackgroundColor(); 
+	    
 		table.getTableHeader().addMouseListener(new MouseAdapter() {
 			
 			private int draggedColumnModelIndex = -1;
@@ -467,9 +493,30 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 		
 		table.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent event) {
-			    //: TODO complete this
-				if (event.getButton() == MouseEvent.BUTTON1) {
-			    	System.out.println("Click: " + event.getClickCount());
+				if (event.getButton() == MouseEvent.BUTTON1 && event.getClickCount() >= 2) {
+				
+					Point point = event.getPoint();
+					JTable table = getTable();
+					popUpModelRow = table.rowAtPoint(point);
+					popUpModelColumn = table.convertColumnIndexToModel(table.columnAtPoint(point));
+					if (popUpModelRow >= 0 && popUpModelColumn >= 0) {
+						InspectableProperty property = model[popUpModelRow][popUpModelColumn];
+						InspectableProperty baseProperty = property;
+						if (baseProperty instanceof SplitPropertyPart) {
+						    baseProperty = ((SplitPropertyPart)baseProperty).getOwner().getOwner();
+						}
+						
+						if (baseProperty instanceof CommentProperty) {
+							CommentDialog dialog = inspector.getCommentDialog();
+							dialog.setComment(property.getValue());
+							dialog.setLocationRelativeTo(inspector);
+							dialog.setVisible(true);
+							if (dialog.isConfirmed()) {
+								setValueAt(dialog.getComment(), popUpModelRow, popUpModelColumn);
+							}
+							fireTableCellUpdated(popUpModelRow, popUpModelColumn);
+						}
+					}
 			    }
 
 				if (event.getButton() == MouseEvent.BUTTON3) {
@@ -533,20 +580,6 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 		hideItem.addActionListener(this);
     	popUpMenu.add(hideItem);
 
-	    hideSeparator = new JSeparator(); 
-    	popUpMenu.add(hideSeparator);
-    	
-    	splitMenu = new JMenu(split);
-    	popUpMenu.add(splitMenu);
-    	updateSplitMenu();
-    	
-    	joinItem = new JMenuItem(join);
-    	joinItem.addActionListener(this);
-    	popUpMenu.add(joinItem);
-    	
-	    splitSeparator = new JSeparator(); 
-    	popUpMenu.add(splitSeparator);
-
 		sortAscItem = new JMenuItem(sortAsc);
 		sortAscItem.addActionListener(this);
     	popUpMenu.add(sortAscItem);
@@ -555,9 +588,30 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
     	sortDesItem.addActionListener(this);
     	popUpMenu.add(sortDesItem);
 
+    	splitMenu = new JMenu(split);
+    	popUpMenu.add(splitMenu);
+    	updateSplitMenu();
+    	
+    	joinItem = new JMenuItem(join);
+    	joinItem.addActionListener(this);
+    	popUpMenu.add(joinItem);
+
 	    sortSeparator = new JSeparator(); 
     	popUpMenu.add(sortSeparator);
     	
+    	JMenuItem hideAllItem = new JMenuItem(hideAll);
+    	hideAllItem.addActionListener(this);
+    	popUpMenu.add(hideAllItem);
+
+    	JMenuItem showAllItem = new JMenuItem(showAll);
+    	showAllItem.addActionListener(this);
+    	popUpMenu.add(showAllItem);
+
+    	JMenu visibilityMenu = new JMenu(visibility);
+    	popUpMenu.add(visibilityMenu);
+
+    	popUpMenu.addSeparator();
+
     	ArrayList list = getModeNames();
 
        	for (int i = 0; i < list.size(); i++) {
@@ -568,19 +622,8 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
        		popUpMenu.add(menuItem);
        	}
     	
-    	popUpMenu.add(new JSeparator());
+    	popUpMenu.addSeparator();
 
-    	JMenuItem hideAllItem = new JMenuItem(hideAll);
-    	hideAllItem.addActionListener(this);
-    	popUpMenu.add(hideAllItem);
-
-    	JMenuItem showAllItem = new JMenuItem(showAll);
-    	showAllItem.addActionListener(this);
-    	popUpMenu.add(showAllItem);
-    	
-    	JMenu visibilityMenu = new JMenu(visibility);
-    	popUpMenu.add(visibilityMenu);
-    	
         propertiesColumnMenuItem = new JCheckBoxMenuItem[propertiesColumnCount];
         JMenu menuToAdd = visibilityMenu;
     	
@@ -603,25 +646,35 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
     		showAllItem.setEnabled(false);
     		visibilityMenu.setEnabled(false);
     	}
+    	
+    	JMenuItem setBackgroundItem = new JMenuItem(backgroundColorString);
+    	setBackgroundItem.addActionListener(this);
+    	popUpMenu.add(setBackgroundItem);
+    	
+    	JMenuItem defaultBackgroundItem = new JMenuItem(defaultColorString);
+    	defaultBackgroundItem.addActionListener(this);
+    	popUpMenu.add(defaultBackgroundItem);
 
     	popUpMenu.addSeparator();
-    	
+
     	showAllRowsItem = new JCheckBoxMenuItem(showAllRowsString);
     	showAllRowsItem.setSelected(showAllRows);
     	showAllRowsItem.addActionListener(this);
     	popUpMenu.add(showAllRowsItem);
+
+    	popUpMenu.addSeparator();
     	
     	extendCountersItem = new JMenuItem(extendCounters);
     	extendCountersItem.addActionListener(this);
     	popUpMenu.add(extendCountersItem);
     }
-
+    
 	public void actionPerformed(ActionEvent event) {
 		String action = event.getActionCommand();
 		Object source = event.getSource();
-		
+
 		if (action.equals(hide)) {
-	    	if (popUpModelColumn >= 0) {
+			if (popUpModelColumn >= 0) {
 	    		int propertiesColumn = modelToPropertiesColumnIndex[popUpModelColumn];
 	    		propertiesColumnMenuItem[propertiesColumn].setSelected(false);
 	    		propertiesColumnVisibilities[propertiesColumn] = false;
@@ -690,8 +743,25 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 				propertiesColumnVisibilities[i] = state;
 		    }
 		    updateColumnVisibility();
+		    
 		} else if (action.equals(showAllRowsString)) {
 			setShowAllRows(((JCheckBoxMenuItem)source).isSelected());
+			
+		} else if (action.equals(backgroundColorString)) {
+		    final JColorChooser chooser = ColorChooser.getInstance();
+		    
+		    chooser.setColor(background);
+		    ActionListener okListener = new ActionListener() {
+				public void actionPerformed(ActionEvent event) {
+				    background = chooser.getColor();
+				    updateBackgroundColor();
+				}
+		    };
+		    JColorChooser.createDialog(inspector, colorChooserTitle, true, chooser, okListener, null)
+		        .setVisible(true); 
+		} else if (action.equals(defaultColorString)) {
+		    background = defaultBackground;
+		    updateBackgroundColor();
 		} else if (action.equals(extendCounters)) {
 			extendCounters(table.getSelectedRows(), table.getSelectedColumns());
 		} else if (source instanceof JCheckBoxMenuItem) {
@@ -742,6 +812,12 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 		table.getTableHeader().repaint();
 		fireTableDataChanged();
 	}
+
+	private void updateBackgroundColor() {
+	    table.setBackground(background);
+	    table.getTableHeader().setBackground(background);
+	    pane.getViewport().setBackground(background);
+	} 
 	
 	private void updateSortedColumn(int modelColumn) {
 		int newSortedPropertiesColumn = modelToPropertiesColumnIndex[modelColumn];
@@ -805,10 +881,8 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
         boolean sortable = inTable && !first;
         
         setJComponentVisible(hideItem, manipulatable);
-        setJComponentVisible(hideSeparator, manipulatable);
         setJComponentVisible(splitMenu, manipulatable && !splitted);
         setJComponentVisible(joinItem, manipulatable && splitted);
-        setJComponentVisible(splitSeparator, manipulatable);
         setJComponentVisible(sortAscItem, sortable);
         setJComponentVisible(sortDesItem, sortable);
         setJComponentVisible(sortSeparator, sortable);
@@ -859,7 +933,9 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 	}
 	
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		return model[rowIndex][columnIndex].getValue(); 
+	    String value = model[rowIndex][columnIndex].getValue();
+		// TODO: The only properties with null values are CommentProperty. This could maybe be fixed.
+	    return (value != null) ? value : ""; 
 	}
 
 	public void setValueAt(Object aValue, int row, int column) {
@@ -1003,6 +1079,8 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 		
 		// If no record, make default model.
 		if (record == null) {
+		    background = defaultBackground;
+    		updateBackgroundColor();
     	    createDefaultColumnModel();
     		table.resizeColumns();
 			return;
@@ -1012,6 +1090,9 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 			showAllRows = record.isShowAllRows();
 			table.getTableHeader().repaint();
 		}
+		
+		background = new Color(record.getBackgroundColor());
+		updateBackgroundColor();
 		
     	// If no rows, assume all are visible. 
         for (int i = 0; i < propertiesRowCount; i++) {
@@ -1127,7 +1208,15 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 		TableColumn column = new TableColumn();
 		column.setModelIndex(colIndex);
 		column.setHeaderRenderer(table.getDefaultRenderer(String.class));
-		column.setIdentifier(identifier ? propertiesColumnNames[modelToPropertiesColumnIndex[colIndex]] : null);
+		String name = propertiesColumnNames[modelToPropertiesColumnIndex[colIndex]];
+		if (name.equals(propertiesCommentsColumn)) {
+			column.setCellEditor(new DefaultCellEditor(new JTextField()){
+				public boolean isCellEditable(EventObject anEvent) {
+					return false;
+				}
+			});
+		}
+		column.setIdentifier(identifier ? name : null);
 		column.setHeaderValue(modelColumnNames[colIndex]);
 		return column;
 	}
@@ -1139,6 +1228,7 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 		boolean defaultNoSortOrder = (sortedPropertiesColumn == -1);
 		boolean defaultColumnVisibilityAndOrder = true;
 		boolean defaultNoColumnSplit = true;
+		boolean defaultBackgroundColour = background.equals(defaultBackground);
 		boolean defaultNoRecentSplits = recentSplitData.isEmpty();
 		boolean defaultRowVisibility = true;
 		
@@ -1162,7 +1252,7 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
         }
         
         boolean allDefault = defaultNoSortOrder && defaultColumnVisibilityAndOrder && defaultNoColumnSplit
-        	&& defaultNoRecentSplits && defaultRowVisibility; 
+        	&& defaultBackgroundColour && defaultNoRecentSplits && defaultRowVisibility; 
 
         // If everything is default, save nothing and remove the data.
         if (allDefault && mode == 0 && showAllRows) {
@@ -1173,7 +1263,7 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
         // If other modes, save an entry with all data that is not default. 
         String modeName = getModeNames().get(mode).toString();
         SpreadsheetTableViewRecord viewRecord =
-        	new SpreadsheetTableViewRecord(typeSign, dataType, modeName, showAllRows);
+        	new SpreadsheetTableViewRecord(typeSign, dataType, modeName, showAllRows, background.getRGB());
         
         if (!defaultNoSortOrder) {
         	String name = propertiesColumnNames[sortedPropertiesColumn];

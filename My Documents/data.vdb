@@ -4,35 +4,42 @@
 #! DBDEND
 
 
+# Description
 record(compress, Compress_number1) {
   field(ASG, "  ")
 }
 
+# This is
+# a mulitline
+# comment.
 record(compress, Compress_number2) {
 }
 
+# asdqwvaluevalue
 record(compress, Compress_number3) {
   field(EVNT, "343")
 }
 
+# qwe
 record(compress, Compress_number4) {
   field(EVNT, "67547")
 }
 
+# Description
 record(compress, Compress_number5) {
   field(DESC, "Fg\")
-  field(ASG, "Cel12")
   field(EVNT, "343")
 }
 
+# Description
 record(compress, Compress_number6) {
   field(TSEL, "343")
   field(DESC, "Fgdg")
-  field(ASG, "Cel22")
   field(SCAN, "Fgdg")
   field(PINI, "Fgdg")
 }
 
+# Description
 record(compress, Compress_number7) {
   field(TSEL, "67547")
   field(DESC, "Dfgdf")
@@ -43,32 +50,39 @@ record(compress, Compress_number7) {
 
 record(compress, Compress_number8) {
   field(TSEL, "ztrztz")
-  field(EVNT, "343")
+  field(EVNT, "abc abd")
   field(SCAN, "Dfgdf")
 }
 
+# Description
+# Description
+# 
+# Description
 record(compress, Compress_number9) {
   field(TSEL, "232")
   field(EVNT, "67547")
   field(DESC, "Fg")
-  field(ASG, "Fgdg")
+  field(ASG, "Description")
 }
 
+# Description
 record(compress, Compress_number10) {
   field(EVNT, "343")
   field(DESC, "Fgdg")
-  field(ASG, "Dfgdf")
 }
 
+# Description
 record(compress, Compress_number11) {
-  field(DESC, "Dfgdf")
+  field(DESC, "jhg jgh")
   field(DTYP, "12")
 }
 
+# Description
 record(compress, Compress_number12) {
   field(PINI, "<nonkjkje>")
 }
 
+# Description
 record(compress, Compress_number13) {
   field(EVNT, "67547")
   field(ASG, "Cel")
@@ -94,7 +108,7 @@ expand("template1.vdb", template1) {
   macro(macro2, "drugi2")
   macro(macro3, "Mogo g")
   macro(new, "deluje")
-  macro(MacroForGroup, "do!")
+  macro(MacroForGroup, "fd dfd")
   macro(spet_novi_macro, "deluje?hihi")
 }
 
@@ -104,6 +118,7 @@ expand("template1.vdb", template13) {
   macro(macro1, "d")
   macro(spet_novi_macro, "test")
   macro(macro3, "56 h")
+  macro(MacroForGroup, "hgfh gfdg")
 }
 
 expand("template1.vdb", template14) {
@@ -114,7 +129,7 @@ expand("template1.vdb", template14) {
 record(ai, NewAI2) {
   field(TSEL, "#L1 A3 ")
   field(DTYP, "<none>1")
-  field(SDIS, "#L0 A0 @")
+  field(SDIS, "#L0 A0 @is this it")
   field(FLNK, "1")
   field(INP, "#L3 A5 @g6")
 }
@@ -125,6 +140,7 @@ record(ai, NewAI3) {
   field(SDIS, "#L0 A0 @")
   field(FLNK, "2")
   field(INP, "#L4 A6 @g7")
+  field(SIML, "yes it is")
 }
 
 record(ai, NewAI4) {
@@ -137,7 +153,7 @@ record(ai, NewAI4) {
 
 record(ai, NewAI0) {
   field(TSEL, "#L0 A0 @")
-  field(SDIS, "#L0 A0 @")
+  field(SDIS, "#L0 A0 @yes it is")
   field(DTYP, "<none>0")
   field(FLNK, "0")
   field(INP, "#L2 A4 @g5")
@@ -149,6 +165,7 @@ record(ai, NewAI12) {
   field(SDIS, "#L0 A0 @")
   field(FLNK, "4")
   field(INP, "#L6 A8 @g9")
+  field(SIML, "orange")
 }
 
 record(ai, NewAI15) {
@@ -158,11 +175,12 @@ record(ai, NewAI15) {
   field(FLNK, "5")
   field(INP, "#L7 A9 @g10")
   field(SIOL, "#L0 A0 @g5")
+  field(SIML, "apple")
 }
 
 record(ai, NewAI18) {
   field(TSEL, "#L6 A18 @")
-  field(SDIS, "#L0 A0 @")
+  field(SDIS, "#L0 A0 @orange")
   field(FLNK, "6")
   field(INP, "#L8 A10 @g11")
 }
@@ -170,9 +188,10 @@ record(ai, NewAI18) {
 record(ai, NewAI21) {
   field(TSEL, "#L7 A21 @")
   field(DTYP, "<none>7")
-  field(SDIS, "#L0 A0 @")
+  field(SDIS, "#L0 A0 @apple")
   field(FLNK, "7")
   field(INP, "#L9 A11 @g12")
+  field(SIML, "invincible lemon")
 }
 
 record(ai, NewAI24) {
@@ -186,7 +205,7 @@ record(ai, NewAI24) {
 record(ai, NewAI27) {
   field(TSEL, "#L9 A27 @")
   field(DTYP, "<none>9")
-  field(SDIS, "#L0 A0 @")
+  field(SDIS, "#L0 A0 @invincible lemon")
   field(INP, "#L11 A13 @g14")
   field(FLNK, "9")
 }
@@ -198,18 +217,21 @@ record(compress, Compress_number14) {
 
 #! Further lines contain data used by VisualDCT
 #! View(1977,2180,1.0)
-#! SpreadsheetView(R,"compress","Group","false",HiddenRow("Compress_number1"),HiddenRow("Compress_number11"),HiddenRow("Compress_number12"),HiddenRow("Compress_number13"),HiddenRow("Compress_number14"))
+#! SpreadsheetView(R,"ai","Group","true",-1,RowOrder("SIML",0,"Descending"),Col("Name"),Col("Comment"),Col("DTYP"),Col("FLNK"),Col("SIML"),Col("SIML[2]"),Col("SIML[3]"),Col("SIML[4]>"),Col("TSEL"),Col("TSEL[2]"),Col("TSEL[3]>"),Col("SDIS"),Col("SDIS[2]"),Col("SDIS[3]>"),SplitCol("INP","Delimiter","\s+"),SplitCol("SIML","Delimiter","i"),SplitCol("TSEL","Delimiter","\s+"),SplitCol("SDIS","Pattern","#(L\d+) (A\d+)[ ]*@(.*)"),RecentSplit("Delimiter","i"),RecentSplit("Pattern","#(L\d+) (A\d+)[ ]*@(.*)"))
+#! SpreadsheetView(T,"template2.vdb","Default view","false",-3355444,HiddenRow("template22"),HiddenRow("template23"))
+#! SpreadsheetView(T,"template1.vdb","Default view","true",-13434625,HiddenRow("template13"),SplitCol("MacroForGroup","Delimiter","\s+"))
+#! SpreadsheetView(R,"compress","DBD Order","false",-3368449,RowOrder("Name",0,"Ascending"),Col("Name"),Col("PHAS"),Col("TSEL"),Col("EVNT"),Col("EVNT[2]>"),Col("Comment"),Col("Comment[2]"),Col("Comment[3]>"),Col("DTYP"),Col("DISV"),Col("SDIS"),Col("DISS"),Col("PRIO"),Col("FLNK"),Col("VAL"),Col("INP"),Col("ALG"),Col("NSAM"),Col("N"),Col("IHIL"),Col("ILIL"),Col("HOPR"),Col("LOPR"),Col("PREC"),Col("EGU"),HiddenRow("Compress_number1"),HiddenRow("Compress_number3"),HiddenRow("Compress_number5"),HiddenRow("Compress_number7"),HiddenRow("Compress_number9"),HiddenRow("Compress_number11"),HiddenRow("Compress_number13"),SplitCol("Comment","Delimiter","\n+"),SplitCol("EVNT","Delimiter","\s+"),RecentSplit("Delimiter","\n+"))
 #! Record(Compress_number1,2040,2189,0,1,"Compress_number1")
 #! Record(Compress_number2,2060,2222,0,1,"Compress_number2")
 #! Record(Compress_number3,2060,2209,0,1,"Compress_number3")
 #! Record(Compress_number4,2080,2229,0,1,"Compress_number4")
-#! Record(Compress_number5,2080,2201,0,1,"Compress_number5")
-#! Record(Compress_number6,2100,2193,0,1,"Compress_number6")
+#! Record(Compress_number5,2080,2215,0,1,"Compress_number5")
+#! Record(Compress_number6,2100,2207,0,1,"Compress_number6")
 #! Record(Compress_number7,2100,2193,0,1,"Compress_number7")
 #! Record(Compress_number8,2120,2221,0,1,"Compress_number8")
 #! Field("Compress_number8.TSEL",16777215,1,"Compress_number8.TSEL")
 #! Record(Compress_number9,2120,2207,0,1,"Compress_number9")
-#! Record(Compress_number10,2140,2261,0,1,"Compress_number10")
+#! Record(Compress_number10,2140,2275,0,1,"Compress_number10")
 #! Record(Compress_number11,2140,2275,0,1,"Compress_number11")
 #! Record(Compress_number12,2160,2309,0,1,"Compress_number12")
 #! Record(Compress_number13,2160,2295,0,1,"Compress_number13")
@@ -240,13 +262,17 @@ record(compress, Compress_number14) {
 #! TemplateField("template14","MacroForGroup",16777215,0,1)
 
 #! Record(NewAI2,2060,2673,0,1,"NewAI2")
-#! Record(NewAI3,2070,2673,0,1,"NewAI3")
+#! Record(NewAI3,2070,2659,0,1,"NewAI3")
+#! Field("NewAI3.SIML",16777215,1,"NewAI3.SIML")
 #! Record(NewAI4,2080,2693,0,1,"NewAI4")
 #! Record(NewAI0,2040,2653,0,1,"NewAI0")
-#! Record(NewAI12,2090,2693,0,1,"NewAI12")
-#! Record(NewAI15,2100,2699,0,1,"NewAI15")
+#! Record(NewAI12,2090,2679,0,1,"NewAI12")
+#! Field("NewAI12.SIML",16777215,1,"NewAI12.SIML")
+#! Record(NewAI15,2100,2685,0,1,"NewAI15")
+#! Field("NewAI15.SIML",16777215,1,"NewAI15.SIML")
 #! Record(NewAI18,2110,2727,0,1,"NewAI18")
-#! Record(NewAI21,2120,2733,0,1,"NewAI21")
+#! Record(NewAI21,2120,2719,0,1,"NewAI21")
+#! Field("NewAI21.SIML",16777215,1,"NewAI21.SIML")
 #! Record(NewAI24,2140,2673,0,1,"NewAI24")
 #! Record(NewAI27,2360,2733,0,1,"NewAI27")
 #! Visibility("NewAI27.INP",1)

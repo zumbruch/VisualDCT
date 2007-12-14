@@ -100,7 +100,7 @@ public class SpreadsheetTable extends JTable {
     			String value = getValueAt(j, i).toString();
     			colWidth = Math.max(colWidth, metrics.stringWidth(value));
     		}
-    		colModel.getColumn(i).setPreferredWidth(colWidth + 16);
+    		colModel.getColumn(i).setPreferredWidth(Math.min(colWidth + 16, 128));
     	}
     }
 }

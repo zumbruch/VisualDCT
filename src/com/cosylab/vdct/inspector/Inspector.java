@@ -482,26 +482,15 @@ private javax.swing.JComboBox getObjectComboBox() {
 private javax.swing.JTable getScrollPaneTable() {
 	if (ivjScrollPaneTable == null) {
 		try {
-			ivjScrollPaneTable = new javax.swing.JTable();
-			ivjScrollPaneTable.setName("ScrollPaneTable");
+			tableModel = new InspectorTableModel(this);
+
+			//TODO: continue here
+			ivjScrollPaneTable = new InspectorTable(tableModel, InspectorManager.getInstance());
 			getTableScrollPane().setColumnHeaderView(ivjScrollPaneTable.getTableHeader());
 			// this caused visibility icon problems when scrolling
 			//getTableScrollPane().getViewport().setScrollMode(JViewport.BACKINGSTORE_SCROLL_MODE); 
-			ivjScrollPaneTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
-			ivjScrollPaneTable.setBackground(new java.awt.Color(204,204,204));
-			ivjScrollPaneTable.setShowVerticalLines(true);
-			ivjScrollPaneTable.setGridColor(java.awt.Color.black);
-			ivjScrollPaneTable.setBounds(0, 0, 200, 200);
-			ivjScrollPaneTable.setRowHeight(17);
-			
-			// enable clipboard actions
-			new InspectorTableClipboardAdapter(ivjScrollPaneTable);
-			ivjScrollPaneTable.setRowSelectionAllowed(true);
-			// note: selection is possible only on name column
-			ivjScrollPaneTable.setColumnSelectionAllowed(false);
-			
+
 			// user code begin {1}
-			tableModel = new InspectorTableModel(this);
 			ivjScrollPaneTable.setModel(tableModel);
 			ivjScrollPaneTable.setTableHeader(null);
 			ivjScrollPaneTable.setDefaultRenderer(String.class, new InspectorTableCellRenderer(ivjScrollPaneTable, tableModel));

@@ -82,32 +82,44 @@ public class DBResolver {
 
 	// visual data
 	// used format #! View(xoffset, yoffset, scale)
-	// used format #! Record(recordname, xpos, ypos, color, rotated, "description")
-	// used format #! Group(groupname, xpos, ypos, color, "description")
-	// used format #! Field(fieldname, color, rotated, "description")
-	// used format #! Visibility(fieldname, visibility)
-	// used format #! Link(fieldname, inLinkID)
-	// used format #! Connector(id, outLinkID, xpos, ypos, color, "description")
-	//	 eg.       #! Record(ts:fanOut0, 124, 432, 324568, 0, "fanOut record")
 	public static final String VDCTVIEW = "View";
+	// used format #! SpreadsheetView("type", "name", "mode name", "show all rows", background color)
 	public static final String VDCTSPREADSHEET_VIEW = "SpreadsheetView";
-	public static final String VDCTSPREADSHEET_COLUMN = "Col";
-	public static final String VDCTSPREADSHEET_HIDDENROW = "HiddenRow";
-	public static final String VDCTSPREADSHEET_ROWORDER = "RowOrder";
-	public static final String VDCTSPREADSHEET_SPLITCOLUMN = "SplitCol";
-	public static final String VDCTSPREADSHEET_RECENTSPLIT = "RecentSplit";
-	public static final String VDCTRECORD = "Record";
-	public static final String VDCTGROUP = "Group";
-	public static final String VDCTFIELD = "Field";
-	public static final String VDCTLINK = "Link";
-	public static final String VDCTVISIBILITY = "Visibility";
-	public static final String VDCTCONNECTOR = "Connector";
 
+	/* The following are inside the SpreadsheetView(...) 
+	 */
+	// used format #! Col("name")
+	public static final String VDCTSPREADSHEET_COLUMN = "Col";
+	// used format #! HiddenRow("name")
+	public static final String VDCTSPREADSHEET_HIDDENROW = "HiddenRow";
+	// used format #! RowOrder("column name", "split index", "order string")
+	public static final String VDCTSPREADSHEET_ROWORDER = "RowOrder";
+	// used format #! SplitCol("column name", "is delimiter string", "pattern string")
+	public static final String VDCTSPREADSHEET_SPLITCOLUMN = "SplitCol";
+	// used format #! RecentSplit("is delimiter string", "delimiter or pattern")
+	public static final String VDCTSPREADSHEET_RECENTSPLIT = "RecentSplit";
+
+	
+	// used format #! Record(recordname, xpos, ypos, color, rotated, "description")
+	public static final String VDCTRECORD = "Record";
+	// used format #! Group(groupname, xpos, ypos, color, "description")
+	public static final String VDCTGROUP = "Group";
+	// used format #! Field(fieldname, color, rotated, "description")
+	public static final String VDCTFIELD = "Field";
+	// used format #! Link(fieldname, inLinkID)
+	public static final String VDCTLINK = "Link";
+	// used format #! Visibility(fieldname, visibility)
+	public static final String VDCTVISIBILITY = "Visibility";
+	// used format #! Connector(id, outLinkID, xpos, ypos, color, "description")
+	public static final String VDCTCONNECTOR = "Connector";
+	//	 eg.       #! Record(ts:fanOut0, 124, 432, 324568, 0, "fanOut record")
+
+	
 	// used format #! ConstantPort(portname, inLinkID, xpos, ypos, color, defaultVisibility, textPositionNorth)
-	// used format #! InputPort(portname, inLinkID, xpos, ypos, color, defaultVisibility, textPositionNorth)
-	// used format #! OutputPort(portname, inLinkID, xpos, ypos, color, defaultVisibility, textPositionNorth)
 	public static final String VDCT_CONSTANT_PORT = "ConstantPort";
+	// used format #! InputPort(portname, inLinkID, xpos, ypos, color, defaultVisibility, textPositionNorth)
 	public static final String VDCT_INPUT_PORT = "InputPort";
+	// used format #! OutputPort(portname, inLinkID, xpos, ypos, color, defaultVisibility, textPositionNorth)
 	public static final String VDCT_OUTPUT_PORT = "OutputPort";
 
 	// used format #! InputMacro(macroname, description, xpos, ypos, color, defaultVisibility, textPositionNorth)
@@ -844,6 +856,15 @@ public static String processComment(DBData data, EnhancedStreamTokenizer tokeniz
 						throw (new DBGParseException(errorString, tokenizer, fileName));
 					}
 					
+					// Read background color. 
+					int backgroundColor = 0;
+					tokenizer.nextToken();
+					if (tokenizer.ttype == EnhancedStreamTokenizer.TT_NUMBER) {
+						backgroundColor = (int)tokenizer.nval;
+					} else {
+						throw (new DBGParseException(errorString, tokenizer, fileName));
+					}
+					
 					// Read properties.
 					SpreadsheetRowOrder rowOrder = null;
 					Vector columnsVector = new Vector();
@@ -962,7 +983,7 @@ public static String processComment(DBData data, EnhancedStreamTokenizer tokeniz
     			 	recentSplitsVector.copyInto(recentSplits);
     			 	
 					SpreadsheetTableViewRecord viewRecord =
-						new SpreadsheetTableViewRecord(type, name, modeName, showAllRowsString);
+						new SpreadsheetTableViewRecord(type, name, modeName, showAllRowsString, backgroundColor);
 					viewRecord.setRowOrder(rowOrder);
 					viewRecord.setColumns(columns);
 					viewRecord.setSplitColumns(splitColumns);

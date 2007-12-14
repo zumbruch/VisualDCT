@@ -44,6 +44,7 @@ import javax.swing.KeyStroke;
 import javax.swing.TransferHandler;
 
 import com.cosylab.vdct.undo.UndoManager;
+import com.cosylab.vdct.util.StringUtils;
 
 /**
  * TableClipboardAdapter enables Cut-Copy-Paste Clipboard functionality on JTables.
@@ -302,12 +303,12 @@ public class InspectorTableClipboardAdapter extends TransferHandler implements A
         		int row = selRows[i];
         		int col = selCols[j];
 
-        		// the first column does not contain values in inspector and spreadheet
+        		// the first column does not contain values in inspector and spreadsheet
         		if (col == 0) {
         			continue;
         		}
 
-        		buffer.append(table.getValueAt(row, col));
+        		buffer.append(StringUtils.substituteTabsAndNewLinesWithSpaces(table.getValueAt(row, col).toString()));
         		if (j < numOfSelCols - 1) {
         			buffer.append("\t");
         		}

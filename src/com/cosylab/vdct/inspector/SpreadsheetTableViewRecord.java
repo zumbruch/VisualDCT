@@ -37,6 +37,7 @@ public class SpreadsheetTableViewRecord {
 	private String name = null;
 	private String modeName = null;
 	private boolean showAllRows = false;
+	private int backgroundColor = 0;
 
 	private SpreadsheetRowOrder rowOrder = null;
 	private String[] columns = null;
@@ -52,9 +53,11 @@ public class SpreadsheetTableViewRecord {
 	 * @param name
 	 * @param modeName
 	 * @param showAllRows
+	 * @param backgroundColor
 	 */
-	public SpreadsheetTableViewRecord(String type, String name, String modeName, String showAllRowsString) {
-		this(type, name, modeName, isShowAllRowsString(showAllRowsString));
+	public SpreadsheetTableViewRecord(String type, String name, String modeName, String showAllRowsString,
+			int backgroundColor) {
+		this(type, name, modeName, isShowAllRowsString(showAllRowsString), backgroundColor);
 	}
 	
 	/**
@@ -62,13 +65,16 @@ public class SpreadsheetTableViewRecord {
 	 * @param name
 	 * @param modeName
 	 * @param showAllRows
+	 * @param backgroundColor
 	 */
-	public SpreadsheetTableViewRecord(String type, String name, String modeName, boolean showAllRows) {
+	public SpreadsheetTableViewRecord(String type, String name, String modeName, boolean showAllRows,
+			int backgroundColor) {
 		super();
 		this.type = type;
 		this.name = name;
 		this.modeName = modeName;
 		this.showAllRows = showAllRows;
+		this.backgroundColor = backgroundColor;
 	}
 	
 	/**
@@ -97,6 +103,13 @@ public class SpreadsheetTableViewRecord {
 	 */
 	public boolean isShowAllRows() {
 		return showAllRows;
+	}
+	
+	/**
+	 * @return the backgroundColor
+	 */
+	public int getBackgroundColor() {
+		return backgroundColor;
 	}
 
 	/**

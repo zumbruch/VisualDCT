@@ -96,6 +96,10 @@ public class InspectorTableCellRenderer extends DefaultTableCellRenderer {
 		if (value != null) {
 			str = value.toString();
 		}
+		
+		// Refresh the background color.
+		bgColor = table.getBackground();
+		
 		int modelRow = row;
 		int modelColumn = table.convertColumnIndexToModel(column);
 		

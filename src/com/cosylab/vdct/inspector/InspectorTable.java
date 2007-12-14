@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
+ * Copyright (c) 2007, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -28,55 +28,57 @@
 
 package com.cosylab.vdct.inspector;
 
-import java.util.Comparator;
+import java.awt.Color;
 
-public class SpreadsheetRowComparator implements Comparator {
-	
-    private int column = 0;
-    private int sign = 1;
-    SpreadsheetTableModel tableModel = null;
-    
-    public SpreadsheetRowComparator(SpreadsheetTableModel tableModel) {
-    	super();
-    	this.tableModel = tableModel;
-    }
-	
-	public void setColumn(int column) {
-		this.column = column;
-	}
+import javax.swing.JTable;
 
-	public void setAscending(boolean ascending) {
-		sign = ascending ? 1 : -1;
-	}
+/**
+ * @author ssah
+ *
+ */
+public class InspectorTable extends JTable {
 
-	public int compare(Object arg0, Object arg1) {
+	private PropertyTableModel tableModel = null;
+	private HelpDisplayer helpDisplayer = null;
+
+	/**
+	 * @param tableModel
+	 * @param helpDisplayer
+	 */
+	public InspectorTable(PropertyTableModel tableModel,
+			HelpDisplayer helpDisplayer) {
+		super();
+		this.tableModel = tableModel;
+		this.helpDisplayer = helpDisplayer;
 		
-		InspectableProperty[] first = (InspectableProperty[])arg0;  
-		InspectableProperty[] second = (InspectableProperty[])arg1;
+		
+		setName("ScrollPaneTable");
+		setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		setBackground(new Color(204,204,204));
+		setShowVerticalLines(true);
+		setGridColor(Color.black);
+		setBounds(0, 0, 200, 200);
+		setRowHeight(17);
+		
+		// enable clipboard actions
+		new InspectorTableClipboardAdapter(this);
+		setRowSelectionAllowed(true);
+		// note: selection is possible only on name column
+		setColumnSelectionAllowed(false);
+	}
 
-	    String firstString = first[column].getValue();
-	    String secondString = second[column].getValue();
-
-	    // TODO: This is only because of CommentProperty, may be fixable.
-	    if (firstString == null) {
-	    	firstString = "";
-	    }
-	    if (secondString == null) {
-	    	secondString = "";
-	    }
-	    
-	    String firstName = SplitData.removeValueAtEnd(firstString);
-	    String secondName = SplitData.removeValueAtEnd(secondString);
-	    
-	    int firstNumber = SplitData.extractValueAtEnd(firstString);
-	    int secondNumber = SplitData.extractValueAtEnd(secondString);
-
-		int nameComp = firstName.compareTo(secondName); 
-        if (nameComp != 0) {
-        	return sign * nameComp;
-
-        }
-        // names with no number are displayed before any with numbers
-		return sign * (firstNumber - secondNumber); 
+	// Set help messages at row selection. 
+	public void changeSelection(int rowIndex, int columnIndex, boolean toggle, boolean extend) {
+		super.changeSelection(rowIndex, columnIndex, toggle, extend);
+		
+		if (getEditingColumn() == -1) {
+			String helpString = "";
+			if (getSelectedRowCount() == 1) {
+				int row = getSelectedRow();
+				InspectableProperty property = tableModel.getPropertyAt(row, 0);
+				helpString = property.getHelp();
+			}
+			helpDisplayer.displayHelp(helpString);
+		}
 	}
 }

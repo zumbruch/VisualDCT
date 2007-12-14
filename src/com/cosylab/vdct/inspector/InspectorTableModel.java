@@ -1,5 +1,6 @@
 package com.cosylab.vdct.inspector;
 
+
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
  * All rights reserved.
@@ -92,6 +93,7 @@ public int getPropertyDisplayTypeAt(int row, int column) {
 public int getHeaderDisplayType(int column) {
 	return PropertyTableModel.HEADERDISP_TEXT;
 }
+
 /**
  * getRowCount method comment.
  */

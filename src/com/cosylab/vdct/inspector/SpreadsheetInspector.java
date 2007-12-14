@@ -49,14 +49,14 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
-import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.TableCellEditor;
 
+import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.DataProvider;
 import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.events.commands.GetGUIInterface;
@@ -76,23 +76,43 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer, Chan
 	private Vector types = null;	
 	private Vector instances = null;
 	private SpreadsheetTable[] tables = null;
-	private JLabel helpLabel = null;
+	private JLabel hintLabel = null;
 	
 	private JMenuItem undoItem = null;
 	private JMenuItem redoItem = null;
 	
     private CustomSplitDialog splitDialog = null;
+    private CommentDialog commentDialog = null;
 	
 	private final static String undoString = "UndoAction";
 	private final static String redoString = "RedoAction";
+
+	private final static String helpTitle = "Help";
+	private final static String hintTitle = "Hint";
 	
-	private final static String entryHelp =
-		"To edit a cell, double click it or select it and write input.\n" +
-		"Press and hold left mouse button to select a block.\n" + 
-		"Press and hold left mouse button over a block to drag it into another application.\n" + 
-		"To select the whole row, select the row start.\n" + 
-		"Blocks can be copied(Ctrl+C)/pasted(Ctrl+V) or dragged/dropped from/to Excel.\n" +
-		"A paste/drop of data at invalid location can be undone(Ctr+Z).";
+	private final static String helpTask1 = "Edit a cell:";
+	private final static String helpAction1 = "Left double click";
+				
+	private final static String helpTask2 = "Select a block:";
+	private final static String helpAction2 = "Hold left button";
+				
+	private final static String helpTask3 = "Drag and drop:";
+	private final static String helpAction3 = "Hold left button over selection";
+				
+	private final static String helpTask4 = "Hide/show a line:";
+	private final static String helpAction4 = "Right click on the row start";
+				
+	private final static String helpTask5 = "Copy selection:";
+	private final static String helpAction5 = "Ctrl+C";
+				
+	private final static String helpTask6 = "Paste data:";
+	private final static String helpAction6 = "Ctrl+V";
+				
+	private final static String helpTask7 = "Undo an action:";
+	private final static String helpAction7 = "Ctrl+Z";
+				
+	private final static String helpTask8 = "Redo an action:";
+	private final static String helpAction8 = "Ctrl+Y";
 
 	public SpreadsheetInspector(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
@@ -110,7 +130,7 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer, Chan
 		if (b) {
 			loadData();
 	        if (types.size() == 0) {
-	        	helpLabel.setText("No objects to display.");
+	        	hintLabel.setText("No objects to display.");
 	        }
 			createDynamicGUI();
 		} else {
@@ -123,7 +143,7 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer, Chan
 	}
 	
 	public void displayHelp(String text) {
-    	helpLabel.setText(text);
+    	hintLabel.setText((text != null && text.length() > 0) ? text : " ");
     }
 	
 	public JMenuItem getUndoItem() {
@@ -146,60 +166,28 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer, Chan
         tabbedPane.setTabPlacement(JTabbedPane.BOTTOM);
         tabbedPane.setAutoscrolls(true);
         tabbedPane.addChangeListener(this);
-        tabbedPane.setPreferredSize(new Dimension(1000, 600));
 
-    	JButton button = new JButton(); 
-    	button.setMnemonic('O');
-    	button.setText("OK");
-    	button.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	setVisible(false);
-            }
-        });
+        JPanel contentPanel = new JPanel(new GridBagLayout());
+        contentPanel.setPreferredSize(new Dimension(Constants.VDCT_WIDTH - 16, Constants.VDCT_HEIGHT - 64));
 
-		helpLabel = new JLabel();
-		helpLabel.setHorizontalAlignment(SwingConstants.LEFT);
-		helpLabel.setHorizontalTextPosition(SwingConstants.CENTER);
-
-        JTextArea textArea = new JTextArea();
-        textArea.setEditable(false);
-        textArea.setBackground(getBackground());
-        textArea.setFont(helpLabel.getFont());
-        textArea.append(entryHelp);
-		
-		JPanel panel = new JPanel(new GridBagLayout());
-    	
 		GridBagConstraints constraints = new GridBagConstraints();
-		constraints.gridwidth = 2;
 		constraints.weightx = 1.0;
 		constraints.weighty = 1.0;
 		constraints.fill = GridBagConstraints.BOTH;
 		constraints.insets = new Insets(4, 4, 4, 4);
-		panel.add(tabbedPane, constraints);
-
+		contentPanel.add(tabbedPane, constraints);
+		
+        JPanel helpAndButtonPanel = createHelpAndButtonPanel();
 		constraints = new GridBagConstraints();
-		constraints.gridwidth = 2;
 		constraints.gridy = 1;
 		constraints.weightx = 1.0;
 		constraints.fill = GridBagConstraints.HORIZONTAL;
 		constraints.insets = new Insets(4, 4, 4, 4);
-		panel.add(textArea, constraints);
+		contentPanel.add(helpAndButtonPanel, constraints);
 		
-		constraints = new GridBagConstraints();
-		constraints.gridy = 2;
-		constraints.weightx = 1.0;
-		constraints.insets = new Insets(0, 4, 4, 4);
-		panel.add(helpLabel, constraints);
-
-		constraints = new GridBagConstraints();
-		constraints.gridx = 1;
-		constraints.gridy = 2;
-		constraints.insets = new Insets(0, 0, 4, 4);
-		panel.add(button, constraints);
-
 		setTitle("Spreadsheet");
         setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
-		getContentPane().add(panel);
+		getContentPane().add(contentPanel);
 		pack();
     }
 
@@ -245,6 +233,209 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer, Chan
     	setJMenuBar(bar);
     }
 
+    private JPanel createHelpAndButtonPanel() {
+    	JPanel helpAndButtonPanel = new JPanel(new GridBagLayout());
+
+    	JPanel helpPanel = new JPanel(new GridBagLayout());
+    	
+    	JPanel hintPanel = new JPanel(new GridBagLayout());
+    	hintPanel.setBorder(new TitledBorder(hintTitle));
+		hintLabel = new JLabel(" ");
+    	GridBagConstraints constraints = new GridBagConstraints();
+        constraints.anchor = GridBagConstraints.WEST;
+    	constraints.weightx = 1.0;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+		constraints.insets = new Insets(0, 4, 8, 4);
+		hintPanel.add(hintLabel, constraints);
+
+    	constraints = new GridBagConstraints();
+    	constraints.weightx = 1.0;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+		helpPanel.add(hintPanel, constraints);
+
+    	JPanel helpTextPanel = new JPanel(new GridBagLayout());
+    	helpTextPanel.setBorder(new TitledBorder(helpTitle));
+    	
+    	JPanel helpPanel1 = createHelpPanel1();
+    	constraints = new GridBagConstraints();
+		constraints.weightx = .5;
+		constraints.insets = new Insets(0, 4, 8, 4);
+		helpTextPanel.add(helpPanel1, constraints);
+
+    	JPanel helpPanel2 = createHelpPanel2();
+    	constraints = new GridBagConstraints();
+		constraints.gridx = 1;
+    	constraints.weightx = .5;
+		constraints.insets = new Insets(0, 4, 8, 4);
+		helpTextPanel.add(helpPanel2, constraints);
+
+    	constraints = new GridBagConstraints();
+    	constraints.gridy = 1;
+    	constraints.weightx = 1.0;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+		helpPanel.add(helpTextPanel, constraints);
+
+    	constraints = new GridBagConstraints();
+    	constraints.weightx = 1.0;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+		helpAndButtonPanel.add(helpPanel, constraints);
+		
+    	JPanel buttonPanel = createButtonPanel();
+    	constraints = new GridBagConstraints();
+		constraints.gridx = 1;
+        constraints.anchor = GridBagConstraints.SOUTHEAST;
+		helpAndButtonPanel.add(buttonPanel, constraints);
+
+		return helpAndButtonPanel;
+    }
+    
+    private JPanel createHelpPanel1() {
+    	
+    	JPanel helpPanel1 = new JPanel(new GridBagLayout());
+
+    	JLabel helpTask1Label = new JLabel(helpTask1);
+    	GridBagConstraints constraints = new GridBagConstraints();
+		constraints.anchor = GridBagConstraints.EAST;
+		constraints.insets = new Insets(0, 4, 0, 4);
+		helpPanel1.add(helpTask1Label, constraints);
+
+    	JLabel helpAction1Label = new JLabel(helpAction1);
+    	constraints = new GridBagConstraints();
+		constraints.gridx = 1;
+		constraints.anchor = GridBagConstraints.WEST;
+		constraints.insets = new Insets(0, 4, 0, 4);
+		helpPanel1.add(helpAction1Label, constraints);
+
+    	JLabel helpTask2Label = new JLabel(helpTask2);
+    	constraints = new GridBagConstraints();
+		constraints.gridy = 1;
+		constraints.anchor = GridBagConstraints.EAST;
+		constraints.insets = new Insets(0, 4, 0, 4);
+		helpPanel1.add(helpTask2Label, constraints);
+
+    	JLabel helpAction2Label = new JLabel(helpAction2);
+    	constraints = new GridBagConstraints();
+		constraints.gridx = 1;
+		constraints.gridy = 1;
+		constraints.anchor = GridBagConstraints.WEST;
+		constraints.insets = new Insets(0, 4, 0, 4);
+		helpPanel1.add(helpAction2Label, constraints);
+
+    	JLabel helpTask3Label = new JLabel(helpTask3);
+    	constraints = new GridBagConstraints();
+		constraints.gridy = 2;
+		constraints.anchor = GridBagConstraints.EAST;
+		constraints.insets = new Insets(0, 4, 0, 4);
+		helpPanel1.add(helpTask3Label, constraints);
+
+    	JLabel helpAction3Label = new JLabel(helpAction3);
+    	constraints = new GridBagConstraints();
+		constraints.gridx = 1;
+		constraints.gridy = 2;
+		constraints.anchor = GridBagConstraints.WEST;
+		constraints.insets = new Insets(0, 4, 0, 4);
+		helpPanel1.add(helpAction3Label, constraints);
+
+    	JLabel helpTask4Label = new JLabel(helpTask4);
+    	constraints = new GridBagConstraints();
+		constraints.gridy = 3;
+		constraints.anchor = GridBagConstraints.EAST;
+		constraints.insets = new Insets(0, 4, 0, 4);
+		helpPanel1.add(helpTask4Label, constraints);
+
+    	JLabel helpAction4Label = new JLabel(helpAction4);
+    	constraints = new GridBagConstraints();
+		constraints.gridx = 1;
+		constraints.gridy = 3;
+		constraints.anchor = GridBagConstraints.WEST;
+		constraints.insets = new Insets(0, 4, 0, 4);
+		helpPanel1.add(helpAction4Label, constraints);
+		
+		return helpPanel1;
+    }
+
+    private JPanel createHelpPanel2() {
+    	
+    	JPanel helpPanel2 = new JPanel(new GridBagLayout());
+
+    	JLabel helpTask5Label = new JLabel(helpTask5);
+    	GridBagConstraints constraints = new GridBagConstraints();
+		constraints.anchor = GridBagConstraints.EAST;
+		constraints.insets = new Insets(0, 4, 0, 4);
+		helpPanel2.add(helpTask5Label, constraints);
+
+    	JLabel helpAction5Label = new JLabel(helpAction5);
+    	constraints = new GridBagConstraints();
+		constraints.gridx = 1;
+		constraints.anchor = GridBagConstraints.WEST;
+		constraints.insets = new Insets(0, 4, 0, 4);
+		helpPanel2.add(helpAction5Label, constraints);
+
+    	JLabel helpTask6Label = new JLabel(helpTask6);
+    	constraints = new GridBagConstraints();
+		constraints.gridy = 1;
+		constraints.anchor = GridBagConstraints.EAST;
+		constraints.insets = new Insets(0, 4, 0, 4);
+		helpPanel2.add(helpTask6Label, constraints);
+
+    	JLabel helpAction6Label = new JLabel(helpAction6);
+    	constraints = new GridBagConstraints();
+		constraints.gridx = 1;
+		constraints.gridy = 1;
+		constraints.anchor = GridBagConstraints.WEST;
+		constraints.insets = new Insets(0, 4, 0, 4);
+		helpPanel2.add(helpAction6Label, constraints);
+
+    	JLabel helpTask7Label = new JLabel(helpTask7);
+    	constraints = new GridBagConstraints();
+		constraints.gridy = 2;
+		constraints.anchor = GridBagConstraints.EAST;
+		constraints.insets = new Insets(0, 4, 0, 4);
+		helpPanel2.add(helpTask7Label, constraints);
+
+    	JLabel helpAction7Label = new JLabel(helpAction7);
+    	constraints = new GridBagConstraints();
+		constraints.gridx = 1;
+		constraints.gridy = 2;
+		constraints.anchor = GridBagConstraints.WEST;
+		constraints.insets = new Insets(0, 4, 0, 4);
+		helpPanel2.add(helpAction7Label, constraints);
+
+    	JLabel helpTask8Label = new JLabel(helpTask8);
+    	constraints = new GridBagConstraints();
+		constraints.gridy = 3;
+		constraints.anchor = GridBagConstraints.EAST;
+		constraints.insets = new Insets(0, 4, 0, 4);
+		helpPanel2.add(helpTask8Label, constraints);
+
+    	JLabel helpAction8Label = new JLabel(helpAction8);
+    	constraints = new GridBagConstraints();
+		constraints.gridx = 1;
+		constraints.gridy = 3;
+		constraints.anchor = GridBagConstraints.WEST;
+		constraints.insets = new Insets(0, 4, 0, 4);
+		helpPanel2.add(helpAction8Label, constraints);
+		
+		return helpPanel2;
+    }
+
+    private JPanel createButtonPanel() {
+    	
+    	JPanel buttonPanel = new JPanel(new GridBagLayout());
+    	JButton button = new JButton(); 
+    	button.setMnemonic('C');
+    	button.setText("Close");
+    	button.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            	setVisible(false);
+            }
+        });
+    	GridBagConstraints constraints = new GridBagConstraints();
+		constraints.insets = new Insets(4, 16, 4, 4);
+		buttonPanel.add(button, constraints);
+		return buttonPanel;
+    }
+    
     private void createDynamicGUI() {
     	createTables();
     	resizeTablesColumns();
@@ -340,7 +531,14 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer, Chan
             splitDialog = new CustomSplitDialog(this);
         }
         return splitDialog;
-     }
+    }
+
+    public CommentDialog getCommentDialog() {
+        if (commentDialog == null) {
+        	commentDialog = new CommentDialog(this);
+        }
+        return commentDialog;
+    }
 
     private void closeEditors() {
     	for (int i = 0; i < tables.length; i++) {

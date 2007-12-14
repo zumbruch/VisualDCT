@@ -213,6 +213,11 @@ public static java.awt.Color string2color(String str) {
 public static String removeQuotesAndLineBreaks(String str) {
 	return str.replaceAll("\\\"", "\\\\\"").replaceAll("\\n", "\\\\n");
 }
+
+//TODO implement more efficient algorithm
+public static String substituteTabsAndNewLinesWithSpaces(String str) {
+	return str.replaceAll("\\t", " ").replaceAll("\\n", " ");
+}
 /**
  * Insert the method's description here.
  * Creation date: (23.4.2001 18:52:04)
