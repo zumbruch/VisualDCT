@@ -30,9 +30,11 @@ package com.cosylab.vdct;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Event;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.print.PageFormat;
@@ -78,6 +80,7 @@ import javax.swing.JSeparator;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -4397,6 +4400,7 @@ private javax.swing.JMenuItem getSpreadsheetMenuItem() {
 			spreadsheetMenuItem.setName("SpreadsheetMenuItem");
 			spreadsheetMenuItem.setMnemonic('P');
 			spreadsheetMenuItem.setText("Spreadsheet...");
+			spreadsheetMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Event.ALT_MASK));
 			spreadsheetMenuItem.setEnabled(true);
 		} catch (java.lang.Throwable ivjExc) {
 			handleException(ivjExc);

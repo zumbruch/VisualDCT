@@ -75,7 +75,7 @@ private javax.swing.JLabel getJLabelCopyright1() {
 			JLabelCopyright1.setName("JLabelCopyright1");
 			JLabelCopyright1.setFont(new java.awt.Font("dialog", 1, 10));
 			JLabelCopyright1.setAlignmentX(java.awt.Component.CENTER_ALIGNMENT);
-			JLabelCopyright1.setText("Copyright © 2001 - 2005. All rights reserved.");
+			JLabelCopyright1.setText("Copyright © 2001 - 2008. All rights reserved.");
         } catch (Exception e) {
             e.printStackTrace();
         }

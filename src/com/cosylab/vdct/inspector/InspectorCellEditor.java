@@ -132,7 +132,6 @@ public class InspectorCellEditor implements TableCellEditor, TreeCellEditor {
 		this.helpDisplayer = helpDisplayer;
 
 		// create all components
-		// combo box
 		intelliComboBox = new JComboBox();
 		intelliComboBox.setBorder(null);
 		intelliComboBox.setEditor(new BorderlessComboBoxEditor());
@@ -491,6 +490,7 @@ public class InspectorCellEditor implements TableCellEditor, TreeCellEditor {
 					intelliFormattedTextField.setText(property.getValue());
 				}
 				intelliFormattedTextField.setToolTipText(property.getToolTipText());
+				intelliFormattedTextField.selectAll();
 			}
 			else
 			{
@@ -499,6 +499,7 @@ public class InspectorCellEditor implements TableCellEditor, TreeCellEditor {
 
 				intelliTextField.setText(property.getValue());
 				intelliTextField.setToolTipText(property.getToolTipText());
+				intelliTextField.selectAll();
 			}
 		}
 

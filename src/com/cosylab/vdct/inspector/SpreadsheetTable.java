@@ -47,6 +47,11 @@ public class SpreadsheetTable extends JTable {
     
     SpreadsheetTableModel spreadsheetModel = null;
 	
+    private static final int firstColumnWidth = 20;
+    private static final int minColumnWidth = 64;
+    private static final int maxColumnWidth = 128;
+    private static final int columnMargin = 16;
+    
 	public SpreadsheetTable(Vector data) {
 		super();
 	    setName("ScrollPaneTable");
@@ -95,12 +100,12 @@ public class SpreadsheetTable extends JTable {
     	TableColumnModel colModel = getColumnModel(); 
 
     	for (int i = 0; i < colCount; i++) {
-    		int colWidth = (i == 0) ? 0 : 48;
+    		int colWidth = (i == 0) ? firstColumnWidth : minColumnWidth;
     		for (int j = 0; j < rowCount; j++) {
     			String value = getValueAt(j, i).toString();
-    			colWidth = Math.max(colWidth, metrics.stringWidth(value));
+    			colWidth = Math.max(colWidth, metrics.stringWidth(value) + columnMargin);
     		}
-    		colModel.getColumn(i).setPreferredWidth(Math.min(colWidth + 16, 128));
+    		colModel.getColumn(i).setPreferredWidth(Math.min(colWidth, maxColumnWidth));
     	}
     }
 }

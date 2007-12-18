@@ -31,6 +31,7 @@ package com.cosylab.vdct.inspector;
 import java.awt.Color;
 import java.awt.Dialog;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -45,6 +46,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
@@ -52,14 +54,11 @@ import javax.swing.event.DocumentListener;
 
 /**
  * @author ssah
- *
  */
 public class CustomSplitDialog extends JDialog implements ActionListener, DocumentListener {
 	
 	boolean delimiterType = false;
 
-	private JLabel dummyLabel = null;
-	
 	private JTextArea selectedInstructions = null;
 
 	private JRadioButton delimiterButton = null;
@@ -83,16 +82,15 @@ public class CustomSplitDialog extends JDialog implements ActionListener, Docume
 	private static final String patternString = "Pattern";
 	
 	private static final String basicInstructions =
-		"Specify the delimiter or the pattern by which to split " +
-		"the column data.";
+		"Specify the delimiter or the pattern by which to split the column data.";
 	
 	private static final String delimiterInstructions =
-		"The data will be split to parts between the delimiter. The delimiter can\n" +
-		"be specified by a regular expression.";
+		"The data will be split to parts between the delimiter. The delimiter can be specified by a regular"
+		+ " expression.";
 
 	private static final String patternInstructions =
-		"The data will be split by the specified pattern. The pattern is a regular\n" +
-		"expression where parts are marked with parentheses.";
+		"The data will be split by the specified pattern. The pattern is a regular expression where parts are" +
+		" marked with parentheses.";
 
 	private static final String delimiterExampleData = "#C5 A124    @specs: 1, 6, 18"; 
 	private static final String delimiterExamplePatternLabel = "Delimiter:";
@@ -128,8 +126,6 @@ public class CustomSplitDialog extends JDialog implements ActionListener, Docume
 		JPanel contentPanel = new JPanel(new GridBagLayout());
 		contentPanel.setPreferredSize(new Dimension(448, 384));
 
-    	dummyLabel = new JLabel();
-    	
     	JPanel splitByPanel = createSplitByPanel();
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.weightx = 1.0;
@@ -172,10 +168,8 @@ public class CustomSplitDialog extends JDialog implements ActionListener, Docume
     	splitByPanel.setBorder(new TitledBorder("Split by"));
     	
 		JTextArea instructions = new JTextArea(basicInstructions);
-    	instructions.setEditable(false);
-    	instructions.setBackground(dummyLabel.getBackground());
-    	instructions.setFont(dummyLabel.getFont());
-		GridBagConstraints constraints = new GridBagConstraints();
+		myTextAreaIsLikeAWrappingLabel(instructions);
+    	GridBagConstraints constraints = new GridBagConstraints();
 		constraints.weightx = 1.0;
 		constraints.fill = GridBagConstraints.HORIZONTAL;
 		constraints.insets = new Insets(0, 4, 4, 4);
@@ -190,9 +184,7 @@ public class CustomSplitDialog extends JDialog implements ActionListener, Docume
 		splitByPanel.add(patternPanel, constraints);
 
     	selectedInstructions = new JTextArea(delimiterInstructions);
-    	selectedInstructions.setEditable(false);
-    	selectedInstructions.setBackground(dummyLabel.getBackground());
-    	selectedInstructions.setFont(dummyLabel.getFont());
+		myTextAreaIsLikeAWrappingLabel(selectedInstructions);
 		constraints = new GridBagConstraints();
 		constraints.gridy = 2;
 		constraints.weightx = 1.0;
@@ -216,9 +208,7 @@ public class CustomSplitDialog extends JDialog implements ActionListener, Docume
 		examplePanel.add(exampleDataLabel, constraints);
 
 		exampleData = new JTextArea();
-    	exampleData.setEditable(false);
-    	exampleData.setBackground(dummyLabel.getBackground());
-    	exampleData.setFont(dummyLabel.getFont());
+		myTextAreaIsLikeAWrappingLabel(exampleData);
     	constraints = new GridBagConstraints();
 		constraints.gridx = 1;
 		constraints.weightx = 1.;
@@ -235,9 +225,7 @@ public class CustomSplitDialog extends JDialog implements ActionListener, Docume
 		examplePanel.add(examplePatternLabel, constraints);
 		
 		examplePattern = new JTextArea();
-    	examplePattern.setEditable(false);
-    	examplePattern.setBackground(dummyLabel.getBackground());
-    	examplePattern.setFont(dummyLabel.getFont());
+		myTextAreaIsLikeAWrappingLabel(examplePattern);
     	constraints = new GridBagConstraints();
 		constraints.gridx = 1;
 		constraints.gridy = 1;
@@ -256,9 +244,7 @@ public class CustomSplitDialog extends JDialog implements ActionListener, Docume
 		examplePanel.add(exampleSplitDataLabel, constraints);
 
     	exampleSplitData = new JTextArea();
-    	exampleSplitData.setEditable(false);
-    	exampleSplitData.setBackground(dummyLabel.getBackground());
-    	exampleSplitData.setFont(dummyLabel.getFont());
+    	myTextAreaIsLikeAWrappingLabel(exampleSplitData);
     	constraints = new GridBagConstraints();
 		constraints.gridx = 1;
 		constraints.gridy = 2;
@@ -291,9 +277,7 @@ public class CustomSplitDialog extends JDialog implements ActionListener, Docume
 		testDataPanel.add(testDataField, constraints);
 
     	splitResultArea = new JTextArea();
-    	splitResultArea.setEditable(false);
-    	splitResultArea.setBackground(dummyLabel.getBackground());
-    	splitResultArea.setFont(dummyLabel.getFont());
+    	myTextAreaIsLikeAWrappingLabel(splitResultArea);
 		constraints = new GridBagConstraints();
 		constraints.gridy = 1;
 		constraints.gridwidth = 2;
@@ -378,6 +362,15 @@ public class CustomSplitDialog extends JDialog implements ActionListener, Docume
 		patternPanel.add(patternField, constraints);
 		
 		return patternPanel;
+    }
+    
+    private void myTextAreaIsLikeAWrappingLabel(JTextArea area) {
+    	area.setBackground((Color)UIManager.get("Label.background"));
+    	area.setForeground((Color)UIManager.get("Label.foreground"));    	
+    	area.setFont((Font)UIManager.get ("Label.font"));
+		area.setEditable(false);
+		area.setLineWrap(true); 
+		area.setWrapStyleWord(true);
     }
     
     public void setSplitData(SplitData data) {

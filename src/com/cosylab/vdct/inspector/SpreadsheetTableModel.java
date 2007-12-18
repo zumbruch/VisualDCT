@@ -40,6 +40,7 @@ import java.util.EventObject;
 import java.util.HashMap;
 import java.util.Vector;
 
+import javax.swing.Action;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JColorChooser;
@@ -56,7 +57,7 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-import com.cosylab.vdct.graphics.ColorChooser;//
+import com.cosylab.vdct.graphics.ColorChooser;
 import com.cosylab.vdct.graphics.objects.Record;
 import com.cosylab.vdct.graphics.objects.Template;
 import com.cosylab.vdct.graphics.popup.PopUpMenu;
@@ -141,6 +142,8 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 	private static final String sortDes = "Sort descending"; 
 	private static final String showAll = "Show all columns"; 
 	private static final String hideAll = "Hide all columns"; 
+	private static final String presetColumnOrders = "Preset column orders"; 
+	
 	private static final String visibility = "Column visibility"; 
 	private static final String extendCounters = "Increase counters"; 
 	private static final String showAllRowsString = "Show all rows";
@@ -153,6 +156,8 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 	private static final String join = "Join columns"; 
 
 	private static final String hideRow = "Hide row"; 
+
+    private static final String extendCountersToolTip = "Increase counters in selected region.";
 
     private static final String colorChooserTitle = "Set the table background color";
 	
@@ -450,9 +455,23 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 	            	displayPopupMenu(table, event.getX(), event.getY());
 			    }
 	        }
-
+            
 			public void mousePressed(MouseEvent event) {
+
+	        	JTable table = getTable(); 
 	        	JTableHeader header = getTable().getTableHeader();
+
+	            // A workaround for a viewport reset during column drag bug with the Java6_03.
+	        	int column = header.getColumnModel().getColumnIndexAtX(event.getPoint().x);
+	        	if (column >= 0) {
+	        		table.setColumnSelectionInterval(column, column);
+	        		final Action focusAction = table.getActionMap().get("focusHeader");
+	        		// Older versions have no such actions.
+	        		if (focusAction != null) {
+	        		   focusAction.actionPerformed(new ActionEvent(table, 0, "focusHeader"));
+	        		}
+	        	}
+
 	        	TableColumn draggedColumn = header.getDraggedColumn(); 
 	        	if (draggedColumn != null) {
 	        		int colIndex = draggedColumn.getModelIndex();
@@ -611,6 +630,8 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
     	popUpMenu.add(visibilityMenu);
 
     	popUpMenu.addSeparator();
+    	
+    	JMenu presetColumnOrderMenu = new JMenu(presetColumnOrders);
 
     	ArrayList list = getModeNames();
 
@@ -619,8 +640,10 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
        		JMenuItem menuItem = new JMenuItem(action + " columns");
        		menuItem.setActionCommand(action);
        		menuItem.addActionListener(this);
-       		popUpMenu.add(menuItem);
+       		presetColumnOrderMenu.add(menuItem);
        	}
+
+    	popUpMenu.add(presetColumnOrderMenu);
     	
     	popUpMenu.addSeparator();
 
@@ -665,6 +688,7 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
     	popUpMenu.addSeparator();
     	
     	extendCountersItem = new JMenuItem(extendCounters);
+    	extendCountersItem.setToolTipText(extendCountersToolTip);
     	extendCountersItem.addActionListener(this);
     	popUpMenu.add(extendCountersItem);
     }
@@ -1222,9 +1246,23 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 	}
 	
 	public void saveView() {
+	
 		String typeSign = getTypeString(inspectables[0]);
+		SpreadsheetTableViewRecord oldRecord = SpreadsheetTableViewData.getInstance().get(typeSign + dataType);
+
+        // Stored hidden rows must be preserved if they don't appear in the new view.
+		Vector hiddenRowsVector = new Vector();
+		String[] rows = oldRecord.getHiddenRows();
+		if (rows != null && rows.length > 0) {
+            for (int i = 0; i < rows.length; i++) {
+            	int propertiesIndex = nameToPropertiesRowIndex(rows[i]);
+            	if (propertiesIndex < 0) {
+            	    hiddenRowsVector.add(rows[i]);
+            	}
+            }
+    	}
 		
-		// Determine if the current column visibility/order and splitting is default.
+		// Determine if the parts of the view are default.
 		boolean defaultNoSortOrder = (sortedPropertiesColumn == -1);
 		boolean defaultColumnVisibilityAndOrder = true;
 		boolean defaultNoColumnSplit = true;
@@ -1244,13 +1282,18 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
         		defaultNoColumnSplit = false;
         	}
         }
-        for (int i = 0; i < propertiesRowCount; i++) {
-        	if (!propertiesRowVisibilities[i]) {
-        		defaultRowVisibility = false;
-        		break;
+        // If there are hidden rows that don't appear in this view, they have to be saved, so no default. 
+        if (hiddenRowsVector.size() > 0) {
+            defaultRowVisibility = false;
+        } else {
+        	for (int i = 0; i < propertiesRowCount; i++) {
+        		if (!propertiesRowVisibilities[i]) {
+        			defaultRowVisibility = false;
+        			break;
+        		}
         	}
         }
-        
+
         boolean allDefault = defaultNoSortOrder && defaultColumnVisibilityAndOrder && defaultNoColumnSplit
         	&& defaultBackgroundColour && defaultNoRecentSplits && defaultRowVisibility; 
 
@@ -1301,17 +1344,16 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
         }
         
         if (!defaultRowVisibility) {
-    		Vector rowsStrings = new Vector();
         	int namesIndex = nameToPropertiesColumnIndex(propertiesNamesColumn);
         	if (namesIndex >= 0) {
         		for (int i = 0; i < propertiesRowCount; i++) {
         			if (!propertiesRowVisibilities[i]) {
-        				rowsStrings.add(properties[i][namesIndex].getValue());
+        				hiddenRowsVector.add(properties[i][namesIndex].getValue());
         			}
         		}
             }
-        	String[] rows = new String[rowsStrings.size()]; 
-            rowsStrings.copyInto(rows);
+        	rows = new String[hiddenRowsVector.size()]; 
+            hiddenRowsVector.copyInto(rows);
     		viewRecord.setHiddenRows(rows);
         }
 
