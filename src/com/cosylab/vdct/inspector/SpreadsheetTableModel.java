@@ -637,7 +637,7 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 
        	for (int i = 0; i < list.size(); i++) {
        		String action = list.get(i).toString();
-       		JMenuItem menuItem = new JMenuItem(action + " columns");
+       		JMenuItem menuItem = new JMenuItem(action + " order");
        		menuItem.setActionCommand(action);
        		menuItem.addActionListener(this);
        		presetColumnOrderMenu.add(menuItem);
