@@ -94,7 +94,7 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer, Chan
 	private final static String hintTitle = "Hint";
 	
 	private final static String helpTask1 = "Edit a cell:";
-	private final static String helpAction1 = "Left double click";
+	private final static String helpAction1 = "Double Left click";
 				
 	private final static String helpTask2 = "Select a block:";
 	private final static String helpAction2 = "Hold left button";
