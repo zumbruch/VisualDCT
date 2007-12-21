@@ -38,6 +38,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EventObject;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.Vector;
 
 import javax.swing.Action;
@@ -71,6 +74,8 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 	
 	private String dataType = null;
 	private Inspectable[] inspectables = null;
+	private Set loadedInspectablesNames = null;
+	
 	private SpreadsheetRowComparator comparator = null;
     private Vector recentSplitData = null;
 	private HashMap nameToRecentSplitDataIndex = null;
@@ -165,21 +170,28 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 	private static final String templateType = "T"; 
 	private static final String unknownType = "U";
 
-	public SpreadsheetTableModel(SpreadsheetInspector inspector, String dataType, Vector inspectData) throws
-	        IllegalArgumentException {
+	public SpreadsheetTableModel(SpreadsheetInspector inspector, String dataType, Vector displayData, 
+			Vector loadedData) throws IllegalArgumentException {
 		
-  		if (inspectData == null || inspectData.size() == 0) {
+  		if (displayData == null || displayData.size() == 0) {
   			throw new IllegalArgumentException("inspectables must not be empty or null");
   		}
   		this.inspector = inspector; 
   		
 		this.dataType = dataType;
 		comparator = new SpreadsheetRowComparator(this);
-		inspectables = new Inspectable[inspectData.size()];
-		inspectData.copyInto(inspectables); 
+		inspectables = new Inspectable[displayData.size()];
+		displayData.copyInto(inspectables); 
         recentSplitData = new Vector();
     	nameToRecentSplitDataIndex = new HashMap();
         propertiesRowCount = inspectables.length;
+        
+    	// Store all names of the loaded objects. 
+        loadedInspectablesNames = new HashSet();
+        Iterator iterator = loadedData.iterator();
+        while (iterator.hasNext()) {
+        	loadedInspectablesNames.add(((Inspectable)iterator.next()).getName());
+        }
 	}
 
 	public void refresh() {
@@ -1250,17 +1262,19 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 		String typeSign = getTypeString(inspectables[0]);
 		SpreadsheetTableViewRecord oldRecord = SpreadsheetTableViewData.getInstance().get(typeSign + dataType);
 
-        // Stored hidden rows must be preserved if they don't appear in the new view.
+        // Stored hidden rows must be preserved if they exist in the database and don't appear in the new view.
 		Vector hiddenRowsVector = new Vector();
-		String[] rows = oldRecord.getHiddenRows();
-		if (rows != null && rows.length > 0) {
-            for (int i = 0; i < rows.length; i++) {
-            	int propertiesIndex = nameToPropertiesRowIndex(rows[i]);
-            	if (propertiesIndex < 0) {
-            	    hiddenRowsVector.add(rows[i]);
-            	}
-            }
-    	}
+		if (oldRecord != null) {
+			String[] rows = oldRecord.getHiddenRows();
+			if (rows != null && rows.length > 0) {
+				for (int i = 0; i < rows.length; i++) {
+					int propertiesIndex = nameToPropertiesRowIndex(rows[i]);
+					if (propertiesIndex < 0 && loadedInspectablesNames.contains(rows[i])) {
+						hiddenRowsVector.add(rows[i]);
+					}
+				}
+			}
+		}
 		
 		// Determine if the parts of the view are default.
 		boolean defaultNoSortOrder = (sortedPropertiesColumn == -1);
@@ -1352,7 +1366,7 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
         			}
         		}
             }
-        	rows = new String[hiddenRowsVector.size()]; 
+        	String[] rows = new String[hiddenRowsVector.size()]; 
             hiddenRowsVector.copyInto(rows);
     		viewRecord.setHiddenRows(rows);
         }

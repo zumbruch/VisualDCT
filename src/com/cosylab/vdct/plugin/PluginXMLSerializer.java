@@ -93,8 +93,16 @@ public void importPlugins(String fileName, PluginManager pluginManager) throws E
 	Document doc = null;
 	try
 	{
-		// shp: importPlugins is now capable of loading xml from jar files
-		//doc = XMLManager.readFileDocument(fileName, DTD_SYMBOL, dtdURL);
+	    /* Sometimes fileName is in a format with backslashes and sometimes slashes.
+	     * TODO: replace this hack with a general rule on how the file names should be passed.
+	     */
+		if (fileName.indexOf('\\') >= 0) {
+			try {
+			    fileName = (new File(fileName).toURI()).toURL().getFile();
+			} catch (MalformedURLException exception) {
+				// nothing
+			}
+		}
 		doc = XMLManager.readResourceDocument(fileName, DTD_SYMBOL, dtdURL);
 	}
 	catch (FileNotFoundException e)

@@ -37,6 +37,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Vector;
 
 import javax.swing.JButton;
@@ -49,6 +50,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
@@ -73,8 +75,9 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer, Chan
 
     private JTabbedPane tabbedPane = null;
 	
-	private Vector types = null;	
-	private Vector instances = null;
+	private HashMap inspectables = null;
+	private HashMap selectedInspectables = null;
+	
 	private SpreadsheetTable[] tables = null;
 	private JLabel hintLabel = null;
 	
@@ -129,7 +132,7 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer, Chan
 		
 		if (b) {
 			loadData();
-	        if (types.size() == 0) {
+	        if (inspectables.isEmpty()) {
 	        	hintLabel.setText("No objects to display.");
 	        }
 			createDynamicGUI();
@@ -450,29 +453,43 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer, Chan
     private void createTables() {
         tabbedPane.removeAll();
 
-    	tables = new SpreadsheetTable[types.size()];
-        Enumeration typesEn = types.elements();
-    	Enumeration instancesEn = instances.elements();
+        /*
+        createTables: hashtable table is selected if not empty, otherwise all;
+        for every key: get all vector, display vector; if display vector nonempty:
+        get the typeName using first element, and create model with it;
+        */
+        HashMap displayData = selectedInspectables.isEmpty() ? inspectables : selectedInspectables;
+        
+    	Object key = null;
     	String type = null;
-    	Vector vector = null;
-    	int i = 0;
-    	
-    	while (typesEn.hasMoreElements() && instancesEn.hasMoreElements()) {
-    		type = (String)typesEn.nextElement();
-    		vector = (Vector)instancesEn.nextElement();
-
-            JScrollPane scrollPane = new JScrollPane();
-    		tables[i] = getTable(type, vector, scrollPane);
-            scrollPane.setViewportView(tables[i]);
-            tabbedPane.addTab(type, scrollPane);
-            i++;
-    	}
+    	Vector displayObjects = null;
+    	Vector loadedObjects = null;
+    	JTable table = null;
+    	Vector tableVector = new Vector();
+        Iterator iterator = displayData.keySet().iterator();
+        while(iterator.hasNext()) {
+            key = iterator.next();
+            displayObjects = (Vector)displayData.get(key);
+            loadedObjects = (Vector)inspectables.get(key);
+            if (!displayObjects.isEmpty()) {
+            	type = getTypeName(displayObjects.get(0));
+            	
+                JScrollPane scrollPane = new JScrollPane();
+                table = getTable(type, displayObjects, loadedObjects, scrollPane);
+                scrollPane.setViewportView(table);
+                tabbedPane.addTab(type, scrollPane);
+                tableVector.add(table);
+            }
+        }
+        
+        tables = new SpreadsheetTable[tableVector.size()];
+        tableVector.copyInto(tables);
     }
     
-    private SpreadsheetTable getTable(String type, Vector data, JScrollPane scrollPane) {
+    private SpreadsheetTable getTable(String type, Vector displayData, Vector loadedData, JScrollPane scrollPane) {
 
-    	SpreadsheetTable table = new SpreadsheetTable(data);
-		SpreadsheetTableModel tableModel = new SpreadsheetTableModel(this, type, data);
+    	SpreadsheetTable table = new SpreadsheetTable(displayData);
+		SpreadsheetTableModel tableModel = new SpreadsheetTableModel(this, type, displayData, loadedData);
     	table.setModel(tableModel);
 
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_Z, ActionEvent.CTRL_MASK, false);
@@ -550,103 +567,55 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer, Chan
     		}
     	}
     }
-    
+
 	private void loadData() {
-	
-		Vector candidates = ViewState.getInstance().getSelectedObjects();
-		Vector inspectables = getSpreadsheetData(candidates);
-    	if (inspectables.size() == 0) {
-    		candidates = DataProvider.getInstance().getInspectable(); 
-    		inspectables = getSpreadsheetData(candidates);
-    	}
-    	
-    	Vector records = getRecords(inspectables);
-    	Vector templates = getTemplates(inspectables);
-
-    	types = new Vector();
-    	
-		for (int i = 0; i < records.size(); i++) {
-			types.add(((Record)((Vector)records.get(i)).get(0)).getType());
-		}
-		for (int i = 0; i < templates.size(); i++) {
-			types.add(((Template)((Vector)templates.get(i)).get(0)).getTemplateData().getTemplate().getId());
-		}
-    	
-    	instances = new Vector();
-    	instances.addAll(records);
-    	instances.addAll(templates);
+		
+		inspectables = new HashMap();
+		selectedInspectables = new HashMap();
+		
+		fillTable(inspectables, DataProvider.getInstance().getInspectable());
+		fillTable(selectedInspectables, ViewState.getInstance().getSelectedObjects());
 	}
 	
-	private Vector getRecords(Vector candidates) {
+	private void fillTable(HashMap map, Vector objects) {
 
-    	Vector records = new Vector();
-
-    	HashMap typeToVector = new HashMap();    	
-    	
-		for (int i = 0; i < candidates.size(); i++) {
-    		Inspectable inspectable = (Inspectable)candidates.get(i);
-    		if (!(inspectable instanceof Record)) {
-    			continue;
-    		}
-    		String type = ((Record)inspectable).getType();
-
-    		Vector vector = (Vector)typeToVector.get(type);
-    		if (vector == null) {
-    			vector = new Vector();
-    		    records.add(vector);
-    			typeToVector.put(type, vector);
-    		}
-    		vector.add(inspectable);
-		}
-		return records;
-	}
-
-	private Vector getTemplates(Vector candidates) {
-
-    	Vector templates = new Vector();
-		for (int i = 0; i < candidates.size(); i++) {
-    		Inspectable inspectable = (Inspectable)candidates.get(i);
-    		if (!(inspectable instanceof Template)) {
-    			continue;
-    		}
-    		VDBTemplate template = ((Template)inspectable).getTemplateData().getTemplate();
-    		
-    		// templates must be checked by == and not by hash code or equals() method
-    		Vector vector = null;
-    		int j = 0;
-    		for (j = 0; j < templates.size(); j++) {
-    			vector = (Vector)templates.get(j);
-    			if (template == ((Template)vector.get(0)).getTemplateData().getTemplate()) {
-    				break;
-    			}
-    		}
-    		if (j == templates.size()) {
-    			vector = new Vector(); 
-    			templates.add(vector);
-    		}
-    		vector.add(inspectable);
-		}
-		return templates;
-	}
-	
-	private Vector getSpreadsheetData(Vector candidates) {
-
-		Enumeration enumeration = candidates.elements();
-    	Vector data = new Vector();
+		Enumeration enumeration = objects.elements();
     	
     	Object object = null;
-    	Inspectable inspectable = null;
+    	Object key = null;
+    	Vector vector = null;
     	while (enumeration.hasMoreElements()) {
     		object = enumeration.nextElement();
-    		if (!(object instanceof Inspectable)) {
-    			continue;
-    		}
-    		inspectable = (Inspectable)object;
-    		
-    		if (inspectable instanceof Template || inspectable instanceof Record) {
-        		data.add(object);
+    		key = getTypeKey(object);
+    		if (key != null) {
+    			vector = (Vector)map.get(key); 
+    			if (vector == null) {
+    				vector = new Vector();
+        			map.put(key, vector);
+    			}
+    			vector.add(object);
     		}
     	}
-    	return data;
 	}
+    
+    public static Object getTypeKey(Object object) {
+    	
+    	if (object instanceof Record) {
+    		return ((Record)object).getType();
+    	} else if (object instanceof Template) {
+    		return ((Template)object).getTemplateData().getTemplate();
+    	}
+    	return null;
+    }
+
+    public static String getTypeName(Object object) {
+    	
+    	Object key = getTypeKey(object);
+    	if (object instanceof Record) {
+    		return key.toString();
+    	} else if (object instanceof Template) {
+    		return ((VDBTemplate)(key)).getId();
+    	}
+    	return null;
+    }
 }

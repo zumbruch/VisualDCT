@@ -9,92 +9,13 @@ record(compress, Compress_number1) {
   field(ASG, "  ")
 }
 
-# This is
-# a mulitline
-# comment.
-record(compress, Compress_number2) {
-}
-
-# asdqwvaluevalue
-record(compress, Compress_number3) {
-  field(EVNT, "343")
-}
-
-# qwe
-record(compress, Compress_number4) {
-  field(EVNT, "67547")
-}
-
-# Description
-record(compress, Compress_number5) {
-  field(DESC, "Fg\")
-  field(EVNT, "343")
-}
-
-# Description
-record(compress, Compress_number6) {
-  field(TSEL, "343")
-  field(DESC, "Fgdg")
-  field(SCAN, "Fgdg")
-  field(PINI, "Fgdg")
-}
-
-# Description
-record(compress, Compress_number7) {
-  field(TSEL, "67547")
-  field(DESC, "Dfgdf")
-  field(ASG, "Cel3\")
-  field(SCAN, "Fgdg")
-  field(PINI, "Dfgdf")
-}
-
-record(compress, Compress_number8) {
-  field(TSEL, "ztrztz")
-  field(EVNT, "abc abd")
-  field(SCAN, "Dfgdf")
-  field(PHAS, "fgds")
-}
-
-# Description
-# Description
-# 
-# Description
-record(compress, Compress_number9) {
-  field(TSEL, "232")
-  field(EVNT, "67547")
-  field(DESC, "Fg")
-  field(ASG, "Description")
-}
-
-# Description
-record(compress, Compress_number10) {
-  field(EVNT, "343")
-  field(DESC, "Fgdg")
-}
-
-# Description
-record(compress, Compress_number11) {
-  field(DESC, "jhg jgh")
-  field(DTYP, "12")
-}
-
-# Description
-record(compress, Compress_number12) {
-  field(PINI, "<nonkjkje>")
-}
-
-# Description
-record(compress, Compress_number13) {
-  field(EVNT, "67547")
-  field(ASG, "Cel")
-}
-
 expand("template1.vdb", template12) {
   macro(macro2, "")
   macro(macro3, "tretji3")
   macro(macro1, "kaj?")
   macro(new, "res")
   macro(spet_novi_macro, "Nov")
+  macro(MacroForGroup, "dsd ")
 }
 
 expand("template2.vdb", template22) {
@@ -106,15 +27,16 @@ expand("template2.vdb", template23) {
 
 expand("template1.vdb", template1) {
   macro(macro1, "prvi1")
-  macro(macro2, "drugi2")
+  macro(macro2, "drugi2 dsadas")
   macro(macro3, "Mogo g")
   macro(new, "deluje")
-  macro(MacroForGroup, "fd dfd")
+  macro(MacroForGroup, "d dfd")
   macro(spet_novi_macro, "deluje?hihi")
 }
 
+# dsdsds
 expand("template1.vdb", template13) {
-  macro(macro2, "a")
+  macro(macro2, "dsadad")
   macro(new, "")
   macro(macro1, "d")
   macro(spet_novi_macro, "test")
@@ -211,31 +133,45 @@ record(ai, NewAI27) {
   field(FLNK, "9")
 }
 
-record(compress, Compress_number14) {
-  field(EVNT, "ztrztz")
-  field(ASG, "f 4 34g")
+record(compress, Compress_number2) {
+  field(ASG, "  ")
+}
+
+record(compress, Compress_number3) {
+  field(ASG, "  ")
+  field(EVNT, "fdsfdsfsd")
+  field(VAL, "fdsfsdfsdf")
+}
+
+record(compress, Compress_number4) {
+  field(ASG, "  ")
+}
+
+record(compress, Compress_number5) {
+  field(ASG, "  ")
+}
+
+record(compress, Compress_number6) {
+  field(ASG, "  ")
+}
+
+record(compress, Compress_number7) {
+  field(ASG, "  ")
+}
+
+record(ao, sds) {
+}
+
+record(motor, Mottorrad) {
 }
 
 #! Further lines contain data used by VisualDCT
-#! View(1977,2180,1.0)
-#! SpreadsheetView(T,"template1.vdb","Default view","true",-13434625,HiddenRow("template13"),SplitCol("MacroForGroup","Delimiter","\s+"))
-#! SpreadsheetView(R,"ai","Group","true",-1,RowOrder("SIML",0,"Descending"),Col("Name"),Col("Comment"),Col("DTYP"),Col("FLNK"),Col("SIML"),Col("SIML[2]"),Col("SIML[3]"),Col("SIML[4]>"),Col("TSEL"),Col("TSEL[2]"),Col("TSEL[3]>"),Col("SDIS"),Col("SDIS[2]"),Col("SDIS[3]>"),SplitCol("INP","Delimiter","\s+"),SplitCol("SIML","Delimiter","i"),SplitCol("TSEL","Delimiter","\s+"),SplitCol("SDIS","Pattern","#(L\d+) (A\d+)[ ]*@(.*)"),RecentSplit("Delimiter","i"),RecentSplit("Pattern","#(L\d+) (A\d+)[ ]*@(.*)"))
-#! SpreadsheetView(R,"compress","DBD Order","false",-3368449,RowOrder("Name",0,"Ascending"),Col("Name"),Col("PHAS"),Col("TSEL"),Col("EVNT"),Col("EVNT[2]>"),Col("Comment"),Col("Comment[2]"),Col("Comment[3]>"),Col("DTYP"),Col("DISV"),Col("SDIS"),Col("DISS"),Col("PRIO"),Col("FLNK"),Col("VAL"),Col("INP"),Col("ALG"),Col("NSAM"),Col("N"),Col("IHIL"),Col("ILIL"),Col("HOPR"),Col("LOPR"),Col("PREC"),Col("EGU"),HiddenRow("Compress_number1"),HiddenRow("Compress_number3"),HiddenRow("Compress_number5"),HiddenRow("Compress_number7"),HiddenRow("Compress_number9"),HiddenRow("Compress_number11"),HiddenRow("Compress_number13"),SplitCol("Comment","Delimiter","\n+"),SplitCol("EVNT","Delimiter","\s+"),RecentSplit("Delimiter","\n+"))
-#! SpreadsheetView(T,"template2.vdb","Default view","false",-3355444,HiddenRow("template22"),HiddenRow("template23"))
+#! View(2066,2017,1.0)
+#! SpreadsheetView(R,"ai","Group","true",-1,RowOrder("SIML",0,"Descending"),Col("Name"),Col("Comment"),Col("DTYP"),Col("FLNK"),Col("SIML"),Col("SDIS"),Col("SDIS[2]"),Col("SDIS[3]>"),Col("TSEL"),Col("TSEL[2]"),Col("TSEL[3]>"),SplitCol("INP","Delimiter","\s+"),SplitCol("TSEL","Delimiter","\s+"),SplitCol("SDIS","Pattern","#(L\d+) (A\d+)[ ]*@(.*)"),RecentSplit("Delimiter","i"),RecentSplit("Pattern","#(L\d+) (A\d+)[ ]*@(.*)"))
+#! SpreadsheetView(T,"template1.vdb","Default view","true",-13434625,HiddenRow("template13"),SplitCol("macro2","Delimiter","a"),RecentSplit("Delimiter","a"),RecentSplit("Delimiter","\s+"))
+#! SpreadsheetView(T,"template2.vdb","Default view","true",-3355444,Col("Name"),Col("macro"),Col("Comment"),HiddenRow("template22"),HiddenRow("template23"))
+#! SpreadsheetView(R,"compress","DBD Order","false",-3368449,RowOrder("Name",0,"Ascending"),Col("Name"),Col("PHAS"),Col("TSEL"),Col("EVNT"),Col("Comment"),Col("DTYP"),Col("DISV"),Col("SDIS"),Col("DISS"),Col("PRIO"),Col("FLNK"),Col("VAL"),Col("INP"),Col("ALG"),Col("NSAM"),Col("N"),Col("IHIL"),Col("ILIL"),Col("HOPR"),Col("LOPR"),Col("PREC"),Col("EGU"),HiddenRow("Compress_number1"),HiddenRow("Compress_number4"),HiddenRow("Compress_number5"),HiddenRow("Compress_number6"),HiddenRow("Compress_number7"),SplitCol("Comment","Delimiter","\n+"),SplitCol("EVNT","Delimiter","\s+"),RecentSplit("Delimiter","\n+"))
 #! Record(Compress_number1,2040,2189,0,1,"Compress_number1")
-#! Record(Compress_number2,2060,2222,0,1,"Compress_number2")
-#! Record(Compress_number3,2060,2209,0,1,"Compress_number3")
-#! Record(Compress_number4,2080,2229,0,1,"Compress_number4")
-#! Record(Compress_number5,2080,2215,0,1,"Compress_number5")
-#! Record(Compress_number6,2100,2207,0,1,"Compress_number6")
-#! Record(Compress_number7,2100,2193,0,1,"Compress_number7")
-#! Record(Compress_number8,2120,2207,0,1,"Compress_number8")
-#! Field("Compress_number8.TSEL",16777215,1,"Compress_number8.TSEL")
-#! Record(Compress_number9,2120,2207,0,1,"Compress_number9")
-#! Record(Compress_number10,2140,2275,0,1,"Compress_number10")
-#! Record(Compress_number11,2140,2275,0,1,"Compress_number11")
-#! Record(Compress_number12,2160,2309,0,1,"Compress_number12")
-#! Record(Compress_number13,2160,2295,0,1,"Compress_number13")
 
 #! TemplateInstance("template12",2600,2200,0,"")
 #! TemplateField("template12","MacroForGroup",16777215,0,1)
@@ -277,4 +213,11 @@ record(compress, Compress_number14) {
 #! Record(NewAI24,2140,2673,0,1,"NewAI24")
 #! Record(NewAI27,2360,2733,0,1,"NewAI27")
 #! Visibility("NewAI27.INP",1)
-#! Record(Compress_number14,2180,2315,0,1,"Compress_number14")
+#! Record(Compress_number2,2060,2209,0,1,"Compress_number2")
+#! Record(Compress_number3,2070,2181,0,1,"Compress_number3")
+#! Record(Compress_number4,2080,2229,0,1,"Compress_number4")
+#! Record(Compress_number5,2090,2229,0,1,"Compress_number5")
+#! Record(Compress_number6,2100,2249,0,1,"Compress_number6")
+#! Record(Compress_number7,2110,2249,0,1,"Compress_number7")
+#! Record(sds,2680,2722,0,1,"sds")
+#! Record(Mottorrad,2860,2682,0,1,"Mottorrad")
