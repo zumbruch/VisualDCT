@@ -28,11 +28,9 @@
 package com.cosylab.vdct.inspector;
 
 import com.cosylab.vdct.events.CommandManager;
+import com.cosylab.vdct.events.commands.GetGUIInterface;
 import com.cosylab.vdct.events.commands.GetVDBManager;
 import com.cosylab.vdct.graphics.objects.Flexible;
-import com.cosylab.vdct.graphics.objects.VisibleObject;
-import com.cosylab.vdct.undo.RenameAction;
-import com.cosylab.vdct.undo.UndoManager;
 import com.cosylab.vdct.vdb.NameValueInfoProperty;
 
 /**
@@ -83,20 +81,10 @@ public class NameProperty extends NameValueInfoProperty {
         	return;
         }
 
-        if (!namedObject.rename(value)) {
-			return;
-		}
+		GetGUIInterface interf = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
+		interf.getGUIMenuInterface().rename(oldName, value);
+        
 		this.value = namedObject.getFlexibleName();
-
-		UndoManager.getInstance().addAction(new RenameAction(namedObject, oldName, this.value));
-		
-        // TODO: call appropriately when InspectorInterface is generalized 
-        //InspectorManager.getInstance().updateProperty(visualRecord, field);
-
-		if (namedObject instanceof VisibleObject) { 
-			((VisibleObject)namedObject).unconditionalValidation();
-		}
-		CommandManager.getInstance().execute("RepaintWorkspace");
 	}
 	
 	/* (non-Javadoc)

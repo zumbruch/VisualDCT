@@ -1018,9 +1018,12 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 		// If the name was changed, add the new name.
 		if (propertiesColumn == propertiesNamesColumnIndex) {
    			nameToPropertiesRowIndex.put(model[row][column].getValue(), new Integer(propertiesRow));
+   			// Refresh all table and redo the splitting as the name change can affect the content of link fields. 
+			refreshModel();
+		} else {
+			// Otherwise just refresh the row to display the current validity of this inspectable's fields. 
+			fireTableRowsUpdated(row, row);
 		}
-		
-		fireTableRowsUpdated(row, row);
 	}
 	
 	public boolean isCellEditable(int rowIndex, int columnIndex) {

@@ -49,7 +49,7 @@ public class SpreadsheetTable extends JTable {
 	
     private static final int firstColumnWidth = 20;
     private static final int minColumnWidth = 64;
-    private static final int maxColumnWidth = 128;
+    private static final int maxColumnWidth = 256;
     private static final int columnMargin = 16;
     
 	public SpreadsheetTable(Vector data) {
