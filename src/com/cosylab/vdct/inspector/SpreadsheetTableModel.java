@@ -61,10 +61,13 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 import com.cosylab.vdct.graphics.ColorChooser;
+import com.cosylab.vdct.graphics.DrawingSurface;
 import com.cosylab.vdct.graphics.objects.Record;
 import com.cosylab.vdct.graphics.objects.Template;
+import com.cosylab.vdct.graphics.objects.VisibleObject;
 import com.cosylab.vdct.graphics.popup.PopUpMenu;
 import com.cosylab.vdct.plugin.debug.PluginDebugManager;
+import com.cosylab.vdct.undo.DeleteAction;
 import com.cosylab.vdct.undo.UndoManager;
 import com.cosylab.vdct.vdb.CommentProperty;
 
@@ -100,7 +103,8 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
     private SplitData[] propertiesColumnSplitData = null;
     private JCheckBoxMenuItem[] propertiesColumnMenuItem = null;
     
-    private JPopupMenu popUpMenu = null;
+    private JPopupMenu columnPopupMenu = null;
+    private JPopupMenu rowPopupMenu = null;
     private JMenuItem hideItem = null; 
 	private JMenu splitMenu = null; 
     private JMenuItem joinItem = null;
@@ -110,6 +114,10 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
     private JMenuItem showAllRowsItem = null;
     private JMenuItem extendCountersItem = null;
 
+    private JMenuItem showRowsItem = null;
+    private JMenuItem hideRowsItem = null;
+    private JMenuItem deleteRowsItem = null;
+    
     private int propertiesToModelColumnIndex[] = null;
     private int modelToPropertiesColumnIndex[] = null;
     
@@ -137,8 +145,8 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
     // The maximum number of recent entries for splitting columns.
     private static final int recentSplitDataMaxCount = 8;    
     
-    private int popUpModelRow = -1;
-    private int popUpModelColumn = -1;
+    private int popupModelRow = -1;
+    private int popupModelColumn = -1;
 
 	private static ArrayList defaultModes = null; 
 	
@@ -161,6 +169,11 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 	private static final String join = "Join columns"; 
 
 	private static final String hideRow = "Hide row"; 
+	private static final String hideRows = "Hide rows"; 
+	private static final String showRow = "Show row"; 
+	private static final String showRows = "Show rows"; 
+	private static final String deleteRow = "Delete row"; 
+	private static final String deleteRows = "Delete rows"; 
 
     private static final String extendCountersToolTip = "Increase counters in selected region.";
 
@@ -198,6 +211,10 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 		saveView();
 		refreshProperties();
 		loadView();
+	}
+	
+	public Inspectable getLastInspectable() {
+		return inspectables[propertiesRowCount - 1];
 	}
 	
 	private void refreshProperties() {
@@ -290,7 +307,8 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 			propertiesRowVisibilities[i] = true;
 		}
 		
-		createPopupMenu();
+		createColumnPopupMenu();
+		createRowPopupMenu();
 
 		refreshModel();
 	}
@@ -462,9 +480,9 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 	            } else if (event.getButton() == MouseEvent.BUTTON3) {
 			    	Point point = event.getPoint();
 			    	JTable table = getTable();
-			        popUpModelRow = table.rowAtPoint(point);
-			        popUpModelColumn = table.convertColumnIndexToModel(table.columnAtPoint(point));
-	            	displayPopupMenu(table, event.getX(), event.getY());
+			        popupModelRow = -1;
+			        popupModelColumn = table.convertColumnIndexToModel(table.columnAtPoint(point));
+	            	displayPopupMenu(true, table, event.getX(), event.getY());
 			    }
 	        }
             
@@ -528,10 +546,10 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 				
 					Point point = event.getPoint();
 					JTable table = getTable();
-					popUpModelRow = table.rowAtPoint(point);
-					popUpModelColumn = table.convertColumnIndexToModel(table.columnAtPoint(point));
-					if (popUpModelRow >= 0 && popUpModelColumn >= 0) {
-						InspectableProperty property = model[popUpModelRow][popUpModelColumn];
+					popupModelRow = table.rowAtPoint(point);
+					popupModelColumn = table.convertColumnIndexToModel(table.columnAtPoint(point));
+					if (popupModelRow >= 0 && popupModelColumn >= 0) {
+						InspectableProperty property = model[popupModelRow][popupModelColumn];
 						InspectableProperty baseProperty = property;
 						if (baseProperty instanceof SplitPropertyPart) {
 						    baseProperty = ((SplitPropertyPart)baseProperty).getOwner().getOwner();
@@ -543,50 +561,19 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 							dialog.setLocationRelativeTo(inspector);
 							dialog.setVisible(true);
 							if (dialog.isConfirmed()) {
-								setValueAt(dialog.getComment(), popUpModelRow, popUpModelColumn);
+								setValueAt(dialog.getComment(), popupModelRow, popupModelColumn);
 							}
-							fireTableCellUpdated(popUpModelRow, popUpModelColumn);
+							fireTableCellUpdated(popupModelRow, popupModelColumn);
 						}
 					}
 			    }
-
+				
 				if (event.getButton() == MouseEvent.BUTTON3) {
 			    	Point point = event.getPoint();
-			    	
 			    	JTable table = getTable();
-			        popUpModelRow = table.rowAtPoint(point);
-			        popUpModelColumn = table.convertColumnIndexToModel(table.columnAtPoint(point));
-			        
-			        if (popUpModelRow >= 0 && popUpModelColumn == 0) {
-			        	
-		        		/* If all rows are shown, at the right click, switch the row visibility instantly. If only
-		        		 * unhidden rows are shown, instead bring up a popup menu with the hide command. 
-		        		 */
-			        	if (showAllRows) {
-		        			int propertyIndex = modelToPropertiesRowIndex(popUpModelRow);
-		        			boolean state = !propertiesRowVisibilities[propertyIndex];
-		        			propertiesRowVisibilities[propertyIndex] = state;
-		        			((SpreadsheetRowVisible)properties[propertyIndex][0]).setVisible(state);
-	        				fireTableCellUpdated(popUpModelRow, 0);
-			        	} else {
-			        		JPopupMenu popupMenu = new JPopupMenu();
-			        		JMenuItem menuItem = new JMenuItem(hideRow);
-			        		menuItem.addActionListener(new ActionListener() {
-			        			public void actionPerformed(ActionEvent event) {
-			        				int propertyIndex = modelToPropertiesRowIndex(popUpModelRow);
-				        			boolean state = !propertiesRowVisibilities[propertyIndex];
-				        			propertiesRowVisibilities[propertyIndex] = state;
-				        			((SpreadsheetRowVisible)properties[propertyIndex][0]).setVisible(state);
-			        				refreshModel();
-			        				fireTableDataChanged();
-			        			}
-			        		});
-			        		popupMenu.add(menuItem);
-			        		popupMenu.show(table, event.getX(), event.getY());
-			        	}
-			        } else {
-				    	displayPopupMenu(table, event.getX(), event.getY());
-			        }
+			        popupModelRow = table.rowAtPoint(point);
+			        popupModelColumn = table.convertColumnIndexToModel(table.columnAtPoint(point));
+		        	displayPopupMenu(false, table, event.getX(), event.getY());
 			    }
 	        }
 		}); 
@@ -594,9 +581,9 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 		pane.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent event) {
 				if (event.getButton() == MouseEvent.BUTTON3) {
-			        popUpModelRow = -1;
-			        popUpModelColumn = -1;
-					displayPopupMenu(getTableScrollPane(), event.getX(), event.getY());
+			        popupModelRow = -1;
+			        popupModelColumn = -1;
+					displayPopupMenu(false, getTableScrollPane(), event.getX(), event.getY());
 			    }
 	        }
 		});
@@ -604,44 +591,44 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 		loadView();
 	}
 
-    private void createPopupMenu() {
-    	popUpMenu = new JPopupMenu();
+    private void createColumnPopupMenu() {
+    	columnPopupMenu = new JPopupMenu();
 
 		hideItem = new JMenuItem(hide);
 		hideItem.addActionListener(this);
-    	popUpMenu.add(hideItem);
+    	columnPopupMenu.add(hideItem);
 
 		sortAscItem = new JMenuItem(sortAsc);
 		sortAscItem.addActionListener(this);
-    	popUpMenu.add(sortAscItem);
+    	columnPopupMenu.add(sortAscItem);
 
     	sortDesItem = new JMenuItem(sortDes);
     	sortDesItem.addActionListener(this);
-    	popUpMenu.add(sortDesItem);
+    	columnPopupMenu.add(sortDesItem);
 
     	splitMenu = new JMenu(split);
-    	popUpMenu.add(splitMenu);
+    	columnPopupMenu.add(splitMenu);
     	updateSplitMenu();
     	
     	joinItem = new JMenuItem(join);
     	joinItem.addActionListener(this);
-    	popUpMenu.add(joinItem);
+    	columnPopupMenu.add(joinItem);
 
 	    sortSeparator = new JSeparator(); 
-    	popUpMenu.add(sortSeparator);
+    	columnPopupMenu.add(sortSeparator);
     	
     	JMenuItem hideAllItem = new JMenuItem(hideAll);
     	hideAllItem.addActionListener(this);
-    	popUpMenu.add(hideAllItem);
+    	columnPopupMenu.add(hideAllItem);
 
     	JMenuItem showAllItem = new JMenuItem(showAll);
     	showAllItem.addActionListener(this);
-    	popUpMenu.add(showAllItem);
+    	columnPopupMenu.add(showAllItem);
 
     	JMenu visibilityMenu = new JMenu(visibility);
-    	popUpMenu.add(visibilityMenu);
+    	columnPopupMenu.add(visibilityMenu);
 
-    	popUpMenu.addSeparator();
+    	columnPopupMenu.addSeparator();
     	
     	JMenu presetColumnOrderMenu = new JMenu(presetColumnOrders);
 
@@ -655,9 +642,9 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
        		presetColumnOrderMenu.add(menuItem);
        	}
 
-    	popUpMenu.add(presetColumnOrderMenu);
+    	columnPopupMenu.add(presetColumnOrderMenu);
     	
-    	popUpMenu.addSeparator();
+    	columnPopupMenu.addSeparator();
 
         propertiesColumnMenuItem = new JCheckBoxMenuItem[propertiesColumnCount];
         JMenu menuToAdd = visibilityMenu;
@@ -684,25 +671,38 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
     	
     	JMenuItem setBackgroundItem = new JMenuItem(backgroundColorString);
     	setBackgroundItem.addActionListener(this);
-    	popUpMenu.add(setBackgroundItem);
+    	columnPopupMenu.add(setBackgroundItem);
     	
     	JMenuItem defaultBackgroundItem = new JMenuItem(defaultColorString);
     	defaultBackgroundItem.addActionListener(this);
-    	popUpMenu.add(defaultBackgroundItem);
+    	columnPopupMenu.add(defaultBackgroundItem);
 
-    	popUpMenu.addSeparator();
+    	columnPopupMenu.addSeparator();
 
     	showAllRowsItem = new JCheckBoxMenuItem(showAllRowsString);
     	showAllRowsItem.setSelected(showAllRows);
     	showAllRowsItem.addActionListener(this);
-    	popUpMenu.add(showAllRowsItem);
+    	columnPopupMenu.add(showAllRowsItem);
 
-    	popUpMenu.addSeparator();
+    	columnPopupMenu.addSeparator();
     	
     	extendCountersItem = new JMenuItem(extendCounters);
     	extendCountersItem.setToolTipText(extendCountersToolTip);
     	extendCountersItem.addActionListener(this);
-    	popUpMenu.add(extendCountersItem);
+    	columnPopupMenu.add(extendCountersItem);
+    }
+    
+    private void createRowPopupMenu() {
+    	rowPopupMenu = new JPopupMenu();
+    	hideRowsItem = new JMenuItem(hideRow);
+    	hideRowsItem.addActionListener(this);
+    	rowPopupMenu.add(hideRowsItem);
+    	showRowsItem = new JMenuItem(showRow);
+    	showRowsItem.addActionListener(this);
+    	rowPopupMenu.add(showRowsItem);
+    	deleteRowsItem = new JMenuItem(deleteRow);
+    	deleteRowsItem.addActionListener(this);
+    	rowPopupMenu.add(deleteRowsItem);
     }
     
 	public void actionPerformed(ActionEvent event) {
@@ -710,15 +710,15 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 		Object source = event.getSource();
 
 		if (action.equals(hide)) {
-			if (popUpModelColumn >= 0) {
-	    		int propertiesColumn = modelToPropertiesColumnIndex[popUpModelColumn];
+			if (popupModelColumn >= 0) {
+	    		int propertiesColumn = modelToPropertiesColumnIndex[popupModelColumn];
 	    		propertiesColumnMenuItem[propertiesColumn].setSelected(false);
 	    		propertiesColumnVisibilities[propertiesColumn] = false;
 	    		updateColumnVisibility();
 	    	}
 		} else if (action.equals(whitespaces) || action.equals(customPattern)) {
 
-			int index = popUpModelColumn;
+			int index = popupModelColumn;
 			if (index >= 0) {
 				SplitData split = null; 
 				if (action.equals(customPattern)) {
@@ -760,16 +760,16 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 				}
 			}
 		} else if (action.equals(join)) {
-			if (popUpModelColumn >= 0) {
-				propertiesColumnSplitData[modelToPropertiesColumnIndex[popUpModelColumn]] = null;
+			if (popupModelColumn >= 0) {
+				propertiesColumnSplitData[modelToPropertiesColumnIndex[popupModelColumn]] = null;
 				refreshModel();
 				// refresh
 				saveView();
 				loadView();
 	    	}
 		} else if (action.equals(sortAsc) || action.equals(sortDes)) {
-	    	if (popUpModelColumn >= 0) {
-	    		updateSortedColumn(popUpModelColumn);
+	    	if (popupModelColumn >= 0) {
+	    		updateSortedColumn(popupModelColumn);
 	    	}
 		} else if (action.equals(hideAll) || action.equals(showAll)) {
 		    boolean state = action.equals(showAll);
@@ -800,12 +800,57 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 		    updateBackgroundColor();
 		} else if (action.equals(extendCounters)) {
 			extendCounters(table.getSelectedRows(), table.getSelectedColumns());
+
+		} else if (action.equals(hideRow) || action.equals(hideRows)
+				|| action.equals(showRow) || action.equals(showRows)) {
+			
+			boolean state = action.equals(showRow) || action.equals(showRows);
+
+			int[] selRows = table.getSelectedRows();
+			if (selRows.length == 0) {
+				selRows = new int[] {popupModelRow};
+			}
+			int propertyIndex = 0;
+			for (int r = 0; r < selRows.length; r++) {
+				propertyIndex = modelToPropertiesRowIndex(selRows[r]);
+				propertiesRowVisibilities[propertyIndex] = state;
+				((SpreadsheetRowVisible)properties[propertyIndex][0]).setVisible(state);
+			}
+			refreshModel();
+			fireTableDataChanged();
+		
+		} else if (action.equals(deleteRow) || action.equals(deleteRows)) {
+
+			int[] selRows = table.getSelectedRows();
+			if (selRows.length == 0) {
+				selRows = new int[] {popupModelRow};
+			}
+
+			try	{
+				UndoManager.getInstance().startMacroAction();
+
+				Inspectable inspectable = null;
+				for (int r = 0; r < selRows.length; r++) {
+					inspectable = inspectables[modelToPropertiesRowIndex(selRows[r])];
+					if (inspectable instanceof VisibleObject) {
+						VisibleObject visible = (VisibleObject)inspectable;
+						visible.destroy();
+						UndoManager.getInstance().addAction(new DeleteAction(visible));
+					}
+				}
+			} catch (Exception exception) {
+				// Nothing.
+			} finally {
+				UndoManager.getInstance().stopMacroAction();
+			}
+			DrawingSurface.getInstance().repaint();
+			
 		} else if (source instanceof JCheckBoxMenuItem) {
 			propertiesColumnVisibilities[nameToPropertiesColumnIndex(action)] =
 				((JCheckBoxMenuItem)source).isSelected();
 		    updateColumnVisibility();
 		} else {
-			if (popUpModelColumn >= 0) {
+			if (popupModelColumn >= 0) {
 				Integer recentIndexObject = (Integer)nameToRecentSplitDataIndex.get(action);
 				if (recentIndexObject != null) {
 					int recentIndex = recentIndexObject.intValue();
@@ -814,7 +859,7 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 					recentSplitData.add(0, data);
 					updateSplitMenu();
 
-					int propertiesColumnIndex = modelToPropertiesColumnIndex[popUpModelColumn]; 
+					int propertiesColumnIndex = modelToPropertiesColumnIndex[popupModelColumn]; 
 					String name = propertiesColumnNames[propertiesColumnIndex];
 					SplitData split = new SplitData(name, data.getDelimiterTypeString(), data.getPattern());
 					propertiesColumnSplitData[propertiesColumnIndex] = split;
@@ -904,28 +949,63 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
     	splitMenu.add(menuItem);
     }
 
-    private void displayPopupMenu(JComponent component, int posX, int posY) {
-        boolean inTable = popUpModelRow >= 0 && popUpModelColumn >= 0;
-        boolean first = popUpModelColumn == 0;
-        boolean persistant = popUpModelColumn <= solidPropertiesColumnCount;
-        boolean splitted = false;
-        if (inTable) {
-        	splitted = propertiesColumnSplitData[modelToPropertiesColumnIndex[popUpModelColumn]] != null;
+    private void displayPopupMenu(boolean forHeader, JComponent component, int posX, int posY) {
+        
+        boolean first = popupModelColumn == 0;
+        boolean onRow = popupModelRow >= 0;
+        boolean onColumn = popupModelColumn >= 0;
+        boolean wholeRowSelected = table.getSelectedRow() >= 0 && table.getSelectedColumn() == 0;   
+        
+        /* If there is a row selected or the click is on the first column, bring up a row popup menu, otherwise bring
+         * up a column popup menu.
+         */
+        if (wholeRowSelected || (first && onRow)) {
+        	/* Enable quick hidden row switching when all rows are displayed and none selected.
+        	 */
+        	if (wholeRowSelected || !showAllRows) {
+        		
+                boolean multipleSelected = table.getSelectedRowCount() > 1;
+                boolean visible = false; 
+                if (!multipleSelected) {
+            		int modelIndex = (table.getSelectedRowCount() > 0) ? table.getSelectedRow() : popupModelRow;
+    				int propertyIndex = modelToPropertiesRowIndex(modelIndex);
+    				visible = propertiesRowVisibilities[propertyIndex];
+                }
+                
+            	setJComponentVisible(showRowsItem, multipleSelected || !visible);
+            	setJComponentVisible(hideRowsItem, multipleSelected || visible);
+
+            	showRowsItem.setText(multipleSelected ? showRows : showRow);
+            	hideRowsItem.setText(multipleSelected ? hideRows : hideRow);
+            	deleteRowsItem.setText(multipleSelected ? deleteRows : deleteRow);
+            	
+            	rowPopupMenu.show(component, posX, posY);
+        	} else {
+            	switchRowHiddenState();
+        	}
+
+        } else {
+        	boolean onTableOrHeader = (forHeader || onRow) && onColumn;
+        	boolean persistant = popupModelColumn <= solidPropertiesColumnCount;
+        	boolean splitted = false;
+        	if (onTableOrHeader) {
+        		splitted = propertiesColumnSplitData[modelToPropertiesColumnIndex[popupModelColumn]] != null;
+        	}
+
+        	boolean manipulatable = onTableOrHeader && !first && !persistant; 
+        	boolean sortable = onTableOrHeader && !first;
+
+        	setJComponentVisible(hideItem, manipulatable);
+        	setJComponentVisible(splitMenu, manipulatable && !splitted);
+        	setJComponentVisible(joinItem, manipulatable && splitted);
+        	setJComponentVisible(sortAscItem, sortable);
+        	setJComponentVisible(sortDesItem, sortable);
+        	setJComponentVisible(sortSeparator, sortable);
+
+        	extendCountersItem.setEnabled(table.getSelectedColumnCount() >= 1 && table.getSelectedRowCount() >= 2);
+
+        	columnPopupMenu.show(component, posX, posY);
         }
-        
-        boolean manipulatable = inTable && !first && !persistant; 
-        boolean sortable = inTable && !first;
-        
-        setJComponentVisible(hideItem, manipulatable);
-        setJComponentVisible(splitMenu, manipulatable && !splitted);
-        setJComponentVisible(joinItem, manipulatable && splitted);
-        setJComponentVisible(sortAscItem, sortable);
-        setJComponentVisible(sortDesItem, sortable);
-        setJComponentVisible(sortSeparator, sortable);
-        
-        extendCountersItem.setEnabled(table.getSelectedColumnCount() >= 1 && table.getSelectedRowCount() >= 2);
-        
-        popUpMenu.show(component, posX, posY);
     }
     
     private void setJComponentVisible(JComponent component, boolean visible) {
@@ -933,7 +1013,15 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
     		component.setVisible(visible);
     	}
     }
-	
+
+    private void switchRowHiddenState() {
+    	int propertyIndex = modelToPropertiesRowIndex(popupModelRow);
+    	boolean state = !propertiesRowVisibilities[propertyIndex];
+    	propertiesRowVisibilities[propertyIndex] = state;
+    	((SpreadsheetRowVisible)properties[propertyIndex][0]).setVisible(state);
+    	fireTableCellUpdated(popupModelRow, 0);
+    }
+    
     /** Returns the index of the named data row or -1 if there is none.
      */
     private int nameToPropertiesRowIndex(String name) {

@@ -78,6 +78,10 @@ public class SpreadsheetTable extends JTable {
 		}
 	}
 
+	public SpreadsheetTableModel getSpreadsheetModel() {
+		return spreadsheetModel;
+	}
+
 	/* (non-Javadoc)
 	 * @see javax.swing.JTable#setModel(javax.swing.table.TableModel)
 	 */

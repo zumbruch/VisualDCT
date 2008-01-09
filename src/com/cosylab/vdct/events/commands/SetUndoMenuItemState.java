@@ -54,7 +54,7 @@ public SetUndoMenuItemState(VisualDCT visualDCT) {
 public void execute() {
 	visualDCT.getUndoMenuItem().setEnabled(state);
 	visualDCT.getUndoButton().setEnabled(state);
-	visualDCT.getSpreadsheetInspector().getUndoItem().setEnabled(state);
+	visualDCT.getSpreadsheetInspector().setUndoState(state);
 }
 /**
  * Insert the method's description here.

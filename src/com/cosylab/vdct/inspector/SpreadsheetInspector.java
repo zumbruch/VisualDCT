@@ -62,33 +62,50 @@ import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.DataProvider;
 import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.events.commands.GetGUIInterface;
+import com.cosylab.vdct.events.commands.GetVDBManager;
+import com.cosylab.vdct.graphics.DrawingSurface;
 import com.cosylab.vdct.graphics.ViewState;
+import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.objects.Record;
 import com.cosylab.vdct.graphics.objects.Template;
+import com.cosylab.vdct.util.StringUtils;
 import com.cosylab.vdct.vdb.VDBTemplate;
 
 /**
  * @author ssah
  *
  */
-public class SpreadsheetInspector extends JDialog implements HelpDisplayer, ChangeListener, ActionListener {
+public class SpreadsheetInspector extends JDialog
+        implements HelpDisplayer, ChangeListener, ActionListener, InspectableObjectsListener {
 
-    private JTabbedPane tabbedPane = null;
-	
 	private HashMap inspectables = null;
-	private HashMap selectedInspectables = null;
+	private HashMap displayedInspectables = null;
 	
+    private JTabbedPane tabbedPane = null;
 	private SpreadsheetTable[] tables = null;
 	private JLabel hintLabel = null;
-	
 	private JMenuItem undoItem = null;
 	private JMenuItem redoItem = null;
+	private JButton newRowButton = null;
+	private JButton undoButton= null;
+	private JButton redoButton = null;
 	
     private CustomSplitDialog splitDialog = null;
     private CommentDialog commentDialog = null;
+    private NewTemplateInstanceDialog templateDialog = null;
+    
+    private String currentTab = null;
 	
-	private final static String undoString = "UndoAction";
-	private final static String redoString = "RedoAction";
+	private final static String undoString = "Undo";
+	private final static String redoString = "Redo";
+	
+	private final static String newRowString = "Add record/template";
+	private final static char newRowMnemonic = 'a';
+	private final static String newTypeRecordString = "Add new type record";
+	private final static char newTypeRecordMnemonic = 'r';
+	private final static String newTypeTemplateString = "Add new type template";
+	private final static char newTypeTemplateMnemonic = 't';
+	
 
 	private final static String helpTitle = "Help";
 	private final static String hintTitle = "Hint";
@@ -132,15 +149,11 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer, Chan
 		
 		if (b) {
 			loadData();
-	        if (inspectables.isEmpty()) {
-	        	hintLabel.setText("No objects to display.");
-	        }
-			createDynamicGUI();
+			refreshDynamicGUI();
+			DataProvider.getInstance().addInspectableListener(this);
 		} else {
-			closeEditors();
-	    	for (int i = 0; i < tables.length; i++) {
-	    		((SpreadsheetTableModel)tables[i].getModel()).saveView();
-	    	}
+			saveView();
+			DataProvider.getInstance().removeInspectableListener(this);
         }
 		super.setVisible(b);
 	}
@@ -148,41 +161,77 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer, Chan
 	public void displayHelp(String text) {
     	hintLabel.setText((text != null && text.length() > 0) ? text : " ");
     }
+		
+	public void inspectableObjectAdded(Inspectable object) {
+		boolean added = addInstance(inspectables, object);
+		added |= addInstance(displayedInspectables, object);
+		if (added) {
+			saveView();			
+			currentTab = getTypeName(object);
+			refreshDynamicGUI();
+		}
+	}
 	
-	public JMenuItem getUndoItem() {
-		return undoItem;
+	public void inspectableObjectRemoved(Inspectable object) {
+		boolean removed = removeInstance(inspectables, object);
+		removed |= removeInstance(displayedInspectables, object);
+		if (removed) { 
+			saveView();			
+			refreshDynamicGUI();
+		}
 	}
 
-	public JMenuItem getRedoItem() {
-		return redoItem;
+	public void setUndoState(boolean state) {
+		undoItem.setEnabled(state);
+		undoButton.setEnabled(state);
 	}
 
-	/** This method is called from within the constructor to
-     * initialize the form.
+	public void setRedoState(boolean state) {
+		redoItem.setEnabled(state);
+		redoButton.setEnabled(state);
+	}
+
+	private void saveView() {
+		closeEditors();
+    	for (int i = 0; i < tables.length; i++) {
+    		((SpreadsheetTableModel)tables[i].getModel()).saveView();
+    	}
+    	currentTab = getSelectedTab();
+	}
+	
+	/** This method is called from within the constructor to initialize the form.
      */
     private void createStaticGUI() {
 
     	createMenuBar();
     	
+        JPanel contentPanel = new JPanel(new GridBagLayout());
+        contentPanel.setPreferredSize(new Dimension(Constants.VDCT_WIDTH - 16, Constants.VDCT_HEIGHT - 64));
+
+    	JPanel buttonPanel = createButtonPanel();
+		GridBagConstraints constraints = new GridBagConstraints();
+    	constraints = new GridBagConstraints();
+		constraints.weightx = 1.0;
+		constraints.fill = GridBagConstraints.HORIZONTAL;
+		constraints.insets = new Insets(4, 4, 4, 4);
+		contentPanel.add(buttonPanel, constraints);
+        
         tabbedPane = new JTabbedPane();
         tabbedPane.setTabLayoutPolicy(javax.swing.JTabbedPane.SCROLL_TAB_LAYOUT);
         tabbedPane.setTabPlacement(JTabbedPane.BOTTOM);
         tabbedPane.setAutoscrolls(true);
         tabbedPane.addChangeListener(this);
-
-        JPanel contentPanel = new JPanel(new GridBagLayout());
-        contentPanel.setPreferredSize(new Dimension(Constants.VDCT_WIDTH - 16, Constants.VDCT_HEIGHT - 64));
-
-		GridBagConstraints constraints = new GridBagConstraints();
+		constraints = new GridBagConstraints();
+		constraints.gridy = 1;
 		constraints.weightx = 1.0;
 		constraints.weighty = 1.0;
 		constraints.fill = GridBagConstraints.BOTH;
-		constraints.insets = new Insets(4, 4, 4, 4);
+		constraints.insets = new Insets(0, 4, 4, 4);
 		contentPanel.add(tabbedPane, constraints);
 		
-        JPanel helpAndButtonPanel = createHelpAndButtonPanel();
+        JPanel helpAndButtonPanel = createHintAndHelpPanel();
 		constraints = new GridBagConstraints();
-		constraints.gridy = 1;
+		constraints.gridy = 2;
 		constraints.weightx = 1.0;
 		constraints.fill = GridBagConstraints.HORIZONTAL;
 		constraints.insets = new Insets(4, 4, 4, 4);
@@ -236,8 +285,79 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer, Chan
     	setJMenuBar(bar);
     }
 
-    private JPanel createHelpAndButtonPanel() {
-    	JPanel helpAndButtonPanel = new JPanel(new GridBagLayout());
+    private JPanel createButtonPanel() {
+    	
+    	JPanel buttonPanel = new JPanel(new GridBagLayout());
+
+    	newRowButton = new JButton(newRowString); 
+    	newRowButton.setMnemonic(newRowMnemonic);
+    	newRowButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+            	addNewRow();
+            }
+        });
+    	GridBagConstraints constraints = new GridBagConstraints();
+		constraints.insets = new Insets(0, 0, 0, 8);
+		buttonPanel.add(newRowButton, constraints);
+
+    	JButton button = new JButton(newTypeRecordString); 
+    	button.setMnemonic(newTypeRecordMnemonic);
+    	button.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+				CommandManager.getInstance().execute("ShowNewDialog");
+            }
+        });
+    	constraints = new GridBagConstraints();
+		constraints.gridx = 1;
+		constraints.insets = new Insets(0, 0, 0, 8);
+		buttonPanel.add(button, constraints);
+
+    	button = new JButton(newTypeTemplateString); 
+    	button.setMnemonic(newTypeTemplateMnemonic);
+    	button.addActionListener(new ActionListener() {
+    		public void actionPerformed(ActionEvent event) {
+    			showTemplateDialog();
+    		}
+        });
+    	constraints = new GridBagConstraints();
+		constraints.gridx = 2;
+		constraints.insets = new Insets(0, 0, 0, 8);
+		buttonPanel.add(button, constraints);
+
+    	undoButton = new JButton(undoString); 
+    	undoButton.addActionListener(this);
+    	constraints = new GridBagConstraints();
+		constraints.gridx = 3;
+		constraints.insets = new Insets(0, 32, 0, 8);
+		buttonPanel.add(undoButton, constraints);
+
+    	redoButton = new JButton(redoString); 
+    	redoButton.addActionListener(this);
+    	constraints = new GridBagConstraints();
+		constraints.gridx = 4;
+		constraints.insets = new Insets(0, 0, 0, 8);
+		buttonPanel.add(redoButton, constraints);
+		
+    	button = new JButton(); 
+    	button.setMnemonic('l');
+    	button.setText("Close view");
+    	button.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+            	setVisible(false);
+            }
+        });
+    	constraints = new GridBagConstraints();
+		constraints.gridx = 5;
+    	constraints.weightx = 1.0;
+        constraints.anchor = GridBagConstraints.EAST;
+		constraints.insets = new Insets(0, 8, 0, 0);
+		buttonPanel.add(button, constraints);
+		
+		return buttonPanel;
+    }
+   
+    private JPanel createHintAndHelpPanel() {
+    	JPanel hintAndHelpPanel = new JPanel(new GridBagLayout());
 
     	JPanel helpPanel = new JPanel(new GridBagLayout());
     	
@@ -281,15 +401,9 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer, Chan
     	constraints = new GridBagConstraints();
     	constraints.weightx = 1.0;
         constraints.fill = GridBagConstraints.HORIZONTAL;
-		helpAndButtonPanel.add(helpPanel, constraints);
+		hintAndHelpPanel.add(helpPanel, constraints);
 		
-    	JPanel buttonPanel = createButtonPanel();
-    	constraints = new GridBagConstraints();
-		constraints.gridx = 1;
-        constraints.anchor = GridBagConstraints.SOUTHEAST;
-		helpAndButtonPanel.add(buttonPanel, constraints);
-
-		return helpAndButtonPanel;
+		return hintAndHelpPanel;
     }
     
     private JPanel createHelpPanel1() {
@@ -422,26 +536,24 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer, Chan
 		return helpPanel2;
     }
 
-    private JPanel createButtonPanel() {
-    	
-    	JPanel buttonPanel = new JPanel(new GridBagLayout());
-    	JButton button = new JButton(); 
-    	button.setMnemonic('C');
-    	button.setText("Close");
-    	button.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	setVisible(false);
-            }
-        });
-    	GridBagConstraints constraints = new GridBagConstraints();
-		constraints.insets = new Insets(4, 16, 4, 4);
-		buttonPanel.add(button, constraints);
-		return buttonPanel;
-    }
     
-    private void createDynamicGUI() {
+    private void refreshDynamicGUI() {
     	createTables();
     	resizeTablesColumns();
+        boolean noObjects = displayedInspectables.isEmpty();
+    	
+    	hintLabel.setText(noObjects ? "No objects to display." : "");
+    	newRowButton.setEnabled(!noObjects);
+    	
+    	if (noObjects) {
+        	hintLabel.setText("No objects to display.");
+        }
+    	
+        if (currentTab != null) {
+        	setSelectedTab(currentTab);
+        } else {
+        	currentTab = getSelectedTab();
+        }
     }
     
     private void refreshTables() {
@@ -452,24 +564,16 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer, Chan
     
     private void createTables() {
         tabbedPane.removeAll();
-
-        /*
-        createTables: hashtable table is selected if not empty, otherwise all;
-        for every key: get all vector, display vector; if display vector nonempty:
-        get the typeName using first element, and create model with it;
-        */
-        HashMap displayData = selectedInspectables.isEmpty() ? inspectables : selectedInspectables;
-        
     	Object key = null;
     	String type = null;
     	Vector displayObjects = null;
     	Vector loadedObjects = null;
     	JTable table = null;
     	Vector tableVector = new Vector();
-        Iterator iterator = displayData.keySet().iterator();
+        Iterator iterator = displayedInspectables.keySet().iterator();
         while(iterator.hasNext()) {
             key = iterator.next();
-            displayObjects = (Vector)displayData.get(key);
+            displayObjects = (Vector)displayedInspectables.get(key);
             loadedObjects = (Vector)inspectables.get(key);
             if (!displayObjects.isEmpty()) {
             	type = getTypeName(displayObjects.get(0));
@@ -557,6 +661,60 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer, Chan
         return commentDialog;
     }
 
+    public JDialog getTemplateDialog() {
+        if (templateDialog == null) {
+        	templateDialog = new NewTemplateInstanceDialog(this);
+        }
+        return templateDialog;
+    }
+    
+    private void showTemplateDialog() {
+    	getTemplateDialog().setLocationRelativeTo(this);
+    	getTemplateDialog().setVisible(true);
+    }
+
+    private void addNewRow() {
+        Inspectable inspectable = tables[tabbedPane.getSelectedIndex()].getSpreadsheetModel().getLastInspectable();
+        if (inspectable instanceof Record) {
+        	// Create an unique name in the same fashion as while copying.
+        	String name = inspectable.getName();
+        	while (Group.getRoot().findObject(name, true) != null) {
+        	    name = StringUtils.incrementName(name, Constants.COPY_SUFFIX);
+        	}
+    		GetVDBManager manager = (GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
+    		manager.getManager().createRecord(name, getTypeName(inspectable), true);
+        } else if (inspectable instanceof Template) {
+        	DrawingSurface.getInstance().createTemplateInstance(null, getTypeName(inspectable).toString(), true);
+        }
+    }
+    
+    /**
+     * Returns the title of the currently selected tab or null if none are selected.  
+     */
+    private String getSelectedTab() {
+    	int t = tabbedPane.getSelectedIndex();
+    	if (t >= 0) {
+    		return tabbedPane.getTitleAt(t);
+    	}
+    	return null;
+    }
+
+    /**
+     * Returns true if the tab with the given title exists and was selected, and false otherwise. 
+     */
+    private boolean setSelectedTab(String title) {
+    	int count = tabbedPane.getTabCount();
+    	int t = 0;
+    	while (t < count && !tabbedPane.getTitleAt(t).equals(title)) {
+    		t++;
+    	}
+    	if (t < count) {
+    		tabbedPane.setSelectedIndex(t);
+    		return true;
+    	}
+    	return false;
+    }
+    
     private void closeEditors() {
     	for (int i = 0; i < tables.length; i++) {
 
@@ -571,33 +729,51 @@ public class SpreadsheetInspector extends JDialog implements HelpDisplayer, Chan
 	private void loadData() {
 		
 		inspectables = new HashMap();
-		selectedInspectables = new HashMap();
+		displayedInspectables = new HashMap();
 		
 		fillTable(inspectables, DataProvider.getInstance().getInspectable());
-		fillTable(selectedInspectables, ViewState.getInstance().getSelectedObjects());
+		fillTable(displayedInspectables, ViewState.getInstance().getSelectedObjects());
+		if (displayedInspectables.isEmpty()) {
+			fillTable(displayedInspectables, DataProvider.getInstance().getInspectable());
+		}
 	}
 	
 	private void fillTable(HashMap map, Vector objects) {
-
 		Enumeration enumeration = objects.elements();
-    	
-    	Object object = null;
-    	Object key = null;
-    	Vector vector = null;
     	while (enumeration.hasMoreElements()) {
-    		object = enumeration.nextElement();
-    		key = getTypeKey(object);
-    		if (key != null) {
-    			vector = (Vector)map.get(key); 
-    			if (vector == null) {
-    				vector = new Vector();
-        			map.put(key, vector);
-    			}
-    			vector.add(object);
-    		}
+    		addInstance(map, enumeration.nextElement());
     	}
 	}
-    
+
+	private boolean addInstance(HashMap map, Object object) {
+    	Object key = getTypeKey(object);
+   		if (key != null) {
+   			Vector vector = (Vector)map.get(key); 
+   			if (vector == null) {
+   				vector = new Vector();
+      			map.put(key, vector);
+   			}
+   			vector.add(object);
+   			return true;
+   		}
+   		return false;
+	}
+
+	private boolean removeInstance(HashMap map, Object object) {
+		Object key = getTypeKey(object);
+		if (key != null) {
+			Vector vector = (Vector)map.get(key); 
+			if (vector != null) {
+				vector.remove(object);
+				if (vector.isEmpty()) {
+					map.remove(key);
+				}
+				return true;
+			}
+		}
+		return false;
+	}
+	
     public static Object getTypeKey(Object object) {
     	
     	if (object instanceof Record) {
