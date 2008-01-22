@@ -337,7 +337,7 @@ public class NamingContext {
 		//Pattern portp = Pattern.compile("$\\(([a-zA-Z0-9_:-]+)\\.([a-zA-Z0-9_:-]+)\\)");
 		Pattern macrop = Pattern.compile("\\$\\(([^\\.\\$\\)]+)\\)");
 		//Pattern portp = Pattern.compile("\\$\\(([^\\.\\$]+)\\.([^\\.\\$]+)\\)");
-		Pattern portp = Pattern.compile("\\$\\(([^\\.\\)]+)\\.([^\\.\\)]+)\\)");
+		Pattern portp = Pattern.compile("\\$\\(([^\\.]+)\\.([^\\.]+)\\)");
 		
 		Matcher port = portp.matcher(value);
 		StringBuffer result = new StringBuffer();
