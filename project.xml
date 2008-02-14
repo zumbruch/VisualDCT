@@ -15,6 +15,7 @@
   <developer id="msekoranja" name="Matej Sekoranja" email="matej.sekoranja_AT_cosylab.com" responsibility="implementator" />
   <!--developer id="ilist" name="Ivo List" email="ivo.list_AT_cosylab.com" responsibility="implementator" /-->
   <developer id="jbobnar" name="Jaka Bobnar" email="jaka.bobnar_AT_cosylab.com" responsibility="implementator" />
+  <developer id="ssah" name="Sunil Sah" email="sunil.sah_AT_cosylab.com" responsibility="implementator" />
 
   <rt bugQueue="42" projectKeyword="43" projectQueue="53" bugKeyword="21" enhancementKeyword="24">
  	<keyword id="87"/>
@@ -38,6 +39,7 @@
   <news date="2004-11-18" developer="msekoranja" title="Package D2 pre-release."/>
   <news date="2005-05-27" developer="msekoranja" title="Package D2 release."/>
   <news date="2005-12-20" developer="msekoranja" title="Package F release."/>
+  <news date="2008-01-22" developer="msekoranja" title="Package E release."/>
  
   <!-- additional documentation -->
   <document url="http://visualdct.cosylab.com" comment="VisualDCT homepage where you can find all related manuals, articles and presentations." title="VisualDCT homepage"/>
