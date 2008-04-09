@@ -57,6 +57,7 @@ import com.cosylab.vdct.graphics.FontMetricsBuffer;
 import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.inspector.SplitData;
+import com.cosylab.vdct.inspector.SpreadsheetColumnData;
 import com.cosylab.vdct.inspector.SpreadsheetRowOrder;
 import com.cosylab.vdct.inspector.SpreadsheetTableViewData;
 import com.cosylab.vdct.inspector.SpreadsheetTableViewRecord;
@@ -1299,8 +1300,13 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
  final String VIEW_START            = "#! " + DBResolver.VDCTVIEW + "(";
 
  final String SPREADSHEET_VIEW_START = "#! " + DBResolver.VDCTSPREADSHEET_VIEW + "(";
+ 
+ final String SPREADSHEET_COLUMNORDER_START = DBResolver.VDCTSPREADSHEET_COLUMNORDER + "(";
+ final String SPREADSHEET_SHOWALLROWS_START = DBResolver.VDCTSPREADSHEET_SHOWALLROWS + "(";
+ final String SPREADSHEET_BACKGROUNDCOLOR_START = DBResolver.VDCTSPREADSHEET_BACKGROUNDCOLOR + "(";
  final String SPREADSHEET_ROWORDER_START = DBResolver.VDCTSPREADSHEET_ROWORDER + "(";
  final String SPREADSHEET_COLUMN_START = DBResolver.VDCTSPREADSHEET_COLUMN + "(";
+ final String SPREADSHEET_WIDTH_START = DBResolver.VDCTSPREADSHEET_WIDTH + "(";
  final String SPREADSHEET_ROW_START = DBResolver.VDCTSPREADSHEET_HIDDENROW + "(";
  final String SPREADSHEET_SPLITCOLUMN_START = DBResolver.VDCTSPREADSHEET_SPLITCOLUMN + "(";
  final String SPREADSHEET_RECENTSPLIT_START = DBResolver.VDCTSPREADSHEET_RECENTSPLIT + "(";
@@ -1333,37 +1339,72 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
  SpreadsheetTableViewRecord sprView = null; 
  while (iterator.hasNext()) {
 	 sprView = (SpreadsheetTableViewRecord)iterator.next();
+	 
+     String modeName = sprView.getModeName();
+     Boolean showAllRows = sprView.getShowAllRows();
+     Integer backgroundColor = sprView.getBackgroundColor();
+     SpreadsheetRowOrder rowOrder = sprView.getRowOrder();
+     SpreadsheetColumnData[] columns = sprView.getColumns();
+     String[] rows = sprView.getHiddenRows();
+     SplitData[] splitColumns = sprView.getSplitColumns();
+     SplitData[] recentSplits = sprView.getRecentSplits();
+
+     // If no data, skip writing the entry.
+	 if (modeName == null && showAllRows == null && backgroundColor == null
+			 && rowOrder == null && columns == null && rows == null
+			 && splitColumns == null && recentSplits == null) {
+		 continue;
+	 }
 
      file.writeBytes(SPREADSHEET_VIEW_START + sprView.getType());
      file.writeBytes(comma + quote + sprView.getName() + quote);
-     file.writeBytes(comma + quote + sprView.getModeName() + quote);
-     file.writeBytes(comma + quote + sprView.getShowAllRowsString() + quote);
-     file.writeBytes(comma + sprView.getBackgroundColor());
+
+     if (modeName != null) {
+		 file.writeBytes(comma + SPREADSHEET_COLUMNORDER_START);
+		 file.writeBytes(quote + modeName + quote);
+		 file.writeBytes(")");
+     }
+
+     if (showAllRows != null) {
+		 file.writeBytes(comma + SPREADSHEET_SHOWALLROWS_START);
+		 file.writeBytes(quote + showAllRows.toString() + quote);
+		 file.writeBytes(")");
+     }
+
+     if (backgroundColor != null) {
+		 file.writeBytes(comma + SPREADSHEET_BACKGROUNDCOLOR_START);
+		 file.writeBytes(backgroundColor.toString());
+		 file.writeBytes(")");
+     }
      
-     SpreadsheetRowOrder rowOrder = sprView.getRowOrder();
      if (rowOrder != null) {
-		 file.writeBytes(comma + SPREADSHEET_ROWORDER_START);
+		 file.writeBytes(comma + SPREADSHEET_WIDTH_START);
 		 file.writeBytes(quote + rowOrder.getColumnName() + quote);
 		 file.writeBytes(comma + rowOrder.getColumnSplitIndex());
 		 file.writeBytes(comma + quote + rowOrder.getAscendingString() + quote);
 		 file.writeBytes(")");
      }
      
-     String[] columns = sprView.getColumns();
      if (columns != null) {
     	 for (int i = 0; i < columns.length; i++) {
-    		 file.writeBytes(comma + SPREADSHEET_COLUMN_START + quote + columns[i] + "\")");
+    		 file.writeBytes(comma + SPREADSHEET_COLUMN_START);
+    		 file.writeBytes(quote + columns[i].getColumnName() + quote);
+    		 file.writeBytes(comma + quote + String.valueOf(columns[i].isHidden()) + quote);
+    		 if (!columns[i].isDefaultWidth()) {
+    			 file.writeBytes(comma + SPREADSHEET_ROWORDER_START);
+    			 file.writeBytes(String.valueOf(columns[i].getWidth()));
+    			 file.writeBytes(")");
+    		 }
+    		 file.writeBytes(")");
     	 }
      }
 
-     String[] rows = sprView.getHiddenRows();
      if (rows != null) {
     	 for (int i = 0; i < rows.length; i++) {
     		 file.writeBytes(comma + SPREADSHEET_ROW_START + quote + rows[i] + "\")");
     	 }
      }
 
-     SplitData[] splitColumns = sprView.getSplitColumns();
      if (splitColumns != null) {
     	 for (int i = 0; i < splitColumns.length; i++) {
     		 file.writeBytes(comma + SPREADSHEET_SPLITCOLUMN_START);
@@ -1374,7 +1415,6 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
     	 }
      }
 
-     SplitData[] recentSplits = sprView.getRecentSplits();
      if (recentSplits != null) {
     	 for (int i = 0; i < recentSplits.length; i++) {
     		 file.writeBytes(comma + SPREADSHEET_RECENTSPLIT_START);

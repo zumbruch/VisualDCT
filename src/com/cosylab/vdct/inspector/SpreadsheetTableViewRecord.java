@@ -35,46 +35,25 @@ public class SpreadsheetTableViewRecord {
 
 	private String type = null;
 	private String name = null;
+	
 	private String modeName = null;
-	private boolean showAllRows = false;
-	private int backgroundColor = 0;
+	private Boolean showAllRows = null;
+	private Integer backgroundColor = null;
 
 	private SpreadsheetRowOrder rowOrder = null;
-	private String[] columns = null;
+	private SpreadsheetColumnData[] columns = null;
 	private SplitData[] splitColumns = null;
 	private String[] hiddenRows = null;
 	private SplitData[] recentSplits = null;
 	
-	private static final String TRUE = "true";  
-	private static final String FALSE = "false";  
-
 	/**
 	 * @param type
 	 * @param name
-	 * @param modeName
-	 * @param showAllRows
-	 * @param backgroundColor
 	 */
-	public SpreadsheetTableViewRecord(String type, String name, String modeName, String showAllRowsString,
-			int backgroundColor) {
-		this(type, name, modeName, isShowAllRowsString(showAllRowsString), backgroundColor);
-	}
-	
-	/**
-	 * @param type
-	 * @param name
-	 * @param modeName
-	 * @param showAllRows
-	 * @param backgroundColor
-	 */
-	public SpreadsheetTableViewRecord(String type, String name, String modeName, boolean showAllRows,
-			int backgroundColor) {
+	public SpreadsheetTableViewRecord(String type, String name) {
 		super();
 		this.type = type;
 		this.name = name;
-		this.modeName = modeName;
-		this.showAllRows = showAllRows;
-		this.backgroundColor = backgroundColor;
 	}
 	
 	/**
@@ -99,38 +78,6 @@ public class SpreadsheetTableViewRecord {
 	}
 	
 	/**
-	 * @return the showAllRows
-	 */
-	public boolean isShowAllRows() {
-		return showAllRows;
-	}
-	
-	/**
-	 * @return the backgroundColor
-	 */
-	public int getBackgroundColor() {
-		return backgroundColor;
-	}
-
-	/**
-	 * @param showAllRows the showAllRows to set
-	 */
-	public void setShowAllRows(boolean showAllRows) {
-		this.showAllRows = showAllRows;
-	}
-	
-	public String getShowAllRowsString() {
-		return showAllRows ? TRUE : FALSE;
-	}
-
-	/**
-	 * @param showAllRows the showAllRows to set
-	 */
-	public static boolean isShowAllRowsString(String showAllRows) {
-		return showAllRows.equals(TRUE);
-	}
-	
-	/**
 	 * @return the rowOrder
 	 */
 	public SpreadsheetRowOrder getRowOrder() {
@@ -147,7 +94,7 @@ public class SpreadsheetTableViewRecord {
 	/**
 	 * @return the columns
 	 */
-	public String[] getColumns() {
+	public SpreadsheetColumnData[] getColumns() {
 		return columns;
 	}
 	
@@ -200,7 +147,7 @@ public class SpreadsheetTableViewRecord {
 	/**
 	 * @param columns the columns to set
 	 */
-	public void setColumns(String[] columns) {
+	public void setColumns(SpreadsheetColumnData[] columns) {
 		this.columns = columns;
 	}
 
@@ -223,5 +170,21 @@ public class SpreadsheetTableViewRecord {
 	 */
 	public void setHiddenRows(String[] rows) {
 		this.hiddenRows = rows;
+	}
+
+	public Boolean getShowAllRows() {
+		return showAllRows;
+	}
+
+	public void setShowAllRows(Boolean showAllRows) {
+		this.showAllRows = showAllRows;
+	}
+
+	public Integer getBackgroundColor() {
+		return backgroundColor;
+	}
+
+	public void setBackgroundColor(Integer backgroundColor) {
+		this.backgroundColor = backgroundColor;
 	}
 }

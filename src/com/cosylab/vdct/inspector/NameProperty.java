@@ -35,7 +35,7 @@ import com.cosylab.vdct.vdb.NameValueInfoProperty;
 
 /**
  * An InspectableProperties interface for editing names.
- * @author ssah
+ * @author ssah 
  *
  */
 public class NameProperty extends NameValueInfoProperty {
@@ -64,10 +64,10 @@ public class NameProperty extends NameValueInfoProperty {
 	 * @see com.cosylab.vdct.vdb.NameValueInfoProperty#setValue(java.lang.String)
 	 */
 	public void setValue(String value) {
+		
 		if (!flexible) {
 			return;
 		}
-
 		String oldName = namedObject.getFlexibleName();
 		
 		// Do nothing if the name is the same.
@@ -83,7 +83,6 @@ public class NameProperty extends NameValueInfoProperty {
 
 		GetGUIInterface interf = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
 		interf.getGUIMenuInterface().rename(oldName, value);
-        
 		this.value = namedObject.getFlexibleName();
 	}
 	

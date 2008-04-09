@@ -163,6 +163,7 @@ public class SpreadsheetInspector extends JDialog
     }
 		
 	public void inspectableObjectAdded(Inspectable object) {
+        System.out.println("inspectableObjectAdded:" + object.toString());
 		boolean added = addInstance(inspectables, object);
 		added |= addInstance(displayedInspectables, object);
 		if (added) {
@@ -173,6 +174,8 @@ public class SpreadsheetInspector extends JDialog
 	}
 	
 	public void inspectableObjectRemoved(Inspectable object) {
+        System.out.println("inspectableObjectRemoved:" + object.toString());
+		
 		boolean removed = removeInstance(inspectables, object);
 		removed |= removeInstance(displayedInspectables, object);
 		if (removed) { 
@@ -592,9 +595,8 @@ public class SpreadsheetInspector extends JDialog
     
     private SpreadsheetTable getTable(String type, Vector displayData, Vector loadedData, JScrollPane scrollPane) {
 
-    	SpreadsheetTable table = new SpreadsheetTable(displayData);
-		SpreadsheetTableModel tableModel = new SpreadsheetTableModel(this, type, displayData, loadedData);
-    	table.setModel(tableModel);
+    	SpreadsheetTable table = new SpreadsheetTable(this, scrollPane, displayData);
+		SpreadsheetTableModel tableModel = new SpreadsheetTableModel(type, displayData, loadedData);
 
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_Z, ActionEvent.CTRL_MASK, false);
 		table.registerKeyboardAction(this, undoString, keyStroke, JComponent.WHEN_FOCUSED);
@@ -610,7 +612,8 @@ public class SpreadsheetInspector extends JDialog
     	table.setDefaultRenderer(String.class, new InspectorTableCellRenderer(table, tableModel));
     	table.setDefaultEditor(String.class, editor);
 
-    	tableModel.setTable(table, scrollPane);
+    	tableModel.setTable(table);
+    	table.setModel(tableModel);
     	
     	return table;
     }
