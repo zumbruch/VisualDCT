@@ -163,7 +163,6 @@ public class SpreadsheetInspector extends JDialog
     }
 		
 	public void inspectableObjectAdded(Inspectable object) {
-        System.out.println("inspectableObjectAdded:" + object.toString());
 		boolean added = addInstance(inspectables, object);
 		added |= addInstance(displayedInspectables, object);
 		if (added) {
@@ -174,8 +173,6 @@ public class SpreadsheetInspector extends JDialog
 	}
 	
 	public void inspectableObjectRemoved(Inspectable object) {
-        System.out.println("inspectableObjectRemoved:" + object.toString());
-		
 		boolean removed = removeInstance(inspectables, object);
 		removed |= removeInstance(displayedInspectables, object);
 		if (removed) { 
@@ -197,7 +194,7 @@ public class SpreadsheetInspector extends JDialog
 	private void saveView() {
 		closeEditors();
     	for (int i = 0; i < tables.length; i++) {
-    		((SpreadsheetTableModel)tables[i].getModel()).saveView();
+    		((SpreadsheetColumnViewModel)tables[i].getModel()).saveView();
     	}
     	currentTab = getSelectedTab();
 	}
@@ -596,7 +593,7 @@ public class SpreadsheetInspector extends JDialog
     private SpreadsheetTable getTable(String type, Vector displayData, Vector loadedData, JScrollPane scrollPane) {
 
     	SpreadsheetTable table = new SpreadsheetTable(this, scrollPane, displayData);
-		SpreadsheetTableModel tableModel = new SpreadsheetTableModel(type, displayData, loadedData);
+		SpreadsheetColumnViewModel tableModel = new SpreadsheetColumnViewModel(type, displayData, loadedData);
 
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_Z, ActionEvent.CTRL_MASK, false);
 		table.registerKeyboardAction(this, undoString, keyStroke, JComponent.WHEN_FOCUSED);

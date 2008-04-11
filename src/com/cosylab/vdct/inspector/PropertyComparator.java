@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
+ * Copyright (c) 2008, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -28,34 +28,39 @@
 
 package com.cosylab.vdct.inspector;
 
+import java.util.Arrays;
 import java.util.Comparator;
 
-public class SpreadsheetRowComparator implements Comparator {
-	
-    private int column = 0;
+/**
+ * @author ssah
+ *
+ */
+public class PropertyComparator implements Comparator {
+
+    InspectableProperty[][] properties = null;
+    private boolean rows = true;
+    private int sortingIndex = 0;
     private int sign = 1;
-    SpreadsheetSplitViewModel tableModel = null;
     
-    public SpreadsheetRowComparator(SpreadsheetSplitViewModel tableModel) {
-    	super();
-    	this.tableModel = tableModel;
-    }
-	
-	public void setColumn(int column) {
-		this.column = column;
-	}
-
-	public void setAscending(boolean ascending) {
-		sign = ascending ? 1 : -1;
-	}
-
+	/* (non-Javadoc)
+	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+	 */
 	public int compare(Object arg0, Object arg1) {
+		int firstIndex = ((Integer)arg0).intValue();
+		int secondIndex = ((Integer)arg1).intValue();
 		
-		InspectableProperty[] first = (InspectableProperty[])arg0;  
-		InspectableProperty[] second = (InspectableProperty[])arg1;
-
-	    String firstString = first[column].getValue();
-	    String secondString = second[column].getValue();
+		InspectableProperty first = null;  
+		InspectableProperty second = null;
+		if (rows) {
+			first = properties[firstIndex][sortingIndex];  
+			second = properties[secondIndex][sortingIndex];  
+		} else {
+			first = properties[sortingIndex][firstIndex];  
+			second = properties[sortingIndex][secondIndex];  
+		}
+		
+	    String firstString = first.getValue();
+	    String secondString = second.getValue();
 
 	    // TODO: This is only because of CommentProperty, may be fixable.
 	    if (firstString == null) {
@@ -76,7 +81,41 @@ public class SpreadsheetRowComparator implements Comparator {
         	return sign * nameComp;
 
         }
+        
         // names with no number are displayed before any with numbers
 		return sign * (firstNumber - secondNumber); 
+	}
+	
+	public static int[] getOrder(InspectableProperty[][] properties, boolean rows,
+			int sortingIndex, boolean ascending) {
+		
+		int orderLen = rows ? properties.length : properties[0].length; 
+		Integer[] order = new Integer[orderLen];
+	    for (int i = 0; i < order.length; i++) {
+	    	order[i] = new Integer(i); 
+		}
+		
+	    PropertyComparator comparator = new PropertyComparator(properties, rows, sortingIndex, ascending);
+	    Arrays.sort(order, comparator);
+
+	    int[] intOrder = new int[orderLen];
+	    for (int i = 0; i < intOrder.length; i++) {
+	    	intOrder[i] = order[i].intValue(); 
+		}
+	    return intOrder;
+	}
+
+	/**
+	 * @param properties
+	 * @param rows
+	 * @param sortingIndex
+	 */
+	private PropertyComparator(InspectableProperty[][] properties, boolean rows,
+			int sortingIndex, boolean ascending) {
+		super();
+		this.properties = properties;
+		this.rows = rows;
+		this.sortingIndex = sortingIndex;
+		sign = ascending ? 1 : -1;
 	}
 }

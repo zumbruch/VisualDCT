@@ -25,6 +25,7 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package com.cosylab.vdct.inspector;
 
 import java.awt.Color;
@@ -91,7 +92,7 @@ public class SpreadsheetTable extends JTable implements ActionListener{
     private int popupModelRow = -1;
     private int popupModelColumn = -1;
 
-    SpreadsheetTableModel sprModel = null;
+    SpreadsheetColumnViewModel sprModel = null;
 	
     private static final int firstColumnWidth = 20;
     private static final int minColumnWidth = 32;
@@ -165,15 +166,16 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 		}
 	}
 
-	public SpreadsheetTableModel getSpreadsheetModel() {
+	public SpreadsheetColumnViewModel getSpreadsheetModel() {
 		return sprModel;
 	}
 
 	/* (non-Javadoc)
 	 * @see javax.swing.JTable#setModel(javax.swing.table.TableModel)
 	 */
-	public void setModel(SpreadsheetTableModel spreadsheetModel) {
+	public void setModel(SpreadsheetColumnViewModel spreadsheetModel) {
 		this.sprModel = spreadsheetModel;
+		setColumnModel(sprModel);
 		super.setModel(spreadsheetModel);
 		addListeners();
 	}
@@ -267,7 +269,11 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 			    			showAllRowsItem.setSelected(newState);
 			    			getTableHeader().repaint();
 			    		} else {
-			    			sprModel.updateSortedColumn(columnModelIndex);
+			    			
+			    			sprModel.sortRows(columnModelIndex);
+			    			int a = 0;
+			    			// TODO: remove
+			    			//sprModel.updateSortedColumn(columnModelIndex);
 			    		}
 			    	}
 	            } else if (event.getButton() == MouseEvent.BUTTON3) {
@@ -314,10 +320,17 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 			    	if (viewIndex > 0) {
 			    		moveColumn(viewIndex, 0);
 			    	}
+			    	
 			    	// Validate the positions of columns if there was a drag.
 			    	if (draggedColumnModelIndex >= 0) {
 			    		int newViewIndex = convertColumnIndexToView(draggedColumnModelIndex);
 			    		if (newViewIndex != draggedColumnViewIndex) {
+			    			
+			    			sprModel.repositionColumn(draggedColumnViewIndex, newViewIndex);
+			    			
+			    			// TODO old, remove
+			    			/*
+			    			System.out.println("SprTable: " + draggedColumnViewIndex + "->" + newViewIndex);
 			    			sprModel.refreshOnColumnDragEnd();
 			    			refreshPopupMenus();
 			    			refreshPropertiesColumnMenuItemsState();
@@ -325,6 +338,7 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 			    			updateSplitMenu();
 			    			resizeColumns();
 			    			getTableHeader().repaint();
+			    			*/
 			    		}
 			    		draggedColumnModelIndex = -1;
 			    	}
@@ -367,6 +381,8 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 				if (event.getButton() == MouseEvent.BUTTON3) {
 					displayPopupMenu(false, getTableScrollPane(), -1, -1, event.getX(), event.getY());
 			    }
+				// TODO: remove
+				sprModel.displayModel();
 	        }
 		});
 		
@@ -412,12 +428,13 @@ public class SpreadsheetTable extends JTable implements ActionListener{
             	
             	rowPopupMenu.show(component, posX, posY);
         	} else {
-        		sprModel.switchRowHiddenState(row);
+        		boolean visible = sprModel.isRowVisible(row);
+        		sprModel.setRowsVisibility(new int[] {row}, !visible);
         	}
 
         } else {
         	boolean onTableOrHeader = (forHeader || onRow) && onColumn;
-        	boolean persistant = column <= sprModel.getSolidColumnsCount();
+        	boolean persistant = column <= sprModel.getSolidProperitiesColumnCount();
         	boolean splitted = onTableOrHeader && sprModel.isSplit(column);
         	boolean manipulatable = onTableOrHeader && !first && !persistant; 
         	boolean sortable = onTableOrHeader && !first;
@@ -476,7 +493,7 @@ public class SpreadsheetTable extends JTable implements ActionListener{
     	
     	JMenu presetColumnOrderMenu = new JMenu(presetColumnOrders);
 
-    	ArrayList list = sprModel.getModeNames();
+    	ArrayList list = sprModel.getColumnOrderNames();
 
        	for (int i = 0; i < list.size(); i++) {
        		String action = list.get(i).toString();
@@ -502,14 +519,14 @@ public class SpreadsheetTable extends JTable implements ActionListener{
    			checkBoxItem.addActionListener(this);
    			
    	    	// Add check boxes for all but the unhideable and the first.
-   			int itemPos = j - (sprModel.getSolidColumnsCount() + 1); 
+   			int itemPos = j - (sprModel.getSolidProperitiesColumnCount() + 1); 
    			if (itemPos >= 0) {
    				menuToAdd = PopUpMenu.addItem(checkBoxItem, menuToAdd, itemPos, visibilityMenuItemCount);
    			}
     	}
     	
     	// If no items to hide/show, the options should be disabled.
-    	if (propertiesColumnCount <= sprModel.getSolidColumnsCount() + 1) {
+    	if (propertiesColumnCount <= sprModel.getSolidProperitiesColumnCount() + 1) {
     		hideAllItem.setEnabled(false);
     		showAllItem.setEnabled(false);
     		visibilityMenu.setEnabled(false);
@@ -557,8 +574,13 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 
 		if (action.equals(hide)) {
 			if (popupModelColumn >= 0) {
-				sprModel.setColumnVisibility(false, popupModelColumn);
-	    		propertiesColumnMenuItem[sprModel.getModelToPropertiesColumnIndex(popupModelColumn)].setSelected(false);
+				int propertyColumn = sprModel.getPropertyColumn(popupModelColumn);
+	    		propertiesColumnMenuItem[propertyColumn].setSelected(false);
+				sprModel.setColumnsVisibility(new int[] {popupModelColumn}, false);
+
+				// TODO remove
+				//sprModel.setColumnVisibility(false, popupModelColumn);
+	    		//propertiesColumnMenuItem[sprModel.getModelToPropertiesColumnIndex(popupModelColumn)].setSelected(false);
 	    	}
 		} else if (action.equals(whitespaces) || action.equals(customPattern)) {
 
@@ -619,12 +641,19 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 	    	}
 		} else if (action.equals(hideAll) || action.equals(showAll)) {
 		    boolean visible = action.equals(showAll);
-		    
+
 		    // do this on all but the first two
-		    for (int i = sprModel.getSolidColumnsCount() + 1; i < propertiesColumnMenuItem.length; i++) {
-		    	sprModel.setPropertiesColumnVisibility(visible, i);
+		    int startColumn = sprModel.getSolidProperitiesColumnCount() + 1;
+		    int endColumn = propertiesColumnMenuItem.length;
+		    
+		    int[] columns = new int[endColumn - startColumn];
+		    // do this on all but the first two
+		    for (int i = startColumn; i < endColumn; i++) {
+		    	//sprModel.setPropertiesColumnVisibility(visible, i);
 		    	propertiesColumnMenuItem[i].setSelected(visible);
+		    	columns[i - startColumn] = i;
 		    }
+			sprModel.setPropertyColumnsVisibility(columns, visible);
 		    
 		} else if (action.equals(showAllRowsString)) {
 		    boolean state = ((JCheckBoxMenuItem)source).isSelected();
@@ -664,7 +693,7 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 			if (selRows.length == 0) {
 				selRows = new int[] {popupModelRow};
 			}
-			sprModel.setRowVisibility(visible, selRows);
+			sprModel.setRowsVisibility(selRows, visible);
 		
 		} else if (action.equals(deleteRow) || action.equals(deleteRows)) {
 
@@ -676,7 +705,9 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 			
 		} else if (source instanceof JCheckBoxMenuItem) {
 			int columnIndex = sprModel.getPropertiesColumnIndex(action);
-			sprModel.setPropertiesColumnVisibility(((JCheckBoxMenuItem)source).isSelected(), columnIndex);
+			sprModel.setPropertyColumnsVisibility(new int[] {columnIndex}, ((JCheckBoxMenuItem)source).isSelected());
+			// TODO remove
+			//sprModel.setPropertiesColumnVisibility(((JCheckBoxMenuItem)source).isSelected(), columnIndex);
 		} else {
 			if (popupModelColumn >= 0) {
 				int recentIndex = getRecentSplitDataIndex(action);
@@ -763,7 +794,7 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 	}
 	
 	private void refreshPropertiesColumnMenuItemsState() {
-	    for (int i = sprModel.getSolidColumnsCount() + 1; i < propertiesColumnMenuItem.length; i++) {
+	    for (int i = sprModel.getSolidProperitiesColumnCount() + 1; i < propertiesColumnMenuItem.length; i++) {
 		   	propertiesColumnMenuItem[i].setSelected(sprModel.isPropertiesColumnVisible(i));
 		}
 	} 
