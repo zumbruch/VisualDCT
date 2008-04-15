@@ -57,6 +57,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
 
 import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.DataProvider;
@@ -194,7 +195,7 @@ public class SpreadsheetInspector extends JDialog
 	private void saveView() {
 		closeEditors();
     	for (int i = 0; i < tables.length; i++) {
-    		((SpreadsheetColumnViewModel)tables[i].getModel()).saveView();
+    		((SpreadsheetColumnViewModel)tables[i].getModel()).storeView();
     	}
     	currentTab = getSelectedTab();
 	}
@@ -605,13 +606,13 @@ public class SpreadsheetInspector extends JDialog
     	
     	InspectorCellEditor editor = new InspectorCellEditor(tableModel, this);
     	editor.setClickCountToStart(2);
+    	TableCellRenderer renderer = new InspectorTableCellRenderer(table, tableModel);
 
-    	table.setDefaultRenderer(String.class, new InspectorTableCellRenderer(table, tableModel));
+    	table.setDefaultRenderer(String.class, renderer);
     	table.setDefaultEditor(String.class, editor);
+    	tableModel.setRenderer(renderer);
 
-    	tableModel.setTable(table);
     	table.setModel(tableModel);
-    	
     	return table;
     }
 

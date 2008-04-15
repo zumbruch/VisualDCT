@@ -28,12 +28,17 @@
 
 package com.cosylab.vdct.inspector;
 
+import java.awt.Color;
 import java.util.Enumeration;
+import java.util.EventObject;
 import java.util.Vector;
 
+import javax.swing.DefaultCellEditor;
+import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.DefaultTableColumnModel;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
@@ -44,7 +49,11 @@ import javax.swing.table.TableColumnModel;
 public class SpreadsheetColumnViewModel extends SpreadsheetSplitViewModel implements TableColumnModel {
 	
 	TableColumnModel columnModel = null;
+	TableCellRenderer renderer = null;
 
+    private Color defaultBackground = null;
+    private Color background = null;
+	
 	/**
 	 * @param dataType
 	 * @param displayData
@@ -55,8 +64,195 @@ public class SpreadsheetColumnViewModel extends SpreadsheetSplitViewModel implem
 			Vector loadedData) throws IllegalArgumentException {
 		super(dataType, displayData, loadedData);
 		columnModel = new DefaultTableColumnModel();
+		refreshColumns();
+	}
+	
+	/**
+	 * @param renderer the renderer to set
+	 */
+	public void setRenderer(TableCellRenderer renderer) {
+		this.renderer = renderer;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.inspector.SpreadsheetSplitViewModel#recallView()
+	 */
+	public void recallView() {
+		super.recallView();
+		refreshColumns();
+		recallTableColor();
+	}
+
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.inspector.SpreadsheetSplitViewModel#storeView()
+	 */
+	public void storeView() {
+		super.storeView();
+		storeTableColor();
+	}
+
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.inspector.SpreadsheetSplitViewModel#refreshAll()
+	 */
+	protected void refreshAll() {
+		super.refreshAll();
+		refreshColumns();
+	}
+
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.inspector.SpreadsheetSplitViewModel#repositionColumn(int, int)
+	 */
+	public void repositionColumn(int startIndex, int destIndex) {
+		super.repositionColumn(startIndex, destIndex);
+		refreshColumns();
+	}
+
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.inspector.SpreadsheetSplitViewModel#setColumnOrder(java.lang.String)
+	 */
+	public void setColumnOrder(String modeName) {
+		super.setColumnOrder(modeName);
+		refreshColumns();
+	}
+
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.inspector.SpreadsheetSplitViewModel#setColumnsVisibility(int[], boolean)
+	 */
+	public void setColumnsVisibility(int[] columns, boolean visible) {
+		super.setColumnsVisibility(columns, visible);
+		refreshColumns();
+	}
+
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.inspector.SpreadsheetSplitViewModel#setPropertyColumnsVisibility(int[], boolean)
+	 */
+	public void setPropertyColumnsVisibility(int[] columns, boolean visible) {
+		super.setPropertyColumnsVisibility(columns, visible);
+		refreshColumns();
+	}
+
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.inspector.SpreadsheetSplitViewModel#setRowsVisibility(int[], boolean)
+	 */
+	public void setRowsVisibility(int[] rows, boolean visible) {
+		super.setRowsVisibility(rows, visible);
+		refreshColumns();
+	}
+
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.inspector.SpreadsheetSplitViewModel#setShowAllRows(boolean)
+	 */
+	public void setShowAllRows(boolean showAllRows) {
+		super.setShowAllRows(showAllRows);
+		refreshColumns();
+	}
+
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.inspector.SpreadsheetSplitViewModel#sortRowsByColumn(int)
+	 */
+	public void sortRowsByColumn(int column) {
+		super.sortRowsByColumn(column);
+		refreshColumns();
+	}
+
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.inspector.SpreadsheetSplitViewModel#splitColumn(com.cosylab.vdct.inspector.SplitData, int)
+	 */
+	public void splitColumn(SplitData splitData, int column) {
+		super.splitColumn(splitData, column);
+		refreshColumns();
+	}
+
+	public Color getBackground() {
+		return background;
+	}
+	
+	public void setBackground(Color background) {
+		this.background = background;
+	}
+	
+	public Color getDefaultBackground() {
+		return defaultBackground;
+	}
+
+	public void setDefaultBackground(Color defaultBackground) {
+		this.defaultBackground = defaultBackground;
+	}
+	
+	private void refreshColumns() {
+		
+		// TODO: reuse existing columns, sample code below. First set comment property to be uneditable.
+        while (getColumnCount() > 0) {
+        	removeColumn(columnModel.getColumn(0));
+        }
+		for (int j = 0; j < super.getColumnCount(); j++) {
+		    columnModel.addColumn(createColumn(j, true));
+		}
+		return;
+        /*
+        int pos = 0;
+		for (pos = 0; pos < super.getColumnCount(); pos++) {
+			if (pos < getColumnCount()) {
+				// Recycle existing columns.
+				TableColumn column = getColumn(pos);
+				if (column.getModelIndex() != pos) {
+					column.setModelIndex(pos);
+				}
+				String headerValue = getColumnHeaderValue(pos);
+				if (!column.getHeaderValue().equals(headerValue)) {
+					column.setHeaderValue(headerValue);
+				}
+			} else {
+			    addColumn(createColumn(pos, true));
+			}
+		}
+		// Delete the remaining unneeded columns.  
+		if (pos < getColumnCount()) {
+			TableColumn column = getColumn(pos);
+		    removeColumn(column);
+		}
+		*/
+	}
+	
+	private TableColumn createColumn(int colIndex, boolean defaultWidth) {
+		TableColumn column = new SpreadsheetColumn(defaultWidth);
+		column.setModelIndex(colIndex);
+		column.setHeaderValue(getColumnHeaderValue(colIndex));
+		column.setHeaderRenderer(renderer);
+		
+		// TODO: make an option to make comment properties uneditable
+		String name = getColumnId(colIndex);
+		if (name.equals(propertiesCommentsColumn)) {
+			column.setCellEditor(new DefaultCellEditor(new JTextField()){
+				public boolean isCellEditable(EventObject anEvent) {
+					return false;
+				}
+			});
+		}
+		
+		return column;
+	}
+
+	private void recallTableColor() {
+		SpreadsheetTableViewRecord record = getViewRecord();
+
+		Integer recBackgroundColor = record.getBackgroundColor(); 
+		if (recBackgroundColor != null) {
+			background = new Color(recBackgroundColor.intValue());
+		}
+	}
+	
+	private void storeTableColor() {
+		SpreadsheetTableViewRecord record = getViewRecord();
+
+		boolean defaultBackgroundColour = background.equals(defaultBackground);
+        if (!defaultBackgroundColour) {
+        	record.setBackgroundColor(new Integer(background.getRGB()));
+        } else {
+        	record.setBackgroundColor(null);
+        }
+	}
+	
 	public void addColumn(TableColumn column) {
 		columnModel.addColumn(column);
 	}

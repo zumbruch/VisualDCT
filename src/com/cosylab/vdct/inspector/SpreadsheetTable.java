@@ -68,14 +68,22 @@ public class SpreadsheetTable extends JTable implements ActionListener{
     private static Graphics2D graphics = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB).createGraphics();
 
     SpreadsheetInspector inspector = null;
-	
-	private HashMap nameToRecentSplitDataIndex = null;
+    SpreadsheetColumnViewModel sprModel = null;
+
+    private int popupModelRow = -1;
+    private int popupModelColumn = -1;
+
+    private HashMap nameToRecentSplitDataIndex = null;
     private JScrollPane pane = null;
 
     private JPopupMenu columnPopupMenu = null;
     private JPopupMenu rowPopupMenu = null;
+
+	private JMenu recentSplitsMenu = null;
+	private JMenu columnOrderMenu = null;
+	private JMenu propertiesVisibilityMenu = null;
+    
     private JMenuItem hideItem = null; 
-	private JMenu splitMenu = null; 
     private JMenuItem joinItem = null;
 	private JMenuItem sortAscItem = null; 
 	private JMenuItem sortDesItem = null; 
@@ -83,16 +91,14 @@ public class SpreadsheetTable extends JTable implements ActionListener{
     private JMenuItem showAllRowsItem = null;
     private JMenuItem extendCountersItem = null;
 
-    private JCheckBoxMenuItem[] propertiesColumnMenuItem = null;
-
+    private JMenuItem hideAllItem = null;
+    private JMenuItem showAllItem = null;
+    
     private JMenuItem showRowsItem = null;
     private JMenuItem hideRowsItem = null;
     private JMenuItem deleteRowsItem = null;
 
-    private int popupModelRow = -1;
-    private int popupModelColumn = -1;
-
-    SpreadsheetColumnViewModel sprModel = null;
+    private JCheckBoxMenuItem[] propertiesColumnMenuItem = null;
 	
     private static final int firstColumnWidth = 20;
     private static final int minColumnWidth = 32;
@@ -152,6 +158,10 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 	    this.inspector = inspector;
 	    this.pane = pane;
 	    nameToRecentSplitDataIndex = new HashMap();
+
+	    // Create static gui elements.
+	    createColumnPopupMenu();
+	    createRowPopupMenu();
 	}
 
 	/** When selecting the fields in the first column, selects the whole row.
@@ -178,22 +188,19 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 		setColumnModel(sprModel);
 		super.setModel(spreadsheetModel);
 		addListeners();
+		
+		sprModel.recallView();
+		refreshAll();
 	}
 
 	public void refresh() {
 		sprModel.refresh();
-		refreshPopupMenus();
-        refreshPropertiesColumnMenuItemsState();
-        updateBackgroundColor();            
-		updateSplitMenu();
-		resizeColumns();
-		repaint();
-		getTableHeader().repaint();
+		refreshAll();
 	}
 	
 	public void resizeColumns() {
     	
-    	int colCount = getColumnCount();
+    	int colCount = sprModel.getColumnCount();
     	TableColumnModel colModel = getColumnModel();
     	SpreadsheetColumn column = null;
 		
@@ -218,7 +225,11 @@ public class SpreadsheetTable extends JTable implements ActionListener{
     		
     	int rowCount = getRowCount();
    		for (int j = 0; j < rowCount; j++) {
+   			// TODO
+   			try {
    			value = getValueAt(j, columnIndex).toString();
+   			} catch(Exception e) {
+   			}
    			colWidth = Math.max(colWidth, metrics.stringWidth(value) + columnMargin);
    		}
    		column.setPreferredWidth(colWidth);
@@ -229,11 +240,166 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 		return this;
 	}
     
+	public JScrollPane getTableScrollPane() {
+	    return pane;
+	}
+
+	public void actionPerformed(ActionEvent event) {
+		String action = event.getActionCommand();
+		Object source = event.getSource();
+
+		if (action.equals(hide)) {
+			if (popupModelColumn >= 0) {
+				int propertyColumn = sprModel.getPropertyColumn(popupModelColumn);
+	    		propertiesColumnMenuItem[propertyColumn].setSelected(false);
+				sprModel.setColumnsVisibility(new int[] {popupModelColumn}, false);
+
+				// TODO remove
+				//sprModel.setColumnVisibility(false, popupModelColumn);
+	    		//propertiesColumnMenuItem[sprModel.getModelToPropertiesColumnIndex(popupModelColumn)].setSelected(false);
+	    	}
+		} else if (action.equals(whitespaces) || action.equals(customPattern)) {
+
+			int index = popupModelColumn;
+			if (index >= 0) {
+				SplitData split = null; 
+				if (action.equals(customPattern)) {
+					CustomSplitDialog dialog = inspector.getCustomSplitDialog();
+					dialog.setLocationRelativeTo(inspector);
+					
+					Vector recentSplitData = sprModel.getRecentSplitData();
+					if (recentSplitData.size() > 0) {
+						split = (SplitData)recentSplitData.get(0);
+					} else {
+						split = SplitData.getWhitespaceSplitData();
+					}
+					dialog.setSplitData(split);
+					/* Add the data from the first row of the splitting column as starting test example. If no visible
+					 * rows, add from the first among all.
+					 */
+                    dialog.setTestExample((sprModel.getRowCount() >= 0) ? sprModel.getModelValue(0, index) : "");
+					dialog.setVisible(true);
+					split = dialog.getSplitData();
+					if (split != null) {
+						recentSplitData.add(0, split);
+						while (recentSplitData.size() > sprModel.getRecentSplitDataMaxCount()) {
+							recentSplitData.remove(recentSplitData.size() - 1);
+						}
+						refreshRecentSplitsMenu();
+					}
+					
+				} else {
+				    split = SplitData.getWhitespaceSplitData();
+				}
+				if (split != null) {
+					sprModel.splitColumn(split, index);
+	    			refreshRecentSplitsMenu();
+	    			resizeColumns();
+	    			getTableHeader().repaint();
+				}
+			}
+		} else if (action.equals(join)) {
+			if (popupModelColumn >= 0) {
+				sprModel.splitColumn(null, popupModelColumn);
+    			refreshRecentSplitsMenu();
+    			resizeColumns();
+    			getTableHeader().repaint();
+	    	}
+		} else if (action.equals(sortAsc) || action.equals(sortDes)) {
+	    	if (popupModelColumn >= 0) {
+	    		sprModel.sortRowsByColumn(popupModelColumn);
+	    	}
+		} else if (action.equals(hideAll) || action.equals(showAll)) {
+		    boolean visible = action.equals(showAll);
+
+		    // do this on all but the first two
+		    int startColumn = sprModel.getSolidProperitiesColumnCount() + 1;
+		    int endColumn = propertiesColumnMenuItem.length;
+		    
+		    int[] columns = new int[endColumn - startColumn];
+		    // do this on all but the first two
+		    for (int i = startColumn; i < endColumn; i++) {
+		    	//sprModel.setPropertiesColumnVisibility(visible, i);
+		    	propertiesColumnMenuItem[i].setSelected(visible);
+		    	columns[i - startColumn] = i;
+		    }
+			sprModel.setPropertyColumnsVisibility(columns, visible);
+		    
+		} else if (action.equals(showAllRowsString)) {
+		    boolean state = ((JCheckBoxMenuItem)source).isSelected();
+		    sprModel.setShowAllRows(state);
+		    refreshShowAllRowsItem();
+			getTableHeader().repaint();
+		} else if (action.equals(backgroundColorString)) {
+		    final JColorChooser chooser = ColorChooser.getInstance();
+		    
+		    chooser.setColor(getBackground());
+		    ActionListener okListener = new ActionListener() {
+				public void actionPerformed(ActionEvent event) {
+				    sprModel.setBackground(chooser.getColor());
+				    refreshBackgroundColor();
+				}
+		    };
+		    JColorChooser.createDialog(inspector, colorChooserTitle, true, chooser, okListener, null)
+		        .setVisible(true); 
+		} else if (action.equals(defaultColorString)) {
+			sprModel.setBackground(sprModel.getDefaultBackground());
+		    refreshBackgroundColor();
+		} else if (action.equals(extendCounters)) {
+		
+		    int[] selViewColumns = getSelectedColumns();
+		    int[] selColumns = new int[selViewColumns.length]; 
+            for (int c = 0; c < selViewColumns.length; c++) {
+			    selColumns[c] = convertColumnIndexToModel(selViewColumns[c]);
+			}
+            sprModel.extendCounters(getSelectedRows(), selColumns);
+
+		} else if (action.equals(hideRow) || action.equals(hideRows)
+				|| action.equals(showRow) || action.equals(showRows)) {
+			
+			boolean visible = action.equals(showRow) || action.equals(showRows);
+
+			int[] selRows = getSelectedRows();
+			if (selRows.length == 0) {
+				selRows = new int[] {popupModelRow};
+			}
+			sprModel.setRowsVisibility(selRows, visible);
+		
+		} else if (action.equals(deleteRow) || action.equals(deleteRows)) {
+
+			int[] selRows = getSelectedRows();
+			if (selRows.length == 0) {
+				selRows = new int[] {popupModelRow};
+			}
+			sprModel.deleteRows(selRows);
+			
+		} else if (source instanceof JCheckBoxMenuItem) {
+			int columnIndex = sprModel.getPropertiesColumnIndex(action);
+			sprModel.setPropertyColumnsVisibility(new int[] {columnIndex}, ((JCheckBoxMenuItem)source).isSelected());
+			// TODO remove
+			//sprModel.setPropertiesColumnVisibility(((JCheckBoxMenuItem)source).isSelected(), columnIndex);
+		} else {
+			if (popupModelColumn >= 0) {
+				int recentIndex = getRecentSplitDataIndex(action);
+				if (recentIndex >= 0) {
+					sprModel.splitColumnByRecentList(recentIndex, popupModelColumn);
+	    			refreshRecentSplitsMenu();
+	    			resizeColumns();
+	    			getTableHeader().repaint();
+              		return;
+				}
+			}
+			
+			sprModel.setColumnOrder(action);
+			refreshAll();
+        }
+	}
+	
 	private void addListeners() {
 	    
 	    sprModel.setDefaultBackground(getBackground());
 	    sprModel.setBackground(getBackground());
-	    updateBackgroundColor(); 
+	    refreshBackgroundColor(); 
 	    
 		getTableHeader().addMouseListener(new MouseAdapter() {
 			
@@ -266,11 +432,11 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 			    		if (columnModelIndex == 0) {
 			    		    boolean newState = !sprModel.isShowAllRows(); 
 			    		    sprModel.setShowAllRows(newState);
-			    			showAllRowsItem.setSelected(newState);
+			    		    refreshShowAllRowsItem();
 			    			getTableHeader().repaint();
 			    		} else {
 			    			
-			    			sprModel.sortRows(columnModelIndex);
+			    			sprModel.sortRowsByColumn(columnModelIndex);
 			    			int a = 0;
 			    			// TODO: remove
 			    			//sprModel.updateSortedColumn(columnModelIndex);
@@ -382,22 +548,15 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 					displayPopupMenu(false, getTableScrollPane(), -1, -1, event.getX(), event.getY());
 			    }
 				// TODO: remove
-				sprModel.displayModel();
+				//sprModel.displayModel();
 	        }
 		});
-		
-		sprModel.refreshView();
-		refreshPopupMenus();
-    	refreshPropertiesColumnMenuItemsState();
-    	updateBackgroundColor();
-		updateSplitMenu();
-		resizeColumns();
-		getTableHeader().repaint();
 	}
 
     private void displayPopupMenu(boolean forHeader, JComponent component, int row, int column, int posX, int posY) {
 
-    	setPopupPosition(row, column);
+		popupModelRow = row;
+		popupModelColumn = column;
     	
         boolean first = column == 0;
         boolean onRow = row >= 0;
@@ -416,7 +575,7 @@ public class SpreadsheetTable extends JTable implements ActionListener{
                 boolean visible = false; 
                 if (!multipleSelected) {
             		int modelIndex = (getSelectedRowCount() > 0) ? getSelectedRow() : row;
-    				visible = sprModel.isModelRowVisible(modelIndex);
+    				visible = sprModel.isRowVisible(modelIndex);
                 }
                 
             	setJComponentVisible(showRowsItem, multipleSelected || !visible);
@@ -440,7 +599,7 @@ public class SpreadsheetTable extends JTable implements ActionListener{
         	boolean sortable = onTableOrHeader && !first;
 
         	setJComponentVisible(hideItem, manipulatable);
-        	setJComponentVisible(splitMenu, manipulatable && !splitted);
+        	setJComponentVisible(recentSplitsMenu, manipulatable && !splitted);
         	setJComponentVisible(joinItem, manipulatable && splitted);
         	setJComponentVisible(sortAscItem, sortable);
         	setJComponentVisible(sortDesItem, sortable);
@@ -467,9 +626,8 @@ public class SpreadsheetTable extends JTable implements ActionListener{
     	sortDesItem.addActionListener(this);
     	columnPopupMenu.add(sortDesItem);
 
-    	splitMenu = new JMenu(split);
-    	columnPopupMenu.add(splitMenu);
-    	updateSplitMenu();
+    	recentSplitsMenu = new JMenu(split);
+    	columnPopupMenu.add(recentSplitsMenu);
     	
     	joinItem = new JMenuItem(join);
     	joinItem.addActionListener(this);
@@ -478,59 +636,23 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 	    sortSeparator = new JSeparator(); 
     	columnPopupMenu.add(sortSeparator);
     	
-    	JMenuItem hideAllItem = new JMenuItem(hideAll);
+    	hideAllItem = new JMenuItem(hideAll);
     	hideAllItem.addActionListener(this);
     	columnPopupMenu.add(hideAllItem);
 
-    	JMenuItem showAllItem = new JMenuItem(showAll);
+    	showAllItem = new JMenuItem(showAll);
     	showAllItem.addActionListener(this);
     	columnPopupMenu.add(showAllItem);
 
-    	JMenu visibilityMenu = new JMenu(visibility);
-    	columnPopupMenu.add(visibilityMenu);
+    	propertiesVisibilityMenu = new JMenu(visibility);
+    	columnPopupMenu.add(propertiesVisibilityMenu);
 
     	columnPopupMenu.addSeparator();
     	
-    	JMenu presetColumnOrderMenu = new JMenu(presetColumnOrders);
-
-    	ArrayList list = sprModel.getColumnOrderNames();
-
-       	for (int i = 0; i < list.size(); i++) {
-       		String action = list.get(i).toString();
-       		JMenuItem menuItem = new JMenuItem(action + " order");
-       		menuItem.setActionCommand(action);
-       		menuItem.addActionListener(this);
-       		presetColumnOrderMenu.add(menuItem);
-       	}
-
-    	columnPopupMenu.add(presetColumnOrderMenu);
+    	columnOrderMenu = new JMenu(presetColumnOrders);
+    	columnPopupMenu.add(columnOrderMenu);
     	
     	columnPopupMenu.addSeparator();
-    	
-    	int propertiesColumnCount = sprModel.getPropertiesColumnCount();
-
-        propertiesColumnMenuItem = new JCheckBoxMenuItem[propertiesColumnCount];
-        JMenu menuToAdd = visibilityMenu;
-    	
-    	for (int j = 0; j < propertiesColumnCount; j++) {
-   			JCheckBoxMenuItem checkBoxItem = new JCheckBoxMenuItem(sprModel.getPropertiesColumnNames(j));
-   			propertiesColumnMenuItem[j] = checkBoxItem;
-   			checkBoxItem.setSelected(true);
-   			checkBoxItem.addActionListener(this);
-   			
-   	    	// Add check boxes for all but the unhideable and the first.
-   			int itemPos = j - (sprModel.getSolidProperitiesColumnCount() + 1); 
-   			if (itemPos >= 0) {
-   				menuToAdd = PopUpMenu.addItem(checkBoxItem, menuToAdd, itemPos, visibilityMenuItemCount);
-   			}
-    	}
-    	
-    	// If no items to hide/show, the options should be disabled.
-    	if (propertiesColumnCount <= sprModel.getSolidProperitiesColumnCount() + 1) {
-    		hideAllItem.setEnabled(false);
-    		showAllItem.setEnabled(false);
-    		visibilityMenu.setEnabled(false);
-    	}
     	
     	JMenuItem setBackgroundItem = new JMenuItem(backgroundColorString);
     	setBackgroundItem.addActionListener(this);
@@ -543,7 +665,6 @@ public class SpreadsheetTable extends JTable implements ActionListener{
     	columnPopupMenu.addSeparator();
 
     	showAllRowsItem = new JCheckBoxMenuItem(showAllRowsString);
-    	showAllRowsItem.setSelected(sprModel.isShowAllRows());
     	showAllRowsItem.addActionListener(this);
     	columnPopupMenu.add(showAllRowsItem);
 
@@ -568,173 +689,13 @@ public class SpreadsheetTable extends JTable implements ActionListener{
     	rowPopupMenu.add(deleteRowsItem);
     }
 
-	public void actionPerformed(ActionEvent event) {
-		String action = event.getActionCommand();
-		Object source = event.getSource();
-
-		if (action.equals(hide)) {
-			if (popupModelColumn >= 0) {
-				int propertyColumn = sprModel.getPropertyColumn(popupModelColumn);
-	    		propertiesColumnMenuItem[propertyColumn].setSelected(false);
-				sprModel.setColumnsVisibility(new int[] {popupModelColumn}, false);
-
-				// TODO remove
-				//sprModel.setColumnVisibility(false, popupModelColumn);
-	    		//propertiesColumnMenuItem[sprModel.getModelToPropertiesColumnIndex(popupModelColumn)].setSelected(false);
-	    	}
-		} else if (action.equals(whitespaces) || action.equals(customPattern)) {
-
-			int index = popupModelColumn;
-			if (index >= 0) {
-				SplitData split = null; 
-				if (action.equals(customPattern)) {
-					CustomSplitDialog dialog = inspector.getCustomSplitDialog();
-					dialog.setLocationRelativeTo(inspector);
-					
-					Vector recentSplitData = sprModel.getRecentSplitData();
-					if (recentSplitData.size() > 0) {
-						split = (SplitData)recentSplitData.get(0);
-					} else {
-						split = SplitData.getWhitespaceSplitData();
-					}
-					dialog.setSplitData(split);
-					/* Add the data from the first row of the splitting column as starting test example. If no visible
-					 * rows, add from the first among all.
-					 */
-                    dialog.setTestExample((sprModel.getModelRowCount() >= 0) ? sprModel.getModelValue(0, index) : "");
-					dialog.setVisible(true);
-					split = dialog.getSplitData();
-					if (split != null) {
-						recentSplitData.add(0, split);
-						while (recentSplitData.size() > sprModel.getRecentSplitDataMaxCount()) {
-							recentSplitData.remove(recentSplitData.size() - 1);
-						}
-						updateSplitMenu();
-					}
-					
-				} else {
-				    split = SplitData.getWhitespaceSplitData();
-				}
-				if (split != null) {
-					sprModel.splitColumn(split, index);
-              		refreshPopupMenus();
-	    			refreshPropertiesColumnMenuItemsState();
-	    			updateBackgroundColor();
-	    			updateSplitMenu();
-	    			resizeColumns();
-	    			getTableHeader().repaint();
-				}
-			}
-		} else if (action.equals(join)) {
-			if (popupModelColumn >= 0) {
-				sprModel.splitColumn(null, popupModelColumn);
-           		refreshPopupMenus();
-    			refreshPropertiesColumnMenuItemsState();
-    			updateBackgroundColor();
-    			updateSplitMenu();
-    			resizeColumns();
-    			getTableHeader().repaint();
-	    	}
-		} else if (action.equals(sortAsc) || action.equals(sortDes)) {
-	    	if (popupModelColumn >= 0) {
-	    		sprModel.updateSortedColumn(popupModelColumn);
-	    	}
-		} else if (action.equals(hideAll) || action.equals(showAll)) {
-		    boolean visible = action.equals(showAll);
-
-		    // do this on all but the first two
-		    int startColumn = sprModel.getSolidProperitiesColumnCount() + 1;
-		    int endColumn = propertiesColumnMenuItem.length;
-		    
-		    int[] columns = new int[endColumn - startColumn];
-		    // do this on all but the first two
-		    for (int i = startColumn; i < endColumn; i++) {
-		    	//sprModel.setPropertiesColumnVisibility(visible, i);
-		    	propertiesColumnMenuItem[i].setSelected(visible);
-		    	columns[i - startColumn] = i;
-		    }
-			sprModel.setPropertyColumnsVisibility(columns, visible);
-		    
-		} else if (action.equals(showAllRowsString)) {
-		    boolean state = ((JCheckBoxMenuItem)source).isSelected();
-		    sprModel.setShowAllRows(state);
-			showAllRowsItem.setSelected(state);
-			getTableHeader().repaint();
-		} else if (action.equals(backgroundColorString)) {
-		    final JColorChooser chooser = ColorChooser.getInstance();
-		    
-		    chooser.setColor(getBackground());
-		    ActionListener okListener = new ActionListener() {
-				public void actionPerformed(ActionEvent event) {
-				    sprModel.setBackground(chooser.getColor());
-				    updateBackgroundColor();
-				}
-		    };
-		    JColorChooser.createDialog(inspector, colorChooserTitle, true, chooser, okListener, null)
-		        .setVisible(true); 
-		} else if (action.equals(defaultColorString)) {
-			sprModel.setBackground(sprModel.getDefaultBackground());
-		    updateBackgroundColor();
-		} else if (action.equals(extendCounters)) {
-		
-		    int[] selViewColumns = getSelectedColumns();
-		    int[] selColumns = new int[selViewColumns.length]; 
-            for (int c = 0; c < selViewColumns.length; c++) {
-			    selColumns[c] = convertColumnIndexToModel(selViewColumns[c]);
-			}
-            sprModel.extendCounters(getSelectedRows(), selColumns);
-
-		} else if (action.equals(hideRow) || action.equals(hideRows)
-				|| action.equals(showRow) || action.equals(showRows)) {
-			
-			boolean visible = action.equals(showRow) || action.equals(showRows);
-
-			int[] selRows = getSelectedRows();
-			if (selRows.length == 0) {
-				selRows = new int[] {popupModelRow};
-			}
-			sprModel.setRowsVisibility(selRows, visible);
-		
-		} else if (action.equals(deleteRow) || action.equals(deleteRows)) {
-
-			int[] selRows = getSelectedRows();
-			if (selRows.length == 0) {
-				selRows = new int[] {popupModelRow};
-			}
-			sprModel.deleteRows(selRows);
-			
-		} else if (source instanceof JCheckBoxMenuItem) {
-			int columnIndex = sprModel.getPropertiesColumnIndex(action);
-			sprModel.setPropertyColumnsVisibility(new int[] {columnIndex}, ((JCheckBoxMenuItem)source).isSelected());
-			// TODO remove
-			//sprModel.setPropertiesColumnVisibility(((JCheckBoxMenuItem)source).isSelected(), columnIndex);
-		} else {
-			if (popupModelColumn >= 0) {
-				int recentIndex = getRecentSplitDataIndex(action);
-				if (recentIndex >= 0) {
-					sprModel.splitColumnByRecentList(recentIndex, popupModelColumn);
-              		updateSplitMenu();
-              		refreshPopupMenus();
-	    			refreshPropertiesColumnMenuItemsState();
-	    			updateBackgroundColor();
-	    			updateSplitMenu();
-	    			resizeColumns();
-	    			getTableHeader().repaint();
-              		return;
-				}
-			}
-			
-			sprModel.setColumnOrder(action);
-            refreshPopupMenus();
-            refreshPropertiesColumnMenuItemsState();
-            updateBackgroundColor();            
-   			updateSplitMenu();
-            resizeColumns();
-    		getTableHeader().repaint();
-        }
-	}
-
-	private void updateBackgroundColor() {
+    private void setJComponentVisible(JComponent component, boolean visible) {
+    	if (component.isVisible() != visible) {
+    		component.setVisible(visible);
+    	}
+    }
+    
+	private void refreshBackgroundColor() {
 		Color background = sprModel.getBackground();
 	    setBackground(background);
 	    getTableHeader().setBackground(background);
@@ -746,12 +707,23 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 		return (integer != null) ? integer.intValue() : -1;
 	}
 
-	private void updateSplitMenu() {
-    	splitMenu.removeAll();
+	private void refreshPropertiesColumnMenuItemsState() {
+	    for (int i = sprModel.getSolidProperitiesColumnCount() + 1; i < propertiesColumnMenuItem.length; i++) {
+		   	propertiesColumnMenuItem[i].setSelected(sprModel.isPropertiesColumnVisible(i));
+		}
+	}
+
+	private void refreshShowAllRowsItem() {
+		showAllRowsItem.setSelected(sprModel.isShowAllRows());
+	} 
+	
+	private void refreshRecentSplitsMenu() {
+
+		recentSplitsMenu.removeAll();
     	JMenuItem menuItem = new JMenuItem(whitespaces);
     	menuItem.addActionListener(this);
-    	splitMenu.add(menuItem);
-    	splitMenu.addSeparator();
+    	recentSplitsMenu.add(menuItem);
+    	recentSplitsMenu.addSeparator();
 
     	nameToRecentSplitDataIndex.clear();
     	
@@ -760,42 +732,70 @@ public class SpreadsheetTable extends JTable implements ActionListener{
     		String name = recentSplitData.get(i).toString();
         	menuItem = new JMenuItem(name);
         	menuItem.addActionListener(this);
-        	splitMenu.add(menuItem);
+        	recentSplitsMenu.add(menuItem);
         	nameToRecentSplitDataIndex.put(name, new Integer(i));
     	}
     	
     	if (recentSplitData.size() > 0) {
-        	splitMenu.addSeparator();
+        	recentSplitsMenu.addSeparator();
     	}
 
     	menuItem = new JMenuItem(customPattern);
     	menuItem.addActionListener(this);
-    	splitMenu.add(menuItem);
+    	recentSplitsMenu.add(menuItem);
     }
+	
+	private void refreshColumnOrderMenu() {
+		columnOrderMenu.removeAll();
+		
+    	ArrayList list = sprModel.getColumnOrderNames();
 
-    private void setJComponentVisible(JComponent component, boolean visible) {
-    	if (component.isVisible() != visible) {
-    		component.setVisible(visible);
+       	for (int i = 0; i < list.size(); i++) {
+       		String action = list.get(i).toString();
+       		JMenuItem menuItem = new JMenuItem(action + " order");
+       		menuItem.setActionCommand(action);
+       		menuItem.addActionListener(this);
+       		columnOrderMenu.add(menuItem);
+       	}
+  		columnOrderMenu.setEnabled(list.size() > 0);
+	}
+
+	private void refreshPropertiesVisibilityMenu() {
+    	int propertiesColumnCount = sprModel.getPropertiesColumnCount();
+
+        propertiesColumnMenuItem = new JCheckBoxMenuItem[propertiesColumnCount];
+        JMenu menuToAdd = propertiesVisibilityMenu;
+    	
+    	for (int j = 0; j < propertiesColumnCount; j++) {
+   			JCheckBoxMenuItem checkBoxItem = new JCheckBoxMenuItem(sprModel.getPropertiesColumnNames(j));
+   			propertiesColumnMenuItem[j] = checkBoxItem;
+   			checkBoxItem.setSelected(true);
+   			checkBoxItem.addActionListener(this);
+   			
+   	    	// Add check boxes for all but the unhideable and the first.
+   			int itemPos = j - (sprModel.getSolidProperitiesColumnCount() + 1); 
+   			if (itemPos >= 0) {
+   				menuToAdd = PopUpMenu.addItem(checkBoxItem, menuToAdd, itemPos, visibilityMenuItemCount);
+   			}
     	}
-    }
-    
-	private void refreshPopupMenus() {
-		createColumnPopupMenu();
-		createRowPopupMenu();
-	}
-
-	public JScrollPane getTableScrollPane() {
-	    return pane;
-	}
-
-	public void setPopupPosition(int row, int column) {
-		popupModelRow = row;
-		popupModelColumn = column;
+    	
+    	boolean enabled = (propertiesColumnCount > sprModel.getSolidProperitiesColumnCount() + 1); 
+    	hideAllItem.setEnabled(enabled);
+    	showAllItem.setEnabled(enabled);
+    	propertiesVisibilityMenu.setEnabled(enabled);
 	}
 	
-	private void refreshPropertiesColumnMenuItemsState() {
-	    for (int i = sprModel.getSolidProperitiesColumnCount() + 1; i < propertiesColumnMenuItem.length; i++) {
-		   	propertiesColumnMenuItem[i].setSelected(sprModel.isPropertiesColumnVisible(i));
-		}
-	} 
+	
+	private void refreshAll() {
+		refreshShowAllRowsItem();		
+		refreshRecentSplitsMenu();
+		refreshColumnOrderMenu();
+		refreshPropertiesVisibilityMenu();
+		
+    	refreshPropertiesColumnMenuItemsState();
+    	refreshBackgroundColor();
+		resizeColumns();
+		repaint();
+		getTableHeader().repaint();
+	}
 }

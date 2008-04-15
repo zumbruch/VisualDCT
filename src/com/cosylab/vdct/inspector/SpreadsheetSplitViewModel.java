@@ -28,15 +28,7 @@
 
 package com.cosylab.vdct.inspector;
 
-import java.awt.Color;
-import java.util.Arrays;
-import java.util.EventObject;
 import java.util.Vector;
-
-import javax.swing.DefaultCellEditor;
-import javax.swing.JTextField;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
 
 import com.cosylab.vdct.plugin.debug.PluginDebugManager;
 import com.cosylab.vdct.undo.UndoManager;
@@ -48,36 +40,23 @@ import com.cosylab.vdct.vdb.CommentProperty;
  */
 public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 
-	private SpreadsheetTable table = null;
-	private SpreadsheetRowComparator comparator = null;
+	// TODO
+	//private SpreadsheetTable table = null;
 	
-    private Vector recentSplitData = null;
-	private int modelRowCount = 0;
-    private Color defaultBackground = null;
-    private Color background = null;
-    private SplitData[] propertiesColumnSplitData = null;
-    private int propertiesToModelColumnIndex[] = null;
-    private int modelToPropertiesColumnIndex[] = null;
-    
     private int modelColumnCount = 0;
 	private InspectableProperty[][] model = null;
-	private String[] modelColumnNames = null;
 
-	// The current sorted state.
+    private int propertiesToModelColumnIndex[] = null;
+    private int modelToPropertiesColumnIndex[] = null;
+    private String[] modelColumnNames = null;
+
     private int sortedSplitIndex = 0;
+    private SplitData[] propertiesColumnSplitData = null;
+    private Vector recentSplitData = null;
 
     // The maximum number of recent entries for splitting columns.
     private static final int recentSplitDataMaxCount = 8;
 
-    private boolean showAllRows = true;
-
-	private boolean[] propertiesRowVisibilities = null;
-	private boolean[] propertiesColumnVisibilities = null;
-    
-	// The current sorted state.
-    private int sortedPropertiesColumn = -1;
-    private boolean sortedOrderAsc = true;     
-	
 	/**
 	 * @param dataType
 	 * @param displayData
@@ -87,8 +66,29 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 	public SpreadsheetSplitViewModel(String dataType, Vector displayData,
 			Vector loadedData) throws IllegalArgumentException {
 		super(dataType, displayData, loadedData);
-		comparator = new SpreadsheetRowComparator(this);
+		//comparator = new SpreadsheetRowComparator(this);
         recentSplitData = new Vector();
+		refreshSplitData();
+		refreshModel();
+	}
+	
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.inspector.SpreadsheetViewModel#recallView()
+	 */
+	public void recallView() {
+		super.recallView();
+		recallSplitData();
+		recallViewData();
+		refreshModel();
+	}
+
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.inspector.SpreadsheetViewModel#storeView()
+	 */
+	public void storeView() {
+		super.storeView();
+		storeSplitData();
+		storeViewData();
 	}
 
 	/* (non-Javadoc)
@@ -96,7 +96,7 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 	 */
 	public void setShowAllRows(boolean showAllRows) {
 		super.setShowAllRows(showAllRows);
-		refreshColumnModel();
+		refreshModel();
 	}
 	
 	/* (non-Javadoc)
@@ -104,7 +104,7 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 	 */
 	public void setRowsVisibility(int[] rows, boolean visible) {
 		super.setRowsVisibility(rows, visible);
-		refreshColumnModel();
+		refreshModel();
 	}
 
 	/* (non-Javadoc)
@@ -116,7 +116,7 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 			columns[c] = modelToPropertiesColumnIndex[columns[c]];
 		}
 		super.setColumnsVisibility(columns, visible);
-		refreshColumnModel();
+		refreshModel();
 	}
 
 	/* (non-Javadoc)
@@ -124,7 +124,7 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 	 */
 	public void setPropertyColumnsVisibility(int[] columns, boolean visible) {
 		super.setPropertyColumnsVisibility(columns, visible);
-		refreshColumnModel();
+		refreshModel();
 	}
 	
 	/* (non-Javadoc)
@@ -132,46 +132,36 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 	 */
 	public void repositionColumn(int startIndex, int destIndex) {
 		super.repositionColumn(modelToPropertiesColumnIndex[startIndex], modelToPropertiesColumnIndex[destIndex]);
-		refreshColumnModel();
-		// TODO: remove
-		/*
-		System.out.print("repositionColumn");
-        TableColumnModel columnModel = table.getTableHeader().getColumnModel();
-		for (int i = 0; i < columnModel.getColumnCount(); i++) {
-			System.out.print("[" + i + "->" + columnModel.getColumn(i).getModelIndex() + "]");
-		}
-		System.out.println("");
-		*/
+		refreshModel();
 	}
 
-	
-	public void sortRows(int modelColumn) {
-		int newSortedPropertiesColumn = modelToPropertiesColumnIndex[modelColumn];
-		int newSortedSplitIndex = modelColumn - propertiesToModelColumnIndex[newSortedPropertiesColumn];
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.inspector.SpreadsheetViewModel#sortRowsByColumn(int)
+	 */
+	public void sortRowsByColumn(int column) {
 
-		if (sortedPropertiesColumn == newSortedPropertiesColumn && sortedSplitIndex == newSortedSplitIndex) {
-			sortedOrderAsc = !sortedOrderAsc;
-		} else {
-			sortedPropertiesColumn = newSortedPropertiesColumn;
-			sortedSplitIndex = newSortedSplitIndex;
-    		sortedOrderAsc = true;
-        }
-		int[] order = PropertyComparator.getOrder(model, true, modelColumn, sortedOrderAsc);
+		int visibleIndex = modelToPropertiesColumnIndex[column];
+		int newSortedColumn = visibleToBaseColumn(visibleIndex);
+
+		int newSortedSplitIndex = column - propertiesToModelColumnIndex[visibleIndex];
+
+		boolean sameColumn = (sortedColumn == newSortedColumn && sortedSplitIndex == newSortedSplitIndex); 
+		sortedOrderAsc = sameColumn ? !sortedOrderAsc : true;
+		sortedColumn = newSortedColumn;
+		sortedSplitIndex = newSortedSplitIndex;
+
+		int[] order = PropertyComparator.getOrder(model, true, column, sortedOrderAsc);
         setRowOrder(order);
-		refreshColumnModel();
-		
-		// TODO: remove
-		//displayModel();		
-		/*
-		System.out.print("sortRows");
-        TableColumnModel columnModel = table.getTableHeader().getColumnModel();
-		for (int i = 0; i < columnModel.getColumnCount(); i++) {
-			System.out.print("[" + i + "->" + columnModel.getColumn(i).getModelIndex() + "]");
-		}
-		System.out.println("");
-		*/
+		refreshModel();
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.inspector.SpreadsheetViewModel#getColumnCount()
+	 */
+	public int getColumnCount() {
+		return modelColumnCount;
+	}
+
 	/* (non-Javadoc)
 	 * @see com.cosylab.vdct.inspector.SpreadsheetViewModel#getColumnClass(int)
 	 */
@@ -197,23 +187,19 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 	 * @see com.cosylab.vdct.inspector.SpreadsheetViewModel#getPropertyDisplayTypeAt(int, int)
 	 */
 	public int getPropertyDisplayTypeAt(int row, int column) {
-		return super.getPropertyDisplayTypeAt(modelToPropertiesRowIndex(row), modelToPropertiesColumnIndex[column]);
+		return super.getPropertyDisplayTypeAt(row, modelToPropertiesColumnIndex[column]);
 	}
 
+	// TODO
+	/*
 	public void setTable(SpreadsheetTable table) {
 	    this.table = table;
-	}
-
-	public void refresh() {
-		saveView();
-		refreshProperties();
-		refreshModel();
-		loadView();
 	}
 
 	public SpreadsheetTable getTable() {
 	    return table;
 	}
+	*/
 
 	/* Returns the multi-line string associated with the cell at the given position, or null it there is
 	 * none. 
@@ -235,32 +221,14 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 		return null;
 	}
 	
-	protected final int modelToPropertiesColumn(int column) {
-		return super.visibleToBaseColumn(modelToPropertiesColumnIndex[column]);
-	}
-	protected final int modelToPropertiesRow(int row) {
-		// TODO
-		return row;//super.visibleToBaseRow(modelToPropertiesRowIndex(row));
-	}
-
 	public boolean isSplit(int column) {
 		return propertiesColumnSplitData[modelToPropertiesColumn(column)] != null;		
 	}
-
-    public int getPropertyRow(int row) {
-    	return super.getPropertyRow(modelToPropertiesRow(row));
-    }
 
     public int getPropertyColumn(int column) {
     	return super.getPropertyColumn(modelToPropertiesColumnIndex[column]);
     }
 	
-	public void setColumnVisibility(boolean visible, int column) {
-		int propertiesColumn = modelToPropertiesColumn(column);
-		propertiesColumnVisibilities[propertiesColumn] = visible;
-		updateColumnVisibility();
-	}
-
 	public int getModelToPropertiesColumnIndex(int column) {
 		return modelToPropertiesColumnIndex[column];
 	}
@@ -269,9 +237,11 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 		return recentSplitData;
 	}
 	
+	/*
 	public int getModelRowCount() {
 		return modelRowCount;
 	}
+	*/
 	
 	public String getModelValue(int row, int column) {
 		return model[row][column].getValue();
@@ -288,41 +258,6 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 		}
 		propertiesColumnSplitData[propertiesColumn] = splitData;
 		refreshModel();
-		// refresh
-		saveView();
-		loadView();
-	}
-
-	public Color getBackground() {
-		return background;
-	}
-	
-	public void setBackground(Color background) {
-		this.background = background;
-	}
-	
-	public Color getDefaultBackground() {
-		return defaultBackground;
-	}
-
-	public void setDefaultBackground(Color defaultBackground) {
-		this.defaultBackground = defaultBackground;
-	}
-	
-	public void updateSortedColumn(int modelColumn) {
-		/*
-		int newSortedPropertiesColumn = modelToPropertiesColumnIndex[modelColumn];
-		int newSortedSplitIndex = modelColumn - propertiesToModelColumnIndex[newSortedPropertiesColumn];
-
-		if (sortedPropertiesColumn == newSortedPropertiesColumn && sortedSplitIndex == newSortedSplitIndex) {
-			sortedOrderAsc = !sortedOrderAsc;
-		} else {
-			sortedPropertiesColumn = newSortedPropertiesColumn;
-			sortedSplitIndex = newSortedSplitIndex;
-    		sortedOrderAsc = true;
-        }
-		sortModelRows();
-		*/
 	}
 
 	public void splitColumnByRecentList(int recentIndex, int column) {
@@ -336,25 +271,12 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 	}
 	
 	public void setColumnOrder(String modeName) {
-		
+
 		int newMode = getColumnOrderIndex(modeName);
 		if (newMode != -1) {
-			saveSplitData();
-			saveViewData();
-
 			setColumnOrderIndex(newMode);
-
-			loadSplitData();
-			loadViewRowStateData();
-			clearColumnModel();
-			createDefaultColumnModel();
-			loadViewColumnHiddenStateData();
+			refreshModel();
 		}
-	}
-	
-	public void refreshOnColumnDragEnd() {
-		saveView();
-		loadView();
 	}
 	
 	/* Returns -1 if the column at the index should not be dragged. 
@@ -366,53 +288,6 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 		
 		// The first empty column must not be dragged. 
 		return (firstOfSplits > 0) ? firstOfSplits : -1;
-	}
-
-	// TODO: remove
-	/*
-	public void setShowAllRows(boolean state) {
-		showAllRows = state;
-		refreshModel();
-		fireTableDataChanged();
-	}
-	*/
-
-	/*
-	public void setRowVisibility(boolean visible, int[] rows) {
-		int propertyIndex = 0;
-		for (int r = 0; r < rows.length; r++) {
-			propertyIndex = modelToPropertiesRowIndex(rows[r]);
-			propertiesRowVisibilities[propertyIndex] = visible;
-			((SpreadsheetRowVisible)super.getPropertyAt(propertyIndex, 0)).setVisible(visible);
-		}
-		refreshModel();
-		fireTableDataChanged();
-	}
-	*/
-	
-	public void deleteRows(int[] rows) {
-		
-		int[] propertiesRows = new int[rows.length];
-		for (int r = 0; r < rows.length; r++) {
-			propertiesRows[r] = modelToPropertiesRowIndex(rows[r]);
-		}
-		super.deleteRows(propertiesRows);
-	}
-    /*
-    public void switchRowHiddenState(int row) {
-    	int propertyIndex = modelToPropertiesRowIndex(row);
-    	boolean state = !propertiesRowVisibilities[propertyIndex];
-    	propertiesRowVisibilities[propertyIndex] = state;
-    	((SpreadsheetRowVisible)super.getPropertyAt(propertyIndex, 0)).setVisible(state);
-    	fireTableCellUpdated(row, 0);
-    }
-    */
-    public int getColumnCount() {
-		return modelColumnCount;
-	}
-
-	public int getRowCount() {
-		return modelRowCount;
 	}
 	
 	public Object getValueAt(int rowIndex, int columnIndex) {
@@ -507,41 +382,25 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
         UndoManager.getInstance().stopMacroAction();
 	}
 	
-	public boolean isModelRowVisible(int row) {
-	    return propertiesRowVisibilities[modelToPropertiesRowIndex(row)];
-	}
-
-	public void saveView() {
-		
-		super.saveView();		
-		saveSplitData();
-		saveViewData();
-	}
-
-	protected void sortModelRows() {
-		// TODO
-		/*
-		if (sortedPropertiesColumn >= 0) {
-			comparator.setColumn(propertiesToModelColumnIndex[sortedPropertiesColumn] + sortedSplitIndex);
-			comparator.setAscending(sortedOrderAsc);
-			Arrays.sort(model, comparator);
-			fireTableDataChanged();
-		}
-		*/
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.inspector.SpreadsheetViewModel#refreshAll()
+	 */
+	protected void refreshAll() {
+		super.refreshAll();
+		refreshSplitData();
+		refreshModel();
 	}
 	
+	protected String getColumnHeaderValue(int column) {
+		return modelColumnNames[column];
+	}
+
+	protected final int modelToPropertiesColumn(int column) {
+		return super.visibleToBaseColumn(modelToPropertiesColumnIndex[column]);
+	}
 
     protected int modelToPropertiesRowIndex(int modelRow) {
-    	return modelRow;
-    	// TODO: remove
-    	/*
-    	int propertiesNamesColumnIndex = super.getNamesColumn();
-    	if (propertiesNamesColumnIndex == -1) {
-    		return -1;
-    	}
-    	String rowName = model[modelRow][propertiesToModelColumnIndex[propertiesNamesColumnIndex]].getValue();
-    	return getPropertiesRowIndex(rowName);
-    	*/
+    	return super.visibleToBaseRow(modelRow);
     }
 
 	private void refreshModel() {
@@ -550,25 +409,8 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 		int viewRowCount = super.getRowCount();
 		updateSplitData();
         
-		// Create a translation table from visible to all rows.
-		modelRowCount = 0; 
+		model = new InspectableProperty[viewRowCount][];
 		for (int i = 0; i < viewRowCount; i++) {
-			if (showAllRows || propertiesRowVisibilities[i]) {
-				modelRowCount++;
-			}
-		}
-		
-		int[] modelToPropertiesRowIndex = new int[modelRowCount];
-		int modelRow = 0; 
-		for (int i = 0; i < viewRowCount; i++) {
-			if (showAllRows || propertiesRowVisibilities[i]) {
-				modelToPropertiesRowIndex[modelRow] = i;
-				modelRow++;
-			}
-		}
-		
-		model = new InspectableProperty[modelRowCount][];
-		for (int i = 0; i < modelRowCount; i++) {
 			model[i] = new InspectableProperty[modelColumnCount];
 		}
 		
@@ -596,21 +438,19 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 			    	modelColumnNames[modelJ + p] = colName;
 				}
 				
-				for (int i = 0; i < modelRowCount; i++) {
-					int propertyRow = modelToPropertiesRowIndex[i];
-					SplitPropertyGroup group = new SplitPropertyGroup(super.getPropertyAt(propertyRow, j), split);
+				for (int i = 0; i < viewRowCount; i++) {
+					SplitPropertyGroup group = new SplitPropertyGroup(super.getPropertyAt(i, j), split);
 					for (int p = 0; p < parts; p++) {
 						model[i][modelJ + p] = group.getPart(p);
 					}
 				}
 			} else {
 		    	modelColumnNames[modelJ] = name;
-				for (int i = 0; i < modelRowCount; i++) {
-					model[i][modelJ] = super.getPropertyAt(modelToPropertiesRowIndex[i], j);
+				for (int i = 0; i < viewRowCount; i++) {
+					model[i][modelJ] = super.getPropertyAt(i, j);
 				}
             }
 		}
-		sortModelRows();
 	}
 
 	private void updateSplitData() {
@@ -657,114 +497,31 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 		}
 	}
 	
-	private void updateColumnVisibility() {
-		// TODO
-		
-		/*
-		TableColumnModel columnModel = table.getTableHeader().getColumnModel();
-		
-		int lastIndex = -1;
-		for (int j = 0; j < modelColumnCount; j++) {
-			
-			int index = table.convertColumnIndexToView(j);
-			TableColumn column = index >= 0 ? columnModel.getColumn(index) : null;
-			
-			boolean visible = propertiesColumnVisibilities[modelToPropertiesColumn(j)];
-			boolean first = propertiesToModelColumnIndex[modelToPropertiesColumnIndex[j]] == j;
-			
-			if (column != null && !visible) {
-				columnModel.removeColumn(column);
-			}
-			if (column == null && visible) {
-				column = createColumn(j, first, true);
-	    		// Set the identifier to the first of the split columns only. This is used when saving the order.
-				columnModel.addColumn(column);
-				*/
-				/* If a column is shown, place it after the column where it would appear if the columns were not
-				 * reordered. 
-				 */
-		/*
-				columnModel.moveColumn(columnModel.getColumnCount() - 1, lastIndex + 1);
-				lastIndex++;
-			}
-			if (index >= 0) {
-				lastIndex = index;
-			}
-		}
-        */
-	}
-	
+	// TODO remove when on upper layer
+	/*
 	private void clearColumnModel() {
-		// TODO
-		/*
-		for (int j = 0; j < getPropertiesColumnCount(); j++) {
-    	    propertiesColumnVisibilities[j] = false;
-    	}
-		*/
+		if (table == null) {
+		    return;
+		}
+		
         TableColumnModel columnModel = table.getTableHeader().getColumnModel();
         while (columnModel.getColumnCount() > 0) {
         	columnModel.removeColumn(columnModel.getColumn(0));
         }
 	}
 	
-	private void removeColumns(int propIndex) {
-        TableColumnModel columnModel = table.getTableHeader().getColumnModel();
-        
-        int parts = 1;
-		if (propertiesColumnSplitData[propIndex] != null) {
-			parts = propertiesColumnSplitData[propIndex].getParts();
+	private void createDefaultColumnModel() {
+		
+		if (table == null) {
+		    return;
 		}
 		
-		int colStart = super.baseToVisibleColumn(propIndex);
-		if (colStart < 0) {
-			return;
-		}
-		colStart = propertiesToModelColumnIndex[colStart];
-    	int tableViewIndex = 0;
-    	for (int p = 0; p < parts; p++) {
-	    	// Set the identifier to the first of the split columns only. This is used when saving the order.
-        	tableViewIndex = table.convertColumnIndexToView(colStart + p);
-    		columnModel.removeColumn(columnModel.getColumn(tableViewIndex));
-    	}
-    	propertiesColumnVisibilities[propIndex] = false;
-	}
-	
-	private void createDefaultColumnModel() {
-		// TODO: remove other version
         TableColumnModel columnModel = table.getTableHeader().getColumnModel();
 		for (int j = 0; j < modelColumnCount; j++) {
 			boolean isSplitFirst = propertiesToModelColumnIndex[modelToPropertiesColumnIndex[j]] == j;
     		TableColumn column = createColumn(j, isSplitFirst, true);
 		    columnModel.addColumn(column);
 		}
-        /*		
-		for (int j = 0; j < super.getColumnCount(); j++) {
-			addColumns(super.visibleToBaseColumn(j), true);
-		}
-		*/
-	} 
-	
-	private void addColumns(int propIndex, boolean defaultWidth) {
-
-        TableColumnModel columnModel = table.getTableHeader().getColumnModel();
-        
-        int parts = 1;
-		if (propertiesColumnSplitData[propIndex] != null) {
-			parts = propertiesColumnSplitData[propIndex].getParts();
-		}
-		
-		int colStart = super.baseToVisibleColumn(propIndex);
-		if (colStart < 0) {
-			return;
-		}
-		colStart = propertiesToModelColumnIndex[colStart];
-		    
-    	for (int p = 0; p < parts; p++) {
-			TableColumn column = createColumn(colStart + p, p == 0, defaultWidth);
-    		// Set the identifier to the first of the split columns only. This is used when saving the order.
-    		columnModel.addColumn(column);
-    	}
-    	propertiesColumnVisibilities[propIndex] = true;
 	}
 	
 	private TableColumn createColumn(int colIndex, boolean identifier, boolean defaultWidth) {
@@ -783,26 +540,9 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 		column.setHeaderValue(modelColumnNames[colIndex]);
 		return column;
 	}
+	*/ 
 
-	
-	protected void loadView() {
-
-		super.loadView();
-		SpreadsheetTableViewRecord record = SpreadsheetTableViewData.getInstance().get(typeSign + dataType);
-
-		// If no record, make default model.
-		if (record == null) {
-			refreshModel();
-		    background = defaultBackground;
-    	    createDefaultColumnModel();
-			return;
-		}
-		
-		loadSplitData();
-		loadViewData();
-	}
-	
-	protected void loadSplitData() {
+	private void recallSplitData() {
 		SpreadsheetTableViewRecord record = getViewRecord();
 
 		// Set the split data and refresh the model.
@@ -829,108 +569,24 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
     	}
 	}
 	
-	protected void loadViewData() {
+	private void recallViewData() {
 		SpreadsheetTableViewRecord record = getViewRecord();
 
-		Integer recBackgroundColor = record.getBackgroundColor(); 
-		if (recBackgroundColor != null) {
-			background = new Color(recBackgroundColor.intValue());
-		}
-		
-		loadViewRowStateData();
-		loadViewColumnOrderStateData();
-		loadViewColumnHiddenStateData();
-	}
-
-	protected void loadViewRowStateData() {
-		SpreadsheetTableViewRecord record = getViewRecord();
-		
-		Boolean recShowAllRows = record.getShowAllRows();
-		if (recShowAllRows != null && showAllRows != recShowAllRows.booleanValue()) {
-			showAllRows = recShowAllRows.booleanValue();
-		}
-		
-    	// If no rows, assume all are visible. 
-        for (int i = 0; i < super.getRowCount(); i++) {
-        	propertiesRowVisibilities[i] = true;
-			((SpreadsheetRowVisible)super.getPropertyAt(i, 0)).setVisible(true);
-        }
-		String[] rows = record.getHiddenRows();
-		if (rows != null && rows.length > 0) {
-            for (int i = 0; i < rows.length; i++) {
-            	int propertiesIndex = getPropertiesRowIndex(rows[i]);
-            	if (propertiesIndex >= 0) {
-            		propertiesRowVisibilities[propertiesIndex] = false;
-        			((SpreadsheetRowVisible)super.getPropertyAt(propertiesIndex, 0)).setVisible(false);
-            	}
-            }
-    	}
-		refreshModel();
-
-    	SpreadsheetRowOrder rowOrder = record.getRowOrder();
+		SpreadsheetRowOrder rowOrder = record.getRowOrder();
         if (rowOrder != null) {
         	String orderedColumnName = rowOrder.getColumnName();
         	int index = getPropertiesColumnIndex(orderedColumnName);
         	if (index >= 0) {
-        		int splitIndex = rowOrder.getColumnSplitIndex();
-        		SplitData splitData = propertiesColumnSplitData[index];
-        		if (splitData == null || splitIndex >= splitData.getParts()) {
-        			splitIndex = 0;
-        		}
-        		sortedPropertiesColumn = index;
-        		sortedSplitIndex = splitIndex;
-        		sortedOrderAsc = rowOrder.isAscending();
-        		sortModelRows();
+        		sortedSplitIndex = rowOrder.getColumnSplitIndex();
+        		int modelIndex = propertiesToModelColumnIndex[baseToVisibleColumn(sortedColumn)] + sortedSplitIndex;
+        		int[] order = PropertyComparator.getOrder(model, true, modelIndex, sortedOrderAsc);
+        		setRowOrder(order);
+        		refreshModel();
         	}
         }
 	}
 
-	protected void loadViewColumnOrderStateData() {
-		clearColumnModel();
-	    createDefaultColumnModel();
-
-    	// TODO
-		/*
-		SpreadsheetTableViewRecord record = getViewRecord();
-		
-		clearColumnModel();
-        
-    	// If no columns, assume default view.
-        SpreadsheetColumnData[] columns = record.getColumns();
-		if (columns != null && columns.length > 0) {
-	    	// Add the first empty column.
-    		addColumns(0, true);
-            for (int j = 0; j < columns.length; j++) {
-            	int index = getPropertiesColumnIndex(columns[j].getColumnName());
-    		    if (index >= 0) {
-    		    	addColumns(index, columns[j].isDefaultWidth());
-    		    }
-            }
-    	} else {
-    	    createDefaultColumnModel();
-    	}
-    	*/
-	}
-	
-	protected void loadViewColumnHiddenStateData() {
-
-		// TODO
-		/*
-		SpreadsheetTableViewRecord record = getViewRecord();
-		SpreadsheetColumnData[] columns = record.getColumns();
-		if (columns != null) {
-			// Remove all hidden from view.
-            for (int j = 0; j < columns.length; j++) {
-            	int index = getPropertiesColumnIndex(columns[j].getColumnName());
-    	    	if (index >= 0 && columns[j].isHidden()) {
-    		    	removeColumns(index);
-    		    }
-            }
-    	}
-    	*/
-	}
-
-	protected void saveSplitData() {
+	protected void storeSplitData() {
 		SpreadsheetTableViewRecord record = getViewRecord();
 		
 		boolean defaultNoColumnSplit = true;
@@ -967,186 +623,34 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
         }
 	}
 	
-	protected void saveViewData() {
+	protected void storeViewData() {
 		SpreadsheetTableViewRecord record = getViewRecord();
-		
-		//continue here
 
-        // Stored hidden rows must be preserved if they exist in the database and don't appear in the new view.
-		Vector hiddenRowsVector = new Vector();
-		String[] rows = record.getHiddenRows();
-		if (rows != null && rows.length > 0) {
-			for (int i = 0; i < rows.length; i++) {
-				int propertiesIndex = getPropertiesRowIndex(rows[i]);
-				if (propertiesIndex < 0 && getLoadedInspectablesNames().contains(rows[i])) {
-					hiddenRowsVector.add(rows[i]);
-				}
-			}
-		}
-
-		// Determine if the parts of the view are default.
-		boolean defaultShowAllRows = showAllRows;
-        if (!defaultShowAllRows) {
-        	record.setShowAllRows(Boolean.valueOf(showAllRows));
-        } else {
-        	record.setShowAllRows(null);
-        }
-
-		boolean defaultBackgroundColour = background.equals(defaultBackground);
-        if (!defaultBackgroundColour) {
-        	record.setBackgroundColor(new Integer(background.getRGB()));
-        } else {
-        	record.setBackgroundColor(null);
-        }
-        
-		boolean defaultNoSortOrder = (sortedPropertiesColumn == -1);
+        boolean defaultNoSortOrder = (sortedColumn == -1);
         if (!defaultNoSortOrder) {
-        	String name = super.getColumnId(sortedPropertiesColumn);
+        	String name = getPropertiesColumnNames(sortedColumn);
         	record.setRowOrder(new SpreadsheetRowOrder(name, sortedSplitIndex, sortedOrderAsc));
         } else {
         	record.setRowOrder(null);
         }
+	}
+	
+	private void refreshSplitData() {
 		
-		// TODO
-		/*
-		boolean defaultColumnVisibilityAndOrder = true;
-		int prevColumnViewPosition = -1;
-		int propertiesColumnCount = super.getColumnCount();
-		int viewRowCount = super.getRowCount();
-		int viewColumnCount = super.getColumnCount();
-        for (int j = 0; j < propertiesColumnCount; j++) {
-        	int columnViewPosition = table.convertColumnIndexToView(propertiesToModelColumnIndex[super.baseToVisibleColumn(j)]);
-        	if (prevColumnViewPosition > columnViewPosition || !propertiesColumnVisibilities[j]) {
-        		defaultColumnVisibilityAndOrder = false;
-        	}
-        	prevColumnViewPosition = columnViewPosition;
-        }
-
-        if (!defaultColumnVisibilityAndOrder) {
-        	Vector columnStrings = new Vector();
-
-        	TableColumnModel columnModel = table.getTableHeader().getColumnModel();
-        	SpreadsheetColumn column = null;
-        	String name = null;
-            int columnCount = columnModel.getColumnCount();
-            // Store the first columns of the split ones, except for the first which is empty.
-            for (int j = 1; j < columnCount; j++) {
-            	column = (SpreadsheetColumn)columnModel.getColumn(j);
-            	name = (String)column.getIdentifier();
-            	if (name != null) {
-        		    columnStrings.add(new SpreadsheetColumnData(name, false,
-        		    		column.isDefaultWidth(), column.getPreferredWidth()));
-            	}
-    		}
-            // Then store all the hidden columns.
-            for (int j = 1; j < propertiesColumnCount; j++) {
-            	if (!propertiesColumnVisibilities[j]) {
-        		    columnStrings.add(new SpreadsheetColumnData(getPropertiesColumnNames(j), true, true, 0));
-            	}
-            }
-            
-            SpreadsheetColumnData[] columns = new SpreadsheetColumnData[columnStrings.size()]; 
-            columnStrings.copyInto(columns);
-    		record.setColumns(columns);
-        } else {
-    		record.setColumns(null);
-        }
-        */
-        
-		int viewRowCount = super.getRowCount();
-		boolean defaultRowVisibility = true;
-        // If there are hidden rows that don't appear in this view, they have to be saved, so no default. 
-        if (hiddenRowsVector.size() > 0) {
-            defaultRowVisibility = false;
-        } else {
-        	for (int i = 0; i < viewRowCount; i++) {
-        		if (!propertiesRowVisibilities[i]) {
-        			defaultRowVisibility = false;
-        			break;
-        		}
-        	}
-        }
-        if (!defaultRowVisibility) {
-        	int namesIndex = super.getNamesColumn();
-        	if (namesIndex >= 0) {
-        		for (int i = 0; i < viewRowCount; i++) {
-        			if (!propertiesRowVisibilities[i]) {
-        				hiddenRowsVector.add(super.getPropertyAt(i, namesIndex).getValue());
-        			}
-        		}
-            }
-        	rows = new String[hiddenRowsVector.size()]; 
-            hiddenRowsVector.copyInto(rows);
-    		record.setHiddenRows(rows);
-        } else {
-    		record.setHiddenRows(null);
-        }
-	}
-	
-	public void setPropertiesColumnVisibility(boolean visible, int column) {
-		propertiesColumnVisibilities[column] = visible;
-		updateColumnVisibility();
-	}
-
-	public boolean isPropertiesColumnVisible(int column) {
-	    return propertiesColumnVisibilities[column];
-	}
-	
-	public void refreshView() {
-	    loadView();
-	}
-
-	protected void setColumnOrderIndex(int mode) {
-		super.setColumnOrderIndex(mode);
-		refreshModel();
-	}
-	
-	protected void refreshProperties() {
-		
-		super.refreshProperties();
-
 		// Prepare space for properties column data.
 		int propertiesColumnCount = getPropertiesColumnCount();
 		propertiesColumnSplitData = new SplitData[propertiesColumnCount];
 		for (int j = 0; j < propertiesColumnCount; j++) {
 		    propertiesColumnSplitData[j] = null;
 		}
-		
-		propertiesColumnVisibilities = new boolean[propertiesColumnCount]; 
-		for (int j = 0; j < propertiesColumnCount; j++) {
-			propertiesColumnVisibilities[j] = false;
-		}
-
-		// Prepare space for row data.
-		int viewRowCount = super.getRowCount();
-		propertiesRowVisibilities = new boolean[viewRowCount]; 
-		for (int i = 0; i < viewRowCount; i++) {
-			propertiesRowVisibilities[i] = true;
-		}
 	}
 	
-	// TODO: better refresh hierarchy  
+	// TODO: move to upper layer
+	/*
 	private void refreshColumnModel() {
 		refreshModel();
 		clearColumnModel();
 	    createDefaultColumnModel();
 	}
-	
-	// TODO: remove
-	public void displayModel() {
-		for (int i = 0; i < super.getPropertiesRowCount(); i++) {
-			System.out.print("[" + getPropertyValue(i, 1) + "]");
-		}
-		System.out.println();
-		
-		for (int i = 0; i < super.getRowCount(); i++) {
-			System.out.print("[" + getPropertyAt(super.visibleToBaseRow(i), 1).getValue() + "]");
-		}
-		System.out.println();
-		
-		for (int i = 0; i < getRowCount(); i++) {
-			System.out.print("[" + model[i][1].getValue() + "]");
-		}
-		System.out.println();
-	}
+	*/
 }

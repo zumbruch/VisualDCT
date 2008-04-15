@@ -53,7 +53,7 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 	private Inspectable[] inspectables = null;
 	private Set loadedInspectablesNames = null;
 	
-	private int columnOrder = -1;
+	private int columnOrder = 0;
 	private int propertiesRowCount = 0;
 	private int propertiesColumnCount = 0;
 	
@@ -97,6 +97,22 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
         while (iterator.hasNext()) {
         	loadedInspectablesNames.add(((Inspectable)iterator.next()).getName());
         }
+        
+        refreshProperties();
+	}
+	
+	public void refresh() {
+		storeView();
+		refreshAll();
+		recallView();
+	}
+	
+	public void recallView() {
+		recallTableModelData();
+	}
+
+	public void storeView() {
+		storeTableModelData();
 	}
 
     public int getColumnCount() {
@@ -201,6 +217,12 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 		return null;
 	}
 	
+	/* Refresh all data on the model. 
+	 */
+	protected void refreshAll() {
+        refreshProperties();
+	}
+	
 	protected int getNamesColumn() {
 	    return nameToPropertiesColumnIndex(propertiesNamesColumn);
 	}
@@ -226,24 +248,6 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
    		refreshProperties();
 	}
 
-	protected void loadView() {
-		
-		SpreadsheetTableViewRecord record = SpreadsheetTableViewData.getInstance().get(typeSign + dataType);
-
-		// If no record, make default model.
-		if (record == null) {
-			columnOrder = 0;
-	        refreshProperties();
-			return;
-		}
-		
-		loadTableModelData();
-	}
-	
-	protected void saveView() {
-		saveTableModelData();
-	}
-	
 	public Inspectable getLastInspectable() {
 		return inspectables[propertiesRowCount - 1];
 	}
@@ -271,12 +275,14 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 	}
 	
 	public int getPropertiesColumnIndex(String name) {
-		// TODO remove this later
 		return nameToPropertiesColumnIndex(name);
+	}
+
+	protected String getPropertiesRowNames(int row) {
+		return properties[row][nameToPropertiesColumnIndex(propertiesNamesColumn)].getValue();
 	}
 	
 	protected int getPropertiesRowIndex(String name) {
-		// TODO remove this later
 		return nameToPropertiesRowIndex(name);
 	}
     
@@ -323,7 +329,7 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
         return (index != null) ? index.intValue() : -1;
     }
     
-	protected void refreshProperties() {
+	private void refreshProperties() {
 
         // Get the properties of all inspectable objects and store the first creator property of each.
 		InspectableProperty[][] inspectableProperties = new InspectableProperty[propertiesRowCount][];
@@ -410,24 +416,20 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 		return record;
 	}
 	
-	private void loadTableModelData() {
+	private void recallTableModelData() {
 		SpreadsheetTableViewRecord record = getViewRecord();
-		
-        int newMode = -1;
-        String modeName = record.getModeName();
-        if (modeName != null) {
-            newMode = getColumnOrderIndex(modeName);
-        }
-        
-        // If no mode yet, and no mode loaded, assume mode 0.
-        if (newMode == -1 && columnOrder == -1) {
-			setColumnOrderIndex(0);
-        } else if (newMode != -1 && newMode != columnOrder) {
-			setColumnOrderIndex(newMode);
+
+        int newColumOrder = -1;
+        String columnOrderName = record.getModeName();
+        if (columnOrderName != null) {
+            newColumOrder = getColumnOrderIndex(columnOrderName);
+        }        
+        if (newColumOrder != -1 && newColumOrder != columnOrder) {
+			setColumnOrderIndex(newColumOrder);
 		}
 	}
 
-	private void saveTableModelData() {
+	private void storeTableModelData() {
 		SpreadsheetTableViewRecord record = getViewRecord();
 		
 		boolean defaultMode = columnOrder == 0;

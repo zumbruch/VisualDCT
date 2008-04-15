@@ -1378,7 +1378,7 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
      }
      
      if (rowOrder != null) {
-		 file.writeBytes(comma + SPREADSHEET_WIDTH_START);
+		 file.writeBytes(comma + SPREADSHEET_ROWORDER_START);
 		 file.writeBytes(quote + rowOrder.getColumnName() + quote);
 		 file.writeBytes(comma + rowOrder.getColumnSplitIndex());
 		 file.writeBytes(comma + quote + rowOrder.getAscendingString() + quote);
@@ -1391,7 +1391,7 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
     		 file.writeBytes(quote + columns[i].getColumnName() + quote);
     		 file.writeBytes(comma + quote + String.valueOf(columns[i].isHidden()) + quote);
     		 if (!columns[i].isDefaultWidth()) {
-    			 file.writeBytes(comma + SPREADSHEET_ROWORDER_START);
+    			 file.writeBytes(comma + SPREADSHEET_WIDTH_START);
     			 file.writeBytes(String.valueOf(columns[i].getWidth()));
     			 file.writeBytes(")");
     		 }

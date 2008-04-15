@@ -28,7 +28,6 @@
 
 package com.cosylab.vdct.inspector;
 
-import java.util.Set;
 import java.util.Vector;
 
 /**
@@ -37,6 +36,10 @@ import java.util.Vector;
  */
 public class SpreadsheetViewModel extends SpreadsheetTableModel {
 
+	// The current row sorted state.
+    protected int sortedColumn = -1;
+    protected boolean sortedOrderAsc = true;     
+	
     private boolean[] rowVisibilities = null; 
     private boolean[] columnVisibilities = null;
     
@@ -50,14 +53,42 @@ public class SpreadsheetViewModel extends SpreadsheetTableModel {
     private int[] allToVisibleColumn = null;
     private int[] visibleToAllColumn = null;
     
-    private boolean showAllRows = false;
+    private boolean showAllRows = true;
 	
 	public SpreadsheetViewModel(String dataType, Vector displayData,
 			Vector loadedData) throws IllegalArgumentException {
 		super(dataType, displayData, loadedData);
+		refreshTables();
 	}
 	
-	private void refreshAll() {
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.inspector.SpreadsheetTableModel#recallView()
+	 */
+	public void recallView() {
+		super.recallView();
+		refreshAll();
+		recallRowsVisibilityAndOrder();
+		recallColumnsVisibilityAndOrder();
+	}
+
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.inspector.SpreadsheetTableModel#storelView()
+	 */
+	public void storeView() {
+		super.storeView();
+	    storeRowsVisibilityAndOrder();
+	    storeColumnsVisibilityAndOrder();
+	}
+	
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.inspector.SpreadsheetTableModel#refreshAll()
+	 */
+	protected void refreshAll() {
+		super.refreshAll();
+		refreshTables();
+	}
+
+	private void refreshTables() {
 		int rowCount = super.getRowCount();
 		int columnCount = super.getColumnCount();
 
@@ -90,8 +121,6 @@ public class SpreadsheetViewModel extends SpreadsheetTableModel {
 		refreshOrderedToBaseColumn();
 		refreshAllToVisibleColumn();
 		refreshVisibleToAllColumn();
-
-		loadViewState();
 	}
 	
 	private void setId(int[] order) {
@@ -102,7 +131,7 @@ public class SpreadsheetViewModel extends SpreadsheetTableModel {
 	
 	private void refreshBaseToOrderedRow() {
 	    for (int r = 0; r < baseToOrderedRow.length; r++) {
-	        baseToOrderedRow[baseToOrderedRow[r]] = r;
+	        baseToOrderedRow[orderedToBaseRow[r]] = r;
 		}
 	}
 	
@@ -146,7 +175,7 @@ public class SpreadsheetViewModel extends SpreadsheetTableModel {
 	
 	private void refreshBaseToOrderedColumn() {
 	    for (int c = 0; c < baseToOrderedColumn.length; c++) {
-	        baseToOrderedColumn[baseToOrderedColumn[c]] = c;
+	        baseToOrderedColumn[orderedToBaseColumn[c]] = c;
 		}
 	}
 	
@@ -181,48 +210,67 @@ public class SpreadsheetViewModel extends SpreadsheetTableModel {
 	    	}
 		}
 	}
-	
-	protected final int visibleToBaseRow(int row) {
-		// TODO: remove
-		try {
-		return orderedToBaseRow[visibleToAllRow[row]];
-		} catch(Exception e) {
-		}
-		return 0;
-	}
 
-	protected final int visibleToBaseColumn(int column) {
-		// TODO: remove
-		try {
-		return orderedToBaseColumn[visibleToAllColumn[column]];
-		} catch (Exception we) {
-			
-		}
-		return 0;
-	}
-	
 	protected final int baseToVisibleRow(int row) {
 		return allToVisibleRow[baseToOrderedRow[row]];
+	}
+	
+	protected final int visibleToBaseRow(int row) {
+		return orderedToBaseRow[visibleToAllRow[row]];
 	}
 
 	protected final int baseToVisibleColumn(int column) {
 		return allToVisibleColumn[baseToOrderedColumn[column]];
 	}
-	
-	private void loadViewState() {
-		loadRowsVisibilityAndOrder();
-		loadColumnsVisibilityAndOrder();
+
+	protected final int visibleToBaseColumn(int column) {
+		return orderedToBaseColumn[visibleToAllColumn[column]];
 	}
 	
-	private void saveViewState() {
-	    saveRowsVisibilityAndOrder();
-	    saveColumnsVisibilityAndOrder();
-	}
-	
-	private void loadRowsVisibilityAndOrder() {
+	private void recallRowsVisibilityAndOrder() {
+		SpreadsheetTableViewRecord record = getViewRecord();
+
+		boolean refreshVisibility = false;
+		Boolean recShowAllRows = record.getShowAllRows();
+		if (recShowAllRows != null && showAllRows != recShowAllRows.booleanValue()) {
+			showAllRows = recShowAllRows.booleanValue();
+			refreshVisibility = true;
+		}
+		
+    	// If no rows, assume all are visible. 
+        for (int i = 0; i < super.getRowCount(); i++) {
+        	rowVisibilities[i] = true;
+			((SpreadsheetRowVisible)super.getPropertyAt(i, 0)).setVisible(true);
+        }
+		String[] rows = record.getHiddenRows();
+		if (rows != null && rows.length > 0) {
+            for (int i = 0; i < rows.length; i++) {
+            	int propertiesIndex = getPropertiesRowIndex(rows[i]);
+            	if (propertiesIndex >= 0) {
+            		rowVisibilities[propertiesIndex] = false;
+        			((SpreadsheetRowVisible)super.getPropertyAt(propertiesIndex, 0)).setVisible(false);
+            	}
+            }
+			refreshVisibility = true;
+    	}
+		if (refreshVisibility) {
+			refreshAllToVisibleRow();
+			refreshVisibleToAllRow();
+		}
+		
+    	SpreadsheetRowOrder rowOrder = record.getRowOrder();
+        if (rowOrder != null) {
+        	String orderedColumnName = rowOrder.getColumnName();
+        	int index = getPropertiesColumnIndex(orderedColumnName);
+        	if (index >= 0) {
+        		sortedColumn = index;
+        		sortedOrderAsc = rowOrder.isAscending();
+        		sortRows(sortedColumn, sortedOrderAsc);
+        	}
+        }
 	}
 
-	private void loadColumnsVisibilityAndOrder() {
+	private void recallColumnsVisibilityAndOrder() {
 
 		SpreadsheetTableViewRecord record = getViewRecord();
         SpreadsheetColumnData[] columns = record.getColumns();
@@ -260,40 +308,63 @@ public class SpreadsheetViewModel extends SpreadsheetTableModel {
 		}
 	}
 
-	private void saveRowsVisibilityAndOrder() {
+	private void storeRowsVisibilityAndOrder() {
 
 		SpreadsheetTableViewRecord record = getViewRecord();
-		
-        // If there are hidden rows that don't appear in this view, they have to be saved, so no default. 
-		boolean defaultRowVisibility = true;
-        if (hiddenRowsVector.size() > 0) {
-            defaultRowVisibility = false;
+
+		boolean defaultShowAllRows = showAllRows;
+        if (!defaultShowAllRows) {
+        	record.setShowAllRows(Boolean.valueOf(showAllRows));
         } else {
-        	for (int r = 0; r < viewRowCount; i++) {
-        		if (!propertiesRowVisibilities[i]) {
+        	record.setShowAllRows(null);
+        }
+		
+        // Stored hidden rows must be preserved if they exist in the database and don't appear in the new view.
+		Vector hiddenRowsVector = new Vector();
+		String[] rows = record.getHiddenRows();
+		if (rows != null && rows.length > 0) {
+			for (int i = 0; i < rows.length; i++) {
+				int propertiesIndex = getPropertiesRowIndex(rows[i]);
+				if (propertiesIndex < 0 && getLoadedInspectablesNames().contains(rows[i])) {
+					hiddenRowsVector.add(rows[i]);
+				}
+			}
+		}
+       
+		int viewRowCount = super.getRowCount();
+        // If there are hidden rows that don't appear in this view, they have to be saved, so no default. 
+		boolean defaultRowVisibility = (hiddenRowsVector.size() == 0);
+        if (defaultRowVisibility) {
+        	for (int i = 0; i < viewRowCount; i++) {
+        		if (!rowVisibilities[i]) {
         			defaultRowVisibility = false;
         			break;
         		}
         	}
         }
         if (!defaultRowVisibility) {
-        	int namesIndex = super.getNamesColumn();
-        	if (namesIndex >= 0) {
-        		for (int i = 0; i < viewRowCount; i++) {
-        			if (!propertiesRowVisibilities[i]) {
-        				hiddenRowsVector.add(super.getPropertyAt(i, namesIndex).getValue());
-        			}
-        		}
-            }
-        	rows = new String[hiddenRowsVector.size()]; 
+       		for (int i = 0; i < rowVisibilities.length; i++) {
+       			if (!rowVisibilities[i]) {
+       				hiddenRowsVector.add(getPropertiesRowNames(i));
+       			}
+       		}
+       		rows = new String[hiddenRowsVector.size()]; 
             hiddenRowsVector.copyInto(rows);
     		record.setHiddenRows(rows);
         } else {
     		record.setHiddenRows(null);
         }
+        
+		boolean defaultNoSortOrder = (sortedColumn == -1);
+        if (!defaultNoSortOrder) {
+        	String name = getPropertiesColumnNames(sortedColumn);
+        	record.setRowOrder(new SpreadsheetRowOrder(name, 0, sortedOrderAsc));
+        } else {
+        	record.setRowOrder(null);
+        }
 	}
 
-	private void saveColumnsVisibilityAndOrder() {
+	private void storeColumnsVisibilityAndOrder() {
 		
 		// Default view is all columns in the starting order and all visible.
 		boolean defaultColumnVisibilityAndOrder = baseToOrderedColumn.length == visibleToAllColumn.length;
@@ -330,10 +401,14 @@ public class SpreadsheetViewModel extends SpreadsheetTableModel {
     	return visibleToBaseColumn(column);
     }
     
+    public boolean isPropertiesColumnVisible(int column) {
+    	return columnVisibilities[column]; 
+    }
+    
     public boolean isRowVisible(int row) {
 		return rowVisibilities[visibleToBaseRow(row)];
     }
-
+    
     public boolean isShowAllRows() {
         return showAllRows;
     }
@@ -397,21 +472,22 @@ public class SpreadsheetViewModel extends SpreadsheetTableModel {
 	}
 
 	public void sortRows(int column, boolean ascending) {
-        column = visibleToBaseColumn(column);
-		baseToOrderedRow = PropertyComparator.getOrder(getProperties(), true, column, ascending);
-
-		refreshOrderedToBaseRow();
-		refreshAllToVisibleRow();
-		refreshVisibleToAllRow();
+		column = visibleToBaseColumn(column);
+		orderedToBaseRow = PropertyComparator.getOrder(getProperties(), true, column, ascending);
+		refreshBaseToOrderedRow();
 	}
 
 	public void sortColumns(int row, boolean ascending) {
 		row = visibleToBaseRow(row);
-		baseToOrderedColumn = PropertyComparator.getOrder(getProperties(), false, row, ascending);
+		orderedToBaseColumn = PropertyComparator.getOrder(getProperties(), false, row, ascending);
+		refreshBaseToOrderedColumn();
+	}
 
-		refreshOrderedToBaseColumn();
-		refreshAllToVisibleColumn();
-		refreshVisibleToAllColumn();
+	public void sortRowsByColumn(int column) {
+		int newSortedColumn = visibleToBaseColumn(column);
+		sortedOrderAsc = (sortedColumn == newSortedColumn) ? !sortedOrderAsc : true;
+		sortedColumn = newSortedColumn;
+		sortRows(sortedColumn, sortedOrderAsc);
 	}
 	
 	/* (non-Javadoc)
@@ -498,22 +574,6 @@ public class SpreadsheetViewModel extends SpreadsheetTableModel {
 	}
 
 	/* (non-Javadoc)
-	 * @see com.cosylab.vdct.inspector.SpreadsheetTableModel#loadView()
-	 */
-	protected void loadView() {
-		super.loadView();
-		loadViewState();
-	}
-
-	/* (non-Javadoc)
-	 * @see com.cosylab.vdct.inspector.SpreadsheetTableModel#saveView()
-	 */
-	protected void saveView() {
-		super.saveView();
-		saveViewState();
-	}
-
-	/* (non-Javadoc)
 	 * @see com.cosylab.vdct.inspector.SpreadsheetTableModel#setValueAt(java.lang.Object, int, int)
 	 */
 	public void setValueAt(Object value, int row, int column) {
@@ -521,7 +581,6 @@ public class SpreadsheetViewModel extends SpreadsheetTableModel {
 	}
 
 	protected void setRowOrder(int[] sortOrder) {
-		
 		// Expand sortOrder permutation to all rows, leaving hidden where they are.
 		int[] allSortOrder = new int[baseToOrderedRow.length]; 
 		setId(allSortOrder);
@@ -529,7 +588,7 @@ public class SpreadsheetViewModel extends SpreadsheetTableModel {
 	    	allSortOrder[visibleToAllRow[r]] = visibleToAllRow[sortOrder[r]];
 	    }
 	    
-		// New orderToBase order is first the sortOrder, and then the previous orderToBase.
+		// New orderToBase permutation is multiplication of sortOrder and the previous orderToBase.
 	    for (int r = 0; r < baseToOrderedRow.length; r++) {
 	    	allSortOrder[r] = orderedToBaseRow[allSortOrder[r]];
 		}
@@ -537,37 +596,19 @@ public class SpreadsheetViewModel extends SpreadsheetTableModel {
 	    refreshBaseToOrderedRow();
 	}
 	
-	// TODO: remove
-	private void displayOrder(String name, int[] order) {
-		System.out.print(name + "[");
-	    for (int r = 0; r < order.length; r++) {
-			System.out.print(order[r] + " ");
-		}
-		System.out.println("]");
-	}
-
 	protected void setColumnOrder(int[] sortOrder) {
-		// TODO: copy above
-	    for (int c = 0; c < sortOrder.length; c++) {
-	    	orderedToBaseColumn[visibleToAllColumn[c]] = visibleToAllColumn[sortOrder[c]];
+		// Expand sortOrder permutation to all columns, leaving hidden where they are.
+		int[] allSortOrder = new int[baseToOrderedColumn.length]; 
+		setId(allSortOrder);
+	    for (int r = 0; r < sortOrder.length; r++) {
+	    	allSortOrder[visibleToAllColumn[r]] = visibleToAllColumn[sortOrder[r]];
+	    }
+	    
+		// New orderToBase permutation is multiplication of sortOrder and the previous orderToBase.
+	    for (int r = 0; r < baseToOrderedColumn.length; r++) {
+	    	allSortOrder[r] = orderedToBaseColumn[allSortOrder[r]];
 		}
-		refreshBaseToOrderedColumn();
-	}
-	
-	/* (non-Javadoc)
-	 * @see com.cosylab.vdct.inspector.SpreadsheetTableModel#getLoadedInspectablesNames()
-	 */
-	protected Set getLoadedInspectablesNames() {
-		// TODO should be handled by persistence, or at least moved to this level
-		return super.getLoadedInspectablesNames();
-	}
-
-	/* (non-Javadoc)
-	 * @see com.cosylab.vdct.inspector.SpreadsheetTableModel#refreshProperties()
-	 */
-	protected void refreshProperties() {
-		super.refreshProperties();
-		// TODO move to a single refresh function stack
-		refreshAll();
+	    orderedToBaseColumn = allSortOrder;
+	    refreshBaseToOrderedColumn();
 	}
 }
