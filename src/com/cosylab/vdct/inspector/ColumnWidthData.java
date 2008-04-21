@@ -28,28 +28,50 @@
 
 package com.cosylab.vdct.inspector;
 
-import javax.swing.table.TableColumn;
-
 /**
  * @author ssah
  *
  */
-public class SpreadsheetColumn extends TableColumn {
+public class ColumnWidthData {
 
-	protected boolean defaultWidth = true;
+	private String name = null;
+	private SplitPartWidthData[] splitIndices = null;
+
 	/**
-	 * @param defaultWidth
-	 * @param table
+	 * @param name
+	 * @param splitIndices
 	 */
-	public SpreadsheetColumn(boolean defaultWidth) {
+	public ColumnWidthData(String name, SplitPartWidthData[] splitIndices) {
 		super();
-		this.defaultWidth = defaultWidth;
-	}
-	public boolean isDefaultWidth() {
-		return defaultWidth;
+		this.name = name;
+		this.splitIndices = splitIndices;
 	}
 
-	public void setDefaultWidth(boolean defaultWidth) {
-		this.defaultWidth = defaultWidth;
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * @param name the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	/**
+	 * @return the splitIndices
+	 */
+	public SplitPartWidthData[] getSplitIndices() {
+		return splitIndices;
+	}
+
+	/**
+	 * @param splitIndices the splitIndices to set
+	 */
+	public void setSplitIndices(SplitPartWidthData[] splitIndices) {
+		this.splitIndices = splitIndices;
 	}
 }

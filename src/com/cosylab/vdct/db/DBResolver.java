@@ -35,6 +35,7 @@ import com.cosylab.vdct.Settings;
 import com.cosylab.vdct.graphics.objects.InLink;
 import com.cosylab.vdct.graphics.objects.OutLink;
 import com.cosylab.vdct.inspector.SplitData;
+import com.cosylab.vdct.inspector.SplitPartWidthData;
 import com.cosylab.vdct.inspector.SpreadsheetColumnData;
 import com.cosylab.vdct.inspector.SpreadsheetRowOrder;
 import com.cosylab.vdct.inspector.SpreadsheetTableViewData;
@@ -99,9 +100,9 @@ public class DBResolver {
 	public static final String VDCTSPREADSHEET_SHOWALLROWS = "ShowAllRows";
 	// used format #! BackgroundColor("color")
 	public static final String VDCTSPREADSHEET_BACKGROUNDCOLOR = "BackgroundColor";
-	// used format #! Column("name", "hidden", [Width(...)])
+	// used format #! Column("name", "hidden", [Width(...), [Width(...), ...]])
 	public static final String VDCTSPREADSHEET_COLUMN = "Column";
-	// used format #! Width(nondefault width)
+	// used format #! Width(split index, nondefault width)
 	public static final String VDCTSPREADSHEET_WIDTH = "Width";
 	// used format #! HiddenRow("name")
 	public static final String VDCTSPREADSHEET_HIDDENROW = "HiddenRow";
@@ -853,11 +854,12 @@ public class DBResolver {
 						Boolean showAllRows = null;
 						Integer backgroundColor = null;
 						SpreadsheetRowOrder rowOrder = null;
-						Vector columnsVector = new Vector();
+						Map columnsMap = new HashMap();
 						Vector splitColumnsVector = new Vector();
 						Vector hiddenRowsVector = new Vector();
 						Vector recentSplitsVector = new Vector();
 
+						int columnPropertyIndex = 0;
 						int namelessPropertyIndex = 0;
 
 						tokenizer.nextToken();
@@ -891,6 +893,7 @@ public class DBResolver {
 										throw (new DBGParseException(errorString, tokenizer, fileName));
 									}
 								} else if (tokenizer.sval.equalsIgnoreCase(VDCTSPREADSHEET_COLUMN)) {
+									
 									tokenizer.nextToken();
 									String columnName = null;
 									if (tokenizer.ttype == EnhancedStreamTokenizer.TT_WORD ||
@@ -909,8 +912,25 @@ public class DBResolver {
 									}
 
 									tokenizer.nextToken();
-                                    if (tokenizer.ttype == EnhancedStreamTokenizer.TT_WORD
+									int sortIndex = 0;
+									if (tokenizer.ttype == EnhancedStreamTokenizer.TT_NUMBER) {
+										sortIndex = (int)tokenizer.nval;
+									} else {
+										throw (new DBGParseException(errorString, tokenizer, fileName));
+									}
+									
+									Vector widthData = new Vector();
+									tokenizer.nextToken();
+                                    while (tokenizer.ttype == EnhancedStreamTokenizer.TT_WORD
                                     		&& tokenizer.sval.equalsIgnoreCase(VDCTSPREADSHEET_WIDTH)) {
+
+    									tokenizer.nextToken();
+    									int splitIndex = 0;
+    									if (tokenizer.ttype == EnhancedStreamTokenizer.TT_NUMBER) {
+    										splitIndex = (int)tokenizer.nval;
+    									} else {
+    										throw (new DBGParseException(errorString, tokenizer, fileName));
+    									}
 
     									tokenizer.nextToken();
     									int width = 0;
@@ -919,11 +939,15 @@ public class DBResolver {
     									} else {
     										throw (new DBGParseException(errorString, tokenizer, fileName));
     									}
-    									columnsVector.add(new SpreadsheetColumnData(columnName, hidden, true, width));
-                                    } else {
-    									columnsVector.add(new SpreadsheetColumnData(columnName, hidden, false, 0));
-                                    	continue;
+    									widthData.add(new SplitPartWidthData(splitIndex, width));
+    									tokenizer.nextToken();
                                     }
+								
+									SplitPartWidthData[] splitPartWidthData = new SplitPartWidthData[widthData.size()];
+									widthData.copyInto(splitPartWidthData);
+    								columnsMap.put(columnName, new SpreadsheetColumnData(columnName, hidden, sortIndex, splitPartWidthData));
+    								
+    								continue;
 
 								} else if (tokenizer.sval.equalsIgnoreCase(VDCTSPREADSHEET_ROWORDER)) {
 									tokenizer.nextToken();
@@ -1015,10 +1039,11 @@ public class DBResolver {
 									tokenizer.nextToken();
 									if (tokenizer.ttype == EnhancedStreamTokenizer.TT_WORD ||
 											tokenizer.ttype == DBConstants.quoteChar) {
-										columnsVector.add(new SpreadsheetColumnData(tokenizer.sval, false, true, 0));
+										columnsMap.put(tokenizer.sval, new SpreadsheetColumnData(tokenizer.sval, false, columnPropertyIndex));
 									} else {
 										throw (new DBGParseException(errorString, tokenizer, fileName));
 									}
+									columnPropertyIndex++;
 								} else if (namelessPropertyIndex == 0) {
 
 									if (tokenizer.ttype == EnhancedStreamTokenizer.TT_WORD ||
@@ -1055,8 +1080,6 @@ public class DBResolver {
 							tokenizer.nextToken();
 						}
 						
-						SpreadsheetColumnData[] columns = new SpreadsheetColumnData[columnsVector.size()];
-						columnsVector.copyInto(columns);
 						SplitData[] splitColumns = new SplitData[splitColumnsVector.size()];
 						splitColumnsVector.copyInto(splitColumns);
 						String[] hiddenRows = new String[hiddenRowsVector.size()];
@@ -1069,7 +1092,7 @@ public class DBResolver {
 						viewRecord.setShowAllRows(showAllRows);
 						viewRecord.setBackgroundColor(backgroundColor);
 						viewRecord.setRowOrder(rowOrder);
-						viewRecord.setColumns(columns);
+						viewRecord.setColumns(columnsMap);
 						viewRecord.setSplitColumns(splitColumns);
 						viewRecord.setHiddenRows(hiddenRows);
 						viewRecord.setRecentSplits(recentSplits);

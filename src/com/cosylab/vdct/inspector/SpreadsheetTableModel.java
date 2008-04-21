@@ -166,6 +166,8 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
    			nameToPropertiesRowIndex.put(properties[row][column].getValue(), new Integer(row));
 		}
 		*/
+
+		// Update the whole row as validity of this inspectable's fields can change on property value change. 
 		fireTableRowsUpdated(row, row);
 	}
 	
@@ -290,7 +292,14 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 		return String.class;
 	}
 	
-	public ArrayList getColumnOrderNames() {
+	public void setColumnOrder(String modeName) {
+		int newMode = getColumnOrderIndex(modeName);
+		if (newMode != -1) {
+			setColumnOrderIndex(newMode);
+		}
+	}
+
+	protected ArrayList getColumnOrderNames() {
 
 		ArrayList list = inspectables[0].getModeNames();
 		if (list == null) {
@@ -302,7 +311,7 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 		}
 		return list;
 	}
-
+	
 	protected final InspectableProperty[][] getProperties() {
 		return properties;
 	}

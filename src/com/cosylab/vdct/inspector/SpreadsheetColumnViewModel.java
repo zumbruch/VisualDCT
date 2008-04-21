@@ -31,6 +31,8 @@ package com.cosylab.vdct.inspector;
 import java.awt.Color;
 import java.util.Enumeration;
 import java.util.EventObject;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.DefaultCellEditor;
@@ -74,6 +76,10 @@ public class SpreadsheetColumnViewModel extends SpreadsheetSplitViewModel implem
 		this.renderer = renderer;
 	}
 
+	public void onColumnWidthChange() {
+		storeColumnWidths();
+	}
+	
 	/* (non-Javadoc)
 	 * @see com.cosylab.vdct.inspector.SpreadsheetSplitViewModel#recallView()
 	 */
@@ -81,6 +87,7 @@ public class SpreadsheetColumnViewModel extends SpreadsheetSplitViewModel implem
 		super.recallView();
 		refreshColumns();
 		recallTableColor();
+		recallColumnWidths();
 	}
 
 	/* (non-Javadoc)
@@ -89,6 +96,7 @@ public class SpreadsheetColumnViewModel extends SpreadsheetSplitViewModel implem
 	public void storeView() {
 		super.storeView();
 		storeTableColor();
+		storeColumnWidths();
 	}
 
 	/* (non-Javadoc)
@@ -182,12 +190,13 @@ public class SpreadsheetColumnViewModel extends SpreadsheetSplitViewModel implem
 	private void refreshColumns() {
 		
 		// TODO: reuse existing columns, sample code below. First set comment property to be uneditable.
-        while (getColumnCount() > 0) {
+		while (getColumnCount() > 0) {
         	removeColumn(columnModel.getColumn(0));
         }
 		for (int j = 0; j < super.getColumnCount(); j++) {
 		    columnModel.addColumn(createColumn(j, true));
 		}
+		recallColumnWidths();
 		return;
         /*
         int pos = 0;
@@ -251,6 +260,68 @@ public class SpreadsheetColumnViewModel extends SpreadsheetSplitViewModel implem
         } else {
         	record.setBackgroundColor(null);
         }
+	}
+	
+	private void recallColumnWidths() {
+		SpreadsheetTableViewRecord record = getViewRecord();
+		
+		Iterator columns = record.getColumns().values().iterator();
+		while (columns.hasNext()) {
+			SpreadsheetColumnData columnData = (SpreadsheetColumnData)columns.next();
+
+			int baseIndex = getPropertiesColumnIndex(columnData.getName());
+			if (baseIndex == -1) {
+				continue;
+			}
+			int index = baseToSplitColumn(baseIndex);
+			if (index == -1) {
+				continue;
+			}
+			boolean split = isSplit(index);
+			int splitParts = getSplitParts(baseIndex);
+			
+			SplitPartWidthData[] data = columnData.getSplitIndices();
+			for (int i = 0; i < data.length; i++) {
+				int splitIndex = data[i].getSplitIndex();
+				if (split == (splitIndex != -1) && splitIndex < splitParts) {
+					SpreadsheetColumn column = (SpreadsheetColumn)getColumn(split ? index + splitIndex : index);
+					column.setDefaultWidth(false);
+					column.setPreferredWidth(data[i].getWidth());
+				}
+			}
+		}
+	}
+	
+	private void storeColumnWidths() {
+		SpreadsheetTableViewRecord record = getViewRecord();
+		
+		Map columnsMap = record.getColumns();
+		Iterator columns = columnsMap.values().iterator();
+		while (columns.hasNext()) {
+			SpreadsheetColumnData columnData = (SpreadsheetColumnData)columns.next();
+
+			int baseIndex = getPropertiesColumnIndex(columnData.getName());
+			if (baseIndex == -1) {
+				continue;
+			}
+			int splitIndex = baseToSplitColumn(baseIndex);
+			if (splitIndex == -1 || splitIndex >= getColumnCount()) {
+				continue;
+			}
+			boolean split = isSplit(splitIndex);
+			int splitParts = getSplitParts(baseIndex);
+			
+			Vector widthsVector = new Vector();
+			for (int i = 0; i < splitParts; i++) {
+				SpreadsheetColumn column = (SpreadsheetColumn)getColumn(splitIndex + i);
+				if (!column.isDefaultWidth()) {
+					widthsVector.add(new SplitPartWidthData(split ? i : -1, column.getWidth()));
+				}
+			}
+			SplitPartWidthData[] widths = new SplitPartWidthData[widthsVector.size()];
+			widthsVector.copyInto(widths);
+			columnData.setSplitIndices(widths);
+		}
 	}
 	
 	public void addColumn(TableColumn column) {

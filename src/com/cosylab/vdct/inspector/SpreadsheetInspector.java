@@ -540,7 +540,6 @@ public class SpreadsheetInspector extends JDialog
     
     private void refreshDynamicGUI() {
     	createTables();
-    	resizeTablesColumns();
         boolean noObjects = displayedInspectables.isEmpty();
     	
     	hintLabel.setText(noObjects ? "No objects to display." : "");
@@ -556,7 +555,7 @@ public class SpreadsheetInspector extends JDialog
         	currentTab = getSelectedTab();
         }
     }
-    
+
     private void refreshTables() {
     	for (int i = 0; i < tables.length; i++) {
     		tables[i].refresh();
@@ -616,16 +615,6 @@ public class SpreadsheetInspector extends JDialog
     	return table;
     }
 
-    /**
-     * Sets the widths of all columns so that the values text of all fields can
-     * be displayed. 
-     */
-    public void resizeTablesColumns() {
-    	for (int i = 0; i < tables.length; i++) {
-    		tables[i].resizeColumns();
-    	}
-    }
-    
     /* Saves the content of open cells when tabs are changed.
     */
     public void stateChanged(ChangeEvent event) {

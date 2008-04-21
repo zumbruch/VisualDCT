@@ -71,7 +71,6 @@ public class SplitPropertyGroup {
 		String pattern = splitData.getPattern();
 		int partsCount = splitData.getParts();
 		
-		// TODO: test
 		if (value == null) {
 			value = "";
 		}

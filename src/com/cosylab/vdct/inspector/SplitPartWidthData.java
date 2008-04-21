@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
+ * Copyright (c) 2008, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -28,55 +28,50 @@
 
 package com.cosylab.vdct.inspector;
 
-import java.util.Comparator;
+/**
+ * @author ssah
+ *
+ */
+public class SplitPartWidthData {
 
-public class SpreadsheetRowComparator implements Comparator {
-	
-    private int column = 0;
-    private int sign = 1;
-    SpreadsheetSplitViewModel tableModel = null;
-    
-    public SpreadsheetRowComparator(SpreadsheetSplitViewModel tableModel) {
-    	super();
-    	this.tableModel = tableModel;
-    }
-	
-	public void setColumn(int column) {
-		this.column = column;
+	private int splitIndex = -1;
+	private int width = 0;
+
+	/**
+	 * @param splitIndex
+	 * @param width
+	 */
+	public SplitPartWidthData(int splitIndex, int width) {
+		super();
+		this.splitIndex = splitIndex;
+		this.width = width;
 	}
 
-	public void setAscending(boolean ascending) {
-		sign = ascending ? 1 : -1;
+	/**
+	 * @return the splitIndex
+	 */
+	public int getSplitIndex() {
+		return splitIndex;
 	}
 
-	public int compare(Object arg0, Object arg1) {
-		
-		InspectableProperty[] first = (InspectableProperty[])arg0;  
-		InspectableProperty[] second = (InspectableProperty[])arg1;
+	/**
+	 * @param splitIndex the splitIndex to set
+	 */
+	public void setSplitIndex(int splitIndex) {
+		this.splitIndex = splitIndex;
+	}
 
-	    String firstString = first[column].getValue();
-	    String secondString = second[column].getValue();
+	/**
+	 * @return the width
+	 */
+	public int getWidth() {
+		return width;
+	}
 
-	    // TODO: This is only because of CommentProperty, may be fixable.
-	    if (firstString == null) {
-	    	firstString = "";
-	    }
-	    if (secondString == null) {
-	    	secondString = "";
-	    }
-	    
-	    String firstName = SplitData.removeValueAtEnd(firstString);
-	    String secondName = SplitData.removeValueAtEnd(secondString);
-	    
-	    int firstNumber = SplitData.extractValueAtEnd(firstString);
-	    int secondNumber = SplitData.extractValueAtEnd(secondString);
-
-		int nameComp = firstName.compareTo(secondName); 
-        if (nameComp != 0) {
-        	return sign * nameComp;
-
-        }
-        // names with no number are displayed before any with numbers
-		return sign * (firstNumber - secondNumber); 
+	/**
+	 * @param width the width to set
+	 */
+	public void setWidth(int width) {
+		this.width = width;
 	}
 }

@@ -41,6 +41,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Vector;
 
 import com.cosylab.vdct.Console;
@@ -57,6 +58,7 @@ import com.cosylab.vdct.graphics.FontMetricsBuffer;
 import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.inspector.SplitData;
+import com.cosylab.vdct.inspector.SplitPartWidthData;
 import com.cosylab.vdct.inspector.SpreadsheetColumnData;
 import com.cosylab.vdct.inspector.SpreadsheetRowOrder;
 import com.cosylab.vdct.inspector.SpreadsheetTableViewData;
@@ -1344,15 +1346,20 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
      Boolean showAllRows = sprView.getShowAllRows();
      Integer backgroundColor = sprView.getBackgroundColor();
      SpreadsheetRowOrder rowOrder = sprView.getRowOrder();
-     SpreadsheetColumnData[] columns = sprView.getColumns();
-     String[] rows = sprView.getHiddenRows();
+     Map columns = sprView.getColumns();
+     String[] hiddenRows = sprView.getHiddenRows();
      SplitData[] splitColumns = sprView.getSplitColumns();
      SplitData[] recentSplits = sprView.getRecentSplits();
 
      // If no data, skip writing the entry.
-	 if (modeName == null && showAllRows == null && backgroundColor == null
-			 && rowOrder == null && columns == null && rows == null
-			 && splitColumns == null && recentSplits == null) {
+	 if (modeName == null
+			 && showAllRows == null
+			 && backgroundColor == null
+			 && rowOrder == null
+			 && (columns == null || columns.isEmpty())
+			 && (hiddenRows == null || hiddenRows.length == 0)
+			 && (splitColumns == null || splitColumns.length == 0)
+			 && (recentSplits == null || recentSplits.length == 0)) {
 		 continue;
 	 }
 
@@ -1386,22 +1393,29 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
      }
      
      if (columns != null) {
-    	 for (int i = 0; i < columns.length; i++) {
+    	 Iterator colIterator = columns.values().iterator();
+    	 
+    	 while (colIterator.hasNext()) {
+    		 SpreadsheetColumnData column = (SpreadsheetColumnData)colIterator.next(); 
     		 file.writeBytes(comma + SPREADSHEET_COLUMN_START);
-    		 file.writeBytes(quote + columns[i].getColumnName() + quote);
-    		 file.writeBytes(comma + quote + String.valueOf(columns[i].isHidden()) + quote);
-    		 if (!columns[i].isDefaultWidth()) {
+    		 file.writeBytes(quote + column.getName() + quote);
+    		 file.writeBytes(comma + quote + String.valueOf(column.isHidden()) + quote);
+    		 file.writeBytes(comma + String.valueOf(column.getSortIndex()));
+    		 
+    		 SplitPartWidthData[] widths = column.getSplitIndices();
+    		 for (int i = 0; i < widths.length; i++) {
     			 file.writeBytes(comma + SPREADSHEET_WIDTH_START);
-    			 file.writeBytes(String.valueOf(columns[i].getWidth()));
+    			 file.writeBytes(String.valueOf(widths[i].getSplitIndex()));
+    			 file.writeBytes(comma + String.valueOf(widths[i].getWidth()));
     			 file.writeBytes(")");
     		 }
     		 file.writeBytes(")");
     	 }
      }
 
-     if (rows != null) {
-    	 for (int i = 0; i < rows.length; i++) {
-    		 file.writeBytes(comma + SPREADSHEET_ROW_START + quote + rows[i] + "\")");
+     if (hiddenRows != null) {
+    	 for (int i = 0; i < hiddenRows.length; i++) {
+    		 file.writeBytes(comma + SPREADSHEET_ROW_START + quote + hiddenRows[i] + "\")");
     	 }
      }
 

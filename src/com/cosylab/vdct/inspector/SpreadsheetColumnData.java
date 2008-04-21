@@ -32,34 +32,39 @@ package com.cosylab.vdct.inspector;
  * @author ssah
  *
  */
-public class SpreadsheetColumnData {
+public class SpreadsheetColumnData implements Comparable {
 
-	private String columnName = null;
+	private String name = null;
 	private boolean hidden = false;
-	private boolean defaultWidth = true;
-	private int width = 0;
+	private int sortIndex = 0;
+	private SplitPartWidthData[] splitIndices = null;
 
-	/**
-	 * @param columnName
-	 * @param hidden
-	 * @param defaultWidth
-	 * @param width
-	 */
-	public SpreadsheetColumnData(String columnName, boolean hidden,
-			boolean defaultWidth, int width) {
+	public SpreadsheetColumnData(String columnName, boolean hidden, int sortIndex) {
+		this(columnName, hidden, sortIndex, new SplitPartWidthData[0]);
+	}
+	
+	public SpreadsheetColumnData(String name, boolean hidden, int sortIndex,
+			SplitPartWidthData[] splitIndices) {
 		super();
-		this.columnName = columnName;
+		this.name = name;
 		this.hidden = hidden;
-		this.defaultWidth = defaultWidth;
-		this.width = width;
+		this.sortIndex = sortIndex;
+		this.splitIndices = splitIndices;
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
+	public int compareTo(Object o) {
+		return sortIndex  - ((SpreadsheetColumnData)o).sortIndex;
 	}
 
-	public String getColumnName() {
-		return columnName;
+	public String getName() {
+		return name;
 	}
 
-	public void setColumnName(String columnName) {
-		this.columnName = columnName;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public boolean isHidden() {
@@ -70,19 +75,31 @@ public class SpreadsheetColumnData {
 		this.hidden = hidden;
 	}
 
-	public boolean isDefaultWidth() {
-		return defaultWidth;
+	/**
+	 * @return the sortIndex
+	 */
+	public int getSortIndex() {
+		return sortIndex;
 	}
 
-	public void setDefaultWidth(boolean defaultWidth) {
-		this.defaultWidth = defaultWidth;
+	/**
+	 * @param sortIndex the sortIndex to set
+	 */
+	public void setSortIndex(int sortIndex) {
+		this.sortIndex = sortIndex;
 	}
 
-	public int getWidth() {
-		return width;
+	/**
+	 * @return the splitIndices
+	 */
+	public SplitPartWidthData[] getSplitIndices() {
+		return splitIndices;
 	}
 
-	public void setWidth(int width) {
-		this.width = width;
+	/**
+	 * @param splitIndices the splitIndices to set
+	 */
+	public void setSplitIndices(SplitPartWidthData[] splitIndices) {
+		this.splitIndices = splitIndices;
 	}
 }

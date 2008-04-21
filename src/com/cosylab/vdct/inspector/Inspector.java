@@ -484,7 +484,6 @@ private javax.swing.JTable getScrollPaneTable() {
 		try {
 			tableModel = new InspectorTableModel(this);
 
-			//TODO: continue here
 			ivjScrollPaneTable = new InspectorTable(tableModel, InspectorManager.getInstance());
 			getTableScrollPane().setColumnHeaderView(ivjScrollPaneTable.getTableHeader());
 			// this caused visibility icon problems when scrolling

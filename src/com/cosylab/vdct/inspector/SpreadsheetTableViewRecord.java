@@ -27,6 +27,9 @@
  */
 package com.cosylab.vdct.inspector;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /** This stores the view of a single spreadsheet table.
  * 
  * @author ssah
@@ -41,7 +44,7 @@ public class SpreadsheetTableViewRecord {
 	private Integer backgroundColor = null;
 
 	private SpreadsheetRowOrder rowOrder = null;
-	private SpreadsheetColumnData[] columns = null;
+	private Map columns = null;
 	private SplitData[] splitColumns = null;
 	private String[] hiddenRows = null;
 	private SplitData[] recentSplits = null;
@@ -54,6 +57,7 @@ public class SpreadsheetTableViewRecord {
 		super();
 		this.type = type;
 		this.name = name;
+		columns = new HashMap();
 	}
 	
 	/**
@@ -91,13 +95,6 @@ public class SpreadsheetTableViewRecord {
 		this.rowOrder = rowOrder;
 	}
 
-	/**
-	 * @return the columns
-	 */
-	public SpreadsheetColumnData[] getColumns() {
-		return columns;
-	}
-	
 	/**
 	 * @return the splitColumns
 	 */
@@ -145,13 +142,6 @@ public class SpreadsheetTableViewRecord {
 	}
 
 	/**
-	 * @param columns the columns to set
-	 */
-	public void setColumns(SpreadsheetColumnData[] columns) {
-		this.columns = columns;
-	}
-
-	/**
 	 * @param splitColumns the splitColumns to set
 	 */
 	public void setSplitColumns(SplitData[] splitColumns) {
@@ -186,5 +176,19 @@ public class SpreadsheetTableViewRecord {
 
 	public void setBackgroundColor(Integer backgroundColor) {
 		this.backgroundColor = backgroundColor;
+	}
+
+	/**
+	 * @return the columns
+	 */
+	public Map getColumns() {
+		return columns;
+	}
+
+	/**
+	 * @param columns the columns to set
+	 */
+	public void setColumns(Map columns) {
+		this.columns = columns;
 	}
 }

@@ -40,9 +40,6 @@ import com.cosylab.vdct.vdb.CommentProperty;
  */
 public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 
-	// TODO
-	//private SpreadsheetTable table = null;
-	
     private int modelColumnCount = 0;
 	private InspectableProperty[][] model = null;
 
@@ -77,9 +74,9 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 	 */
 	public void recallView() {
 		super.recallView();
+		refreshModel();
 		recallSplitData();
 		recallViewData();
-		refreshModel();
 	}
 
 	/* (non-Javadoc)
@@ -190,17 +187,6 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 		return super.getPropertyDisplayTypeAt(row, modelToPropertiesColumnIndex[column]);
 	}
 
-	// TODO
-	/*
-	public void setTable(SpreadsheetTable table) {
-	    this.table = table;
-	}
-
-	public SpreadsheetTable getTable() {
-	    return table;
-	}
-	*/
-
 	/* Returns the multi-line string associated with the cell at the given position, or null it there is
 	 * none. 
 	 */
@@ -222,9 +208,14 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 	}
 	
 	public boolean isSplit(int column) {
-		return propertiesColumnSplitData[modelToPropertiesColumn(column)] != null;		
+		return propertiesColumnSplitData[splitToBaseColumn(column)] != null;		
 	}
 
+	public int getSplitParts(int baseColumn) {
+		SplitData splitData = propertiesColumnSplitData[baseColumn];
+		return splitData != null ? splitData.getParts() : 1;		
+	}
+	
     public int getPropertyColumn(int column) {
     	return super.getPropertyColumn(modelToPropertiesColumnIndex[column]);
     }
@@ -252,7 +243,7 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 	}
 	
 	public void splitColumn(SplitData splitData, int column) {
-		int propertiesColumn = modelToPropertiesColumn(column); 
+		int propertiesColumn = splitToBaseColumn(column); 
 		if (splitData != null) {
 			splitData.setName(getPropertiesColumnNames(propertiesColumn));
 		}
@@ -271,12 +262,15 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 	}
 	
 	public void setColumnOrder(String modeName) {
+		storeSplitData();
+		storeViewData();
+		super.setColumnOrder(modeName);
 
-		int newMode = getColumnOrderIndex(modeName);
-		if (newMode != -1) {
-			setColumnOrderIndex(newMode);
-			refreshModel();
-		}
+		refreshSplitData();
+		refreshModel();
+
+		recallSplitData();
+		recallViewData();
 	}
 	
 	/* Returns -1 if the column at the index should not be dragged. 
@@ -300,7 +294,6 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 
 		InspectableProperty property = model[row][column];
 
-		int propertiesRow = modelToPropertiesRowIndex(row);
 		int propertiesColumn = modelToPropertiesColumnIndex[column];
 		
 		if (property instanceof SplitPropertyPart) {
@@ -311,7 +304,7 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 			InspectableProperty baseProperty = propertyGroup.getOwner(); 
 			
 			if (baseProperty instanceof CreatorProperty) {
-				super.setValueAt(aValue, propertiesRow, propertiesColumn);
+				super.setValueAt(aValue, row, propertiesColumn);
 				propertyGroup.setOwner(((CreatorProperty)baseProperty).getCreatedProperty());
 			}
 			property.setValue(aValue.toString());
@@ -319,7 +312,7 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 			/* If this isn't a split part, just call the base function and update the model data structure if a new
 			 * property has been created by creator property.
 			 */
-			super.setValueAt(aValue, propertiesRow, propertiesColumn);
+			super.setValueAt(aValue, row, propertiesColumn);
 			if (property instanceof CreatorProperty) {
 				model[row][column] = ((CreatorProperty)property).getCreatedProperty();
 			}
@@ -334,6 +327,9 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
    			refreshModel();
 		}
 		*/
+
+		// Update the whole row as validity of this inspectable's fields can change on property value change. 
+		fireTableRowsUpdated(row, row);
 	}
 	
 	public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -349,7 +345,7 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 	}
 	
 	public int getHeaderDisplayType(int column) {
-	    return super.getHeaderDisplayType(modelToPropertiesColumn(column));
+	    return super.getHeaderDisplayType(splitToBaseColumn(column));
 	}
 
 	public void extendCounters(int[] rows, int[] columns) {
@@ -395,14 +391,15 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 		return modelColumnNames[column];
 	}
 
-	protected final int modelToPropertiesColumn(int column) {
+	protected final int splitToBaseColumn(int column) {
 		return super.visibleToBaseColumn(modelToPropertiesColumnIndex[column]);
 	}
 
-    protected int modelToPropertiesRowIndex(int modelRow) {
-    	return super.visibleToBaseRow(modelRow);
-    }
-
+	protected final int baseToSplitColumn(int column) {
+		int visibleIndex = super.baseToVisibleColumn(column);
+		return visibleIndex >= 0 ? propertiesToModelColumnIndex[visibleIndex] : -1;
+	}
+	
 	private void refreshModel() {
 
 		int viewColumnCount = super.getColumnCount();
@@ -496,51 +493,6 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 		    }
 		}
 	}
-	
-	// TODO remove when on upper layer
-	/*
-	private void clearColumnModel() {
-		if (table == null) {
-		    return;
-		}
-		
-        TableColumnModel columnModel = table.getTableHeader().getColumnModel();
-        while (columnModel.getColumnCount() > 0) {
-        	columnModel.removeColumn(columnModel.getColumn(0));
-        }
-	}
-	
-	private void createDefaultColumnModel() {
-		
-		if (table == null) {
-		    return;
-		}
-		
-        TableColumnModel columnModel = table.getTableHeader().getColumnModel();
-		for (int j = 0; j < modelColumnCount; j++) {
-			boolean isSplitFirst = propertiesToModelColumnIndex[modelToPropertiesColumnIndex[j]] == j;
-    		TableColumn column = createColumn(j, isSplitFirst, true);
-		    columnModel.addColumn(column);
-		}
-	}
-	
-	private TableColumn createColumn(int colIndex, boolean identifier, boolean defaultWidth) {
-		TableColumn column = new SpreadsheetColumn(defaultWidth);
-		column.setModelIndex(colIndex);
-		column.setHeaderRenderer(table.getDefaultRenderer(String.class));
-		String name = super.getColumnId(modelToPropertiesColumnIndex[colIndex]);
-		if (name.equals(propertiesCommentsColumn)) {
-			column.setCellEditor(new DefaultCellEditor(new JTextField()){
-				public boolean isCellEditable(EventObject anEvent) {
-					return false;
-				}
-			});
-		}
-		column.setIdentifier(identifier ? name : null);
-		column.setHeaderValue(modelColumnNames[colIndex]);
-		return column;
-	}
-	*/ 
 
 	private void recallSplitData() {
 		SpreadsheetTableViewRecord record = getViewRecord();
@@ -577,11 +529,14 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
         	String orderedColumnName = rowOrder.getColumnName();
         	int index = getPropertiesColumnIndex(orderedColumnName);
         	if (index >= 0) {
-        		sortedSplitIndex = rowOrder.getColumnSplitIndex();
-        		int modelIndex = propertiesToModelColumnIndex[baseToVisibleColumn(sortedColumn)] + sortedSplitIndex;
-        		int[] order = PropertyComparator.getOrder(model, true, modelIndex, sortedOrderAsc);
-        		setRowOrder(order);
-        		refreshModel();
+        		int visibleIndex = baseToVisibleColumn(sortedColumn);
+        		if (visibleIndex >= 0) {
+        			sortedSplitIndex = rowOrder.getColumnSplitIndex();
+        			int modelIndex = propertiesToModelColumnIndex[visibleIndex] + sortedSplitIndex;
+        			int[] order = PropertyComparator.getOrder(model, true, modelIndex, sortedOrderAsc);
+        			setRowOrder(order);
+        			refreshModel();
+        		}
         	}
         }
 	}
@@ -637,20 +592,13 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 	
 	private void refreshSplitData() {
 		
-		// Prepare space for properties column data.
 		int propertiesColumnCount = getPropertiesColumnCount();
-		propertiesColumnSplitData = new SplitData[propertiesColumnCount];
-		for (int j = 0; j < propertiesColumnCount; j++) {
-		    propertiesColumnSplitData[j] = null;
+		if (propertiesColumnSplitData == null || propertiesColumnSplitData.length != propertiesColumnCount) {
+			// Prepare space for properties column data.
+			propertiesColumnSplitData = new SplitData[propertiesColumnCount];
+			for (int j = 0; j < propertiesColumnCount; j++) {
+			    propertiesColumnSplitData[j] = null;
+			}
 		}
 	}
-	
-	// TODO: move to upper layer
-	/*
-	private void refreshColumnModel() {
-		refreshModel();
-		clearColumnModel();
-	    createDefaultColumnModel();
-	}
-	*/
 }

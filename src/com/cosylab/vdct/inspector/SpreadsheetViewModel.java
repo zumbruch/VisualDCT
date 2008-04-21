@@ -28,6 +28,10 @@
 
 package com.cosylab.vdct.inspector;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Vector;
 
 /**
@@ -66,7 +70,7 @@ public class SpreadsheetViewModel extends SpreadsheetTableModel {
 	 */
 	public void recallView() {
 		super.recallView();
-		refreshAll();
+		refreshTables();
 		recallRowsVisibilityAndOrder();
 		recallColumnsVisibilityAndOrder();
 	}
@@ -216,7 +220,11 @@ public class SpreadsheetViewModel extends SpreadsheetTableModel {
 	}
 	
 	protected final int visibleToBaseRow(int row) {
+		try {
 		return orderedToBaseRow[visibleToAllRow[row]];
+		} catch (Exception e) {
+		}
+		return 0;
 	}
 
 	protected final int baseToVisibleColumn(int column) {
@@ -226,8 +234,13 @@ public class SpreadsheetViewModel extends SpreadsheetTableModel {
 	protected final int visibleToBaseColumn(int column) {
 		return orderedToBaseColumn[visibleToAllColumn[column]];
 	}
-	
+
 	private void recallRowsVisibilityAndOrder() {
+		recallRowsVisibility();
+		recallRowsOrder();
+	}
+
+	private void recallRowsVisibility() {
 		SpreadsheetTableViewRecord record = getViewRecord();
 
 		boolean refreshVisibility = false;
@@ -257,7 +270,11 @@ public class SpreadsheetViewModel extends SpreadsheetTableModel {
 			refreshAllToVisibleRow();
 			refreshVisibleToAllRow();
 		}
-		
+	}
+	
+	private void recallRowsOrder() {
+		SpreadsheetTableViewRecord record = getViewRecord();
+
     	SpreadsheetRowOrder rowOrder = record.getRowOrder();
         if (rowOrder != null) {
         	String orderedColumnName = rowOrder.getColumnName();
@@ -269,28 +286,68 @@ public class SpreadsheetViewModel extends SpreadsheetTableModel {
         	}
         }
 	}
-
+	
 	private void recallColumnsVisibilityAndOrder() {
+		recallColumnsVisibility();
+		recallColumnsOrder();
+	}
+
+	private void recallColumnsVisibility() {
 
 		SpreadsheetTableViewRecord record = getViewRecord();
-        SpreadsheetColumnData[] columns = record.getColumns();
-		if (columns != null && columns.length > 0) {
+        Map columnsMap = record.getColumns();
+        Iterator columnsIterator = columnsMap.values().iterator();
+        
+		if (!columnsMap.isEmpty()) {
 
 		    // Clear data, except for the first empty column.  
-	        baseToOrderedColumn[0] = 0;
 	        columnVisibilities[0] = true;
 			for (int c = 1; c < baseToOrderedColumn.length; c++) {
-		        baseToOrderedColumn[c] = -1;
 		        columnVisibilities[c] = false;
 			}
 			
+			SpreadsheetColumnData column = null;
+			while (columnsIterator.hasNext()) {
+				column = (SpreadsheetColumnData)columnsIterator.next();
+            	int index = getPropertiesColumnIndex(column.getName());
+            	if (index >= 0) {
+            		columnVisibilities[index] = !column.isHidden();
+            	}
+            }
+			refreshAllToVisibleColumn();
+			refreshVisibleToAllColumn();
+		}
+	}
+
+	private void recallColumnsOrder() {
+
+		SpreadsheetTableViewRecord record = getViewRecord();
+        Map columnsMap = record.getColumns();
+        Iterator columnsIterator = columnsMap.values().iterator();
+        
+		if (!columnsMap.isEmpty()) {
+
+		    // Clear data, except for the first empty column.  
+	        baseToOrderedColumn[0] = 0;
+			for (int c = 1; c < baseToOrderedColumn.length; c++) {
+		        baseToOrderedColumn[c] = -1;
+			}
+			
+			SpreadsheetColumnData[] columns = new SpreadsheetColumnData[columnsMap.size()];
+			int i = 0;
+			while (columnsIterator.hasNext()) {
+				columns[i] = (SpreadsheetColumnData)columnsIterator.next();
+				i++;
+            }
+			Arrays.sort(columns);
+			
 	    	// The first empty column is always there, so loaded columns have positions starting at 1.
 			int orderedIndex = 1;
+			
 			for (int c = 0; c < columns.length; c++) {
-            	int index = getPropertiesColumnIndex(columns[c].getColumnName());
+            	int index = getPropertiesColumnIndex(columns[c].getName());
             	if (index >= 0) {
             		baseToOrderedColumn[index] = orderedIndex;
-            		columnVisibilities[index] = !columns[c].isHidden();
             		orderedIndex++;
             	}
             }
@@ -309,6 +366,11 @@ public class SpreadsheetViewModel extends SpreadsheetTableModel {
 	}
 
 	private void storeRowsVisibilityAndOrder() {
+		storeRowsVisibility();
+		storeRowsOrder();
+	}
+	
+	private void storeRowsVisibility() {
 
 		SpreadsheetTableViewRecord record = getViewRecord();
 
@@ -354,6 +416,11 @@ public class SpreadsheetViewModel extends SpreadsheetTableModel {
         } else {
     		record.setHiddenRows(null);
         }
+	}
+
+	private void storeRowsOrder() {
+
+		SpreadsheetTableViewRecord record = getViewRecord();
         
 		boolean defaultNoSortOrder = (sortedColumn == -1);
         if (!defaultNoSortOrder) {
@@ -376,21 +443,21 @@ public class SpreadsheetViewModel extends SpreadsheetTableModel {
         }
 
 		SpreadsheetTableViewRecord record = getViewRecord();
-        
-        if (!defaultColumnVisibilityAndOrder) {
-        	Vector columnData = new Vector();
+
+    	Map columnsMap = record.getColumns();
+    	Map map = new HashMap();
+
+    	if (!defaultColumnVisibilityAndOrder) {
         	// Save ordered, exclude the first.
             for (int c = 1; c < orderedToBaseColumn.length; c++) {
             	int baseIndex = orderedToBaseColumn[c];
             	String name = getPropertiesColumnNames(baseIndex);
-            	columnData.add(new SpreadsheetColumnData(name, !columnVisibilities[baseIndex], true, 0));
+            	SpreadsheetColumnData column = (SpreadsheetColumnData)columnsMap.get(name);
+            	SplitPartWidthData[] splitData = (column != null) ? column.getSplitIndices() : new SplitPartWidthData[0]; 
+            	map.put(name, new SpreadsheetColumnData(name, !columnVisibilities[baseIndex], c, splitData));
             }
-            SpreadsheetColumnData[] columns = new SpreadsheetColumnData[columnData.size()]; 
-            columnData.copyInto(columns);
-    		record.setColumns(columns);
-        } else {
-    		record.setColumns(null);
         }
+    	record.setColumns(map);
 	}
 	
     public int getPropertyRow(int row) {
@@ -399,6 +466,15 @@ public class SpreadsheetViewModel extends SpreadsheetTableModel {
 
     public int getPropertyColumn(int column) {
     	return visibleToBaseColumn(column);
+    }
+    
+    public void setColumnOrder(String modeName) {
+		storeRowsVisibilityAndOrder();
+	    storeColumnsVisibilityAndOrder();
+	    super.setColumnOrder(modeName);
+		refreshTables();
+		recallRowsVisibilityAndOrder();
+		recallColumnsVisibility();
     }
     
     public boolean isPropertiesColumnVisible(int column) {
