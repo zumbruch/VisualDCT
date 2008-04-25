@@ -414,7 +414,7 @@ public Object findObject(String objectName, boolean deep) {
 		return null; 	
 	else if (relName.length()==0 || relName.charAt(0)==Constants.GROUP_SEPARATOR)
 	{
-		com.cosylab.vdct.Console.getInstance().println("Invalid name '"+objectName+"'.");
+		//com.cosylab.vdct.Console.getInstance().println("Invalid name '"+objectName+"'.");
 		return null; 	
 	}
 	else if (Group.hasTokens(relName))

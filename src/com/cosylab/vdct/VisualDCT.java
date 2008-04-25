@@ -109,6 +109,7 @@ import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.printing.Page;
 import com.cosylab.vdct.graphics.printing.PrintPreview;
 import com.cosylab.vdct.inspector.SpreadsheetInspector;
+import com.cosylab.vdct.plugin.config.PluginNameConfigManager;
 import com.cosylab.vdct.util.ComboBoxFileChooser;
 import com.cosylab.vdct.util.DBDEntry;
 import com.cosylab.vdct.util.UniversalFileFilter;
@@ -6296,13 +6297,14 @@ public void newRecordDialog_WindowOpened(
     Object[] names = DataProvider.getInstance().getRecordTypes();
     JComboBox combo = getTypeComboBox();
 
+    
     if (names.length > combo.getItemCount())
      {
-	    ComboBoxModel model = combo.getModel();
+        ComboBoxModel model = combo.getModel();
+    	boolean found = false;
 	    
 		for (int i = 0; i < names.length; i++)
 		{
-			boolean found = false;
 			int c = model.getSize();
 			for (int j=0;!found && (j<c); j++)
 				if (model.getElementAt(j).equals(names[i]))
@@ -6313,9 +6315,25 @@ public void newRecordDialog_WindowOpened(
 		}
      }
 
+    ComboBoxModel model = getNameTextField().getModel();
+	String defaultName = PluginNameConfigManager.getInstance().getDefaultName();
+	if (defaultName != null) {
+		int j = 0;
+		for (j = 0; j < model.getSize(); j++) {
+			if (model.getElementAt(j).equals(defaultName)) {
+				break;
+			}
+		}
+		if (j == model.getSize()) {
+			getNameTextField().addItem(defaultName);
+		}
+	}
+
     Object selected = getNameTextField().getSelectedItem();
-    if (selected != null && !selected.toString().endsWith(":"))
-        getNameTextField().setSelectedItem("");
+    if (selected != null && !selected.toString().endsWith(":")) {
+    	getNameTextField().setSelectedItem(defaultName != null ? defaultName : "");
+    }
+	
     //getNameTextField().setText("");
     getWarningLabel().setText(" ");
     getOKButton().setEnabled(false);

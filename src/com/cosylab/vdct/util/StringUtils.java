@@ -29,6 +29,9 @@ package com.cosylab.vdct.util;
  */
 
 import java.awt.Color;
+import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This type was created in VisualAge.
@@ -274,5 +277,85 @@ public static String incrementName(String newName, String suffix)
 	return newName;
 }
 
+/**
+ * Expands simple numeric macros in the form [starting_value-ending_value] and returns a list of all expansions.
+ * 
+ * Example:
+ * 
+ * block[1-3]value[2-1]drop[0-0]
+ * 
+ * becomes
+ * {block1value2drop0,
+ *  block1value1drop0,
+ *  block2value2drop0,
+ *  block2value1drop0,
+ *  block3value2drop0,
+ *  block3value1drop0}
+ */
+public static String[] expandMacros(String string) {
+	String expression = "\\[([\\d]+)-([\\d]+)\\]";
+	
+	Pattern pattern = Pattern.compile(expression);
+	Matcher matcher = pattern.matcher(string);
+	
+	Vector vector = new Vector();
+	
+	int startPos = 0; 
+	
+	while (matcher.find()) {
+		int groupCount = matcher.groupCount();
+		System.out.println("Group count " + groupCount);
+
+		try {
+			Integer lowVal = new Integer(matcher.group(1));
+			Integer highVal = new Integer(matcher.group(2));
+			vector.add(new Object[] {string.substring(startPos, matcher.start(0)), lowVal, highVal});
+			startPos = matcher.end(0);
+		} catch (NumberFormatException exception) {
+			// nothing
+		}
+		int group = 0;
+		while (group < groupCount + 1) {
+			System.out.println("Group " + group + ": " + matcher.group(group));
+			group++;
+		}
+	}
+	String ending = string.substring(startPos);
+
+	int dimSize = vector.size();
+	String[] stringParts = new String[dimSize];
+	int[] startVals = new int[dimSize];
+	int[] endVals = new int[dimSize];
+	for (int i = 0; i < vector.size(); i++) {
+		stringParts[i] = (String)((Object[])vector.get(i))[0]; 
+		startVals[i] = ((Integer)((Object[])vector.get(i))[1]).intValue();
+		endVals[i] = ((Integer)((Object[])vector.get(i))[2]).intValue();
+	}
+	
+	int count = 1;
+	int[] dimensions = new int[dimSize];
+	int[] positions = new int[dimSize];
+	for (int d = 0; d < dimSize; d++) {
+		dimensions[d] = Math.abs(startVals[d] - endVals[d]) + 1; 
+		count *= dimensions[d];
+	}
+	
+	String[] strings = new String[count];
+
+	int pos = 0;
+	for (int s = 0; s < count; s++) {
+		string = "";
+		pos = s;
+		for (int d = dimSize - 1; d >= 0; d--) {
+			positions[d] = pos % dimensions[d];
+			pos /= dimensions[d];
+		}
+		for (int d = 0; d < dimSize; d++) {
+			string += stringParts[d] + (startVals[d] + positions[d] * (endVals[d] - startVals[d] >= 0 ? 1 : 0));
+		}
+		strings[s] = string + ending;
+	}
+	return strings;
+}
 
 }

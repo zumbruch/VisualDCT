@@ -31,6 +31,7 @@ import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.events.commands.GetGUIInterface;
 import com.cosylab.vdct.events.commands.GetVDBManager;
 import com.cosylab.vdct.graphics.objects.Flexible;
+import com.cosylab.vdct.plugin.config.PluginNameConfigManager;
 import com.cosylab.vdct.vdb.NameValueInfoProperty;
 
 /**
@@ -108,6 +109,13 @@ public class NameProperty extends NameValueInfoProperty {
 		return checkNewName(value);
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.vdb.NameValueInfoProperty#getToolTipText()
+	 */
+	public String getToolTipText() {
+		return PluginNameConfigManager.getInstance().getNameDescription();
+	}
+
 	private String checkNewName(String name) {
 
 		if (!flexible) {
