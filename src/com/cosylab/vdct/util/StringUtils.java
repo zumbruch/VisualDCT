@@ -242,14 +242,22 @@ public static String incrementName(String newName, String suffix)
 	int i = newName.length()-1;
 	for (; i>=0 && Character.isDigit(newName.charAt(i)); i--)
 		snum = newName.charAt(i) + snum;
+	
+	int value = -1;
+	try {
+		value = Integer.parseInt(snum);
+	} catch (NumberFormatException exception) {
+		// nothing
+	}
+	
 	i++;
-	if (snum!=nullString)
+	if (snum!=nullString && value != -1)
 	{
 		// skip leading zeros
 		for (; i<(newName.length()-1) && newName.charAt(i)=='0'; i++);
 
-		int len = String.valueOf(Integer.parseInt(snum)).length();
-		snum = String.valueOf(Integer.parseInt(snum)+1);
+		int len = String.valueOf(value).length();
+		snum = String.valueOf(value+1);
 		
 		// preserve number of digits
 		if (snum.length()>len && i>0 && newName.charAt(i-1)=='0')

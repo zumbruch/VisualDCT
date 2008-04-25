@@ -52,6 +52,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.TableModelEvent;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
@@ -91,6 +92,7 @@ public class SpreadsheetTable extends JTable implements ActionListener{
     private JMenuItem showAllRowsItem = null;
     private JMenuItem extendCountersItem = null;
 
+    private JMenuItem defaultColumnVisibilityItem = null;
     private JMenuItem hideAllItem = null;
     private JMenuItem showAllItem = null;
     
@@ -116,6 +118,7 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 	private static final String hide = "Hide column"; 
 	private static final String sortAsc = "Sort ascending"; 
 	private static final String sortDes = "Sort descending"; 
+	private static final String defaultColumnVisibilityString = "Default column visibility"; 
 	private static final String showAll = "Show all columns"; 
 	private static final String hideAll = "Hide all columns"; 
 	private static final String presetColumnOrders = "Preset column orders"; 
@@ -138,8 +141,8 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 	private static final String deleteRow = "Delete row"; 
 	private static final String deleteRows = "Delete rows"; 
 
+    private static final String defaultColumnVisibilityToolTip = "Shows columns with non-default values.";
     private static final String extendCountersToolTip = "Increase counters in selected region.";
-
     private static final String colorChooserTitle = "Set the table background color";
 
 	public SpreadsheetTable(SpreadsheetInspector inspector, JScrollPane pane, Vector data) {
@@ -149,6 +152,7 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 	    setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 	    setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 	    setColumnSelectionAllowed(true);
+	    
 	    setBackground(new Color(204, 204, 204));
 	    setShowVerticalLines(true);
 	    setGridColor(Color.black);
@@ -162,6 +166,66 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 	    // Create static gui elements.
 	    createColumnPopupMenu();
 	    createRowPopupMenu();
+	}
+
+	/* Refit column widths for columns that have a default width.
+	 * 
+	 * @see javax.swing.JTable#tableChanged(javax.swing.event.TableModelEvent)
+	 */
+	public void tableChanged(TableModelEvent e) {
+		super.tableChanged(e);
+		
+		// On INSERT and DELETE the widths are updated trough other calls. 
+		if (e.getType() == TableModelEvent.UPDATE) {
+			
+			if (getFont() != null) {
+				FontMetrics metrics = graphics.getFontMetrics(getFont());
+				TableColumnModel colModel = getColumnModel();
+
+				int startColumn = e.getColumn();
+				int endColumn = e.getColumn() + 1;
+				if (e.getColumn() == TableModelEvent.ALL_COLUMNS) {
+					startColumn = 0;
+					endColumn = colModel.getColumnCount();
+				}
+
+				int startRow = 0;
+				int endRow = sprModel.getRowCount();
+				// Faster but cannot shrink widths back.
+				// startRow = e.getFirstRow();
+				// endRow = e.getLastRow() + 1;
+				if (e.getColumn() == TableModelEvent.ALL_COLUMNS) {
+					startColumn = 0;
+					endColumn = colModel.getColumnCount();
+				} 
+				
+				SpreadsheetColumn column = null;
+				for (int c = startColumn; c < endColumn; c++) {
+					column = (SpreadsheetColumn)colModel.getColumn(c);
+					if (column.isDefaultWidth()) {
+
+						int colWidth = (c == 0) ? firstColumnWidth : minColumnWidth;
+
+						column = (SpreadsheetColumn)getColumnModel().getColumn(c);
+
+						String value = column.getHeaderValue().toString();
+						colWidth = Math.max(colWidth, metrics.stringWidth(value) + columnMargin);
+
+						for (int r = startRow; r < endRow; r++) {
+							value = getValueAt(r, c).toString();
+							colWidth = Math.max(colWidth, metrics.stringWidth(value) + columnMargin);
+						}
+						// Faster but cannot shrink widths back.
+						/*
+						if (column.getPreferredWidth() < colWidth) {
+							column.setPreferredWidth(colWidth);
+						}
+						*/
+						column.setPreferredWidth(colWidth);
+					}
+				}
+			}
+		}
 	}
 
 	/** When selecting the fields in the first column, selects the whole row.
@@ -250,6 +314,7 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 	    		propertiesColumnMenuItem[propertyColumn].setSelected(false);
 				sprModel.setColumnsVisibility(new int[] {popupModelColumn}, false);
     			setDefaultWidthColumnsToFit();
+    			clearSelection();
 	    	}
 		} else if (action.equals(whitespaces) || action.equals(customPattern)) {
 
@@ -289,6 +354,7 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 	    			refreshRecentSplitsMenu();
 	    			setDefaultWidthColumnsToFit();
 	    			getTableHeader().repaint();
+	    			clearSelection();
 				}
 			}
 		} else if (action.equals(join)) {
@@ -297,28 +363,40 @@ public class SpreadsheetTable extends JTable implements ActionListener{
     			refreshRecentSplitsMenu();
     			setDefaultWidthColumnsToFit();
     			getTableHeader().repaint();
+    			clearSelection();
 	    	}
 		} else if (action.equals(sortAsc) || action.equals(sortDes)) {
 	    	if (popupModelColumn >= 0) {
 	    		sprModel.sortRowsByColumn(popupModelColumn);
     			setDefaultWidthColumnsToFit();
+    			clearSelection();
 	    	}
+		} else if (action.equals(defaultColumnVisibilityString)) {
+			sprModel.setDefaultColumnVisibility();
+	    	refreshPropertiesColumnMenuItemsState();
+			setDefaultWidthColumnsToFit();
+			clearSelection();
 		} else if (action.equals(hideAll) || action.equals(showAll)) {
 		    boolean visible = action.equals(showAll);
-
-		    // do this on all but the first two
-		    int startColumn = sprModel.getSolidProperitiesColumnCount() + 1;
-		    int endColumn = propertiesColumnMenuItem.length;
 		    
-		    int[] columns = new int[endColumn - startColumn];
-		    // do this on all but the first two
-		    for (int i = startColumn; i < endColumn; i++) {
-		    	//sprModel.setPropertiesColumnVisibility(visible, i);
-		    	propertiesColumnMenuItem[i].setSelected(visible);
-		    	columns[i - startColumn] = i;
+		    int hideableColumnCount = 0;
+		    for (int i = 0; i < sprModel.getPropertiesColumnCount(); i++) {
+		    	if (!sprModel.isSolidBaseColumn(i)) {
+		    		propertiesColumnMenuItem[i].setSelected(visible);
+		    		hideableColumnCount++;
+		    	}
+		    }
+		    int[] columns = new int[hideableColumnCount];
+		    int h = 0;
+		    for (int i = 0; i < sprModel.getPropertiesColumnCount(); i++) {
+		    	if (!sprModel.isSolidBaseColumn(i)) {
+		    		columns[h] = i;
+		    		h++;
+		    	}
 		    }
 			sprModel.setPropertyColumnsVisibility(columns, visible);
 			setDefaultWidthColumnsToFit();
+			clearSelection();
 		    
 		} else if (action.equals(showAllRowsString)) {
 		    boolean state = ((JCheckBoxMenuItem)source).isSelected();
@@ -326,6 +404,7 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 		    refreshShowAllRowsItem();
 			setDefaultWidthColumnsToFit();
 			getTableHeader().repaint();
+			clearSelection();
 		} else if (action.equals(backgroundColorString)) {
 		    final JColorChooser chooser = ColorChooser.getInstance();
 		    
@@ -361,6 +440,7 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 			}
 			sprModel.setRowsVisibility(selRows, visible);
 			setDefaultWidthColumnsToFit();
+			clearSelection();
 		
 		} else if (action.equals(deleteRow) || action.equals(deleteRows)) {
 
@@ -369,11 +449,13 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 				selRows = new int[] {popupModelRow};
 			}
 			sprModel.deleteRows(selRows);
+			clearSelection();
 			
 		} else if (source instanceof JCheckBoxMenuItem) {
 			int columnIndex = sprModel.getPropertiesColumnIndex(action);
 			sprModel.setPropertyColumnsVisibility(new int[] {columnIndex}, ((JCheckBoxMenuItem)source).isSelected());
 			setDefaultWidthColumnsToFit();
+			clearSelection();
 		} else {
 			if (popupModelColumn >= 0) {
 				int recentIndex = getRecentSplitDataIndex(action);
@@ -382,6 +464,7 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 	    			refreshRecentSplitsMenu();
 	    			setDefaultWidthColumnsToFit();
 	    			getTableHeader().repaint();
+	    			clearSelection();
               		return;
 				}
 			}
@@ -437,6 +520,7 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 			    			sprModel.sortRowsByColumn(columnModelIndex);
 			    			setDefaultWidthColumnsToFit();
 			    		}
+		    			clearSelection();
 			    	}
 	            } else if (event.getButton() == MouseEvent.BUTTON3) {
 	            	displayPopupMenu(true, getThis(), -1, columnModelIndex, posX, posY);
@@ -496,6 +580,7 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 			    		if (newViewIndex != draggedColumnViewIndex) {
 			    			sprModel.repositionColumn(draggedColumnViewIndex, newViewIndex);
 			    			setDefaultWidthColumnsToFit();
+			    			clearSelection();
 			    		}
 			    		draggedColumnModelIndex = -1;
 			    	}
@@ -555,15 +640,24 @@ public class SpreadsheetTable extends JTable implements ActionListener{
         boolean first = column == 0;
         boolean onRow = row >= 0;
         boolean onColumn = column >= 0;
-        boolean wholeRowSelected = getSelectedRow() >= 0 && getSelectedColumn() == 0;   
-        
+        boolean mouseOverSelectedRow = false;
+        if (getSelectedRow() >= 0 && getSelectedColumn() == 0) {
+        	int[] selRows = getSelectedRows();
+        	int r = 0;
+        	for (r = 0; r < selRows.length; r++) {
+        		if (row == selRows[r]) {
+        			break;
+        		}
+        	}
+        	mouseOverSelectedRow = r < selRows.length;
+        }
         /* If there is a row selected or the click is on the first column, bring up a row popup menu, otherwise bring
          * up a column popup menu.
          */
-        if (wholeRowSelected || (first && onRow)) {
+        if (mouseOverSelectedRow || (first && onRow)) {
         	/* Enable quick hidden row switching when all rows are displayed and none selected.
         	 */
-        	if (wholeRowSelected || !sprModel.isShowAllRows()) {
+        	if (mouseOverSelectedRow || !sprModel.isShowAllRows()) {
         		
                 boolean multipleSelected = getSelectedRowCount() > 1;
                 boolean visible = false; 
@@ -584,11 +678,12 @@ public class SpreadsheetTable extends JTable implements ActionListener{
         		boolean visible = sprModel.isRowVisible(row);
         		sprModel.setRowsVisibility(new int[] {row}, !visible);
     			setDefaultWidthColumnsToFit();
+    			clearSelection();
         	}
 
         } else {
         	boolean onTableOrHeader = (forHeader || onRow) && onColumn;
-        	boolean persistant = column <= sprModel.getSolidProperitiesColumnCount();
+        	boolean persistant = onColumn && sprModel.isSolidColumn(column);
         	boolean splitted = onTableOrHeader && sprModel.isSplit(column);
         	boolean manipulatable = onTableOrHeader && !first && !persistant; 
         	boolean sortable = onTableOrHeader && !first;
@@ -630,6 +725,11 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 
 	    sortSeparator = new JSeparator(); 
     	columnPopupMenu.add(sortSeparator);
+
+    	defaultColumnVisibilityItem = new JMenuItem(defaultColumnVisibilityString);
+    	defaultColumnVisibilityItem.setToolTipText(defaultColumnVisibilityToolTip);
+    	defaultColumnVisibilityItem.addActionListener(this);
+    	columnPopupMenu.add(defaultColumnVisibilityItem);
     	
     	hideAllItem = new JMenuItem(hideAll);
     	hideAllItem.addActionListener(this);
@@ -703,8 +803,10 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 	}
 
 	private void refreshPropertiesColumnMenuItemsState() {
-	    for (int i = sprModel.getSolidProperitiesColumnCount() + 1; i < propertiesColumnMenuItem.length; i++) {
-		   	propertiesColumnMenuItem[i].setSelected(sprModel.isPropertiesColumnVisible(i));
+		for (int i = 0; i < sprModel.getPropertiesColumnCount(); i++) {
+	    	if (!sprModel.isSolidBaseColumn(i)) {
+		   	    propertiesColumnMenuItem[i].setSelected(sprModel.isPropertiesColumnVisible(i));
+	    	}
 		}
 	}
 
@@ -762,20 +864,23 @@ public class SpreadsheetTable extends JTable implements ActionListener{
         propertiesVisibilityMenu.removeAll();
         JMenu menuToAdd = propertiesVisibilityMenu;
     	
-    	for (int j = 0; j < propertiesColumnCount; j++) {
+        int itemPos = 0; 
+        for (int j = 0; j < propertiesColumnCount; j++) {
+    		
+    		
    			JCheckBoxMenuItem checkBoxItem = new JCheckBoxMenuItem(sprModel.getPropertiesColumnNames(j));
    			propertiesColumnMenuItem[j] = checkBoxItem;
    			checkBoxItem.setSelected(true);
    			checkBoxItem.addActionListener(this);
-   			
-   	    	// Add check boxes for all but the unhideable and the first.
-   			int itemPos = j - (sprModel.getSolidProperitiesColumnCount() + 1); 
-   			if (itemPos >= 0) {
+
+	    	if (!sprModel.isSolidBaseColumn(j)) {
    				menuToAdd = PopUpMenu.addItem(checkBoxItem, menuToAdd, itemPos, visibilityMenuItemCount);
-   			}
+   				itemPos++;
+	    	}
     	}
     	
-    	boolean enabled = (propertiesColumnCount > sprModel.getSolidProperitiesColumnCount() + 1); 
+    	boolean enabled = (itemPos > 0); 
+    	defaultColumnVisibilityItem.setEnabled(enabled);
     	hideAllItem.setEnabled(enabled);
     	showAllItem.setEnabled(enabled);
     	propertiesVisibilityMenu.setEnabled(enabled);
@@ -793,5 +898,6 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 		setDefaultWidthColumnsToFit();
 		repaint();
 		getTableHeader().repaint();
+		clearSelection();
 	}
 }

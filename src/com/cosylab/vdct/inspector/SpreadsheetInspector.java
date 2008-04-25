@@ -27,6 +27,7 @@
  */
 package com.cosylab.vdct.inspector;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Event;
 import java.awt.GridBagConstraints;
@@ -152,16 +153,23 @@ public class SpreadsheetInspector extends JDialog
 			loadData();
 			refreshDynamicGUI();
 			DataProvider.getInstance().addInspectableListener(this);
+			DrawingSurface.getInstance().setPressedMousePosValid(false);
+			
 		} else {
 			saveView();
 			DataProvider.getInstance().removeInspectableListener(this);
+			DrawingSurface.getInstance().setPressedMousePosValid(true);
         }
 		super.setVisible(b);
 	}
 	
-	public void displayHelp(String text) {
+	public void setHelpText(String text) {
     	hintLabel.setText((text != null && text.length() > 0) ? text : " ");
     }
+
+	public void setHelpTextColor(Color color) {
+		hintLabel.setForeground(color);
+	}
 		
 	public void inspectableObjectAdded(Inspectable object) {
 		boolean added = addInstance(inspectables, object);
@@ -364,7 +372,7 @@ public class SpreadsheetInspector extends JDialog
     	
     	JPanel hintPanel = new JPanel(new GridBagLayout());
     	hintPanel.setBorder(new TitledBorder(hintTitle));
-		hintLabel = new JLabel(" ");
+		hintLabel = new JLabel();
     	GridBagConstraints constraints = new GridBagConstraints();
         constraints.anchor = GridBagConstraints.WEST;
     	constraints.weightx = 1.0;
@@ -542,7 +550,7 @@ public class SpreadsheetInspector extends JDialog
     	createTables();
         boolean noObjects = displayedInspectables.isEmpty();
     	
-    	hintLabel.setText(noObjects ? "No objects to display." : "");
+    	hintLabel.setText(noObjects ? "No objects to display." : " ");
     	newRowButton.setEnabled(!noObjects);
     	
     	if (noObjects) {
@@ -666,6 +674,7 @@ public class SpreadsheetInspector extends JDialog
     private void addNewRow() {
         Inspectable inspectable = tables[tabbedPane.getSelectedIndex()].getSpreadsheetModel().getLastInspectable();
         if (inspectable instanceof Record) {
+
         	// Create an unique name in the same fashion as while copying.
         	String name = inspectable.getName();
         	while (Group.getRoot().findObject(name, true) != null) {
@@ -673,7 +682,9 @@ public class SpreadsheetInspector extends JDialog
         	}
     		GetVDBManager manager = (GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
     		manager.getManager().createRecord(name, getTypeName(inspectable), true);
+
         } else if (inspectable instanceof Template) {
+        	
         	DrawingSurface.getInstance().createTemplateInstance(null, getTypeName(inspectable).toString(), true);
         }
     }

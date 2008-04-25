@@ -3945,7 +3945,7 @@ private javax.swing.JComboBox getNameTextField() {
                                     GetVDBManager validator = 
                                         (GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
                                     String errmsg = validator.getManager().checkRecordName(
-                                            			comboBoxTextField.getText(),
+                                            			comboBoxTextField.getText(), null,
                                                     	true
                                                     );
                                     if (errmsg == null) {
@@ -4042,7 +4042,7 @@ private javax.swing.JTextField getNewNameTextField() {
 			    }
 			    private void check(DocumentEvent e) {
 					GetVDBManager validator = (GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
-					String errmsg = validator.getManager().checkRecordName(ivjNewNameTextField.getText(), true);
+					String errmsg = validator.getManager().checkRecordName(ivjNewNameTextField.getText(), getOldNameLabel().getText(), true);
 					if (errmsg==null) {
 						getRenameOKButton().setEnabled(true);
 						getRenameWarningLabel().setText(" ");
@@ -6360,7 +6360,7 @@ public void oKButton_ActionPerformed(java.awt.event.ActionEvent actionEvent) {
 		    enteredValue = ((JTextField)actionEvent.getSource()).getText();
 		else
 			enteredValue = getNameTextField().getSelectedItem().toString();
-		String errmsg = manager.getManager().checkRecordName(enteredValue, true);
+		String errmsg = manager.getManager().checkRecordName(enteredValue, null, true);
 		if (errmsg==null || errmsg.startsWith("WARNING")) {
 		    // this will change value of combo box
 		    updateComboBoxHistory(getNameTextField(), enteredValue);
@@ -7117,7 +7117,7 @@ public void renameDialog_WindowOpened(java.awt.event.WindowEvent windowEvent) {
 public void renameOKButton_ActionPerformed(java.awt.event.ActionEvent actionEvent) {
 	if (getRenameOKButton().isEnabled()) {
 		GetVDBManager manager = (GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
-		String errmsg = manager.getManager().checkRecordName(getNewNameTextField().getText(), true);
+		String errmsg = manager.getManager().checkRecordName(getNewNameTextField().getText(), getOldNameLabel().getText(), true);
 		if (errmsg==null || errmsg.startsWith("WARNING")) {
 			GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
 		 	cmd.getGUIMenuInterface().rename(getOldNameLabel().getText(), getNewNameTextField().getText());

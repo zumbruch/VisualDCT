@@ -34,9 +34,9 @@ import com.cosylab.vdct.plugin.debug.PluginDebugManager;
 import com.cosylab.vdct.undo.UndoManager;
 import com.cosylab.vdct.vdb.CommentProperty;
 
-/**
+/**This table model supports splitting of columns.
+ *   
  * @author ssah
- *
  */
 public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 
@@ -125,6 +125,14 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 	}
 	
 	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.inspector.SpreadsheetViewModel#setDefaultColumnVisibility()
+	 */
+	public void setDefaultColumnVisibility() {
+		super.setDefaultColumnVisibility();
+		refreshModel();
+	}
+
+	/* (non-Javadoc)
 	 * @see com.cosylab.vdct.inspector.SpreadsheetViewModel#moveColumn(int, int)
 	 */
 	public void repositionColumn(int startIndex, int destIndex) {
@@ -206,6 +214,12 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 		}
 		return null;
 	}
+
+    /* Returns true if this property should not be hidden. First column and name column must not be hidden. 
+     */
+	public boolean isSolidColumn(int column) {
+		return super.isSolidColumn(modelToPropertiesColumnIndex[column]);
+	}
 	
 	public boolean isSplit(int column) {
 		return propertiesColumnSplitData[splitToBaseColumn(column)] != null;		
@@ -227,12 +241,6 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 	public Vector getRecentSplitData() {
 		return recentSplitData;
 	}
-	
-	/*
-	public int getModelRowCount() {
-		return modelRowCount;
-	}
-	*/
 	
 	public String getModelValue(int row, int column) {
 		return model[row][column].getValue();
@@ -276,45 +284,67 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 	/* Returns -1 if the column at the index should not be dragged. 
 	 */
 	public int validateDraggedColumnIndex(int columnIndex) {
-
-		// Change the dragged column to first of a split group. 
-		int firstOfSplits = propertiesToModelColumnIndex[modelToPropertiesColumnIndex[columnIndex]];
-		
 		// The first empty column must not be dragged. 
-		return (firstOfSplits > 0) ? firstOfSplits : -1;
+		return (columnIndex > 0) ? columnIndex : -1;
 	}
 	
 	public Object getValueAt(int rowIndex, int columnIndex) {
-	    String value = model[rowIndex][columnIndex].getValue();
+		String value = model[rowIndex][columnIndex].getValue();
 		// TODO: The only properties with null values are CommentProperty. This could maybe be fixed.
 	    return (value != null) ? value : ""; 
 	}
 
 	public void setValueAt(Object aValue, int row, int column) {
-
+		if (internalSetValueAt(aValue, row, column)) {
+			// Update the whole row as validity of this inspectable's fields can change on property value change. 
+			fireTableRowsUpdated(row, row);
+		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.inspector.SpreadsheetViewModel#internalSetValueAt(java.lang.Object, int, int)
+	 */
+	protected boolean internalSetValueAt(Object value, int row, int column) {
+		
+		boolean change = false;
+		
 		InspectableProperty property = model[row][column];
 
 		int propertiesColumn = modelToPropertiesColumnIndex[column];
 		
 		if (property instanceof SplitPropertyPart) {
-			/* If this split property is part of creator property, all other split parts are empty, so just set
-			 * the current value in the base property and set the new created property as the owner of this group.  
+			/* If this split property is part of creator property, set the new created property as the owner
+			 * of this group.  
 			 */
 			SplitPropertyGroup propertyGroup = ((SplitPropertyPart)property).getOwner();
 			InspectableProperty baseProperty = propertyGroup.getOwner(); 
 			
 			if (baseProperty instanceof CreatorProperty) {
-				super.setValueAt(aValue, row, propertiesColumn);
-				propertyGroup.setOwner(((CreatorProperty)baseProperty).getCreatedProperty());
+				// Just call to create a new property, value doesn't matter as it will be overwritten. 
+				change |= super.internalSetValueAt(value, row, propertiesColumn);
+                InspectableProperty newProperty = ((CreatorProperty)baseProperty).getCreatedProperty();
+    			// If a new property has been created, set it.
+				if (newProperty != null) { 
+					propertyGroup.setOwner(newProperty);
+	                property.setValue(value.toString());
+	                change = true;
+				}
+			} else {
+                property.setValue(value.toString());
+                change = true;
 			}
-			property.setValue(aValue.toString());
 		} else {
 			/* If this isn't a split part, just call the base function and update the model data structure if a new
 			 * property has been created by creator property.
 			 */
-			super.setValueAt(aValue, row, propertiesColumn);
+			change |= super.internalSetValueAt(value, row, propertiesColumn);
 			if (property instanceof CreatorProperty) {
-				model[row][column] = ((CreatorProperty)property).getCreatedProperty();
+				
+                InspectableProperty newProperty = ((CreatorProperty)property).getCreatedProperty();
+    			// If a new property has been created, replace it.
+				if (newProperty != null) { 
+					model[row][column] = newProperty;
+				}
 			}
 		}
 		
@@ -327,11 +357,10 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
    			refreshModel();
 		}
 		*/
-
-		// Update the whole row as validity of this inspectable's fields can change on property value change. 
-		fireTableRowsUpdated(row, row);
+		
+		return change;
 	}
-	
+
 	public boolean isCellEditable(int rowIndex, int columnIndex) {
 		// no editing in debug
 		if (PluginDebugManager.isDebugState()) {
@@ -370,10 +399,13 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 			int step = secondValue - firstValue;
 
 			for (int r = 0; r < rows.length; r++) {
-				model[rows[r]][columns[c]].setValue(baseString + value);
+				internalSetValueAt(baseString + value, rows[r], columns[c]);
 				value += step;
-				fireTableCellUpdated(rows[r], columns[c]);
 			}
+		}
+		// Changes can affect whole rows as certain field validity states depend on other fields of the inspectable.
+		for (int r = 0; r < rows.length; r++) {
+			fireTableRowsUpdated(rows[r], rows[r]);
 		}
         UndoManager.getInstance().stopMacroAction();
 	}

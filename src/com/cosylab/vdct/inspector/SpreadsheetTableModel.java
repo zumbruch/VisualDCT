@@ -45,6 +45,10 @@ import com.cosylab.vdct.undo.DeleteAction;
 import com.cosylab.vdct.undo.UndoManager;
 import com.cosylab.vdct.vdb.CommentProperty;
 
+/**This table model supports ordering the inspectable properties into columns based on their name.
+ * 
+ * @author ssah
+ */
 public class SpreadsheetTableModel extends AbstractTableModel implements PropertyTableModel {
 
 	protected String dataType = null;
@@ -68,9 +72,6 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
     // The name of the column that contains the comments.  
     protected static final String propertiesCommentsColumn = "Comment";
     
-    // The number of starting columns that should not be hidden or split. Currently this is the name.
-    private static final int solidPropertiesColumnCount = 1;    
-
 	private static ArrayList defaultModes = null; 
 	
 	private static final String recordType = "R"; 
@@ -132,8 +133,17 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 	public InspectableProperty getPropertyAt(int row, int column) {
 		return properties[row][column];
 	}
-	
+
 	public void setValueAt(Object aValue, int row, int column) {
+		if (internalSetValueAt(aValue, row, column)) {
+			// Update the whole row as validity of this inspectable's fields can change on property value change. 
+			fireTableRowsUpdated(row, row);
+		}
+	}
+	
+	/* Returns true if there was a change in the property.
+	 */
+	protected boolean internalSetValueAt(Object aValue, int row, int column) {
 		
 		InspectableProperty property = properties[row][column];
 
@@ -141,7 +151,7 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 		// If a name change, the whole table is going to be refreshed.
 		if (column == propertiesNamesColumnIndex) {
 			properties[row][column].setValue(aValue.toString());
-			return;
+			return false;
 			// TODO: fast renaming
 			//nameToPropertiesRowIndex.remove(property.getValue());
 		}
@@ -152,10 +162,12 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 
 			creatorProperty.setName(propertiesColumnNames[column]);
 			creatorProperty.setValue(aValue.toString());
+			
 			property = creatorProperty.getCreatedProperty();
-			
-			properties[row][column] = property; 
-			
+			// If a new property has been created, replace it.
+			if (property != null) { 
+			    properties[row][column] = property;
+			}
 		} else {
 			properties[row][column].setValue(aValue.toString());
 		}
@@ -166,9 +178,7 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
    			nameToPropertiesRowIndex.put(properties[row][column].getValue(), new Integer(row));
 		}
 		*/
-
-		// Update the whole row as validity of this inspectable's fields can change on property value change. 
-		fireTableRowsUpdated(row, row);
+		return true;
 	}
 	
 	public int getHeaderDisplayType(int column) {
@@ -254,12 +264,6 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 		return inspectables[propertiesRowCount - 1];
 	}
 	
-    /* Returns the number of starting columns that should not be hidden or split.
-     */
-	public int getSolidProperitiesColumnCount() {
-		return solidPropertiesColumnCount;
-	}
-
 	public final String getPropertyValue(int row, int column) {
 		return properties[row][column].getValue();
 	}

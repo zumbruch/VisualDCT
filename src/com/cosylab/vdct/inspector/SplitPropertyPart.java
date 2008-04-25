@@ -183,4 +183,23 @@ public class SplitPropertyPart implements InspectableProperty {
 	public SplitPropertyGroup getOwner() {
 		return owner;
 	}
+	
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.inspector.InspectableProperty#hasDefaultValue()
+	 */
+	public boolean hasDefaultValue() {
+		return owner.getOwner().hasDefaultValue();
+	}
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.inspector.InspectableProperty#hasValidity()
+	 */
+	public boolean hasValidity() {
+		return false;
+	}
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.inspector.InspectableProperty#checkValueValidity(java.lang.String)
+	 */
+	public String checkValueValidity(String value) {
+		return null;
+	}
 }

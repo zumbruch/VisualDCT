@@ -44,9 +44,9 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-/**
+/**This table model manages the column model and persistence of column widths and background color.   
+ * 
  * @author ssah
- *
  */
 public class SpreadsheetColumnViewModel extends SpreadsheetSplitViewModel implements TableColumnModel {
 	
@@ -77,7 +77,7 @@ public class SpreadsheetColumnViewModel extends SpreadsheetSplitViewModel implem
 	}
 
 	public void onColumnWidthChange() {
-		storeColumnWidths();
+		storeView();
 	}
 	
 	/* (non-Javadoc)
@@ -136,6 +136,14 @@ public class SpreadsheetColumnViewModel extends SpreadsheetSplitViewModel implem
 	 */
 	public void setPropertyColumnsVisibility(int[] columns, boolean visible) {
 		super.setPropertyColumnsVisibility(columns, visible);
+		refreshColumns();
+	}
+	
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.inspector.SpreadsheetSplitViewModel#setDefaultColumnVisibility()
+	 */
+	public void setDefaultColumnVisibility() {
+		super.setDefaultColumnVisibility();
 		refreshColumns();
 	}
 
@@ -315,7 +323,7 @@ public class SpreadsheetColumnViewModel extends SpreadsheetSplitViewModel implem
 			for (int i = 0; i < splitParts; i++) {
 				SpreadsheetColumn column = (SpreadsheetColumn)getColumn(splitIndex + i);
 				if (!column.isDefaultWidth()) {
-					widthsVector.add(new SplitPartWidthData(split ? i : -1, column.getWidth()));
+					widthsVector.add(new SplitPartWidthData(split ? i : -1, column.getPreferredWidth()));
 				}
 			}
 			SplitPartWidthData[] widths = new SplitPartWidthData[widthsVector.size()];
@@ -324,6 +332,20 @@ public class SpreadsheetColumnViewModel extends SpreadsheetSplitViewModel implem
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.inspector.SpreadsheetViewModel#isColumsDefault()
+	 */
+	protected boolean isColumsDefault() {
+		// Default when all widths default.
+		int columnCount = getColumnCount();
+		for (int c = 0; c < columnCount; c++) {
+			if (!((SpreadsheetColumn)getColumn(c)).isDefaultWidth()) {
+				return false;
+			}
+		}
+		return super.isColumsDefault();
+	}
+
 	public void addColumn(TableColumn column) {
 		columnModel.addColumn(column);
 	}

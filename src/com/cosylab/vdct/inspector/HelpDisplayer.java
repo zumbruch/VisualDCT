@@ -27,11 +27,15 @@
  */
 package com.cosylab.vdct.inspector;
 
+import java.awt.Color;
+
 /** Interface for components able to display string help messages.
  * 
  * @author ssah
  *
  */
 public interface HelpDisplayer {
-    public void displayHelp(String text);
+
+	public void setHelpText(String text);
+	public void setHelpTextColor(Color color);
 }

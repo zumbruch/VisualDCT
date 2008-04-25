@@ -28,6 +28,7 @@ package com.cosylab.vdct.inspector;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
@@ -749,8 +750,13 @@ public void updateObject() {
  * @param help java.lang.String
  */
 public void setHelp(java.lang.String help) {
-	getHelpLabel().setText(help);
+	getHelpLabel().setText(help != null ? help : "");
 }
+
+public void setHelpColor(Color color) {
+	getHelpLabel().setForeground(color);
+}
+
 /**
  * Insert the method's description here.
  * Creation date: (26.1.2001 16:24:25)

@@ -129,4 +129,17 @@ public int getVisibility();
  * @param y
  */
 public void popupEvent(Component component, int x, int y);
+
+public boolean hasDefaultValue();
+
+public boolean hasValidity();
+
+/**
+ * Returns null if this value is valid, else the error message.
+ * @param value
+ * @return
+ */
+public String checkValueValidity(String value);
+
 }
+

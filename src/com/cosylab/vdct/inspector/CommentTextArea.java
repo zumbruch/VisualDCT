@@ -49,14 +49,14 @@ public CommentTextArea(HelpDisplayer helpDisplayer) {
 	 * Invoked when a component gains the keyboard focus.
 	 */
 public void focusGained(java.awt.event.FocusEvent e) {
-	helpDisplayer.displayHelp(property.getHelp());
+	helpDisplayer.setHelpText(property.getHelp());
 }
 	/**
 	 * Invoked when a component loses the keyboard focus.
 	 */
 public void focusLost(java.awt.event.FocusEvent e) {
 	property.setValue(getText());
-	helpDisplayer.displayHelp("");
+	helpDisplayer.setHelpText("");
 }
 /**
  * Insert the method's description here.

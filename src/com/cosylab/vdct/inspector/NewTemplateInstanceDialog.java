@@ -173,7 +173,7 @@ public class NewTemplateInstanceDialog extends JDialog implements ActionListener
 
 		if (action.equals(okString)) {
 			String type = templateComboBox.getSelectedItem().toString();
-			DrawingSurface.getInstance().createTemplateInstance(null, type, true);
+	        DrawingSurface.getInstance().createTemplateInstance(null, type, true);
         	setVisible(false);
 		} else if (action.equals(cancelString)) {
         	setVisible(false);

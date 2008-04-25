@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
+ * Copyright (c) 2008, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -25,50 +25,70 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.cosylab.vdct.inspector;
 
-import com.cosylab.vdct.vdb.CreatorPropertyListener;
-import com.cosylab.vdct.vdb.NameValueInfoProperty;
+package com.cosylab.vdct.graphics.objects;
 
-/**
+/** Doubly linked list for LayoutManager. 
+ *  
  * @author ssah
  *
  */
-public class CreatorProperty extends NameValueInfoProperty {
-	
-	private CreatorPropertyListener listener = null;
-	private InspectableProperty createdProperty = null;
+public class LayoutPosition {
 
-	public CreatorProperty(CreatorPropertyListener listener) {
-		super("", "");
-		this.listener = listener;
-	}
+	private LayoutPosition previous = null;
+	private LayoutPosition next = null;
+	private int posX = -1;
+	private int posY = -1;
 
-	/* (non-Javadoc)
-	 * @see com.cosylab.vdct.vdb.NameValueInfoProperty#isEditable()
+	/**
+	 * @param posX
+	 * @param posY
 	 */
-	public boolean isEditable() {
-		return true;
+	public LayoutPosition(int posX, int posY) {
+		super();
+		this.posX = posX;
+		this.posY = posY;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.cosylab.vdct.vdb.NameValueInfoProperty#setValue(java.lang.String)
+	/**
+	 * @return the previous
 	 */
-	public void setValue(String value) {
-		if (value.equals("")) {
-			name = "";
-			createdProperty = null;
-			return;
-		}
-		createdProperty = listener.addProperty(name, value);
-		super.setValue(value);
-	}
-	
-	public void setName(String name) {
-		this.name = name;
+	public LayoutPosition getPrevious() {
+		return previous;
 	}
 
-	public InspectableProperty getCreatedProperty() {
-		return createdProperty;
+	/**
+	 * @param previous the previous to set
+	 */
+	public void setPrevious(LayoutPosition previous) {
+		this.previous = previous;
+	}
+
+	/**
+	 * @return the next
+	 */
+	public LayoutPosition getNext() {
+		return next;
+	}
+
+	/**
+	 * @param next the next to set
+	 */
+	public void setNext(LayoutPosition next) {
+		this.next = next;
+	}
+
+	/**
+	 * @return the posX
+	 */
+	public int getPosX() {
+		return posX;
+	}
+
+	/**
+	 * @return the posY
+	 */
+	public int getPosY() {
+		return posY;
 	}
 }

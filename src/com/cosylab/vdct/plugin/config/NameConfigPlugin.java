@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
+ * Copyright (c) 2008, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -25,50 +25,34 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.cosylab.vdct.inspector;
 
-import com.cosylab.vdct.vdb.CreatorPropertyListener;
-import com.cosylab.vdct.vdb.NameValueInfoProperty;
+package com.cosylab.vdct.plugin.config;
+
+import com.cosylab.vdct.plugin.Plugin;
 
 /**
  * @author ssah
- *
  */
-public class CreatorProperty extends NameValueInfoProperty {
-	
-	private CreatorPropertyListener listener = null;
-	private InspectableProperty createdProperty = null;
+public interface NameConfigPlugin extends Plugin {
 
-	public CreatorProperty(CreatorPropertyListener listener) {
-		super("", "");
-		this.listener = listener;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.cosylab.vdct.vdb.NameValueInfoProperty#isEditable()
+	/**
+	 * If name is valid, the function returns null, otherwise it returns a
+	 * String with the description of the error. 
 	 */
-	public boolean isEditable() {
-		return true;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.cosylab.vdct.vdb.NameValueInfoProperty#setValue(java.lang.String)
-	 */
-	public void setValue(String value) {
-		if (value.equals("")) {
-			name = "";
-			createdProperty = null;
-			return;
-		}
-		createdProperty = listener.addProperty(name, value);
-		super.setValue(value);
-	}
+	public String checkValidity(String name);
 	
-	public void setName(String name) {
-		this.name = name;
-	}
+	/**
+	 * Returns the description of the valid names. Can be null.    
+	 */
+	public String getNameDescription();
 
-	public InspectableProperty getCreatedProperty() {
-		return createdProperty;
-	}
+	/**
+	 * Returns the default name. Can be null.
+	 */
+	public String getDefaultName();
+
+	/**
+	 * Returns true if the plugin has not been stopped since the last start.
+	 */
+	public boolean isRunning();
 }

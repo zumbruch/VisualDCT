@@ -194,6 +194,7 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 	private Stack templateStack = null;	
 	private Vector selectedConnectorsForMove = null;
 	
+	private boolean pressedMousePosValid = true;
 	
 /**
  * DrawingSurface constructor comment.
@@ -2360,6 +2361,8 @@ public static HashMap applyVisualData(boolean importDB, Group group, DBData dbDa
 				}			
 	
 				Template templ = new Template(null, templateInstance, false);
+				templ.move(dbTemplate.getX(), dbTemplate.getY());
+				
 				group.addSubObject(dbTemplate.getTemplateInstanceId(), templ, true);
 				if (importDB) importedList.put(dbTemplate.getTemplateInstanceId(), templ);
 				
@@ -2400,7 +2403,7 @@ public static HashMap applyVisualData(boolean importDB, Group group, DBData dbDa
 				//templ.setDescription(dbTemplate.getDescription());
 				//templ.setDescription(template.getDescription());
 				templ.setColor(dbTemplate.getColor());
-				templ.move(dbTemplate.getX(), dbTemplate.getY());
+				templ.move(0, 0);
 				//templ.forceValidation();
 				
 				tobeUpdated.add(templ);
@@ -2697,7 +2700,8 @@ public static HashMap applyVisualData(boolean importDB, Group group, DBData dbDa
 		e.printStackTrace();
 	}
 
-	group.initializeLayout();
+	// TODO: reuse this if changing layout manager. 
+	//group.initializeLayout();
 		
 	// call this after ports/macros fields are initialized !!
 //	group.manageLinks(true);
@@ -3656,12 +3660,17 @@ public void createTemplateInstance(String name, String type, boolean relative) {
 	double scale = view.getScale();
 	
 	Template templ = new Template(null, templateInstance);
-	Group.getRoot().addSubObject(name, templ, true);
 
 	//templ.setDescription(dbTemplate.getDescription());
 	//templ.setDescription(template.getDescription());
-	templ.setX((int)((getPressedX() + view.getRx()) / scale));
-	templ.setY((int)((getPressedY() + view.getRy()) / scale));
+	if (pressedMousePosValid) {
+	    templ.setX((int)((getPressedX() + view.getRx()) / scale));
+	    templ.setY((int)((getPressedY() + view.getRy()) / scale));
+	} else {
+		templ.setX(-1);
+		templ.setY(-1);
+	}
+	Group.getRoot().addSubObject(name, templ, true);
 	
 	if (Settings.getInstance().getSnapToGrid())
 		templ.snapToGrid();
@@ -4102,6 +4111,19 @@ public void reset() {
 	redrawRequest = true;
 	viewGroup.reset();
 	repaint();
+}
+
+/**
+ * @return the pressedMousePosValid
+ */
+public boolean isPressedMousePosValid() {
+	return pressedMousePosValid;
+}
+/**
+ * @param pressedMousePosValid the pressedMousePosValid to set
+ */
+public void setPressedMousePosValid(boolean pressedMousePosValid) {
+	this.pressedMousePosValid = pressedMousePosValid;
 }
 
 }

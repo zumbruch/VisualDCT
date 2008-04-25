@@ -96,7 +96,10 @@ public class Group
 	private static long openTemplatePortID = 0;
 
 	// contains DB structure (entry (include, path, addpath statements), record, expand)
-	protected Vector structure = null; 
+	protected Vector structure = null;
+	
+	// For placing the new subobjects that do not have a visual position.
+	private LayoutManager layoutManager = null;
 	
 /**
  * Group constructor comment.
@@ -109,6 +112,7 @@ public Group(ContainerObject parent) {
 	setHeight(Constants.GROUP_HEIGHT);
 
 	structure = new Vector();
+	initializeLayout();
 }
 /**
  * Insert the method's description here.
@@ -133,6 +137,8 @@ public void addSubObject(String id, VisibleObject object) {
 	{
 		structure.addElement(object);
 	}
+	
+	addSubObjectToLayout(object);
 /*
 	com.cosylab.vdct.undo.UndoManager.getInstance().addAction(
 		new com.cosylab.vdct.undo.CreateAction(object)
@@ -141,6 +147,16 @@ public void addSubObject(String id, VisibleObject object) {
 	if (object instanceof com.cosylab.vdct.inspector.Inspectable)
 		com.cosylab.vdct.DataProvider.getInstance().fireInspectableObjectAdded((com.cosylab.vdct.inspector.Inspectable)object);
 }
+
+private void addSubObjectToLayout(VisibleObject object) {
+	if ((object.getX() <= 0 || object.getY() <= 0) && object instanceof ContainerObject) {
+		LayoutPosition position = layoutManager.getVacantPosition();
+		object.setX(position.getPosX());
+		object.setY(position.getPosY());
+	}
+	layoutManager.fillPosition(object.getX(), object.getY());
+}
+
 /**
  * Insert the method's description here.
  * IDs are relative
@@ -579,6 +595,34 @@ public VisibleObject hiliteComponentsCheck(int x, int y) {
 public void initializeLayout() {
 
 	ViewState view = ViewState.getInstance();
+	
+	// count objects to layout
+	int containerCount = 0;
+	Enumeration e = getSubObjectsV().elements();
+	while (e.hasMoreElements())
+		if (e.nextElement() instanceof ContainerObject)
+			containerCount++;
+				
+	final int offset = view.getGridSize()*2;
+	
+	// groups should be the widest
+	int nx = (view.getWidth()-offset)/(Constants.GROUP_WIDTH+offset);
+	if (nx==0) nx=1;
+	int sx = (int)((view.getWidth()-offset)/nx);
+	sx = Math.min(sx, Constants.GROUP_WIDTH+offset);
+		
+	int ny = containerCount/nx+1;
+	if (ny==0) ny=1;
+	int sy = (int)(view.getHeight()/(ny+1));
+	sy = Math.min(sy, 3*Constants.GROUP_HEIGHT);		
+	ny = (int)(view.getHeight() / sy);
+
+	layoutManager = new LayoutManager(nx, ny, sx, sy, offset / 2, offset / 2);
+	
+	// TODO remove
+	/*
+	
+	ViewState view = ViewState.getInstance();
 	boolean grid = com.cosylab.vdct.Settings.getInstance().getSnapToGrid();
 	com.cosylab.vdct.Settings.getInstance().setSnapToGrid(false);     // avoid fixes in getX()
 	try
@@ -634,7 +678,7 @@ public void initializeLayout() {
 	{
 		com.cosylab.vdct.Settings.getInstance().setSnapToGrid(grid);
 	}
-
+    */
 }
 /**
  * Insert the method's description here.

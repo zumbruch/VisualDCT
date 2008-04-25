@@ -65,9 +65,6 @@ public class NameProperty extends NameValueInfoProperty {
 	 */
 	public void setValue(String value) {
 		
-		if (!flexible) {
-			return;
-		}
 		String oldName = namedObject.getFlexibleName();
 		
 		// Do nothing if the name is the same.
@@ -75,9 +72,7 @@ public class NameProperty extends NameValueInfoProperty {
 			return;
 		}
 		
-		GetVDBManager manager = (GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
-		String errorMessage = manager.getManager().checkRecordName(value, true);
-        if (errorMessage != null && !errorMessage.startsWith("WARNING")) {
+		if (checkNewName(value) != null) {
         	return;
         }
 
@@ -87,9 +82,44 @@ public class NameProperty extends NameValueInfoProperty {
 	}
 	
 	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.vdb.NameValueInfoProperty#isValid()
+	 */
+	public boolean isValid() {
+		return checkNewName(value) == null;
+	}
+
+	/* (non-Javadoc)
 	 * @see com.cosylab.vdct.vdb.NameValueInfoProperty#isEditable()
 	 */
 	public boolean isEditable() {
 		return flexible;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.inspector.InspectableProperty#hasValidity()
+	 */
+	public boolean hasValidity() {
+		return true;
+	}
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.inspector.InspectableProperty#checkValueValidity(java.lang.String)
+	 */
+	public String checkValueValidity(String value) {
+		return checkNewName(value);
+	}
+	
+	private String checkNewName(String name) {
+
+		if (!flexible) {
+			return null;
+		}
+		String oldName = namedObject.getFlexibleName();
+		
+		GetVDBManager manager = (GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
+		String errorMessage = manager.getManager().checkRecordName(name, oldName, true);
+        if (errorMessage != null && !errorMessage.startsWith("WARNING")) {
+        	return errorMessage;
+        }
+        return null;
 	}
 }

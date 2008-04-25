@@ -40,6 +40,7 @@ import javax.swing.SwingConstants;
 
 import com.cosylab.vdct.*;
 import com.cosylab.vdct.vdb.*;
+import com.cosylab.vdct.plugin.config.PluginNameConfigManager;
 import com.cosylab.vdct.undo.*;
 import com.cosylab.vdct.graphics.objects.*;
 import com.cosylab.vdct.events.*;
@@ -78,6 +79,9 @@ public DSGUIInterface(DrawingSurface drawingSurface) {
 	DSGUIInterface.instance = this;
 	pasteNames = new ArrayList();
 	copiedObjects = new Vector();
+	
+	// Init the name configuration.
+	PluginNameConfigManager.getInstance();
 }
 /**
  * Insert the method's description here.
@@ -128,7 +132,7 @@ public void baseView() {
  * @param name java.lang.String
  */
 public java.lang.String checkGroupName(String name, boolean relative) {
-	return checkRecordName(name, relative);
+	return checkRecordName(name, null, relative);
 }
 /**
  * Returns error message or null if OK
@@ -136,7 +140,7 @@ public java.lang.String checkGroupName(String name, boolean relative) {
  * @return java.lang.String
  * @param name java.lang.String
  */
-public java.lang.String checkRecordName(String name, boolean relative) {
+public java.lang.String checkRecordName(String name, String oldName, boolean relative) {
 
 	if (name.trim().length() == 0) {
 		return "Empty name!";
@@ -144,13 +148,15 @@ public java.lang.String checkRecordName(String name, boolean relative) {
 		return "No spaces allowed!";
 	} else if (name.indexOf('"') != -1) {
 		return "No quotes allowed!";
-	} else if ((!relative && Group.getRoot().findObject(name, true) != null) ||
-			(relative && drawingSurface.getViewGroup().findObject(name, true) != null)) { 
+	} else if (!name.equals(oldName)
+			&& ((!relative && Group.getRoot().findObject(name, true) != null) ||
+			(relative && drawingSurface.getViewGroup().findObject(name, true) != null))) { 
 		return "Name already exists!";
 	} else if (name.length()>Settings.getInstance().getRecordLength()) {
 		return "WARNING: Name length is "+name.length()+" characters!";
 	}
-	return null;
+	
+	return PluginNameConfigManager.getInstance().checkValidity(name);
 }
 public void copyToSystemClipboard(Vector objs)
 {
@@ -357,14 +363,17 @@ public void createRecord(String name, String type, boolean relative) {
 	ViewState view = ViewState.getInstance();
 	double scale = view.getScale();
 	
-	Record record = new Record(null, 
-							   recordData,
-							   (int)((drawingSurface.getPressedX() + view.getRx()) / scale),
-							   (int)((drawingSurface.getPressedY() + view.getRy()) / scale));
+	int posX = -1;
+	int posY = -1;
+	if (DrawingSurface.getInstance().isPressedMousePosValid()) {
+		posX = (int)((drawingSurface.getPressedX() + view.getRx()) / scale);
+		posY = (int)((drawingSurface.getPressedY() + view.getRy()) / scale);
+	}
+	Record record = new Record(null, recordData, posX, posY);
+	Group.getRoot().addSubObject(name, record, true);
+	
 	if (Settings.getInstance().getSnapToGrid())
 		record.snapToGrid();
-
-	Group.getRoot().addSubObject(name, record, true);
 
 	UndoManager.getInstance().addAction(new CreateAction(record));
 

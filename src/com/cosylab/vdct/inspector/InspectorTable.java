@@ -78,7 +78,7 @@ public class InspectorTable extends JTable {
 				InspectableProperty property = tableModel.getPropertyAt(row, 0);
 				helpString = property.getHelp();
 			}
-			helpDisplayer.displayHelp(helpString);
+			helpDisplayer.setHelpText(helpString);
 		}
 	}
 }

@@ -327,6 +327,23 @@ public class InspectorTableClipboardAdapter extends TransferHandler implements A
      */
     private void stringToSelection(String string) {
 
+    	
+    	/*
+refresh selection and get starting and ending values; get buffer 
+
+width and height; if either 0, do nothing;
+
+calculate width and height; if smaller than buffer width/height, 
+
+enlarge them; then compare with table size and make them smaller, 
+
+then copy them into buffer width/height; start undo; go in a loop 
+
+trough all, use modulo with buffer width, height; stop undo with 
+
+finnaly
+    	 */
+    	
     	refreshSelectionData();
 
         // Check whether selection exists. If it does not, currently do nothing.
@@ -335,9 +352,49 @@ public class InspectorTableClipboardAdapter extends TransferHandler implements A
         }
 
     	// skip pasting in the first column, empty with inspector and spreadsheet
-        int startCol = Math.max(selCols[0], 1);
         int startRow = selRows[0];
+        int startCol = Math.max(selCols[0], 1);
+
+        int endRow = selRows[selRows.length - 1];
+        int endCol = selCols[selCols.length - 1];
         
+        int selWidth = endCol - startCol + 1; 
+        int selHeight = endRow - startRow + 1;
+        if (selWidth == 0 || selHeight == 0) {
+            return;
+        }
+        
+        String[][] buffer = stringToStringArray(string);
+        if (buffer.length == 0 || buffer[0].length == 0) {
+        	return;
+        }
+        int bufWidth = buffer[0].length;
+        int bufHeight = buffer.length;
+        
+        // Enlarge the selection size if buffer does not fit. This must not go beyond table limits, though.
+        selWidth = Math.max(selWidth, bufWidth);
+        selHeight = Math.max(selHeight, bufHeight);
+        selWidth = Math.min(selWidth, table.getColumnCount() - startCol);
+        selHeight = Math.min(selHeight, table.getRowCount() - startRow);
+
+        // w/ packed undo support
+        try {
+   			UndoManager.getInstance().startMacroAction();
+
+   			for (int i = 0; i < selHeight; i++) {
+                for (int j = 0; j < selWidth; j++) {
+                	// Repeat the content of buffer if selection too big.
+                    table.setValueAt(buffer[i % bufHeight][j % bufWidth], i + startRow, j + startCol);
+                }
+            }
+    	} finally {
+   	        UndoManager.getInstance().stopMacroAction();
+    	}
+        
+        
+        
+        // TODO:REM
+        /*
         int rowCount = table.getRowCount();
         int columnCount = table.getColumnCount();
 
@@ -348,8 +405,6 @@ public class InspectorTableClipboardAdapter extends TransferHandler implements A
             // acknowledge trailing empty lines; the last is explicitly ignored later    
         	String[] rowStrings = string.split("\\n", -1);
 
-            /* Calculates the maximum fields length to foil Excel's random omission of trailing empty spaces. 
-             */ 
             int maxCols = 0;
             for (int i = 0; i < rowStrings.length - 1; i++) {
             	maxCols = Math.max(maxCols, rowStrings[i].split("\\t", -1).length);
@@ -374,7 +429,7 @@ public class InspectorTableClipboardAdapter extends TransferHandler implements A
                	        pasted = true;
                			UndoManager.getInstance().startMacroAction();
                	    }
-               	    value = j < fields.length ? fields[j] : EMPTY_STRING; 
+               	    value = j < fields.length ? fields[j] : EMPTY_STRING;
                     table.setValueAt(value, row, col);
                 }
             }
@@ -383,5 +438,36 @@ public class InspectorTableClipboardAdapter extends TransferHandler implements A
     	        UndoManager.getInstance().stopMacroAction();
     	    }
     	}
+    	*/
+    }
+    
+    private String[][] stringToStringArray(String buffer) {
+
+        // acknowledge trailing empty lines; the last is explicitly ignored.    
+    	String[] rowStrings = buffer.split("\\n", -1);
+    	int rowCount = rowStrings.length - 1;
+
+        /* Calculates the maximum fields length to foil Excel's random omission of trailing empty spaces. 
+         */ 
+        int columnCount = 0;
+        for (int i = 0; i < rowCount; i++) {
+        	columnCount = Math.max(columnCount, rowStrings[i].split("\\t", -1).length);
+        }
+        
+        String[][] stringArray = new String[rowCount][columnCount];  
+        
+        for (int r = 0; r < rowCount; r++) {
+        	
+            String[] strings = rowStrings[r].split("\\t", columnCount);
+
+            int c = 0;
+        	for (c = 0; c < strings.length; c++) {
+        		stringArray[r][c] = strings[c];
+        	}
+        	for (; c < columnCount; c++) {
+        		stringArray[r][c] = EMPTY_STRING;
+            }
+        }
+        return stringArray;
     }
 }

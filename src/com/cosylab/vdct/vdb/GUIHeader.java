@@ -185,4 +185,24 @@ public static GUIHeader getDefaultHeader()
 	return defaultHeader;
 }
 
+/* (non-Javadoc)
+ * @see com.cosylab.vdct.inspector.InspectableProperty#hasDefaultValue()
+ */
+public boolean hasDefaultValue() {
+	return false;
+}
+
+/* (non-Javadoc)
+ * @see com.cosylab.vdct.inspector.InspectableProperty#hasValidity()
+ */
+public boolean hasValidity() {
+	return false;
+}
+/* (non-Javadoc)
+ * @see com.cosylab.vdct.inspector.InspectableProperty#checkValueValidity(java.lang.String)
+ */
+public String checkValueValidity(String value) {
+	return null;
+}
+
 }

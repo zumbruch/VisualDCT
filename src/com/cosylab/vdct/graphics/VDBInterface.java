@@ -45,12 +45,12 @@ public interface VDBInterface {
  */
 java.lang.String checkGroupName(String name, boolean relative);
 /**
- * Returns error message or null if OK
+ * Returns error message or null if OK. oldName can be null if not applicable.
  * Creation date: (3.2.2001 22:11:01)
  * @return java.lang.String
  * @param name java.lang.String
  */
-java.lang.String checkRecordName(String name, boolean relative);
+java.lang.String checkRecordName(String name, String oldName, boolean relative);
 /**
  * Insert the method's description here.
  * Creation date: (3.2.2001 23:27:30)

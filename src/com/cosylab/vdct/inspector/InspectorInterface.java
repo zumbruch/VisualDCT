@@ -1,5 +1,7 @@
 package com.cosylab.vdct.inspector;
 
+import java.awt.Color;
+
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
  * All rights reserved.
@@ -70,7 +72,10 @@ public void updateObject();
  * Creation date: (26.1.2001 15:18:35)
  * @param help java.lang.String
  */
-void setHelp(String help);
+public void setHelp(String help);
+
+public void setHelpColor(Color color);
+
 /**
  * Insert the method's description here.
  * Creation date: (8.1.2001 17:48:51)

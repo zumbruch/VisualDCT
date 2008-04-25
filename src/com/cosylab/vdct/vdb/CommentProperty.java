@@ -234,4 +234,25 @@ public void popupEvent(Component component, int x, int y)
 {
 }
 
+/** Default value is null or "".
+ * 
+ * @see com.cosylab.vdct.inspector.InspectableProperty#hasDefaultValue()
+ */
+public boolean hasDefaultValue() {
+	return record.getComment() == null || record.getComment().equals("");
+}
+
+/* (non-Javadoc)
+ * @see com.cosylab.vdct.inspector.InspectableProperty#hasValidity()
+ */
+public boolean hasValidity() {
+	return false;
+}
+/* (non-Javadoc)
+ * @see com.cosylab.vdct.inspector.InspectableProperty#checkValueValidity(java.lang.String)
+ */
+public String checkValueValidity(String value) {
+	return null;
+}
+
 }

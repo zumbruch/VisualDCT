@@ -28,16 +28,29 @@ package com.cosylab.vdct.inspector;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.util.*;
-import java.util.regex.Matcher;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.MouseEvent;
+import java.util.EventObject;
 import java.util.regex.Pattern;
-import java.awt.*;
-import java.awt.event.*;
 
-import javax.swing.*;
-import javax.swing.table.*;
-import javax.swing.event.*;
-import javax.swing.tree.*;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.JTree;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.EventListenerList;
+import javax.swing.table.TableCellEditor;
+import javax.swing.tree.TreeCellEditor;
 
 public class InspectorCellEditor implements TableCellEditor, TreeCellEditor {
 
@@ -60,6 +73,7 @@ public class InspectorCellEditor implements TableCellEditor, TreeCellEditor {
 	protected JTextField intelliFormattedTextField;
 	protected EditorDelegate formattedTextfieldDelegate;
 	protected Pattern pattern;
+	protected InspectableProperty property = null;
 
 	protected JComponent editorComponent;
 	protected EditorDelegate delegate;
@@ -110,13 +124,13 @@ public class InspectorCellEditor implements TableCellEditor, TreeCellEditor {
 
 		// Implementing ActionListener interface
 		public void actionPerformed(ActionEvent e) {
-			helpDisplayer.displayHelp("");
+			helpDisplayer.setHelpText(null);
 			fireEditingStopped();
 		}
 
 		// Implementing ItemListener interface
 		public void itemStateChanged(ItemEvent e) {
-			helpDisplayer.displayHelp("");
+			helpDisplayer.setHelpText(null);
 			fireEditingStopped();
 		}
 	}
@@ -218,17 +232,25 @@ public class InspectorCellEditor implements TableCellEditor, TreeCellEditor {
 		 */
 
 		intelliFormattedTextField.getDocument().addDocumentListener(new DocumentListener() {
-			private void check()
-			{
-				Matcher m = pattern.matcher(intelliFormattedTextField.getText());
-				if (m.matches())
-					intelliFormattedTextField.setForeground(Color.black);
-				else
-					intelliFormattedTextField.setForeground(Color.red);
+			private void check() {
+				boolean valid = true;
+				String value = intelliFormattedTextField.getText();
+				if (pattern != null) {
+					valid &= pattern.matcher(value).matches();
+				}
+				String error = property.checkValueValidity(value);
+				valid &= error == null;
+				
+				Color color = valid ? Color.black : Color.red;
+				
+				intelliFormattedTextField.setForeground(color);
+				getHelpDisplayer().setHelpText(error != null ? error : property.getHelp());
+				getHelpDisplayer().setHelpTextColor(color);
 			}
 			public void changedUpdate(DocumentEvent e) {}
 			public void insertUpdate(DocumentEvent e) { check(); }
 			public void removeUpdate(DocumentEvent e) { check(); }
+			
 		});
 
 		emptyDelegate = new EditorDelegate();
@@ -348,7 +370,7 @@ public class InspectorCellEditor implements TableCellEditor, TreeCellEditor {
 	// implements javax.swing.CellEditor
 	public void cancelCellEditing() {
 		fireEditingCanceled();
-		helpDisplayer.displayHelp("");
+		helpDisplayer.setHelpText(null);
 	}
 	/*
 	 * Notify all listeners that have registered interest for
@@ -455,6 +477,9 @@ public class InspectorCellEditor implements TableCellEditor, TreeCellEditor {
 		InspectableProperty property = tableModel.getPropertyAt(row, table.convertColumnIndexToModel(column));
 		String[] choices = property.getSelectableValues();
 
+		helpDisplayer.setHelpText(property.getHelp());
+		helpDisplayer.setHelpTextColor(Color.black);
+		
 		if (choices!=null) {
 			editorComponent = intelliComboBox;
 			delegate = comboDelegate;
@@ -470,13 +495,14 @@ public class InspectorCellEditor implements TableCellEditor, TreeCellEditor {
 		}
 		else {
 			final String allChars = ".*";
+
 			Pattern pattern = property.getEditPattern();
-			if (pattern!=null && !pattern.pattern().equals(allChars))
-			{
+			if (property.hasValidity() && (pattern == null || !pattern.pattern().equals(allChars))) {
 				editorComponent = intelliFormattedTextField;
 				delegate = formattedTextfieldDelegate;
 
 				//formatter.setPattern(pattern);
+				this.property = property;
 				this.pattern = pattern;
 
 				String val = property.getValue();
@@ -503,7 +529,6 @@ public class InspectorCellEditor implements TableCellEditor, TreeCellEditor {
 			}
 		}
 
-		helpDisplayer.displayHelp(property.getHelp());
 		editorComponent.setFont(table.getFont());
 	}
 	/**
@@ -522,8 +547,11 @@ public class InspectorCellEditor implements TableCellEditor, TreeCellEditor {
 	// implements javax.swing.CellEditor
 	public boolean stopCellEditing() {
 		fireEditingStopped();
-		helpDisplayer.displayHelp("");
+		helpDisplayer.setHelpText(null);
 		return true;
 	}
 
+	public HelpDisplayer getHelpDisplayer() {
+		return helpDisplayer;
+	}
 }

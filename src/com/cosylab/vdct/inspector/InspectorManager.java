@@ -28,6 +28,7 @@ package com.cosylab.vdct.inspector;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.awt.Color;
 import java.awt.Frame;
 import java.util.*;
 
@@ -237,8 +238,12 @@ public void updateProperty(Inspectable object, InspectableProperty property) {
 /**
  * Displays help text in the current active inspector. 
  */
-public void displayHelp(String text) {
+public void setHelpText(String text) {
 	getActiveInspector().setHelp(text);
+}
+
+public void setHelpTextColor(Color color) {
+	getActiveInspector().setHelpColor(color);
 }
 
 }
