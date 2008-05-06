@@ -84,8 +84,6 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
 import com.cosylab.vdct.about.VisualDCTAboutDialogEngine;
 import com.cosylab.vdct.events.CommandManager;
@@ -104,6 +102,7 @@ import com.cosylab.vdct.events.commands.ShowMorphingDialog;
 import com.cosylab.vdct.events.commands.ShowNewDialog;
 import com.cosylab.vdct.events.commands.ShowRenameDialog;
 import com.cosylab.vdct.find.FindDialog;
+import com.cosylab.vdct.graphics.VDBInterface;
 import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.printing.Page;
@@ -259,6 +258,11 @@ public class VisualDCT extends JFrame {
 	private com.cosylab.vdct.plugin.debug.DebugStartMenu ivjStartDebugMenuItem = null;
 	private com.cosylab.vdct.plugin.debug.DebugStopMenuItem ivjStopDebugMenuItem = null;
 	private DBDDialog dbdDialog = null;
+
+	private NameChecker newRecordNameChecker = null;
+	private NameChecker newGroupNameChecker = null;
+	private NameChecker renameNameChecker = null;
+	
 	// navigation menuitems
 	private JMenuItem leftMenuItem = null;
 	private JMenuItem rightMenuItem = null;
@@ -409,7 +413,7 @@ class IvjEventHandler implements java.awt.event.ActionListener, java.awt.event.I
 				connEtoM1(e);
 			else if (e.getSource() == VisualDCT.this.getGroupOKButton()) 
 				connEtoC52(e);
-			else if (e.getSource() == VisualDCT.this.getgroupNameTextField()) 
+			else if (e.getSource() == VisualDCT.this.getGroupNameTextField()) 
 				connEtoC53(e);
 			else if (e.getSource() == VisualDCT.this.getRenameCancelButton()) 
 				connEtoM3(e);
@@ -2838,44 +2842,12 @@ private javax.swing.JMenuItem getGroupMenuItem() {
  * @return javax.swing.JTextField
  */
 /* WARNING: THIS METHOD WILL BE REGENERATED. */
-private javax.swing.JTextField getgroupNameTextField() {
+private javax.swing.JTextField getGroupNameTextField() {
 	if (ivjgroupNameTextField == null) {
 		try {
 			ivjgroupNameTextField = new javax.swing.JTextField();
 			ivjgroupNameTextField.setName("groupNameTextField");
 			// user code begin {1}
-			
-			ivjgroupNameTextField.getDocument().addDocumentListener(new DocumentListener()
-			{
-			    public void insertUpdate(DocumentEvent e) {
-			        check(e);
-			    }
-			    public void removeUpdate(DocumentEvent e) {
-			        check(e);
-			    }
-			    public void changedUpdate(DocumentEvent e) {
-			        // we won't ever get this with a PlainDocument
-			    }
-			    private void check(DocumentEvent e) {
-					GetVDBManager validator = (GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
-					String errmsg = validator.getManager().checkGroupName(ivjgroupNameTextField.getText(), true);
-					if (errmsg==null)
-					{
-						getGroupOKButton().setEnabled(true);
-						getGroupWarningLabel().setText(" ");
-					}
-					else if (errmsg.startsWith("WARNING"))
-					{
-						getGroupOKButton().setEnabled(true);
-						getGroupWarningLabel().setText(errmsg);
-					}
-					else
-					{
-						getGroupOKButton().setEnabled(false);
-						getGroupWarningLabel().setText(errmsg);
-					}
-			    }
-			});
 
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
@@ -2886,6 +2858,14 @@ private javax.swing.JTextField getgroupNameTextField() {
 	}
 	return ivjgroupNameTextField;
 }
+
+protected NameChecker getNewGroupNameChecker() {
+	if (newGroupNameChecker == null) {
+		newGroupNameChecker = new NameChecker(getGroupNameTextField(), null, true, getGroupOKButton(), getGroupWarningLabel());
+	}
+	return newGroupNameChecker;
+}
+
 /**
  * Return the GroupOKButton property value.
  * @return javax.swing.JButton
@@ -3227,7 +3207,7 @@ private javax.swing.JPanel getJDialogContentPane1() {
 			constraintsgroupNameTextField.fill = java.awt.GridBagConstraints.HORIZONTAL;
 			constraintsgroupNameTextField.weightx = 1.0;
 			constraintsgroupNameTextField.insets = new java.awt.Insets(20, 4, 4, 18);
-			getJDialogContentPane1().add(getgroupNameTextField(), constraintsgroupNameTextField);
+			getJDialogContentPane1().add(getGroupNameTextField(), constraintsgroupNameTextField);
 
 			java.awt.GridBagConstraints constraintsButtonPanel1 = new java.awt.GridBagConstraints();
 			constraintsButtonPanel1.gridx = 0; constraintsButtonPanel1.gridy = 2;
@@ -3914,53 +3894,18 @@ private javax.swing.JComboBox getNameTextField() {
 			// user code begin {1}
 
 			ivjNameTextField.setEditable(true);
-
+			
 			ComboBoxEditor editor = ivjNameTextField.getEditor();
 			if (editor.getEditorComponent() instanceof JTextField)
 			{
 				final JTextField comboBoxTextField = (JTextField)editor.getEditorComponent();
-				
+
 				// register event listener to the text field
 				comboBoxTextField.addActionListener(new ActionListener() {
-				    		public void actionPerformed(ActionEvent e) {
-				    		    oKButton_ActionPerformed(e);
-				    		}
-				        });
-				
-				// add document (on change listener)
-				comboBoxTextField.getDocument().addDocumentListener(
-                            new DocumentListener() {
-                                public void insertUpdate(DocumentEvent e) {
-                                    check(e);
-                                }
-
-                                public void removeUpdate(DocumentEvent e) {
-                                    check(e);
-                                }
-
-                                public void changedUpdate(DocumentEvent e) {
-                                    // we won't ever get this with a PlainDocument
-                                }
-
-                                private void check(DocumentEvent e) {
-                                    GetVDBManager validator = 
-                                        (GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
-                                    String errmsg = validator.getManager().checkRecordName(
-                                            			comboBoxTextField.getText(), null,
-                                                    	true
-                                                    );
-                                    if (errmsg == null) {
-                                        getOKButton().setEnabled(true);
-                                        getWarningLabel().setText(" ");
-                                    } else if (errmsg.startsWith("WARNING")) {
-                                        getOKButton().setEnabled(true);
-                                        getWarningLabel().setText(errmsg);
-                                    } else {
-                                        getOKButton().setEnabled(false);
-                                        getWarningLabel().setText(errmsg);
-                                    }
-                                }
-                            });
+					public void actionPerformed(ActionEvent e) {
+						oKButton_ActionPerformed(e);
+					}
+				});
 			}
 			
 			// user code end
@@ -3971,6 +3916,20 @@ private javax.swing.JComboBox getNameTextField() {
 		}
 	}
 	return ivjNameTextField;
+}
+
+/**
+ * Returns new record name checker or null if there isn't one.
+ */
+protected NameChecker getNewRecordNameChecker() {
+	if (newRecordNameChecker == null) {
+		Component editorComponent = getNameTextField().getEditor().getEditorComponent();
+		if (editorComponent instanceof JTextField) {
+			newRecordNameChecker =
+				new NameChecker((JTextField)editorComponent, null, false, getOKButton(), getWarningLabel());
+		}
+	}
+	return newRecordNameChecker;
 }
 
 /**
@@ -4030,37 +3989,6 @@ private javax.swing.JTextField getNewNameTextField() {
 			ivjNewNameTextField.setName("NewNameTextField");
 			// user code begin {1}
 
-			ivjNewNameTextField.getDocument().addDocumentListener(new DocumentListener()
-			{
-			    public void insertUpdate(DocumentEvent e) {
-			        check(e);
-			    }
-			    public void removeUpdate(DocumentEvent e) {
-			        check(e);
-			    }
-			    public void changedUpdate(DocumentEvent e) {
-			        // we won't ever get this with a PlainDocument
-			    }
-			    private void check(DocumentEvent e) {
-					GetVDBManager validator = (GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
-					String errmsg = validator.getManager().checkRecordName(ivjNewNameTextField.getText(), getOldNameLabel().getText(), true);
-					if (errmsg==null) {
-						getRenameOKButton().setEnabled(true);
-						getRenameWarningLabel().setText(" ");
-					}
-					else if (errmsg.startsWith("WARNING"))
-					{
-						getRenameOKButton().setEnabled(true);
-						getRenameWarningLabel().setText(errmsg);
-					}
-					else
-					{
-						getRenameOKButton().setEnabled(false);
-						getRenameWarningLabel().setText(errmsg);
-					}
-			    }
-			});
-
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
 			// user code begin {2}
@@ -4070,6 +3998,14 @@ private javax.swing.JTextField getNewNameTextField() {
 	}
 	return ivjNewNameTextField;
 }
+
+protected NameChecker getRenameNameChecker() {
+	if (renameNameChecker == null) {
+		renameNameChecker = new NameChecker(getNewNameTextField(), getOldNameLabel(), false, getRenameOKButton(), getRenameWarningLabel());
+	}
+	return renameNameChecker;
+}
+
 /**
  * Return the NewRecordDialog property value.
  * @return javax.swing.JDialog
@@ -5744,11 +5680,10 @@ public void groupDialog_WindowOpened(java.awt.event.WindowEvent windowEvent) {
 		groupName = groupName.substring(pos+2).trim();		// skip "]:"
 
 	if (groupName.equals(Constants.MAIN_GROUP))
-		getgroupNameTextField().setText("");
+		getGroupNameTextField().setText("");
 	else
-		getgroupNameTextField().setText(groupName+Constants.GROUP_SEPARATOR);
-	getGroupWarningLabel().setText(" ");
-	getOKButton().setEnabled(false);
+		getGroupNameTextField().setText(groupName+Constants.GROUP_SEPARATOR);
+	getNewGroupNameChecker().check();
 }
 /**
  * Comment
@@ -5761,11 +5696,12 @@ public void groupMenuItem_ActionPerformed() {
  */
 public void groupOKButton_ActionPerformed(java.awt.event.ActionEvent actionEvent) {
 	if (getGroupOKButton().isEnabled()) {
-		GetVDBManager manager = (GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
-		String errmsg = manager.getManager().checkGroupName(getgroupNameTextField().getText(), true);
-		if (errmsg==null || errmsg.startsWith("WARNING")) {
+		VDBInterface vDBInterface =
+			((GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager")).getManager();
+		String errmsg = vDBInterface.checkGroupName(getGroupNameTextField().getText(), true);
+		if (errmsg==null || !vDBInterface.isErrorMessage(errmsg)) {
 			GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
-		 	cmd.getGUIMenuInterface().group(getgroupNameTextField().getText());
+		 	cmd.getGUIMenuInterface().group(getGroupNameTextField().getText());
 			getGroupDialog().dispose();
 		}
 		else {
@@ -5997,7 +5933,7 @@ private void initConnections() throws java.lang.Exception {
 	getCancelButton1().addActionListener(ivjEventHandler);
 	getGroupDialog().addWindowListener(ivjEventHandler);
 	getGroupOKButton().addActionListener(ivjEventHandler);
-	getgroupNameTextField().addActionListener(ivjEventHandler);
+	getGroupNameTextField().addActionListener(ivjEventHandler);
 	getRenameCancelButton().addActionListener(ivjEventHandler);
 	getRenameOKButton().addActionListener(ivjEventHandler);
 	getNewNameTextField().addActionListener(ivjEventHandler);
@@ -6333,11 +6269,11 @@ public void newRecordDialog_WindowOpened(
     if (selected != null && !selected.toString().endsWith(":")) {
     	getNameTextField().setSelectedItem(defaultName != null ? defaultName : "");
     }
-	
-    //getNameTextField().setText("");
-    getWarningLabel().setText(" ");
-    getOKButton().setEnabled(false);
-    
+
+    NameChecker checker = getNewRecordNameChecker();
+    if (checker != null) {
+    	checker.check();
+    }
     getNameTextField().requestFocus();
 }
 
@@ -6372,17 +6308,19 @@ public void morphingDialog_WindowOpened(
  */
 public void oKButton_ActionPerformed(java.awt.event.ActionEvent actionEvent) {
 	if (getOKButton().isEnabled()) {
-		GetVDBManager manager = (GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
+
+		VDBInterface vDBInterface =
+			((GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager")).getManager();
 		String enteredValue;
 		if (actionEvent.getSource() instanceof JTextField)
 		    enteredValue = ((JTextField)actionEvent.getSource()).getText();
 		else
 			enteredValue = getNameTextField().getSelectedItem().toString();
-		String errmsg = manager.getManager().checkRecordName(enteredValue, null, true);
-		if (errmsg==null || errmsg.startsWith("WARNING")) {
+		String errmsg = vDBInterface.checkRecordName(enteredValue, null, true);
+		if (errmsg==null || !vDBInterface.isErrorMessage(errmsg)) {
 		    // this will change value of combo box
 		    updateComboBoxHistory(getNameTextField(), enteredValue);
-			manager.getManager().createRecord(
+		    vDBInterface.createRecord(
 				enteredValue,
 				getTypeComboBox().getSelectedItem().toString(),
 				true);
@@ -7126,17 +7064,17 @@ public void redoMenuItem_ActionPerformed() {
  */
 public void renameDialog_WindowOpened(java.awt.event.WindowEvent windowEvent) {
 	getNewNameTextField().setText(getOldNameLabel().getText());
-	getRenameWarningLabel().setText(" ");
-	getRenameOKButton().setEnabled(false);
+	getRenameNameChecker().check();
 }
 /**
  * Comment
  */
 public void renameOKButton_ActionPerformed(java.awt.event.ActionEvent actionEvent) {
 	if (getRenameOKButton().isEnabled()) {
-		GetVDBManager manager = (GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
-		String errmsg = manager.getManager().checkRecordName(getNewNameTextField().getText(), getOldNameLabel().getText(), true);
-		if (errmsg==null || errmsg.startsWith("WARNING")) {
+		VDBInterface vDBInterface =
+			((GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager")).getManager();
+		String errmsg = vDBInterface.checkRecordName(getNewNameTextField().getText(), getOldNameLabel().getText(), true);
+		if (errmsg==null || !vDBInterface.isErrorMessage(errmsg)) {
 			GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
 		 	cmd.getGUIMenuInterface().rename(getOldNameLabel().getText(), getNewNameTextField().getText());
 			getRenameDialog().dispose();

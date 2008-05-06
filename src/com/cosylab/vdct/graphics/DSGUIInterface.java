@@ -28,23 +28,63 @@ package com.cosylab.vdct.graphics;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
-import java.io.*;
-import java.util.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Vector;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 
-import com.cosylab.vdct.*;
-import com.cosylab.vdct.vdb.*;
+import com.cosylab.vdct.Constants;
+import com.cosylab.vdct.DataProvider;
+import com.cosylab.vdct.Settings;
+import com.cosylab.vdct.VisualDCT;
+import com.cosylab.vdct.events.CommandManager;
+import com.cosylab.vdct.events.commands.SetRedoMenuItemState;
+import com.cosylab.vdct.events.commands.SetUndoMenuItemState;
+import com.cosylab.vdct.events.commands.SetWorkspaceFile;
+import com.cosylab.vdct.events.commands.ShowMorphingDialog;
+import com.cosylab.vdct.events.commands.ShowRenameDialog;
+import com.cosylab.vdct.graphics.objects.Border;
+import com.cosylab.vdct.graphics.objects.Box;
+import com.cosylab.vdct.graphics.objects.Connector;
+import com.cosylab.vdct.graphics.objects.Flexible;
+import com.cosylab.vdct.graphics.objects.Group;
+import com.cosylab.vdct.graphics.objects.Line;
+import com.cosylab.vdct.graphics.objects.Macro;
+import com.cosylab.vdct.graphics.objects.Morphable;
+import com.cosylab.vdct.graphics.objects.Movable;
+import com.cosylab.vdct.graphics.objects.NamingContext;
+import com.cosylab.vdct.graphics.objects.Port;
+import com.cosylab.vdct.graphics.objects.Record;
+import com.cosylab.vdct.graphics.objects.Template;
+import com.cosylab.vdct.graphics.objects.TextBox;
+import com.cosylab.vdct.graphics.objects.VisibleObject;
 import com.cosylab.vdct.plugin.config.PluginNameConfigManager;
-import com.cosylab.vdct.undo.*;
-import com.cosylab.vdct.graphics.objects.*;
-import com.cosylab.vdct.events.*;
-import com.cosylab.vdct.events.commands.*;
+import com.cosylab.vdct.undo.ComposedAction;
+import com.cosylab.vdct.undo.CreateAction;
+import com.cosylab.vdct.undo.DeleteAction;
+import com.cosylab.vdct.undo.MorphAction;
+import com.cosylab.vdct.undo.MorphTemplateAction;
+import com.cosylab.vdct.undo.MoveToGroupAction;
+import com.cosylab.vdct.undo.RenameAction;
+import com.cosylab.vdct.undo.UndoManager;
+import com.cosylab.vdct.util.StringUtils;
+import com.cosylab.vdct.vdb.VDBData;
+import com.cosylab.vdct.vdb.VDBRecordData;
+import com.cosylab.vdct.vdb.VDBTemplate;
+import com.cosylab.vdct.vdb.VDBTemplateInstance;
 
 /**
  * Insert the type's description here.
@@ -68,6 +108,9 @@ public class DSGUIInterface implements GUIMenuInterface, VDBInterface {
 	private boolean doOffsetAtPaste = false;
 	
 	//private static final String nullString = "";
+	
+	private static final String errorString = "Error: ";
+	private static final String warningString = "Warning: ";
 
 /**
  * Insert the method's description here.
@@ -142,22 +185,45 @@ public java.lang.String checkGroupName(String name, boolean relative) {
  */
 public java.lang.String checkRecordName(String name, String oldName, boolean relative) {
 
-	if (name.trim().length() == 0) {
-		return "Empty name!";
-	} else if (name.indexOf(' ') != -1) {
-		return "No spaces allowed!";
-	} else if (name.indexOf('"') != -1) {
-		return "No quotes allowed!";
-	} else if (!name.equals(oldName)
-			&& ((!relative && Group.getRoot().findObject(name, true) != null) ||
-			(relative && drawingSurface.getViewGroup().findObject(name, true) != null))) { 
-		return "Name already exists!";
-	} else if (name.length()>Settings.getInstance().getRecordLength()) {
-		return "WARNING: Name length is "+name.length()+" characters!";
+	String[] names = StringUtils.expandMacros(name);
+	
+	if (names == null) {
+		return errorString + "Won't add more than " + Constants.MAX_NAME_MACRO_EXPANSIONS + " records!";
 	}
 	
-	return PluginNameConfigManager.getInstance().checkValidity(name);
+	String recordName = null;
+	String nameString = null;
+
+	for (int n = 0; n < names.length; n++) {
+		recordName = names[n];
+		nameString = recordName + ": ";
+		
+		if (recordName.trim().length() == 0) {
+			return errorString + nameString + "Empty name!";
+		} else if (recordName.indexOf(' ') != -1) {
+			return errorString + nameString + "No spaces allowed!";
+		} else if (recordName.indexOf('"') != -1) {
+			return errorString + nameString + "No quotes allowed!";
+		} else if (!recordName.equals(oldName)
+				&& ((!relative && Group.getRoot().findObject(recordName, true) != null) ||
+				(relative && drawingSurface.getViewGroup().findObject(recordName, true) != null))) { 
+			return errorString + nameString + "Name already exists!";
+		} else if (recordName.length()>Settings.getInstance().getRecordLength()) {
+			return warningString + nameString + "Name length is "+recordName.length()+" characters!";
+		}
+		
+		String errorStr = PluginNameConfigManager.getInstance().checkValidity(recordName);
+		if (errorStr != null) {
+			return warningString + nameString + errorStr;
+		}
+	}
+	return null;
 }
+
+public boolean isErrorMessage(String message) {
+	return message != null && !message.startsWith(warningString);
+}
+
 public void copyToSystemClipboard(Vector objs)
 {
 	try
@@ -346,36 +412,64 @@ public TextBox createTextBox()
  * @param relative boolean
  */
 public void createRecord(String name, String type, boolean relative) {
-	if (relative)
-	{
-		String parentName = drawingSurface.getViewGroup().getAbsoluteName();
-		if (parentName.length()>0)
-			name = parentName + Constants.GROUP_SEPARATOR + name;
-	}
-	
-	VDBRecordData recordData = VDBData.getNewVDBRecordData(
-			DataProvider.getInstance().getDbdDB(), type, name);
-	if (recordData==null) {
-		com.cosylab.vdct.Console.getInstance().println("o) Interal error: failed to create record "+name+" ("+type+")!");
+
+	String[] names = StringUtils.expandMacros(name);
+
+	/* If more than Constants.MAX_NAME_MACRO_EXPANSIONS records would be added.
+	 * Gui forbids this so we should never get null.
+	 */
+	if (names == null) {
 		return;
 	}
 
 	ViewState view = ViewState.getInstance();
 	double scale = view.getScale();
+	int posX = drawingSurface.getPressedX();
+	int posY = drawingSurface.getPressedY();
 	
-	int posX = -1;
-	int posY = -1;
-	if (DrawingSurface.getInstance().isPressedMousePosValid()) {
-		posX = (int)((drawingSurface.getPressedX() + view.getRx()) / scale);
-		posY = (int)((drawingSurface.getPressedY() + view.getRy()) / scale);
-	}
-	Record record = new Record(null, recordData, posX, posY);
-	Group.getRoot().addSubObject(name, record, true);
+	UndoManager.getInstance().startMacroAction();
 	
-	if (Settings.getInstance().getSnapToGrid())
-		record.snapToGrid();
+	for (int n = 0; n < names.length; n++) {
+		String recordName = names[n];
+		
+		String errmsg = checkRecordName(recordName, null, true);
+		if (errmsg != null && isErrorMessage(errmsg)) {
+			continue;
+		}
+		
+		if (relative) {
+			String parentName = drawingSurface.getViewGroup().getAbsoluteName();
+			if (parentName.length()>0)
+				recordName = parentName + Constants.GROUP_SEPARATOR + recordName;
+		}
+		
+		VDBRecordData recordData = VDBData.getNewVDBRecordData(
+				DataProvider.getInstance().getDbdDB(), type, recordName);
+		if (recordData==null) {
+			com.cosylab.vdct.Console.getInstance().println("o) Interal error: failed to create record "+recordName+" ("+type+")!");
+			continue;
+		}
 
-	UndoManager.getInstance().addAction(new CreateAction(record));
+		int recPosX = (int)((posX + view.getRx()) / scale);
+		int recPosY = (int)((posY + view.getRy()) / scale);
+
+		Record record = new Record(null, recordData, recPosX, recPosY);
+		Point move = record.getMoveInsideView();
+		record.move(move.x, move.y);
+		
+		posX += view.getGridSize() * 2;  
+		posY += view.getGridSize() * 2;
+		drawingSurface.setPressedMousePos(posX, posY);
+		
+		Group.getRoot().addSubObject(recordName, record, true);
+		
+		if (Settings.getInstance().getSnapToGrid())
+			record.snapToGrid();
+
+		UndoManager.getInstance().addAction(new CreateAction(record));
+	}
+	
+    UndoManager.getInstance().stopMacroAction();
 
 	//drawingSurface.setModified(true);
 	drawingSurface.repaint();

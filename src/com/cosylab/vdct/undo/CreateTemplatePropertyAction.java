@@ -39,15 +39,16 @@ import com.cosylab.vdct.inspector.InspectorManager;
 public class CreateTemplatePropertyAction extends ActionObject {
 	protected Template object;
 	protected String name;
+	protected String value;
 
-	private static final String nullString = "";	
 /**
  * Insert the method's description here.
  * Creation date: (3.5.2001 16:27:58)
  */
-public CreateTemplatePropertyAction(Template object, String name) {
+public CreateTemplatePropertyAction(Template object, String name, String value) {
 	this.object=object;
 	this.name=name;
+	this.value = value;
 }
 /**
  * Insert the method's description here.
@@ -55,13 +56,13 @@ public CreateTemplatePropertyAction(Template object, String name) {
  * @return java.lang.String
  */
 public String getDescription() {
-	return "Create Template Property ["+object+"]("+name+")";
+	return "Create Template Property ["+object+"]("+name+":"+value+")";
 }
 /**
  * This method was created in VisualAge.
  */
 protected void redoAction() {
-	object.getTemplateData().addProperty(name, nullString);
+	object.getTemplateData().addProperty(name, value);
 
 	object.updateTemplateFields();
 	InspectorManager.getInstance().updateObject(object);

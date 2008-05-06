@@ -1323,7 +1323,7 @@ public InspectableProperty  addProperty(String key, String value) {
 	}
 	templateData.addProperty(key, value);
 
-	UndoManager.getInstance().addAction(new CreateTemplatePropertyAction(this, key));
+	UndoManager.getInstance().addAction(new CreateTemplatePropertyAction(this, key, value));
 
 	updateTemplateFields();
 	InspectorManager.getInstance().updateObject(this);
@@ -1368,7 +1368,7 @@ public void addProperty()
 					templateData.addProperty(reply, nullString);
 	
 					com.cosylab.vdct.undo.UndoManager.getInstance().addAction(
-							new CreateTemplatePropertyAction(this, reply));
+							new CreateTemplatePropertyAction(this, reply, nullString));
 	
 					updateTemplateFields();
 					InspectorManager.getInstance().updateObject(this);
@@ -1415,7 +1415,7 @@ public void removeProperty(InspectableProperty property)
 	templateData.removeProperty(property.getName());
 	
 	com.cosylab.vdct.undo.UndoManager.getInstance().addAction(
-					new DeleteTemplatePropertyAction(this, property.getName()));
+					new DeleteTemplatePropertyAction(this, property.getName(), property.getValue()));
 
 	updateTemplateFields();
 	InspectorManager.getInstance().updateObject(this);
@@ -1458,12 +1458,12 @@ public void renameProperty(InspectableProperty property)
 				com.cosylab.vdct.undo.ComposedAction composedAction = 
 												new com.cosylab.vdct.undo.ComposedAction();
 
-				Object value = templateData.getProperties().get(property.getName());
+				String value = templateData.getProperties().get(property.getName()).toString();
 				templateData.removeProperty(property.getName());
-				composedAction.addAction(new DeleteTemplatePropertyAction(this, property.getName()));
+				composedAction.addAction(new DeleteTemplatePropertyAction(this, property.getName(), value));
 
-				templateData.addProperty(reply, value.toString());
-				composedAction.addAction(new CreateTemplatePropertyAction(this, reply));
+				templateData.addProperty(reply, value);
+				composedAction.addAction(new CreateTemplatePropertyAction(this, reply, value));
 
 				com.cosylab.vdct.undo.UndoManager.getInstance().addAction(composedAction);
 

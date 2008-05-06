@@ -174,6 +174,7 @@ public class Constants {
     public static final double ARROW_SHARPNESS = Math.PI / 12;
 
     //public static final boolean WIRE_CROSSING_AVOIDIANCE = true;
-    // TODO tmp
     //public static boolean WIRE_CROSSING_AVOIDIANCE = Boolean.valueOf(System.getProperty("WIRE_CROSSING_AVOIDIANCE", "true")).booleanValue();
+
+    public static final int MAX_NAME_MACRO_EXPANSIONS = 1000;
 }

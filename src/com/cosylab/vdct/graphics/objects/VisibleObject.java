@@ -584,4 +584,21 @@ public int getTopOffset() {
     return 0;
 }
 
+/**
+ * Returns ths smallest vector (dX, dY), which would move this inside the view defined by ViewState. 
+ * @return
+ */
+public Point getMoveInsideView() {
+	ViewState view = ViewState.getInstance();
+	
+    int leftLimit = 0;
+    int rightLimit = view.getWidth() - width;
+    int topLimit = 0;
+    int bottomLimit = view.getHeight() - height;
+
+	int horMargin = (x < leftLimit) ? leftLimit - x : (x > rightLimit ? rightLimit - x: 0);
+	int vertMargin = (y < topLimit) ? topLimit - y : (y > bottomLimit ? bottomLimit - y: 0);
+    return new Point(horMargin, vertMargin);
+}
+
 }

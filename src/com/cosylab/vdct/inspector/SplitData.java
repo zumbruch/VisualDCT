@@ -34,9 +34,11 @@ package com.cosylab.vdct.inspector;
  */
 public class SplitData {
 	private String name = null;
-    boolean delimiterType = false;
+	private boolean delimiterType = false;
     private String pattern = null;
-    int parts = -1;
+    private int parts = -1;
+    
+    private SplitPropertyGroup[] splitGroups = null;
     
     private static final String delimiterString = "Delimiter";
     private static final String patternString = "Pattern";
@@ -138,6 +140,20 @@ public class SplitData {
 	public String getDelimiterTypeString() {
 		return delimiterType ? delimiterString : patternString;
 	}
+	
+	/**
+	 * @return the splitGroups
+	 */
+	public SplitPropertyGroup[] getSplitGroups() {
+		return splitGroups;
+	}
+
+	/**
+	 * @param splitGroups the splitGroups to set
+	 */
+	public void setSplitGroups(SplitPropertyGroup[] splitGroups) {
+		this.splitGroups = splitGroups;
+	}
 
 	private static boolean isDelimiterType(String delimiterTypeString) {
 		return delimiterTypeString.equals(delimiterString);
@@ -149,6 +165,7 @@ public class SplitData {
 	public String toString() {
 		return getDelimiterTypeString() + " <" + pattern + ">";
 	}
+	
 	
 	/** Returns the number at the end of the given string. If there is no such number, it returns -1.
 	 */

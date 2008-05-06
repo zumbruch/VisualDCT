@@ -43,6 +43,7 @@ import com.cosylab.vdct.graphics.objects.Template;
 import com.cosylab.vdct.graphics.objects.VisibleObject;
 import com.cosylab.vdct.undo.DeleteAction;
 import com.cosylab.vdct.undo.UndoManager;
+import com.cosylab.vdct.util.StringUtils;
 import com.cosylab.vdct.vdb.CommentProperty;
 
 /**This table model supports ordering the inspectable properties into columns based on their name.
@@ -126,7 +127,7 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 	
 	public Object getValueAt(int rowIndex, int columnIndex) {
 	    String value = properties[rowIndex][columnIndex].getValue();
-		// TODO: The only properties with null values are CommentProperty. This could maybe be fixed.
+		// TASK:EMPTYNULL
 	    return (value != null) ? value : ""; 
 	}
 
@@ -135,6 +136,20 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 	}
 
 	public void setValueAt(Object aValue, int row, int column) {
+		String[] values = StringUtils.expandMacros(aValue.toString());
+		if (values == null) {
+			return;
+		}
+		UndoManager.getInstance().startMacroAction();
+		int curRow = row;
+		while (curRow < getRowCount() && curRow - row < values.length) {
+			internalSetValueAtAndUpdate(values[curRow - row], curRow, column);
+			curRow++;
+		}
+        UndoManager.getInstance().stopMacroAction();
+	}
+
+	protected void internalSetValueAtAndUpdate(Object aValue, int row, int column) {
 		if (internalSetValueAt(aValue, row, column)) {
 			// Update the whole row as validity of this inspectable's fields can change on property value change. 
 			fireTableRowsUpdated(row, row);
@@ -152,7 +167,7 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 		if (column == propertiesNamesColumnIndex) {
 			properties[row][column].setValue(aValue.toString());
 			return false;
-			// TODO: fast renaming
+			// TASK:NONMODALSPR
 			//nameToPropertiesRowIndex.remove(property.getValue());
 		}
 		/* Check if the property is a creator property that creates a new property on the inspectable object.
@@ -172,7 +187,7 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 			properties[row][column].setValue(aValue.toString());
 		}
 		
-		// TODO: fast renaming
+		// TASK:NONMODALSPR
 		/*
 		if (column == propertiesNamesColumnIndex) {
    			nameToPropertiesRowIndex.put(properties[row][column].getValue(), new Integer(row));
@@ -262,6 +277,10 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 
 	public Inspectable getLastInspectable() {
 		return inspectables[propertiesRowCount - 1];
+	}
+
+	public final InspectableProperty getProperty(int row, int column) {
+		return properties[row][column];
 	}
 	
 	public final String getPropertyValue(int row, int column) {

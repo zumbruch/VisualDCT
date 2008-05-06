@@ -151,8 +151,8 @@ public class InspectorTableClipboardAdapter extends TransferHandler implements A
      * implementation. Here it listens for Copy and Paste, and Cut commands.
      * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
      */
-    public void actionPerformed(ActionEvent e)
-    {
+    public void actionPerformed(ActionEvent e) {
+    	
         if (e.getActionCommand().equals(CUT_ACTION_NAME)) {
             performCopy();
             performDelete();
@@ -244,7 +244,7 @@ public class InspectorTableClipboardAdapter extends TransferHandler implements A
      */
     private void performPaste() {
 
-        try {
+    	try {
         	String string = (String)clipboardSystem.getContents(this).getTransferData(DataFlavor.stringFlavor);
         	stringToSelection(string);
         } catch (UnsupportedFlavorException ufe) {
@@ -262,27 +262,22 @@ public class InspectorTableClipboardAdapter extends TransferHandler implements A
         if (numOfSelRows == 0 || numOfSelCols == 0) {
             return;
         }
-        boolean deleted = false;
-        
+
         // undo support (to pack all into one action)
     	try {
+            UndoManager.getInstance().startMacroAction();
+            
             for (int i = 0; i < numOfSelRows; i++) {
                 for (int j = 0; j < numOfSelCols; j++) {
                 	int row = selRows[i];
                 	int col = selCols[j];
                     if (table.isCellEditable(row, col)) {
-                        if (!deleted) {
-                        	deleted = true;
-                			UndoManager.getInstance().startMacroAction();
-                        }
                     	table.setValueAt(EMPTY_STRING, row, col);
                     }    
                 }
             }
     	} finally {
-   		    if (deleted) {
-   		        UndoManager.getInstance().stopMacroAction();
-   		    }
+	        UndoManager.getInstance().stopMacroAction();
    		}
     }
 
@@ -327,26 +322,9 @@ public class InspectorTableClipboardAdapter extends TransferHandler implements A
      */
     private void stringToSelection(String string) {
 
-    	
-    	/*
-refresh selection and get starting and ending values; get buffer 
-
-width and height; if either 0, do nothing;
-
-calculate width and height; if smaller than buffer width/height, 
-
-enlarge them; then compare with table size and make them smaller, 
-
-then copy them into buffer width/height; start undo; go in a loop 
-
-trough all, use modulo with buffer width, height; stop undo with 
-
-finnaly
-    	 */
-    	
     	refreshSelectionData();
 
-        // Check whether selection exists. If it does not, currently do nothing.
+    	// Check whether selection exists. If it does not, currently do nothing.
         if (numOfSelRows == 0 || numOfSelCols == 0) {
             return;
         }
@@ -360,6 +338,7 @@ finnaly
         
         int selWidth = endCol - startCol + 1; 
         int selHeight = endRow - startRow + 1;
+
         if (selWidth == 0 || selHeight == 0) {
             return;
         }
@@ -390,55 +369,6 @@ finnaly
     	} finally {
    	        UndoManager.getInstance().stopMacroAction();
     	}
-        
-        
-        
-        // TODO:REM
-        /*
-        int rowCount = table.getRowCount();
-        int columnCount = table.getColumnCount();
-
-        boolean pasted = false;
-        
-        // w/ packed undo support
-        try {
-            // acknowledge trailing empty lines; the last is explicitly ignored later    
-        	String[] rowStrings = string.split("\\n", -1);
-
-            int maxCols = 0;
-            for (int i = 0; i < rowStrings.length - 1; i++) {
-            	maxCols = Math.max(maxCols, rowStrings[i].split("\\t", -1).length);
-            }
-            
-            int i = 0;
-            int j = 0;
-            int row = 0;
-            int col = 0;
-            String value = null;
-            for (i = 0; i < rowStrings.length - 1; i++) {
-                String[] fields = rowStrings[i].split("\\t", maxCols);
-                row = i + startRow; 
-
-                for (j = 0; j < maxCols; j++) {
-                	col = j + startCol;
-                	
-	                if (row >= rowCount || col >= columnCount) {
-	                	continue;
-	                }
-               	    if (!pasted) {
-               	        pasted = true;
-               			UndoManager.getInstance().startMacroAction();
-               	    }
-               	    value = j < fields.length ? fields[j] : EMPTY_STRING;
-                    table.setValueAt(value, row, col);
-                }
-            }
-    	} finally {
-    	    if (pasted) {
-    	        UndoManager.getInstance().stopMacroAction();
-    	    }
-    	}
-    	*/
     }
     
     private String[][] stringToStringArray(String buffer) {

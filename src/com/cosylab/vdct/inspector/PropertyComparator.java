@@ -62,7 +62,7 @@ public class PropertyComparator implements Comparator {
 	    String firstString = first.getValue();
 	    String secondString = second.getValue();
 
-	    // TODO: This is only because of CommentProperty, may be fixable.
+	    // TASK:EMPTYNULL
 	    if (firstString == null) {
 	    	firstString = "";
 	    }

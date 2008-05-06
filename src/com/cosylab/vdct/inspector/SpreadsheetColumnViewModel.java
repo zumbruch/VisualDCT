@@ -66,6 +66,7 @@ public class SpreadsheetColumnViewModel extends SpreadsheetSplitViewModel implem
 			Vector loadedData) throws IllegalArgumentException {
 		super(dataType, displayData, loadedData);
 		columnModel = new DefaultTableColumnModel();
+		columnModel.setColumnSelectionAllowed(true);
 		refreshColumns();
 	}
 	
@@ -197,7 +198,6 @@ public class SpreadsheetColumnViewModel extends SpreadsheetSplitViewModel implem
 	
 	private void refreshColumns() {
 		
-		// TODO: reuse existing columns, sample code below. First set comment property to be uneditable.
 		while (getColumnCount() > 0) {
         	removeColumn(columnModel.getColumn(0));
         }
@@ -206,6 +206,9 @@ public class SpreadsheetColumnViewModel extends SpreadsheetSplitViewModel implem
 		}
 		recallColumnWidths();
 		return;
+		/* TASK:COLREUSE: Sample code for reusing of existing columns.
+		 * First do TASK:UNEDITCOM.
+		 */
         /*
         int pos = 0;
 		for (pos = 0; pos < super.getColumnCount(); pos++) {
@@ -237,7 +240,7 @@ public class SpreadsheetColumnViewModel extends SpreadsheetSplitViewModel implem
 		column.setHeaderValue(getColumnHeaderValue(colIndex));
 		column.setHeaderRenderer(renderer);
 		
-		// TODO: make an option to make comment properties uneditable
+		// TASK:UNEDITCOM
 		String name = getColumnId(colIndex);
 		if (name.equals(propertiesCommentsColumn)) {
 			column.setCellEditor(new DefaultCellEditor(new JTextField()){

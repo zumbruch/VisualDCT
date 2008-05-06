@@ -73,7 +73,7 @@ public class NameConfigExample implements NameConfigPlugin {
 	 */
 	public String checkValidity(String name) {
 		if (pattern != null && !pattern.matcher(name).matches()) {
-			return "Error: the name does not match the pattern: " + pattern.pattern();
+			return "The name does not match the pattern: " + pattern.pattern();
 		}
 		return null;
 	}

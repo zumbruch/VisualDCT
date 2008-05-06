@@ -43,6 +43,8 @@ public class SplitPropertyGroup {
 	private SplitPropertyPart[] parts = null;
 	private String trail = null;
 	
+	private String value = null;
+	
 	private int patternParts = 0;
 	private boolean patternMatch = true;
 	private boolean nestedGroups = false;
@@ -74,6 +76,7 @@ public class SplitPropertyGroup {
 		if (value == null) {
 			value = "";
 		}
+		this.value = value;
 		
 		Vector partsVector = new Vector();
 		int foundParts = 0;
@@ -165,8 +168,6 @@ public class SplitPropertyGroup {
 			}
 		}
 		
-		patternParts = foundParts; 
-		
 		/* If there are columns remaining, fill them with empty fields with the same delimiter. If delimiter is not
 		 * known, use default.
 		 */
@@ -179,9 +180,11 @@ public class SplitPropertyGroup {
 		}
 		parts = new SplitPropertyPart[partsVector.size()];
 		partsVector.copyInto(parts);
+
+		patternParts = foundParts; 
 	}
 
-	static int getPartsCount(String value, SplitData splitData) {
+	public static int getPartsCount(String value, SplitData splitData) {
 		
 		if (value == null) {
 			value = "";
@@ -190,7 +193,7 @@ public class SplitPropertyGroup {
 		String pattern = splitData.getPattern();
 		
 		if (delimiterType) {
-			return value.split(pattern).length;
+			return value.split(pattern, -1).length;
 		} else {
 			int groupCount = 0;
 			try {
@@ -209,7 +212,8 @@ public class SplitPropertyGroup {
 		for (int p = 0; p < parts.length; p++) {
 			value += parts[p].getLead() + parts[p].getValue();
 		}
-		owner.setValue(value + trail);
+		this.value = value + trail;
+		owner.setValue(this.value);
 	}
 
 	/**
@@ -264,5 +268,12 @@ public class SplitPropertyGroup {
 	 */
 	public String getErrorDesc() {
 		return errorDesc;
+	}
+
+	/**
+	 * @return the value
+	 */
+	public String getValue() {
+		return value;
 	}
 }

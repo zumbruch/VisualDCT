@@ -692,15 +692,6 @@ public class SpreadsheetViewModel extends SpreadsheetTableModel {
 	}
 
 	/* (non-Javadoc)
-	 * @see com.cosylab.vdct.inspector.SpreadsheetTableModel#setValueAt(java.lang.Object, int, int)
-	 */
-	public void setValueAt(Object value, int row, int column) {
-		if (internalSetValueAt(value, row, column)) {
-			fireTableRowsUpdated(row, row);
-		}
-	}
-	
-	/* (non-Javadoc)
 	 * @see com.cosylab.vdct.inspector.SpreadsheetTableModel#internalSetValueAt(java.lang.Object, int, int)
 	 */
 	protected boolean internalSetValueAt(Object value, int row, int column) {

@@ -32,6 +32,7 @@ import java.util.Vector;
 
 import com.cosylab.vdct.plugin.debug.PluginDebugManager;
 import com.cosylab.vdct.undo.UndoManager;
+import com.cosylab.vdct.util.StringUtils;
 import com.cosylab.vdct.vdb.CommentProperty;
 
 /**This table model supports splitting of columns.
@@ -290,17 +291,10 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 	
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		String value = model[rowIndex][columnIndex].getValue();
-		// TODO: The only properties with null values are CommentProperty. This could maybe be fixed.
+		// TASK:EMPTYNULL
 	    return (value != null) ? value : ""; 
 	}
 
-	public void setValueAt(Object aValue, int row, int column) {
-		if (internalSetValueAt(aValue, row, column)) {
-			// Update the whole row as validity of this inspectable's fields can change on property value change. 
-			fireTableRowsUpdated(row, row);
-		}
-	}
-	
 	/* (non-Javadoc)
 	 * @see com.cosylab.vdct.inspector.SpreadsheetViewModel#internalSetValueAt(java.lang.Object, int, int)
 	 */
@@ -348,7 +342,7 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 			}
 		}
 		
-		/* TODO: fast renaming
+		/* TASK:NONMODALSPR
 		 * On name change, if the whole table is not refreshed, at least splitting has to be recalculated as the
 		 * field values that point to the name change.
 		 */
@@ -467,8 +461,11 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 			    	modelColumnNames[modelJ + p] = colName;
 				}
 				
+				SplitPropertyGroup[] splitGroups = split.getSplitGroups();
 				for (int i = 0; i < viewRowCount; i++) {
-					SplitPropertyGroup group = new SplitPropertyGroup(super.getPropertyAt(i, j), split);
+					//SplitPropertyGroup group = new SplitPropertyGroup(super.getPropertyAt(i, j), split);
+					SplitPropertyGroup group = splitGroups[visibleToBaseRow(i)];
+					
 					for (int p = 0; p < parts; p++) {
 						model[i][modelJ + p] = group.getPart(p);
 					}
@@ -487,17 +484,42 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 		int propertiesRowCount = getPropertiesRowCount();
 		int propertiesColumnCount = getPropertiesColumnCount();
 		
-		// Calculate the required parts to which the a specific column must be split into.
 		for (int j = 0; j < propertiesColumnCount; j++) {
 			SplitData split = propertiesColumnSplitData[j];
 			if (split != null) {
-				int maxParts = 1;
-				for (int i = 0; i < propertiesRowCount; i++) {
-					String value = getPropertyValue(i, j);
-					int parts = SplitPropertyGroup.getPartsCount(value, split);
-					maxParts = Math.max(maxParts, parts);
+				
+                // Check if current data is out of date.
+				boolean refresh = false;
+				SplitPropertyGroup[] splitGroups = split.getSplitGroups();
+				if (splitGroups != null && splitGroups.length == propertiesRowCount) {
+					for (int i = 0; i < propertiesRowCount; i++) {
+						if (splitGroups[i] == null || !StringUtils.emptyEquals(splitGroups[i].getValue(), getPropertyValue(i, j))) {
+							refresh = true;
+							break;
+						}
+					}
+				} else {
+					refresh = true;
 				}
-				split.setParts(maxParts);
+				
+				if (refresh) {
+					splitGroups = new SplitPropertyGroup[propertiesRowCount];
+					split.setSplitGroups(splitGroups);
+
+					/* Calculate the number of required columns to which the current must be split into.
+					 */
+					int maxParts = 1;
+					int parts = 0;
+					for (int i = 0; i < propertiesRowCount; i++) {
+						parts = SplitPropertyGroup.getPartsCount(getPropertyValue(i, j), split);
+						maxParts = Math.max(maxParts, parts);
+					}
+					split.setParts(maxParts);
+					
+					for (int i = 0; i < propertiesRowCount; i++) {
+					    splitGroups[i] = new SplitPropertyGroup(getProperty(i, j), split);
+					}
+				}
 			}
 		}
 

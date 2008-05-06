@@ -30,6 +30,7 @@ package com.cosylab.vdct.inspector;
 import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.events.commands.GetGUIInterface;
 import com.cosylab.vdct.events.commands.GetVDBManager;
+import com.cosylab.vdct.graphics.VDBInterface;
 import com.cosylab.vdct.graphics.objects.Flexible;
 import com.cosylab.vdct.plugin.config.PluginNameConfigManager;
 import com.cosylab.vdct.vdb.NameValueInfoProperty;
@@ -73,7 +74,10 @@ public class NameProperty extends NameValueInfoProperty {
 			return;
 		}
 		
-		if (checkNewName(value) != null) {
+		VDBInterface vDBInterface =
+			((GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager")).getManager();
+		
+		if (vDBInterface.isErrorMessage(checkNewName(value))) {
         	return;
         }
 
@@ -123,11 +127,8 @@ public class NameProperty extends NameValueInfoProperty {
 		}
 		String oldName = namedObject.getFlexibleName();
 		
-		GetVDBManager manager = (GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
-		String errorMessage = manager.getManager().checkRecordName(name, oldName, true);
-        if (errorMessage != null && !errorMessage.startsWith("WARNING")) {
-        	return errorMessage;
-        }
-        return null;
+		VDBInterface vDBInterface =
+			((GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager")).getManager();
+		return vDBInterface.checkRecordName(name, oldName, true);
 	}
 }

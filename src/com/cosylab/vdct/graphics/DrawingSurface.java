@@ -194,8 +194,6 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 	private Stack templateStack = null;	
 	private Vector selectedConnectorsForMove = null;
 	
-	private boolean pressedMousePosValid = true;
-	
 /**
  * DrawingSurface constructor comment.
  */
@@ -2700,8 +2698,7 @@ public static HashMap applyVisualData(boolean importDB, Group group, DBData dbDa
 		e.printStackTrace();
 	}
 
-	// TODO: reuse this if changing layout manager. 
-	//group.initializeLayout();
+	group.initializeLayout();
 		
 	// call this after ports/macros fields are initialized !!
 //	group.manageLinks(true);
@@ -3663,14 +3660,20 @@ public void createTemplateInstance(String name, String type, boolean relative) {
 
 	//templ.setDescription(dbTemplate.getDescription());
 	//templ.setDescription(template.getDescription());
-	if (pressedMousePosValid) {
-	    templ.setX((int)((getPressedX() + view.getRx()) / scale));
-	    templ.setY((int)((getPressedY() + view.getRy()) / scale));
-	} else {
-		templ.setX(-1);
-		templ.setY(-1);
-	}
-	Group.getRoot().addSubObject(name, templ, true);
+    int posX = getPressedX();
+    int posY = getPressedX();
+	
+	templ.setX((int)((posX + view.getRx()) / scale));
+    templ.setY((int)((posY + view.getRy()) / scale));
+
+    Point move = templ.getMoveInsideView();
+    templ.move(move.x, move.y);
+    
+	posX += view.getGridSize() * 2;  
+	posY += view.getGridSize() * 2;
+	setPressedMousePos(posX, posY);
+    
+    Group.getRoot().addSubObject(name, templ, true);
 	
 	if (Settings.getInstance().getSnapToGrid())
 		templ.snapToGrid();
@@ -4114,16 +4117,11 @@ public void reset() {
 }
 
 /**
- * @return the pressedMousePosValid
- */
-public boolean isPressedMousePosValid() {
-	return pressedMousePosValid;
-}
-/**
  * @param pressedMousePosValid the pressedMousePosValid to set
  */
-public void setPressedMousePosValid(boolean pressedMousePosValid) {
-	this.pressedMousePosValid = pressedMousePosValid;
+public void setPressedMousePos(int x, int y) {
+	pressedX = x;
+	pressedY = y;
 }
 
 }

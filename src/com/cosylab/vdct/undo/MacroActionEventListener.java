@@ -1,7 +1,5 @@
-package com.cosylab.vdct.undo;
-
 /**
- * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
+ * Copyright (c) 2008, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -28,41 +26,14 @@ package com.cosylab.vdct.undo;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import com.cosylab.vdct.graphics.objects.Template;
-
-
-/**
- * Insert the type's description here.
- * Creation date: (3.5.2001 20:32:44)
- * @author 
- */
-public class DeleteTemplatePropertyAction extends CreateTemplatePropertyAction {
+package com.cosylab.vdct.undo;
 
 /**
- * DeleteAction constructor comment.
- * @param object com.cosylab.vdct.graphics.objects.VisibleObject
+ * @author ssah
+ *
  */
-public DeleteTemplatePropertyAction(Template object, String name, String value) {
-	super(object, name, value);
-}
-/**
- * Insert the method's description here.
- * Creation date: (3.5.2001 16:26:04)
- * @return java.lang.String
- */
-public String getDescription() {
-	return "Delete Template Property ["+object+"]("+name+ ":" + value + ")";
-}
-/**
- * This method was created in VisualAge.
- */
-protected void redoAction() {
-	super.undoAction();
-}
-/**
- * This method was created in VisualAge.
- */
-protected void undoAction() {
-	super.redoAction();
-}
+public interface MacroActionEventListener {
+
+	public void macroActionStarted();
+	public void macroActionStopped();
 }

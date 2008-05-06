@@ -1,5 +1,31 @@
 package com.cosylab.vdct.vdb;
 
+import java.awt.Component;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.Vector;
+import java.util.regex.Pattern;
+
+import com.cosylab.vdct.Console;
+import com.cosylab.vdct.Constants;
+import com.cosylab.vdct.DataProvider;
+import com.cosylab.vdct.dbd.DBDConstants;
+import com.cosylab.vdct.dbd.DBDData;
+import com.cosylab.vdct.dbd.DBDDeviceData;
+import com.cosylab.vdct.dbd.DBDFieldData;
+import com.cosylab.vdct.dbd.DBDMenuData;
+import com.cosylab.vdct.dbd.DBDResolver;
+import com.cosylab.vdct.graphics.objects.Debuggable;
+import com.cosylab.vdct.graphics.objects.Group;
+import com.cosylab.vdct.graphics.objects.LinkSource;
+import com.cosylab.vdct.graphics.objects.Record;
+import com.cosylab.vdct.inspector.ChangableVisibility;
+import com.cosylab.vdct.inspector.InspectableProperty;
+import com.cosylab.vdct.inspector.InspectorManager;
+import com.cosylab.vdct.plugin.debug.PluginDebugManager;
+import com.cosylab.vdct.util.StringUtils;
+
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
  * All rights reserved.
@@ -27,24 +53,6 @@ package com.cosylab.vdct.vdb;
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-import com.cosylab.vdct.dbd.*;
-import com.cosylab.vdct.DataProvider;
-import com.cosylab.vdct.Console;
-import com.cosylab.vdct.inspector.ChangableVisibility;
-import com.cosylab.vdct.inspector.InspectableProperty;
-import com.cosylab.vdct.inspector.InspectorManager;
-import com.cosylab.vdct.plugin.debug.PluginDebugManager;
-import com.cosylab.vdct.graphics.objects.Debuggable;
-import com.cosylab.vdct.graphics.objects.Group;
-import com.cosylab.vdct.graphics.objects.LinkSource;
-import com.cosylab.vdct.graphics.objects.Record;
-
-import java.awt.Component;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * This type was created in VisualAge.
@@ -454,17 +462,7 @@ public String getToolTipText()
  * Creation date: (24/8/99 15:29:04)
  * @return java.util.regex.Pattern
  */
-public Pattern getEditPattern()
-{
-	if ((dbdData.getField_type()==DBDConstants.DBF_INLINK) ||
-		(dbdData.getField_type()==DBDConstants.DBF_OUTLINK))
-	{
-		// if not software
-		String linkType = record.getDTYPLinkType();
-		if (linkType!=null)
-			return DataProvider.getInstance().getEditPatternLinkType(linkType);
-	}
-
+public Pattern getEditPattern() {
 	return null;
 }
 
@@ -473,22 +471,8 @@ public Pattern getEditPattern()
  * Creation date: (11.1.2001 21:28:51)
  * @return boolean
  */
-public boolean isValid()
-{
-	if ((dbdData.getField_type()==DBDConstants.DBF_INLINK) ||
-		(dbdData.getField_type()==DBDConstants.DBF_OUTLINK))
-	{
-		Pattern pattern = getEditPattern();
-		if (pattern!=null)
-		{
-    	   Matcher m = pattern.matcher(getValue());
-        	if (m.matches())
-        		return true;
-        	else
-				return false;			
-		}
-	}
-	return true;
+public boolean isValid() {
+	return checkExpandedValues(value) == null;	
 }
 /**
  * Insert the method's description here.
@@ -592,6 +576,41 @@ public boolean hasValidity() {
  * @see com.cosylab.vdct.inspector.InspectableProperty#checkValueValidity(java.lang.String)
  */
 public String checkValueValidity(String value) {
+	return checkExpandedValues(value);
+}
+
+private Pattern getPattern()
+{
+	if ((dbdData.getField_type()==DBDConstants.DBF_INLINK) ||
+		(dbdData.getField_type()==DBDConstants.DBF_OUTLINK))
+	{
+		// if not software
+		String linkType = record.getDTYPLinkType();
+		if (linkType!=null)
+			return DataProvider.getInstance().getEditPatternLinkType(linkType);
+	}
+
 	return null;
 }
+
+private String checkExpandedValues(String value) {
+	
+	Pattern pattern = getPattern();
+	if (pattern == null) {
+		return null;
+	}
+
+	String[] values = StringUtils.expandMacros(value);
+	if (values == null) {
+		return getHelp() + ": Error: Won't set more tban " + Constants.MAX_NAME_MACRO_EXPANSIONS + " fields!";
+	}
+	
+	for (int n = 0; n < values.length; n++) {
+		if (!pattern.matcher(values[n]).matches()) {
+			return getHelp() + ": Warning: " + values[n] + " doesn't match the pattern " + pattern.pattern();
+		}
+	}
+	return null;
+}
+
 }

@@ -55,8 +55,6 @@ import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
@@ -70,6 +68,8 @@ import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.objects.Record;
 import com.cosylab.vdct.graphics.objects.Template;
+import com.cosylab.vdct.undo.MacroActionEventListener;
+import com.cosylab.vdct.undo.UndoManager;
 import com.cosylab.vdct.util.StringUtils;
 import com.cosylab.vdct.vdb.VDBTemplate;
 
@@ -78,7 +78,7 @@ import com.cosylab.vdct.vdb.VDBTemplate;
  *
  */
 public class SpreadsheetInspector extends JDialog
-        implements HelpDisplayer, ChangeListener, ActionListener, InspectableObjectsListener {
+		implements HelpDisplayer, ActionListener, InspectableObjectsListener, MacroActionEventListener {
 
 	private HashMap inspectables = null;
 	private HashMap displayedInspectables = null;
@@ -97,15 +97,18 @@ public class SpreadsheetInspector extends JDialog
     private NewTemplateInstanceDialog templateDialog = null;
     
     private String currentTab = null;
+    
+    private boolean macroActionsEnabled = false;
+    private boolean inspectableDataChanged = false;
 	
 	private final static String undoString = "Undo";
 	private final static String redoString = "Redo";
 	
-	private final static String newRowString = "Add record/template";
+	private final static String newRowString = "Add row";
 	private final static char newRowMnemonic = 'a';
-	private final static String newTypeRecordString = "Add new type record";
+	private final static String newTypeRecordString = "Add records...";
 	private final static char newTypeRecordMnemonic = 'r';
-	private final static String newTypeTemplateString = "Add new type template";
+	private final static String newTypeTemplateString = "Add templates...";
 	private final static char newTypeTemplateMnemonic = 't';
 	
 
@@ -153,12 +156,14 @@ public class SpreadsheetInspector extends JDialog
 			loadData();
 			refreshDynamicGUI();
 			DataProvider.getInstance().addInspectableListener(this);
-			DrawingSurface.getInstance().setPressedMousePosValid(false);
-			
+			UndoManager.getInstance().addMacroActionEventListener(this);
 		} else {
+			closeEditors();
 			saveView();
+	    	currentTab = getSelectedTab();
+
 			DataProvider.getInstance().removeInspectableListener(this);
-			DrawingSurface.getInstance().setPressedMousePosValid(true);
+			UndoManager.getInstance().removeMacroActionEventListener(this);
         }
 		super.setVisible(b);
 	}
@@ -175,9 +180,13 @@ public class SpreadsheetInspector extends JDialog
 		boolean added = addInstance(inspectables, object);
 		added |= addInstance(displayedInspectables, object);
 		if (added) {
-			saveView();			
 			currentTab = getTypeName(object);
-			refreshDynamicGUI();
+			if (macroActionsEnabled) {
+				inspectableDataChanged = true;
+			} else {
+				saveView();			
+				refreshDynamicGUI();
+			}
 		}
 	}
 	
@@ -185,9 +194,33 @@ public class SpreadsheetInspector extends JDialog
 		boolean removed = removeInstance(inspectables, object);
 		removed |= removeInstance(displayedInspectables, object);
 		if (removed) { 
+			currentTab = getTypeName(object);
+			if (macroActionsEnabled) {
+				inspectableDataChanged = true;
+			} else {
+				saveView();			
+				refreshDynamicGUI();
+			}
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.undo.MacroActionEventListener#macroActionStarted()
+	 */
+	public void macroActionStarted() {
+	    macroActionsEnabled = true;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.undo.MacroActionEventListener#macroActionStopped()
+	 */
+	public void macroActionStopped() {
+	    macroActionsEnabled = false;
+	    if (inspectableDataChanged) {
 			saveView();			
 			refreshDynamicGUI();
-		}
+	    }
+	    inspectableDataChanged = false;
 	}
 
 	public void setUndoState(boolean state) {
@@ -201,11 +234,9 @@ public class SpreadsheetInspector extends JDialog
 	}
 
 	private void saveView() {
-		closeEditors();
     	for (int i = 0; i < tables.length; i++) {
     		((SpreadsheetColumnViewModel)tables[i].getModel()).storeView();
     	}
-    	currentTab = getSelectedTab();
 	}
 	
 	/** This method is called from within the constructor to initialize the form.
@@ -229,8 +260,8 @@ public class SpreadsheetInspector extends JDialog
         tabbedPane.setTabLayoutPolicy(javax.swing.JTabbedPane.SCROLL_TAB_LAYOUT);
         tabbedPane.setTabPlacement(JTabbedPane.BOTTOM);
         tabbedPane.setAutoscrolls(true);
-        tabbedPane.addChangeListener(this);
-		constraints = new GridBagConstraints();
+
+        constraints = new GridBagConstraints();
 		constraints.gridy = 1;
 		constraints.weightx = 1.0;
 		constraints.weighty = 1.0;
@@ -306,7 +337,7 @@ public class SpreadsheetInspector extends JDialog
             }
         });
     	GridBagConstraints constraints = new GridBagConstraints();
-		constraints.insets = new Insets(0, 0, 0, 8);
+		constraints.insets = new Insets(0, 0, 0, 32);
 		buttonPanel.add(newRowButton, constraints);
 
     	JButton button = new JButton(newTypeRecordString); 
@@ -547,6 +578,7 @@ public class SpreadsheetInspector extends JDialog
 
     
     private void refreshDynamicGUI() {
+    	
     	createTables();
         boolean noObjects = displayedInspectables.isEmpty();
     	
@@ -559,9 +591,8 @@ public class SpreadsheetInspector extends JDialog
     	
         if (currentTab != null) {
         	setSelectedTab(currentTab);
-        } else {
-        	currentTab = getSelectedTab();
         }
+        currentTab = getSelectedTab();
     }
 
     private void refreshTables() {
@@ -622,14 +653,6 @@ public class SpreadsheetInspector extends JDialog
     	table.setModel(tableModel);
     	return table;
     }
-
-    /* Saves the content of open cells when tabs are changed.
-    */
-    public void stateChanged(ChangeEvent event) {
-    	if (isVisible()) {
-            closeEditors();
-    	}
-    } 
 
     public void actionPerformed(ActionEvent event) {
     	if (event.getActionCommand().equals(undoString) || event.getSource() == undoItem) {

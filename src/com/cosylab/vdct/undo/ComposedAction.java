@@ -84,4 +84,8 @@ protected void undoAction() {
 	for (int i=objs.length-1; i>=0; i--)
 		((ActionObject)objs[i]).undoAction();
 }
+
+public boolean isEmpty() {
+	return actions.isEmpty();
+}
 }

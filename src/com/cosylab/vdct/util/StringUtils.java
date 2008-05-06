@@ -33,6 +33,8 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.cosylab.vdct.Constants;
+
 /**
  * This type was created in VisualAge.
  */
@@ -279,6 +281,7 @@ public static String incrementName(String newName, String suffix)
 
 /**
  * Expands simple numeric macros in the form [starting_value-ending_value] and returns a list of all expansions.
+ * If the string would expand to more than Constants.MAX_NAME_MACRO_EXPANSIONS strings, null is returned instead.
  * 
  * Example:
  * 
@@ -303,9 +306,6 @@ public static String[] expandMacros(String string) {
 	int startPos = 0; 
 	
 	while (matcher.find()) {
-		int groupCount = matcher.groupCount();
-		System.out.println("Group count " + groupCount);
-
 		try {
 			Integer lowVal = new Integer(matcher.group(1));
 			Integer highVal = new Integer(matcher.group(2));
@@ -313,11 +313,6 @@ public static String[] expandMacros(String string) {
 			startPos = matcher.end(0);
 		} catch (NumberFormatException exception) {
 			// nothing
-		}
-		int group = 0;
-		while (group < groupCount + 1) {
-			System.out.println("Group " + group + ": " + matcher.group(group));
-			group++;
 		}
 	}
 	String ending = string.substring(startPos);
@@ -340,6 +335,10 @@ public static String[] expandMacros(String string) {
 		count *= dimensions[d];
 	}
 	
+	if (count > Constants.MAX_NAME_MACRO_EXPANSIONS) {
+		return null;
+	}
+	
 	String[] strings = new String[count];
 
 	int pos = 0;
@@ -351,11 +350,22 @@ public static String[] expandMacros(String string) {
 			pos /= dimensions[d];
 		}
 		for (int d = 0; d < dimSize; d++) {
-			string += stringParts[d] + (startVals[d] + positions[d] * (endVals[d] - startVals[d] >= 0 ? 1 : 0));
+			string += stringParts[d] + (startVals[d] + positions[d] * (endVals[d] - startVals[d] >= 0 ? 1 : -1));
 		}
 		strings[s] = string + ending;
 	}
 	return strings;
 }
 
+/* Returns true if string1 equals string2, where the values of null and "" are considered the same.
+ */
+public static boolean emptyEquals(String string1, String string2) {
+    if (string1 == null) {
+    	string1 = "";
+    }
+    if (string2 == null) {
+    	string2 = "";
+    }
+    return string1.equals(string2);
+}  	
 }

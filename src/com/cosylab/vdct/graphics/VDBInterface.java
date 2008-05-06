@@ -66,4 +66,10 @@ Line createLine();
 TextBox createTextBox();
 
 void createRecord(String name, String type, boolean relative);
+
+/**
+ * Returns true if the string returned by checkGroupName(...) and checkRecordName(...) is an error
+ * message and false when it is a warning.
+ */
+public boolean isErrorMessage(String message);
 }

@@ -1,5 +1,9 @@
 package com.cosylab.vdct.undo;
 
+import java.util.Iterator;
+import java.util.Vector;
+
+import com.cosylab.vdct.Console;
 import com.cosylab.vdct.graphics.DrawingSurface;
 
 /**
@@ -49,11 +53,16 @@ public class UndoManager {
 
 	private boolean monitor = false;
 
-	private ComposedActionInterface composedAction = null;
+	private ComposedAction composedAction = null;
+	private int macroActionsCalls = 0;
+	
+	private Vector macroActionListeners = null;
+
 /**
  * UndoManager constructor comment.
  */
 protected UndoManager(int steps2remember) {
+	macroActionListeners = new Vector();
 	bufferSize = steps2remember;
 	actions = new ActionObject[bufferSize];
 	instance = this; // to prevent dead-loop reset-getInstance
@@ -179,11 +188,21 @@ public boolean isMonitor() {
  * This method was created in VisualAge.
  */
 public void redo() {
+
+	if (composedAction != null) {
+		Console.getInstance().println("Warning: UndoManager: redo(): macro action in progress.");
+		packComposedAction();
+	}
+	
 	if (pos!=last) {
 		boolean m = monitor;
 		monitor = false;
 		pos=increment(pos);
+		
+		fireMacroActionStart();
 		actions[pos].redo();
+		fireMacroActionStop();
+		
 		//System.out.println("Redo: "+actions[pos].getDescription());
 		com.cosylab.vdct.graphics.DrawingSurface.getInstance().setModified(true);
 		com.cosylab.vdct.graphics.DSGUIInterface.getInstance().updateMenuItems();
@@ -196,6 +215,12 @@ public void redo() {
  * This method was created in VisualAge.
  */
 public void reset() {
+
+	if (composedAction != null) {
+		Console.getInstance().println("Warning: UndoManager: reset(): macro action in progress.");
+		packComposedAction();
+	}
+	
 	first=0;
 	pos=last=lowerbound;
 	for (int i=0; i < bufferSize; i++)
@@ -218,34 +243,56 @@ public void setMonitor(boolean newMonitor) {
  * Creation date: (3.5.2001 20:43:57)
  */
 public void startMacroAction() {
-	ComposedAction action = new ComposedAction();
-	addAction(action);
-	this.composedAction = action;
-}
-/**
- * Insert the method's description here.
- * Creation date: (3.5.2001 20:43:57)
- * @param composedAction com.cosylab.vdct.undo.ComposedActionInterface
- */
-public void startMacroAction(ComposedActionInterface composedAction) {
-	this.composedAction=composedAction;
+
+	macroActionsCalls++;
+	if (macroActionsCalls > 1) {
+		return;
+	}
+	
+	if (composedAction != null) {
+		Console.getInstance().println("Warning: UndoManager: startMacroAction(): macro action not stopped.");
+		packComposedAction();
+	}
+	composedAction = new ComposedAction();
+	fireMacroActionStart();
 }
 /**
  * Insert the method's description here.
  * Creation date: (3.5.2001 20:44:21)
  */
 public void stopMacroAction() {
-	composedAction=null;
+
+	macroActionsCalls--;
+	if (macroActionsCalls > 0) {
+		return;
+	}
+	
+	if (composedAction == null) {
+		Console.getInstance().println("Warning: UndoManager: stopMacroAction(): macro action not started.");
+		return;
+	}
+	packComposedAction();
+	fireMacroActionStop();
 	//System.out.println("Stopped composing");
 }
 /**
  * This method was created in VisualAge.
  */
 public void undo() {
+
+	if (composedAction != null) {
+		Console.getInstance().println("Warning: UndoManager: undo(): macro action in progress.");
+		packComposedAction();
+	}
+
 	if (pos!=lowerbound)  {
 		boolean m = monitor;
 		monitor = false;
+		
+		fireMacroActionStart();
 		actions[pos].undo();
+		fireMacroActionStop();
+		
 		//System.out.println("Undo: "+actions[pos].getDescription());
 		pos=decrement(pos);
 		com.cosylab.vdct.graphics.DrawingSurface.getInstance().setModified(true);
@@ -281,4 +328,33 @@ public void prepareAfterSaving() {
     bufferSizeReached = false;
     actionsAfterSave = 0;
 }
+
+public void addMacroActionEventListener(MacroActionEventListener listener) {
+	macroActionListeners.add(listener);
+}
+public void removeMacroActionEventListener(MacroActionEventListener listener) {
+	macroActionListeners.remove(listener);
+}
+
+private void fireMacroActionStart() {
+	Iterator iterator = macroActionListeners.iterator();
+	while (iterator.hasNext()) {
+	    ((MacroActionEventListener)iterator.next()).macroActionStarted();
+	}
+}
+private void fireMacroActionStop() {
+	Iterator iterator = macroActionListeners.iterator();
+	while (iterator.hasNext()) {
+	    ((MacroActionEventListener)iterator.next()).macroActionStopped();
+	}
+}
+
+private void packComposedAction() {
+	ComposedAction action = composedAction; 
+	composedAction = null;
+	if (!action.isEmpty()) {
+		addAction(action);
+	}
+}
+
 }

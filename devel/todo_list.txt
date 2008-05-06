@@ -1,23 +1,14 @@
-critical, medium difficulty:
 -support for adding macros to templates in spreadsheet view
-
-possibly annoying, easy:
 -persistence of the selected tab in spreadsheet view
-
-rare or possibly unimportant, easy:
 -inspector has to refresh on field change in spreadsheet
 -inspector has to refresh link fields on rename in main window
--spreadsheet column resize on changed field
 -window unfocus, focus on rename dialog should not overwrite the name with the current
 -in the main vdct workspace the grid should be displayed to the exact bottom and right edge
 -preservation of unrecognised view comment data for future versions
--spreadsheet popup selection commands only when clicking over selections
 -deleting instances in spreadsheet using delete key
--detecting all hidden/shown row states for apreadsheet row popup command selection
-
-future development:
--new tab in spreadsheet view for all records/templates
--column display mode in spreadsheet that shows only column when an instance has a field with nondefault value
--nonmodal spreadsheet view - make an event based refreshing for it
+-detecting all hidden/shown row states for spreadsheet row popup command selection
+-TASK:NONMODALSPR: nonmodal spreadsheet view
 -generalize inspector interface for both inspector and spreadsheetinspector
--faster version of spreadsheet view refresh when multiple instances are added/removed
+-TASK:EMPTYNULL: strict usage of ""/null with property values, including comment property
+-TASK:UNEDITCOM: uneditable comment property
+-TASK:COLREUSE: reusing of generated columns in spreadsheetcolumnmodelview

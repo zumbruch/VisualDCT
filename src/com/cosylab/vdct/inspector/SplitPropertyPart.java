@@ -74,7 +74,6 @@ public class SplitPropertyPart implements InspectableProperty {
 	 * @see com.cosylab.vdct.inspector.InspectableProperty#getEditPattern()
 	 */
 	public Pattern getEditPattern() {
-		 //TODO: partPattern;
 		return null;
 	}
 
@@ -82,7 +81,7 @@ public class SplitPropertyPart implements InspectableProperty {
 	 * @see com.cosylab.vdct.inspector.InspectableProperty#getHelp()
 	 */
 	public String getHelp() {
-		return null;
+		return owner.getOwner().getToolTipText();
 	}
 
 	/* (non-Javadoc)
@@ -145,8 +144,7 @@ public class SplitPropertyPart implements InspectableProperty {
 	 * @see com.cosylab.vdct.inspector.InspectableProperty#isValid()
 	 */
 	public boolean isValid() {
-		//TODO: partPattern.matcher(value).matches();
-		return true;
+		return owner.getOwner().isValid();
 	}
 
 	/* (non-Javadoc)
@@ -194,7 +192,7 @@ public class SplitPropertyPart implements InspectableProperty {
 	 * @see com.cosylab.vdct.inspector.InspectableProperty#hasValidity()
 	 */
 	public boolean hasValidity() {
-		return false;
+		return owner.getOwner().hasValidity();
 	}
 	/* (non-Javadoc)
 	 * @see com.cosylab.vdct.inspector.InspectableProperty#checkValueValidity(java.lang.String)
