@@ -1322,6 +1322,7 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
  
  final String SPREADSHEET_COLUMNORDER_START = DBResolver.VDCTSPREADSHEET_COLUMNORDER + "(";
  final String SPREADSHEET_SHOWALLROWS_START = DBResolver.VDCTSPREADSHEET_SHOWALLROWS + "(";
+ final String SPREADSHEET_GROUPCOLUMNSBYGUIGROUP_START = DBResolver.VDCTSPREADSHEET_GROUPCOLUMNSBYGUIGROUP + "(";
  final String SPREADSHEET_BACKGROUNDCOLOR_START = DBResolver.VDCTSPREADSHEET_BACKGROUNDCOLOR + "(";
  final String SPREADSHEET_ROWORDER_START = DBResolver.VDCTSPREADSHEET_ROWORDER + "(";
  final String SPREADSHEET_COLUMN_START = DBResolver.VDCTSPREADSHEET_COLUMN + "(";
@@ -1361,6 +1362,7 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 	 
      String modeName = sprView.getModeName();
      Boolean showAllRows = sprView.getShowAllRows();
+     Boolean groupColumnsByGuiGroup = sprView.getGroupColumnsByGuiGroup();
      Integer backgroundColor = sprView.getBackgroundColor();
      SpreadsheetRowOrder rowOrder = sprView.getRowOrder();
      Map columns = sprView.getColumns();
@@ -1371,6 +1373,7 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
      // If no data, skip writing the entry.
 	 if (modeName == null
 			 && showAllRows == null
+			 && groupColumnsByGuiGroup == null
 			 && backgroundColor == null
 			 && rowOrder == null
 			 && (columns == null || columns.isEmpty())
@@ -1395,6 +1398,12 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 		 file.writeBytes(")");
      }
 
+     if (groupColumnsByGuiGroup != null) {
+		 file.writeBytes(comma + SPREADSHEET_GROUPCOLUMNSBYGUIGROUP_START);
+		 file.writeBytes(quote + groupColumnsByGuiGroup.toString() + quote);
+		 file.writeBytes(")");
+     }
+     
      if (backgroundColor != null) {
 		 file.writeBytes(comma + SPREADSHEET_BACKGROUNDCOLOR_START);
 		 file.writeBytes(backgroundColor.toString());

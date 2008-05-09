@@ -31,6 +31,7 @@ package com.cosylab.vdct.inspector;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Vector;
 
@@ -59,6 +60,7 @@ public class SpreadsheetViewModel extends SpreadsheetTableModel {
     private int[] visibleToAllColumn = null;
     
     private boolean showAllRows = true;
+    private boolean groupColumnsByGuiGroup = true;    
 	
 	public SpreadsheetViewModel(String dataType, Vector displayData,
 			Vector loadedData) throws IllegalArgumentException {
@@ -324,6 +326,11 @@ public class SpreadsheetViewModel extends SpreadsheetTableModel {
 		SpreadsheetTableViewRecord record = getViewRecord();
         Map columnsMap = record.getColumns();
         Iterator columnsIterator = columnsMap.values().iterator();
+
+		Boolean recGroupColumnsByGuiGroup = record.getGroupColumnsByGuiGroup();
+		if (recGroupColumnsByGuiGroup != null && groupColumnsByGuiGroup != recGroupColumnsByGuiGroup.booleanValue()) {
+			groupColumnsByGuiGroup = recGroupColumnsByGuiGroup.booleanValue();
+		}
         
 		if (!columnsMap.isEmpty()) {
 
@@ -363,6 +370,8 @@ public class SpreadsheetViewModel extends SpreadsheetTableModel {
 			refreshAllToVisibleColumn();
 			refreshVisibleToAllColumn();
 		}
+		
+   		refreshColumnGrouping();
 	}
 
 	private void storeRowsVisibilityAndOrder() {
@@ -432,10 +441,18 @@ public class SpreadsheetViewModel extends SpreadsheetTableModel {
 	}
 
 	private void storeColumnsVisibilityAndOrder() {
+
+		SpreadsheetTableViewRecord record = getViewRecord();
+		
+		boolean defaultGroupColumnsByGuiGroup = groupColumnsByGuiGroup;
+        if (!defaultGroupColumnsByGuiGroup) {
+        	record.setGroupColumnsByGuiGroup(Boolean.valueOf(groupColumnsByGuiGroup));
+        } else {
+        	record.setGroupColumnsByGuiGroup(null);
+        }
 		
 		boolean defaultColumnVisibilityAndOrder = isColumsDefault();
 
-		SpreadsheetTableViewRecord record = getViewRecord();
     	Map columnsMap = record.getColumns();
     	Map map = new HashMap();
 
@@ -450,6 +467,70 @@ public class SpreadsheetViewModel extends SpreadsheetTableModel {
             }
         }
     	record.setColumns(map);
+	}
+	
+	private void repositionGuiGroup(Object movedGuiGroup, Object destGuiGroup, boolean insertAfter) {
+		
+		/* Reorder the groups by inserting and retrieving columns into/from ordered map.
+		 */
+		Vector movedGroup = new Vector();
+
+		LinkedHashMap map = new LinkedHashMap();
+		for (int c = 1; c < orderedToBaseColumn.length; c++) {
+			int colIndex = orderedToBaseColumn[c];
+			Object guiGroup = getGuiGroup(colIndex);
+
+			if (movedGuiGroup!= null && guiGroup.equals(movedGuiGroup)) {
+				movedGroup.add(new Integer(colIndex));
+			} else {
+				boolean insertMovedGroup = movedGuiGroup != null && destGuiGroup != null
+					&& guiGroup.equals(destGuiGroup) && !map.containsKey(movedGuiGroup);
+				
+				if (insertMovedGroup && !insertAfter) {
+					map.put(movedGuiGroup, movedGroup);
+				}
+				
+				if (!map.containsKey(guiGroup)) {
+					map.put(guiGroup, new Vector());
+				}
+				((Vector)map.get(guiGroup)).add(new Integer(colIndex));
+
+				if (insertMovedGroup && insertAfter) {
+					map.put(movedGuiGroup, movedGroup);
+				}
+			}
+		}
+
+		Iterator guiGroups = map.values().iterator();
+
+		int c = 1;
+		while (guiGroups.hasNext()) {
+			Iterator colIndices = ((Vector)guiGroups.next()).iterator(); 
+			while (colIndices.hasNext()) {
+				orderedToBaseColumn[c] = ((Integer)colIndices.next()).intValue();
+				c++;
+			}
+		}
+	}
+	
+	private Object getGuiGroup(int baseColumn) {
+		/* Gui group for column is currently detected trough a field. If no data present,
+		 * return default where each column is its own group. 
+		 */
+		Integer guiGroupIndex = null;
+		if (getPropertiesRowCount() > 0) {
+    		guiGroupIndex = getProperty(0, baseColumn).getGuiGroup();
+		}
+		return guiGroupIndex != null ? (Object)guiGroupIndex : (Object)super.getColumnId(baseColumn);
+	}
+	
+	private void refreshColumnGrouping() {
+		if (groupColumnsByGuiGroup) {
+			repositionGuiGroup(null, null, false);
+			refreshBaseToOrderedColumn();
+			refreshAllToVisibleColumn();
+			refreshVisibleToAllColumn();
+		}
 	}
 	
 	protected boolean isColumsDefault() {
@@ -513,6 +594,7 @@ public class SpreadsheetViewModel extends SpreadsheetTableModel {
 		refreshTables();
 		recallRowsVisibilityAndOrder();
 		recallColumnsVisibility();
+   		refreshColumnGrouping();
     }
     
     public boolean isPropertiesColumnVisible(int column) {
@@ -522,7 +604,7 @@ public class SpreadsheetViewModel extends SpreadsheetTableModel {
     public boolean isRowVisible(int row) {
 		return rowVisibilities[visibleToBaseRow(row)];
     }
-    
+
     public boolean isShowAllRows() {
         return showAllRows;
     }
@@ -532,6 +614,15 @@ public class SpreadsheetViewModel extends SpreadsheetTableModel {
 		refreshAllToVisibleRow();
 		refreshVisibleToAllRow();
     }
+
+    public boolean isGroupColumnsByGuiGroup() {
+        return groupColumnsByGuiGroup;
+    }
+
+	public void setGroupColumnsByGuiGroup(boolean groupColumnsByGuiGroup) {
+    	this.groupColumnsByGuiGroup = groupColumnsByGuiGroup;
+   		refreshColumnGrouping();
+	}
     
 	public void setRowsVisibility(int[] rows, boolean visible) {
 		for (int r = 0; r < rows.length; r++) {
@@ -562,24 +653,42 @@ public class SpreadsheetViewModel extends SpreadsheetTableModel {
 	
 	public void repositionColumn(int startIndex, int destIndex) {
 
-		/* Translate the indices to all columns, then perform the shift and insertion on the ordered array.
-		 * Finally recreate the base and visibility arrays.  
-		 */
+		boolean insertAfter = startIndex < destIndex;
+		
 		startIndex = visibleToAllColumn[startIndex];
 		destIndex = visibleToAllColumn[destIndex];
 		
-		int baseMovedIndex = orderedToBaseColumn[startIndex]; 
-		if (startIndex < destIndex) {
-			for (int i = startIndex; i < destIndex; i++) {
-				orderedToBaseColumn[i] = orderedToBaseColumn[i + 1]; 
-			}
-		} else {
-			for (int i = startIndex; i > destIndex; i--) {
-				orderedToBaseColumn[i] = orderedToBaseColumn[i - 1]; 
-			}
+    	Object startGuiGroup = null; 
+    	Object destGuiGroup = null;
+		if (groupColumnsByGuiGroup) {
+        	startGuiGroup = getGuiGroup(orderedToBaseColumn[startIndex]); 
+        	destGuiGroup = getGuiGroup(orderedToBaseColumn[destIndex]);
 		}
-		orderedToBaseColumn[destIndex] = baseMovedIndex;
 		
+        /* If columns are moved inside the group, perform on the level of columns, otherwise
+         * on the level of gui groups. 
+         */
+		if (groupColumnsByGuiGroup && !startGuiGroup.equals(destGuiGroup)) {
+			repositionGuiGroup(startGuiGroup, destGuiGroup, insertAfter);
+		} else {
+			
+			/* Perform the shift and insertion on the ordered array.
+			 */
+			int baseMovedIndex = orderedToBaseColumn[startIndex]; 
+			if (startIndex < destIndex) {
+				for (int i = startIndex; i < destIndex; i++) {
+					orderedToBaseColumn[i] = orderedToBaseColumn[i + 1]; 
+				}
+			} else {
+				for (int i = startIndex; i > destIndex; i--) {
+					orderedToBaseColumn[i] = orderedToBaseColumn[i - 1]; 
+				}
+			}
+			orderedToBaseColumn[destIndex] = baseMovedIndex;
+		}
+		
+		/* Recreate the inverse mapping and visibility arrays.  
+		 */
 		refreshBaseToOrderedColumn();
 		refreshAllToVisibleColumn();
 		refreshVisibleToAllColumn();

@@ -579,6 +579,13 @@ public String checkValueValidity(String value) {
 	return checkExpandedValues(value);
 }
 
+/* (non-Javadoc)
+ * @see com.cosylab.vdct.inspector.InspectableProperty#getGuiGroup()
+ */
+public Integer getGuiGroup() {
+	return new Integer(getGUI_type());
+}
+
 private Pattern getPattern()
 {
 	if ((dbdData.getField_type()==DBDConstants.DBF_INLINK) ||

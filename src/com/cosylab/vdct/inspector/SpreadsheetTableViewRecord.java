@@ -41,6 +41,7 @@ public class SpreadsheetTableViewRecord {
 	
 	private String modeName = null;
 	private Boolean showAllRows = null;
+	private Boolean groupColumnsByGuiGroup = null;
 	private Integer backgroundColor = null;
 
 	private SpreadsheetRowOrder rowOrder = null;
@@ -190,5 +191,19 @@ public class SpreadsheetTableViewRecord {
 	 */
 	public void setColumns(Map columns) {
 		this.columns = columns;
+	}
+
+	/**
+	 * @return the groupColumnsByGuiGroup
+	 */
+	public Boolean getGroupColumnsByGuiGroup() {
+		return groupColumnsByGuiGroup;
+	}
+
+	/**
+	 * @param groupColumnsByGuiGroup the groupColumnsByGuiGroup to set
+	 */
+	public void setGroupColumnsByGuiGroup(Boolean groupColumnsByGuiGroup) {
+		this.groupColumnsByGuiGroup = groupColumnsByGuiGroup;
 	}
 }

@@ -90,6 +90,7 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 	private JMenuItem sortDesItem = null; 
 	private JComponent sortSeparator = null;
 	private JMenuItem showAllRowsItem = null;
+	private JMenuItem groupColumnsByGuiGroupItem = null;
 	private JMenuItem extendCountersItem = null;
 
 	private JMenuItem defaultColumnVisibilityItem = null;
@@ -126,6 +127,7 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 	private static final String visibility = "Column visibility"; 
 	private static final String extendCounters = "Increase counters"; 
 	private static final String showAllRowsString = "Show all rows";
+	private static final String groupColumnsByGuiGroupString = "Group columns by GUI Group";
 	private static final String backgroundColorString = "Set background color...";
 	private static final String defaultColorString = "Default background color";
 
@@ -403,6 +405,13 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 		} else if (action.equals(showAllRowsString)) {
 			boolean state = ((JCheckBoxMenuItem)source).isSelected();
 			sprModel.setShowAllRows(state);
+			refreshShowAllRowsItem();
+			setDefaultWidthColumnsToFit();
+			getTableHeader().repaint();
+			clearSelection();
+		} else if (action.equals(groupColumnsByGuiGroupString)) {
+			boolean state = ((JCheckBoxMenuItem)source).isSelected();
+			sprModel.setGroupColumnsByGuiGroup(state);
 			refreshShowAllRowsItem();
 			setDefaultWidthColumnsToFit();
 			getTableHeader().repaint();
@@ -718,9 +727,14 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 			setJComponentVisible(sortDesItem, sortable);
 			setJComponentVisible(sortSeparator, sortable);
 
-			extendCountersItem.setEnabled(
-					getSelectedColumnCount() >= 1 && (!getRowSelectionAllowed() || getSelectedRowCount() >= 2));
-
+			boolean extendCountersEnabled = false;
+			if (getRowSelectionAllowed()) {
+				extendCountersEnabled = getSelectedColumnCount() >= 1 && getSelectedRowCount() >= 2;
+			} else {
+				extendCountersEnabled = getSelectedColumnCount() >= 1 && sprModel.getRowCount() >= 2;
+			}
+			extendCountersItem.setEnabled(extendCountersEnabled);
+			
 			columnPopupMenu.show(component, posX, posY);
 		}
 	}
@@ -787,6 +801,10 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 		showAllRowsItem.addActionListener(this);
 		columnPopupMenu.add(showAllRowsItem);
 
+		groupColumnsByGuiGroupItem = new JCheckBoxMenuItem(groupColumnsByGuiGroupString);
+		groupColumnsByGuiGroupItem.addActionListener(this);
+		columnPopupMenu.add(groupColumnsByGuiGroupItem);
+		
 		columnPopupMenu.addSeparator();
 
 		extendCountersItem = new JMenuItem(extendCounters);
@@ -838,6 +856,10 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 		showAllRowsItem.setSelected(sprModel.isShowAllRows());
 	} 
 
+	private void refreshGroupColumnsByGuiGroupItem() {
+		groupColumnsByGuiGroupItem.setSelected(sprModel.isGroupColumnsByGuiGroup());
+	} 
+	
 	private void refreshRecentSplitsMenu() {
 
 		recentSplitsMenu.removeAll();
@@ -912,7 +934,8 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 
 
 	private void refreshAll() {
-		refreshShowAllRowsItem();		
+		refreshShowAllRowsItem();
+		refreshGroupColumnsByGuiGroupItem();
 		refreshRecentSplitsMenu();
 		refreshColumnOrderMenu();
 		refreshPropertiesVisibilityMenu();

@@ -422,4 +422,10 @@ public class VDBMacro implements InspectableProperty, Descriptable, ChangableVis
 	public String checkValueValidity(String value) {
 		return null;
 	}
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.inspector.InspectableProperty#getGuiGroup()
+	 */
+	public Integer getGuiGroup() {
+		return null;
+	}
 }

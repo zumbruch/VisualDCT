@@ -686,6 +686,11 @@ public void importBorder(java.io.File file) throws IOException {
 public void importDBD(java.io.File file) throws IOException {
 	drawingSurface.openDBD(file, true);
 }
+
+public void importIrmisDbGroup(String user, String password, String host, String group) {
+	drawingSurface.importIrmisDbGroup(user, password, host, group);
+}
+
 /**
  * Insert the method's description here.
  * Creation date: (29.4.2001 11:37:22)

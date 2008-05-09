@@ -165,6 +165,14 @@ public class SpreadsheetColumnViewModel extends SpreadsheetSplitViewModel implem
 	}
 
 	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.inspector.SpreadsheetSplitViewModel#setGroupColumnsByGuiGroup(boolean)
+	 */
+	public void setGroupColumnsByGuiGroup(boolean groupColumnsByGuiGroup) {
+		super.setGroupColumnsByGuiGroup(groupColumnsByGuiGroup);
+		refreshColumns();
+	}
+
+	/* (non-Javadoc)
 	 * @see com.cosylab.vdct.inspector.SpreadsheetSplitViewModel#sortRowsByColumn(int)
 	 */
 	public void sortRowsByColumn(int column) {

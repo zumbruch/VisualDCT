@@ -101,6 +101,9 @@ void importBorder(File file) throws IOException;
  * @exception java.io.IOException The exception description.
  */
 void importDBD(File file) throws IOException;
+
+void importIrmisDbGroup(String user, String password, String host, String group);
+
 /**
  * Insert the method's description here.
  * Creation date: (29.4.2001 11:37:15)

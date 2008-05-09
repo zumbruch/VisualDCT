@@ -192,4 +192,11 @@ public class PortDescriptionProperty implements InspectableProperty {
 		public String checkValueValidity(String value) {
 			return null;
 		}
+		
+		/* (non-Javadoc)
+		 * @see com.cosylab.vdct.inspector.InspectableProperty#getGuiGroup()
+		 */
+		public Integer getGuiGroup() {
+			return null;
+		}
 }

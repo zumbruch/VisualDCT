@@ -28,35 +28,132 @@ package com.cosylab.vdct.graphics;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.io.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.MediaTracker;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
+import java.awt.print.PageFormat;
+import java.awt.print.Pageable;
+import java.awt.print.Printable;
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterGraphics;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.DateFormat;
-import java.util.*;
-import java.awt.event.*;
-import java.awt.print.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Stack;
+import java.util.Vector;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
-import javax.swing.event.*;
+import javax.swing.event.MouseInputListener;
 
-import com.cosylab.vdct.*;
-import com.cosylab.vdct.db.*;
-import com.cosylab.vdct.dbd.*;
-import com.cosylab.vdct.vdb.*;
-import com.cosylab.vdct.undo.*;
+import com.cosylab.vdct.Console;
+import com.cosylab.vdct.Constants;
+import com.cosylab.vdct.DataProvider;
+import com.cosylab.vdct.Settings;
+import com.cosylab.vdct.VisualDCT;
+import com.cosylab.vdct.db.DBBox;
+import com.cosylab.vdct.db.DBConnectorData;
+import com.cosylab.vdct.db.DBData;
+import com.cosylab.vdct.db.DBEntry;
+import com.cosylab.vdct.db.DBFieldData;
+import com.cosylab.vdct.db.DBGroupData;
+import com.cosylab.vdct.db.DBLine;
+import com.cosylab.vdct.db.DBLinkData;
+import com.cosylab.vdct.db.DBRecordData;
+import com.cosylab.vdct.db.DBResolver;
+import com.cosylab.vdct.db.DBTemplateField;
+import com.cosylab.vdct.db.DBTemplateInstance;
+import com.cosylab.vdct.db.DBTextBox;
+import com.cosylab.vdct.db.DBView;
+import com.cosylab.vdct.dbd.DBDConstants;
+import com.cosylab.vdct.dbd.DBDData;
+import com.cosylab.vdct.dbd.DBDResolver;
+import com.cosylab.vdct.events.CommandManager;
+import com.cosylab.vdct.events.KeyEventManager;
+import com.cosylab.vdct.events.MouseEventManager;
+import com.cosylab.vdct.events.commands.GetGUIInterface;
+import com.cosylab.vdct.events.commands.GetPrintableInterface;
+import com.cosylab.vdct.events.commands.GetVDBManager;
+import com.cosylab.vdct.events.commands.LinkCommand;
+import com.cosylab.vdct.events.commands.NullCommand;
+import com.cosylab.vdct.events.commands.RepaintCommand;
+import com.cosylab.vdct.events.commands.SetCursorCommand;
+import com.cosylab.vdct.events.commands.SetWorkspaceGroup;
+import com.cosylab.vdct.events.commands.SetWorkspaceScale;
+import com.cosylab.vdct.graphics.objects.Border;
+import com.cosylab.vdct.graphics.objects.Box;
+import com.cosylab.vdct.graphics.objects.Connector;
+import com.cosylab.vdct.graphics.objects.ContainerObject;
+import com.cosylab.vdct.graphics.objects.EPICSLink;
+import com.cosylab.vdct.graphics.objects.EPICSLinkOut;
+import com.cosylab.vdct.graphics.objects.EPICSLinkOutIn;
+import com.cosylab.vdct.graphics.objects.EPICSVarLink;
+import com.cosylab.vdct.graphics.objects.Group;
+import com.cosylab.vdct.graphics.objects.InLink;
+import com.cosylab.vdct.graphics.objects.Line;
+import com.cosylab.vdct.graphics.objects.LinkManagerObject;
+import com.cosylab.vdct.graphics.objects.LinkMoverUtilities;
+import com.cosylab.vdct.graphics.objects.LinkSource;
+import com.cosylab.vdct.graphics.objects.Macro;
+import com.cosylab.vdct.graphics.objects.Movable;
+import com.cosylab.vdct.graphics.objects.OutLink;
+import com.cosylab.vdct.graphics.objects.Port;
+import com.cosylab.vdct.graphics.objects.Record;
+import com.cosylab.vdct.graphics.objects.Rotatable;
+import com.cosylab.vdct.graphics.objects.Selectable;
+import com.cosylab.vdct.graphics.objects.Template;
+import com.cosylab.vdct.graphics.objects.TextBox;
+import com.cosylab.vdct.graphics.objects.VisibleObject;
+import com.cosylab.vdct.graphics.popup.PopUpMenu;
+import com.cosylab.vdct.graphics.popup.Popupable;
+import com.cosylab.vdct.graphics.printing.Page;
+import com.cosylab.vdct.inspector.Inspectable;
+import com.cosylab.vdct.inspector.InspectorManager;
+import com.cosylab.vdct.irmis.RdbLoader;
+import com.cosylab.vdct.undo.ActionObject;
+import com.cosylab.vdct.undo.ComposedAction;
+import com.cosylab.vdct.undo.CreateAction;
+import com.cosylab.vdct.undo.ImportAction;
+import com.cosylab.vdct.undo.MoveAction;
+import com.cosylab.vdct.undo.UndoManager;
 import com.cosylab.vdct.util.DBDEntry;
 import com.cosylab.vdct.util.StringUtils;
-import com.cosylab.vdct.events.*;
-import com.cosylab.vdct.events.commands.*;
-import com.cosylab.vdct.graphics.objects.*;
-import com.cosylab.vdct.inspector.*;
-import com.cosylab.vdct.graphics.popup.*;
-import com.cosylab.vdct.graphics.printing.Page;
-
-import java.awt.geom.AffineTransform;
+import com.cosylab.vdct.vdb.VDBData;
+import com.cosylab.vdct.vdb.VDBFieldData;
+import com.cosylab.vdct.vdb.VDBMacro;
+import com.cosylab.vdct.vdb.VDBPort;
+import com.cosylab.vdct.vdb.VDBRecordData;
+import com.cosylab.vdct.vdb.VDBTemplate;
+import com.cosylab.vdct.vdb.VDBTemplateInstance;
+import com.cosylab.vdct.vdb.VDBTemplateMacro;
+import com.cosylab.vdct.vdb.VDBTemplatePort;
 
 /**
  * Insert the type's description here.
@@ -2128,6 +2225,87 @@ public boolean open(InputStream is, File file, boolean importDB, boolean importT
 	} 
 	else
 		return false;
+}
+
+public boolean importIrmisDbGroup(String user, String password, String host, String group) {
+
+	DBData dbData = null;
+	boolean success = true;
+
+	try {
+		setCursor(hourCursor);
+		UndoManager.getInstance().setMonitor(false);
+
+		dbData = RdbLoader.getInstance().loadDbGroup(user, password, host, group);
+
+		// check for sucess
+		DBDData dbdData = DataProvider.getInstance().getDbdDB();
+		if ((dbdData == null) || (dbData == null) || !dbdData.consistencyCheck(dbData))
+		{
+			UndoManager.getInstance().setMonitor(true);
+			restoreCursor();
+			return false;
+		}
+
+		// check is DTYP fields are defined before any DBF_INPUT/DBF_OUTPUT fields...
+		DBData.checkDTYPfield(dbData, dbdData);
+
+		VDBData vdbData = VDBData.generateVDBData(dbdData, dbData);
+		
+		Group.getClipboard().clear();
+		Group vg = viewGroup;
+		Group rg = Group.getRoot();
+		try {
+			// put all to dummy root group
+			viewGroup = new Group(null);
+			viewGroup.setAbsoluteName("");
+			viewGroup.setLookupTable(new Hashtable());
+			Group.setRoot(viewGroup);
+
+			// import directly to workspace (current view group)
+			// imported list needed for undo action
+			HashMap importedList = applyVisualData(true, viewGroup, dbData, vdbData);
+
+			// find 'first' template defined in this file (not via includes)
+			VDBTemplate template = (VDBTemplate)VDBData.getTemplates().get(dbData.getTemplateData().getId());
+			if (template != null) {
+				VDBData.addPortsAndMacros(dbData.getTemplateData(), template, vdbData, importedList);
+			}
+
+			viewGroup.manageLinks(true);
+			viewGroup.unconditionalValidateSubObjects(isFlat());
+			viewGroup.selectAllComponents();
+
+			((GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface")).getGUIMenuInterface().cut();
+		} finally {
+			viewGroup = vg;
+			Group.setRoot(rg);
+		}
+
+		((GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface")).getGUIMenuInterface().paste();
+		Group.getClipboard().clear();
+
+
+		if (VisualDCT.getInstance() != null) {
+			VisualDCT.getInstance().updateLoadLabel();
+		}
+
+		blockNavigatorRedrawOnce = false;
+		createNavigatorImage();
+		forceRedraw = true;
+		repaint();
+	} catch (Exception exception) {
+		Console.getInstance().println(exception);
+		success = false;
+	} finally {
+		///!!! TODO put somewhere in try-finally block
+		restoreCursor();
+		UndoManager.getInstance().setMonitor(true);
+		// free db memory	    
+		dbData = null;
+		System.gc();
+	}
+	return success;
 }
 
 /**

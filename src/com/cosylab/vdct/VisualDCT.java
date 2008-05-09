@@ -257,6 +257,9 @@ public class VisualDCT extends JFrame {
 	private JMenu ivjDebugMenu = null;
 	private com.cosylab.vdct.plugin.debug.DebugStartMenu ivjStartDebugMenuItem = null;
 	private com.cosylab.vdct.plugin.debug.DebugStopMenuItem ivjStopDebugMenuItem = null;
+	private JMenu irmisMenu = null;
+	private JMenuItem irmisMenuItem = null;
+	
 	private DBDDialog dbdDialog = null;
 
 	private NameChecker newRecordNameChecker = null;
@@ -2509,6 +2512,49 @@ private javax.swing.JMenu getDebugMenu() {
 	}
 	return ivjDebugMenu;
 }
+
+private JMenu getIrmisMenu() {
+	if (irmisMenu == null) {
+		try {
+			irmisMenu = new JMenu();
+			irmisMenu.setName("IrmisMenu");
+			irmisMenu.setMnemonic('I');
+			irmisMenu.setText("IRMIS");
+			irmisMenu.add(getIrmisMenuItem());
+		} catch (Throwable ivjExc) {
+			handleException(ivjExc);
+		}
+	}
+	return irmisMenu;
+}
+
+private JMenuItem getIrmisMenuItem() {
+	if (irmisMenuItem == null) {
+		try {
+			irmisMenuItem = new JMenuItem();
+			irmisMenuItem.setName("Do");
+			irmisMenuItem.setMnemonic('D');
+			irmisMenuItem.setText("Do");
+			
+			irmisMenuItem.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+				    GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
+		  		 	cmd.getGUIMenuInterface().importIrmisDbGroup("testuser", "password", "localhost", "AirC");
+				}
+			});
+		} catch (Throwable ivjExc) {
+			handleException(ivjExc);
+		}
+	}
+	return irmisMenuItem;
+}
+
+/*
+private JMenu iRMISMenu = null;
+private JMenuItem iRMISMenuItem = null;
+*/
+
+
 /**
  * Return the DeleteMenuItem property value.
  * @return javax.swing.JMenuItem
@@ -5390,6 +5436,7 @@ private javax.swing.JMenuBar getVisualDCTJMenuBar() {
 			ivjVisualDCTJMenuBar.add(getViewMenu());
 			ivjVisualDCTJMenuBar.add(getPluginsMenu());
 			ivjVisualDCTJMenuBar.add(getDebugMenu());
+			ivjVisualDCTJMenuBar.add(getIrmisMenu());
 			ivjVisualDCTJMenuBar.add(getToolsMenu());
 			ivjVisualDCTJMenuBar.add(getHelpMenu());
 			// user code begin {1}

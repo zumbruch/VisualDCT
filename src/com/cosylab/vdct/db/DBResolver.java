@@ -98,6 +98,8 @@ public class DBResolver {
 	public static final String VDCTSPREADSHEET_COLUMNORDER = "ColumnOrder";
 	// used format #! ShowAllRows("true/false")
 	public static final String VDCTSPREADSHEET_SHOWALLROWS = "ShowAllRows";
+	// used format #! GroupColumnsByGuiGroup("true/false")
+	public static final String VDCTSPREADSHEET_GROUPCOLUMNSBYGUIGROUP = "GroupColumnsByGuiGroup";
 	// used format #! BackgroundColor("color")
 	public static final String VDCTSPREADSHEET_BACKGROUNDCOLOR = "BackgroundColor";
 	// used format #! Column("name", "hidden", [Width(...), [Width(...), ...]])
@@ -852,6 +854,7 @@ public class DBResolver {
 						// Read properties.
 						String modeName = null;
 						Boolean showAllRows = null;
+						Boolean groupColumnsByGuiGroup = null;
 						Integer backgroundColor = null;
 						SpreadsheetRowOrder rowOrder = null;
 						Map columnsMap = new HashMap();
@@ -882,6 +885,14 @@ public class DBResolver {
 									if (tokenizer.ttype == EnhancedStreamTokenizer.TT_WORD ||
 											tokenizer.ttype == DBConstants.quoteChar) {
 										showAllRows = Boolean.valueOf(tokenizer.sval.equals(String.valueOf(true)));
+									} else {
+										throw (new DBGParseException(errorString, tokenizer, fileName));
+									}
+								} else if (tokenizer.sval.equalsIgnoreCase(VDCTSPREADSHEET_GROUPCOLUMNSBYGUIGROUP)) {
+									tokenizer.nextToken();
+									if (tokenizer.ttype == EnhancedStreamTokenizer.TT_WORD ||
+											tokenizer.ttype == DBConstants.quoteChar) {
+										groupColumnsByGuiGroup = Boolean.valueOf(tokenizer.sval.equals(String.valueOf(true)));
 									} else {
 										throw (new DBGParseException(errorString, tokenizer, fileName));
 									}
@@ -1090,6 +1101,7 @@ public class DBResolver {
 						SpreadsheetTableViewRecord viewRecord = new SpreadsheetTableViewRecord(type, name);
 						viewRecord.setModeName(modeName);
 						viewRecord.setShowAllRows(showAllRows);
+						viewRecord.setGroupColumnsByGuiGroup(groupColumnsByGuiGroup);
 						viewRecord.setBackgroundColor(backgroundColor);
 						viewRecord.setRowOrder(rowOrder);
 						viewRecord.setColumns(columnsMap);

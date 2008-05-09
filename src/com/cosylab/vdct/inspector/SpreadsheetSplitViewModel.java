@@ -98,6 +98,14 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 	}
 	
 	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.inspector.SpreadsheetViewModel#setGroupColumnsByGuiGroup(boolean)
+	 */
+	public void setGroupColumnsByGuiGroup(boolean groupColumnsByGuiGroup) {
+		super.setGroupColumnsByGuiGroup(groupColumnsByGuiGroup);
+		refreshModel();
+	}
+
+	/* (non-Javadoc)
 	 * @see com.cosylab.vdct.inspector.SpreadsheetViewModel#setRowsVisibility(int[], boolean)
 	 */
 	public void setRowsVisibility(int[] rows, boolean visible) {

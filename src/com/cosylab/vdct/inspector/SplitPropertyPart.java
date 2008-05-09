@@ -200,4 +200,11 @@ public class SplitPropertyPart implements InspectableProperty {
 	public String checkValueValidity(String value) {
 		return null;
 	}
+	
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.inspector.InspectableProperty#getGuiGroup()
+	 */
+	public Integer getGuiGroup() {
+		return owner.getOwner().getGuiGroup();
+	}
 }

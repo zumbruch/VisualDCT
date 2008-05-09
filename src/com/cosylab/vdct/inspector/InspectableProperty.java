@@ -141,5 +141,11 @@ public boolean hasValidity();
  */
 public String checkValueValidity(String value);
 
+/**
+ * Returns the gui group index as an Integer or null if no gui group info available.
+ * @return
+ */
+public Integer getGuiGroup();
+
 }
 
