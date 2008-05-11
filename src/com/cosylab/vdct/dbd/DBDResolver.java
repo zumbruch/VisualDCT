@@ -61,7 +61,8 @@ public class DBDResolver {
  * @param bt java.lang.String
  */
 public static int getBaseType(String bt) {
-	if (bt.equalsIgnoreCase("DECIMAL"))	return (DBDConstants.DECIMAL);
+	if (bt == null) return DBDConstants.NOT_DEFINED;
+	else if (bt.equalsIgnoreCase("DECIMAL"))	return (DBDConstants.DECIMAL);
 	else if (bt.equalsIgnoreCase("HEX")) return (DBDConstants.HEX);
 	else return DBDConstants.NOT_DEFINED;
 }
@@ -71,7 +72,8 @@ public static int getBaseType(String bt) {
  * @param stype java.lang.String
  */
 public static int getFieldType(String stype) {
-	if (stype.equalsIgnoreCase("DBF_STRING"))	     return (DBDConstants.DBF_STRING);
+	if (stype == null) return DBDConstants.NOT_DEFINED;
+	else if (stype.equalsIgnoreCase("DBF_STRING"))	     return (DBDConstants.DBF_STRING);
 	else if (stype.equalsIgnoreCase("DBF_CHAR"))     return (DBDConstants.DBF_CHAR);
 	else if (stype.equalsIgnoreCase("DBF_UCHAR"))    return (DBDConstants.DBF_UCHAR);
 	else if (stype.equalsIgnoreCase("DBF_SHORT"))    return (DBDConstants.DBF_SHORT);
@@ -158,7 +160,8 @@ public static String getGUIString(int GUItype) {
  * @param gui java.lang.String
  */
 public static int getGUIType(String gui) {
-	if (gui.equalsIgnoreCase("GUI_COMMON")) return DBDConstants.GUI_COMMON;
+	if (gui == null) return DBDConstants.GUI_UNDEFINED;
+	else if (gui.equalsIgnoreCase("GUI_COMMON")) return DBDConstants.GUI_COMMON;
 	else if (gui.equalsIgnoreCase("GUI_ALARMS")) return DBDConstants.GUI_ALARMS;
 	else if (gui.equalsIgnoreCase("GUI_BITS1")) return DBDConstants.GUI_BITS1;
 	else if (gui.equalsIgnoreCase("GUI_BITS2")) return DBDConstants.GUI_BITS2;

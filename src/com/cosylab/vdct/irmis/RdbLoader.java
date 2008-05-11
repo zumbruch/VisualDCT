@@ -34,9 +34,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import com.cosylab.vdct.DataProvider;
 import com.cosylab.vdct.db.DBData;
 import com.cosylab.vdct.db.DBFieldData;
 import com.cosylab.vdct.db.DBRecordData;
+import com.cosylab.vdct.dbd.DBDData;
+import com.cosylab.vdct.dbd.DBDDeviceData;
+import com.cosylab.vdct.dbd.DBDFieldData;
+import com.cosylab.vdct.dbd.DBDMenuData;
+import com.cosylab.vdct.dbd.DBDRecordData;
+import com.cosylab.vdct.dbd.DBDResolver;
 
 /**
  * @author ssah
@@ -87,10 +94,14 @@ public class RdbLoader {
         ResultSet set = statement.executeQuery();
         while (set.next()) {
     		DBRecordData record = new DBRecordData();
-    		record.setName(set.getString(1));
-    		record.setRecord_type(set.getString(2));
+    		String name = set.getString(1);
+    		String type = set.getString(2);
+    		record.setName(name);
+    		record.setRecord_type(type);
     		loadRecord(record, connection);
     		data.addRecord(record);
+    		
+    		loadRecordDef(type, connection);
         }
 		return data;
 	}
@@ -100,8 +111,101 @@ public class RdbLoader {
         statement.setString(1, record.getName());
         ResultSet set = statement.executeQuery();
         while (set.next()) {
+        	// value in DBFieldData can be null, in this case it will be set to default.
         	record.addField(new DBFieldData(set.getString(1), set.getString(2)));
         }
 		return record;
+	}
+	
+	private void loadRecordDef(String name, Connection connection) throws SQLException {
+
+		DBDData definitions = DataProvider.getInstance().getDbdDB();
+		if (definitions.getDBDRecordData(name) == null) {
+			DBDRecordData recordDef = new DBDRecordData();
+			recordDef.setName(name);
+			
+	        PreparedStatement statement = connection.prepareStatement("SELECT"
+	        		+ " fld_id, fld_prmt_grp, fld_type_id, fld_init, fld_prmt, fld_base, fld_size, sgnl_fld_menu_id"
+	        		+ " FROM sgnl_fld_def WHERE rec_type_id=?");
+	        statement.setString(1, name);
+	        ResultSet set = statement.executeQuery();
+	        while (set.next()) {
+	        	DBDFieldData fieldDef = new DBDFieldData();
+
+	        	String fieldName = set.getString(1);
+	        	int guiType = DBDResolver.getGUIType(set.getString(2));
+	        	int type = DBDResolver.getFieldType(set.getString(3));
+	        	String initValue = set.getString(4);
+	        	String promptValue = set.getString(5);
+	        	int baseType = DBDResolver.getGUIType(set.getString(6));
+	        	int sizeValue = set.getInt(7);
+	        	String menuName = set.getString(8);
+	        	
+	        	fieldDef.setName(fieldName);
+	        	fieldDef.setGUI_type(guiType);
+	        	fieldDef.setField_type(type);
+	        	if (initValue != null) {
+	        	    fieldDef.setInit_value(initValue);
+	        	}
+	        	if (promptValue != null) {
+	        	    fieldDef.setPrompt_value(promptValue);
+	        	}
+	        	fieldDef.setBase_type(baseType);
+	        	fieldDef.setSize_value(sizeValue);
+	        	if (menuName != null) {
+	        	    fieldDef.setMenu_name(menuName);
+	        	    loadMenuOrDeviceDef(menuName, connection);
+	        	}
+	        	recordDef.addField(fieldDef);
+	        }
+			
+			definitions.addRecord(recordDef);
+		}
+	}
+
+	private void loadMenuOrDeviceDef(String name, Connection connection) throws SQLException {
+		if (name.endsWith("DTYP")) {
+			loadDeviceDef(name, connection);
+		} else {
+			loadMenuDef(name, connection);
+		}
+	}
+
+	private void loadMenuDef(String name, Connection connection) throws SQLException {
+		DBDData definitions = DataProvider.getInstance().getDbdDB();
+		
+		if (definitions.getDBDMenuData(name) == null) {
+			DBDMenuData menuDef = new DBDMenuData();
+			menuDef.setName(name);
+			
+	        PreparedStatement statement = connection.prepareStatement(
+	        		"SELECT fld_menu_val FROM sgnl_fld_menu WHERE sgnl_fld_menu_id=?");
+	        statement.setString(1, name);
+	        ResultSet set = statement.executeQuery();
+	        while (set.next()) {
+	        	String value = set.getString(1);
+	        	menuDef.addMenuChoice(value, value);
+	        }
+			definitions.addMenu(menuDef);
+		}
+	}
+
+	private void loadDeviceDef(String name, Connection connection) throws SQLException {
+		String recordName = name.substring(0, name.lastIndexOf("DTYP"));
+		
+		DBDData definitions = DataProvider.getInstance().getDbdDB();
+		if (definitions.getDBDDeviceData(recordName) == null) {
+	        PreparedStatement statement = connection.prepareStatement(
+	        		"SELECT fld_menu_val FROM sgnl_fld_menu WHERE sgnl_fld_menu_id=?");
+	        statement.setString(1, name);
+	        ResultSet set = statement.executeQuery();
+	        while (set.next()) {
+	        	DBDDeviceData deviceDef = new DBDDeviceData();
+				deviceDef.setRecord_type(recordName);
+				deviceDef.setLink_type("CONSTANT");
+				deviceDef.setChoice_string(set.getString(1));
+				definitions.addDevice(deviceDef);
+	        }
+		}
 	}
 }
