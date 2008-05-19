@@ -66,6 +66,17 @@ public static int getBaseType(String bt) {
 	else if (bt.equalsIgnoreCase("HEX")) return (DBDConstants.HEX);
 	else return DBDConstants.NOT_DEFINED;
 }
+
+public static String getBaseType(int type) {
+	switch (type)
+	{
+		case DBDConstants.DECIMAL:	return "DECIMAL";
+		case DBDConstants.HEX:		return "HEX";
+		default:
+			return "UNKNOWN";
+	}		
+}
+
 /**
  * This method was created in VisualAge.
  * @return int

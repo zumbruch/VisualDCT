@@ -258,7 +258,8 @@ public class VisualDCT extends JFrame {
 	private com.cosylab.vdct.plugin.debug.DebugStartMenu ivjStartDebugMenuItem = null;
 	private com.cosylab.vdct.plugin.debug.DebugStopMenuItem ivjStopDebugMenuItem = null;
 	private JMenu irmisMenu = null;
-	private JMenuItem irmisMenuItem = null;
+	private JMenuItem irmisLoadMenuItem = null;
+	private JMenuItem irmisSaveMenuItem = null;
 	
 	private DBDDialog dbdDialog = null;
 
@@ -2520,7 +2521,8 @@ private JMenu getIrmisMenu() {
 			irmisMenu.setName("IrmisMenu");
 			irmisMenu.setMnemonic('I');
 			irmisMenu.setText("IRMIS");
-			irmisMenu.add(getIrmisMenuItem());
+			irmisMenu.add(getIrmisLoadMenuItem());
+			irmisMenu.add(getIrmisSaveMenuItem());
 		} catch (Throwable ivjExc) {
 			handleException(ivjExc);
 		}
@@ -2528,25 +2530,46 @@ private JMenu getIrmisMenu() {
 	return irmisMenu;
 }
 
-private JMenuItem getIrmisMenuItem() {
-	if (irmisMenuItem == null) {
+private JMenuItem getIrmisLoadMenuItem() {
+	if (irmisLoadMenuItem == null) {
 		try {
-			irmisMenuItem = new JMenuItem();
-			irmisMenuItem.setName("Do");
-			irmisMenuItem.setMnemonic('D');
-			irmisMenuItem.setText("Do");
+			irmisLoadMenuItem = new JMenuItem();
+			irmisLoadMenuItem.setName("Load");
+			irmisLoadMenuItem.setMnemonic('L');
+			irmisLoadMenuItem.setText("Load");
 			
-			irmisMenuItem.addActionListener(new ActionListener() {
+			irmisLoadMenuItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 				    GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
-		  		 	cmd.getGUIMenuInterface().importIrmisDbGroup("testuser", "password", "localhost", "AirC");
+		  		 	cmd.getGUIMenuInterface().importIrmisDbGroup();
 				}
 			});
 		} catch (Throwable ivjExc) {
 			handleException(ivjExc);
 		}
 	}
-	return irmisMenuItem;
+	return irmisLoadMenuItem;
+}
+
+private JMenuItem getIrmisSaveMenuItem() {
+	if (irmisSaveMenuItem == null) {
+		try {
+			irmisSaveMenuItem = new JMenuItem();
+			irmisSaveMenuItem.setName("Save");
+			irmisSaveMenuItem.setMnemonic('S');
+			irmisSaveMenuItem.setText("Save");
+			
+			irmisSaveMenuItem.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+				    GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
+		  		 	cmd.getGUIMenuInterface().saveIrmisDbGroup();
+				}
+			});
+		} catch (Throwable ivjExc) {
+			handleException(ivjExc);
+		}
+	}
+	return irmisSaveMenuItem;
 }
 
 /*

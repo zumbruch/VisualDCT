@@ -1281,6 +1281,147 @@ private static void writeIncludes(java.io.DataOutputStream file) throws IOExcept
 
 }
 
+private static void writeVDCTViewData(DataOutputStream file) throws IOException {
+
+	 final String nl = "\n";
+
+	 final String comma = ",";
+	 final String quote = "\"";
+	 final String ending = ")"+nl;
+
+	 final String VIEW_START            = "#! " + DBResolver.VDCTVIEW + "(";
+
+	 final String SPREADSHEET_VIEW_START = "#! " + DBResolver.VDCTSPREADSHEET_VIEW + "(";
+	 
+	 final String SPREADSHEET_COLUMNORDER_START = DBResolver.VDCTSPREADSHEET_COLUMNORDER + "(";
+	 final String SPREADSHEET_SHOWALLROWS_START = DBResolver.VDCTSPREADSHEET_SHOWALLROWS + "(";
+	 final String SPREADSHEET_GROUPCOLUMNSBYGUIGROUP_START = DBResolver.VDCTSPREADSHEET_GROUPCOLUMNSBYGUIGROUP + "(";
+	 final String SPREADSHEET_BACKGROUNDCOLOR_START = DBResolver.VDCTSPREADSHEET_BACKGROUNDCOLOR + "(";
+	 final String SPREADSHEET_ROWORDER_START = DBResolver.VDCTSPREADSHEET_ROWORDER + "(";
+	 final String SPREADSHEET_COLUMN_START = DBResolver.VDCTSPREADSHEET_COLUMN + "(";
+	 final String SPREADSHEET_WIDTH_START = DBResolver.VDCTSPREADSHEET_WIDTH + "(";
+	 final String SPREADSHEET_ROW_START = DBResolver.VDCTSPREADSHEET_HIDDENROW + "(";
+	 final String SPREADSHEET_SPLITCOLUMN_START = DBResolver.VDCTSPREADSHEET_SPLITCOLUMN + "(";
+	 final String SPREADSHEET_RECENTSPLIT_START = DBResolver.VDCTSPREADSHEET_RECENTSPLIT + "(";
+
+	 ViewState view = ViewState.getInstance();
+
+	 file.writeBytes(VIEW_START + view.getRx() + comma + view.getRy() +
+		 			 comma + view.getScale() + ending);
+	 
+	 // Write the data on the spreadsheet views.
+	 Iterator iterator = SpreadsheetTableViewData.getInstance().getRecords();
+	 SpreadsheetTableViewRecord sprView = null; 
+	 while (iterator.hasNext()) {
+		 sprView = (SpreadsheetTableViewRecord)iterator.next();
+		 
+	     String modeName = sprView.getModeName();
+	     Boolean showAllRows = sprView.getShowAllRows();
+	     Boolean groupColumnsByGuiGroup = sprView.getGroupColumnsByGuiGroup();
+	     Integer backgroundColor = sprView.getBackgroundColor();
+	     SpreadsheetRowOrder rowOrder = sprView.getRowOrder();
+	     Map columns = sprView.getColumns();
+	     String[] hiddenRows = sprView.getHiddenRows();
+	     SplitData[] splitColumns = sprView.getSplitColumns();
+	     SplitData[] recentSplits = sprView.getRecentSplits();
+
+	     // If no data, skip writing the entry.
+		 if (modeName == null
+				 && showAllRows == null
+				 && groupColumnsByGuiGroup == null
+				 && backgroundColor == null
+				 && rowOrder == null
+				 && (columns == null || columns.isEmpty())
+				 && (hiddenRows == null || hiddenRows.length == 0)
+				 && (splitColumns == null || splitColumns.length == 0)
+				 && (recentSplits == null || recentSplits.length == 0)) {
+			 continue;
+		 }
+
+	     file.writeBytes(SPREADSHEET_VIEW_START + sprView.getType());
+	     file.writeBytes(comma + quote + sprView.getName() + quote);
+
+	     if (modeName != null) {
+			 file.writeBytes(comma + SPREADSHEET_COLUMNORDER_START);
+			 file.writeBytes(quote + modeName + quote);
+			 file.writeBytes(")");
+	     }
+
+	     if (showAllRows != null) {
+			 file.writeBytes(comma + SPREADSHEET_SHOWALLROWS_START);
+			 file.writeBytes(quote + showAllRows.toString() + quote);
+			 file.writeBytes(")");
+	     }
+
+	     if (groupColumnsByGuiGroup != null) {
+			 file.writeBytes(comma + SPREADSHEET_GROUPCOLUMNSBYGUIGROUP_START);
+			 file.writeBytes(quote + groupColumnsByGuiGroup.toString() + quote);
+			 file.writeBytes(")");
+	     }
+	     
+	     if (backgroundColor != null) {
+			 file.writeBytes(comma + SPREADSHEET_BACKGROUNDCOLOR_START);
+			 file.writeBytes(backgroundColor.toString());
+			 file.writeBytes(")");
+	     }
+	     
+	     if (rowOrder != null) {
+			 file.writeBytes(comma + SPREADSHEET_ROWORDER_START);
+			 file.writeBytes(quote + rowOrder.getColumnName() + quote);
+			 file.writeBytes(comma + rowOrder.getColumnSplitIndex());
+			 file.writeBytes(comma + quote + rowOrder.getAscendingString() + quote);
+			 file.writeBytes(")");
+	     }
+	     
+	     if (columns != null) {
+	    	 Iterator colIterator = columns.values().iterator();
+	    	 
+	    	 while (colIterator.hasNext()) {
+	    		 SpreadsheetColumnData column = (SpreadsheetColumnData)colIterator.next(); 
+	    		 file.writeBytes(comma + SPREADSHEET_COLUMN_START);
+	    		 file.writeBytes(quote + column.getName() + quote);
+	    		 file.writeBytes(comma + quote + String.valueOf(column.isHidden()) + quote);
+	    		 file.writeBytes(comma + String.valueOf(column.getSortIndex()));
+	    		 
+	    		 SplitPartWidthData[] widths = column.getSplitIndices();
+	    		 for (int i = 0; i < widths.length; i++) {
+	    			 file.writeBytes(comma + SPREADSHEET_WIDTH_START);
+	    			 file.writeBytes(String.valueOf(widths[i].getSplitIndex()));
+	    			 file.writeBytes(comma + String.valueOf(widths[i].getWidth()));
+	    			 file.writeBytes(")");
+	    		 }
+	    		 file.writeBytes(")");
+	    	 }
+	     }
+
+	     if (hiddenRows != null) {
+	    	 for (int i = 0; i < hiddenRows.length; i++) {
+	    		 file.writeBytes(comma + SPREADSHEET_ROW_START + quote + hiddenRows[i] + "\")");
+	    	 }
+	     }
+
+	     if (splitColumns != null) {
+	    	 for (int i = 0; i < splitColumns.length; i++) {
+	    		 file.writeBytes(comma + SPREADSHEET_SPLITCOLUMN_START);
+	    		 file.writeBytes(quote + splitColumns[i].getName() + quote);
+	    		 file.writeBytes(comma + quote + splitColumns[i].getDelimiterTypeString() + quote);
+	    		 file.writeBytes(comma + quote + splitColumns[i].getPattern() + quote);
+	    		 file.writeBytes(")");
+	    	 }
+	     }
+
+	     if (recentSplits != null) {
+	    	 for (int i = 0; i < recentSplits.length; i++) {
+	    		 file.writeBytes(comma + SPREADSHEET_RECENTSPLIT_START);
+	    		 file.writeBytes(quote + recentSplits[i].getDelimiterTypeString() + quote);
+	    		 file.writeBytes(comma + quote + recentSplits[i].getPattern() + quote);
+	    		 file.writeBytes(")");
+	    	 }
+	     }
+	     
+	     file.writeBytes(ending);
+	 }
+}
 /**
  * Insert the method's description here.
  * Creation date: (22.4.2001 21:51:25)
@@ -1316,21 +1457,6 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
  final String quote = "\"";
  final String ending = ")"+nl;
 
- final String VIEW_START            = "#! " + DBResolver.VDCTVIEW + "(";
-
- final String SPREADSHEET_VIEW_START = "#! " + DBResolver.VDCTSPREADSHEET_VIEW + "(";
- 
- final String SPREADSHEET_COLUMNORDER_START = DBResolver.VDCTSPREADSHEET_COLUMNORDER + "(";
- final String SPREADSHEET_SHOWALLROWS_START = DBResolver.VDCTSPREADSHEET_SHOWALLROWS + "(";
- final String SPREADSHEET_GROUPCOLUMNSBYGUIGROUP_START = DBResolver.VDCTSPREADSHEET_GROUPCOLUMNSBYGUIGROUP + "(";
- final String SPREADSHEET_BACKGROUNDCOLOR_START = DBResolver.VDCTSPREADSHEET_BACKGROUNDCOLOR + "(";
- final String SPREADSHEET_ROWORDER_START = DBResolver.VDCTSPREADSHEET_ROWORDER + "(";
- final String SPREADSHEET_COLUMN_START = DBResolver.VDCTSPREADSHEET_COLUMN + "(";
- final String SPREADSHEET_WIDTH_START = DBResolver.VDCTSPREADSHEET_WIDTH + "(";
- final String SPREADSHEET_ROW_START = DBResolver.VDCTSPREADSHEET_HIDDENROW + "(";
- final String SPREADSHEET_SPLITCOLUMN_START = DBResolver.VDCTSPREADSHEET_SPLITCOLUMN + "(";
- final String SPREADSHEET_RECENTSPLIT_START = DBResolver.VDCTSPREADSHEET_RECENTSPLIT + "(";
-
  final String RECORD_START          = "#! " + DBResolver.VDCTRECORD + "(";
  final String GROUP_START           = "#! " + DBResolver.VDCTGROUP + "(";
  final String FIELD_START           = "#! " + DBResolver.VDCTFIELD + "(";
@@ -1349,126 +1475,7 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 
  final String NULL  = "null";
 
- ViewState view = ViewState.getInstance();
-
- file.writeBytes(VIEW_START + view.getRx() + comma + view.getRy() +
-	 			 comma + view.getScale() + ending);
- 
- // Write the data on the spreadsheet views.
- Iterator iterator = SpreadsheetTableViewData.getInstance().getRecords();
- SpreadsheetTableViewRecord sprView = null; 
- while (iterator.hasNext()) {
-	 sprView = (SpreadsheetTableViewRecord)iterator.next();
-	 
-     String modeName = sprView.getModeName();
-     Boolean showAllRows = sprView.getShowAllRows();
-     Boolean groupColumnsByGuiGroup = sprView.getGroupColumnsByGuiGroup();
-     Integer backgroundColor = sprView.getBackgroundColor();
-     SpreadsheetRowOrder rowOrder = sprView.getRowOrder();
-     Map columns = sprView.getColumns();
-     String[] hiddenRows = sprView.getHiddenRows();
-     SplitData[] splitColumns = sprView.getSplitColumns();
-     SplitData[] recentSplits = sprView.getRecentSplits();
-
-     // If no data, skip writing the entry.
-	 if (modeName == null
-			 && showAllRows == null
-			 && groupColumnsByGuiGroup == null
-			 && backgroundColor == null
-			 && rowOrder == null
-			 && (columns == null || columns.isEmpty())
-			 && (hiddenRows == null || hiddenRows.length == 0)
-			 && (splitColumns == null || splitColumns.length == 0)
-			 && (recentSplits == null || recentSplits.length == 0)) {
-		 continue;
-	 }
-
-     file.writeBytes(SPREADSHEET_VIEW_START + sprView.getType());
-     file.writeBytes(comma + quote + sprView.getName() + quote);
-
-     if (modeName != null) {
-		 file.writeBytes(comma + SPREADSHEET_COLUMNORDER_START);
-		 file.writeBytes(quote + modeName + quote);
-		 file.writeBytes(")");
-     }
-
-     if (showAllRows != null) {
-		 file.writeBytes(comma + SPREADSHEET_SHOWALLROWS_START);
-		 file.writeBytes(quote + showAllRows.toString() + quote);
-		 file.writeBytes(")");
-     }
-
-     if (groupColumnsByGuiGroup != null) {
-		 file.writeBytes(comma + SPREADSHEET_GROUPCOLUMNSBYGUIGROUP_START);
-		 file.writeBytes(quote + groupColumnsByGuiGroup.toString() + quote);
-		 file.writeBytes(")");
-     }
-     
-     if (backgroundColor != null) {
-		 file.writeBytes(comma + SPREADSHEET_BACKGROUNDCOLOR_START);
-		 file.writeBytes(backgroundColor.toString());
-		 file.writeBytes(")");
-     }
-     
-     if (rowOrder != null) {
-		 file.writeBytes(comma + SPREADSHEET_ROWORDER_START);
-		 file.writeBytes(quote + rowOrder.getColumnName() + quote);
-		 file.writeBytes(comma + rowOrder.getColumnSplitIndex());
-		 file.writeBytes(comma + quote + rowOrder.getAscendingString() + quote);
-		 file.writeBytes(")");
-     }
-     
-     if (columns != null) {
-    	 Iterator colIterator = columns.values().iterator();
-    	 
-    	 while (colIterator.hasNext()) {
-    		 SpreadsheetColumnData column = (SpreadsheetColumnData)colIterator.next(); 
-    		 file.writeBytes(comma + SPREADSHEET_COLUMN_START);
-    		 file.writeBytes(quote + column.getName() + quote);
-    		 file.writeBytes(comma + quote + String.valueOf(column.isHidden()) + quote);
-    		 file.writeBytes(comma + String.valueOf(column.getSortIndex()));
-    		 
-    		 SplitPartWidthData[] widths = column.getSplitIndices();
-    		 for (int i = 0; i < widths.length; i++) {
-    			 file.writeBytes(comma + SPREADSHEET_WIDTH_START);
-    			 file.writeBytes(String.valueOf(widths[i].getSplitIndex()));
-    			 file.writeBytes(comma + String.valueOf(widths[i].getWidth()));
-    			 file.writeBytes(")");
-    		 }
-    		 file.writeBytes(")");
-    	 }
-     }
-
-     if (hiddenRows != null) {
-    	 for (int i = 0; i < hiddenRows.length; i++) {
-    		 file.writeBytes(comma + SPREADSHEET_ROW_START + quote + hiddenRows[i] + "\")");
-    	 }
-     }
-
-     if (splitColumns != null) {
-    	 for (int i = 0; i < splitColumns.length; i++) {
-    		 file.writeBytes(comma + SPREADSHEET_SPLITCOLUMN_START);
-    		 file.writeBytes(quote + splitColumns[i].getName() + quote);
-    		 file.writeBytes(comma + quote + splitColumns[i].getDelimiterTypeString() + quote);
-    		 file.writeBytes(comma + quote + splitColumns[i].getPattern() + quote);
-    		 file.writeBytes(")");
-    	 }
-     }
-
-     if (recentSplits != null) {
-    	 for (int i = 0; i < recentSplits.length; i++) {
-    		 file.writeBytes(comma + SPREADSHEET_RECENTSPLIT_START);
-    		 file.writeBytes(quote + recentSplits[i].getDelimiterTypeString() + quote);
-    		 file.writeBytes(comma + quote + recentSplits[i].getPattern() + quote);
-    		 file.writeBytes(")");
-    	 }
-     }
-     
-     file.writeBytes(ending);
- }
- 
  Enumeration e = elements.elements();
-
  while (e.hasMoreElements()) 
  	{
 	 	obj = e.nextElement();
@@ -2032,6 +2039,7 @@ public static void save(Group group2save, File file, NamingContext renamer, bool
 		if (!export)	
 		{
 			stream.writeBytes("\n#! Further lines contain data used by VisualDCT\n");
+			writeVDCTViewData(stream);			
 			group2save.writeVDCTData(stream, renamer, export);
 		}
 	

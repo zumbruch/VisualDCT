@@ -136,7 +136,7 @@ import com.cosylab.vdct.graphics.popup.Popupable;
 import com.cosylab.vdct.graphics.printing.Page;
 import com.cosylab.vdct.inspector.Inspectable;
 import com.cosylab.vdct.inspector.InspectorManager;
-import com.cosylab.vdct.irmis.RdbLoader;
+import com.cosylab.vdct.irmis.Rdb;
 import com.cosylab.vdct.undo.ActionObject;
 import com.cosylab.vdct.undo.ComposedAction;
 import com.cosylab.vdct.undo.CreateAction;
@@ -2227,7 +2227,7 @@ public boolean open(InputStream is, File file, boolean importDB, boolean importT
 		return false;
 }
 
-public boolean importIrmisDbGroup(String user, String password, String host, String group) {
+public boolean importIrmisDbGroup() {
 
 	DBData dbData = null;
 	boolean success = true;
@@ -2236,7 +2236,7 @@ public boolean importIrmisDbGroup(String user, String password, String host, Str
 		setCursor(hourCursor);
 		UndoManager.getInstance().setMonitor(false);
 
-		dbData = RdbLoader.getInstance().loadDbGroup(user, password, host, group);
+		dbData = Rdb.getInstance().loadDbGroup();
 
 		// check for sucess
 		DBDData dbdData = DataProvider.getInstance().getDbdDB();

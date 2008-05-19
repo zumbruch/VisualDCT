@@ -250,4 +250,11 @@ public java.util.Hashtable getDevices() {
 public Enumeration getRecordNames() {
 	return records.keys();
 }
+/**
+ * @return the menus
+ */
+public Hashtable getMenus() {
+	return menus;
+}
+
 }

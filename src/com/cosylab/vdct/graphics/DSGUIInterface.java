@@ -46,6 +46,7 @@ import java.util.Vector;
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 
+import com.cosylab.vdct.Console;
 import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.DataProvider;
 import com.cosylab.vdct.Settings;
@@ -71,6 +72,7 @@ import com.cosylab.vdct.graphics.objects.Record;
 import com.cosylab.vdct.graphics.objects.Template;
 import com.cosylab.vdct.graphics.objects.TextBox;
 import com.cosylab.vdct.graphics.objects.VisibleObject;
+import com.cosylab.vdct.irmis.Rdb;
 import com.cosylab.vdct.plugin.config.PluginNameConfigManager;
 import com.cosylab.vdct.undo.ComposedAction;
 import com.cosylab.vdct.undo.CreateAction;
@@ -687,8 +689,16 @@ public void importDBD(java.io.File file) throws IOException {
 	drawingSurface.openDBD(file, true);
 }
 
-public void importIrmisDbGroup(String user, String password, String host, String group) {
-	drawingSurface.importIrmisDbGroup(user, password, host, group);
+public void importIrmisDbGroup() {
+	drawingSurface.importIrmisDbGroup();
+}
+
+public void saveIrmisDbGroup() {
+	try {
+		Rdb.getInstance().saveDbGroup();
+	} catch (Exception exception) {
+		Console.getInstance().println(exception);
+	}
 }
 
 /**

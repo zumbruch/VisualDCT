@@ -102,7 +102,9 @@ void importBorder(File file) throws IOException;
  */
 void importDBD(File file) throws IOException;
 
-void importIrmisDbGroup(String user, String password, String host, String group);
+void importIrmisDbGroup();
+
+void saveIrmisDbGroup();
 
 /**
  * Insert the method's description here.

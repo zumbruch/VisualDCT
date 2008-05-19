@@ -102,7 +102,7 @@ public class DBResolver {
 	public static final String VDCTSPREADSHEET_GROUPCOLUMNSBYGUIGROUP = "GroupColumnsByGuiGroup";
 	// used format #! BackgroundColor("color")
 	public static final String VDCTSPREADSHEET_BACKGROUNDCOLOR = "BackgroundColor";
-	// used format #! Column("name", "hidden", [Width(...), [Width(...), ...]])
+	// used format #! Column("name", "hidden" [, Width(...) [, Width(...), ...]])
 	public static final String VDCTSPREADSHEET_COLUMN = "Column";
 	// used format #! Width(split index, nondefault width)
 	public static final String VDCTSPREADSHEET_WIDTH = "Width";
@@ -126,7 +126,7 @@ public class DBResolver {
 	public static final String VDCTLINK = "Link";
 	// used format #! Visibility(fieldname, visibility)
 	public static final String VDCTVISIBILITY = "Visibility";
-	// used format #! Connector(id, outLinkID, xpos, ypos, color, "description")
+	// used format #! Connector(id, outLinkID, xpos, ypos, color, "description" [, mode])
 	public static final String VDCTCONNECTOR = "Connector";
 	//	 eg.       #! Record(ts:fanOut0, 124, 432, 324568, 0, "fanOut record")
 
