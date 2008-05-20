@@ -28,26 +28,17 @@
 
 package com.cosylab.vdct.irmis;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.Vector;
 
-import com.cosylab.vdct.Console;
 import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.DataProvider;
-import com.cosylab.vdct.db.DBConstants;
 import com.cosylab.vdct.db.DBData;
 import com.cosylab.vdct.db.DBFieldData;
 import com.cosylab.vdct.db.DBRecordData;
-import com.cosylab.vdct.db.DBResolver;
-import com.cosylab.vdct.db.DBTemplateInstance;
 import com.cosylab.vdct.dbd.DBDConstants;
 import com.cosylab.vdct.dbd.DBDData;
 import com.cosylab.vdct.dbd.DBDDeviceData;
@@ -61,7 +52,6 @@ import com.cosylab.vdct.graphics.objects.Template;
 import com.cosylab.vdct.util.StringUtils;
 import com.cosylab.vdct.vdb.VDBFieldData;
 import com.cosylab.vdct.vdb.VDBRecordData;
-import com.cosylab.vdct.vdb.VDBTemplateInstance;
 
 /**
  * @author ssah
@@ -69,24 +59,13 @@ import com.cosylab.vdct.vdb.VDBTemplateInstance;
  */
 public class Rdb {
 
-	private String user = null;
-	private String password = null;
-	private String host = null;
-	private String group = null;
-	private String database = null;
-	private Connection connection = null;
-	
 	private static Rdb rdb = null;
+	private SqlHelper helper = null;
 	
 	private static final String emptyString = "";
-
-	private static final String defaultUser = "user";
-	private static final String defaultPassword = "password";
-	private static final String defaultHost = "localhost";
-	private static final String defaultGroup = "Group";
-	private static final String defaultDatabase = "epics";
-
 	private static final String recordDefDescription = "Saved by VDCT";
+	private static final String iocDeviceIdString = "Unknown device";
+	private static final String dtypString = "DTYP";
 	
 	public static Rdb getInstance() throws Exception {
 		if (rdb == null) {
@@ -98,174 +77,66 @@ public class Rdb {
 	public DBData loadDbGroup() {
 
 		DBData data = null;
-		createConnection();
-		if (connection == null) {
+		helper.createConnection();
+		
+		if (!helper.isConnection()) {
 			return null;
 		}
+		String group = helper.getGroup();
 		
 		try {
 			data = new DBData(group, group);
 			loadRecords(data, group);
+			loadTemplates(data, group);			
 			
-			connection.commit();
+			helper.commit();
 		} catch (SQLException exception) {
-			displayExceptionMessage("Error while loading database!", exception);
+			helper.displayExceptionMessage("Error while loading database!", exception);
 		} finally {
-		    closeConnection(false);
+			helper.closeConnection(false);
 	    }
 		return data;
 	}
 	
 	public void saveDbGroup() {
 		
-		createConnection();
-		if (connection == null) {
+		helper.createConnection();
+		if (!helper.isConnection()) {
 			return;
 		}
+		String group = helper.getGroup();
 		
 		boolean rollback = false;
 		try {
-			saveRecords();
-			connection.commit();
+			saveDataDef();
+			saveGroup(group);			
+            saveRecords();
+            helper.commit();
 		} catch (SQLException exception) {
-			displayExceptionMessage("Error while saving database!", exception);
+			helper.displayExceptionMessage("Error while saving database!", exception);
 			rollback = true;
 		} finally {
-    		closeConnection(rollback);
+			helper.closeConnection(rollback);
 		}
 	}
 	
 	private Rdb() throws Exception {
-		Class.forName("com.mysql.jdbc.Driver").newInstance();
-		user = defaultUser;
-		password = defaultPassword;
-		host = defaultHost;
-		group = defaultGroup;
-		database = defaultDatabase;
-		
-		// TODO:REM
-		user = "testuser";
-		group = "AirC";
-	}
-	
-	private void displayExceptionMessage(String message, SQLException exception) {
-	    Console.getInstance().println(message);
-	    Console.getInstance().println("SQLException: " + exception.getMessage());
-	    Console.getInstance().println("SQLState: " + exception.getSQLState());
-	    Console.getInstance().println("VendorError: " + exception.getErrorCode());
-	    exception.printStackTrace();
-	}
-	
-	private void createConnection() {
-		connection = null;
-		try {
-			String connectionString = "jdbc:mysql://" + host + "/" + database
-			        + "?user=" + user + "&password=" + password;
-			connection = DriverManager.getConnection(connectionString);
-			connection.setAutoCommit(false);
-		} catch (SQLException exception) {
-			displayExceptionMessage("Error creating connection!", exception);
-		}
-	}
-
-	private void closeConnection(boolean rollback) {
-		try {
-			if (rollback) {
-			    connection.rollback();
-			}
-			connection.close();
-		} catch (SQLException exception) {
-			displayExceptionMessage("Error closing connection!", exception);
-		}
-	}
-	
-	private String getList(Object[] elements) {
-		StringBuffer buffer = new StringBuffer();
-		int len = elements.length;
-		for (int e = 0; e < len; e++) {
-			buffer.append(elements[e].toString());
-			if (e < len - 1) {
-				buffer.append(",");
-			}
-		}
-		return buffer.toString();
-	}
-
-	private String getQuotedList(Object[] elements) {
-		StringBuffer buffer = new StringBuffer();
-		int len = elements.length;
-		for (int e = 0; e < len; e++) {
-			buffer.append("'");
-			buffer.append(elements[e].toString());
-			buffer.append("'");
-			if (e < len - 1) {
-				buffer.append(",");
-			}
-		}
-		return buffer.toString();
-	}
-
-	private String getEqualityList(Object[][] elements) {
-		StringBuffer buffer = new StringBuffer();
-		int rows = elements.length;
-		if (rows < 2) {
-			return emptyString;
-		}
-		
-		int len = elements[0].length;
-		for (int e = 0; e < len; e++) {
-			buffer.append(elements[0][e].toString());
-			buffer.append("='");
-			buffer.append(elements[1][e].toString());
-			buffer.append("'");
-			if (e < len - 1) {
-				buffer.append(",");
-			}
-		}
-		return buffer.toString();
-	}
-	
-	private ResultSet loadRows(String table, Object[] columns, String condition) throws SQLException {
-
-        String columnsString = getList(columns);
-        PreparedStatement statement = connection.prepareStatement(
-        		"SELECT " + columnsString + " FROM " + table + " WHERE " + condition);
-		return statement.executeQuery();
-	}
-	
-	private void saveRow(String table, Object[][] keyPairs, Object[][] valuePairs) throws SQLException {
-		
-		// Check for row existence.
-		String condition = getEqualityList(keyPairs);
-		Object[] columns = {keyPairs[0][0]};  
-		
-		ResultSet set = loadRows(table, columns, condition);
-		boolean exists = set.next(); 
-		
-        PreparedStatement statement = null;
-		
-		if (exists) {
-			String setString = getEqualityList(valuePairs);
-			statement = connection.prepareStatement(
-	        		"UPDATE " + table + " SET " + setString + " WHERE " + condition);
-			
-			System.out.println(setString + ":" + condition);
-		} else {
-			String columnString = getList(valuePairs[0]);
-			String valueString = getQuotedList(valuePairs[1]);
-			statement = connection.prepareStatement("INSERT INTO " + table
-					+ " (" + columnString + ") VALUES (" + valueString + ")");
-
-			System.out.println(columnString + ":" + valueString);
-		}
-        statement.execute();
+		helper = SqlHelper.getInstance();
 	}
 	
 	private void loadRecords(DBData data, String group) throws SQLException {
-		Object[] columns = {"sgnl_id", "sgnl_rec.rec_type_id"};  
 
-		ResultSet set = loadRows("sgnl_rec, sgnl_rec_type", columns,
-				"epics_grp_id=" + group + " AND sgnl_rec.rec_type_id = sgnl_rec_type.rec_type_id AND rec_type_code='E'");
+		/* TODO: rec_code_type usage
+		Object[] columns = {"sgnl_id", "sgnl_rec.rec_type_id"};  
+		Object[][] conditions = {{"epics_grp_id", "sgnl_rec.rec_type_id", "rec_type_code"},
+                {group,            "sgnl_rec_type.rec_type_id", "E"}};
+		ResultSet set = loadRows("sgnl_rec, sgnl_rec_type", columns, conditions);
+        */
+
+		Object[] columns = {"sgnl_id", "rec_type_id"};  
+		Object[][] conditions = {{"epics_grp_id"}, {group}};
+		
+		ResultSet set = helper.loadRows("sgnl_rec", columns, conditions);
         
         while (set.next()) {
     		DBRecordData record = new DBRecordData();
@@ -281,6 +152,8 @@ public class Rdb {
 	}
 
 	private void loadTemplates(DBData data, String group) throws SQLException {
+		// Currently disabled.
+		/*
 		Object[] columns = {"expand_id", "template_id"};  
 		ResultSet set = loadRows("expand", columns, "");
         while (set.next()) {
@@ -288,13 +161,16 @@ public class Rdb {
     			new DBTemplateInstance(set.getString(2), set.getString(1));
     		data.addTemplateInstance(templateInstance);
         }
+        */
 	}
 	
 	private DBRecordData loadRecord(DBRecordData record) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement(
-        		"SELECT fld_id, ext_val FROM sgnl_fld WHERE sgnl_id=?");
-        statement.setString(1, record.getName());
-        ResultSet set = statement.executeQuery();
+        
+		Object[] columns = {"fld_id", "ext_val"};  
+		Object[][] conditions = {{"sgnl_id"},
+                {record.getName()}};
+		
+		ResultSet set = helper.loadRows("sgnl_fld", columns, conditions);
         while (set.next()) {
         	// value in DBFieldData can be null, in this case it will be set to default.
         	record.addField(new DBFieldData(set.getString(1), set.getString(2)));
@@ -309,34 +185,29 @@ public class Rdb {
 			DBDRecordData recordDef = new DBDRecordData();
 			recordDef.setName(name);
 			
-	        PreparedStatement statement = connection.prepareStatement("SELECT"
-	        		+ " fld_id, fld_prmt_grp, fld_type_id, fld_init, fld_desc, fld_base, fld_size, sgnl_fld_menu_id"
-	        		+ " FROM sgnl_fld_def WHERE rec_type_id=? ORDER BY prmpt_ord");
-	        statement.setString(1, name);
-	        ResultSet set = statement.executeQuery();
+			Object[] columns = {"fld_id", "fld_prmt_grp", "fld_type_id", "fld_init", "fld_desc", "fld_base", "fld_size", "sgnl_fld_menu_id"};
+			Object[][] conditions = {{"rec_type_id"}, {name}};
+			
+			
+			ResultSet set = helper.loadRows("sgnl_fld_def", columns, conditions, "prmpt_ord");
 	        while (set.next()) {
 	        	DBDFieldData fieldDef = new DBDFieldData();
 
-	        	String fieldName = set.getString(1);
-	        	int guiType = DBDResolver.getGUIType(set.getString(2));
-	        	int type = DBDResolver.getFieldType(set.getString(3));
-	        	String initValue = set.getString(4);
-	        	String promptValue = set.getString(5);
-	        	int baseType = DBDResolver.getGUIType(set.getString(6));
-	        	int sizeValue = set.getInt(7);
-	        	String menuName = set.getString(8);
+	        	fieldDef.setName(set.getString(1));
+	        	fieldDef.setGUI_type(DBDResolver.getGUIType(set.getString(2)));
+	        	fieldDef.setField_type(DBDResolver.getFieldType(set.getString(3)));
 	        	
-	        	fieldDef.setName(fieldName);
-	        	fieldDef.setGUI_type(guiType);
-	        	fieldDef.setField_type(type);
+	        	String initValue = set.getString(4);
 	        	if (initValue != null) {
 	        	    fieldDef.setInit_value(initValue);
 	        	}
+	        	String promptValue = set.getString(5);
 	        	if (promptValue != null) {
 	        	    fieldDef.setPrompt_value(promptValue);
 	        	}
-	        	fieldDef.setBase_type(baseType);
-	        	fieldDef.setSize_value(sizeValue);
+	        	fieldDef.setBase_type(DBDResolver.getGUIType(set.getString(6)));
+	        	fieldDef.setSize_value(set.getInt(7));
+	        	String menuName = set.getString(8);
 	        	if (menuName != null) {
 	        	    fieldDef.setMenu_name(menuName);
 	        	    loadMenuOrDeviceDef(menuName);
@@ -349,7 +220,7 @@ public class Rdb {
 	}
 
 	private void loadMenuOrDeviceDef(String name) throws SQLException {
-		if (name.endsWith("DTYP")) {
+		if (name.endsWith(dtypString)) {
 			loadDeviceDef(name);
 		} else {
 			loadMenuDef(name);
@@ -362,11 +233,11 @@ public class Rdb {
 		if (definitions.getDBDMenuData(name) == null) {
 			DBDMenuData menuDef = new DBDMenuData();
 			menuDef.setName(name);
+
+			Object[] columns = {"fld_menu_val"};
+			Object[][] conditions = {{"sgnl_fld_menu_id"}, {name}};
 			
-	        PreparedStatement statement = connection.prepareStatement(
-	        		"SELECT fld_menu_val FROM sgnl_fld_menu WHERE sgnl_fld_menu_id=?");
-	        statement.setString(1, name);
-	        ResultSet set = statement.executeQuery();
+			ResultSet set = helper.loadRows("sgnl_fld_menu", columns, conditions);
 	        while (set.next()) {
 	        	String value = set.getString(1);
 	        	menuDef.addMenuChoice(value, value);
@@ -376,14 +247,15 @@ public class Rdb {
 	}
 
 	private void loadDeviceDef(String name) throws SQLException {
-		String recordName = name.substring(0, name.lastIndexOf("DTYP"));
+		String recordName = name.substring(0, name.lastIndexOf(dtypString));
 		
 		DBDData definitions = DataProvider.getInstance().getDbdDB();
 		if (definitions.getDBDDeviceData(recordName) == null) {
-	        PreparedStatement statement = connection.prepareStatement(
-	        		"SELECT fld_menu_val FROM sgnl_fld_menu WHERE sgnl_fld_menu_id=?");
-	        statement.setString(1, name);
-	        ResultSet set = statement.executeQuery();
+			
+			Object[] columns = {"fld_menu_val"};  
+			Object[][] conditions = {{"sgnl_fld_menu_id"}, {name}};
+			
+			ResultSet set = helper.loadRows("sgnl_fld_menu", columns, conditions);
 	        while (set.next()) {
 	        	DBDDeviceData deviceDef = new DBDDeviceData();
 				deviceDef.setRecord_type(recordName);
@@ -396,6 +268,8 @@ public class Rdb {
 	
 	private void saveDataDef() throws SQLException {
 		saveMenusDef();
+		saveDevicesDef();
+		saveRecordsDef();
 	}
 
 	private void saveMenusDef() throws SQLException{
@@ -415,80 +289,93 @@ public class Rdb {
 			while (menuChoices.hasNext()) {
 				menuChoice = (String)menuChoices.next();
 
-				Object[][] keyPairs = {{"sgnl_fld_menu_id"}, {menuName}};
-				Object[][] valuePairs = {{"sgnl_fld_menu_id", "fld_menu_val"},
-    					      {menuName,           menuChoice}};
-    			saveRow("sgnl_fld_menu", keyPairs, valuePairs);
+				Object[][] keyPairs = {{"sgnl_fld_menu_id", "fld_menu_val"},
+					      {menuName,           menuChoice}};
+				Object[][] valuePairs = {{}, {}};
+				helper.saveRow("sgnl_fld_menu", keyPairs, valuePairs);
 			}
 		}
 	}
 
-	private void saveRecordsDef() throws SQLException{
+	private void saveDevicesDef() throws SQLException{
+
+		DBDData definitions = DataProvider.getInstance().getDbdDB();
+		Iterator devices = definitions.getDevices().values().iterator();
+		DBDDeviceData device = null;
+		String recordType = null;
+		String menuName = null;
+		String choice = null;
+		
+		while (devices.hasNext()) {
+			device = (DBDDeviceData)devices.next();
+			recordType = device.getRecord_type();
+			menuName = recordType + dtypString;
+			choice = device.getChoice_string();
+			
+			Object[][] menuKeys = {{"sgnl_fld_menu_id", "fld_menu_val"},
+					{menuName,           choice}};
+			Object[][] menuValues = {{}, {}};
+			helper.saveRow("sgnl_fld_menu", menuKeys, menuValues);
+		}
+	}
+	
+	private void saveRecordsDef() throws SQLException {
 		DBDData definitions = DataProvider.getInstance().getDbdDB();
 		Enumeration recordNames = definitions.getRecordNames();
 		DBDRecordData record = null;
 		String recordName = null;
-		Iterator fields = null;
-		DBDFieldData field = null;
 		
 		while (recordNames.hasMoreElements()) {
 			recordName = (String)recordNames.nextElement();
 
-			Object[][] keyPairs = {{"rec_type_id"}, {recordName}};
-			Object[][] valuePairs = {{"rec_type_id", "type_desc"},
-    					             {recordName,     recordDefDescription}};
-   			saveRow("sgnl_rec_type", keyPairs, valuePairs);
+			Object[][] keyPairs = {{"rec_type_id"},
+		             {recordName}};
+			Object[][] valuePairs = {{"rec_type_code", "type_desc"},
+		             {"E", recordDefDescription}};
+			helper.saveRow("sgnl_rec_type", keyPairs, valuePairs);
 
    			record = definitions.getDBDRecordData(recordName);
-   			fields = record.getFieldsV().iterator();
-   			while (fields.hasNext()) {
-   				field = (DBDFieldData)fields.next();
-   				
-   				
-   			}
-		
+   			saveFieldsDef(record);
 		}
 	}
 
-	private void saveFieldsDef(DBDRecordData record) throws SQLException{
+	private void saveFieldsDef(DBDRecordData record) throws SQLException {
 
-		/*
-table:
-sgnl_fld_def
-
-getName->fld_id
-type(from recdef)->rec_type_id
-getGuiTypeString(getGUI_Type)->fld_prmt_grp
-getFieldTypeString(getFieldType)->fld_type_id
-getInitValue->fld_init
-getProptValue->fld_desc
-getBaseValue->fld_base
-getSizeValue->fld_size
-		 */
-		
 		Iterator fields = record.getFieldsV().iterator();
 		DBDFieldData field = null;
 		String recordName = record.getName();
 		String fieldName = null;
+		int fieldType = DBDConstants.NOT_DEFINED;
+		String menuName = null;
 		
 		while (fields.hasNext()) {
 			field = (DBDFieldData)fields.next();
 			fieldName = field.getName();
 			
+			fieldType = field.getField_type();
+			menuName = fieldType == DBDConstants.DBF_DEVICE
+				? recordName + dtypString : field.getMenu_name();
+			
 			Object[][] keyPairs = {{"rec_type_id",   "fld_id"},
 					{recordName, fieldName}};
-			Object[][] valuePairs = {{"rec_type_id", "fld_id", "fld_prmt_grp", "fld_type_id", "fld_init", "fld_desc", "fld_base", "fld_size"},
-					{recordName,
-				fieldName,
+			Object[][] valuePairs = {{"fld_prmt_grp", "fld_type_id", "fld_init", "fld_desc", "fld_base", "fld_size", "sgnl_fld_menu_id"},
+					{
 				DBDResolver.getGUIString(field.getGUI_type()),
-				DBDResolver.getFieldType(field.getField_type()),
+				DBDResolver.getFieldType(fieldType),
 				field.getInit_value(),
 				field.getPrompt_value(),
 				DBDResolver.getBaseType(field.getBase_type()),
-				String.valueOf(field.getSize_value())}
+				String.valueOf(field.getSize_value()),
+			    menuName}
 			};
-			saveRow("sgnl_fld_def", keyPairs, valuePairs);
+			helper.saveRow("sgnl_fld_def", keyPairs, valuePairs);
 		}
+	}
+
+	private void saveGroup(String name) throws SQLException {
+		Object[][] keyPairs = {{"epics_grp_id"}, {name}};
+		Object[][] valuePairs = {{"ioc_dvc_id"}, {iocDeviceIdString}};
+		helper.saveRow("epics_grp", keyPairs, valuePairs);
 	}
 	
 	private void saveRecords() throws SQLException {
@@ -504,7 +391,6 @@ getSizeValue->fld_size
         Iterator iterator = Group.getRoot().getStructure().iterator();
 
 		VDBRecordData recordData = null;
-		VDBTemplateInstance template = null;
 		String name = null;
         
         while (iterator.hasNext()) {
@@ -516,13 +402,15 @@ getSizeValue->fld_size
         		
         		if (!name.startsWith(Constants.CLIPBOARD_NAME)) {
         			Object[][] keyPairs = {{"sgnl_id"}, {name}};
-        			Object[][] valuePairs = {{"sgnl_id", "epics_grp_id", "rec_type_id"},
-        					                 {name,      group,          recordData.getType()}};
-        			saveRow("sgnl_rec", keyPairs, valuePairs);
+        			Object[][] valuePairs = {{"epics_grp_id", "rec_type_id"},
+        					                 {helper.getGroup(),          recordData.getType()}};
+        			helper.saveRow("sgnl_rec", keyPairs, valuePairs);
             		saveFields(recordData);
         		}
         	} else if (object instanceof Template) {
-        		template = ((Template)object).getTemplateData();
+        		// Not implemented yet.
+        		/*
+        		VDBTemplateInstance template = ((Template)object).getTemplateData();
 
         		name = template.getName();
 
@@ -532,27 +420,20 @@ getSizeValue->fld_size
         					                 {name,        template.getTemplate().getId()}};
         			saveRow("export", keyPairs, valuePairs);
         		}
+        		*/
         	}
         }
 	}
 	
 	private void saveFields(VDBRecordData recordData) throws SQLException {
 		
-		PreparedStatement statement = connection.prepareStatement(
-        		"SELECT fld_id FROM sgnl_fld WHERE sgnl_id=? AND rec_type_id=?");
-        statement.setString(1, recordData.getName());
-        statement.setString(2, recordData.getType());
-
-        ResultSet set = statement.executeQuery();
-        HashSet rdbFields = new HashSet();
-        while (set.next()) {
-        	rdbFields.add(set.getString(1));
-        }
-		
         Iterator iterator = recordData.getFieldsV().iterator();
         VDBFieldData fieldData = null;
         String name = null;
         String value = null;
+        String recordName = recordData.getName();
+        String recordType = recordData.getType();
+		String table = "sgnl_fld";
         
         while (iterator.hasNext()) {
         	fieldData = (VDBFieldData)iterator.next();
@@ -560,32 +441,15 @@ getSizeValue->fld_size
         	name = fieldData.getName();
         	value = StringUtils.removeQuotes(fieldData.getValue());
         	
+        	Object[][] keyPairs = {{"sgnl_id",  "fld_id", "rec_type_id"},
+                				   {recordName, name,     recordType}};
+			Object[][] valuePairs = {{"ext_val"},
+					                 {value}};
+			
         	if (fieldData.hasDefaultValue() || value.equals(emptyString)) {
-        		if (rdbFields.contains(name)) {
-        			statement = connection.prepareStatement("DELETE FROM sgnl_fld"
-        					+ " WHERE sgnl_id=? AND fld_id=? AND rec_type_id=?");
-        			statement.setString(1, recordData.getName());
-        			statement.setString(2, name);
-        			statement.setString(3, recordData.getType());
-            		statement.executeUpdate();
-        		}
-        	} else { 
-        		if (rdbFields.contains(name)) {
-        			statement = connection.prepareStatement("UPDATE sgnl_fld SET ext_val=?"
-        					+ " WHERE sgnl_id=? AND fld_id=? AND rec_type_id=?");
-        			statement.setString(1, value);
-        			statement.setString(2, recordData.getName());
-        			statement.setString(3, name);
-        			statement.setString(4, recordData.getType());
-        		} else {
-        			statement = connection.prepareStatement("INSERT INTO sgnl_fld"
-        					+ " (sgnl_id, fld_id, rec_type_id, ext_val) VALUES (?,?,?,?)");
-        			statement.setString(1, recordData.getName());
-        			statement.setString(2, name);
-        			statement.setString(3, recordData.getType());
-        			statement.setString(4, value);
-        		}
-        		statement.executeUpdate();
+        		helper.deleteRow(table, keyPairs);
+        	} else {
+        		helper.saveRow(table, keyPairs, valuePairs);
             }
         }
 	}

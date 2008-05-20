@@ -134,7 +134,7 @@ public int getGUI_type() {
  * @return java.lang.String
  */
 public java.lang.String getHelp() {
-	return dbdData.getPrompt_value();
+	return dbdData != null ? dbdData.getPrompt_value() : null;
 }
 /**
  * Insert the method's description here.
@@ -174,8 +174,8 @@ public VDBRecordData getRecord() {
  * @return java.lang.String[]
  */
 public java.lang.String[] getSelectableValues() {
-	if ((dbdData.getField_type() == DBDConstants.DBF_MENU) ||
-		(dbdData.getField_type() == DBDConstants.DBF_DEVICE)) {
+	if (dbdData != null && ((dbdData.getField_type() == DBDConstants.DBF_MENU) ||
+		(dbdData.getField_type() == DBDConstants.DBF_DEVICE))) {
 
 			DBDData dbd = DataProvider.getInstance().getDbdDB();
 			Vector values = new Vector();
@@ -255,8 +255,8 @@ public java.lang.String getValue() {
  */
 public String getInitValue()
 {
-	if ((dbdData.getField_type()==DBDConstants.DBF_INLINK) ||
-		(dbdData.getField_type()==DBDConstants.DBF_OUTLINK))
+	if (dbdData != null && ((dbdData.getField_type()==DBDConstants.DBF_INLINK) ||
+		(dbdData.getField_type()==DBDConstants.DBF_OUTLINK)))
 	{
 		// if not software
 		String linkType = record.getDTYPLinkType();
@@ -274,21 +274,24 @@ public String getInitValue()
  * @return boolean
  */
 public boolean hasDefaultValue() {
-	if (dbdData.getField_type()==DBDConstants.DBF_MENU ||
-		dbdData.getField_type()==DBDConstants.DBF_DEVICE)
-	{
-		// if initial value is pecified, than it is explicity written
-		if ((value.equals(com.cosylab.vdct.Constants.NONE) && dbdData.getInit_value().length()==0) ||
-			(dbdData.getInit_value().length()>0 &&
-			 value.equals(dbdData.getInit_value()+com.cosylab.vdct.Constants.MENU_DEFAULT_VALUE_INDICATOR))) 
-			return true;
-		else
+	if (dbdData != null) {
+		if (dbdData.getField_type()==DBDConstants.DBF_MENU ||
+				dbdData.getField_type()==DBDConstants.DBF_DEVICE) {
+			// if initial value is pecified, than it is explicity written
+			if ((value.equals(com.cosylab.vdct.Constants.NONE) && dbdData.getInit_value().length()==0) ||
+					(dbdData.getInit_value().length()>0 &&
+							value.equals(dbdData.getInit_value()+com.cosylab.vdct.Constants.MENU_DEFAULT_VALUE_INDICATOR))) 
+				return true;
+			else
+				return false;
+		}
+		else if (!value.equals(dbdData.getInit_value()))
 			return false;
+		else 
+			return true;
 	}
-	else if (!value.equals(dbdData.getInit_value()))
-		return false;
 	else 
-		return true;
+		return false;
 
 }
 /**
@@ -439,21 +442,24 @@ public void setValueSilently(java.lang.String newValue) {
  */
 public String getToolTipText()
 {
-	String type = DBDResolver.getFieldType(dbdData.getField_type());
-	
-	if ((dbdData.getField_type()==DBDConstants.DBF_INLINK) ||
-		(dbdData.getField_type()==DBDConstants.DBF_OUTLINK))
-	{
-		// if not software
-		String linkType = record.getDTYPLinkType();
-		if (linkType!=null)
+	String type = null;
+	if (dbdData != null) {
+
+		type = DBDResolver.getFieldType(dbdData.getField_type());
+
+		if ((dbdData.getField_type()==DBDConstants.DBF_INLINK) ||
+				(dbdData.getField_type()==DBDConstants.DBF_OUTLINK))
 		{
-			Pattern pattern = DataProvider.getInstance().getEditPatternLinkType(linkType);
-			if (pattern!=null)
-				type = type+" ["+DataProvider.getInstance().getEditDescriptionLinkType(linkType)+"]";
+			// if not software
+			String linkType = record.getDTYPLinkType();
+			if (linkType!=null)
+			{
+				Pattern pattern = DataProvider.getInstance().getEditPatternLinkType(linkType);
+				if (pattern!=null)
+					type = type+" ["+DataProvider.getInstance().getEditDescriptionLinkType(linkType)+"]";
+			}
 		}
 	}
-	
 	return type;
 }
  
@@ -588,8 +594,8 @@ public Integer getGuiGroup() {
 
 private Pattern getPattern()
 {
-	if ((dbdData.getField_type()==DBDConstants.DBF_INLINK) ||
-		(dbdData.getField_type()==DBDConstants.DBF_OUTLINK))
+	if ((dbdData != null) && ((dbdData.getField_type()==DBDConstants.DBF_INLINK) ||
+		(dbdData.getField_type()==DBDConstants.DBF_OUTLINK)))
 	{
 		// if not software
 		String linkType = record.getDTYPLinkType();
