@@ -28,7 +28,9 @@ package com.cosylab.vdct.graphics;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.io.*;
+import java.awt.Frame;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Insert the type's description here.
@@ -102,9 +104,9 @@ void importBorder(File file) throws IOException;
  */
 void importDBD(File file) throws IOException;
 
-void importIrmisDbGroup();
+void importIrmisDbGroup(Frame guiContext);
 
-void saveIrmisDbGroup();
+void saveIrmisDbGroup(Frame guiContext);
 
 /**
  * Insert the method's description here.

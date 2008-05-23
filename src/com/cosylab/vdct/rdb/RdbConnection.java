@@ -26,7 +26,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.cosylab.vdct.irmis;
+package com.cosylab.vdct.rdb;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -34,90 +34,57 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import com.cosylab.vdct.Console;
-
 /**
  * @author ssah
  *
  */
-public class SqlHelper {
+public class RdbConnection {
 
 	private String user = null;
 	private String password = null;
 	private String host = null;
-	private String group = null;
 	private String database = null;
 	private Connection connection = null;
 	
-	private static SqlHelper sqlHelper = null;
-	
-	private static final String defaultUser = "user";
-	private static final String defaultPassword = "password";
-	private static final String defaultHost = "localhost";
-	private static final String defaultGroup = "Group";
-	private static final String defaultDatabase = "epics";
-
-	public static SqlHelper getInstance() throws Exception {
-		if (sqlHelper == null) {
-			sqlHelper = new SqlHelper();
-		}
-		return sqlHelper;
+	public RdbConnection() throws Exception {
+		Class.forName("com.mysql.jdbc.Driver").newInstance();
 	}
 	
-	private SqlHelper() throws Exception {
-		Class.forName("com.mysql.jdbc.Driver").newInstance();
-		user = defaultUser;
-		password = defaultPassword;
-		host = defaultHost;
-		group = defaultGroup;
-		database = defaultDatabase;
-		
-		// TODO:REM
-		user = "testuser";
-		group = "AirC";
+	public void setParameters(String host, String database, String user, String password) {
+		this.host = host;
+		this.database = database;
+		this.user = user;
+		this.password = password;
 	}
 	
 	public boolean isConnection() {
 		return connection != null;
 	}
 	
-	public String getGroup() {
-		return group;
-	}
-	
 	public void commit() throws SQLException {
 		connection.commit();
 	}
 	
-	public void displayExceptionMessage(String message, SQLException exception) {
-	    Console.getInstance().println(message);
-	    Console.getInstance().println("SQLException: " + exception.getMessage());
-	    Console.getInstance().println("SQLState: " + exception.getSQLState());
-	    Console.getInstance().println("VendorError: " + exception.getErrorCode());
-	    exception.printStackTrace();
-	}
-	
-	public void createConnection() {
+	public Connection createConnection() throws SQLException {
 		connection = null;
-		try {
-			String connectionString = "jdbc:mysql://" + host + "/" + database
-			        + "?user=" + user + "&password=" + password;
-			connection = DriverManager.getConnection(connectionString);
-			connection.setAutoCommit(false);
-		} catch (SQLException exception) {
-			displayExceptionMessage("Error creating connection!", exception);
-		}
+		String connectionString = "jdbc:mysql://" + host + "/" + database
+		+ "?user=" + user + "&password=" + password;
+
+		connection = DriverManager.getConnection(connectionString);
+		connection.setAutoCommit(false);
+		return connection;
 	}
 
-	public void closeConnection(boolean rollback) {
-		try {
-			if (rollback) {
-			    connection.rollback();
-			}
-			connection.close();
-		} catch (SQLException exception) {
-			displayExceptionMessage("Error closing connection!", exception);
-		}
+	public Connection getConnection() {
+		return connection;
+	}
+	
+	public void rollbackConnection() throws SQLException {
+		connection.rollback();
+	}
+	
+	public void closeConnection() throws SQLException {
+		connection.close();
 	}
 	
 	private String getList(Object[] elements) {

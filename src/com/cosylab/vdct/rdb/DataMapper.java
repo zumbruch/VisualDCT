@@ -26,8 +26,9 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.cosylab.vdct.irmis;
+package com.cosylab.vdct.rdb;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Enumeration;
@@ -57,71 +58,89 @@ import com.cosylab.vdct.vdb.VDBRecordData;
  * @author ssah
  *
  */
-public class Rdb {
+public class DataMapper {
 
-	private static Rdb rdb = null;
-	private SqlHelper helper = null;
+	private RdbConnection helper = null;
+	
+	private String group = null; 
 	
 	private static final String emptyString = "";
 	private static final String recordDefDescription = "Saved by VDCT";
 	private static final String iocDeviceIdString = "Unknown device";
 	private static final String dtypString = "DTYP";
+
+	public DataMapper() throws Exception {
+		helper = new RdbConnection();
+	}
 	
-	public static Rdb getInstance() throws Exception {
-		if (rdb == null) {
-			rdb = new Rdb();
-		}
-		return rdb;
+	public void setConnectionParameters(String host, String database, String user, String password) {
+		helper.setParameters(host, database, user, password);
 	}
 
-	public DBData loadDbGroup() {
+	public DBData loadDbGroup(String group) throws Exception {
 
-		DBData data = null;
-		helper.createConnection();
-		
+		this.group = group;
+		if (!helper.isConnection()) {
+		    helper.createConnection();
+		}
 		if (!helper.isConnection()) {
 			return null;
 		}
-		String group = helper.getGroup();
 		
+		DBData data = null;
+		Exception exception = null;
 		try {
 			data = new DBData(group, group);
 			loadRecords(data, group);
 			loadTemplates(data, group);			
 			
 			helper.commit();
-		} catch (SQLException exception) {
-			helper.displayExceptionMessage("Error while loading database!", exception);
-		} finally {
-			helper.closeConnection(false);
-	    }
+		} catch (SQLException sqlException) {
+			exception = new Exception("Error while loading database: " + sqlException.getMessage());
+		}
+		
+		if (exception != null) {
+			throw exception;
+		}
 		return data;
 	}
 	
-	public void saveDbGroup() {
+	public void saveDbGroup(String group) throws Exception {
 		
-		helper.createConnection();
+		this.group = group;
+		if (!helper.isConnection()) {
+		    helper.createConnection();
+		}
 		if (!helper.isConnection()) {
 			return;
 		}
-		String group = helper.getGroup();
-		
-		boolean rollback = false;
+
+		Exception exception = null;
 		try {
 			saveDataDef();
 			saveGroup(group);			
             saveRecords();
             helper.commit();
-		} catch (SQLException exception) {
-			helper.displayExceptionMessage("Error while saving database!", exception);
-			rollback = true;
-		} finally {
-			helper.closeConnection(rollback);
+		} catch (SQLException sqlException) {
+			exception = new Exception("Error while saving database: " + sqlException.getMessage());
+			helper.rollbackConnection();
+		}
+		
+		if (exception != null) {
+			throw exception;
 		}
 	}
 	
-	private Rdb() throws Exception {
-		helper = SqlHelper.getInstance();
+	public Connection createNewConnection() throws SQLException {
+		return helper.createConnection();
+	}
+
+	public boolean isConnection() {
+		return helper.isConnection();
+	}
+	
+	public void closeConnection() throws SQLException {
+		helper.closeConnection();
 	}
 	
 	private void loadRecords(DBData data, String group) throws SQLException {
@@ -403,7 +422,7 @@ public class Rdb {
         		if (!name.startsWith(Constants.CLIPBOARD_NAME)) {
         			Object[][] keyPairs = {{"sgnl_id"}, {name}};
         			Object[][] valuePairs = {{"epics_grp_id", "rec_type_id"},
-        					                 {helper.getGroup(),          recordData.getType()}};
+        					                 {group,          recordData.getType()}};
         			helper.saveRow("sgnl_rec", keyPairs, valuePairs);
             		saveFields(recordData);
         		}

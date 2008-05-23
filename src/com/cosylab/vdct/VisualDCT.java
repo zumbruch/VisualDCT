@@ -109,6 +109,7 @@ import com.cosylab.vdct.graphics.printing.Page;
 import com.cosylab.vdct.graphics.printing.PrintPreview;
 import com.cosylab.vdct.inspector.SpreadsheetInspector;
 import com.cosylab.vdct.plugin.config.PluginNameConfigManager;
+import com.cosylab.vdct.rdb.Rdb;
 import com.cosylab.vdct.util.ComboBoxFileChooser;
 import com.cosylab.vdct.util.DBDEntry;
 import com.cosylab.vdct.util.UniversalFileFilter;
@@ -258,6 +259,7 @@ public class VisualDCT extends JFrame {
 	private com.cosylab.vdct.plugin.debug.DebugStartMenu ivjStartDebugMenuItem = null;
 	private com.cosylab.vdct.plugin.debug.DebugStopMenuItem ivjStopDebugMenuItem = null;
 	private JMenu irmisMenu = null;
+	private JMenuItem irmisConnectMenuItem = null;
 	private JMenuItem irmisLoadMenuItem = null;
 	private JMenuItem irmisSaveMenuItem = null;
 	
@@ -2521,6 +2523,7 @@ private JMenu getIrmisMenu() {
 			irmisMenu.setName("IrmisMenu");
 			irmisMenu.setMnemonic('I');
 			irmisMenu.setText("IRMIS");
+			irmisMenu.add(getIrmisConnectMenuItem());
 			irmisMenu.add(getIrmisLoadMenuItem());
 			irmisMenu.add(getIrmisSaveMenuItem());
 		} catch (Throwable ivjExc) {
@@ -2528,6 +2531,26 @@ private JMenu getIrmisMenu() {
 		}
 	}
 	return irmisMenu;
+}
+
+private JMenuItem getIrmisConnectMenuItem() {
+	if (irmisConnectMenuItem == null) {
+		try {
+			irmisConnectMenuItem = new JMenuItem();
+			irmisConnectMenuItem.setName("Connect");
+			irmisConnectMenuItem.setMnemonic('C');
+			irmisConnectMenuItem.setText("Connect");
+			
+			irmisConnectMenuItem.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					Rdb.getInstance().getRdbInterface().connect(VisualDCT.getInstance());
+				}
+			});
+		} catch (Throwable ivjExc) {
+			handleException(ivjExc);
+		}
+	}
+	return irmisConnectMenuItem;
 }
 
 private JMenuItem getIrmisLoadMenuItem() {
@@ -2540,8 +2563,8 @@ private JMenuItem getIrmisLoadMenuItem() {
 			
 			irmisLoadMenuItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-				    GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
-		  		 	cmd.getGUIMenuInterface().importIrmisDbGroup();
+					GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
+					cmd.getGUIMenuInterface().importIrmisDbGroup(VisualDCT.getInstance());
 				}
 			});
 		} catch (Throwable ivjExc) {
@@ -2562,7 +2585,7 @@ private JMenuItem getIrmisSaveMenuItem() {
 			irmisSaveMenuItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 				    GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
-		  		 	cmd.getGUIMenuInterface().saveIrmisDbGroup();
+		  		 	cmd.getGUIMenuInterface().saveIrmisDbGroup(VisualDCT.getInstance());
 				}
 			});
 		} catch (Throwable ivjExc) {
@@ -2571,12 +2594,6 @@ private JMenuItem getIrmisSaveMenuItem() {
 	}
 	return irmisSaveMenuItem;
 }
-
-/*
-private JMenu iRMISMenu = null;
-private JMenuItem iRMISMenuItem = null;
-*/
-
 
 /**
  * Return the DeleteMenuItem property value.
@@ -6159,6 +6176,9 @@ public static void main(final java.lang.String[] args) {
 
 		/* Plugins */
 		com.cosylab.vdct.plugin.PluginManager.getInstance().checkAutoStartPlugins();
+		
+		/* Load xml settings. */
+		XmlSettings.getInstance();
 	
 		System.out.println();
 			
@@ -6206,6 +6226,8 @@ public static void main(final java.lang.String[] args) {
 
 			public void windowClosed(java.awt.event.WindowEvent e) {
 				Settings.getInstance().save();
+				XmlSettings.getInstance().save();
+				
 				com.cosylab.vdct.plugin.PluginManager.getInstance().save();
 				com.cosylab.vdct.plugin.PluginManager.getInstance().destroyAllPlugins();
 				System.out.println();

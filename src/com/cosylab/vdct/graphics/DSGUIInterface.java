@@ -28,6 +28,7 @@ package com.cosylab.vdct.graphics;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.awt.Frame;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
@@ -46,7 +47,6 @@ import java.util.Vector;
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 
-import com.cosylab.vdct.Console;
 import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.DataProvider;
 import com.cosylab.vdct.Settings;
@@ -72,7 +72,6 @@ import com.cosylab.vdct.graphics.objects.Record;
 import com.cosylab.vdct.graphics.objects.Template;
 import com.cosylab.vdct.graphics.objects.TextBox;
 import com.cosylab.vdct.graphics.objects.VisibleObject;
-import com.cosylab.vdct.irmis.Rdb;
 import com.cosylab.vdct.plugin.config.PluginNameConfigManager;
 import com.cosylab.vdct.undo.ComposedAction;
 import com.cosylab.vdct.undo.CreateAction;
@@ -689,16 +688,12 @@ public void importDBD(java.io.File file) throws IOException {
 	drawingSurface.openDBD(file, true);
 }
 
-public void importIrmisDbGroup() {
-	drawingSurface.importIrmisDbGroup();
+public void importIrmisDbGroup(Frame guiContext) {
+	drawingSurface.importIrmisDbGroup(guiContext);
 }
 
-public void saveIrmisDbGroup() {
-	try {
-		Rdb.getInstance().saveDbGroup();
-	} catch (Exception exception) {
-		Console.getInstance().println(exception);
-	}
+public void saveIrmisDbGroup(Frame guiContext) {
+	drawingSurface.saveIrmisDbGroup(guiContext);
 }
 
 /**

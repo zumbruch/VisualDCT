@@ -33,6 +33,7 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -136,7 +137,7 @@ import com.cosylab.vdct.graphics.popup.Popupable;
 import com.cosylab.vdct.graphics.printing.Page;
 import com.cosylab.vdct.inspector.Inspectable;
 import com.cosylab.vdct.inspector.InspectorManager;
-import com.cosylab.vdct.irmis.Rdb;
+import com.cosylab.vdct.rdb.Rdb;
 import com.cosylab.vdct.undo.ActionObject;
 import com.cosylab.vdct.undo.ComposedAction;
 import com.cosylab.vdct.undo.CreateAction;
@@ -290,6 +291,8 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 	private Stack viewStack = null;	
 	private Stack templateStack = null;	
 	private Vector selectedConnectorsForMove = null;
+	
+	private String dbGroup = null;
 	
 /**
  * DrawingSurface constructor comment.
@@ -2227,7 +2230,7 @@ public boolean open(InputStream is, File file, boolean importDB, boolean importT
 		return false;
 }
 
-public boolean importIrmisDbGroup() {
+public boolean importIrmisDbGroup(Frame guiContext) {
 
 	DBData dbData = null;
 	boolean success = true;
@@ -2236,7 +2239,7 @@ public boolean importIrmisDbGroup() {
 		setCursor(hourCursor);
 		UndoManager.getInstance().setMonitor(false);
 
-		dbData = Rdb.getInstance().loadDbGroup();
+		dbData = Rdb.getInstance().getRdbInterface().loadDbGroup(guiContext);
 
 		// check for sucess
 		DBDData dbdData = DataProvider.getInstance().getDbdDB();
@@ -2246,6 +2249,8 @@ public boolean importIrmisDbGroup() {
 			restoreCursor();
 			return false;
 		}
+		
+		dbGroup = dbData.getTemplateData().getFileName();
 
 		// check is DTYP fields are defined before any DBF_INPUT/DBF_OUTPUT fields...
 		DBData.checkDTYPfield(dbData, dbdData);
@@ -2306,6 +2311,14 @@ public boolean importIrmisDbGroup() {
 		System.gc();
 	}
 	return success;
+}
+
+public void saveIrmisDbGroup(Frame guiContext) {
+	try {
+		Rdb.getInstance().getRdbInterface().saveDbGroup(dbGroup, guiContext);
+	} catch (Exception exception) {
+		Console.getInstance().println(exception);
+	}
 }
 
 /**
