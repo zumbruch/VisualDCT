@@ -29,7 +29,6 @@
 package com.cosylab.vdct.rdb;
 
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -38,9 +37,11 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
@@ -58,7 +59,7 @@ public class ConnectionDialog extends JDialog implements ActionListener {
 	private JTextField hostField = null;
 	private JTextField databaseField = null;
 	private JTextField userField = null;
-	private JTextField passwordField = null;
+	private JPasswordField passwordField = null;
 	
 	private static final String connectString = "Connect";
 	private static final String cancelString = "Cancel";
@@ -71,7 +72,7 @@ public class ConnectionDialog extends JDialog implements ActionListener {
 	/**
 	 * @param arg0
 	 */
-	public ConnectionDialog(Frame arg0, DataMapper mapper) {
+	public ConnectionDialog(JFrame arg0, DataMapper mapper) {
         super(arg0, true);
 
 		this.mapper = mapper;
@@ -81,13 +82,26 @@ public class ConnectionDialog extends JDialog implements ActionListener {
         createGUI();
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.awt.Component#setVisible(boolean)
+	 */
+	public void setVisible(boolean b) {
+		if (b) {
+			setLocationRelativeTo(getParent());			
+		}
+		// TODO Auto-generated method stub
+		super.setVisible(b);
+	}
+
+
+
 	/** This method is called from within the constructor to
      * initialize the form.
      */
     private void createGUI() {
 
 		JPanel contentPanel = new JPanel(new GridBagLayout());
-		contentPanel.setPreferredSize(new Dimension(448, 384));
+		contentPanel.setPreferredSize(new Dimension(448, 128));
 
     	JPanel connectionPannel = createConnectionPanel();
 		GridBagConstraints constraints = new GridBagConstraints();
@@ -98,7 +112,7 @@ public class ConnectionDialog extends JDialog implements ActionListener {
 
     	JPanel buttonPanel = createButtonPanel();
 		constraints = new GridBagConstraints();
-		constraints.gridy = 2;
+		constraints.gridy = 1;
 		constraints.weightx = 1.0;
 		constraints.fill = GridBagConstraints.HORIZONTAL;
 		constraints.insets = new Insets(4, 4, 4, 4);
@@ -117,71 +131,68 @@ public class ConnectionDialog extends JDialog implements ActionListener {
     	GridBagConstraints constraints = new GridBagConstraints();
 		constraints.weightx = .0;
 		constraints.fill = GridBagConstraints.HORIZONTAL;
-		constraints.insets = new Insets(0, 4, 4, 4);
+		constraints.insets = new Insets(4, 4, 4, 4);
 		connectionPanel.add(hostLabel, constraints);
 
     	hostField = new JTextField();
         constraints = new GridBagConstraints();
 		constraints.gridx = 1;
-		constraints.weightx = 1.0;
+		constraints.weightx = .5;
 		constraints.fill = GridBagConstraints.HORIZONTAL;
-		constraints.insets = new Insets(0, 4, 4, 4);
+		constraints.insets = new Insets(4, 4, 4, 4);
 		connectionPanel.add(hostField, constraints);
 		
     	JLabel databaseLabel = new JLabel(databaseString);
     	constraints = new GridBagConstraints();
+		constraints.gridx = 2;
 		constraints.weightx = .0;
 		constraints.fill = GridBagConstraints.HORIZONTAL;
-		constraints.insets = new Insets(0, 4, 4, 4);
+		constraints.insets = new Insets(4, 4, 4, 4);
 		connectionPanel.add(databaseLabel, constraints);
 
     	databaseField = new JTextField();
         constraints = new GridBagConstraints();
-		constraints.gridx = 1;
-		constraints.weightx = 1.0;
+		constraints.gridx = 3;
+		constraints.weightx = .5;
 		constraints.fill = GridBagConstraints.HORIZONTAL;
-		constraints.insets = new Insets(0, 4, 4, 4);
+		constraints.insets = new Insets(4, 4, 4, 4);
 		connectionPanel.add(databaseField, constraints);
 		
     	JLabel userLabel = new JLabel(userString);
     	constraints = new GridBagConstraints();
+		constraints.gridy = 1;
 		constraints.weightx = .0;
 		constraints.fill = GridBagConstraints.HORIZONTAL;
-		constraints.insets = new Insets(0, 4, 4, 4);
+		constraints.insets = new Insets(4, 4, 4, 4);
 		connectionPanel.add(userLabel, constraints);
 
     	userField = new JTextField();
         constraints = new GridBagConstraints();
 		constraints.gridx = 1;
-		constraints.weightx = 1.0;
+		constraints.gridy = 1;
+		constraints.weightx = .5;
 		constraints.fill = GridBagConstraints.HORIZONTAL;
-		constraints.insets = new Insets(0, 4, 4, 4);
+		constraints.insets = new Insets(4, 4, 4, 4);
 		connectionPanel.add(userField, constraints);
 		
     	JLabel passwordLabel = new JLabel(passwordString);
     	constraints = new GridBagConstraints();
+		constraints.gridx = 2;
+		constraints.gridy = 1;
 		constraints.weightx = .0;
 		constraints.fill = GridBagConstraints.HORIZONTAL;
-		constraints.insets = new Insets(0, 4, 4, 4);
+		constraints.insets = new Insets(4, 4, 4, 4);
 		connectionPanel.add(passwordLabel, constraints);
 
-    	passwordField = new JTextField();
+    	passwordField = new JPasswordField();
         constraints = new GridBagConstraints();
-		constraints.gridx = 1;
-		constraints.weightx = 1.0;
+		constraints.gridx = 3;
+		constraints.gridy = 1;
+		constraints.weightx = .5;
 		constraints.fill = GridBagConstraints.HORIZONTAL;
-		constraints.insets = new Insets(0, 4, 4, 4);
+		constraints.insets = new Insets(4, 4, 4, 4);
 		connectionPanel.add(passwordField, constraints);
 		
-    	JButton connectButton = new JButton(connectString); 
-    	connectButton.setMnemonic('C');
-    	connectButton.addActionListener(this);
-		constraints = new GridBagConstraints();
-		constraints.weightx = .5;
-		constraints.anchor = GridBagConstraints.EAST;
-        constraints.insets = new Insets(4, 4, 4, 4);
-        connectionPanel.add(connectButton, constraints);
-        
         XmlSettings xmlSettings = XmlSettings.getInstance();
         hostField.setText(xmlSettings.getRdbHost());
         databaseField.setText(xmlSettings.getRdbDatabase());
@@ -226,6 +237,8 @@ public class ConnectionDialog extends JDialog implements ActionListener {
 				if (mapper.isConnection()) {
 					mapper.closeConnection();
 				}
+				mapper.setConnectionParameters(hostField.getText(), databaseField.getText(),
+						userField.getText(), String.valueOf(passwordField.getPassword()));
 				mapper.createNewConnection();
 				
 				saveSettings();
@@ -245,6 +258,6 @@ public class ConnectionDialog extends JDialog implements ActionListener {
         xmlSettings.setRdbHost(hostField.getText());
         xmlSettings.setRdbDatabase(databaseField.getText());
         xmlSettings.setRdbUser(userField.getText());
-        xmlSettings.setRdbPassword(passwordField.getText());
+        xmlSettings.setRdbPassword(String.valueOf(passwordField.getPassword()));
 	}
 }

@@ -28,78 +28,30 @@
 
 package com.cosylab.vdct.rdb;
 
-import java.awt.Frame;
-
-import com.cosylab.vdct.db.DBData;
+import javax.swing.JFrame;
 
 /**
  * @author ssah
  *
  */
-public class Irmis implements RdbInterface {
+public class RdbInstance {
 
-	private DataMapper mapper = null;
-	private ConnectionDialog dialog = null;
-
-	/**
-	 * 
-	 */
-	public Irmis() {
+	private static RdbInstance rdbInstance = null;
+	private Rdb rdb = null;
+	
+	public static RdbInstance getInstance(JFrame guiContext) {
+		if (rdbInstance == null) {
+			rdbInstance = new RdbInstance(guiContext);
+		}
+		return rdbInstance;
+	}
+	
+	public RdbInterface getRdbInterface() {
+		return rdb; 
+	}
+	
+	private RdbInstance(JFrame guiContext) {
 		super();
-		try {
-		    mapper = new DataMapper();
-		} catch (Exception exception) {
-			exception.printStackTrace();
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see com.cosylab.vdct.rdb.RdbInterface#connect(java.awt.Frame)
-	 */
-	public void connect(Frame guiContext) {
-		if (dialog == null) {
-			dialog = new ConnectionDialog(guiContext, mapper);
-		}
-		dialog.setVisible(true);
-	}
-
-	/* (non-Javadoc)
-	 * @see com.cosylab.vdct.rdb.RdbInterface#getDbGroupName()
-	 */
-	public String getDbGroupName(Frame guiContext) {
-		if (dialog == null) {
-			dialog = new ConnectionDialog(guiContext, mapper);
-		}
-		dialog.setVisible(true);
-		
-		// TODO:REPLACE
-		//return dialog.getGroupName();
-		return "AirC";
-	}
-
-	/* (non-Javadoc)
-	 * @see com.cosylab.vdct.rdb.RdbInterface#loadDbGroup(java.lang.String)
-	 */
-	public DBData loadDbGroup(Frame guiContext) {
-		if (dialog == null) {
-			dialog = new ConnectionDialog(guiContext, mapper);
-		}
-		//dialog.setSaveMode(false);
-		dialog.setVisible(true);
-		
-		// TODO:REPLACE
-		//return dialog.getData();
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.cosylab.vdct.rdb.RdbInterface#saveDbGroup(java.lang.String)
-	 */
-	public void saveDbGroup(String name, Frame guiContext) {
-		if (dialog == null) {
-			dialog = new ConnectionDialog(guiContext, mapper);
-		}
-		//dialog.setSaveMode(true);
-		dialog.setVisible(true);
+		rdb = new Rdb(guiContext);
 	}
 }

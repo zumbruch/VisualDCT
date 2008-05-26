@@ -1,10 +1,5 @@
 package com.cosylab.vdct.rdb.group;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.Vector;
-
 import javax.swing.JDialog;
 
 import com.cosylab.vdct.rdb.DataMapper;
@@ -15,7 +10,7 @@ import com.cosylab.vdct.rdb.DataMapper;
 
 public class group
 {
-    private SQLTableGUI gui = null;
+    //private SQLTableGUI gui = null;
 	
 	static public void usage ()
     {
@@ -29,6 +24,7 @@ public class group
     
     private void main (String args[], DataMapper mapper, JDialog guiContext)
     {
+        /*
         boolean use_tree = false;
         
         if (args.length > 0)
@@ -38,7 +34,6 @@ public class group
             else
                 usage();
         }
-
         Connection c = SQLHelper.create(mapper).getConnection();
 
         if (use_tree)
@@ -55,6 +50,7 @@ public class group
             headers.add(new String("Description"));
             headers.add(new String("IOC"));
             
+
             PreparedStatement select_all, select, update, insert, delete;
             try
             {
@@ -72,7 +68,7 @@ public class group
                     " VALUES (?,?,?)");
                 delete = c.prepareStatement(
                     "DELETE FROM epics_grp WHERE epics_grp_id=?");
-                
+                /*
                 SQLTableModel model =
                     new SQLTableModel101(headers,
                                          select_all,
@@ -80,11 +76,11 @@ public class group
                                          update,
                                          insert,
                                          delete);
-                gui = new SQLTableGUI();
-                gui.makeGUI(model, "EPICS Record Groups", guiContext);
+                //gui = new SQLTableGUI();
+                //gui.makeGUI(model, "EPICS Record Groups", guiContext);
                 //   gui.setColumnEditor(3, new MenuFieldEditor(
                 //    "SELECT dvc_id FROM ioc_dvc ORDER BY dvc_id"));
-                gui.execute();
+                //gui.execute();
             }
             catch (SQLException e)
             {
@@ -92,10 +88,7 @@ public class group
                 e.printStackTrace();
             }
         }
-    }
-    
-    public String getGroup() {
-    	return gui.getSelectedGroup();
+        */
     }
 };
 

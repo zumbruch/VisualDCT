@@ -28,8 +28,6 @@
 
 package com.cosylab.vdct.rdb;
 
-import java.awt.Frame;
-
 import com.cosylab.vdct.db.DBData;
 
 /**
@@ -38,9 +36,9 @@ import com.cosylab.vdct.db.DBData;
  */
 public interface RdbInterface {
 
-    public void connect(Frame guiContext);
+    public void connect();
 	
-	public DBData loadDbGroup(Frame guiContext);
-	
-	public void saveDbGroup(String name, Frame guiContext);
+	public DBData loadDbGroup();
+	public void saveDbGroup(String name);
+	public void saveAsDbGroup(String name);
 }

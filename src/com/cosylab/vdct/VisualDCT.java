@@ -109,7 +109,7 @@ import com.cosylab.vdct.graphics.printing.Page;
 import com.cosylab.vdct.graphics.printing.PrintPreview;
 import com.cosylab.vdct.inspector.SpreadsheetInspector;
 import com.cosylab.vdct.plugin.config.PluginNameConfigManager;
-import com.cosylab.vdct.rdb.Rdb;
+import com.cosylab.vdct.rdb.RdbInstance;
 import com.cosylab.vdct.util.ComboBoxFileChooser;
 import com.cosylab.vdct.util.DBDEntry;
 import com.cosylab.vdct.util.UniversalFileFilter;
@@ -258,10 +258,11 @@ public class VisualDCT extends JFrame {
 	private JMenu ivjDebugMenu = null;
 	private com.cosylab.vdct.plugin.debug.DebugStartMenu ivjStartDebugMenuItem = null;
 	private com.cosylab.vdct.plugin.debug.DebugStopMenuItem ivjStopDebugMenuItem = null;
-	private JMenu irmisMenu = null;
-	private JMenuItem irmisConnectMenuItem = null;
-	private JMenuItem irmisLoadMenuItem = null;
-	private JMenuItem irmisSaveMenuItem = null;
+	private JMenu rdbMenu = null;
+	private JMenuItem rdbConnectMenuItem = null;
+	private JMenuItem rdbLoadMenuItem = null;
+	private JMenuItem rdbSaveMenuItem = null;
+	private JMenuItem rdbSaveAsMenuItem = null;
 	
 	private DBDDialog dbdDialog = null;
 
@@ -2516,83 +2517,105 @@ private javax.swing.JMenu getDebugMenu() {
 	return ivjDebugMenu;
 }
 
-private JMenu getIrmisMenu() {
-	if (irmisMenu == null) {
+private JMenu getRdbMenu() {
+	if (rdbMenu == null) {
 		try {
-			irmisMenu = new JMenu();
-			irmisMenu.setName("IrmisMenu");
-			irmisMenu.setMnemonic('I');
-			irmisMenu.setText("IRMIS");
-			irmisMenu.add(getIrmisConnectMenuItem());
-			irmisMenu.add(getIrmisLoadMenuItem());
-			irmisMenu.add(getIrmisSaveMenuItem());
+			rdbMenu = new JMenu();
+			rdbMenu.setName("RdbMenu");
+			rdbMenu.setMnemonic('I');
+			rdbMenu.setText("Irmis");
+			rdbMenu.add(getRdbConnectMenuItem());
+			rdbMenu.add(getRdbLoadMenuItem());
+			rdbMenu.add(getRdbSaveMenuItem());
+			rdbMenu.add(getRdbSaveAsMenuItem());
 		} catch (Throwable ivjExc) {
 			handleException(ivjExc);
 		}
 	}
-	return irmisMenu;
+	return rdbMenu;
 }
 
-private JMenuItem getIrmisConnectMenuItem() {
-	if (irmisConnectMenuItem == null) {
+private JMenuItem getRdbConnectMenuItem() {
+	if (rdbConnectMenuItem == null) {
 		try {
-			irmisConnectMenuItem = new JMenuItem();
-			irmisConnectMenuItem.setName("Connect");
-			irmisConnectMenuItem.setMnemonic('C');
-			irmisConnectMenuItem.setText("Connect");
+			rdbConnectMenuItem = new JMenuItem();
+			rdbConnectMenuItem.setName("Connect");
+			rdbConnectMenuItem.setMnemonic('C');
+			rdbConnectMenuItem.setText("Connect...");
 			
-			irmisConnectMenuItem.addActionListener(new ActionListener() {
+			rdbConnectMenuItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					Rdb.getInstance().getRdbInterface().connect(VisualDCT.getInstance());
+					RdbInstance.getInstance(VisualDCT.getInstance()).getRdbInterface().connect();
 				}
 			});
 		} catch (Throwable ivjExc) {
 			handleException(ivjExc);
 		}
 	}
-	return irmisConnectMenuItem;
+	return rdbConnectMenuItem;
 }
 
-private JMenuItem getIrmisLoadMenuItem() {
-	if (irmisLoadMenuItem == null) {
+private JMenuItem getRdbLoadMenuItem() {
+	if (rdbLoadMenuItem == null) {
 		try {
-			irmisLoadMenuItem = new JMenuItem();
-			irmisLoadMenuItem.setName("Load");
-			irmisLoadMenuItem.setMnemonic('L');
-			irmisLoadMenuItem.setText("Load");
+			rdbLoadMenuItem = new JMenuItem();
+			rdbLoadMenuItem.setName("Load");
+			rdbLoadMenuItem.setMnemonic('L');
+			rdbLoadMenuItem.setText("Load...");
 			
-			irmisLoadMenuItem.addActionListener(new ActionListener() {
+			rdbLoadMenuItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
-					cmd.getGUIMenuInterface().importIrmisDbGroup(VisualDCT.getInstance());
+					cmd.getGUIMenuInterface().loadRdbGroup(VisualDCT.getInstance());
 				}
 			});
 		} catch (Throwable ivjExc) {
 			handleException(ivjExc);
 		}
 	}
-	return irmisLoadMenuItem;
+	return rdbLoadMenuItem;
 }
 
-private JMenuItem getIrmisSaveMenuItem() {
-	if (irmisSaveMenuItem == null) {
+private JMenuItem getRdbSaveMenuItem() {
+	if (rdbSaveMenuItem == null) {
 		try {
-			irmisSaveMenuItem = new JMenuItem();
-			irmisSaveMenuItem.setName("Save");
-			irmisSaveMenuItem.setMnemonic('S');
-			irmisSaveMenuItem.setText("Save");
+			rdbSaveMenuItem = new JMenuItem();
+			rdbSaveMenuItem.setName("Save");
+			rdbSaveMenuItem.setMnemonic('S');
+			rdbSaveMenuItem.setText("Save");
 			
-			irmisSaveMenuItem.addActionListener(new ActionListener() {
+			rdbSaveMenuItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 				    GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
-		  		 	cmd.getGUIMenuInterface().saveIrmisDbGroup(VisualDCT.getInstance());
+		  		 	cmd.getGUIMenuInterface().saveRdbGroup(VisualDCT.getInstance());
 				}
 			});
 		} catch (Throwable ivjExc) {
 			handleException(ivjExc);
 		}
 	}
-	return irmisSaveMenuItem;
+	return rdbSaveMenuItem;
+}
+
+private JMenuItem getRdbSaveAsMenuItem() {
+	if (rdbSaveAsMenuItem == null) {
+		try {
+			rdbSaveAsMenuItem = new JMenuItem();
+			rdbSaveAsMenuItem.setName("Save as");
+			rdbSaveAsMenuItem.setMnemonic('A');
+			rdbSaveAsMenuItem.setText("Save as...");
+			
+			rdbSaveAsMenuItem.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+				    GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
+		  		 	cmd.getGUIMenuInterface().saveAsRdbGroup(VisualDCT.getInstance());
+				}
+			});
+		} catch (Throwable ivjExc) {
+			handleException(ivjExc);
+		}
+	}
+	return rdbSaveAsMenuItem;
 }
 
 /**
@@ -5476,7 +5499,7 @@ private javax.swing.JMenuBar getVisualDCTJMenuBar() {
 			ivjVisualDCTJMenuBar.add(getViewMenu());
 			ivjVisualDCTJMenuBar.add(getPluginsMenu());
 			ivjVisualDCTJMenuBar.add(getDebugMenu());
-			ivjVisualDCTJMenuBar.add(getIrmisMenu());
+			ivjVisualDCTJMenuBar.add(getRdbMenu());
 			ivjVisualDCTJMenuBar.add(getToolsMenu());
 			ivjVisualDCTJMenuBar.add(getHelpMenu());
 			// user code begin {1}

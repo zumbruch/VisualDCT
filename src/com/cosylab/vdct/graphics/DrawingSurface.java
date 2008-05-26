@@ -33,7 +33,6 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
-import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -67,6 +66,7 @@ import java.util.LinkedHashSet;
 import java.util.Stack;
 import java.util.Vector;
 
+import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -137,7 +137,7 @@ import com.cosylab.vdct.graphics.popup.Popupable;
 import com.cosylab.vdct.graphics.printing.Page;
 import com.cosylab.vdct.inspector.Inspectable;
 import com.cosylab.vdct.inspector.InspectorManager;
-import com.cosylab.vdct.rdb.Rdb;
+import com.cosylab.vdct.rdb.RdbInstance;
 import com.cosylab.vdct.undo.ActionObject;
 import com.cosylab.vdct.undo.ComposedAction;
 import com.cosylab.vdct.undo.CreateAction;
@@ -2230,7 +2230,7 @@ public boolean open(InputStream is, File file, boolean importDB, boolean importT
 		return false;
 }
 
-public boolean importIrmisDbGroup(Frame guiContext) {
+public boolean loadRdbDbGroup(JFrame guiContext) {
 
 	DBData dbData = null;
 	boolean success = true;
@@ -2239,7 +2239,7 @@ public boolean importIrmisDbGroup(Frame guiContext) {
 		setCursor(hourCursor);
 		UndoManager.getInstance().setMonitor(false);
 
-		dbData = Rdb.getInstance().getRdbInterface().loadDbGroup(guiContext);
+		dbData = RdbInstance.getInstance(guiContext).getRdbInterface().loadDbGroup();
 
 		// check for sucess
 		DBDData dbdData = DataProvider.getInstance().getDbdDB();
@@ -2313,9 +2313,17 @@ public boolean importIrmisDbGroup(Frame guiContext) {
 	return success;
 }
 
-public void saveIrmisDbGroup(Frame guiContext) {
+public void saveRdbGroup(JFrame guiContext) {
 	try {
-		Rdb.getInstance().getRdbInterface().saveDbGroup(dbGroup, guiContext);
+		RdbInstance.getInstance(guiContext).getRdbInterface().saveDbGroup(dbGroup);
+	} catch (Exception exception) {
+		Console.getInstance().println(exception);
+	}
+}
+
+public void saveAsRdbGroup(JFrame guiContext) {
+	try {
+		RdbInstance.getInstance(guiContext).getRdbInterface().saveAsDbGroup(dbGroup);
 	} catch (Exception exception) {
 		Console.getInstance().println(exception);
 	}

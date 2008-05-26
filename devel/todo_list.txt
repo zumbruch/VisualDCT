@@ -1,4 +1,4 @@
--support for adding macros to templates in spreadsheet view
+-unified configuration files searcher 
 -persistence of the selected tab in spreadsheet view
 -inspector has to refresh on field change in spreadsheet
 -inspector has to refresh link fields on rename in main window

@@ -28,7 +28,6 @@ package com.cosylab.vdct.graphics;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.awt.Frame;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
@@ -44,6 +43,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 
@@ -688,12 +688,16 @@ public void importDBD(java.io.File file) throws IOException {
 	drawingSurface.openDBD(file, true);
 }
 
-public void importIrmisDbGroup(Frame guiContext) {
-	drawingSurface.importIrmisDbGroup(guiContext);
+public void loadRdbGroup(JFrame guiContext) {
+	drawingSurface.loadRdbDbGroup(guiContext);
 }
 
-public void saveIrmisDbGroup(Frame guiContext) {
-	drawingSurface.saveIrmisDbGroup(guiContext);
+public void saveRdbGroup(JFrame guiContext) {
+	drawingSurface.saveRdbGroup(guiContext);
+}
+
+public void saveAsRdbGroup(JFrame guiContext) {
+	drawingSurface.saveAsRdbGroup(guiContext);
 }
 
 /**

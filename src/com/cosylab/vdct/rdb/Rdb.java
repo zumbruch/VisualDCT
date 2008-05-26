@@ -28,28 +28,91 @@
 
 package com.cosylab.vdct.rdb;
 
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
+import com.cosylab.vdct.db.DBData;
+import com.cosylab.vdct.rdb.group.SQLTableGUI;
+
 /**
  * @author ssah
  *
  */
-public class Rdb {
+public class Rdb implements RdbInterface {
 
-	private static Rdb rdb = null;
-	private Irmis irmis = null;
-	
-	public static Rdb getInstance() {
-		if (rdb == null) {
-			rdb = new Rdb();
-		}
-		return rdb;
-	}
-	
-	public RdbInterface getRdbInterface() {
-		return irmis; 
-	}
-	
-	private Rdb() {
+	private DataMapper mapper = null;
+	private ConnectionDialog connectionDialog = null;
+	private SQLTableGUI groupDialog = null;
+	private JFrame guiContext = null;
+
+	/**
+	 * 
+	 */
+	public Rdb(JFrame guiContext) {
 		super();
-		irmis = new Irmis();
+		this.guiContext = guiContext; 
+		try {
+		    mapper = new DataMapper();
+		} catch (Exception exception) {
+			exception.printStackTrace();
+		}
+		connectionDialog = new ConnectionDialog(guiContext, mapper);
+		groupDialog = new SQLTableGUI(mapper, guiContext);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.rdb.RdbInterface#connect(java.awt.Frame)
+	 */
+	public void connect() {
+		connectionDialog.setVisible(true);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.rdb.RdbInterface#loadDbGroup(java.lang.String)
+	 */
+	public DBData loadDbGroup() {
+		if (!mapper.isConnection()) {
+			connectionDialog.setVisible(true);
+		}
+		if (mapper.isConnection()) {
+			groupDialog.setLoadMode(true);		
+			groupDialog.setVisible(true);
+			return groupDialog.getData();
+		}
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.rdb.RdbInterface#saveDbGroup(java.lang.String)
+	 */
+	public void saveDbGroup(String name) {
+		if (!mapper.isConnection()) {
+			connectionDialog.setVisible(true);
+		}
+		if (mapper.isConnection()) {
+
+			try {
+				mapper.saveDbGroup(name);
+			} catch (Exception exception) {
+				JOptionPane.showMessageDialog(guiContext, exception.getMessage(),
+						"Database error", JOptionPane.ERROR_MESSAGE);
+
+				groupDialog.setLoadMode(false);		
+				groupDialog.setVisible(true);
+			}
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.rdb.RdbInterface#saveAsDbGroup(java.lang.String)
+	 */
+	public void saveAsDbGroup(String name) {
+		if (!mapper.isConnection()) {
+			connectionDialog.setVisible(true);
+		}
+		if (mapper.isConnection()) {
+			groupDialog.setLoadMode(false);		
+			groupDialog.setVisible(true);
+		}
 	}
 }
