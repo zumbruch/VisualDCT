@@ -2,7 +2,7 @@ package com.cosylab.vdct.rdb.group;
 
 import javax.swing.JDialog;
 
-import com.cosylab.vdct.rdb.DataMapper;
+import com.cosylab.vdct.rdb.RdbDataMapper;
 
 // $Id$
 //
@@ -18,11 +18,11 @@ public class group
         System.exit(0);
     }
     
-    public group(DataMapper mapper, JDialog guiContext) {
+    public group(RdbDataMapper mapper, JDialog guiContext) {
     	main(new String[0], mapper, guiContext);
     }
     
-    private void main (String args[], DataMapper mapper, JDialog guiContext)
+    private void main (String args[], RdbDataMapper mapper, JDialog guiContext)
     {
         /*
         boolean use_tree = false;

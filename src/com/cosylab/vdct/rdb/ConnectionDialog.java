@@ -54,7 +54,7 @@ import com.cosylab.vdct.XmlSettings;
  */
 public class ConnectionDialog extends JDialog implements ActionListener {
 
-	private DataMapper mapper = null;
+	private RdbDataMapper mapper = null;
 	
 	private JTextField hostField = null;
 	private JTextField databaseField = null;
@@ -72,7 +72,7 @@ public class ConnectionDialog extends JDialog implements ActionListener {
 	/**
 	 * @param arg0
 	 */
-	public ConnectionDialog(JFrame arg0, DataMapper mapper) {
+	public ConnectionDialog(JFrame arg0, RdbDataMapper mapper) {
         super(arg0, true);
 
 		this.mapper = mapper;

@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Vector;
 
-import com.cosylab.vdct.rdb.DataMapper;
+import com.cosylab.vdct.rdb.RdbDataMapper;
 
 // SQLHelper:
 // Connects to EPICS RDB Schema.
@@ -22,7 +22,7 @@ public class SQLHelper
     public static boolean use_MySQL=false;
     private Connection connection; // init. in constructor
 
-    static public SQLHelper create(DataMapper mapper)
+    static public SQLHelper create(RdbDataMapper mapper)
     {
         sql_helper = new SQLHelper();
         try

@@ -101,10 +101,12 @@ public class RdbConnection {
 
 	private String getQuestionMarkList(int length) {
 		StringBuffer buffer = new StringBuffer();
-		for (int e = 0; e < length - 1; e++) {
-			buffer.append("?,");
+		for (int e = 0; e < length; e++) {
+			buffer.append("?");
+			if (e < length - 1) {
+				buffer.append(",");
+			}
 		}
-		buffer.append("?");
 		return buffer.toString();
 	}
 	
@@ -145,24 +147,43 @@ public class RdbConnection {
 	}
 
 	public ResultSet loadRows(String table, Object[] columns, Object[][] keyPairs) throws SQLException {
-		return loadRows(table, columns, keyPairs, null);
+		return loadRows(table, columns, keyPairs, null, null);
 	}
 	
-	public ResultSet loadRows(String table, Object[] columns, Object[][] keyPairs, String orderBy) throws SQLException {
+	public ResultSet loadRows(String table, Object[] columns, Object[][] keyPairs, String conditions) throws SQLException {
+		return loadRows(table, columns, keyPairs, conditions, null);
+	}
+	
+	public ResultSet loadRows(String table, Object[] columns, Object[][] keyPairs, String conditions, String orderBy) throws SQLException {
 
-        String columnsString = getList(columns);
-        String condition = getEqualityStatement(keyPairs[0]);
+        String columnsString = columns != null ? getList(columns) : "*";
+        String equalityConditions = getEqualityStatement(keyPairs[0]);
+        boolean equalityExists = !equalityConditions.equals(""); 
         
-        String sqlString = "SELECT " + columnsString + " FROM "
-        	+ table + " WHERE " + condition + (orderBy != null ? " ORDER BY " + orderBy : "");
+        String sqlString = "SELECT " + columnsString + " FROM " + table;
+        if (equalityExists) {
+            sqlString += " WHERE " + equalityConditions;
+        }
+        if (equalityExists && conditions != null) {
+            sqlString += " AND ";
+        }
+        if (conditions != null) {
+            sqlString += conditions;
+        }
+        if (orderBy != null) {
+        	sqlString += " ORDER BY " + orderBy;
+        }
         PreparedStatement statement = connection.prepareStatement(sqlString);
         insertValues(statement, keyPairs[1]);
+        
+        // TODO:REM
+        //System.out.println(statement.toString());
+        
 		return statement.executeQuery();
 	}
 	
 	private boolean isRowPresent(String table, Object[][] keyPairs) throws SQLException {
-		Object[] columns = {keyPairs[0][0]};  
-		ResultSet set = loadRows(table, columns, keyPairs);
+		ResultSet set = loadRows(table, null, keyPairs);
 		return set.next(); 
 	}
 
@@ -190,14 +211,20 @@ public class RdbConnection {
 			
 			PreparedStatement statement = connection.prepareStatement(sqlString);
 	        insertValues(statement, keyPairs[1], valuePairs[1]);
-			statement.execute();
+	        
+			// TODO:REM
+			//System.out.println(statement.toString());
+	        statement.execute();
 		} else if (update && valuePairs[0].length > 0) {
 			String condition = getEqualityStatement(keyPairs[0]);
 			String setString = getEqualityList(valuePairs[0]);
 			String sqlString = "UPDATE " + table + " SET " + setString + " WHERE " + condition;
 			PreparedStatement statement = connection.prepareStatement(sqlString);
-	        insertValues(statement, keyPairs[1], valuePairs[1]);
-			statement.execute();
+	        insertValues(statement, valuePairs[1], keyPairs[1]);
+			
+			// TODO:REM
+			//System.out.println(statement.toString());
+	        statement.execute();
 		}
 	}
 
@@ -205,6 +232,10 @@ public class RdbConnection {
 		String sqlString = "DELETE FROM " + table + " WHERE " + getEqualityStatement(keyPairs[0]);
 		PreparedStatement statement = connection.prepareStatement(sqlString);
         insertValues(statement, keyPairs[1]);
-		statement.execute();
+
+		// TODO:REM
+		//System.out.println(statement.toString());
+        
+        statement.execute();
 	}
 }

@@ -8,10 +8,8 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.Vector;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -19,14 +17,9 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableColumnModel;
 
 import com.cosylab.vdct.db.DBData;
-import com.cosylab.vdct.rdb.DataMapper;
+import com.cosylab.vdct.rdb.RdbDataMapper;
 
 /** SQLTableGUI
  * GUI for SQLTableModel,
@@ -36,12 +29,13 @@ public class SQLTableGUI extends JDialog implements ActionListener {
 	// Simple apps call run(), see below
 	
 	private boolean loadMode = true;
-	private DataMapper mapper = null;
+	private RdbDataMapper mapper = null;
+	private String selectedIoc = null;
 	private String selectedGroup = null;
 	private DBData data = null;
 	
-	protected SQLTableModel model;
-	public JTable table;
+	protected EpicsGroupTreeModel model;
+	public EpicsGroupTree tree;
 	private JButton groupAction = null;
 
 	private static final String addNewString = "Add New";
@@ -58,7 +52,7 @@ public class SQLTableGUI extends JDialog implements ActionListener {
 	 * @param arg1
 	 * @throws HeadlessException
 	 */
-	public SQLTableGUI(DataMapper mapper, JFrame guiContext) {
+	public SQLTableGUI(RdbDataMapper mapper, JFrame guiContext) {
 		super(guiContext, true);
 		this.mapper = mapper;
         makeGUI(guiContext);
@@ -67,46 +61,10 @@ public class SQLTableGUI extends JDialog implements ActionListener {
 	private void makeGUI(JFrame guiContext) {
 		GUI.init();
 
-		// TODO:REM
-		/*
-		button = new JButton("Exit");
-		button.setMnemonic(KeyEvent.VK_X);
-		button.addActionListener(new ActionListener()
-		{   public void actionPerformed(ActionEvent e)
-		{
-			if (model.wasEdited())
-			{
-				switch (JOptionPane.showConfirmDialog(
-						top,
-						"Table has been changed.\nSave changes?",
-						"Confirm Save",
-						JOptionPane.YES_NO_CANCEL_OPTION,
-						JOptionPane.QUESTION_MESSAGE))
-						{
-						case JOptionPane.CANCEL_OPTION:
-							return;
-						case JOptionPane.YES_OPTION:
-							if (model.save() == false)
-								return; // error in save, don't quit
-						}
-			}
-
-
-		}
-		});
-		buttons.add(button);
-		*/
-
 		setTitle(loadMode ? loadGroupString : saveGroupString);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		getContentPane().add(createContentPanel());
 		pack();
-	}
-
-	// Might be called between makeGUI and execute:
-	public void setColumnEditor(int column, TableCellEditor editor)
-	{
-		table.getColumnModel().getColumn(column).setCellEditor(editor);
 	}
 
 	/**
@@ -212,6 +170,34 @@ public class SQLTableGUI extends JDialog implements ActionListener {
 	
 	private JScrollPane createTablePane() {
 		
+		tree = new EpicsGroupTree();
+		tree.addListener(new EpicsGroupTreeListener() {
+			
+			public void iocSelected(String ioc_id) {
+				selectedIoc = ioc_id;
+				selectedGroup = null;
+				groupAction.setEnabled(false);
+			}
+			public void groupSelected(String ioc_id, String group_id) {
+				selectedIoc = ioc_id;
+				selectedGroup = group_id;
+				groupAction.setEnabled(true);
+			}
+		});
+
+		// Shortcut: Double-click = onOk  (if valid stuff selected)
+		tree.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2 && selectedGroup != null && selectedIoc != null) {
+					performGroupAction();
+				}
+			}
+		});
+		
+		JScrollPane pane = new JScrollPane(tree);
+		
+		//TODO:REM
+		/*
 		table = new JTable();
 		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
@@ -219,6 +205,9 @@ public class SQLTableGUI extends JDialog implements ActionListener {
 			}
 		});
 		JScrollPane pane = new JScrollPane(table);
+		*/
+		
+		
 		pane.setPreferredSize(new Dimension(640, 384));
 		return pane;
 	}
@@ -252,6 +241,8 @@ public class SQLTableGUI extends JDialog implements ActionListener {
 		String action = event.getActionCommand();
 		
 		if (action.equals(refreshString)) {
+			// TODO:REM
+			/*
 			if (model.wasEdited())
 			{
 				switch (JOptionPane.showConfirmDialog(
@@ -267,37 +258,23 @@ public class SQLTableGUI extends JDialog implements ActionListener {
 							model.fireTableDataChanged();
 						}
 			}
+			*/
 		} else if (action.equals(addNewString)) {
-			model.addRecord();
+			// TODO: refresh the tree
+			//model.addRecord();
 
 		} else if (action.equals(storeChangesString)) {
+			// TODO:REM
+			/*
 			if (model.save())
 			{
 				model.load();
 				model.fireTableDataChanged();
 			}
+			*/
 
-		} else if (action.equals(loadString)) {
-			try {
-				data = mapper.loadDbGroup(selectedGroup);
-				setVisible(false);
-			} catch (Exception exception) {
-				exception.printStackTrace();
-
-				JOptionPane.showMessageDialog(null, exception.getMessage(), "Database error",
-						JOptionPane.ERROR_MESSAGE);
-			}
-		} else if (action.equals(saveString)) {
-			try {
-				mapper.saveDbGroup(selectedGroup);
-				setVisible(false);
-			} catch (Exception exception) {
-				exception.printStackTrace();
-				
-				JOptionPane.showMessageDialog(null, exception.getMessage(), "Database error",
-						JOptionPane.ERROR_MESSAGE);
-			}
-
+		} else if (action.equals(loadString) || action.equals(saveString)) {
+			performGroupAction();
 		} else if (action.equals(cancelString)) {
 			data = null;
 			setVisible(false);
@@ -305,7 +282,12 @@ public class SQLTableGUI extends JDialog implements ActionListener {
 	}
 	
 	public void createTableModel() {
-        boolean use_tree = false;
+        
+		model = new EpicsGroupTreeModel(mapper);
+		tree.setModel(model);
+		
+		/*
+		boolean use_tree = false;
         
         Connection c = SQLHelper.create(mapper).getConnection();
         
@@ -332,8 +314,8 @@ public class SQLTableGUI extends JDialog implements ActionListener {
             	select_all = c.prepareStatement("SELECT p_db_id, p_db_file_name, p_db_version, p_db_desc FROM p_db");
                 select = c.prepareStatement("SELECT p_db_id FROM p_db WHERE p_db_id=?");
                 update = c.prepareStatement("UPDATE p_db SET p_db_file_name=?, p_db_version=?, p_db_desc=? WHERE p_db_id=?");
-                insert = c.prepareStatement("INSERT INTO p_db (p_db_id, ioc_id, p_db_file_name, p_db_version, p_db_desc)"
-                		+ "  VALUES (?," + String.valueOf(iocId) + ",?,?)");
+                insert = c.prepareStatement("INSERT INTO p_db (p_db_id, ioc_id_FK, p_db_file_name, p_db_version, p_db_desc)"
+                		+ "  VALUES (?," + String.valueOf(iocId) + ",?,?,?)");
                 delete = c.prepareStatement("DELETE FROM p_db WHERE p_db_id=?");
                 
                 model = new SQLTableModel101(headers, select_all, select, update, insert, delete);
@@ -350,11 +332,30 @@ public class SQLTableGUI extends JDialog implements ActionListener {
                 e.printStackTrace();
             }
         }
+        */
 	}
 	
+	private void performGroupAction() {
+		try {
+			if (loadMode) {
+				data = mapper.loadDbGroup(selectedGroup);
+			} else {
+				mapper.saveDbGroup(selectedGroup);
+			}
+			setVisible(false);
+		} catch (Exception exception) {
+			exception.printStackTrace();
+
+			JOptionPane.showMessageDialog(null, exception.getMessage(), "Database error",
+					JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+	// TODO:REM
+	/*
 	private void setTableColumnWidths() {
 		// "delete" column is smaller than rest
-		TableColumnModel cm = table.getColumnModel();
+		TableColumnModel cm = tree.getColumnModel();
 		int num = cm.getColumnCount();
 		if (num > 0)
 			cm.getColumn(0).setMaxWidth(50);
@@ -363,14 +364,15 @@ public class SQLTableGUI extends JDialog implements ActionListener {
 	}
 	
 	private void refreshSelectedGroup() {
-		int rows = table.getSelectedRowCount();
-		int selectedRow = table.getSelectedRow();
+		int rows = tree.getSelectedRowCount();
+		int selectedRow = tree.getSelectedRow();
 		if (rows != 1 || selectedRow == -1) {
 			selectedGroup = null;
 			groupAction.setEnabled(false);
 		} else {
-			selectedGroup = table.getValueAt(selectedRow, 1).toString();
+			selectedGroup = tree.getValueAt(selectedRow, 1).toString();
 			groupAction.setEnabled(true);
 		}
 	}
+	*/
 };

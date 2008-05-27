@@ -39,7 +39,6 @@ public class SpreadsheetColumn extends TableColumn {
 	protected boolean defaultWidth = true;
 	/**
 	 * @param defaultWidth
-	 * @param table
 	 */
 	public SpreadsheetColumn(boolean defaultWidth) {
 		super();

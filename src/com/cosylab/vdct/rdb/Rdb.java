@@ -40,7 +40,7 @@ import com.cosylab.vdct.rdb.group.SQLTableGUI;
  */
 public class Rdb implements RdbInterface {
 
-	private DataMapper mapper = null;
+	private RdbDataMapper mapper = null;
 	private ConnectionDialog connectionDialog = null;
 	private SQLTableGUI groupDialog = null;
 	private JFrame guiContext = null;
@@ -52,7 +52,7 @@ public class Rdb implements RdbInterface {
 		super();
 		this.guiContext = guiContext; 
 		try {
-		    mapper = new DataMapper();
+		    mapper = new RdbDataMapper();
 		} catch (Exception exception) {
 			exception.printStackTrace();
 		}

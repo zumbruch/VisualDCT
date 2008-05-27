@@ -34,6 +34,7 @@ import java.sql.SQLException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Vector;
 
 import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.DataProvider;
@@ -58,7 +59,7 @@ import com.cosylab.vdct.vdb.VDBRecordData;
  * @author ssah
  *
  */
-public class DataMapper {
+public class RdbDataMapper {
 
 	// TODO: reactivate when definitions saving use cases defined. 
 	private static boolean manageDbds = false;
@@ -75,7 +76,7 @@ public class DataMapper {
 	private static final String recordDefDescription = "Saved by VDCT";
 	private static final String dtypString = "DTYP";
 
-	public DataMapper() throws Exception {
+	public RdbDataMapper() throws Exception {
 		helper = new RdbConnection();
 		version = new Integer(0);
 	}
@@ -91,12 +92,15 @@ public class DataMapper {
 		DBData data = null;
 		Exception exception = null;
 		try {
-			data = new DBData(group, group);
-			loadRecords(data, group);
-			loadTemplates(data, group);			
-			
-			helper.commit();
+			if (loadDbId(group)) {
+				data = new DBData(group, group);
+				loadRecords(data, group);
+				loadTemplates(data, group);			
+			}
 		} catch (SQLException sqlException) {
+			// TODO:REM
+			sqlException.printStackTrace();
+			
 			exception = new Exception("Error while loading database: " + sqlException.getMessage());
 		}
 		
@@ -121,6 +125,9 @@ public class DataMapper {
             saveRecords();
             helper.commit();
 		} catch (SQLException sqlException) {
+			// TODO:REM
+			sqlException.printStackTrace();
+			
 			exception = new Exception("Error while saving database: " + sqlException.getMessage());
 			helper.rollbackConnection();
 		}
@@ -147,6 +154,67 @@ public class DataMapper {
 		return iocId.intValue();
 	}
 	
+	/** Returns Vector of String objects representing IOCs.
+	 */ 
+	public Vector getIocs() throws SQLException {
+
+		Object[] columns = {"ioc_id"};  
+		Object[][] conditions = {{}, {}};
+		ResultSet set = helper.loadRows("ioc", columns, conditions);
+        
+        Vector iocs = new Vector();
+		while (set.next()) {
+        	iocs.add(set.getString(1));
+        }
+        return iocs;
+	}
+
+	/** Returns Vector of String objects representing db files under the given IOC.
+	 */ 
+	public Vector getGroups(String iocId) throws SQLException {
+
+		Object[] columns = {"p_db_file_name"};  
+		Object[][] conditions = {{"ioc_id_FK"}, {iocId}};
+		ResultSet set = helper.loadRows("p_db", columns, conditions);
+        
+        Vector groups = new Vector();
+        while (set.next()) {
+        	groups.add(set.getString(1));
+        }
+        return groups;
+	}
+
+	/** Returns Vector of String objects representing versions of the given group.
+	 */ 
+	public Vector getVersions(String group, String iocId) throws SQLException {
+
+		Object[] columns = {"p_db_version"};  
+		Object[][] conditions = {{"ioc_id_FK", "p_db_file_anme"}, {iocId, group}};
+		ResultSet set = helper.loadRows("p_db", columns, conditions);
+        
+        Vector versions = new Vector();
+        while (set.next()) {
+        	versions.add(set.getString(1));
+        }
+        return versions;
+	}
+	
+	private boolean loadDbId(String group) throws SQLException {
+	
+		Object[] columns = {"p_db_id"};  
+		Object[][] conditions = {{"p_db_file_name"}, {group}};
+		// TODO: also use version
+		//Object[][] conditions = {{"p_db_version"}, {version}};
+		
+		ResultSet set = helper.loadRows("p_db", columns, conditions);
+        
+        if (set.next()) {
+        	pDbId = new Integer(set.getInt(1));
+        	return true;
+        }
+        return false;
+	}
+	
 	private void loadRecords(DBData data, String group) throws SQLException {
 
 		/* TODO: rec_code_type usage
@@ -156,18 +224,22 @@ public class DataMapper {
 		ResultSet set = loadRows("sgnl_rec, sgnl_rec_type", columns, conditions);
         */
 
-		Object[] columns = {"sgnl_id", "rec_type_id"};  
-		Object[][] conditions = {{"epics_grp_id"}, {group}};
+		Object[] columns = {"p_rec_id", "p_rec_nm", "p_rec_type_id_FK"};  
+		Object[][] conditions = {{"p_db_id_FK"}, {pDbId}};
 		
-		ResultSet set = helper.loadRows("sgnl_rec", columns, conditions);
+		ResultSet set = helper.loadRows("p_rec", columns, conditions);
         
+		Integer id = null;
+		String name = null;
+		String type = null;
         while (set.next()) {
     		DBRecordData record = new DBRecordData();
-    		String name = set.getString(1);
-    		String type = set.getString(2);
+    		id = new Integer(set.getInt(1));
+    		name = set.getString(2);
+    		type = set.getString(3);
     		record.setName(name);
     		record.setRecord_type(type);
-    		loadFields(record);
+    		loadFields(record, id);
     		data.addRecord(record);
     		
     		if (manageDbds) {
@@ -189,13 +261,12 @@ public class DataMapper {
         */
 	}
 	
-	private DBRecordData loadFields(DBRecordData record) throws SQLException {
+	private DBRecordData loadFields(DBRecordData record, Integer recordId) throws SQLException {
         
-		Object[] columns = {"fld_id", "ext_val"};  
-		Object[][] conditions = {{"sgnl_id"},
-                {record.getName()}};
+		Object[] columns = {"p_fld_type", "p_fld_val"};  
+		Object[][] conditions = {{"p_rec_id_FK"}, {recordId}};
 		
-		ResultSet set = helper.loadRows("sgnl_fld", columns, conditions);
+		ResultSet set = helper.loadRows("p_fld, p_fld_type", columns, conditions, "p_fld_type_id_FK=p_fld_type_id");
         while (set.next()) {
         	// value in DBFieldData can be null, in this case it will be set to default.
         	record.addField(new DBFieldData(set.getString(1), set.getString(2)));
@@ -214,7 +285,7 @@ public class DataMapper {
 			Object[][] conditions = {{"rec_type_id"}, {name}};
 			
 			
-			ResultSet set = helper.loadRows("sgnl_fld_def", columns, conditions, "prmpt_ord");
+			ResultSet set = helper.loadRows("sgnl_fld_def", columns, conditions, null, "prmpt_ord");
 	        while (set.next()) {
 	        	DBDFieldData fieldDef = new DBDFieldData();
 
@@ -399,18 +470,15 @@ public class DataMapper {
 		}
 	}
 	
-	private int saveMinRecordDef(String type) throws SQLException {
+	private void saveMinRecordDef(String type) throws SQLException {
+		
 		Object[][] keyPairs = {{"p_rec_type_id", "p_dbd_id_FK"}, {type, pDbdId}};
-		Object[][] valuePairs = {{}, {}};
+		Object[][] valuePairs = {{"p_rec_type_code", "p_type_desc"}, {"E", recordDefDescription}};
 		helper.appendRow("p_rec_type", keyPairs, valuePairs);
-
-		Object[] columns = {"p_rec_type_id"};
-		ResultSet set = helper.loadRows("p_rec_type", columns, keyPairs);
-		return set.next() ? set.getInt(1) : 0;
 	}
 	
-	private int saveMinFieldDef(String type) throws SQLException {
-		Object[][] keyPairs = {{"p_fld_type_id", "p_dbd_id_FK"}, {type, pDbdId}};
+	private int saveMinFieldDef(String fieldName, String recordType) throws SQLException {
+		Object[][] keyPairs = {{"p_rec_type_id_FK", "p_dbd_id_FK", "p_fld_type"}, {recordType, pDbdId, fieldName}};
 		Object[][] valuePairs = {{}, {}};
 		helper.appendRow("p_fld_type", keyPairs, valuePairs);
 
@@ -444,8 +512,8 @@ public class DataMapper {
 	}
 	
 	private void saveGroup() throws SQLException {
-		Object[][] keyPairs = {{"p_db_file_name", "p_db_version", "ioc_id"}, {group, version, iocId}};
-		Object[][] valuePairs = {{"ioc_id"}, {iocId}};
+		Object[][] keyPairs = {{"p_db_file_name", "p_db_version", "ioc_id_FK"}, {group, version, iocId}};
+		Object[][] valuePairs = {{}, {}};
 		helper.appendRow("p_db", keyPairs, valuePairs);
 		
 		Object[] columns = {"p_db_id"};
@@ -501,37 +569,35 @@ public class DataMapper {
 	private void saveRecord(VDBRecordData recordData) throws SQLException  {
 		String name = recordData.getName();
 		String type = recordData.getType();
-		Integer recTypeId = new Integer(saveMinRecordDef(type));
+		saveMinRecordDef(type);
 		
-		Object[][] keyPairs = {{"p_rec_nm", "p_db_id_FK", "p_rec_type_id_FK"}, {name, pDbId, recTypeId}};
+		Object[][] keyPairs = {{"p_rec_nm", "p_db_id_FK", "p_rec_type_id_FK"}, {name, pDbId, type}};
 		Object[][] valuePairs = {{}, {}};
 		helper.saveRow("p_rec", keyPairs, valuePairs);
 		
 		Object[] columns = {"p_rec_id"};
-		ResultSet set = helper.loadRows("p_db", columns, keyPairs);
+		ResultSet set = helper.loadRows("p_rec", columns, keyPairs);
 		
 		Integer recId = new Integer(set.next() ? set.getInt(1) : 0);
 		
 		Iterator iterator = recordData.getFieldsV().iterator();
 		while (iterator.hasNext()) {
-			saveField((VDBFieldData)iterator.next(), recId);
+			saveField((VDBFieldData)iterator.next(), recId, type);
 		}
 	}
 	
-	private void saveField(VDBFieldData fieldData, Integer recId) throws SQLException {
+	private void saveField(VDBFieldData fieldData, Integer recId, String recordType) throws SQLException {
 
 		String name = fieldData.getName();
     	String value = StringUtils.removeQuotes(fieldData.getValue());
     	String table = "p_fld";
 		
-    	Integer fldTypeId = new Integer(saveMinFieldDef(name));
+    	Integer fldTypeId = new Integer(saveMinFieldDef(name, recordType));
     	
     	Object[][] keyPairs = {{"p_rec_id_FK", "p_fld_type_id_FK"}, {recId, fldTypeId}};
 		Object[][] valuePairs = {{"p_fld_val"}, {value}};
 		
-    	if (fieldData.hasDefaultValue() || value.equals(emptyString)) {
-    		helper.deleteRow(table, keyPairs);
-    	} else {
+    	if (!fieldData.hasDefaultValue() && !value.equals(emptyString)) {
     		helper.saveRow(table, keyPairs, valuePairs);
         }
 	}
