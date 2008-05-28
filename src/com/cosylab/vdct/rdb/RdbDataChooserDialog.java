@@ -1,4 +1,4 @@
-package com.cosylab.vdct.rdb.group;
+package com.cosylab.vdct.rdb;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -14,17 +14,18 @@ import java.awt.event.MouseEvent;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 
 import com.cosylab.vdct.db.DBData;
-import com.cosylab.vdct.rdb.RdbDataMapper;
 
 /** SQLTableGUI
  * GUI for SQLTableModel,
  */
-public class SQLTableGUI extends JDialog implements ActionListener {
+public class RdbDataChooserDialog extends JDialog implements ActionListener {
 
 	// Simple apps call run(), see below
 	
@@ -32,15 +33,18 @@ public class SQLTableGUI extends JDialog implements ActionListener {
 	private RdbDataMapper mapper = null;
 	private String selectedIoc = null;
 	private String selectedGroup = null;
+	private String selectedVersion = null;
 	private DBData data = null;
+	private NewRdbDataDialog newGroupDialog = null;
 	
-	protected EpicsGroupTreeModel model;
-	public EpicsGroupTree tree;
+	private JPopupMenu popupMenu = null; 
+	
+	protected RdbDataTreeModel model;
+	public RdbDataTree tree;
 	private JButton groupAction = null;
 
-	private static final String addNewString = "Add New";
-	private static final String refreshString = "Refresh";
-	private static final String storeChangesString = "Store Changes";
+	private static final String addNewString = "Add new";
+	private static final String addNewDbString = "Add new db";
 	private static final String loadString = "Load";
 	private static final String saveString = "Save";
 	private static final String loadGroupString = "Load Group";
@@ -52,21 +56,15 @@ public class SQLTableGUI extends JDialog implements ActionListener {
 	 * @param arg1
 	 * @throws HeadlessException
 	 */
-	public SQLTableGUI(RdbDataMapper mapper, JFrame guiContext) {
+	public RdbDataChooserDialog(RdbDataMapper mapper, JFrame guiContext) {
 		super(guiContext, true);
 		this.mapper = mapper;
         makeGUI(guiContext);
 	}
 
-	private void makeGUI(JFrame guiContext) {
-		GUI.init();
-
-		setTitle(loadMode ? loadGroupString : saveGroupString);
-		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		getContentPane().add(createContentPanel());
-		pack();
+	public void setRdbDataId(RdbDataId dataId) {
 	}
-
+	
 	/**
 	 * @param loadMode the loadMode to set
 	 */
@@ -95,6 +93,15 @@ public class SQLTableGUI extends JDialog implements ActionListener {
 		super.setVisible(arg0);
 	}
 
+	private void makeGUI(JFrame guiContext) {
+		setTitle(loadMode ? loadGroupString : saveGroupString);
+		setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
+		getContentPane().add(createContentPanel());
+		
+		newGroupDialog = new NewRdbDataDialog(mapper, this);
+		pack();
+	}
+	
 	private JPanel createContentPanel() {
 		
 		JPanel contentPanel = new JPanel(new GridBagLayout());
@@ -128,7 +135,7 @@ public class SQLTableGUI extends JDialog implements ActionListener {
 		constraints.insets = new Insets(4, 4, 4, 0);
 		groupPanel.add(groupButtonsPanel, constraints);
 		
-		JScrollPane createTablePane = createTablePane();
+		JScrollPane createTablePane = createTreePane();
 		constraints = new GridBagConstraints();
 		constraints.gridy = 1;
 		constraints.weightx = 1.0;
@@ -142,71 +149,61 @@ public class SQLTableGUI extends JDialog implements ActionListener {
 
 	private JPanel createGroupButtonsPanel() {
 		JPanel buttonsPanel = new JPanel();
-		JButton button = new JButton(refreshString);
+		JButton button = new JButton(addNewString);
 		button.setMnemonic(KeyEvent.VK_R);
 		button.addActionListener(this);
 		GridBagConstraints constraints = new GridBagConstraints();
-		constraints.insets = new Insets(4, 0, 4, 4);
+		constraints.insets = new Insets(4, 0, 4, 0);
 		buttonsPanel.add(button, constraints);
 
-		button = new JButton(addNewString);
-		button.setMnemonic(KeyEvent.VK_A);
-		button.addActionListener(this);
-		constraints = new GridBagConstraints();
-		constraints.gridx = 1;
-		constraints.insets = new Insets(4, 4, 4, 4);
-		buttonsPanel.add(button, constraints);
-
-		button = new JButton(storeChangesString);
-		button.setMnemonic(KeyEvent.VK_C);
-		button.addActionListener(this);
-		constraints = new GridBagConstraints();
-		constraints.gridx = 2;
-		constraints.insets = new Insets(4, 4, 4, 0);
-		buttonsPanel.add(button, constraints);
-		
 		return buttonsPanel;
 	}
 	
-	private JScrollPane createTablePane() {
+	private JScrollPane createTreePane() {
 		
-		tree = new EpicsGroupTree();
-		tree.addListener(new EpicsGroupTreeListener() {
+		tree = new RdbDataTree();
+		tree.addListener(new RdbDataTreeListener() {
 			
-			public void iocSelected(String ioc_id) {
-				selectedIoc = ioc_id;
+			public void iocSelected(String iocId) {
+				selectedIoc = iocId;
 				selectedGroup = null;
+				selectedVersion = null;
 				groupAction.setEnabled(false);
 			}
-			public void groupSelected(String ioc_id, String group_id) {
-				selectedIoc = ioc_id;
-				selectedGroup = group_id;
+			public void groupSelected(String iocId, String groupId) {
+				selectedIoc = iocId;
+				selectedGroup = groupId;
+				selectedVersion = null;
+				groupAction.setEnabled(false);
+			}
+			/* (non-Javadoc)
+			 * @see com.cosylab.vdct.rdb.group.EpicsGroupTreeListener#versionSelected(java.lang.String, java.lang.String, java.lang.String)
+			 */
+			public void versionSelected(String iocId, String groupId, String version) {
+				selectedIoc = iocId;
+				selectedGroup = groupId;
+				selectedVersion = version;
 				groupAction.setEnabled(true);
 			}
 		});
 
-		// Shortcut: Double-click = onOk  (if valid stuff selected)
+		createPopupMenu();
+		
 		tree.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
-				if (e.getClickCount() == 2 && selectedGroup != null && selectedIoc != null) {
-					performGroupAction();
+			public void mouseClicked(MouseEvent event) {
+				if (event.getButton() == MouseEvent.BUTTON1) {
+					// Double-click performs the main action, load or save.
+					if (event.getClickCount() == 2 && selectedGroup != null
+							&& selectedIoc != null && selectedVersion != null) {
+						performGroupAction();
+					}
+				} else if (event.getButton() == MouseEvent.BUTTON3) {
+					popupMenu.show(tree, event.getX(), event.getY());
 				}
 			}
 		});
-		
+	
 		JScrollPane pane = new JScrollPane(tree);
-		
-		//TODO:REM
-		/*
-		table = new JTable();
-		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-			public void valueChanged(ListSelectionEvent e) {
-				refreshSelectedGroup();
-			}
-		});
-		JScrollPane pane = new JScrollPane(table);
-		*/
-		
 		
 		pane.setPreferredSize(new Dimension(640, 384));
 		return pane;
@@ -233,6 +230,14 @@ public class SQLTableGUI extends JDialog implements ActionListener {
 
 		return buttonsPanel;
 	}
+	
+	private void createPopupMenu() {
+		popupMenu = new JPopupMenu();
+		
+		JMenuItem addItem = new JMenuItem(addNewDbString);
+		addItem.addActionListener(this);
+		popupMenu.add(addItem);
+	}
 
 	/* (non-Javadoc)
 	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
@@ -240,39 +245,8 @@ public class SQLTableGUI extends JDialog implements ActionListener {
 	public void actionPerformed(ActionEvent event) {
 		String action = event.getActionCommand();
 		
-		if (action.equals(refreshString)) {
-			// TODO:REM
-			/*
-			if (model.wasEdited())
-			{
-				switch (JOptionPane.showConfirmDialog(
-						this,
-						"Table has been edited.\n" +
-						"Replace with RDB, loose edited values?",
-						"Confirm Reload",
-						JOptionPane.YES_NO_OPTION,
-						JOptionPane.QUESTION_MESSAGE))
-						{
-						case JOptionPane.YES_OPTION:
-							model.load();
-							model.fireTableDataChanged();
-						}
-			}
-			*/
-		} else if (action.equals(addNewString)) {
-			// TODO: refresh the tree
-			//model.addRecord();
-
-		} else if (action.equals(storeChangesString)) {
-			// TODO:REM
-			/*
-			if (model.save())
-			{
-				model.load();
-				model.fireTableDataChanged();
-			}
-			*/
-
+		if (action.equals(addNewString) || action.equals(addNewDbString)) {
+			addNewGroup();
 		} else if (action.equals(loadString) || action.equals(saveString)) {
 			performGroupAction();
 		} else if (action.equals(cancelString)) {
@@ -283,8 +257,9 @@ public class SQLTableGUI extends JDialog implements ActionListener {
 	
 	public void createTableModel() {
         
-		model = new EpicsGroupTreeModel(mapper);
+		model = new RdbDataTreeModel(mapper);
 		tree.setModel(model);
+		groupAction.setEnabled(false);
 		
 		/*
 		boolean use_tree = false;
@@ -337,10 +312,13 @@ public class SQLTableGUI extends JDialog implements ActionListener {
 	
 	private void performGroupAction() {
 		try {
+			
+			RdbDataId dataId = new RdbDataId(selectedGroup, selectedVersion, selectedIoc);
+
 			if (loadMode) {
-				data = mapper.loadDbGroup(selectedGroup);
+				data = mapper.loadRdbData(dataId);
 			} else {
-				mapper.saveDbGroup(selectedGroup);
+				mapper.saveRdbData(dataId);
 			}
 			setVisible(false);
 		} catch (Exception exception) {
@@ -350,29 +328,11 @@ public class SQLTableGUI extends JDialog implements ActionListener {
 					JOptionPane.ERROR_MESSAGE);
 		}
 	}
-
-	// TODO:REM
-	/*
-	private void setTableColumnWidths() {
-		// "delete" column is smaller than rest
-		TableColumnModel cm = tree.getColumnModel();
-		int num = cm.getColumnCount();
-		if (num > 0)
-			cm.getColumn(0).setMaxWidth(50);
-		for (int i=1; i<num; ++i)
-			cm.getColumn(i).setMinWidth(80);
-	}
 	
-	private void refreshSelectedGroup() {
-		int rows = tree.getSelectedRowCount();
-		int selectedRow = tree.getSelectedRow();
-		if (rows != 1 || selectedRow == -1) {
-			selectedGroup = null;
-			groupAction.setEnabled(false);
-		} else {
-			selectedGroup = tree.getValueAt(selectedRow, 1).toString();
-			groupAction.setEnabled(true);
+	private void addNewGroup() {
+		newGroupDialog.setVisible(true);
+		if (newGroupDialog.isConfirmed()) {
+			createTableModel();
 		}
 	}
-	*/
 };

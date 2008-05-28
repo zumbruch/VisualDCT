@@ -137,6 +137,7 @@ import com.cosylab.vdct.graphics.popup.Popupable;
 import com.cosylab.vdct.graphics.printing.Page;
 import com.cosylab.vdct.inspector.Inspectable;
 import com.cosylab.vdct.inspector.InspectorManager;
+import com.cosylab.vdct.rdb.RdbDataId;
 import com.cosylab.vdct.rdb.RdbInstance;
 import com.cosylab.vdct.undo.ActionObject;
 import com.cosylab.vdct.undo.ComposedAction;
@@ -292,7 +293,7 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 	private Stack templateStack = null;	
 	private Vector selectedConnectorsForMove = null;
 	
-	private String dbGroup = null;
+	private RdbDataId dataId = null;
 	
 /**
  * DrawingSurface constructor comment.
@@ -2239,7 +2240,7 @@ public boolean loadRdbDbGroup(JFrame guiContext) {
 		setCursor(hourCursor);
 		UndoManager.getInstance().setMonitor(false);
 
-		dbData = RdbInstance.getInstance(guiContext).getRdbInterface().loadDbGroup();
+		dbData = RdbInstance.getInstance(guiContext).getRdbInterface().loadRdbData();
 
 		// check for sucess
 		DBDData dbdData = DataProvider.getInstance().getDbdDB();
@@ -2249,8 +2250,7 @@ public boolean loadRdbDbGroup(JFrame guiContext) {
 			restoreCursor();
 			return false;
 		}
-		
-		dbGroup = dbData.getTemplateData().getFileName();
+		dataId = new RdbDataId(dbData.getTemplateData().getId());
 
 		// check is DTYP fields are defined before any DBF_INPUT/DBF_OUTPUT fields...
 		DBData.checkDTYPfield(dbData, dbdData);
@@ -2303,7 +2303,6 @@ public boolean loadRdbDbGroup(JFrame guiContext) {
 		Console.getInstance().println(exception);
 		success = false;
 	} finally {
-		///!!! TODO put somewhere in try-finally block
 		restoreCursor();
 		UndoManager.getInstance().setMonitor(true);
 		// free db memory	    
@@ -2315,7 +2314,7 @@ public boolean loadRdbDbGroup(JFrame guiContext) {
 
 public void saveRdbGroup(JFrame guiContext) {
 	try {
-		RdbInstance.getInstance(guiContext).getRdbInterface().saveDbGroup(dbGroup);
+		RdbInstance.getInstance(guiContext).getRdbInterface().saveRdbData(dataId);
 	} catch (Exception exception) {
 		Console.getInstance().println(exception);
 	}
@@ -2323,7 +2322,7 @@ public void saveRdbGroup(JFrame guiContext) {
 
 public void saveAsRdbGroup(JFrame guiContext) {
 	try {
-		RdbInstance.getInstance(guiContext).getRdbInterface().saveAsDbGroup(dbGroup);
+		RdbInstance.getInstance(guiContext).getRdbInterface().saveAsRdbData(dataId);
 	} catch (Exception exception) {
 		Console.getInstance().println(exception);
 	}

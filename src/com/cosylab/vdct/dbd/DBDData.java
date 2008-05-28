@@ -90,8 +90,9 @@ public boolean consistencyCheck(com.cosylab.vdct.db.DBData db) {
 	
 	ConsoleInterface console = Console.getInstance();
 	
-	console.println();
-	console.print("o) Checking consistency with DBD file...");
+	// No output if everything ok.
+	//console.println();
+	//console.print("o) Checking consistency with DBD file...");
 	if (db==null) {
 		console.println();
 		console.println("\t No DB data defined.");
@@ -201,13 +202,15 @@ public boolean consistencyCheck(com.cosylab.vdct.db.DBData db) {
 	}
 
 	if (isOK) {
-		console.println();
-		console.print("\tOK");
+		// No output if everything ok.
+		//console.println();
+		//console.print("\tOK");
 	} else {
 		console.println();
 		console.print("o) DB file is not consistent with DBD file!");
+		console.println();
+		console.println();
 	}
-	console.println(); console.println();
 	return isOK;
 }
 /**

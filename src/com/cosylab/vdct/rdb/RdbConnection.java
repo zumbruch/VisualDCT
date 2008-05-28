@@ -160,7 +160,7 @@ public class RdbConnection {
         String equalityConditions = getEqualityStatement(keyPairs[0]);
         boolean equalityExists = !equalityConditions.equals(""); 
         
-        String sqlString = "SELECT " + columnsString + " FROM " + table;
+        String sqlString = "SELECT DISTINCT " + columnsString + " FROM " + table;
         if (equalityExists) {
             sqlString += " WHERE " + equalityConditions;
         }
@@ -175,9 +175,6 @@ public class RdbConnection {
         }
         PreparedStatement statement = connection.prepareStatement(sqlString);
         insertValues(statement, keyPairs[1]);
-        
-        // TODO:REM
-        //System.out.println(statement.toString());
         
 		return statement.executeQuery();
 	}
@@ -212,8 +209,6 @@ public class RdbConnection {
 			PreparedStatement statement = connection.prepareStatement(sqlString);
 	        insertValues(statement, keyPairs[1], valuePairs[1]);
 	        
-			// TODO:REM
-			//System.out.println(statement.toString());
 	        statement.execute();
 		} else if (update && valuePairs[0].length > 0) {
 			String condition = getEqualityStatement(keyPairs[0]);
@@ -222,8 +217,6 @@ public class RdbConnection {
 			PreparedStatement statement = connection.prepareStatement(sqlString);
 	        insertValues(statement, valuePairs[1], keyPairs[1]);
 			
-			// TODO:REM
-			//System.out.println(statement.toString());
 	        statement.execute();
 		}
 	}
@@ -233,9 +226,6 @@ public class RdbConnection {
 		PreparedStatement statement = connection.prepareStatement(sqlString);
         insertValues(statement, keyPairs[1]);
 
-		// TODO:REM
-		//System.out.println(statement.toString());
-        
         statement.execute();
 	}
 }

@@ -32,7 +32,6 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import com.cosylab.vdct.db.DBData;
-import com.cosylab.vdct.rdb.group.SQLTableGUI;
 
 /**
  * @author ssah
@@ -42,7 +41,7 @@ public class Rdb implements RdbInterface {
 
 	private RdbDataMapper mapper = null;
 	private ConnectionDialog connectionDialog = null;
-	private SQLTableGUI groupDialog = null;
+	private RdbDataChooserDialog groupDialog = null;
 	private JFrame guiContext = null;
 
 	/**
@@ -57,7 +56,7 @@ public class Rdb implements RdbInterface {
 			exception.printStackTrace();
 		}
 		connectionDialog = new ConnectionDialog(guiContext, mapper);
-		groupDialog = new SQLTableGUI(mapper, guiContext);
+		groupDialog = new RdbDataChooserDialog(mapper, guiContext);
 	}
 
 	/* (non-Javadoc)
@@ -70,7 +69,7 @@ public class Rdb implements RdbInterface {
 	/* (non-Javadoc)
 	 * @see com.cosylab.vdct.rdb.RdbInterface#loadDbGroup(java.lang.String)
 	 */
-	public DBData loadDbGroup() {
+	public DBData loadRdbData() {
 		if (!mapper.isConnection()) {
 			connectionDialog.setVisible(true);
 		}
@@ -85,18 +84,26 @@ public class Rdb implements RdbInterface {
 	/* (non-Javadoc)
 	 * @see com.cosylab.vdct.rdb.RdbInterface#saveDbGroup(java.lang.String)
 	 */
-	public void saveDbGroup(String name) {
+	public void saveRdbData(RdbDataId dataId) {
 		if (!mapper.isConnection()) {
 			connectionDialog.setVisible(true);
 		}
 		if (mapper.isConnection()) {
-
-			try {
-				mapper.saveDbGroup(name);
-			} catch (Exception exception) {
-				JOptionPane.showMessageDialog(guiContext, exception.getMessage(),
-						"Database error", JOptionPane.ERROR_MESSAGE);
-
+			
+			boolean success = false;
+			// Check if enough data known to perform a direct save. 
+			if (dataId != null && dataId.isDefined()) {
+				try {
+					mapper.saveRdbData(dataId);
+					success = true;
+				} catch (Exception exception) {
+					JOptionPane.showMessageDialog(guiContext, exception.getMessage(),
+							"Database error", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+			
+			// If something failed fall back to save as dialog.
+			if (!success) {
 				groupDialog.setLoadMode(false);		
 				groupDialog.setVisible(true);
 			}
@@ -106,12 +113,13 @@ public class Rdb implements RdbInterface {
 	/* (non-Javadoc)
 	 * @see com.cosylab.vdct.rdb.RdbInterface#saveAsDbGroup(java.lang.String)
 	 */
-	public void saveAsDbGroup(String name) {
+	public void saveAsRdbData(RdbDataId dataId) {
 		if (!mapper.isConnection()) {
 			connectionDialog.setVisible(true);
 		}
 		if (mapper.isConnection()) {
-			groupDialog.setLoadMode(false);		
+			groupDialog.setLoadMode(false);
+			groupDialog.setRdbDataId(dataId);
 			groupDialog.setVisible(true);
 		}
 	}

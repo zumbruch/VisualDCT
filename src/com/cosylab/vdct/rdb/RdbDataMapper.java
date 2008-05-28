@@ -61,7 +61,7 @@ import com.cosylab.vdct.vdb.VDBRecordData;
  */
 public class RdbDataMapper {
 
-	// TODO: reactivate when definitions saving use cases defined. 
+	// Reactivate when definitions saving use cases defined. 
 	private static boolean manageDbds = false;
 	private RdbConnection helper = null;
 
@@ -69,38 +69,30 @@ public class RdbDataMapper {
 	private Integer pDbdId = null; 
 	private Integer pDbId = null; 
 	
-	private String group = null; 
-	private Integer version = null; 
-	
 	private static final String emptyString = "";
 	private static final String recordDefDescription = "Saved by VDCT";
 	private static final String dtypString = "DTYP";
 
 	public RdbDataMapper() throws Exception {
 		helper = new RdbConnection();
-		version = new Integer(0);
 	}
 	
 	public void setConnectionParameters(String host, String database, String user, String password) {
 		helper.setParameters(host, database, user, password);
 	}
 
-	public DBData loadDbGroup(String group) throws Exception {
-
-		this.group = group;
+	public DBData loadRdbData(RdbDataId dataId) throws Exception {
 
 		DBData data = null;
 		Exception exception = null;
 		try {
-			if (loadDbId(group)) {
-				data = new DBData(group, group);
-				loadRecords(data, group);
-				loadTemplates(data, group);			
+			if (loadDbId(dataId)) {
+				data = new DBData(dataId.toString(), dataId.getFileName());
+				loadRecords(data);
+				loadTemplates(data);			
 			}
 		} catch (SQLException sqlException) {
-			// TODO:REM
 			sqlException.printStackTrace();
-			
 			exception = new Exception("Error while loading database: " + sqlException.getMessage());
 		}
 		
@@ -110,24 +102,20 @@ public class RdbDataMapper {
 		return data;
 	}
 	
-	public void saveDbGroup(String group) throws Exception {
+	public void saveRdbData(RdbDataId dataId) throws Exception {
 		
-		this.group = group;
-
 		Exception exception = null;
 		try {
-			if (manageDbds) {
-			    saveDataDef();
+			if (loadDbId(dataId)) {
+				if (manageDbds) {
+					saveDataDef();
+				}
+				saveDefinitionFile();
+				saveRecords();
+				helper.commit();
 			}
-			saveDefinitionFile();
-			saveIoc();
-			saveGroup();			
-            saveRecords();
-            helper.commit();
 		} catch (SQLException sqlException) {
-			// TODO:REM
 			sqlException.printStackTrace();
-			
 			exception = new Exception("Error while saving database: " + sqlException.getMessage());
 			helper.rollbackConnection();
 		}
@@ -151,6 +139,7 @@ public class RdbDataMapper {
 	
 	public int createAnIoc() throws SQLException {
 		saveIoc();
+        helper.commit();
 		return iocId.intValue();
 	}
 	
@@ -160,7 +149,7 @@ public class RdbDataMapper {
 
 		Object[] columns = {"ioc_id"};  
 		Object[][] conditions = {{}, {}};
-		ResultSet set = helper.loadRows("ioc", columns, conditions);
+		ResultSet set = helper.loadRows("ioc", columns, conditions, null, "ioc_id");
         
         Vector iocs = new Vector();
 		while (set.next()) {
@@ -171,11 +160,11 @@ public class RdbDataMapper {
 
 	/** Returns Vector of String objects representing db files under the given IOC.
 	 */ 
-	public Vector getGroups(String iocId) throws SQLException {
+	public Vector getRdbDatas(String iocId) throws SQLException {
 
 		Object[] columns = {"p_db_file_name"};  
 		Object[][] conditions = {{"ioc_id_FK"}, {iocId}};
-		ResultSet set = helper.loadRows("p_db", columns, conditions);
+		ResultSet set = helper.loadRows("p_db", columns, conditions, null, "p_db_file_name");
         
         Vector groups = new Vector();
         while (set.next()) {
@@ -189,8 +178,8 @@ public class RdbDataMapper {
 	public Vector getVersions(String group, String iocId) throws SQLException {
 
 		Object[] columns = {"p_db_version"};  
-		Object[][] conditions = {{"ioc_id_FK", "p_db_file_anme"}, {iocId, group}};
-		ResultSet set = helper.loadRows("p_db", columns, conditions);
+		Object[][] conditions = {{"ioc_id_FK", "p_db_file_name"}, {iocId, group}};
+		ResultSet set = helper.loadRows("p_db", columns, conditions, null, "p_db_version");
         
         Vector versions = new Vector();
         while (set.next()) {
@@ -199,13 +188,21 @@ public class RdbDataMapper {
         return versions;
 	}
 	
-	private boolean loadDbId(String group) throws SQLException {
+	public void addRdbDataId(RdbDataId dataId, String desription) throws SQLException {
+
+    	Object[][] keyPairs = {{"p_db_file_name", "ioc_id_FK", "p_db_version"},
+    			{dataId.getFileName(), dataId.getIoc(), dataId.getVersion()}};
+		Object[][] valuePairs = {{"p_db_desc"}, {desription}};
+   		helper.saveRow("p_db", keyPairs, valuePairs);
+        helper.commit();
+	}
+	
+	private boolean loadDbId(RdbDataId dataId) throws SQLException {
 	
 		Object[] columns = {"p_db_id"};  
-		Object[][] conditions = {{"p_db_file_name"}, {group}};
-		// TODO: also use version
-		//Object[][] conditions = {{"p_db_version"}, {version}};
-		
+		Object[][] conditions = {{"p_db_file_name", "p_db_version", "ioc_id_FK"},
+				{dataId.getFileName(), dataId.getVersion(), dataId.getIoc()}};
+
 		ResultSet set = helper.loadRows("p_db", columns, conditions);
         
         if (set.next()) {
@@ -215,9 +212,9 @@ public class RdbDataMapper {
         return false;
 	}
 	
-	private void loadRecords(DBData data, String group) throws SQLException {
+	private void loadRecords(DBData data) throws SQLException {
 
-		/* TODO: rec_code_type usage
+		/* Rec_code_type usage.
 		Object[] columns = {"sgnl_id", "sgnl_rec.rec_type_id"};  
 		Object[][] conditions = {{"epics_grp_id", "sgnl_rec.rec_type_id", "rec_type_code"},
                 {group,            "sgnl_rec_type.rec_type_id", "E"}};
@@ -248,7 +245,7 @@ public class RdbDataMapper {
         }
 	}
 
-	private void loadTemplates(DBData data, String group) throws SQLException {
+	private void loadTemplates(DBData data) throws SQLException {
 		// Currently disabled.
 		/*
 		Object[] columns = {"expand_id", "template_id"};  
@@ -511,21 +508,9 @@ public class RdbDataMapper {
 		}
 	}
 	
-	private void saveGroup() throws SQLException {
-		Object[][] keyPairs = {{"p_db_file_name", "p_db_version", "ioc_id_FK"}, {group, version, iocId}};
-		Object[][] valuePairs = {{}, {}};
-		helper.appendRow("p_db", keyPairs, valuePairs);
-		
-		Object[] columns = {"p_db_id"};
-		ResultSet set = helper.loadRows("p_db", columns, keyPairs);
-		if (set.next()) {
-			pDbId = new Integer(set.getInt(1));
-		}
-	}
-	
 	private void saveRecords() throws SQLException {
 
-		// TODO: remove when Group and rec_type_code usage is defined  
+		// rec type code usage: remove when Group and rec_type_code usage is defined  
 		/*
 		PreparedStatement statement = connection.prepareStatement(
         		"SELECT sgnl_id FROM sgnl_rec, sgnl_rec_type"

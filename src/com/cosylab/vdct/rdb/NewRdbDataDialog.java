@@ -31,230 +31,232 @@ package com.cosylab.vdct.rdb;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.HeadlessException;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.util.Iterator;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-import javax.swing.WindowConstants;
-import javax.swing.border.TitledBorder;
-
-import com.cosylab.vdct.XmlSettings;
 
 /**
  * @author ssah
  *
  */
-public class ConnectionDialog extends JDialog implements ActionListener {
+public class NewRdbDataDialog extends JDialog implements ActionListener {
 
 	private RdbDataMapper mapper = null;
+	private boolean confirmed = false;
+
+	private JTextField dbNameField = null;
+	private JTextField versionField = null;
+	private JComboBox iocComboBox = null;
+	private JTextField descriptionField = null;
 	
-	private JTextField hostField = null;
-	private JTextField databaseField = null;
-	private JTextField userField = null;
-	private JPasswordField passwordField = null;
-	
-	private static final String connectString = "Connect";
+	private static final String addNewDbString = "Add new db";
+	private static final String fileNameString = "File name:";
+	private static final String iocString = "Ioc";
+	private static final String versionString = "Version";
+	private static final String descriptionString = "Description";
+	private static final String addString = "Add";
 	private static final String cancelString = "Cancel";
-
-	private static final String hostString = "Host:";
-	private static final String databaseString = "Database:";
-	private static final String userString = "User:";
-	private static final String passwordString = "Password:";
-
+	
 	/**
 	 * @param arg0
+	 * @param arg1
+	 * @throws HeadlessException
 	 */
-	public ConnectionDialog(JFrame arg0, RdbDataMapper mapper) {
-        super(arg0, true);
-
+	public NewRdbDataDialog(RdbDataMapper mapper, JDialog parent) {
+		super(parent, true);
 		this.mapper = mapper;
-        
-        setTitle("Connect to database");
-        setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
-        createGUI();
+        makeGUI();
 	}
 	
+	/**
+	 * @return the confirmed
+	 */
+	public boolean isConfirmed() {
+		return confirmed;
+	}
+
 	/* (non-Javadoc)
 	 * @see java.awt.Component#setVisible(boolean)
 	 */
-	public void setVisible(boolean b) {
-		if (b) {
-			setLocationRelativeTo(getParent());			
+	public void setVisible(boolean arg0) {
+		try {
+			if (arg0) {
+				refreshIocCombobox(); 
+				setLocationRelativeTo(getParent());			
+			}
+			super.setVisible(arg0);
+			
+		} catch (Exception exception) {
+			JOptionPane.showMessageDialog(null, exception.getMessage(), "Error loading Ioc data",
+					JOptionPane.ERROR_MESSAGE);
 		}
-		super.setVisible(b);
 	}
 
-	/** This method is called from within the constructor to
-     * initialize the form.
-     */
-    private void createGUI() {
+	private void makeGUI() {
+		setTitle(addNewDbString);
+		setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
+		getContentPane().add(createContentPanel());
+		pack();
+	}
 
+	private JPanel createContentPanel() {
+		
 		JPanel contentPanel = new JPanel(new GridBagLayout());
 		contentPanel.setPreferredSize(new Dimension(448, 128));
 
-    	JPanel connectionPannel = createConnectionPanel();
+		JPanel newGroupPanel = createNewGroupPanel();
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.weightx = 1.0;
-		constraints.fill = GridBagConstraints.HORIZONTAL;
+		constraints.weighty = 1.0;
+		constraints.fill = GridBagConstraints.BOTH;
 		constraints.insets = new Insets(4, 4, 4, 4);
-		contentPanel.add(connectionPannel, constraints);
+		contentPanel.add(newGroupPanel, constraints);
 
-    	JPanel buttonPanel = createButtonPanel();
+		JPanel buttonsPanel = createButtonsPanel();
 		constraints = new GridBagConstraints();
 		constraints.gridy = 1;
 		constraints.weightx = 1.0;
 		constraints.fill = GridBagConstraints.HORIZONTAL;
 		constraints.insets = new Insets(4, 4, 4, 4);
-		contentPanel.add(buttonPanel, constraints);
-        
-		getContentPane().add(contentPanel);
-		pack();
-    }
+		contentPanel.add(buttonsPanel, constraints);
 
-    private JPanel createConnectionPanel() {
+		return contentPanel;
+	}
+	
+	private JPanel createNewGroupPanel() {
+
+    	JPanel newGroupPanel = new JPanel(new GridBagLayout());
     	
-    	JPanel connectionPanel = new JPanel(new GridBagLayout());
-    	connectionPanel.setBorder(new TitledBorder("Connect to database"));
-    	
-    	JLabel hostLabel = new JLabel(hostString);
+    	JLabel fileNameLabel = new JLabel(fileNameString);
     	GridBagConstraints constraints = new GridBagConstraints();
 		constraints.weightx = .0;
 		constraints.fill = GridBagConstraints.HORIZONTAL;
 		constraints.insets = new Insets(4, 4, 4, 4);
-		connectionPanel.add(hostLabel, constraints);
+		newGroupPanel.add(fileNameLabel, constraints);
 
-    	hostField = new JTextField();
+		dbNameField = new JTextField();
         constraints = new GridBagConstraints();
 		constraints.gridx = 1;
 		constraints.weightx = .5;
 		constraints.fill = GridBagConstraints.HORIZONTAL;
 		constraints.insets = new Insets(4, 4, 4, 4);
-		connectionPanel.add(hostField, constraints);
+		newGroupPanel.add(dbNameField, constraints);
 		
-    	JLabel databaseLabel = new JLabel(databaseString);
+    	JLabel versionLabel = new JLabel(versionString);
     	constraints = new GridBagConstraints();
 		constraints.gridx = 2;
 		constraints.weightx = .0;
 		constraints.fill = GridBagConstraints.HORIZONTAL;
 		constraints.insets = new Insets(4, 4, 4, 4);
-		connectionPanel.add(databaseLabel, constraints);
+		newGroupPanel.add(versionLabel, constraints);
 
-    	databaseField = new JTextField();
+		versionField = new JTextField();
         constraints = new GridBagConstraints();
 		constraints.gridx = 3;
 		constraints.weightx = .5;
 		constraints.fill = GridBagConstraints.HORIZONTAL;
 		constraints.insets = new Insets(4, 4, 4, 4);
-		connectionPanel.add(databaseField, constraints);
+		newGroupPanel.add(versionField, constraints);
 		
-    	JLabel userLabel = new JLabel(userString);
+    	JLabel iocLabel = new JLabel(iocString);
     	constraints = new GridBagConstraints();
 		constraints.gridy = 1;
 		constraints.weightx = .0;
 		constraints.fill = GridBagConstraints.HORIZONTAL;
 		constraints.insets = new Insets(4, 4, 4, 4);
-		connectionPanel.add(userLabel, constraints);
+		newGroupPanel.add(iocLabel, constraints);
 
-    	userField = new JTextField();
+		iocComboBox = new JComboBox();
         constraints = new GridBagConstraints();
 		constraints.gridx = 1;
 		constraints.gridy = 1;
 		constraints.weightx = .5;
 		constraints.fill = GridBagConstraints.HORIZONTAL;
 		constraints.insets = new Insets(4, 4, 4, 4);
-		connectionPanel.add(userField, constraints);
+		newGroupPanel.add(iocComboBox, constraints);
 		
-    	JLabel passwordLabel = new JLabel(passwordString);
+    	JLabel descriptionLabel = new JLabel(descriptionString);
     	constraints = new GridBagConstraints();
 		constraints.gridx = 2;
 		constraints.gridy = 1;
 		constraints.weightx = .0;
 		constraints.fill = GridBagConstraints.HORIZONTAL;
 		constraints.insets = new Insets(4, 4, 4, 4);
-		connectionPanel.add(passwordLabel, constraints);
+		newGroupPanel.add(descriptionLabel, constraints);
 
-    	passwordField = new JPasswordField();
+		descriptionField = new JTextField();
         constraints = new GridBagConstraints();
 		constraints.gridx = 3;
 		constraints.gridy = 1;
 		constraints.weightx = .5;
 		constraints.fill = GridBagConstraints.HORIZONTAL;
 		constraints.insets = new Insets(4, 4, 4, 4);
-		connectionPanel.add(passwordField, constraints);
+		newGroupPanel.add(descriptionField, constraints);
 		
-        XmlSettings xmlSettings = XmlSettings.getInstance();
-        hostField.setText(xmlSettings.getRdbHost());
-        databaseField.setText(xmlSettings.getRdbDatabase());
-        userField.setText(xmlSettings.getRdbUser());
-        passwordField.setText(xmlSettings.getRdbPassword());
-		
-		return connectionPanel;
-    }
-
-
-    private JPanel createButtonPanel() {
-    	JPanel buttonPanel = new JPanel(new GridBagLayout());
-		
-    	JButton connectButton = new JButton(connectString); 
-    	connectButton.setMnemonic('C');
-    	connectButton.addActionListener(this);
+		return newGroupPanel;
+	}
+	
+	private JPanel createButtonsPanel() {
+		JPanel buttonsPanel = new JPanel();
+		JButton addNewButton = new JButton(addString);
+		addNewButton.setMnemonic(KeyEvent.VK_A);
+		addNewButton.addActionListener(this);
 		GridBagConstraints constraints = new GridBagConstraints();
-		constraints.weightx = .5;
 		constraints.anchor = GridBagConstraints.EAST;
-        constraints.insets = new Insets(4, 4, 4, 4);
-        buttonPanel.add(connectButton, constraints);
+		constraints.insets = new Insets(4, 4, 4, 4);
+		buttonsPanel.add(addNewButton, constraints);
 
-    	JButton cancelButton = new JButton(cancelString); 
-    	cancelButton.setMnemonic('N');
-    	cancelButton.addActionListener(this);
-    	
+		JButton button = new JButton(cancelString);
+		button.setMnemonic(KeyEvent.VK_C);
+		button.addActionListener(this);
 		constraints = new GridBagConstraints();
 		constraints.gridx = 1;
-		constraints.weightx = .5;
 		constraints.anchor = GridBagConstraints.WEST;
-        constraints.insets = new Insets(4, 4, 4, 4);
-        buttonPanel.add(cancelButton, constraints);
-        
-        return buttonPanel;
-    }
+		constraints.insets = new Insets(4, 4, 4, 4);
+		buttonsPanel.add(button, constraints);
 
+		return buttonsPanel;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+	 */
 	public void actionPerformed(ActionEvent event) {
 		String action = event.getActionCommand();
-
-		if (action.equals(connectString)) {
+		
+		if (action.equals(addString)) {
 			try {
-				if (mapper.isConnection()) {
-					mapper.closeConnection();
-				}
-				mapper.setConnectionParameters(hostField.getText(), databaseField.getText(),
-						userField.getText(), String.valueOf(passwordField.getPassword()));
-				mapper.createNewConnection();
-				
-				saveSettings();
-	        	setVisible(false);
-				
-			} catch (Exception exception) {
-	            JOptionPane.showMessageDialog(this, exception.getMessage(), "Connect error",
-	            		JOptionPane.ERROR_MESSAGE);
+				RdbDataId dataId = new RdbDataId(dbNameField.getText(), versionField.getText(),
+						iocComboBox.getSelectedItem().toString());
+				mapper.addRdbDataId(dataId, descriptionField.getText());
+				confirmed = true;
+				setVisible(false);
+			} catch(Exception exception) {
+				JOptionPane.showMessageDialog(null, exception.getMessage(), "Database error",
+						JOptionPane.ERROR_MESSAGE);
 			}
 		} else if (action.equals(cancelString)) {
-        	setVisible(false);
+			confirmed = false;
+			setVisible(false);
 		} 
 	}
 	
-	private void saveSettings() {
-        XmlSettings xmlSettings = XmlSettings.getInstance();
-        xmlSettings.setRdbHost(hostField.getText());
-        xmlSettings.setRdbDatabase(databaseField.getText());
-        xmlSettings.setRdbUser(userField.getText());
-        xmlSettings.setRdbPassword(String.valueOf(passwordField.getPassword()));
+	private void refreshIocCombobox() throws Exception {
+		Iterator iterator = mapper.getIocs().iterator();
+		iocComboBox.removeAllItems();
+		while (iterator.hasNext()) {
+            iocComboBox.addItem(iterator.next());
+		}
 	}
 }
