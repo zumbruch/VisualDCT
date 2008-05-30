@@ -51,5 +51,5 @@ void writeObjects(DataOutputStream file, NamingContext renamer, boolean export) 
  * @param namer NameManipulator
  * @exception java.io.IOException The exception description.
  */
-void writeVDCTData(DataOutputStream file, NamingContext renamer, boolean export) throws java.io.IOException;
+void writeVDCTObjects(DataOutputStream file, NamingContext renamer, boolean export) throws java.io.IOException;
 }

@@ -1458,6 +1458,22 @@ public class DBResolver {
 				lines++;
 		}
 	}
+	
+	public static void readVdctData(DBData data, String vdctData, String source) {
+		StringReader reader = new StringReader(vdctData);
+		EnhancedStreamTokenizer tokenizer = new EnhancedStreamTokenizer(reader);
+		initializeTokenizer(tokenizer);
+		try {
+			while (tokenizer.nextToken() != EnhancedStreamTokenizer.TT_EOF) {
+				if ((tokenizer.ttype == EnhancedStreamTokenizer.TT_WORD)
+						&& (tokenizer.sval.startsWith(DBConstants.commentString))) {
+					processComment(data, tokenizer, source);
+				}
+			}
+		} catch (Exception exception) {
+			exception.printStackTrace();
+		}
+	}
 
 	/**
 	 * This method was created in VisualAge.

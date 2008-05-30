@@ -251,7 +251,7 @@ public void copyToSystemClipboard(Vector objs)
 		}
 		
 		Group.writeObjects(objs, dos, nc, false);
-		Group.writeVDCTData(objs, dos, nc, false);
+		Group.writeVDCTObjects(objs, dos, nc, false);
 		
 		StringSelection ss = new StringSelection(baos.toString());
 		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, ss);

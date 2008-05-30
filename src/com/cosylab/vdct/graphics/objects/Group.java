@@ -37,6 +37,9 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -1281,7 +1284,27 @@ private static void writeIncludes(java.io.DataOutputStream file) throws IOExcept
 
 }
 
+public static String getVDCTData() {
+	
+	StringWriter writer = new StringWriter();
+	try {
+		writeVDCTViewData(writer);
+		NamingContext renamer = new NamingContext(null, Group.getEditingTemplateData(), null, null, false);
+		Group.getRoot().writeVDCTObjects(writer, renamer, false);
+		writer.flush();
+	} catch (IOException exception) {
+		// Does not happen with StringWriter.
+	}
+	return writer.toString();
+}
+
 private static void writeVDCTViewData(DataOutputStream file) throws IOException {
+	Writer writer = new OutputStreamWriter(file);
+	writeVDCTViewData(writer);
+	writer.flush();
+}
+
+private static void writeVDCTViewData(Writer writer) throws IOException {
 
 	 final String nl = "\n";
 
@@ -1306,7 +1329,7 @@ private static void writeVDCTViewData(DataOutputStream file) throws IOException 
 
 	 ViewState view = ViewState.getInstance();
 
-	 file.writeBytes(VIEW_START + view.getRx() + comma + view.getRy() +
+	 writer.write(VIEW_START + view.getRx() + comma + view.getRy() +
 		 			 comma + view.getScale() + ending);
 	 
 	 // Write the data on the spreadsheet views.
@@ -1338,39 +1361,39 @@ private static void writeVDCTViewData(DataOutputStream file) throws IOException 
 			 continue;
 		 }
 
-	     file.writeBytes(SPREADSHEET_VIEW_START + sprView.getType());
-	     file.writeBytes(comma + quote + sprView.getName() + quote);
+	     writer.write(SPREADSHEET_VIEW_START + sprView.getType());
+	     writer.write(comma + quote + sprView.getName() + quote);
 
 	     if (modeName != null) {
-			 file.writeBytes(comma + SPREADSHEET_COLUMNORDER_START);
-			 file.writeBytes(quote + modeName + quote);
-			 file.writeBytes(")");
+			 writer.write(comma + SPREADSHEET_COLUMNORDER_START);
+			 writer.write(quote + modeName + quote);
+			 writer.write(")");
 	     }
 
 	     if (showAllRows != null) {
-			 file.writeBytes(comma + SPREADSHEET_SHOWALLROWS_START);
-			 file.writeBytes(quote + showAllRows.toString() + quote);
-			 file.writeBytes(")");
+			 writer.write(comma + SPREADSHEET_SHOWALLROWS_START);
+			 writer.write(quote + showAllRows.toString() + quote);
+			 writer.write(")");
 	     }
 
 	     if (groupColumnsByGuiGroup != null) {
-			 file.writeBytes(comma + SPREADSHEET_GROUPCOLUMNSBYGUIGROUP_START);
-			 file.writeBytes(quote + groupColumnsByGuiGroup.toString() + quote);
-			 file.writeBytes(")");
+			 writer.write(comma + SPREADSHEET_GROUPCOLUMNSBYGUIGROUP_START);
+			 writer.write(quote + groupColumnsByGuiGroup.toString() + quote);
+			 writer.write(")");
 	     }
 	     
 	     if (backgroundColor != null) {
-			 file.writeBytes(comma + SPREADSHEET_BACKGROUNDCOLOR_START);
-			 file.writeBytes(backgroundColor.toString());
-			 file.writeBytes(")");
+			 writer.write(comma + SPREADSHEET_BACKGROUNDCOLOR_START);
+			 writer.write(backgroundColor.toString());
+			 writer.write(")");
 	     }
 	     
 	     if (rowOrder != null) {
-			 file.writeBytes(comma + SPREADSHEET_ROWORDER_START);
-			 file.writeBytes(quote + rowOrder.getColumnName() + quote);
-			 file.writeBytes(comma + rowOrder.getColumnSplitIndex());
-			 file.writeBytes(comma + quote + rowOrder.getAscendingString() + quote);
-			 file.writeBytes(")");
+			 writer.write(comma + SPREADSHEET_ROWORDER_START);
+			 writer.write(quote + rowOrder.getColumnName() + quote);
+			 writer.write(comma + rowOrder.getColumnSplitIndex());
+			 writer.write(comma + quote + rowOrder.getAscendingString() + quote);
+			 writer.write(")");
 	     }
 	     
 	     if (columns != null) {
@@ -1378,48 +1401,48 @@ private static void writeVDCTViewData(DataOutputStream file) throws IOException 
 	    	 
 	    	 while (colIterator.hasNext()) {
 	    		 SpreadsheetColumnData column = (SpreadsheetColumnData)colIterator.next(); 
-	    		 file.writeBytes(comma + SPREADSHEET_COLUMN_START);
-	    		 file.writeBytes(quote + column.getName() + quote);
-	    		 file.writeBytes(comma + quote + String.valueOf(column.isHidden()) + quote);
-	    		 file.writeBytes(comma + String.valueOf(column.getSortIndex()));
+	    		 writer.write(comma + SPREADSHEET_COLUMN_START);
+	    		 writer.write(quote + column.getName() + quote);
+	    		 writer.write(comma + quote + String.valueOf(column.isHidden()) + quote);
+	    		 writer.write(comma + String.valueOf(column.getSortIndex()));
 	    		 
 	    		 SplitPartWidthData[] widths = column.getSplitIndices();
 	    		 for (int i = 0; i < widths.length; i++) {
-	    			 file.writeBytes(comma + SPREADSHEET_WIDTH_START);
-	    			 file.writeBytes(String.valueOf(widths[i].getSplitIndex()));
-	    			 file.writeBytes(comma + String.valueOf(widths[i].getWidth()));
-	    			 file.writeBytes(")");
+	    			 writer.write(comma + SPREADSHEET_WIDTH_START);
+	    			 writer.write(String.valueOf(widths[i].getSplitIndex()));
+	    			 writer.write(comma + String.valueOf(widths[i].getWidth()));
+	    			 writer.write(")");
 	    		 }
-	    		 file.writeBytes(")");
+	    		 writer.write(")");
 	    	 }
 	     }
 
 	     if (hiddenRows != null) {
 	    	 for (int i = 0; i < hiddenRows.length; i++) {
-	    		 file.writeBytes(comma + SPREADSHEET_ROW_START + quote + hiddenRows[i] + "\")");
+	    		 writer.write(comma + SPREADSHEET_ROW_START + quote + hiddenRows[i] + "\")");
 	    	 }
 	     }
 
 	     if (splitColumns != null) {
 	    	 for (int i = 0; i < splitColumns.length; i++) {
-	    		 file.writeBytes(comma + SPREADSHEET_SPLITCOLUMN_START);
-	    		 file.writeBytes(quote + splitColumns[i].getName() + quote);
-	    		 file.writeBytes(comma + quote + splitColumns[i].getDelimiterTypeString() + quote);
-	    		 file.writeBytes(comma + quote + splitColumns[i].getPattern() + quote);
-	    		 file.writeBytes(")");
+	    		 writer.write(comma + SPREADSHEET_SPLITCOLUMN_START);
+	    		 writer.write(quote + splitColumns[i].getName() + quote);
+	    		 writer.write(comma + quote + splitColumns[i].getDelimiterTypeString() + quote);
+	    		 writer.write(comma + quote + splitColumns[i].getPattern() + quote);
+	    		 writer.write(")");
 	    	 }
 	     }
 
 	     if (recentSplits != null) {
 	    	 for (int i = 0; i < recentSplits.length; i++) {
-	    		 file.writeBytes(comma + SPREADSHEET_RECENTSPLIT_START);
-	    		 file.writeBytes(quote + recentSplits[i].getDelimiterTypeString() + quote);
-	    		 file.writeBytes(comma + quote + recentSplits[i].getPattern() + quote);
-	    		 file.writeBytes(")");
+	    		 writer.write(comma + SPREADSHEET_RECENTSPLIT_START);
+	    		 writer.write(quote + recentSplits[i].getDelimiterTypeString() + quote);
+	    		 writer.write(comma + quote + recentSplits[i].getPattern() + quote);
+	    		 writer.write(")");
 	    	 }
 	     }
 	     
-	     file.writeBytes(ending);
+	     writer.write(ending);
 	 }
 }
 /**
@@ -1429,18 +1452,30 @@ private static void writeVDCTViewData(DataOutputStream file) throws IOException 
  * @param path2remove java.lang.String
  * @exception java.io.IOException The exception description.
  */
-public void writeVDCTData(java.io.DataOutputStream file, NamingContext renamer, boolean export) throws java.io.IOException {
-	writeVDCTData(getSubObjectsV(), file, renamer, export);
+public void writeVDCTObjects(DataOutputStream file, NamingContext renamer, boolean export) throws java.io.IOException {
+	Writer writer = new OutputStreamWriter(file);
+	writeVDCTObjects(getSubObjectsV(), writer, renamer, export);
+	writer.flush();
+}
+
+public void writeVDCTObjects(Writer writer, NamingContext renamer, boolean export) throws java.io.IOException {
+	writeVDCTObjects(getSubObjectsV(), writer, renamer, export);
+}
+
+public static void writeVDCTObjects(Vector elements, DataOutputStream file, NamingContext renamer, boolean export) throws java.io.IOException {
+	Writer writer = new OutputStreamWriter(file);
+	writeVDCTObjects(elements, writer, renamer, export);
+	writer.flush();
 }
 
 /**
  * Insert the method's description here.
  * Creation date: (22.4.2001 21:51:25)
- * @param file java.io.DataOutputStream
+ * @param writer java.io.DataOutputStream
  * @param path2remove java.lang.String
  * @exception java.io.IOException The exception description.
  */
-public static void writeVDCTData(Vector elements, java.io.DataOutputStream file, NamingContext renamer, boolean export) throws java.io.IOException {
+public static void writeVDCTObjects(Vector elements, Writer writer, NamingContext renamer, boolean export) throws java.io.IOException {
 
  Object obj;
  Group group;
@@ -1486,7 +1521,7 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 
 				if (record.getRecordData().getName().startsWith(Constants.CLIPBOARD_NAME)) continue;
 
-	 			file.writeBytes(RECORD_START+
+	 			writer.write(RECORD_START+
 			 		StringUtils.quoteIfMacro(
 				 		renamer.getResolvedName(record.getRecordData().getName())
 				 	) + comma + record.getX() + comma + record.getY() + 
@@ -1508,7 +1543,7 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 						if (connector.getInput()!=null)
 							target = renamer.getResolvedName(connector.getInput().getID());
 						
-						file.writeBytes(CONNECTOR_START+
+						writer.write(CONNECTOR_START+
 					 		StringUtils.quoteIfMacro(
 						 		renamer.getResolvedName(connector.getID())
 						 	) + comma +  
@@ -1526,7 +1561,7 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 				 		{
 				 			field = (EPICSLink)obj;
 	
-				 			file.writeBytes(FIELD_START+
+				 			writer.write(FIELD_START+
 						 		StringUtils.quoteIfMacro(
 							 		renamer.getResolvedName(field.getFieldData().getFullName())
 							 	) + 
@@ -1542,7 +1577,7 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 				 			EPICSLink epicsLink = (EPICSLink)obj;
 				 			OutLink outlink = (OutLink)obj;
 				 			if (outlink.getInput()!=null)
-				 				file.writeBytes(LINK_START+
+				 				writer.write(LINK_START+
 						 			StringUtils.quoteIfMacro(
 							 			renamer.getResolvedName(epicsLink.getFieldData().getFullName())
 							 		) + comma + 
@@ -1560,7 +1595,7 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 	 			{
 			 		vfd = (VDBFieldData)e2.nextElement();
 					if (vfd.getVisibility()!=InspectableProperty.NON_DEFAULT_VISIBLE)
-		 				file.writeBytes(VISIBILITY_START+
+		 				writer.write(VISIBILITY_START+
 				 			StringUtils.quoteIfMacro(
 					 			renamer.getResolvedName(vfd.getFullName())
 					 		) + comma +
@@ -1573,19 +1608,19 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
  	 	else if (obj instanceof Group)
  	 		{
 			 	 group = (Group)obj;
-			 	 file.writeBytes(GROUP_START+
+			 	 writer.write(GROUP_START+
  					StringUtils.quoteIfMacro(
 	 					renamer.getResolvedName(group.getAbsoluteName())
 		 			 ) + comma + group.getX() + comma + group.getY() + 
 				 	 comma + StringUtils.color2string(group.getColor()) +
 					 comma + quote /*+ connector.getDescription() */+ quote +
 					 ending);
-			 	 group.writeVDCTData(file, renamer, export);
+			 	 group.writeVDCTObjects(writer, renamer, export);
 	 		}
  	 	else if (obj instanceof Port) {
 			OutLink outlink = (OutLink)obj;
 			if (outlink.getInput() != null) {			
-				file.writeBytes(LINK_START+
+				writer.write(LINK_START+
 			 			StringUtils.quoteIfMacro(
 				 			renamer.getResolvedName(outlink.getID())
 				 		) + comma + 
@@ -1597,12 +1632,12 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
  	 	}
  	 	else if (obj instanceof Border)
 	 		{
-	 			Group.writeVDCTData(((Border)obj).getSubObjectsV(), file, renamer, export);
+	 			Group.writeVDCTObjects(((Border)obj).getSubObjectsV(), writer, renamer, export);
 	 		}
  	 	else if (obj instanceof Line)
  	 		{
 			 	 Line line = (Line)obj;
-			 	 file.writeBytes(LINE_START+
+			 	 writer.write(LINE_START+
  					StringUtils.quoteIfMacro(
 	 					renamer.getResolvedName(line.getName())
 		 			 ) +
@@ -1618,7 +1653,7 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
  	 	else if (obj instanceof Box)
  	 		{
 			 	 Box box = (Box)obj;
-			 	 file.writeBytes(BOX_START+
+			 	 writer.write(BOX_START+
  					StringUtils.quoteIfMacro(
 	 					renamer.getResolvedName(box.getName())
 		 			 ) +
@@ -1633,7 +1668,7 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
  	 	else if (obj instanceof TextBox)
  	 		{
 			 	 TextBox box = (TextBox)obj;
-			 	 file.writeBytes(TEXTBOX_START+
+			 	 writer.write(TEXTBOX_START+
  					StringUtils.quoteIfMacro(
 	 					renamer.getResolvedName(box.getName())
 		 			 ) +
@@ -1654,8 +1689,8 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 			 	 template = (Template)obj;
 				 String templateName = renamer.getResolvedName(template.getName());
 
-			     file.writeBytes(nl);
-			 	 file.writeBytes(TEMPLATE_INSTANCE_START+
+			     writer.write(nl);
+			 	 writer.write(TEMPLATE_INSTANCE_START+
  					 quote + templateName + quote +
 		 			 comma + template.getX() + comma + template.getY() + 
 				 	 comma + StringUtils.color2string(template.getColor()) +
@@ -1674,7 +1709,7 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 			 			link = (EPICSLinkOut)obj;
 
 			 			if (link.getInput()!=null)
-			 				file.writeBytes(LINK_START+
+			 				writer.write(LINK_START+
 					 			StringUtils.quoteIfMacro(
 					 			       link.getParent().getHashID() + Constants.FIELD_SEPARATOR + renamer.getResolvedName(link.getFieldData().getFullName())
 						 		) + comma + 
@@ -1689,7 +1724,7 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 			 			
 		 				String name = field.getFieldData().getName();
 
-					 	file.writeBytes(TEMPLATE_FIELD_START+
+					 	writer.write(TEMPLATE_FIELD_START+
 		 					 quote + templateName + quote +
 		 					 comma + quote + name + quote +
 							 comma + StringUtils.color2string(field.getColor()) +
@@ -1705,7 +1740,7 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 						if (connector.getInput()!=null)
 							target = renamer.getResolvedName(connector.getInput().getID());
 						
-			 			file.writeBytes(CONNECTOR_START+
+			 			writer.write(CONNECTOR_START+
 					 		StringUtils.quoteIfMacro(
 						 		renamer.getResolvedName(connector.getID())
 						 	) + comma +  
@@ -1719,7 +1754,7 @@ public static void writeVDCTData(Vector elements, java.io.DataOutputStream file,
 		 			 }
 				 }					 
 
-			     file.writeBytes(nl);
+			     writer.write(nl);
 	 		}
 
  	 		
@@ -2040,7 +2075,7 @@ public static void save(Group group2save, File file, NamingContext renamer, bool
 		{
 			stream.writeBytes("\n#! Further lines contain data used by VisualDCT\n");
 			writeVDCTViewData(stream);			
-			group2save.writeVDCTData(stream, renamer, export);
+			group2save.writeVDCTObjects(stream, renamer, export);
 		}
 	
 	} finally {

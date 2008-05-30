@@ -2023,7 +2023,7 @@ public static Map preparePorts(Group group, Map substitutions, NameManipulator n
 /**
  * @see com.cosylab.vdct.graphics.objects.SaveInterface#writeVDCTData(DataOutputStream, String)
  */
-public void writeVDCTData(DataOutputStream file, NamingContext renamer, boolean export)
+public void writeVDCTObjects(DataOutputStream file, NamingContext renamer, boolean export)
 	throws IOException
 {
 	// No-op (done by writeObjects() method).

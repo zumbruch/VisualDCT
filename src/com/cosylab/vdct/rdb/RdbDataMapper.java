@@ -41,6 +41,7 @@ import com.cosylab.vdct.DataProvider;
 import com.cosylab.vdct.db.DBData;
 import com.cosylab.vdct.db.DBFieldData;
 import com.cosylab.vdct.db.DBRecordData;
+import com.cosylab.vdct.db.DBResolver;
 import com.cosylab.vdct.dbd.DBDConstants;
 import com.cosylab.vdct.dbd.DBDData;
 import com.cosylab.vdct.dbd.DBDDeviceData;
@@ -89,7 +90,8 @@ public class RdbDataMapper {
 			if (loadDbId(dataId)) {
 				data = new DBData(dataId.toString(), dataId.getFileName());
 				loadRecords(data);
-				loadTemplates(data);			
+				loadTemplates(data);
+				loadVdctData(data);				
 			}
 		} catch (SQLException sqlException) {
 			sqlException.printStackTrace();
@@ -112,6 +114,8 @@ public class RdbDataMapper {
 				}
 				saveDefinitionFile();
 				saveRecords();
+				saveVdctData();
+				
 				helper.commit();
 			}
 		} catch (SQLException sqlException) {
@@ -585,5 +589,23 @@ public class RdbDataMapper {
     	if (!fieldData.hasDefaultValue() && !value.equals(emptyString)) {
     		helper.saveRow(table, keyPairs, valuePairs);
         }
+	}
+	
+	private void loadVdctData(DBData data) throws SQLException {
+
+		Object[] columns = {"p_db_vdct"};
+    	Object[][] keyPairs = {{"p_db_id"}, {pDbId}};
+		
+   		ResultSet set = helper.loadRows("p_db", columns, keyPairs);
+   		if (set.next()) {
+   			DBResolver.readVdctData(data, set.getString(1), data.getTemplateData().getId());
+   		}
+	}
+	
+	private void saveVdctData() throws SQLException {
+		String string = Group.getVDCTData();
+    	Object[][] keyPairs = {{"p_db_id"}, {pDbId}};
+		Object[][] valuePairs = {{"p_db_vdct"}, {string}};
+   		helper.saveRow("p_db", keyPairs, valuePairs);
 	}
 }

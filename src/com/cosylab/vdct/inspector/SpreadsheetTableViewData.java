@@ -58,11 +58,7 @@ public class SpreadsheetTableViewData {
 		map.put(record.getKey(), record);
 	}
 
-	/** Returns the record of the given type and name, or null if there is no such record.
-	 * 
-	 * @param type
-	 * @param name
-	 * @return
+	/** Returns the record with the given key, or null if there is no such record.
 	 */
 	public SpreadsheetTableViewRecord get(String key) {
 		return (SpreadsheetTableViewRecord)map.get(key);
