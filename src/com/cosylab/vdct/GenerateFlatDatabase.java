@@ -16,6 +16,7 @@ package com.cosylab.vdct;
 
 import com.cosylab.vdct.graphics.DrawingSurface;
 import com.cosylab.vdct.graphics.objects.Group;
+import com.cosylab.vdct.rdb.RdbDataId;
 import com.cosylab.vdct.util.DBDEntry;
 
 import java.io.File;
@@ -74,7 +75,9 @@ public class GenerateFlatDatabase
 			System.out.println("Produce hierarhical names like CapFast: "+(Settings.getInstance().getHierarhicalNames()?"enabled":"disabled"));
 			System.out.println();
 						
-			DrawingSurface drawingSurface = new DrawingSurface();
+			// Get the same id for the group to save when implemented.
+			RdbDataId id = new RdbDataId("file", "0", "ioc");
+			DrawingSurface drawingSurface = new DrawingSurface(id);
 
 			for (int i=0; i<dbdEntries.size(); i++)
 				drawingSurface.openDBD(((DBDEntry)dbdEntries.get(i)).getFile(),

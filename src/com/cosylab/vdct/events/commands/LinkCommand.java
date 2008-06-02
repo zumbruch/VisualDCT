@@ -28,7 +28,7 @@ package com.cosylab.vdct.events.commands;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import com.cosylab.vdct.graphics.DrawingSurface;
+import com.cosylab.vdct.graphics.LinkCommandInterface;
 import com.cosylab.vdct.graphics.objects.LinkSource;
 import com.cosylab.vdct.graphics.objects.VisibleObject;
 
@@ -43,7 +43,7 @@ import com.cosylab.vdct.graphics.objects.VisibleObject;
  */
  
 public class LinkCommand extends com.cosylab.vdct.events.Command {
-	private DrawingSurface drawingSurface;
+	private LinkCommandInterface linkCommandInterface;
 	private LinkSource field = null;
 	private VisibleObject obj = null;
 /**
@@ -51,15 +51,15 @@ public class LinkCommand extends com.cosylab.vdct.events.Command {
  * Creation date: (21.12.2000 22:43:26)
  * @param drawingSurface com.cosylab.vdct.graphics.DrawingSurface 
  */
-public LinkCommand(DrawingSurface drawingSurface) {
-	this.drawingSurface=drawingSurface;
+public LinkCommand(LinkCommandInterface linkCommandInterface) {
+	this.linkCommandInterface=linkCommandInterface;
 }
 /**
  * Insert the method's description here.
  * Creation date: (21.12.2000 22:42:23)
  */
 public void execute() {
-	drawingSurface.linkCommand(obj, field);
+	linkCommandInterface.linkCommand(obj, field);
 }
 /**
  * Insert the method's description here.

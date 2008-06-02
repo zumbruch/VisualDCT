@@ -29,23 +29,28 @@ package com.cosylab.vdct.graphics;
  */
 
 import java.awt.Graphics;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 
 /**
  * PanelDecorator (using Decorator pattern)
  * Creation date: (10.12.2000 11:02:55)
  * @author Matej Sekoranja
  */
-public abstract class PanelDecorator extends javax.swing.JPanel implements VisualComponent {
-	private VisualComponent component;
+public class PanelDecorator extends javax.swing.JPanel implements VisualComponent, ComponentListener {
+	private VisualComponent component = null;
 /**
  * Insert the method's description here.
  * Creation date: (10.12.2000 13:25:27)
  */
-public PanelDecorator() {}
+public PanelDecorator() {
+	addComponentListener(this);
+}
 /**
  * ComponentManager constructor comment.
  */
 public PanelDecorator(VisualComponent component) {
+	this();
 	this.component=component;
 }
 /**
@@ -53,7 +58,9 @@ public PanelDecorator(VisualComponent component) {
  * Creation date: (10.12.2000 11:25:20)
  */
 public void draw(Graphics g) {
-	component.draw(g);
+	if (component != null) {
+	    component.draw(g);
+	}
 }
 /**
  * Insert the method's description here.
@@ -85,7 +92,9 @@ public int getComponentWidth() {
  * Creation date: (10.12.2000 11:26:54)
  */
 public void resize(int x0, int y0, int width, int height) {
-	component.resize(x0, y0, width, height);
+	if (component != null) {
+		component.resize(x0, y0, width, height);
+	}
 }
 /**
  * Insert the method's description here.
@@ -95,4 +104,39 @@ public void resize(int x0, int y0, int width, int height) {
 public void setComponent(VisualComponent newComponent) {
 	component = newComponent;
 }
+
+/**
+/**
+ * Invoked when the component has been made invisible.
+ */
+public void componentHidden(ComponentEvent e) {}
+/**
+ * Invoked when the component's position changes.
+ */
+public void componentMoved(ComponentEvent e) {}
+/**
+ * Invoked when the component's size changes.
+ */
+public void componentResized(ComponentEvent e) {
+	if (component != null) {
+	    component.resize(0, 0, getWidth(), getHeight());
+	}
+}
+/**
+ * Invoked when the component has been made visible.
+ */
+public void componentShown(ComponentEvent e) {
+}
+
+/**
+ * Insert the method's description here.
+ * Creation date: (10.12.2000 14:19:55)
+ * @param g java.awt.Graphics
+ */
+protected void paintComponent(Graphics g) {
+	if (component != null) {
+	    component.draw(g);
+	}
+}
+
 }

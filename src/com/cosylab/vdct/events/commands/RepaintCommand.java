@@ -29,7 +29,7 @@ package com.cosylab.vdct.events.commands;
  */
 
 import com.cosylab.vdct.events.Command;
-import com.cosylab.vdct.graphics.DrawingSurface;
+import com.cosylab.vdct.graphics.RepaintInterface;
 
 /**
  * Insert the type's description here.
@@ -37,13 +37,13 @@ import com.cosylab.vdct.graphics.DrawingSurface;
  * @author Matej Sekoranja
  */
 public class RepaintCommand extends Command {
-	private DrawingSurface component;
+	private RepaintInterface component;
 /**
  * Insert the method's description here.
  * Creation date: (21.12.2000 22:43:26)
  * @param component javax.swing.JComponent
  */
-public RepaintCommand(DrawingSurface component) {
+public RepaintCommand(RepaintInterface component) {
 	this.component=component;
 }
 /**

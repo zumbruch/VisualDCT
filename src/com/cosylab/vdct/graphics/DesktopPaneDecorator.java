@@ -26,98 +26,64 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.cosylab.vdct.rdb;
+package com.cosylab.vdct.graphics;
 
-import com.cosylab.vdct.db.DbDescriptor;
+import java.awt.Graphics;
+
+import javax.swing.JDesktopPane;
 
 /**
  * @author ssah
  *
  */
-public class RdbDataId implements DbDescriptor {
+public abstract class DesktopPaneDecorator extends JDesktopPane implements VisualComponent {
 
-	private String fileName = null;
-	private String version = null;
-	private String ioc = null;
+	private VisualComponent component;
+
+	public DesktopPaneDecorator() {}
+
+	public DesktopPaneDecorator(VisualComponent component) {
+		this.component=component;
+	}
 	
-	private static final String delimiter = ":";
-	
-	/**
-	 * @param fileName
-	 * @param version
-	 * @param ioc
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.graphics.VisualComponent#draw(java.awt.Graphics)
 	 */
-	public RdbDataId(String fileName, String version, String ioc) {
-		super();
-		this.fileName = fileName;
-		this.version = version;
-		this.ioc = ioc;
-	}
-	
-	public RdbDataId(String string) {
-		super();
-		String[] parts = string.split(delimiter);
-		if (parts.length > 0) {
-			fileName = parts[0];
-		}
-		if (parts.length > 1) {
-			version = parts[1];
-		}
-		if (parts.length > 2) {
-			ioc = parts[2];
-		}
-	}
-	
-	public boolean isDefined() {
-		return fileName != null && version != null && ioc != null;
+	public void draw(Graphics g) {
+		component.draw(g);
 	}
 
 	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
+	 * @see com.cosylab.vdct.graphics.VisualComponent#getComponentHeight()
 	 */
-	public String toString() {
-		return fileName + delimiter + version + delimiter + ioc;
+	public int getComponentHeight() {
+		if (component==null) return 0;
+		else return component.getComponentHeight();
 	}
 
-	/**
-	 * @return the fileName
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.graphics.VisualComponent#getComponentWidth()
 	 */
-	public String getFileName() {
-		return fileName;
+	public int getComponentWidth() {
+		if (component==null) return 0;
+		else return component.getComponentWidth();
 	}
 
-	/**
-	 * @param fileName the fileName to set
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.graphics.VisualComponent#resize(int, int, int, int)
 	 */
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
+	public void resize(int x0, int y0, int width, int height) {
+		if (component != null) { 
+			component.resize(x0, y0, width, height);
+		}
+	}
+	
+	public VisualComponent getComponent() {
+		return component;
 	}
 
-	/**
-	 * @return the version
-	 */
-	public String getVersion() {
-		return version;
+	public void setComponent(VisualComponent newComponent) {
+		component = newComponent;
 	}
-
-	/**
-	 * @param version the version to set
-	 */
-	public void setVersion(String version) {
-		this.version = version;
-	}
-
-	/**
-	 * @return the ioc
-	 */
-	public String getIoc() {
-		return ioc;
-	}
-
-	/**
-	 * @param ioc the ioc to set
-	 */
-	public void setIoc(String ioc) {
-		this.ioc = ioc;
-	}
+	
 }

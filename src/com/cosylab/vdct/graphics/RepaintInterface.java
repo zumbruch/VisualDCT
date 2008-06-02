@@ -26,98 +26,13 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.cosylab.vdct.rdb;
-
-import com.cosylab.vdct.db.DbDescriptor;
+package com.cosylab.vdct.graphics;
 
 /**
  * @author ssah
  *
  */
-public class RdbDataId implements DbDescriptor {
+public interface RepaintInterface {
 
-	private String fileName = null;
-	private String version = null;
-	private String ioc = null;
-	
-	private static final String delimiter = ":";
-	
-	/**
-	 * @param fileName
-	 * @param version
-	 * @param ioc
-	 */
-	public RdbDataId(String fileName, String version, String ioc) {
-		super();
-		this.fileName = fileName;
-		this.version = version;
-		this.ioc = ioc;
-	}
-	
-	public RdbDataId(String string) {
-		super();
-		String[] parts = string.split(delimiter);
-		if (parts.length > 0) {
-			fileName = parts[0];
-		}
-		if (parts.length > 1) {
-			version = parts[1];
-		}
-		if (parts.length > 2) {
-			ioc = parts[2];
-		}
-	}
-	
-	public boolean isDefined() {
-		return fileName != null && version != null && ioc != null;
-	}
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	public String toString() {
-		return fileName + delimiter + version + delimiter + ioc;
-	}
-
-	/**
-	 * @return the fileName
-	 */
-	public String getFileName() {
-		return fileName;
-	}
-
-	/**
-	 * @param fileName the fileName to set
-	 */
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
-
-	/**
-	 * @return the version
-	 */
-	public String getVersion() {
-		return version;
-	}
-
-	/**
-	 * @param version the version to set
-	 */
-	public void setVersion(String version) {
-		this.version = version;
-	}
-
-	/**
-	 * @return the ioc
-	 */
-	public String getIoc() {
-		return ioc;
-	}
-
-	/**
-	 * @param ioc the ioc to set
-	 */
-	public void setIoc(String ioc) {
-		this.ioc = ioc;
-	}
+	public void repaint();
 }

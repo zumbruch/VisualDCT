@@ -55,7 +55,7 @@ public static KeyEventManager getInstance() {
  * @param component javax.swing.JComponent
  */
 public void registerSubscreiber(String id, JComponent component) {
-	super.registerSubscreiber(id, component);
+	super.registerSubscriber(id, component);
 }
 /**
  * Insert the method's description here.
@@ -64,7 +64,7 @@ public void registerSubscreiber(String id, JComponent component) {
  * @param listener java.awt.KeyListener
  */
 public void subscribe(String subscriberID, KeyListener listener) {
-	JComponent comp = (JComponent)getSubscreiber().get(subscriberID);
+	JComponent comp = (JComponent)getSubscriber().get(subscriberID);
 	if (comp!=null)
 		comp.addKeyListener(listener);
 }
@@ -76,7 +76,7 @@ public void subscribe(String subscriberID, KeyListener listener) {
  */
  
 public void unregisterSubscreiber(String id, JComponent component) {
-	super.unregisterSubscreiber(id, component);
+	super.unregisterSubscriber(id, component);
 }
 /**
  * Insert the method's description here.
@@ -85,7 +85,7 @@ public void unregisterSubscreiber(String id, JComponent component) {
  * @param listener java.awt.KeyListener
  */
 public void unsubscribe(String subscriberID, KeyListener listener) {
-	JComponent comp = (JComponent)getSubscreiber().get(subscriberID);
+	JComponent comp = (JComponent)getSubscriber().get(subscriberID);
 	if (comp!=null)
 		comp.removeKeyListener(listener);
 }

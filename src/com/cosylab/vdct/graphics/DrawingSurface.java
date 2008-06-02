@@ -93,6 +93,7 @@ import com.cosylab.vdct.db.DBTemplateField;
 import com.cosylab.vdct.db.DBTemplateInstance;
 import com.cosylab.vdct.db.DBTextBox;
 import com.cosylab.vdct.db.DBView;
+import com.cosylab.vdct.db.DbDescriptor;
 import com.cosylab.vdct.dbd.DBDConstants;
 import com.cosylab.vdct.dbd.DBDData;
 import com.cosylab.vdct.dbd.DBDResolver;
@@ -100,11 +101,8 @@ import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.events.KeyEventManager;
 import com.cosylab.vdct.events.MouseEventManager;
 import com.cosylab.vdct.events.commands.GetGUIInterface;
-import com.cosylab.vdct.events.commands.GetPrintableInterface;
 import com.cosylab.vdct.events.commands.GetVDBManager;
-import com.cosylab.vdct.events.commands.LinkCommand;
 import com.cosylab.vdct.events.commands.NullCommand;
-import com.cosylab.vdct.events.commands.RepaintCommand;
 import com.cosylab.vdct.events.commands.SetCursorCommand;
 import com.cosylab.vdct.events.commands.SetWorkspaceGroup;
 import com.cosylab.vdct.events.commands.SetWorkspaceScale;
@@ -162,7 +160,8 @@ import com.cosylab.vdct.vdb.VDBTemplatePort;
  * Creation date: (10.12.2000 13:19:16)
  * @author Matej Sekoranja
  */
-public final class DrawingSurface extends Decorator implements Pageable, Printable, MouseInputListener, Runnable {
+public final class DrawingSurface extends Decorator implements Pageable, Printable,
+		MouseInputListener, Runnable, LinkCommandInterface, RepaintInterface {
 
 	class Hiliter extends Thread {
 		//private VisibleObject object;
@@ -198,6 +197,11 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 		}
 	}
 	private static DrawingSurface instance = null;
+
+	private DbDescriptor id = null;
+	
+	private DSGUIInterface guimenu = null;
+	
 	// decorator support (viewport size)
 	private int x0 = 0;
 	private int y0 = 0;
@@ -293,14 +297,13 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 	private Stack templateStack = null;	
 	private Vector selectedConnectorsForMove = null;
 	
-	private RdbDataId dataId = null;
-	
 /**
  * DrawingSurface constructor comment.
  */
-public DrawingSurface() {
+public DrawingSurface(DbDescriptor id) {
 
 	instance = this;
+	this.id = id;
 	
 	setModified(false);
 
@@ -318,7 +321,7 @@ public DrawingSurface() {
 	hourCursor = new Cursor(Cursor.WAIT_CURSOR);
 	crossCursor = new Cursor(Cursor.CROSSHAIR_CURSOR);
 
-	MouseEventManager.getInstance().subscribe("WorkspacePanel", this);
+	MouseEventManager.getInstance().subscribe("WorkspaceInternalFrame:" + id.toString(), this);
 	KeyEventManager.getInstance().subscribe("ContentPane", new KeyAdapter() {
 	    public void keyPressed(KeyEvent e) {
 	        if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
@@ -340,17 +343,10 @@ public DrawingSurface() {
 	    }
 	});
 
-	CommandManager commandManager = CommandManager.getInstance();
-	DSGUIInterface guimenu = new DSGUIInterface(this);
-	commandManager.addCommand("GetVDBManager", new GetVDBManager(guimenu));
-	commandManager.addCommand("GetGUIMenuInterface", new GetGUIInterface(guimenu));
-	commandManager.addCommand("LinkCommand", new LinkCommand(this));
-	commandManager.addCommand("GetPrintableInterface", new GetPrintableInterface(this));
-	commandManager.addCommand("RepaintWorkspace", new RepaintCommand(this));
-	
+	guimenu = new DSGUIInterface(this);
+
 	if (VisualDCT.getInstance() != null)
 		new Thread(this, "DrawingSurface Repaint Thread").start();
-
 }
 /**
  * Insert the method's description here.
@@ -786,11 +782,15 @@ public void initializeWorkspace() {
 	templateStack.clear();
 	Group.setEditingTemplateData(null);
 
+	// TODO: temporary: all drawing surfacess show the same roog group.
 	setModified(false);
-	Group group = new Group(null);
-	group.setAbsoluteName("");
-	group.setLookupTable(new Hashtable());
-	Group.setRoot(group);
+	Group group = Group.getRoot();
+	if (group == null) {
+		group = new Group(null);
+		group.setAbsoluteName("");
+		group.setLookupTable(new Hashtable());
+		Group.setRoot(group);
+	}
 	moveToGroup(group);
 	
 	//Console.getInstance().flush();
@@ -1546,6 +1546,7 @@ public void mouseMoved(MouseEvent e)
 	 * Invoked when a mouse button has been pressed on a component.
 	 */
 public void mousePressed(MouseEvent e) {
+	
 	notYetDragged = true;
 	ViewState view = ViewState.getInstance();
 	
@@ -2250,7 +2251,7 @@ public boolean loadRdbDbGroup(JFrame guiContext) {
 			restoreCursor();
 			return false;
 		}
-		dataId = new RdbDataId(dbData.getTemplateData().getId());
+		id = new RdbDataId(dbData.getTemplateData().getId());
 
 		// check is DTYP fields are defined before any DBF_INPUT/DBF_OUTPUT fields...
 		DBData.checkDTYPfield(dbData, dbdData);
@@ -2314,7 +2315,7 @@ public boolean loadRdbDbGroup(JFrame guiContext) {
 
 public void saveRdbGroup(JFrame guiContext) {
 	try {
-		RdbInstance.getInstance(guiContext).getRdbInterface().saveRdbData(dataId);
+		RdbInstance.getInstance(guiContext).getRdbInterface().saveRdbData((RdbDataId)id);
 	} catch (Exception exception) {
 		Console.getInstance().println(exception);
 	}
@@ -2322,7 +2323,7 @@ public void saveRdbGroup(JFrame guiContext) {
 
 public void saveAsRdbGroup(JFrame guiContext) {
 	try {
-		RdbInstance.getInstance(guiContext).getRdbInterface().saveAsRdbData(dataId);
+		RdbInstance.getInstance(guiContext).getRdbInterface().saveAsRdbData((RdbDataId)id);
 	} catch (Exception exception) {
 		Console.getInstance().println(exception);
 	}
@@ -4320,6 +4321,12 @@ public void reset() {
 public void setPressedMousePos(int x, int y) {
 	pressedX = x;
 	pressedY = y;
+}
+/**
+ * @return the guimenu
+ */
+public DSGUIInterface getGuimenu() {
+	return guimenu;
 }
 
 }

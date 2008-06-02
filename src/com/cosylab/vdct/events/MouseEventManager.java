@@ -57,7 +57,7 @@ public static MouseEventManager getInstance() {
  * @param component javax.swing.JComponent
  */
 public void registerSubscreiber(String id, JComponent component) {
-	super.registerSubscreiber(id, component);
+	super.registerSubscriber(id, component);
 }
 /**
  * Insert the method's description here.
@@ -66,11 +66,13 @@ public void registerSubscreiber(String id, JComponent component) {
  * @param listener javax.swing.event.MouseInputListener
  */
 public void subscribe(String subscriberID, MouseInputListener listener) {
-	JComponent comp = (JComponent)getSubscreiber().get(subscriberID);
+	JComponent comp = (JComponent)getSubscriber().get(subscriberID);
 	if (comp!=null) {
 		DoubleClickProxy proxy = new DoubleClickProxy(listener);
 		comp.addMouseListener(proxy);
 		comp.addMouseMotionListener(proxy);
+	} else {
+		System.err.println("Warning: subscriber with id " + subscriberID + " doesn't exist.");
 	}
 }
 /**
@@ -80,8 +82,8 @@ public void subscribe(String subscriberID, MouseInputListener listener) {
  * @param component javax.swing.JComponent
  */
  
-public void unregisterSubscreiber(String id, JComponent component) {
-	super.unregisterSubscreiber(id, component);
+public void unregisterSubscriber(String id, JComponent component) {
+	super.unregisterSubscriber(id, component);
 }
 /**
  * Insert the method's description here.
@@ -90,7 +92,7 @@ public void unregisterSubscreiber(String id, JComponent component) {
  * @param listener javax.swing.event.MouseInputListener
  */
 public void unsubscribe(String subscriberID, MouseInputListener listener) {
-	JComponent comp = (JComponent)getSubscreiber().get(subscriberID);
+	JComponent comp = (JComponent)getSubscriber().get(subscriberID);
 	if (comp!=null) {
 		comp.removeMouseListener(listener);
 		comp.removeMouseMotionListener(listener);

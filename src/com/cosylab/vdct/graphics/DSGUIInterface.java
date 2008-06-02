@@ -1309,5 +1309,11 @@ public void updateMenuItems() {
 public void updateGroupLabel() {
 	drawingSurface.updateWorkspaceGroup();
 }
+/**
+ * @return the drawingSurface
+ */
+public DrawingSurface getDrawingSurface() {
+	return drawingSurface;
+}
 
 }

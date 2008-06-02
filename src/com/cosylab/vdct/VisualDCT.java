@@ -28,6 +28,7 @@ package com.cosylab.vdct;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Event;
@@ -109,6 +110,7 @@ import com.cosylab.vdct.graphics.printing.Page;
 import com.cosylab.vdct.graphics.printing.PrintPreview;
 import com.cosylab.vdct.inspector.SpreadsheetInspector;
 import com.cosylab.vdct.plugin.config.PluginNameConfigManager;
+import com.cosylab.vdct.rdb.RdbDataId;
 import com.cosylab.vdct.rdb.RdbInstance;
 import com.cosylab.vdct.util.ComboBoxFileChooser;
 import com.cosylab.vdct.util.DBDEntry;
@@ -248,7 +250,7 @@ public class VisualDCT extends JFrame {
 	private JLabel ivjOldNameLabel = null;
 	private JMenuItem ivjPageSetupMenuItem = null;
 	private JMenuItem ivjPrintPreviewMenuItem = null;
-	private com.cosylab.vdct.graphics.WorkspacePanel ivjworkspace = null;
+	private com.cosylab.vdct.graphics.WorkspaceDesktop ivjworkspace = null;
 	private JMenuItem ivjPluginManagerMenuItem = null;
 	private com.cosylab.vdct.plugin.PluginsMenu ivjPluginsMenu = null;
 	private JSeparator ivjJSeparator7 = null;
@@ -2359,7 +2361,8 @@ private javax.swing.JButton getCancelButton1() {
 private com.cosylab.vdct.graphics.DrawingSurface getcanvas() {
 	if (ivjcanvas == null) {
 		try {
-			ivjcanvas = new com.cosylab.vdct.graphics.DrawingSurface();
+			RdbDataId id = new RdbDataId(String.valueOf(Math.random()));
+			ivjcanvas = new com.cosylab.vdct.graphics.DrawingSurface(id);
 			// user code begin {1}
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
@@ -2811,6 +2814,18 @@ private javax.swing.JMenu getFileMenu() {
 			ivjFileMenu.setMnemonic('F');
 			ivjFileMenu.setText("File");
 			ivjFileMenu.add(getNewMenuItem());
+			
+			// TODO:REM temporary for tests
+			JMenuItem menuItem = new JMenuItem("New window");
+			menuItem.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					RdbDataId id = new RdbDataId(String.valueOf(Math.random()));
+					getworkspace().createNewDrawingSurface(id);
+				}
+			});
+			ivjFileMenu.add(menuItem);
+			
+			
 			ivjFileMenu.add(getOpenMenuItem());
 			ivjFileMenu.add(getImport_DBMenuItem());
 			ivjFileMenu.add(getImportFieldsMenuItem());
@@ -3413,9 +3428,9 @@ private javax.swing.JPanel getJFrameContentPane() {
 			ivjJFrameContentPane = new javax.swing.JPanel();
 			ivjJFrameContentPane.setName("JFrameContentPane");
 			ivjJFrameContentPane.setLayout(new java.awt.BorderLayout());
-			getJFrameContentPane().add(getToolBarPane(), "North");
-			getJFrameContentPane().add(getStatusBarPane(), "South");
-			getJFrameContentPane().add(getworkspace(), "Center");
+			getJFrameContentPane().add(getToolBarPane(), BorderLayout.NORTH);
+			getJFrameContentPane().add(getStatusBarPane(), BorderLayout.SOUTH);
+			getJFrameContentPane().add(getworkspace(), BorderLayout.CENTER);
 			CommandManager.getInstance().addCommand("SetCursor", new SetCursorCommand(ivjJFrameContentPane));
 			KeyEventManager.getInstance().registerSubscreiber("ContentPane", ivjJFrameContentPane);
 			ivjJFrameContentPane.setFocusable(true);
@@ -5542,10 +5557,10 @@ private javax.swing.JLabel getWarningLabel() {
  * @return com.cosylab.vdct.graphics.WorkspacePanel
  */
 /* WARNING: THIS METHOD WILL BE REGENERATED. */
-private com.cosylab.vdct.graphics.WorkspacePanel getworkspace() {
+private com.cosylab.vdct.graphics.WorkspaceDesktop getworkspace() {
 	if (ivjworkspace == null) {
 		try {
-			ivjworkspace = new com.cosylab.vdct.graphics.WorkspacePanel();
+			ivjworkspace = new com.cosylab.vdct.graphics.WorkspaceDesktop();
 			ivjworkspace.setName("workspace");
 			ivjworkspace.addMouseListener(new MouseAdapter() {
 			    public void mouseEntered(MouseEvent e) {
@@ -5554,6 +5569,8 @@ private com.cosylab.vdct.graphics.WorkspacePanel getworkspace() {
 			    }
 			});
 			// user code begin {1}
+			RdbDataId id = new RdbDataId(String.valueOf(Math.random()));
+			ivjworkspace.createNewDrawingSurface(id);
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
 			// user code begin {2}
@@ -6062,8 +6079,11 @@ private void initConnections() throws java.lang.Exception {
 	getSystemCopyMenuItem().addActionListener(ivjEventHandler);
 	getSystemPasteMenuItem().addActionListener(ivjEventHandler);
 
+	// TODO:REM this and the functions
+	/*
 	connPtoP1SetTarget();
 	connPtoP2SetTarget();
+	*/
 }
 /**
  * Initialize the class.
@@ -6179,6 +6199,7 @@ public static void main(final java.lang.String[] args) {
 				try {
 					
 		/* Create the frame */
+        JFrame.setDefaultLookAndFeelDecorated(true);
 		final VisualDCT aVisualDCT = new VisualDCT();
 		aVisualDCT.setSize(Constants.VDCT_WIDTH, Constants.VDCT_HEIGHT);
 		aVisualDCT.getworkspace();

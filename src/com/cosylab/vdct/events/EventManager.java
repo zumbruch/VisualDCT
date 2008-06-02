@@ -56,7 +56,7 @@ public void clear() {
  * Creation date: (18.12.2000 16:31:58)
  * @return java.util.Hashtable
  */
-public java.util.Hashtable getSubscreiber() {
+public java.util.Hashtable getSubscriber() {
 	return subscreiber;
 }
 /**
@@ -65,10 +65,10 @@ public java.util.Hashtable getSubscreiber() {
  * @param id java.lang.String
  * @param subscreiber java.lang.Object
  */
-public void registerSubscreiber(String id, Object newSubscreiber) {
+public void registerSubscriber(String id, Object newSubscriber) {
 	if (subscreiber.containsKey(id))
 		throw new IllegalArgumentException("Error: subscreiber with id '"+id+"' already exists...");
-	else subscreiber.put(id, newSubscreiber);
+	else subscreiber.put(id, newSubscriber);
 }
 /**
  * Insert the method's description here.
@@ -76,7 +76,7 @@ public void registerSubscreiber(String id, Object newSubscreiber) {
  * @param id java.lang.String
  * @param subscreiber java.lang.Object
  */
-public void unregisterSubscreiber(String id, Object newSubscreiber) {
+public void unregisterSubscriber(String id, Object newSubscriber) {
 	subscreiber.remove(id);
 }
 }
