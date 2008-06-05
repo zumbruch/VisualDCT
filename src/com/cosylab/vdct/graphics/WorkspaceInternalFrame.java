@@ -35,7 +35,6 @@ import javax.swing.event.InternalFrameListener;
 
 import com.cosylab.vdct.db.DbDescriptor;
 import com.cosylab.vdct.events.MouseEventManager;
-import com.cosylab.vdct.rdb.RdbDataId;
 
 /**
  * @author ssah
@@ -47,13 +46,13 @@ public class WorkspaceInternalFrame extends JInternalFrame implements InternalFr
     protected PanelDecorator contentPanel = null;
 
     public WorkspaceInternalFrame(DbDescriptor id) {
-        super("Internal frame", true, true, true, true);
+        super(id.toString(), true, true, true, true);
         this.id = id;
         contentPanel = new PanelDecorator();
         // First register the component, then create the DrawingSurface which adds listeners to it.
         MouseEventManager.getInstance().registerSubscreiber(
         		"WorkspaceInternalFrame:" + id.toString(), contentPanel);
-        DrawingSurface drawSurface = DrawingSurfaceManager.getInstance().addDrawingSurface(id);
+        DrawingSurface drawSurface = DrawingSurfaceManager.getInstance().addDrawingSurface(id, contentPanel);
         contentPanel.setComponent(drawSurface);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         
@@ -73,46 +72,27 @@ public class WorkspaceInternalFrame extends JInternalFrame implements InternalFr
 	}
 
 	/* (non-Javadoc)
+	 * @see javax.swing.event.InternalFrameListener#internalFrameDeactivated(javax.swing.event.InternalFrameEvent)
+	 */
+	public void internalFrameDeactivated(InternalFrameEvent e) {
+		DrawingSurfaceManager.getInstance().setFocusedDrawingSurface(null);
+		System.out.println(id + "internalFrameDeactivated");
+	}
+
+	/* (non-Javadoc)
 	 * @see javax.swing.event.InternalFrameListener#internalFrameClosed(javax.swing.event.InternalFrameEvent)
 	 */
 	public void internalFrameClosed(InternalFrameEvent e) {
 		DrawingSurfaceManager.getInstance().removeDrawingSurface(id);
 		System.out.println(id + "internalFrameClosed");
 	}
-
-	/* (non-Javadoc)
-	 * @see javax.swing.event.InternalFrameListener#internalFrameClosing(javax.swing.event.InternalFrameEvent)
-	 */
+	
 	public void internalFrameClosing(InternalFrameEvent e) {
 	}
-
-	/* (non-Javadoc)
-	 * @see javax.swing.event.InternalFrameListener#internalFrameDeactivated(javax.swing.event.InternalFrameEvent)
-	 */
-	public void internalFrameDeactivated(InternalFrameEvent e) {
-		DrawingSurfaceManager.getInstance().setFocusedDrawingSurface(null);
-		System.out.println(id + "internalFrameDeactivated");
-}
-
-	/* (non-Javadoc)
-	 * @see javax.swing.event.InternalFrameListener#internalFrameDeiconified(javax.swing.event.InternalFrameEvent)
-	 */
 	public void internalFrameDeiconified(InternalFrameEvent e) {
-		DrawingSurfaceManager.getInstance().setFocusedDrawingSurface(id);
-		System.out.println(id + "internalFrameDeiconified");
 	}
-
-	/* (non-Javadoc)
-	 * @see javax.swing.event.InternalFrameListener#internalFrameIconified(javax.swing.event.InternalFrameEvent)
-	 */
 	public void internalFrameIconified(InternalFrameEvent e) {
-		DrawingSurfaceManager.getInstance().setFocusedDrawingSurface(null);
-		System.out.println(id + "internalFrameIconified");
 	}
-
-	/* (non-Javadoc)
-	 * @see javax.swing.event.InternalFrameListener#internalFrameOpened(javax.swing.event.InternalFrameEvent)
-	 */
 	public void internalFrameOpened(InternalFrameEvent e) {
 	}
 }

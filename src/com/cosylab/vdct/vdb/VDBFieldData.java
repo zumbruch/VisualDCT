@@ -390,6 +390,7 @@ public void updateInspector()
 {
 	Record visualRecord = (Record)Group.getRoot().findObject(record.getName(), true);
 	if (visualRecord==null) {
+		System.err.println("Warning: record '" + record.getName() + "' not found.");
 		//com.cosylab.vdct.Console.getInstance().println("o) Internal error: no visual representaton of record "+getName()+" found.");
 		return;
 	}

@@ -95,6 +95,7 @@ public void addField(VDBFieldData fd) {
 public void fieldValueChanged(VDBFieldData field) {
 	Record visualRecord = (Record)Group.getRoot().findObject(getName(), true);
 	if (visualRecord==null) {
+		System.err.println("Warning: record '" + getName() + "' not found.");
 		//com.cosylab.vdct.Console.getInstance().println("o) Internal error: no visual representaton of record "+getName()+" found.");
 		return;
 	}
@@ -160,6 +161,7 @@ public void setComment(java.lang.String newComment) {
 
 	Inspectable visualObj = (Inspectable)Group.getRoot().findObject(getName(), true);
 	if (visualObj==null) {
+		System.err.println("Warning: record '" + getName() + "' not found.");
 		//com.cosylab.vdct.Console.getInstance().println("o) Internal error: no visual representaton of record "+getName()+" found.");
 		return;
 	}

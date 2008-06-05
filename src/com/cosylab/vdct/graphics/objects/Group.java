@@ -47,6 +47,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
 
+import sun.reflect.ReflectionFactory.GetReflectionFactoryAction;
+
 import com.cosylab.vdct.Console;
 import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.DataProvider;
@@ -56,6 +58,7 @@ import com.cosylab.vdct.db.DBDataEntry;
 import com.cosylab.vdct.db.DBEntry;
 import com.cosylab.vdct.db.DBResolver;
 import com.cosylab.vdct.db.DBTemplateEntry;
+import com.cosylab.vdct.db.DbDescriptor;
 import com.cosylab.vdct.dbd.DBDConstants;
 import com.cosylab.vdct.graphics.FontMetricsBuffer;
 import com.cosylab.vdct.graphics.ViewState;
@@ -94,6 +97,9 @@ implements Clipboardable, Descriptable, Flexible, Movable, SaveInterface, Select
 
 	// template instances fields lookuptable 
 	private Hashtable lookupTable = null;
+	
+	private static HashMap rootGroups = new HashMap();
+	
 	private static VDBTemplate editingTemplateData = null;
 	private static long openTemplateMacroID = 0;
 	private static long openTemplatePortID = 0;
@@ -532,6 +538,9 @@ private void addSubObjectToLayout(VisibleObject object) {
 	 * @return com.cosylab.vdct.graphics.objects.Group
 	 */
 	public static Group getRoot() {
+		if (root == null) {
+			System.err.println("Warning: returning null as root group.");
+		}
 		return root;
 	}
 	/**
@@ -2232,4 +2241,18 @@ private void addSubObjectToLayout(VisibleObject object) {
 		 }
 	 }
 
+	 public static void addNewRoot(DbDescriptor id, Group group) {
+		 rootGroups.put(id, group);
+		 if (root == null) {
+			 root = group;
+		 }
+	 }
+
+	 public static void removeRoot(DbDescriptor id) {
+		 rootGroups.remove(id);
+	 }
+	 
+	 public static Group getRoot(DbDescriptor id) {
+		 return (Group)rootGroups.get(id);
+	 }
 }

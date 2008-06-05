@@ -35,6 +35,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 
 import com.cosylab.vdct.db.DbDescriptor;
@@ -45,6 +46,7 @@ import com.cosylab.vdct.events.commands.GetVDBManager;
 import com.cosylab.vdct.events.commands.LinkCommand;
 import com.cosylab.vdct.events.commands.RepaintCommand;
 import com.cosylab.vdct.graphics.objects.Box;
+import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.objects.Line;
 import com.cosylab.vdct.graphics.objects.LinkSource;
 import com.cosylab.vdct.graphics.objects.TextBox;
@@ -85,9 +87,8 @@ LinkCommandInterface, RepaintInterface, Pageable {
 		return (DrawingSurface)drawingSurfaces.get(id);
 	}
 
-	public DrawingSurface addDrawingSurface(DbDescriptor id) {
-		DrawingSurface drawingSurface = new DrawingSurface(id);
-		drawingSurface.initializeWorkspace();
+	public DrawingSurface addDrawingSurface(DbDescriptor id, JComponent container) {
+		DrawingSurface drawingSurface = new DrawingSurface(id, container);
 		drawingSurfaces.put(id, drawingSurface);
 		
 		if (dsInterface == null) {
@@ -113,6 +114,7 @@ LinkCommandInterface, RepaintInterface, Pageable {
 			DrawingSurface drawingSurface = getDrawingSurface(id);
 			if (drawingSurface != null) {
 				dsInterface = drawingSurface.getGuimenu();
+				Group.setRoot(Group.getRoot(id));
 			} else {
 				dsInterface = null;
 			}
@@ -167,7 +169,7 @@ LinkCommandInterface, RepaintInterface, Pageable {
 	 */
 	public Line createLine() {
 		if (dsInterface != null) {
-			return createLine();
+			return dsInterface.createLine();
 		}
 		return null;
 	}
@@ -177,7 +179,7 @@ LinkCommandInterface, RepaintInterface, Pageable {
 	 */
 	public void createRecord(String name, String type, boolean relative) {
 		if (dsInterface != null) {
-			createRecord(name, type, relative);
+			dsInterface.createRecord(name, type, relative);
 		}
 	}
 
@@ -186,7 +188,7 @@ LinkCommandInterface, RepaintInterface, Pageable {
 	 */
 	public TextBox createTextBox() {
 		if (dsInterface != null) {
-			return createTextBox();
+			return dsInterface.createTextBox();
 		}
 		return null;
 	}

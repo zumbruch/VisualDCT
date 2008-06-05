@@ -66,6 +66,7 @@ import java.util.LinkedHashSet;
 import java.util.Stack;
 import java.util.Vector;
 
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -102,7 +103,6 @@ import com.cosylab.vdct.events.KeyEventManager;
 import com.cosylab.vdct.events.MouseEventManager;
 import com.cosylab.vdct.events.commands.GetGUIInterface;
 import com.cosylab.vdct.events.commands.GetVDBManager;
-import com.cosylab.vdct.events.commands.NullCommand;
 import com.cosylab.vdct.events.commands.SetCursorCommand;
 import com.cosylab.vdct.events.commands.SetWorkspaceGroup;
 import com.cosylab.vdct.events.commands.SetWorkspaceScale;
@@ -297,13 +297,16 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 	private Stack templateStack = null;	
 	private Vector selectedConnectorsForMove = null;
 	
+	private JComponent container = null; 
+	
 /**
- * DrawingSurface constructor comment.
+ * container can be null when no gui is linked to this. 
  */
-public DrawingSurface(DbDescriptor id) {
+public DrawingSurface(DbDescriptor id, JComponent container) {
 
 	instance = this;
 	this.id = id;
+	this.container = container;
 	
 	setModified(false);
 
@@ -344,6 +347,8 @@ public DrawingSurface(DbDescriptor id) {
 	});
 
 	guimenu = new DSGUIInterface(this);
+	
+	initializeWorkspace();
 
 	if (VisualDCT.getInstance() != null)
 		new Thread(this, "DrawingSurface Repaint Thread").start();
@@ -742,9 +747,13 @@ public com.cosylab.vdct.graphics.objects.Group getViewGroup() {
  * @return javax.swing.JComponent
  */
 public javax.swing.JComponent getWorkspacePanel() {
+	return container;
+	// TODO: REM
+	/*
 	NullCommand pm = (NullCommand)CommandManager.getInstance().getCommand("NullCommand");
 	if (pm!=null) return pm.getComponent();
 	else return null;
+	*/
 }
 /**
  * Insert the method's description here.
@@ -782,15 +791,12 @@ public void initializeWorkspace() {
 	templateStack.clear();
 	Group.setEditingTemplateData(null);
 
-	// TODO: temporary: all drawing surfacess show the same roog group.
 	setModified(false);
-	Group group = Group.getRoot();
-	if (group == null) {
-		group = new Group(null);
-		group.setAbsoluteName("");
-		group.setLookupTable(new Hashtable());
-		Group.setRoot(group);
-	}
+	
+	Group group = new Group(null);
+	group.setAbsoluteName("");
+	group.setLookupTable(new Hashtable());
+	Group.addNewRoot(id, group);
 	moveToGroup(group);
 	
 	//Console.getInstance().flush();

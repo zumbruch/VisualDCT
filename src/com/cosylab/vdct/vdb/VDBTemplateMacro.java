@@ -122,8 +122,12 @@ public class VDBTemplateMacro extends VDBFieldData implements Descriptable, Chan
 			if (oldVisible != newVisible)
 			{						 
 				Template visualTemplate = (Template)Group.getRoot().findObject(templateInstance.getName(), true);
-				if (visualTemplate!=null)
+				if (visualTemplate!=null) {
 					visualTemplate.fieldVisibilityChange(this, newVisible);
+				} else {
+					System.err.println("Warning: template instance '" + templateInstance.getName()
+							+ "' not found.");
+				}
 			}
 		}
 			
@@ -172,6 +176,8 @@ public class VDBTemplateMacro extends VDBFieldData implements Descriptable, Chan
 	{
 		Template visualTemplate = (Template)Group.getRoot().findObject(templateInstance.getName(), true);
 		if (visualTemplate==null) {
+			System.err.println("Warning: template instance '" + templateInstance.getName()
+					+ "' not found.");
 			//com.cosylab.vdct.Console.getInstance().println("o) Internal error: no visual representaton of record "+getName()+" found.");
 			return;
 		}
@@ -281,8 +287,12 @@ public void setValue(java.lang.String newValue) {
 	if (oldVisible != newVisible)
 	{						 
 		visualTemplate = (Template)Group.getRoot().findObject(templateInstance.getName(), true);
-		if (visualTemplate!=null)
+		if (visualTemplate!=null) {
 			visualTemplate.fieldVisibilityChange(this, newVisible);
+		} else {
+			System.err.println("Warning: template instance '" + templateInstance.getName()
+					+ "' not found.");
+		}
 	}
 
 	// mapping to property 

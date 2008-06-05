@@ -77,7 +77,7 @@ public class GenerateFlatDatabase
 						
 			// Get the same id for the group to save when implemented.
 			RdbDataId id = new RdbDataId("file", "0", "ioc");
-			DrawingSurface drawingSurface = new DrawingSurface(id);
+			DrawingSurface drawingSurface = new DrawingSurface(id, null);
 
 			for (int i=0; i<dbdEntries.size(); i++)
 				drawingSurface.openDBD(((DBDEntry)dbdEntries.get(i)).getFile(),

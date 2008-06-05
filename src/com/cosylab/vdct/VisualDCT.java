@@ -298,6 +298,7 @@ public class VisualDCT extends JFrame {
 	
 	private static VisualDCT instance = null;
 	
+	private static int internalFrameNum = 0;
 	
 class IvjEventHandler implements java.awt.event.ActionListener, java.awt.event.ItemListener, java.awt.event.MouseListener, java.awt.event.MouseMotionListener, java.awt.event.WindowListener {
 		public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -2361,8 +2362,9 @@ private javax.swing.JButton getCancelButton1() {
 private com.cosylab.vdct.graphics.DrawingSurface getcanvas() {
 	if (ivjcanvas == null) {
 		try {
-			RdbDataId id = new RdbDataId(String.valueOf(Math.random()));
-			ivjcanvas = new com.cosylab.vdct.graphics.DrawingSurface(id);
+			RdbDataId id = new RdbDataId(String.valueOf(internalFrameNum));
+			internalFrameNum++;
+			ivjcanvas = new com.cosylab.vdct.graphics.DrawingSurface(id, null);
 			// user code begin {1}
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
@@ -2819,7 +2821,8 @@ private javax.swing.JMenu getFileMenu() {
 			JMenuItem menuItem = new JMenuItem("New window");
 			menuItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					RdbDataId id = new RdbDataId(String.valueOf(Math.random()));
+					RdbDataId id = new RdbDataId(String.valueOf(internalFrameNum));
+					internalFrameNum++;
 					getworkspace().createNewDrawingSurface(id);
 				}
 			});
@@ -5569,7 +5572,8 @@ private com.cosylab.vdct.graphics.WorkspaceDesktop getworkspace() {
 			    }
 			});
 			// user code begin {1}
-			RdbDataId id = new RdbDataId(String.valueOf(Math.random()));
+			RdbDataId id = new RdbDataId(String.valueOf(internalFrameNum));
+			internalFrameNum++;
 			ivjworkspace.createNewDrawingSurface(id);
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
@@ -5842,9 +5846,11 @@ public void groupOKButton_ActionPerformed(java.awt.event.ActionEvent actionEvent
  * @param exception java.lang.Throwable
  */
 private void handleException(java.lang.Throwable exception) {
+
 	Console.getInstance().println("--------- UNCAUGHT EXCEPTION ---------");
 	Console.getInstance().println(exception);
 	exception.printStackTrace(System.out);
+	System.err.print(exception.getStackTrace());
 }
 
 /**
@@ -6443,6 +6449,7 @@ public void morphingDialog_WindowOpened(
  * Comment
  */
 public void oKButton_ActionPerformed(java.awt.event.ActionEvent actionEvent) {
+
 	if (getOKButton().isEnabled()) {
 
 		VDBInterface vDBInterface =
