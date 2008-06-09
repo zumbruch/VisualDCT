@@ -28,13 +28,16 @@ package com.cosylab.vdct.graphics;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 
-import com.cosylab.vdct.db.DbDescriptor;
+import javax.swing.JInternalFrame;
+
 import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.events.commands.NullCommand;
+import com.cosylab.vdct.rdb.RdbDataId;
 
 /**
  * Insert the type's description here.
@@ -42,23 +45,58 @@ import com.cosylab.vdct.events.commands.NullCommand;
  * @author Matej Sekoranja
  */
 
-public class WorkspaceDesktop extends DesktopPaneDecorator implements ComponentListener {
+public class WorkspaceDesktop extends DesktopPaneDecorator
+implements ComponentListener, DesktopInterface {
+
+	protected WorkspaceInternalFrame frame = null;
+	protected DrawingSurfaceManagerInterface drawingSurfaceManager = null;
 	
-	private WorkspaceInternalFrame frame = null;
+	protected static int internalFrameCount = 0;
+	protected static final String untitledString = "untitled";
+
 	/**
 	 * VisualAge support
 	 * Creation date: (10.12.2000 12:34:33)
 	 */
 	public WorkspaceDesktop() {
+		super();
 		initialize();
 	}
+
+	public void selectFirstInternalFrame() {
+    	if (getComponentCount() > 0) {
+    		Component component = getComponent(0);
+    		if (component instanceof JInternalFrame) {
+    			try {
+    				((JInternalFrame)component).setSelected(true);
+    			} catch (java.beans.PropertyVetoException exception) {
+    				// Nothing.
+    			}
+			}
+    	}
+	}
+
+	public DrawingSurfaceManagerInterface getDrawingSurfaceManager() {
+		return drawingSurfaceManager;
+	}
+
+	public void setDrawingSurfaceManager(
+			DrawingSurfaceManagerInterface drawingSurfaceManager) {
+		this.drawingSurfaceManager = drawingSurfaceManager;
+	}
+
+	// TODO:REM
 	/**
 	 * WorkspacePanel constructor comment.
 	 * @param component com.cosylab.vdct.graphics.VisualComponent
 	 */
+	/*
 	public WorkspaceDesktop(VisualComponent component) {
 		super(component);
+		drawingSurfaceManager = new DrawingSurfaceManager(this);
+		createNewWindow();
 	}
+	*/
 	/**
 	 * Invoked when the component has been made invisible.
 	 */
@@ -73,7 +111,7 @@ public class WorkspaceDesktop extends DesktopPaneDecorator implements ComponentL
 	public void componentResized(ComponentEvent e) {
 		VisualComponent component = getComponent();
 		if (component != null) {
-    		getComponent().resize(0, 0, getWidth(), getHeight());
+			getComponent().resize(0, 0, getWidth(), getHeight());
 		}
 	}
 	/**
@@ -81,18 +119,37 @@ public class WorkspaceDesktop extends DesktopPaneDecorator implements ComponentL
 	 */
 	public void componentShown(ComponentEvent e) {
 	}
-	
+
+	// TODO:REM
+	/*
 	public void createNewDrawingSurface(DbDescriptor id) {
 		createInternalFrame(id);
 	}
-	
+	 */
+
+	public void setComponent(VisualComponent newComponent) {
+		super.setComponent(newComponent);
+	}
+
+	public void createNewInternalFrame() {
+		RdbDataId id = new RdbDataId();
+		id.setFileName(untitledString + internalFrameCount);
+		internalFrameCount++;
+		WorkspaceInternalFrame frame = new WorkspaceInternalFrame(id, drawingSurfaceManager);
+		frame.setVisible(true);
+		add(frame);
+		try {
+			frame.setSelected(true);
+		} catch (java.beans.PropertyVetoException e) {
+			// Nothing.
+		}
+	}
 	/**
 	 * Insert the method's description here.
 	 * Creation date: (11.12.2000 15:44:25)
 	 */
 	protected void initialize() {
 		addComponentListener(this);
-		//MouseEventManager.getInstance().registerSubscreiber("WorkspacePanel", this);
 		CommandManager.getInstance().addCommand("NullCommand", new NullCommand(this));
 	}
 
@@ -104,23 +161,7 @@ public class WorkspaceDesktop extends DesktopPaneDecorator implements ComponentL
 	protected void paintComponent(Graphics g) {
 		VisualComponent component = getComponent(); 
 		if (component != null) {
-		    getComponent().draw(g);
+			getComponent().draw(g);
 		}
-	}
-
-	/* (non-Javadoc)
-	 * @see com.cosylab.vdct.graphics.DesktopPaneDecorator#setComponent(com.cosylab.vdct.graphics.VisualComponent)
-	 */
-	public void setComponent(VisualComponent newComponent) {
-		super.setComponent(newComponent);
-	}
-	
-	private void createInternalFrame(DbDescriptor id) {
-		frame = new WorkspaceInternalFrame(id);
-		frame.setVisible(true);
-		add(frame);
-		try {
-			frame.setSelected(true);
-		} catch (java.beans.PropertyVetoException e) {}
 	}
 }

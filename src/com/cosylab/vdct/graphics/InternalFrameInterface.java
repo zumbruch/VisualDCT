@@ -26,19 +26,12 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.cosylab.vdct.rdb;
+package com.cosylab.vdct.graphics;
 
-import com.cosylab.vdct.db.DBData;
+import javax.swing.JComponent;
 
-/**
- * @author ssah
- *
- */
-public interface RdbInterface {
+public interface InternalFrameInterface {
 
-    public void connect();
-	
-	public DBData loadRdbData(RdbDataId dataId);
-	public void saveRdbData(RdbDataId dataId);
-	public void saveAsRdbData(RdbDataId dataId);
+	public JComponent getDisplayingComponent();
+	public void setFrameTitle(String title);
 }

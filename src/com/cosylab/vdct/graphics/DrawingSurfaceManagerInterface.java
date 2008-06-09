@@ -26,19 +26,17 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.cosylab.vdct.rdb;
+package com.cosylab.vdct.graphics;
 
-import com.cosylab.vdct.db.DBData;
+import com.cosylab.vdct.db.DbDescriptor;
 
 /**
  * @author ssah
  *
  */
-public interface RdbInterface {
+public interface DrawingSurfaceManagerInterface {
 
-    public void connect();
-	
-	public DBData loadRdbData(RdbDataId dataId);
-	public void saveRdbData(RdbDataId dataId);
-	public void saveAsRdbData(RdbDataId dataId);
+	public VisualComponent addDrawingSurface(DbDescriptor id, InternalFrameInterface displayer);
+	public void removeDrawingSurface(DbDescriptor id);
+	public void setFocusedDrawingSurface(DbDescriptor id);
 }

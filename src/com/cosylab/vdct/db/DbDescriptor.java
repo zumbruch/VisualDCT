@@ -34,4 +34,8 @@ package com.cosylab.vdct.db;
  */
 public interface DbDescriptor {
 
+	public String getFileName();
+	public String getVersion();
+	public String getIoc();
+	public String getDescription();
 }

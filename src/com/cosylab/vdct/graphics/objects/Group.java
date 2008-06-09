@@ -47,8 +47,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
 
-import sun.reflect.ReflectionFactory.GetReflectionFactoryAction;
-
 import com.cosylab.vdct.Console;
 import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.DataProvider;

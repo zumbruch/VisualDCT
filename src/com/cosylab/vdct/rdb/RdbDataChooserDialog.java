@@ -31,6 +31,9 @@ public class RdbDataChooserDialog extends JDialog implements ActionListener {
 	
 	private boolean loadMode = true;
 	private RdbDataMapper mapper = null;
+	
+	private RdbDataId rdbDataId = null;
+	
 	private String selectedIoc = null;
 	private String selectedGroup = null;
 	private String selectedVersion = null;
@@ -63,6 +66,7 @@ public class RdbDataChooserDialog extends JDialog implements ActionListener {
 	}
 
 	public void setRdbDataId(RdbDataId dataId) {
+		rdbDataId = dataId;
 	}
 	
 	/**
@@ -260,65 +264,25 @@ public class RdbDataChooserDialog extends JDialog implements ActionListener {
 		model = new RdbDataTreeModel(mapper);
 		tree.setModel(model);
 		groupAction.setEnabled(false);
-		
-		/*
-		boolean use_tree = false;
-        
-        Connection c = SQLHelper.create(mapper).getConnection();
-        
-        if (use_tree)
-        {
-
-            OkCancelDlg dlg = new EpicsGroupDlg(null);
-            dlg.run();
-            System.exit(0);
-        }
-        else
-        {
-            Vector headers = new Vector();
-            headers.add(new String("Id"));
-            headers.add(new String("Filename"));
-            headers.add(new String("Version"));
-            headers.add(new String("Description"));
-            
-            PreparedStatement select_all, select, update, insert, delete;
-            try
-            {
-                int iocId = mapper.createAnIoc();
-            	
-            	select_all = c.prepareStatement("SELECT p_db_id, p_db_file_name, p_db_version, p_db_desc FROM p_db");
-                select = c.prepareStatement("SELECT p_db_id FROM p_db WHERE p_db_id=?");
-                update = c.prepareStatement("UPDATE p_db SET p_db_file_name=?, p_db_version=?, p_db_desc=? WHERE p_db_id=?");
-                insert = c.prepareStatement("INSERT INTO p_db (p_db_id, ioc_id_FK, p_db_file_name, p_db_version, p_db_desc)"
-                		+ "  VALUES (?," + String.valueOf(iocId) + ",?,?,?)");
-                delete = c.prepareStatement("DELETE FROM p_db WHERE p_db_id=?");
-                
-                model = new SQLTableModel101(headers, select_all, select, update, insert, delete);
-        		model.load();
-        		TableSorter sorter = new TableSorter(model);
-        		table.setModel(sorter);
-        		sorter.addMouseListenerToHeaderInTable(table);
-        		refreshSelectedGroup();        		
-        		setTableColumnWidths();
-            }
-            catch (SQLException e)
-            {
-                System.err.println ("SQL Exception: " + e.getMessage());
-                e.printStackTrace();
-            }
-        }
-        */
 	}
 	
+	/**
+	 * @return the rdbDataId
+	 */
+	public RdbDataId getRdbDataId() {
+		return rdbDataId;
+	}
+
 	private void performGroupAction() {
 		try {
+			rdbDataId.setFileName(selectedGroup);
+			rdbDataId.setVersion(selectedVersion);
+			rdbDataId.setIoc(selectedIoc);
 			
-			RdbDataId dataId = new RdbDataId(selectedGroup, selectedVersion, selectedIoc);
-
 			if (loadMode) {
-				data = mapper.loadRdbData(dataId);
+				data = mapper.loadRdbData(rdbDataId);
 			} else {
-				mapper.saveRdbData(dataId);
+				mapper.saveRdbData(rdbDataId);
 			}
 			setVisible(false);
 		} catch (Exception exception) {

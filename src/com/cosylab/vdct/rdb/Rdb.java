@@ -69,12 +69,13 @@ public class Rdb implements RdbInterface {
 	/* (non-Javadoc)
 	 * @see com.cosylab.vdct.rdb.RdbInterface#loadDbGroup(java.lang.String)
 	 */
-	public DBData loadRdbData() {
+	public DBData loadRdbData(RdbDataId dataId) {
 		if (!mapper.isConnection()) {
 			connectionDialog.setVisible(true);
 		}
 		if (mapper.isConnection()) {
 			groupDialog.setLoadMode(true);		
+			groupDialog.setRdbDataId(dataId);		
 			groupDialog.setVisible(true);
 			return groupDialog.getData();
 		}
@@ -91,7 +92,7 @@ public class Rdb implements RdbInterface {
 		if (mapper.isConnection()) {
 			
 			boolean success = false;
-			// Check if enough data known to perform a direct save. 
+			// Check if enough data is known to perform a direct save. 
 			if (dataId != null && dataId.isDefined()) {
 				try {
 					mapper.saveRdbData(dataId);
@@ -104,7 +105,8 @@ public class Rdb implements RdbInterface {
 			
 			// If something failed fall back to save as dialog.
 			if (!success) {
-				groupDialog.setLoadMode(false);		
+				groupDialog.setLoadMode(false);
+				groupDialog.setRdbDataId(dataId);		
 				groupDialog.setVisible(true);
 			}
 		}

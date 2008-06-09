@@ -39,6 +39,8 @@ public class DBTemplate extends DBComment
 	protected String id = null;
 	protected String fileName = null;
 	protected String description = null;
+	
+	protected DbDescriptor dbDescriptor = null;
 
 	protected Hashtable ports = null;
 	protected Vector portsV = null;
@@ -216,4 +218,17 @@ public class DBTemplate extends DBComment
 		return macrosV;
 	}
 
+	/**
+	 * @return the dbDescriptor
+	 */
+	public DbDescriptor getDbDescriptor() {
+		return dbDescriptor;
+	}
+
+	/**
+	 * @param dbDescriptor the dbDescriptor to set
+	 */
+	public void setDbDescriptor(DbDescriptor dbDescriptor) {
+		this.dbDescriptor = dbDescriptor;
+	}
 }

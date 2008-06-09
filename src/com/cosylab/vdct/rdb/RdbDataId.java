@@ -39,8 +39,14 @@ public class RdbDataId implements DbDescriptor {
 	private String fileName = null;
 	private String version = null;
 	private String ioc = null;
+	private String description = null;
 	
-	private static final String delimiter = ":";
+	// TODO:REM
+	// private static final String delimiter = ":";
+
+	public RdbDataId() {
+		super();
+	}
 	
 	/**
 	 * @param fileName
@@ -54,6 +60,8 @@ public class RdbDataId implements DbDescriptor {
 		this.ioc = ioc;
 	}
 	
+	// TODO:REM
+	/*
 	public RdbDataId(String string) {
 		super();
 		String[] parts = string.split(delimiter);
@@ -67,17 +75,21 @@ public class RdbDataId implements DbDescriptor {
 			ioc = parts[2];
 		}
 	}
+	*/
 	
 	public boolean isDefined() {
 		return fileName != null && version != null && ioc != null;
 	}
 
+	// TODO: REM
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
+	/*
 	public String toString() {
 		return fileName + delimiter + version + delimiter + ioc;
 	}
+	*/
 
 	/**
 	 * @return the fileName
@@ -119,5 +131,19 @@ public class RdbDataId implements DbDescriptor {
 	 */
 	public void setIoc(String ioc) {
 		this.ioc = ioc;
+	}
+
+	/**
+	 * @return the description
+	 */
+	public String getDescription() {
+		return description;
+	}
+
+	/**
+	 * @param description the description to set
+	 */
+	public void setDescription(String description) {
+		this.description = description;
 	}
 }

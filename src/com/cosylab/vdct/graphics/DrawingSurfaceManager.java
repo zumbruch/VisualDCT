@@ -35,7 +35,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 
 import com.cosylab.vdct.db.DbDescriptor;
@@ -56,17 +55,22 @@ import com.cosylab.vdct.graphics.objects.VisibleObject;
  * @author ssah
  *
  */
-public class DrawingSurfaceManager implements GUIMenuInterface, VDBInterface,
+public class DrawingSurfaceManager
+implements DrawingSurfaceManagerInterface, GUIMenuInterface, VDBInterface,
 LinkCommandInterface, RepaintInterface, Pageable {
 
-	private static DrawingSurfaceManager instance = null;
+	// TODO:REM
+	//private static DrawingSurfaceManager instance = null;
 
 	protected DSGUIInterface dsInterface = null;  
 
 	protected HashMap drawingSurfaces = null;
+	
+	protected DesktopInterface desktopInterface = null;
 
-	protected DrawingSurfaceManager() {
+	public DrawingSurfaceManager(DesktopInterface desktopInterface) {
 		drawingSurfaces = new HashMap();
+		this.desktopInterface = desktopInterface;
 		
 		CommandManager commandManager = CommandManager.getInstance();
 		commandManager.addCommand("GetVDBManager", new GetVDBManager(this));
@@ -76,19 +80,21 @@ LinkCommandInterface, RepaintInterface, Pageable {
 		commandManager.addCommand("RepaintWorkspace", new RepaintCommand(this));
 	}
 
+	// TODO:REM
+	/*
 	public static DrawingSurfaceManager getInstance() {
 		if (instance == null) {
 			instance = new DrawingSurfaceManager();
 		}
 		return instance;
 	}
-
+    */
 	public DrawingSurface getDrawingSurface(DbDescriptor id) {
 		return (DrawingSurface)drawingSurfaces.get(id);
 	}
 
-	public DrawingSurface addDrawingSurface(DbDescriptor id, JComponent container) {
-		DrawingSurface drawingSurface = new DrawingSurface(id, container);
+	public VisualComponent addDrawingSurface(DbDescriptor id, InternalFrameInterface displayer) {
+		DrawingSurface drawingSurface = new DrawingSurface(id, displayer);
 		drawingSurfaces.put(id, drawingSurface);
 		
 		if (dsInterface == null) {
@@ -370,6 +376,7 @@ LinkCommandInterface, RepaintInterface, Pageable {
 	 * @see com.cosylab.vdct.graphics.GUIMenuInterface#newCmd()
 	 */
 	public void newCmd() {
+		desktopInterface.createNewInternalFrame();
 		if (dsInterface != null) {
 			dsInterface.newCmd();
 		}
@@ -379,6 +386,7 @@ LinkCommandInterface, RepaintInterface, Pageable {
 	 * @see com.cosylab.vdct.graphics.GUIMenuInterface#openDB(java.io.File)
 	 */
 	public void openDB(File file) throws IOException {
+		desktopInterface.createNewInternalFrame();
 		if (dsInterface != null) {
 			dsInterface.openDB(file);
 		}

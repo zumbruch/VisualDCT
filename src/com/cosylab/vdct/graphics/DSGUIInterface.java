@@ -54,7 +54,6 @@ import com.cosylab.vdct.VisualDCT;
 import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.events.commands.SetRedoMenuItemState;
 import com.cosylab.vdct.events.commands.SetUndoMenuItemState;
-import com.cosylab.vdct.events.commands.SetWorkspaceFile;
 import com.cosylab.vdct.events.commands.ShowMorphingDialog;
 import com.cosylab.vdct.events.commands.ShowRenameDialog;
 import com.cosylab.vdct.graphics.objects.Border;
@@ -720,11 +719,13 @@ public void levelUp() {
  * Creation date: (4.2.2001 15:32:01)
  */
 public void newCmd() {
-	drawingSurface.initializeWorkspace();
-	
+	// TODO:REM
+	//drawingSurface.initializeWorkspace();
+	/*
 	SetWorkspaceFile cmd = (SetWorkspaceFile)CommandManager.getInstance().getCommand("SetFile");
 	cmd.setFile(null);
 	cmd.execute();
+	*/
 }
 /**
  * Insert the method's description here.

@@ -28,65 +28,77 @@
 
 package com.cosylab.vdct.graphics;
 
+import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
 import javax.swing.WindowConstants;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 
 import com.cosylab.vdct.db.DbDescriptor;
+import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.events.MouseEventManager;
+import com.cosylab.vdct.events.commands.SetWorkspaceFile;
 
 /**
  * @author ssah
  *
  */
-public class WorkspaceInternalFrame extends JInternalFrame implements InternalFrameListener {
-	
-    DbDescriptor id = null; 
-    protected PanelDecorator contentPanel = null;
+public class WorkspaceInternalFrame extends JInternalFrame
+implements InternalFrameInterface, InternalFrameListener {
 
-    public WorkspaceInternalFrame(DbDescriptor id) {
-        super(id.toString(), true, true, true, true);
-        this.id = id;
-        contentPanel = new PanelDecorator();
-        // First register the component, then create the DrawingSurface which adds listeners to it.
-        MouseEventManager.getInstance().registerSubscreiber(
-        		"WorkspaceInternalFrame:" + id.toString(), contentPanel);
-        DrawingSurface drawSurface = DrawingSurfaceManager.getInstance().addDrawingSurface(id, contentPanel);
-        contentPanel.setComponent(drawSurface);
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        
-        addInternalFrameListener(this);
-        
-        setContentPane(contentPanel);
-        setSize(256, 256);
-        setLocation(32, 32);
-    }
-    
-	/* (non-Javadoc)
-	 * @see javax.swing.event.InternalFrameListener#internalFrameActivated(javax.swing.event.InternalFrameEvent)
-	 */
+	DbDescriptor id = null; 
+	protected PanelDecorator contentPanel = null;
+	protected DrawingSurfaceManagerInterface drawingSurfaceManager = null;
+
+	public WorkspaceInternalFrame(DbDescriptor id, DrawingSurfaceManagerInterface drawingSurfaceManager) {
+		super(id.getFileName(), true, true, true, true);
+		this.id = id;
+		this.drawingSurfaceManager = drawingSurfaceManager;
+		contentPanel = new PanelDecorator();
+		/* First register the component, then create the drawing surface which adds listeners to
+		 * it.
+		 */
+		MouseEventManager.getInstance().registerSubscriber(
+				"WorkspaceInternalFrame:" + id.toString(), contentPanel);
+		contentPanel.setComponent(drawingSurfaceManager.addDrawingSurface(id, this));
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+
+		addInternalFrameListener(this);
+
+		setFrameTitle(id.getFileName());
+
+		setContentPane(contentPanel);
+		setSize(256, 256);
+		setLocation(32, 32);
+	}
+
+	public JComponent getDisplayingComponent() {
+		return contentPanel;
+	}
+
+	public void setFrameTitle(String title) {
+		setTitle(title);
+		if (isSelected()) {
+			sendActiveGroupNotification();
+		}
+	}
+
 	public void internalFrameActivated(InternalFrameEvent e) {
-		DrawingSurfaceManager.getInstance().setFocusedDrawingSurface(id);
+		drawingSurfaceManager.setFocusedDrawingSurface(id);
+		sendActiveGroupNotification();
 		System.out.println(id + "internalFrameActivated");
 	}
 
-	/* (non-Javadoc)
-	 * @see javax.swing.event.InternalFrameListener#internalFrameDeactivated(javax.swing.event.InternalFrameEvent)
-	 */
 	public void internalFrameDeactivated(InternalFrameEvent e) {
-		DrawingSurfaceManager.getInstance().setFocusedDrawingSurface(null);
+		drawingSurfaceManager.setFocusedDrawingSurface(null);
 		System.out.println(id + "internalFrameDeactivated");
 	}
 
-	/* (non-Javadoc)
-	 * @see javax.swing.event.InternalFrameListener#internalFrameClosed(javax.swing.event.InternalFrameEvent)
-	 */
 	public void internalFrameClosed(InternalFrameEvent e) {
-		DrawingSurfaceManager.getInstance().removeDrawingSurface(id);
+		drawingSurfaceManager.removeDrawingSurface(id);
 		System.out.println(id + "internalFrameClosed");
 	}
-	
+
 	public void internalFrameClosing(InternalFrameEvent e) {
 	}
 	public void internalFrameDeiconified(InternalFrameEvent e) {
@@ -94,5 +106,12 @@ public class WorkspaceInternalFrame extends JInternalFrame implements InternalFr
 	public void internalFrameIconified(InternalFrameEvent e) {
 	}
 	public void internalFrameOpened(InternalFrameEvent e) {
+	}
+
+	private void sendActiveGroupNotification() {
+		SetWorkspaceFile command =
+			(SetWorkspaceFile)CommandManager.getInstance().getCommand("SetFile");
+		command.setFile(title);
+		command.execute();
 	}
 }

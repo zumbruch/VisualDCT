@@ -103,14 +103,15 @@ import com.cosylab.vdct.events.commands.ShowMorphingDialog;
 import com.cosylab.vdct.events.commands.ShowNewDialog;
 import com.cosylab.vdct.events.commands.ShowRenameDialog;
 import com.cosylab.vdct.find.FindDialog;
+import com.cosylab.vdct.graphics.DrawingSurfaceManager;
 import com.cosylab.vdct.graphics.VDBInterface;
 import com.cosylab.vdct.graphics.ViewState;
+import com.cosylab.vdct.graphics.WorkspaceDesktop;
 import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.printing.Page;
 import com.cosylab.vdct.graphics.printing.PrintPreview;
 import com.cosylab.vdct.inspector.SpreadsheetInspector;
 import com.cosylab.vdct.plugin.config.PluginNameConfigManager;
-import com.cosylab.vdct.rdb.RdbDataId;
 import com.cosylab.vdct.rdb.RdbInstance;
 import com.cosylab.vdct.util.ComboBoxFileChooser;
 import com.cosylab.vdct.util.DBDEntry;
@@ -201,8 +202,11 @@ public class VisualDCT extends JFrame {
 	private JSlider ivjZoomSlider = null;
 	private JLabel ivjZoomLabel = null;
 	private JPanel ivjZoomPanel = null;
+	//TODO:REM
+    /*
 	private com.cosylab.vdct.graphics.BorderDecorator ivjborder = null;
 	private com.cosylab.vdct.graphics.DrawingSurface ivjcanvas = null;
+	*/
 	private JFileChooser ivjfileChooser = null;
 	private JCheckBoxMenuItem ivjSnapToGridMenuItem = null;
 	private JCheckBoxMenuItem ivjWindowsPanMenuItem = null;
@@ -298,7 +302,8 @@ public class VisualDCT extends JFrame {
 	
 	private static VisualDCT instance = null;
 	
-	private static int internalFrameNum = 0;
+	// TODO:REM
+	//private static int internalFrameNum = 0;
 	
 class IvjEventHandler implements java.awt.event.ActionListener, java.awt.event.ItemListener, java.awt.event.MouseListener, java.awt.event.MouseMotionListener, java.awt.event.WindowListener {
 		public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -1799,12 +1804,17 @@ private void connEtoM3(java.awt.event.ActionEvent arg1) {
 		handleException(ivjExc);
 	}
 }
+//TODO:REM
+
+
 /**
  * connPtoP1SetTarget:  (canvas.this <--> border.component)
  */
 /* WARNING: THIS METHOD WILL BE REGENERATED. */
+/*
 private void connPtoP1SetTarget() {
 	/* Set the target from the source */
+/*
 	try {
 		getborder().setComponent(getcanvas());
 		// user code begin {1}
@@ -1815,12 +1825,15 @@ private void connPtoP1SetTarget() {
 		handleException(ivjExc);
 	}
 }
+*/
 /**
  * connPtoP2SetTarget:  (workspace.this <--> border.component)
  */
 /* WARNING: THIS METHOD WILL BE REGENERATED. */
+/*
 private void connPtoP2SetTarget() {
 	/* Set the target from the source */
+/*
 	try {
 		getworkspace().setComponent(getborder());
 		// user code begin {1}
@@ -1831,7 +1844,7 @@ private void connPtoP2SetTarget() {
 		handleException(ivjExc);
 	}
 }
-
+*/
 public void systemCopy() {
     GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
     cmd.getGUIMenuInterface().systemCopy();
@@ -2132,6 +2145,8 @@ private javax.swing.JMenuItem getBooks_OnlineMenuItem() {
  * @return com.cosylab.vdct.graphics.BorderDecorator
  */
 /* WARNING: THIS METHOD WILL BE REGENERATED. */
+//TODO:REM
+/*
 private com.cosylab.vdct.graphics.BorderDecorator getborder() {
 	if (ivjborder == null) {
 		try {
@@ -2146,7 +2161,7 @@ private com.cosylab.vdct.graphics.BorderDecorator getborder() {
 	}
 	return ivjborder;
 }
-
+*/
 private javax.swing.JButton getBoxButton() {
 	if (boxButton == null) {
 		try {
@@ -2354,11 +2369,14 @@ private javax.swing.JButton getCancelButton1() {
 	}
 	return ivjCancelButton1;
 }
+//TODO:REM
+
 /**
  * Return the canvas property value.
  * @return com.cosylab.vdct.graphics.DrawingSurface
  */
 /* WARNING: THIS METHOD WILL BE REGENERATED. */
+/*
 private com.cosylab.vdct.graphics.DrawingSurface getcanvas() {
 	if (ivjcanvas == null) {
 		try {
@@ -2375,6 +2393,7 @@ private com.cosylab.vdct.graphics.DrawingSurface getcanvas() {
 	}
 	return ivjcanvas;
 }
+*/
 
 /**
  * Return the CopyButton property value.
@@ -2821,9 +2840,12 @@ private javax.swing.JMenu getFileMenu() {
 			JMenuItem menuItem = new JMenuItem("New window");
 			menuItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
+					// TODO:REM
+					/*
 					RdbDataId id = new RdbDataId(String.valueOf(internalFrameNum));
 					internalFrameNum++;
-					getworkspace().createNewDrawingSurface(id);
+					*/
+					getworkspace().createNewInternalFrame();
 				}
 			});
 			ivjFileMenu.add(menuItem);
@@ -3435,7 +3457,7 @@ private javax.swing.JPanel getJFrameContentPane() {
 			getJFrameContentPane().add(getStatusBarPane(), BorderLayout.SOUTH);
 			getJFrameContentPane().add(getworkspace(), BorderLayout.CENTER);
 			CommandManager.getInstance().addCommand("SetCursor", new SetCursorCommand(ivjJFrameContentPane));
-			KeyEventManager.getInstance().registerSubscreiber("ContentPane", ivjJFrameContentPane);
+			KeyEventManager.getInstance().registerSubscriber("ContentPane", ivjJFrameContentPane);
 			ivjJFrameContentPane.setFocusable(true);
 			ivjJFrameContentPane.addMouseListener(new MouseAdapter() {
 			    public void mouseEntered(MouseEvent e) {
@@ -5563,7 +5585,7 @@ private javax.swing.JLabel getWarningLabel() {
 private com.cosylab.vdct.graphics.WorkspaceDesktop getworkspace() {
 	if (ivjworkspace == null) {
 		try {
-			ivjworkspace = new com.cosylab.vdct.graphics.WorkspaceDesktop();
+			ivjworkspace = new WorkspaceDesktop();
 			ivjworkspace.setName("workspace");
 			ivjworkspace.addMouseListener(new MouseAdapter() {
 			    public void mouseEntered(MouseEvent e) {
@@ -5572,9 +5594,16 @@ private com.cosylab.vdct.graphics.WorkspaceDesktop getworkspace() {
 			    }
 			});
 			// user code begin {1}
+			DrawingSurfaceManager drawingSurfaceManager = new DrawingSurfaceManager(ivjworkspace);
+			ivjworkspace.setDrawingSurfaceManager(drawingSurfaceManager);
+			ivjworkspace.createNewInternalFrame();
+			
+			// TODO:REM
+			/*
 			RdbDataId id = new RdbDataId(String.valueOf(internalFrameNum));
 			internalFrameNum++;
 			ivjworkspace.createNewDrawingSurface(id);
+			*/
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
 			// user code begin {2}
@@ -6286,6 +6315,8 @@ public static void main(final java.lang.String[] args) {
 			};
 		});
 		aVisualDCT.setVisible(true);
+		
+		aVisualDCT.getworkspace().selectFirstInternalFrame();
 
 	} catch (Throwable exception) {
 		System.err.println("Exception occurred in main() of VisualDCT");

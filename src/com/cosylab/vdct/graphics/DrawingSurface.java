@@ -66,7 +66,6 @@ import java.util.LinkedHashSet;
 import java.util.Stack;
 import java.util.Vector;
 
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -297,16 +296,16 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 	private Stack templateStack = null;	
 	private Vector selectedConnectorsForMove = null;
 	
-	private JComponent container = null; 
+	private InternalFrameInterface displayer = null;
 	
 /**
- * container can be null when no gui is linked to this. 
+ * displayer can be null when no gui is linked to this. 
  */
-public DrawingSurface(DbDescriptor id, JComponent container) {
+public DrawingSurface(DbDescriptor id, InternalFrameInterface displayer) {
 
 	instance = this;
 	this.id = id;
-	this.container = container;
+	this.displayer = displayer;
 	
 	setModified(false);
 
@@ -747,7 +746,7 @@ public com.cosylab.vdct.graphics.objects.Group getViewGroup() {
  * @return javax.swing.JComponent
  */
 public javax.swing.JComponent getWorkspacePanel() {
-	return container;
+	return displayer.getDisplayingComponent();
 	// TODO: REM
 	/*
 	NullCommand pm = (NullCommand)CommandManager.getInstance().getCommand("NullCommand");
@@ -2105,8 +2104,11 @@ public boolean open(InputStream is, File file, boolean importDB, boolean importT
 		setCursor(hourCursor);
 
 		// prepare workspace
+		// TODO:REM
+		/*
 		if (!importDB)
 			initializeWorkspace();
+		*/
 		UndoManager.getInstance().setMonitor(false);
 
 		// load
@@ -2228,9 +2230,14 @@ public boolean open(InputStream is, File file, boolean importDB, boolean importT
 		///!!! TODO put somewhere in try-finally block
 		restoreCursor();
 		UndoManager.getInstance().setMonitor(true);
+
+		((RdbDataId)id).setFileName(dbData.getTemplateData().getFileName());
+		
 		// free db memory	    
 		dbData = null;
 		System.gc();
+		
+		displayer.setFrameTitle(id.getFileName());
 
 		return true;
 	} 
@@ -2247,7 +2254,7 @@ public boolean loadRdbDbGroup(JFrame guiContext) {
 		setCursor(hourCursor);
 		UndoManager.getInstance().setMonitor(false);
 
-		dbData = RdbInstance.getInstance(guiContext).getRdbInterface().loadRdbData();
+		dbData = RdbInstance.getInstance(guiContext).getRdbInterface().loadRdbData((RdbDataId)id);
 
 		// check for sucess
 		DBDData dbdData = DataProvider.getInstance().getDbdDB();
@@ -2257,7 +2264,7 @@ public boolean loadRdbDbGroup(JFrame guiContext) {
 			restoreCursor();
 			return false;
 		}
-		id = new RdbDataId(dbData.getTemplateData().getId());
+		id = dbData.getTemplateData().getDbDescriptor();
 
 		// check is DTYP fields are defined before any DBF_INPUT/DBF_OUTPUT fields...
 		DBData.checkDTYPfield(dbData, dbdData);
@@ -2297,6 +2304,7 @@ public boolean loadRdbDbGroup(JFrame guiContext) {
 		((GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface")).getGUIMenuInterface().paste();
 		Group.getClipboard().clear();
 
+		displayer.setFrameTitle(id.getFileName());
 
 		if (VisualDCT.getInstance() != null) {
 			VisualDCT.getInstance().updateLoadLabel();
@@ -3050,7 +3058,8 @@ public boolean openDBD(File file, boolean importDBD) throws IOException {
 	if (!importDBD)
 	{
 		DataProvider.getInstance().setDbdDB(dbdData);
-		if (viewGroup==null) initializeWorkspace();
+		// TODO:REM
+		//if (viewGroup==null) initializeWorkspace();
 		createNavigatorImage();
 	}
 

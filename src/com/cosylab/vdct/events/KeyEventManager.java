@@ -54,7 +54,7 @@ public static KeyEventManager getInstance() {
  * @param id java.lang.String
  * @param component javax.swing.JComponent
  */
-public void registerSubscreiber(String id, JComponent component) {
+public void registerSubscriber(String id, JComponent component) {
 	super.registerSubscriber(id, component);
 }
 /**
@@ -75,7 +75,7 @@ public void subscribe(String subscriberID, KeyListener listener) {
  * @param component javax.swing.JComponent
  */
  
-public void unregisterSubscreiber(String id, JComponent component) {
+public void unregisterSubscriber(String id, JComponent component) {
 	super.unregisterSubscriber(id, component);
 }
 /**

@@ -67,7 +67,7 @@ public class RdbDataMapper {
 	private RdbConnection helper = null;
 
 	private Integer iocId = null; 
-	private Integer pDbdId = null; 
+	private Integer pDbdId = null;
 	private Integer pDbId = null; 
 	
 	private static final String emptyString = "";
@@ -89,6 +89,8 @@ public class RdbDataMapper {
 		try {
 			if (loadDbId(dataId)) {
 				data = new DBData(dataId.toString(), dataId.getFileName());
+				data.getTemplateData().setDbDescriptor(dataId);
+				
 				loadRecords(data);
 				loadTemplates(data);
 				loadVdctData(data);				
