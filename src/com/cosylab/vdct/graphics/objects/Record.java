@@ -218,7 +218,7 @@ public void addLink(Linkable link) {
  * @param dy int
  */
 public boolean checkMove(int dx, int dy) {
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(getRootContainerId());
 
 	if ((getX()<-dx) || (getY()<-dy) || 
 		(getX()>(view.getWidth()-getWidth()-dx)) || (getY()>(view.getHeight()-getHeight()-dy)))
@@ -305,7 +305,7 @@ public void fixEPICSOutLinksOnCopy(String prevGroup, String group) {
 				
 					
 				// fix only selected
-				if (!ViewState.getInstance().isSelected(selectableObject))
+				if (!ViewState.getInstance(getRootContainerId()).isSelected(selectableObject))
 					continue;
 				
 				// fix ports...
@@ -374,7 +374,7 @@ public void disconnect(Linkable disconnector) {
  */
 protected void draw(Graphics g, boolean hilited) {
 
-    ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(getRootContainerId());
 
     double Rscale = getRscale();
 	boolean zoom = Rscale < 1.0 && view.isZoomOnHilited() && view.isHilitedObject(this);
@@ -537,11 +537,8 @@ protected void draw(Graphics g, boolean hilited) {
 					g.drawLine(ccx, cy, cx - 2 * r, cy);
 				}
 //				 !!! more intergroup inlinks?!
-				LinkDrawer.drawInIntergroupLink(
-					g,
-					(OutLink) outlinks.firstElement(),
-					this,
-					isRightSide);
+				LinkDrawer.drawInIntergroupLink(g, view, (OutLink) outlinks.firstElement(),
+						this, isRightSide);
 //			}
 		
 		}
@@ -657,7 +654,7 @@ public void fieldChanged(VDBFieldData field) {
 	if (repaint) {
 		// do not repaint non-viewing group
 		// might happen in debug mode and any other
-		if (DrawingSurface.getInstance().getViewGroup() == getParent())
+		if (DsManager.getDrawingSurface(getRootContainerId()).getViewGroup() == getParent())
 		{
 			unconditionalValidation();
 			com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
@@ -1048,7 +1045,7 @@ public Vector getStartPoints() {
  */
 public VisibleObject hiliteComponentsCheck(int x, int y) {
 
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(getRootContainerId());
 	VisibleObject spotted = null;
 	
 	Enumeration e = subObjectsV.elements();
@@ -1141,7 +1138,7 @@ public boolean selectComponentsCheck(int x1, int y1, int x2, int y2) {
 	if (y1>y2)
 		{ t=y1; y1=y2; y2=t; }
 
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(getRootContainerId());
 	boolean anyNew = false;
 	
 	Enumeration e = subObjectsV.elements();
@@ -1481,7 +1478,7 @@ public void rotate() { right=!right; }
  */
 public boolean selectAllComponents() {
 	
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(getRootContainerId());
 	boolean anyNew = false;
 	
 	Enumeration e = subObjectsV.elements();

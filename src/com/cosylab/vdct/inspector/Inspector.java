@@ -60,7 +60,7 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 
 import com.cosylab.vdct.Console;
-import com.cosylab.vdct.graphics.DrawingSurface;
+import com.cosylab.vdct.graphics.DsManager;
 import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.graphics.objects.VisibleObject;
 
@@ -70,6 +70,9 @@ import com.cosylab.vdct.graphics.objects.VisibleObject;
  * @author Matej Sekoranja
  */
 public class Inspector extends JDialog implements InspectableObjectsListener, InspectorInterface, WindowListener, ChangeListener {
+	
+	private Object rootGroupId = null;
+	
 	private JLabel ivjCommentLabel = null;
 	private CommentTextArea ivjCommentTextArea = null;
 	private JCheckBox ivjFrozeCheckBox = null;
@@ -112,19 +115,12 @@ public Inspector() {
  * Inspector constructor comment.
  * @param owner java.awt.Frame
  */
-public Inspector(java.awt.Frame owner) {
+public Inspector(Frame owner, Object rootGroupId) {
 	super(owner);
+	this.rootGroupId = rootGroupId;
 	initialize();
 }
-/**
- * Inspector constructor comment.
- * @param owner java.awt.Frame
- * @param modal boolean
- */
-public Inspector(java.awt.Frame owner, boolean modal) {
-	super(owner, modal);
-	initialize();
-}
+
 /**
  * Insert the method's description here.
  * Creation date: (2.2.2001 22:31:51)
@@ -440,7 +436,7 @@ private JButton getCenterOnScreenButton() {
                 public void actionPerformed(ActionEvent e) {
                     if (inspectedObject != null) {
                         if (inspectedObject instanceof VisibleObject) {
-                            DrawingSurface.getInstance().centerObject((VisibleObject) inspectedObject);
+                            DsManager.getDrawingSurface(rootGroupId).centerObject((VisibleObject) inspectedObject);
                         }
                     }
                 }
@@ -683,8 +679,9 @@ public void inspectObject(Inspectable object, boolean raise) {
 	if (!updatingList)
 	{
 		if (object instanceof VisibleObject) {
-		    ViewState.getInstance().setAsHilited((VisibleObject) object);
-		    DrawingSurface.getInstance().repaint(true);
+			VisibleObject visible = (VisibleObject)object;
+		    ViewState.getInstance(visible.getRootContainerId()).setAsHilited(visible);
+		    DsManager.getDrawingSurface(rootGroupId).repaint(true);
 		}
 	}
 }
@@ -818,8 +815,8 @@ public void windowActivated(java.awt.event.WindowEvent e) {
 	InspectorManager.getInstance().fucusGained(this);
 	if (inspectedObject != null) {
 	    if (inspectedObject instanceof VisibleObject) {
-	        ViewState.getInstance().setAsHilited((VisibleObject) inspectedObject);
-	        DrawingSurface.getInstance().repaint(true);
+	        ViewState.getInstance(rootGroupId).setAsHilited((VisibleObject) inspectedObject);
+		    DsManager.getDrawingSurface(rootGroupId).repaint(true);
 	    }
 	}
 }
@@ -843,8 +840,8 @@ public void windowClosing(java.awt.event.WindowEvent e) {}
 public void windowDeactivated(java.awt.event.WindowEvent e) {
     if (inspectedObject != null) {
 	    if (inspectedObject instanceof VisibleObject) {
-	        ViewState.getInstance().setAsHilited(null);
-	        DrawingSurface.getInstance().repaint(true);
+	        ViewState.getInstance(rootGroupId).setAsHilited(null);
+		    DsManager.getDrawingSurface(rootGroupId).repaint(true);
 	    }
 	}
 }

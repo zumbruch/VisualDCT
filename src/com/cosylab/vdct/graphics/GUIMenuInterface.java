@@ -269,4 +269,6 @@ void updateGroupLabel();
 void systemCopy();
 void systemPaste();
 
+void reset();
+
 }

@@ -28,16 +28,18 @@ package com.cosylab.vdct.graphics.objects;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.util.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Vector;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
 
 import com.cosylab.vdct.Constants;
+import com.cosylab.vdct.graphics.ViewState;
 
 /**
  * Insert the type's description here.
@@ -115,7 +117,7 @@ public EPICSInLink(ContainerObject parent, com.cosylab.vdct.vdb.VDBFieldData fie
 protected void draw(Graphics g, boolean hilited) {
 //	super.draw(g, hilited);
 	
-	com.cosylab.vdct.graphics.ViewState view = com.cosylab.vdct.graphics.ViewState.getInstance();
+	ViewState view = ViewState.getInstance(getRootContainerId());
 
 	double Rscale = view.getScale();
 	boolean zoom = (Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this);
@@ -162,7 +164,7 @@ protected void draw(Graphics g, boolean hilited) {
 	    
 	    g.setColor(hilited && view.isHilitedObject(this) && !zoom ? Constants.HILITE_COLOR : getVisibleColor());
 	    
-        LinkDrawer.drawLink(g, this, inlink, getQueueCount(), rightSide);
+        LinkDrawer.drawLink(g, view, this, inlink, getQueueCount(), rightSide);
     
 		g.setColor(color);
 		// draw arrow

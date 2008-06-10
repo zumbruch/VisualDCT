@@ -35,6 +35,7 @@ import com.cosylab.vdct.vdb.*;
 import java.awt.event.*;
 import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.inspector.*;
+import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.graphics.popup.*;
 
 /**
@@ -151,7 +152,7 @@ public void disconnect(Linkable disconnector) {
 protected void drawOneSided(Graphics g, boolean hilited) {
 	
 
-	com.cosylab.vdct.graphics.ViewState view = com.cosylab.vdct.graphics.ViewState.getInstance();
+	ViewState view = ViewState.getInstance(getRootContainerId());
 	double Rscale = view.getScale();
 	boolean zoom = (Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this);
 	
@@ -245,7 +246,7 @@ protected void drawOneSided(Graphics g, boolean hilited) {
 			g.drawLine(linkx, rry, rrx-3*r, rry);
 
 		// !!! more intergroup inlinks?!
-		LinkDrawer.drawInIntergroupLink(g, (OutLink)outlinks.firstElement(), this, isRightSide);
+		LinkDrawer.drawInIntergroupLink(g, view, (OutLink)outlinks.firstElement(), this, isRightSide);
 		
 	}
 	
@@ -267,7 +268,7 @@ protected void draw(Graphics g, boolean hilited) {
 		return;
 	}
 
-	com.cosylab.vdct.graphics.ViewState view = com.cosylab.vdct.graphics.ViewState.getInstance();
+	ViewState view = ViewState.getInstance(getRootContainerId());
 	
 	double Rscale = view.getScale();
 	boolean zoom = (Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this);
@@ -346,7 +347,7 @@ protected void draw(Graphics g, boolean hilited) {
 
 		
 		// !!! more intergroup inlinks?!
-		LinkDrawer.drawInIntergroupLink(g, (OutLink)outlinks.firstElement(), this, isRightSide);
+		LinkDrawer.drawInIntergroupLink(g, view, (OutLink)outlinks.firstElement(), this, isRightSide);
 		
 	}
 	super.draw(g, hilited);

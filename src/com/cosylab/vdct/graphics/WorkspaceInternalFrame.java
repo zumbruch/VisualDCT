@@ -48,9 +48,9 @@ implements InternalFrameInterface, InternalFrameListener {
 
 	DbDescriptor id = null; 
 	protected PanelDecorator contentPanel = null;
-	protected DrawingSurfaceManagerInterface drawingSurfaceManager = null;
+	protected DsManagerInterface drawingSurfaceManager = null;
 
-	public WorkspaceInternalFrame(DbDescriptor id, DrawingSurfaceManagerInterface drawingSurfaceManager) {
+	public WorkspaceInternalFrame(DbDescriptor id, DsManagerInterface drawingSurfaceManager) {
 		super(id.getFileName(), true, true, true, true);
 		this.id = id;
 		this.drawingSurfaceManager = drawingSurfaceManager;
@@ -86,17 +86,14 @@ implements InternalFrameInterface, InternalFrameListener {
 	public void internalFrameActivated(InternalFrameEvent e) {
 		drawingSurfaceManager.setFocusedDrawingSurface(id);
 		sendActiveGroupNotification();
-		System.out.println(id + "internalFrameActivated");
 	}
 
 	public void internalFrameDeactivated(InternalFrameEvent e) {
 		drawingSurfaceManager.setFocusedDrawingSurface(null);
-		System.out.println(id + "internalFrameDeactivated");
 	}
 
 	public void internalFrameClosed(InternalFrameEvent e) {
 		drawingSurfaceManager.removeDrawingSurface(id);
-		System.out.println(id + "internalFrameClosed");
 	}
 
 	public void internalFrameClosing(InternalFrameEvent e) {

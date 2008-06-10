@@ -32,8 +32,9 @@ package com.cosylab.vdct.graphics;
  * @author ssah
  *
  */
-public interface RepaintInterface {
-
-	public void repaint(boolean highlighted);
-	public void repaintAll(boolean highlighted);
+public interface DsEventListener {
+	
+	public void onDsAdded(Object id);
+	public void onDsRemoved(Object id);
+	public void onDsFocused(Object id);
 }

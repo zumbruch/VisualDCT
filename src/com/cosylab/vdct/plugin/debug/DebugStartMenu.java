@@ -28,21 +28,31 @@ package com.cosylab.vdct.plugin.debug;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import javax.swing.*;
-
-import java.util.*;
-import java.beans.*;
 import java.awt.Toolkit;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Stack;
+
+import javax.swing.Icon;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.ProgressMonitor;
 
 import com.cosylab.vdct.Console;
 import com.cosylab.vdct.VisualDCT;
-import com.cosylab.vdct.graphics.DrawingSurface;
+import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.graphics.objects.Debuggable;
 import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.objects.Record;
 import com.cosylab.vdct.inspector.InspectableProperty;
-import com.cosylab.vdct.plugin.*;
+import com.cosylab.vdct.plugin.PluginListener;
+import com.cosylab.vdct.plugin.PluginManager;
+import com.cosylab.vdct.plugin.PluginObject;
 import com.cosylab.vdct.vdb.VDBFieldData;
 import com.cosylab.vdct.vdb.VDBRecordData;
 
@@ -109,7 +119,10 @@ public void run()
 	// count loop
 	int recordCount = 0;
 	Stack groupStack = new Stack();
-	groupStack.push(Group.getRoot());
+	
+	Group rootGroup = Group.getRoot();
+	
+	groupStack.push(rootGroup);
 
 	while (!groupStack.isEmpty())
 	{
@@ -127,7 +140,7 @@ public void run()
 
 
 	// connect loop
-	groupStack.push(Group.getRoot());
+	groupStack.push(rootGroup);
 
 	int progress = 0;
 	ProgressMonitor progressMonitor = new ProgressMonitor(VisualDCT.getInstance(),
@@ -191,9 +204,8 @@ public void run()
 
 	progressMonitor.close();
 
-	Group.getRoot().unconditionalValidateSubObjects(false);
-	DrawingSurface.getInstance().repaint();
-
+	rootGroup.unconditionalValidateSubObjects(false);
+	CommandManager.getInstance().execute("RepaintAllFrames");
 }
 	
 

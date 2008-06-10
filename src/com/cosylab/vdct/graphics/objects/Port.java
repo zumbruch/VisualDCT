@@ -83,14 +83,14 @@ public class Port extends VisibleObject implements Descriptable, Movable, OutLin
 			else if (action.equals(removePortString))
 			{
 				destroy();
-				ViewState.getInstance().deselectObject(Port.this);
+				ViewState.getInstance(Port.this.getRootContainerId()).deselectObject(Port.this);
 				com.cosylab.vdct.undo.UndoManager.getInstance().addAction(new com.cosylab.vdct.undo.DeleteAction(Port.this));
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
 			else if (action.equals(removePortDefString))
 			{
 				data.getTemplate().removePort(getName());
-				ViewState.getInstance().deselectObject(Port.this);
+				ViewState.getInstance(Port.this.getRootContainerId()).deselectObject(Port.this);
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
 			else if (action.equals(constantString)) {
@@ -204,7 +204,7 @@ public void accept(Visitor visitor) {}
  * @param dy int
  */
 public boolean checkMove(int dx, int dy) {
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(getRootContainerId());
 
 	if ((getX()<-dx) || (getY()<-dy) || 
 		(getX()>(view.getWidth()-getWidth()-dx)) || (getY()>(view.getHeight()-getHeight()-dy)))
@@ -269,7 +269,7 @@ public void disconnect(Linkable disconnector) {
  */
 protected void draw(java.awt.Graphics g, boolean hilited) {
 
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(getRootContainerId());
 	
 	double Rscale = view.getScale();
 	boolean zoom = (Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this);
@@ -290,7 +290,7 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 	{
 		// draw link
 		g.setColor(hilited && view.isHilitedObject(this) && !zoom ? Constants.HILITE_COLOR : getVisibleColor());
-	    LinkDrawer.drawLink(g, this, inlink, getQueueCount(), rightSide);
+	    LinkDrawer.drawLink(g, view, this, inlink, getQueueCount(), rightSide);
 	}
 	
 	// clipping
@@ -1035,7 +1035,7 @@ public Connector addConnector() {
 
 public void setTextPositionNorth(boolean isTextPositionNorth) {
     this.textPositionNorth = isTextPositionNorth;
-    DrawingSurface.getInstance().repaint();
+    DsManager.getDrawingSurface(getRootContainerId()).repaint();
 }
 
 public boolean isTextPositionNorth() {

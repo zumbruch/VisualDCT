@@ -35,6 +35,7 @@ import java.util.Vector;
 
 import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.graphics.DrawingSurface;
+import com.cosylab.vdct.graphics.DsManager;
 import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.vdb.GUIHeader;
@@ -89,10 +90,10 @@ public void updateTemplateLink()
 		
 	// remove old one		
 	if (lastUpdatedFullName!=null)
-		Group.getRoot().getLookupTable().remove(lastUpdatedFullName);
+		((Group)getRootContainer()).getLookupTable().remove(lastUpdatedFullName);
 	
 	// ups, we already got this registered
-	if (Group.getRoot().getLookupTable().containsKey(getFieldData().getFullName()))
+	if (((Group)getRootContainer()).getLookupTable().containsKey(getFieldData().getFullName()))
 	{
 		lastUpdatedFullName = null;
 		((LinkManagerObject)getParent()).addInvalidLink(this);
@@ -101,7 +102,7 @@ public void updateTemplateLink()
 	else
 	{
 		lastUpdatedFullName = getFieldData().getFullName();
-		Group.getRoot().getLookupTable().put(lastUpdatedFullName, this);
+		((Group)getRootContainer()).getLookupTable().put(lastUpdatedFullName, this);
 		LinkManagerObject.fixLink(this);
 		((LinkManagerObject)getParent()).removeInvalidLink(this);
 	}
@@ -149,7 +150,7 @@ protected void draw(Graphics g, boolean hilited) {
 	if (!isVisible())
 		return;
 
-	com.cosylab.vdct.graphics.ViewState view = com.cosylab.vdct.graphics.ViewState.getInstance();
+	ViewState view = ViewState.getInstance(getRootContainerId());
 	
 	double Rscale = view.getScale();
 	boolean zoom = (Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this);
@@ -279,7 +280,7 @@ public void destroyAndRemove() {
 	super.destroy();
 
 	if (lastUpdatedFullName!=null)
-		Group.getRoot().getLookupTable().remove(getFieldData().getFullName());
+		((Group)getRootContainer()).getLookupTable().remove(getFieldData().getFullName());
 	else
 		((LinkManagerObject)getParent()).removeInvalidLink(this);
 
@@ -437,11 +438,13 @@ public boolean move(int dx, int dy) {
 
 	boolean moved = false;
 
-	ViewState view = ViewState.getInstance();
+	Object id = getRootContainerId();
+	ViewState view = ViewState.getInstance(id);
 	dx = (int)(dx*view.getScale());
 	dy = (int)(dy*view.getScale());
-	int x = DrawingSurface.getInstance().getPressedX() + view.getRx();
-	int y = DrawingSurface.getInstance().getPressedY() + view.getRy();
+	DrawingSurface drawingSurface = DsManager.getDrawingSurface(id);
+	int x = drawingSurface.getPressedX() + view.getRx();
+	int y = drawingSurface.getPressedY() + view.getRy();
 
 	if (dx > 0 && !isRight())
 	{
@@ -480,7 +483,7 @@ public boolean move(int dx, int dy) {
 
 	// should be done for discrete move
 	if (moved)
-		DrawingSurface.getInstance().resetDraggedPosition();
+		drawingSurface.resetDraggedPosition();
 
 	return moved;
 		

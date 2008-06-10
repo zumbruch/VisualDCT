@@ -365,7 +365,7 @@ public void destroy()
 
 protected void draw(Graphics g, boolean hilited)
 {
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(getRootContainerId());
 
 	int posX = getRx() - view.getRx();
 	int posY = getRy() - view.getRy();
@@ -443,7 +443,7 @@ protected void draw(Graphics g, boolean hilited)
 
 public void drawDashedBorder(Graphics g, boolean hilited)
 {
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(getRootContainerId());
 
 	int posX = getRx() - view.getRx();
 	int posY = getRy() - view.getRy();

@@ -49,7 +49,7 @@ public class WorkspaceDesktop extends DesktopPaneDecorator
 implements ComponentListener, DesktopInterface {
 
 	protected WorkspaceInternalFrame frame = null;
-	protected DrawingSurfaceManagerInterface drawingSurfaceManager = null;
+	protected DsManagerInterface drawingSurfaceManager = null;
 	
 	protected static int internalFrameCount = 0;
 	protected static final String untitledString = "untitled";
@@ -76,27 +76,15 @@ implements ComponentListener, DesktopInterface {
     	}
 	}
 
-	public DrawingSurfaceManagerInterface getDrawingSurfaceManager() {
+	public DsManagerInterface getDrawingSurfaceManager() {
 		return drawingSurfaceManager;
 	}
 
 	public void setDrawingSurfaceManager(
-			DrawingSurfaceManagerInterface drawingSurfaceManager) {
+			DsManagerInterface drawingSurfaceManager) {
 		this.drawingSurfaceManager = drawingSurfaceManager;
 	}
 
-	// TODO:REM
-	/**
-	 * WorkspacePanel constructor comment.
-	 * @param component com.cosylab.vdct.graphics.VisualComponent
-	 */
-	/*
-	public WorkspaceDesktop(VisualComponent component) {
-		super(component);
-		drawingSurfaceManager = new DrawingSurfaceManager(this);
-		createNewWindow();
-	}
-	*/
 	/**
 	 * Invoked when the component has been made invisible.
 	 */
@@ -119,13 +107,6 @@ implements ComponentListener, DesktopInterface {
 	 */
 	public void componentShown(ComponentEvent e) {
 	}
-
-	// TODO:REM
-	/*
-	public void createNewDrawingSurface(DbDescriptor id) {
-		createInternalFrame(id);
-	}
-	 */
 
 	public void setComponent(VisualComponent newComponent) {
 		super.setComponent(newComponent);

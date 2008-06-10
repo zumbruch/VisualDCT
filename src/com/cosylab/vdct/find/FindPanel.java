@@ -28,13 +28,43 @@ package com.cosylab.vdct.find;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.util.*;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Vector;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.DefaultListModel;
+import javax.swing.Icon;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+import javax.swing.JToolBar;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 
-import com.cosylab.vdct.graphics.DrawingSurface;
+import com.cosylab.vdct.events.CommandManager;
+import com.cosylab.vdct.graphics.DsManager;
 import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.objects.Record;
@@ -213,7 +243,7 @@ public class FindPanel extends JPanel
         {
             actionStart.setEnabled(false);
             actionStop.setEnabled(true);
-            runFind(DrawingSurface.getInstance().getViewGroup(), newFind());
+            runFind(DsManager.getDrawingSurface().getViewGroup(), newFind());
         } catch (InterruptedException e)
         {
         } finally
@@ -228,10 +258,12 @@ public class FindPanel extends JPanel
      * Show selected (in result panel) object.
      * @param selectedObject	object to show
      */
-    public void goTo(Object selectedObject)
-    {
-        if (selectedObject instanceof VisibleObject)
-            DrawingSurface.getInstance().centerObject((VisibleObject)selectedObject);
+    public void goTo(Object selectedObject) {
+    	
+        if (selectedObject instanceof VisibleObject) {
+        	VisibleObject visible = (VisibleObject)selectedObject;
+            DsManager.getDrawingSurface(visible.getRootContainerId()).centerObject(visible);
+        }
     }
 
     /**
@@ -665,11 +697,15 @@ public class FindPanel extends JPanel
                 		public void actionPerformed(ActionEvent e)
                 		{
                 		    Object[] selected = fileList.getSelectedValues();
-                		    for (int i = 0; i < selected.length; i++)
-                		        if (selected[i] instanceof VisibleObject)
-                		            ViewState.getInstance().setAsSelected((VisibleObject)selected[i]);
-                		    if (selected.length > 0)
-                		        DrawingSurface.getInstance().repaint();
+                		    for (int i = 0; i < selected.length; i++) {
+                		        if (selected[i] instanceof VisibleObject) {
+                		        	VisibleObject visible = (VisibleObject)selected[i]; 
+                		            ViewState.getInstance(visible.getRootContainerId()).setAsSelected(visible);
+                		        }
+                		    }
+                		    if (selected.length > 0) {
+                		    	CommandManager.getInstance().execute("RepaintAllFrames");
+                		    }
                 		}
                     });
             menu.add(item);

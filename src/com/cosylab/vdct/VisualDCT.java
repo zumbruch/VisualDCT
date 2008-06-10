@@ -103,7 +103,8 @@ import com.cosylab.vdct.events.commands.ShowMorphingDialog;
 import com.cosylab.vdct.events.commands.ShowNewDialog;
 import com.cosylab.vdct.events.commands.ShowRenameDialog;
 import com.cosylab.vdct.find.FindDialog;
-import com.cosylab.vdct.graphics.DrawingSurfaceManager;
+import com.cosylab.vdct.graphics.DsListenerInitializer;
+import com.cosylab.vdct.graphics.DsManager;
 import com.cosylab.vdct.graphics.VDBInterface;
 import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.graphics.WorkspaceDesktop;
@@ -5594,8 +5595,9 @@ private com.cosylab.vdct.graphics.WorkspaceDesktop getworkspace() {
 			    }
 			});
 			// user code begin {1}
-			DrawingSurfaceManager drawingSurfaceManager = new DrawingSurfaceManager(ivjworkspace);
+			DsManager drawingSurfaceManager = new DsManager(ivjworkspace);
 			ivjworkspace.setDrawingSurfaceManager(drawingSurfaceManager);
+			DsListenerInitializer.registerDsManagerListeners();
 			ivjworkspace.createNewInternalFrame();
 			
 			// TODO:REM

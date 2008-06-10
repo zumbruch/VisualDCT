@@ -204,15 +204,16 @@ public Connector(String id, LinkManagerObject parent, OutLink outlink, InLink in
 	}
 
 	// boundaries check
+	ViewState view = ViewState.getInstance(getRootContainerId());
 	if (getX() < 0)
 		setX(0);
-	else if (getX() > ViewState.getInstance().getWidth())
-		setX(ViewState.getInstance().getWidth());
+	else if (getX() > view.getWidth())
+		setX(view.getWidth());
 	
 	if (getY() < 0)
 		setY(0);
-	else if (getY() > ViewState.getInstance().getWidth())
-		setY(ViewState.getInstance().getHeight());
+	else if (getY() > view.getWidth())
+		setY(view.getHeight());
 	
 	if (Settings.getInstance().getSnapToGrid())
 		snapToGrid();
@@ -281,7 +282,7 @@ public void bypass() {
  * @param dy int
  */
 public boolean checkMove(int dx, int dy) {
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(getRootContainerId());
 
 	if ((getX()<-dx) || (getY()<-dy) || 
 		(getX()>(view.getWidth()-getWidth()-dx)) || (getY()>(view.getHeight()-getHeight()-dy)) /*||
@@ -342,7 +343,7 @@ public void disconnect(Linkable disconnector) {
 protected void draw(java.awt.Graphics g, boolean hilited) {
 	if (disconnected) return;
 	
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(getRootContainerId());
 
 	int rwidth = getRwidth();
 	int rheight = getRheight();
@@ -351,7 +352,7 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 	
     boolean zoom = (view.getScale() < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this);
 	
-	if (!DrawingSurface.getInstance().isPrinting()) {
+	if (!DsManager.getDrawingSurface(getRootContainerId()).isPrinting()) {
 		// clipping
 		if ((!(rrx>view.getViewWidth()) || (rry>view.getViewHeight())
 		    || ((rrx+rwidth)<0) || ((rry+rheight)<0))) {
@@ -404,11 +405,11 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 
 	
 			if (inlink!=null){
-				LinkDrawer.drawLink(g, this, inlink, getQueueCount(), 
+				LinkDrawer.drawLink(g, view, this, inlink, getQueueCount(), 
 									getOutX()<inlink.getInX());
 			}
 			else if (getOutput()!=null){
-				LinkDrawer.drawLink(g, this, null, getQueueCount(), 
+				LinkDrawer.drawLink(g, view, this, null, getQueueCount(), 
 									getOutput().getOutX()<getX());
 			}
 

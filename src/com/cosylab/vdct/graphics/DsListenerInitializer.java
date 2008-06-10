@@ -28,12 +28,20 @@
 
 package com.cosylab.vdct.graphics;
 
+import com.cosylab.vdct.graphics.objects.Group;
+import com.cosylab.vdct.inspector.InspectorManager;
+import com.cosylab.vdct.undo.UndoManager;
+
 /**
  * @author ssah
  *
  */
-public interface RepaintInterface {
+public class DsListenerInitializer {
 
-	public void repaint(boolean highlighted);
-	public void repaintAll(boolean highlighted);
+	public static void registerDsManagerListeners() {
+		Group.registerDsListener();
+		ViewState.registerDsListener();
+		InspectorManager.registerDsListener();
+		UndoManager.registerDsListener();
+	}
 }

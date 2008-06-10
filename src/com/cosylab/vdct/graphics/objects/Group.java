@@ -56,8 +56,10 @@ import com.cosylab.vdct.db.DBDataEntry;
 import com.cosylab.vdct.db.DBEntry;
 import com.cosylab.vdct.db.DBResolver;
 import com.cosylab.vdct.db.DBTemplateEntry;
-import com.cosylab.vdct.db.DbDescriptor;
 import com.cosylab.vdct.dbd.DBDConstants;
+import com.cosylab.vdct.events.CommandManager;
+import com.cosylab.vdct.events.commands.GetDsManager;
+import com.cosylab.vdct.graphics.DsEventListener;
 import com.cosylab.vdct.graphics.FontMetricsBuffer;
 import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.inspector.InspectableProperty;
@@ -80,14 +82,15 @@ import com.cosylab.vdct.vdb.VDBTemplate;
  * Creation date: (21.12.2000 20:46:35)
  * @author Matej Sekoranja
  */
-public class Group
-extends ContainerObject
-implements Clipboardable, Descriptable, Flexible, Movable, SaveInterface, Selectable, SaveObject
-{
+public class Group extends ContainerObject
+implements Clipboardable, Descriptable, Flexible, Movable, SaveInterface, Selectable,
+SaveObject, DsEventListener {
 
 	private static Group clipboard = null;
 	private static String nullString = "";
 	private static Group root = null;
+	
+	protected Object id = null; 
 	protected String name;
 	protected String namePrefix;
 	// local view settings
@@ -98,7 +101,7 @@ implements Clipboardable, Descriptable, Flexible, Movable, SaveInterface, Select
 	
 	private static HashMap rootGroups = new HashMap();
 	
-	private static VDBTemplate editingTemplateData = null;
+	private VDBTemplate editingTemplateData = null;
 	private static long openTemplateMacroID = 0;
 	private static long openTemplatePortID = 0;
 
@@ -135,7 +138,7 @@ implements Clipboardable, Descriptable, Flexible, Movable, SaveInterface, Select
 		super.addSubObject(id, object);
 
 		// records, group, template
-		Vector structure = Group.getRoot().getStructure();
+		Vector structure = ((Group)getRootContainer()).getStructure();
 		if (object instanceof SaveObject)
 		{
 			structure.addElement(object);
@@ -217,7 +220,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 	 * @param dy int
 	 */
 	public boolean checkMove(int dx, int dy) {
-		ViewState view = ViewState.getInstance();
+		ViewState view = ViewState.getInstance(getRootContainerId());
 
 		if ((getX()<-dx) || (getY()<-dy) || 
 				(getX()>(view.getWidth()-getWidth()-dx)) || (getY()>(view.getHeight()-getHeight()-dy)))
@@ -337,7 +340,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 	 */
 	protected void draw(Graphics g, boolean hilited) {
 
-		ViewState view = ViewState.getInstance();
+		ViewState view = ViewState.getInstance(getRootContainerId());
 
 		double Rscale = getRscale();
 		boolean zoom = Rscale < 1.0 && view.isZoomOnHilited() && view.isHilitedObject(this);
@@ -409,7 +412,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 	 * @param deep boolean
 	 */
 	public Object findObject(String objectName, boolean deep) {
-		if (objectName.length()==0 && Group.getRoot()==this)
+		if (objectName.length()==0 && ((Group)getRootContainer())==this)
 			return this;
 
 		String relName = Group.substractRelativeName(getAbsoluteName(), 
@@ -510,8 +513,8 @@ private void addSubObjectToLayout(VisibleObject object) {
 	 * Creation date: (3.5.2001 13:28:45)
 	 * @return com.cosylab.vdct.graphics.ViewState
 	 */
-	public com.cosylab.vdct.graphics.ViewState getLocalView() {
-		if (localView==null) localView = new ViewState();
+	public ViewState getLocalView() {
+		if (localView==null) localView = new ViewState(getRootContainerId());
 		return localView;
 	}
 	/**
@@ -549,7 +552,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 	 */
 	public Object getSubObject(String id) {
 		if (id.equals(nullString))
-			return getRoot();
+			return getRootContainer();
 		else if (id.equals(Constants.CLIPBOARD_NAME))		// ?!! no ignore case
 			return getClipboard();
 		else
@@ -602,7 +605,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 
 	public void initializeLayout() {
 
-		ViewState view = ViewState.getInstance();
+		ViewState view = ViewState.getInstance(getRootContainerId());
 		boolean grid = com.cosylab.vdct.Settings.getInstance().getSnapToGrid();
 		com.cosylab.vdct.Settings.getInstance().setSnapToGrid(false);     // avoid fixes in getX()
 		try
@@ -820,7 +823,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 		new com.cosylab.vdct.undo.DeleteAction((VisibleObject)object)
 	);
 		 */	
-		Vector structure = Group.getRoot().getStructure();
+		Vector structure = ((Group)getRootContainer()).getStructure();
 		if (object instanceof SaveObject)
 		{
 			structure.remove(object);
@@ -877,7 +880,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 	 */
 	public boolean selectAllComponents() {
 
-		ViewState view = ViewState.getInstance();
+		ViewState view = ViewState.getInstance(getRootContainerId());
 		boolean anyNew = false;
 
 		Enumeration e = subObjectsV.elements();
@@ -908,7 +911,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 		if (y1>y2)
 		{ t=y1; y1=y2; y2=t; }
 
-		ViewState view = ViewState.getInstance();
+		ViewState view = ViewState.getInstance(getRootContainerId());
 		boolean anyNew = false;
 
 		Enumeration e = subObjectsV.elements();
@@ -2124,7 +2127,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 	 */
 	public static VDBTemplate getEditingTemplateData()
 	{
-		return editingTemplateData;
+		return root.editingTemplateData;
 	}
 
 	/**
@@ -2133,7 +2136,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 	 */
 	public static void setEditingTemplateData(VDBTemplate editingTemplateData)
 	{	
-		Group.editingTemplateData = editingTemplateData;
+		root.editingTemplateData = editingTemplateData;
 		if (editingTemplateData != null) {
 			openTemplateMacroID = editingTemplateData.getMacrosGeneratedID();
 			openTemplatePortID = editingTemplateData.getPortsGeneratedID();
@@ -2150,8 +2153,8 @@ private void addSubObjectToLayout(VisibleObject object) {
 		if (openTemplateMacroID == 0 && openTemplatePortID == 0) {
 			return false;
 		}   
-		if (editingTemplateData != null)
-			if (editingTemplateData.getMacrosGeneratedID() == openTemplateMacroID && editingTemplateData.getPortsGeneratedID() == openTemplatePortID) {
+		if (root.editingTemplateData != null)
+			if (root.editingTemplateData.getMacrosGeneratedID() == openTemplateMacroID && root.editingTemplateData.getPortsGeneratedID() == openTemplatePortID) {
 				return false;
 			}
 		return true;
@@ -2239,18 +2242,47 @@ private void addSubObjectToLayout(VisibleObject object) {
 		 }
 	 }
 
-	 public static void addNewRoot(DbDescriptor id, Group group) {
-		 rootGroups.put(id, group);
-		 if (root == null) {
-			 root = group;
-		 }
-	 }
-
-	 public static void removeRoot(DbDescriptor id) {
-		 rootGroups.remove(id);
-	 }
-	 
-	 public static Group getRoot(DbDescriptor id) {
+	 public static Group getRoot(Object id) {
 		 return (Group)rootGroups.get(id);
 	 }
+	 
+	public static Vector getAllRoots() {
+		return new Vector(rootGroups.values());
+	}
+	 
+	public Object getId() {
+		return id;
+	}
+	public void setId(Object id) {
+		this.id = id;
+	}
+	
+    public Object getRootContainerId() {
+    	Object rootId = getParent() != null ? getParent().getRootContainerId() : id;
+    	if (rootId == null) {
+    		System.out.println("Warning: returning null for root container id.");
+    	}
+    	return rootId;
+	}
+    
+    public static void registerDsListener() {
+    	GetDsManager command = (GetDsManager)CommandManager.getInstance().getCommand("GetDsManager");
+    	if (command != null) {
+    		command.getManager().addDsEventListener(new Group(null));
+    	}
+    }
+
+    public void onDsAdded(Object id) {
+    	Group group = new Group(null);
+    	group.setId(id);
+    	group.setAbsoluteName("");
+    	group.setLookupTable(new Hashtable());
+        rootGroups.put(id, group);
+    }
+    public void onDsRemoved(Object id) {
+    	rootGroups.remove(id);
+    }
+    public void onDsFocused(Object id) {
+    	root = (Group)rootGroups.get(id);
+    }
 }

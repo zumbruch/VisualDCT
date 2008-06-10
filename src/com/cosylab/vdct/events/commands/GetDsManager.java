@@ -26,17 +26,27 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.cosylab.vdct.graphics;
+package com.cosylab.vdct.events.commands;
 
-import com.cosylab.vdct.db.DbDescriptor;
+import com.cosylab.vdct.events.Command;
+import com.cosylab.vdct.graphics.DsManagerInterface;
 
 /**
  * @author ssah
  *
  */
-public interface DrawingSurfaceManagerInterface {
+public class GetDsManager extends Command {
+	
+	private DsManagerInterface manager = null;
 
-	public VisualComponent addDrawingSurface(DbDescriptor id, InternalFrameInterface displayer);
-	public void removeDrawingSurface(DbDescriptor id);
-	public void setFocusedDrawingSurface(DbDescriptor id);
+	public GetDsManager(DsManagerInterface manager) {
+		this.manager = manager;
+	}
+	
+	public void execute() {
+	}
+
+	public DsManagerInterface getManager() {
+		return manager;
+	}
 }

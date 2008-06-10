@@ -30,7 +30,14 @@ package com.cosylab.vdct.inspector;
 
 import java.awt.Color;
 import java.awt.Frame;
-import java.util.*;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Vector;
+
+import com.cosylab.vdct.events.CommandManager;
+import com.cosylab.vdct.events.commands.GetDsManager;
+import com.cosylab.vdct.graphics.DsEventListener;
+import com.cosylab.vdct.graphics.objects.Group;
 
 /**
  * Insert the type's description here.
@@ -38,16 +45,21 @@ import java.util.*;
  * @author Matej Sekoranja
  * !!! inspectors are not disposed !!!! (move ins.listeners in inspectors, when this is implemented);
  */
-public class InspectorManager implements HelpDisplayer {
+public class InspectorManager implements DsEventListener, HelpDisplayer {
 
 	private static InspectorManager instance = null;
+	
+	protected static HashMap instances = new HashMap();
+	
 	private static Frame parent = null;
+
+	protected Object rootGroupId = null;
 	
 	private Vector inspectors;
 /**
  * InspectorManager constructor comment.
  */
-protected InspectorManager() {
+protected InspectorManager(Object rootGroupId) {
 	inspectors = new Vector();
 }
 /**
@@ -56,7 +68,7 @@ protected InspectorManager() {
  * @return com.cosylab.vdct.inspector.InspectorInterface
  */
 private InspectorInterface createInspector() {
-	Inspector inspector = new Inspector(parent);
+	Inspector inspector = new Inspector(parent, rootGroupId);
 	com.cosylab.vdct.DataProvider.getInstance().addInspectableListener(inspector);
 	return inspector;
 }
@@ -100,9 +112,14 @@ public InspectorInterface getActiveInspector() {
  * @return com.cosylab.vdct.inspector.InspectorManager
  */
 public static InspectorManager getInstance() {
-	if (instance==null) instance = new InspectorManager();
+	if (instance == null) {
+		System.err.println("Warning: inspector manager instance called while not yet initialized,"
+				+ " returning active default.");
+		instance = new InspectorManager(Group.getRoot().getId());
+	}
 	return instance;
 }
+
 /**
  * Insert the method's description here.
  * Creation date: (10.1.2001 16:00:49)
@@ -244,6 +261,25 @@ public void setHelpText(String text) {
 
 public void setHelpTextColor(Color color) {
 	getActiveInspector().setHelpColor(color);
+}
+
+public static void registerDsListener() {
+	GetDsManager command = (GetDsManager)CommandManager.getInstance().getCommand("GetDsManager");
+	if (command != null) {
+		command.getManager().addDsEventListener(new InspectorManager(null));
+	}
+}
+
+public void onDsAdded(Object id) {
+    instances.put(id, new InspectorManager(id));
+}
+public void onDsRemoved(Object id) {
+	InspectorManager manager = (InspectorManager)instances.get(id);
+	instances.remove(id);
+	manager.disposeAllInspectors();
+}
+public void onDsFocused(Object id) {
+    instance = (InspectorManager)instances.get(id);
 }
 
 }

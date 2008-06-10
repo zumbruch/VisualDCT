@@ -18,7 +18,6 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 import com.cosylab.vdct.Console;
-import com.cosylab.vdct.graphics.DrawingSurface;
 
 /**
  * <code>LinkMoverUtilities</code> supplies the tools for moving the links. 
@@ -85,8 +84,8 @@ public class LinkMoverUtilities {
      * @param y the absolute vertical position of the pointer
      * @return a Vector of the connectors that are affected by the move started at the point (x,y)
      */
-    public Vector isMousePositionLinkMovable(int x, int y) {
-        Vector connectors = getAllConnectors(DrawingSurface.getInstance().getViewGroup());
+    public Vector isMousePositionLinkMovable(int x, int y, Group viewGroup) {
+        Vector connectors = getAllConnectors(viewGroup);
 
         Connector c;
         returnConnectors = new Vector();

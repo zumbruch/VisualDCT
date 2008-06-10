@@ -63,7 +63,7 @@ import com.cosylab.vdct.DataProvider;
 import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.events.commands.GetGUIInterface;
 import com.cosylab.vdct.events.commands.GetVDBManager;
-import com.cosylab.vdct.graphics.DrawingSurface;
+import com.cosylab.vdct.graphics.DsManager;
 import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.objects.Record;
@@ -708,7 +708,7 @@ public class SpreadsheetInspector extends JDialog
 
         } else if (inspectable instanceof Template) {
         	
-        	DrawingSurface.getInstance().createTemplateInstance(null, getTypeName(inspectable).toString(), true);
+        	DsManager.getDrawingSurface().createTemplateInstance(null, getTypeName(inspectable).toString(), true);
         }
     }
     

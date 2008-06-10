@@ -15,6 +15,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.util.Iterator;
 
 import javax.swing.DefaultBoundedRangeModel;
 import javax.swing.JFileChooser;
@@ -24,7 +25,9 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.MouseInputAdapter;
 
-import com.cosylab.vdct.graphics.DrawingSurface;
+import com.cosylab.vdct.events.Command;
+import com.cosylab.vdct.events.CommandManager;
+import com.cosylab.vdct.events.commands.GetGUIInterface;
 import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.util.DoubleClickProxy;
 import com.cosylab.vdct.util.UniversalFileFilter;
@@ -235,7 +238,11 @@ public class SettingsDialog extends javax.swing.JDialog {
 		
 		s.setCanvasWidth(((Number)jSpinnerWidth.getValue()).intValue());
 		s.setCanvasHeight(((Number)jSpinnerHeight.getValue()).intValue());
-		DrawingSurface.getInstance().reset();
+		
+		Command command = CommandManager.getInstance().getCommand("GetGUIMenuInterface");
+		if (command != null) {
+			((GetGUIInterface)command).getGUIMenuInterface().reset();
+		}
 		
 		// double click is global
 		s.setDoubleClickSpeed(jSliderDoubleClickSpeed.getValue());
@@ -246,7 +253,10 @@ public class SettingsDialog extends javax.swing.JDialog {
 		
 		s.setDefaultVisibility(jCheckBoxDefaultVisiblity.isSelected());
 		s.setHideLinks(jCheckBoxLinksVisibility.isSelected());
-		Group.getRoot().updateFields();
+		Iterator iterator = Group.getAllRoots().iterator();
+		while (iterator.hasNext()) {
+			((Group)iterator.next()).updateFields();
+		}
 		
 		s.setWireCrossingAvoidiance(jCheckBoxWireCrossingAvoidiance.isSelected());
 		

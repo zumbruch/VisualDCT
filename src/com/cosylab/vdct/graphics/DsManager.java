@@ -34,18 +34,20 @@ import java.awt.print.Printable;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Vector;
 
 import javax.swing.JFrame;
 
 import com.cosylab.vdct.db.DbDescriptor;
 import com.cosylab.vdct.events.CommandManager;
+import com.cosylab.vdct.events.commands.GetDsManager;
 import com.cosylab.vdct.events.commands.GetGUIInterface;
 import com.cosylab.vdct.events.commands.GetPrintableInterface;
 import com.cosylab.vdct.events.commands.GetVDBManager;
 import com.cosylab.vdct.events.commands.LinkCommand;
 import com.cosylab.vdct.events.commands.RepaintCommand;
 import com.cosylab.vdct.graphics.objects.Box;
-import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.objects.Line;
 import com.cosylab.vdct.graphics.objects.LinkSource;
 import com.cosylab.vdct.graphics.objects.TextBox;
@@ -55,80 +57,112 @@ import com.cosylab.vdct.graphics.objects.VisibleObject;
  * @author ssah
  *
  */
-public class DrawingSurfaceManager
-implements DrawingSurfaceManagerInterface, GUIMenuInterface, VDBInterface,
+public class DsManager
+implements DsManagerInterface, GUIMenuInterface, VDBInterface,
 LinkCommandInterface, RepaintInterface, Pageable {
-
-	// TODO:REM
-	//private static DrawingSurfaceManager instance = null;
+	
+	protected static DsManager instance = null;
 
 	protected DSGUIInterface dsInterface = null;  
 
-	protected HashMap drawingSurfaces = null;
+	protected static HashMap drawingSurfaces = new HashMap();
 	
 	protected DesktopInterface desktopInterface = null;
+	
+	protected Vector dsEventListeners = null;
 
-	public DrawingSurfaceManager(DesktopInterface desktopInterface) {
-		drawingSurfaces = new HashMap();
+	public DsManager(DesktopInterface desktopInterface) {
+		instance = this;
+		
 		this.desktopInterface = desktopInterface;
+		dsEventListeners = new Vector();
 		
 		CommandManager commandManager = CommandManager.getInstance();
+		commandManager.addCommand("GetDsManager", new GetDsManager(this));
 		commandManager.addCommand("GetVDBManager", new GetVDBManager(this));
 		commandManager.addCommand("GetGUIMenuInterface", new GetGUIInterface(this));
 		commandManager.addCommand("LinkCommand", new LinkCommand(this));
 		commandManager.addCommand("GetPrintableInterface", new GetPrintableInterface(this));
 		commandManager.addCommand("RepaintWorkspace", new RepaintCommand(this));
+		commandManager.addCommand("RepaintAllFrames", new RepaintCommand(this, true, false));
+		commandManager.addCommand("RepaintHighlighted", new RepaintCommand(this, false, true));
+	}
+	
+	public static DrawingSurface getDrawingSurface() {
+		if (instance.dsInterface == null) {
+			System.err.println("Warning: returning null for drawing surface.");
+			return null;
+		}
+		return instance.dsInterface.getDrawingSurface();
 	}
 
-	// TODO:REM
-	/*
-	public static DrawingSurfaceManager getInstance() {
-		if (instance == null) {
-			instance = new DrawingSurfaceManager();
-		}
-		return instance;
-	}
-    */
-	public DrawingSurface getDrawingSurface(DbDescriptor id) {
+	public static DrawingSurface getDrawingSurface(Object id) {
 		return (DrawingSurface)drawingSurfaces.get(id);
 	}
 
-	public VisualComponent addDrawingSurface(DbDescriptor id, InternalFrameInterface displayer) {
-		DrawingSurface drawingSurface = new DrawingSurface(id, displayer);
+	public static Vector getAllDrawingSurfaces() {
+		return new Vector(drawingSurfaces.values());
+	}
+	
+	public VisualComponent addDrawingSurface(Object id, InternalFrameInterface displayer) {
+
+		DrawingSurface drawingSurface = new DrawingSurface((DbDescriptor)id, displayer);
 		drawingSurfaces.put(id, drawingSurface);
 		
-		if (dsInterface == null) {
-			dsInterface = drawingSurface.getGuimenu();
+		Iterator iterator = dsEventListeners.iterator();
+		while (iterator.hasNext()) {
+			((DsEventListener)iterator.next()).onDsAdded(id);
 		}
+		if (dsInterface == null) {
+			setFocusedDrawingSurface(id);
+		}
+
+		// This is called after notification of listeners as it uses them.
+		drawingSurface.initializeWorkspace();
+
 		return drawingSurface;
 	}
 
-	public void removeDrawingSurface(DbDescriptor id) {
+	public void removeDrawingSurface(Object id) {
 		DrawingSurface drawingSurface = getDrawingSurface(id);
 		if (drawingSurface != null) {
 			drawingSurfaces.remove(id);
+			
+			Iterator iterator = dsEventListeners.iterator();
+			while (iterator.hasNext()) {
+				((DsEventListener)iterator.next()).onDsRemoved(id);
+			}
+			
 			if (dsInterface == drawingSurface.getGuimenu()) {
 				dsInterface = null;
 			}
 		}
-		/// TODO:REM
-		System.out.println("dsInterface:" + dsInterface);
 	}
 
-	public void setFocusedDrawingSurface(DbDescriptor id) {
+	public void setFocusedDrawingSurface(Object id) {
 		if (id != null) {
 			DrawingSurface drawingSurface = getDrawingSurface(id);
 			if (drawingSurface != null) {
 				dsInterface = drawingSurface.getGuimenu();
-				Group.setRoot(Group.getRoot(id));
+				
+				Iterator iterator = dsEventListeners.iterator();
+				while (iterator.hasNext()) {
+					((DsEventListener)iterator.next()).onDsFocused(id);
+				}
 			} else {
 				dsInterface = null;
 			}
 		} else {
 			dsInterface = null;
 		}
-		/// TODO:REM
-		System.out.println("dsInterface:" + dsInterface);
+	}
+
+	public void addDsEventListener(DsEventListener listener) {
+		dsEventListeners.add(listener);
+	}
+	
+	public void removeDsEventListener(DsEventListener listener) {
+		dsEventListeners.remove(listener);
 	}
 
 	/* (non-Javadoc)
@@ -616,9 +650,23 @@ LinkCommandInterface, RepaintInterface, Pageable {
 	/* (non-Javadoc)
 	 * @see com.cosylab.vdct.graphics.RepaintInterface#repaint()
 	 */
-	public void repaint() {
+	public void repaint(boolean highlighted) {
 		if (dsInterface != null) {
-			dsInterface.getDrawingSurface().repaint();
+			dsInterface.getDrawingSurface().repaint(highlighted);
+		}
+	}
+
+	public void repaintAll(boolean highlighted) {
+		Iterator iterator = drawingSurfaces.values().iterator();
+		while (iterator.hasNext()) {
+			((DrawingSurface)iterator.next()).repaint(highlighted);
+		}
+	}
+	
+	public void reset() {
+		Iterator iterator = drawingSurfaces.values().iterator();
+		while (iterator.hasNext()) {
+			((DrawingSurface)iterator.next()).reset();
 		}
 	}
 

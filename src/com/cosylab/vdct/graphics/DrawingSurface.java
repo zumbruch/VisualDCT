@@ -160,7 +160,7 @@ import com.cosylab.vdct.vdb.VDBTemplatePort;
  * @author Matej Sekoranja
  */
 public final class DrawingSurface extends Decorator implements Pageable, Printable,
-		MouseInputListener, Runnable, LinkCommandInterface, RepaintInterface {
+		MouseInputListener, Runnable, LinkCommandInterface {
 
 	class Hiliter extends Thread {
 		//private VisibleObject object;
@@ -175,7 +175,7 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 		public void run() {
 			while (!terminated) {
 
-				ViewState view = ViewState.getInstance();
+				ViewState view = ViewState.getInstance(id);
 				if ((view == viewGroup.getLocalView())
 					&& view.getBlinkingObjects().size() > 0) {
 					view.setBlinkState(!view.isBlinkState());
@@ -195,8 +195,6 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 			terminated = true;
 		}
 	}
-	private static DrawingSurface instance = null;
-
 	private DbDescriptor id = null;
 	
 	private DSGUIInterface guimenu = null;
@@ -303,15 +301,10 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
  */
 public DrawingSurface(DbDescriptor id, InternalFrameInterface displayer) {
 
-	instance = this;
 	this.id = id;
 	this.displayer = displayer;
 	
 	setModified(false);
-
-	ViewState view = new ViewState();
-	view.setScale(1.0);
-	ViewState.setInstance(view);
 
 	viewStack = new Stack();
 	templateStack = new Stack();
@@ -326,19 +319,21 @@ public DrawingSurface(DbDescriptor id, InternalFrameInterface displayer) {
 	MouseEventManager.getInstance().subscribe("WorkspaceInternalFrame:" + id.toString(), this);
 	KeyEventManager.getInstance().subscribe("ContentPane", new KeyAdapter() {
 	    public void keyPressed(KeyEvent e) {
+	    	ViewState view = ViewState.getInstance(DrawingSurface.this.id);
 	        if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
-	            VisibleObject hil = ViewState.getInstance().getHilitedObject();
+	            VisibleObject hil = view.getHilitedObject();
 	            if (hil != null) {
-	                ViewState.getInstance().setAsHilited(hil, true);
+	            	view.setAsHilited(hil, true);
 	            }
 	        }
 	    }
 	    
 	    public void keyReleased(KeyEvent e) {
 	        if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
-	            VisibleObject hil = ViewState.getInstance().getHilitedObject();
+		    	ViewState view = ViewState.getInstance(DrawingSurface.this.id);
+	            VisibleObject hil = view.getHilitedObject();
 	            if (hil != null) {
-	                ViewState.getInstance().setAsHilited(hil, false);
+	            	view.setAsHilited(hil, false);
 	                repaint();
 	            }
 	        }
@@ -347,8 +342,6 @@ public DrawingSurface(DbDescriptor id, InternalFrameInterface displayer) {
 
 	guimenu = new DSGUIInterface(this);
 	
-	initializeWorkspace();
-
 	if (VisualDCT.getInstance() != null)
 		new Thread(this, "DrawingSurface Repaint Thread").start();
 }
@@ -365,7 +358,7 @@ public void addAction(ActionObject action) {
  * Creation date: (1.5.2001 17:32:20)
  */
 public void baseView() {
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 	view.setScale(1.0);
 	view.setRx((view.getWidth()-view.getViewWidth())/2);
 	view.setRy((view.getHeight()-view.getViewHeight())/2);
@@ -403,7 +396,7 @@ private void createNavigatorImage() {
 		return;
 	}
 	
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 	
 	if ((navigatorImage==null) || 
 		(navigatorSize.width!=navigator.width) || 
@@ -449,7 +442,7 @@ public void draw(Graphics g) {
 		return;
 	}
 
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 
 	// forceReadraw does not force really
 	if ((fastDrawing && !forceRedraw) || /*fastDrawingOnce ||*/ drawOnlyHilitedOnce || !forceRedraw) {
@@ -563,7 +556,7 @@ public void draw(Graphics g) {
 private void drawNavigator(Graphics g) {
 	if (navigatorImage==null) return;
 
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 	
 	// draw navigator image && position
 	copyNavigatorImage(g);
@@ -615,15 +608,8 @@ public int getComponentWidth() {
 	if (getComponent()==null) return width;
 	else return getComponent().getComponentWidth();
 }
-/**
- * Insert the method's description here.
- * Creation date: (3.5.2001 16:17:39)
- * @return com.cosylab.vdct.graphics.DrawingSurface
- */
-public static DrawingSurface getInstance() {
-	return instance;
-}
-	/**
+
+     /**
 	 * Returns the number of pages in the set.
 	 * To enable advanced printing features,
 	 * it is recommended that <code>Pageable</code>
@@ -639,7 +625,7 @@ public int getNumberOfPages() {
 	int pageWidth = (int)pageFormat.getImageableWidth();
 	int pageHeight = (int)pageFormat.getImageableHeight();
 
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 
 	// screen shot
 	double screen2printer = 0;
@@ -762,7 +748,7 @@ private void initializeNavigator() {
 	navigatorSize = new Dimension(-1, -1);
  	navigator = new Rectangle(0, 0, 0, 0);
  	navigatorRect = new Rectangle(0, 0, 0, 0);
-	navigatorView = new ViewState();
+	navigatorView = new ViewState(id);
 /*	navigatorView.setWidth(Integer.MAX_VALUE);
 	navigatorView.setHeight(Integer.MAX_VALUE);
 	navigatorView.setViewWidth(Integer.MAX_VALUE);
@@ -773,6 +759,10 @@ private void initializeNavigator() {
  * Creation date: (8.1.2001 18:04:49)
  */
 public void initializeWorkspace() {
+	
+	ViewState view = ViewState.getInstance(id);
+	view.setScale(1.0);
+	ViewState.setInstance(view);
 	
 	if (isModified())
 		reloadTemplate(Group.getEditingTemplateData());
@@ -785,17 +775,15 @@ public void initializeWorkspace() {
 	//if (Group.getRoot()!=null)
 	//	Group.getRoot().getLookupTable().clear();
 
+	setModified(false);
+
+	Group group = Group.getRoot(id);
+	
 	// clear all stacks
 	viewStack.clear();
 	templateStack.clear();
 	Group.setEditingTemplateData(null);
-
-	setModified(false);
 	
-	Group group = new Group(null);
-	group.setAbsoluteName("");
-	group.setLookupTable(new Hashtable());
-	Group.addNewRoot(id, group);
 	moveToGroup(group);
 	
 	//Console.getInstance().flush();
@@ -844,9 +832,9 @@ public void linkCommand(VisibleObject linkObject, LinkSource linkData) {
 		VisibleObject fld = (VisibleObject)Group.getRoot().getLookupTable().get(linkData.getFullName());
 		if (fld!=null)
 			// field found in lookup table (it is a special link field - not owned by linkManager container)
-			ViewState.getInstance().setAsBlinking(fld);
+			ViewState.getInstance(id).setAsBlinking(fld);
 		else
-			ViewState.getInstance().setAsBlinking(linkObject);
+			ViewState.getInstance(id).setAsBlinking(linkObject);
 		hiliter = new Hiliter(1000);
 		hiliter.start();
 	}
@@ -875,7 +863,7 @@ public void linkCommand(VisibleObject linkObject, LinkSource linkData) {
 	 * Invoked when the mouse has been clicked on a component.
 	 */
 public void mouseClicked(MouseEvent e) {
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 	
 	// check for drags!
 	int cx = e.getX()-view.getX0();
@@ -1258,7 +1246,7 @@ private void createLine()
 	 * bounds of the component).
 	 */
 public void mouseDragged(MouseEvent e) {
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 	int px = e.getX()-view.getX0();
 	int py = e.getY()-view.getY0();
 	
@@ -1479,7 +1467,7 @@ public void mouseExited(MouseEvent e) {}
 public void mouseMoved(MouseEvent e)
 {
 	if (VisualDCT.getInstance().isActive()) {
-	    ViewState view = ViewState.getInstance();
+	    ViewState view = ViewState.getInstance(id);
 		int cx = e.getX()-view.getX0();
 		int cy = e.getY()-view.getY0();
 		double scale = view.getScale();
@@ -1523,7 +1511,8 @@ public void mouseMoved(MouseEvent e)
 				    repaint();
 				} else if (tmplink == null){
 				    
-				    Vector connectors = LinkMoverUtilities.getLinkMoverUtilities().isMousePositionLinkMovable(cx+view.getRx(), cy+view.getRy());
+				    Vector connectors = LinkMoverUtilities.getLinkMoverUtilities().
+				            isMousePositionLinkMovable(cx+view.getRx(), cy+view.getRy(), getViewGroup());
 				    
 				    if (connectors.size() != 0) {
 					    if (connectors.size() == 1){
@@ -1553,7 +1542,7 @@ public void mouseMoved(MouseEvent e)
 public void mousePressed(MouseEvent e) {
 	
 	notYetDragged = true;
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 	
 	int px = e.getX()-view.getX0();
 	int py = e.getY()-view.getY0();
@@ -1659,7 +1648,7 @@ public void mousePressed(MouseEvent e) {
 	 * Invoked when a mouse button has been released on a component.
 	 */
 public void mouseReleased(MouseEvent e) {
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 
 	int px = e.getX()-view.getX0();
 	int py = e.getY()-view.getY0();
@@ -1818,7 +1807,7 @@ public void moveLevelUp() {
  */
 private boolean moveSelection(int dx, int dy) {
 	boolean ok = true;
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 
 	Enumeration selected = view.getSelectedObjects().elements();
 	while (selected.hasMoreElements() && ok)
@@ -1834,7 +1823,7 @@ private boolean moveSelection(int dx, int dy) {
  * Snap to grid selection.
  */
 private void snapToGridSelection() {
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 
 	Enumeration selected = view.getSelectedObjects().elements();
 	while (selected.hasMoreElements())
@@ -1844,7 +1833,7 @@ private void snapToGridSelection() {
  * Mark position of selection.
  */
 private void markPositionSelection() {
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 
 	Enumeration selected = view.getSelectedObjects().elements();
 	while (selected.hasMoreElements())
@@ -3109,7 +3098,7 @@ public int print(java.awt.Graphics graphics, java.awt.print.PageFormat pageForma
 	
 	/*------------------------------------------------------------*/
 	
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 
 	double printScale = 1.0;
 		
@@ -3353,7 +3342,7 @@ private void printLegend(Graphics graphics, int width, int height, int page, int
 	// paints
 	
 	//navigator
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 	
 	if (s.isLegendNavigatorVisibility()) {
 		AffineTransform transf = ((Graphics2D)graphics).getTransform();
@@ -3414,7 +3403,7 @@ private void printLegend(Graphics graphics, int width, int height, int page, int
  * Creation date: (27.12.2000 15:04:17)
  */
 public void recalculateNavigatorPosition() {
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 
 	double ratio = navigatorView.getScale()/view.getScale();
 	/// bug was here
@@ -3437,7 +3426,7 @@ private synchronized void redraw(Graphics g) {
 	if (Settings.getInstance().getNavigator())
 		createNavigatorImage();
 
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 		
 	if ((canvasImage==null) || 
 		(canvasSize.width!=width) || 
@@ -3607,7 +3596,7 @@ public void resize(int x0, int y0, int width, int height) {
 		this.height=height;
 	}
 
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 	
 	view.setX0(x0);
 	view.setY0(y0);
@@ -3645,7 +3634,7 @@ private void restoreCursor() {
  * @param y2 int
  */
 private void selectArea(int x1, int y1, int x2, int y2) {
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 	if (viewGroup.selectComponentsCheck(x1+view.getRx(), y1+view.getRy(), 
 										x2+view.getRx(), y2+view.getRy()))
 	{
@@ -3683,7 +3672,7 @@ public void setModified(boolean newModified) {
  */
 public void setScale(double scale) {
 
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 	double oldscale = view.getScale();
 
 	double ds = scale/oldscale;
@@ -3735,7 +3724,7 @@ public void centerObject(VisibleObject object) {
 		}
 	}
 
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 
 	// find center
 	int drx = object.getRx()+object.getRwidth()/2;
@@ -3762,7 +3751,7 @@ private void stopLinking() {
     if (tmplink!=null) {
 		tmplink = null;
 		if (hiliter!=null) hiliter.terminate();
-		ViewState.getInstance().deblinkAll(); //!!!
+		ViewState.getInstance(id).deblinkAll(); //!!!
 		setCursor(defaultCursor);
 		repaint();
 	}
@@ -3775,7 +3764,7 @@ private void updateWorkspaceScale() {
 	SetWorkspaceScale cmd = (SetWorkspaceScale)CommandManager.getInstance().getCommand("SetWorkspaceScale");
 	if (cmd == null)
 		return;
-	cmd.setScale(ViewState.getInstance().getScale());
+	cmd.setScale(ViewState.getInstance(id).getScale());
 	cmd.execute();
 }
 /**
@@ -3787,7 +3776,7 @@ private void updateWorkspaceScale() {
  * @param y2 int
  */
 public void zoomArea(int x1, int y1, int x2, int y2) {
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 
 	double scale = view.getScale();
 	int w = Math.abs(x2-x1);
@@ -3867,7 +3856,7 @@ public void createTemplateInstance(String name, String type, boolean relative) {
 
 	VDBTemplateInstance templateInstance = VDBData.generateNewVDBTemplateInstance(name, template);
 
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 	double scale = view.getScale();
 	
 	Template templ = new Template(null, templateInstance);
@@ -3994,7 +3983,7 @@ public void descendIntoTemplate(Template template)
 	if (!prepareTemplateLeave())
 		return;
 
-	ViewState.getInstance().setAsHilited(null);
+	ViewState.getInstance(id).setAsHilited(null);
 	
 	if (Group.hasMacroPortsIDChanged()) {
 	    viewGroup.reset();
@@ -4033,7 +4022,7 @@ public void ascendFromTemplate()
                 "Macros/Ports in this template have changed. \nReload and save files that include this template to apply changes.", "Template changed!", JOptionPane.WARNING_MESSAGE);
     }
 	
-	ViewState.getInstance().setAsHilited(null);
+	ViewState.getInstance(id).setAsHilited(null);
 	viewGroup = (Group)viewStack.pop();
 	templateStack.pop();
 	
@@ -4063,7 +4052,7 @@ public void ascendFromTemplate()
 public void moveToGroup(Group group)
 {
 	viewGroup = group;
-	ViewState.getInstance().set(viewGroup);
+	ViewState.getInstance(id).set(viewGroup);
 	//createNavigatorImage();
 	viewGroup.unconditionalValidateSubObjects(isFlat());
 
@@ -4202,7 +4191,7 @@ public void createPort(VDBPort vdbPort) {
 	if (vdbPort==null)
 		return;
 		
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 	double scale = view.getScale();
 	
 	Port port = new Port(vdbPort, viewGroup,
@@ -4233,7 +4222,7 @@ public Macro createMacro(VDBMacro vdbMacro) {
 	if (vdbMacro==null)
 		return null;
 		
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 	double scale = view.getScale();
 	
 	Macro macro = new Macro(vdbMacro, viewGroup,
@@ -4313,7 +4302,7 @@ public boolean isPrinting() {
 public void reset() {
 	canvasImage = null;
 	navigatorImage = null;
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 
 	if (view.getRx()+view.getViewWidth() > view.getWidth()) view.setRx(Math.max(0,view.getWidth()-view.getViewWidth()));
 	if (view.getRy()+view.getViewHeight() > view.getHeight()) view.setRx(Math.max(0,view.getHeight()-view.getViewHeight()));
@@ -4342,6 +4331,12 @@ public void setPressedMousePos(int x, int y) {
  */
 public DSGUIInterface getGuimenu() {
 	return guimenu;
+}
+/**
+ * @return the id
+ */
+public DbDescriptor getId() {
+	return id;
 }
 
 }

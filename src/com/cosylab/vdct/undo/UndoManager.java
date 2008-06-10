@@ -1,10 +1,18 @@
 package com.cosylab.vdct.undo;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
 
 import com.cosylab.vdct.Console;
-import com.cosylab.vdct.graphics.DrawingSurface;
+import com.cosylab.vdct.Constants;
+import com.cosylab.vdct.events.CommandManager;
+import com.cosylab.vdct.events.commands.GetDsManager;
+import com.cosylab.vdct.events.commands.SetRedoMenuItemState;
+import com.cosylab.vdct.events.commands.SetUndoMenuItemState;
+import com.cosylab.vdct.graphics.DsEventListener;
+import com.cosylab.vdct.graphics.DsManager;
+import com.cosylab.vdct.graphics.objects.Group;
 
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
@@ -37,11 +45,15 @@ import com.cosylab.vdct.graphics.DrawingSurface;
 /**
  * This type was created in VisualAge.
  */
-public class UndoManager {
+public class UndoManager implements DsEventListener {
 
 	private static UndoManager instance = null;
 	
+	protected static HashMap instances = new HashMap();
+	
 	private final int lowerbound = -1;
+	
+	protected Object rootGroupId = null;
 	
 	private int pos;
 	private int first, last; 
@@ -61,9 +73,10 @@ public class UndoManager {
 /**
  * UndoManager constructor comment.
  */
-protected UndoManager(int steps2remember) {
+protected UndoManager(Object rootGroupId) {
+	this.rootGroupId = rootGroupId;
 	macroActionListeners = new Vector();
-	bufferSize = steps2remember;
+	bufferSize = Constants.UNDO_STEPS_TO_REMEMBER;
 	actions = new ActionObject[bufferSize];
 	instance = this; // to prevent dead-loop reset-getInstance
 	reset();
@@ -72,7 +85,7 @@ protected UndoManager(int steps2remember) {
  * This method was created in VisualAge.
  * @return int
  */
-public int actions2redo() {
+private int actions2redo() {
 	int redos = 0;
 	int np = pos;
 	while (np!=last) {
@@ -85,7 +98,7 @@ public int actions2redo() {
  * This method was created in VisualAge.
  * @return int
  */
-public int actions2undo() {
+private int actions2undo() {
 	if (pos==lowerbound) return 0;
 	
 	int undos = 1;
@@ -120,7 +133,7 @@ public void addAction(ActionObject action) {
 	}
 
 	//System.out.println("New action: "+action.getDescription());
-	com.cosylab.vdct.graphics.DrawingSurface.getInstance().setModified(true);
+	DsManager.getDrawingSurface(rootGroupId).setModified(true);
 
 	if (pos==lowerbound) pos=last=increment(pos);
 	else {
@@ -135,7 +148,7 @@ public void addAction(ActionObject action) {
 		np=increment(np);
 	}
 	
-	com.cosylab.vdct.graphics.DSGUIInterface.getInstance().updateMenuItems();
+	updateMenuItems();
 }
 /**
  * This method was created in VisualAge.
@@ -164,9 +177,14 @@ public ComposedActionInterface getComposedAction() {
  * @return com.cosylab.vdct.undo.UndoManager
  */
 public static UndoManager getInstance() {
-	if (instance==null) instance = new UndoManager(com.cosylab.vdct.Constants.UNDO_STEPS_TO_REMEMBER);
+	if (instance == null) {
+		System.err.println("Warning: undo manager instance called while not yet initialized,"
+				+ " returning active default.");
+		instance = new UndoManager(Group.getRoot().getId());
+	}
 	return instance;
 }
+
 /**
  * This method was created in VisualAge.
  * @return int
@@ -204,8 +222,8 @@ public void redo() {
 		fireMacroActionStop();
 		
 		//System.out.println("Redo: "+actions[pos].getDescription());
-		com.cosylab.vdct.graphics.DrawingSurface.getInstance().setModified(true);
-		com.cosylab.vdct.graphics.DSGUIInterface.getInstance().updateMenuItems();
+		DsManager.getDrawingSurface(rootGroupId).setModified(true);
+		updateMenuItems();
 		monitor = m;
 		setModification();
 		actionsAfterSave++;
@@ -227,7 +245,7 @@ public void reset() {
 		actions[i]=null;
 	monitor = false;
 	bufferSizeReached=false;
-	com.cosylab.vdct.graphics.DSGUIInterface.getInstance().updateMenuItems();
+	updateMenuItems();
 	prepareAfterSaving();
 }
 /**
@@ -295,8 +313,8 @@ public void undo() {
 		
 		//System.out.println("Undo: "+actions[pos].getDescription());
 		pos=decrement(pos);
-		com.cosylab.vdct.graphics.DrawingSurface.getInstance().setModified(true);
-		com.cosylab.vdct.graphics.DSGUIInterface.getInstance().updateMenuItems();
+		DsManager.getDrawingSurface(rootGroupId).setModified(true);
+		updateMenuItems();
 		monitor = m;
 		setModification();
 		actionsAfterSave--;
@@ -311,11 +329,7 @@ public void undo() {
  *
  */
 private void setModification() {
-    if (pos==savedOnPos && !bufferSizeReached) {
-	    DrawingSurface.getInstance().setModified(false);
-	} else {
-	    DrawingSurface.getInstance().setModified(true);
-	}
+	DsManager.getDrawingSurface(rootGroupId).setModified(pos != savedOnPos || bufferSizeReached);
 }
 
 /**
@@ -354,6 +368,37 @@ private void packComposedAction() {
 	composedAction = null;
 	if (!action.isEmpty()) {
 		addAction(action);
+	}
+}
+
+public static void registerDsListener() {
+	GetDsManager command = (GetDsManager)CommandManager.getInstance().getCommand("GetDsManager");
+	if (command != null) {
+		command.getManager().addDsEventListener(new UndoManager(null));
+	}
+}
+
+public void onDsAdded(Object id) {
+    instances.put(id, new UndoManager(id));
+}
+public void onDsRemoved(Object id) {
+	instances.remove(id);
+}
+public void onDsFocused(Object id) {
+    instance = (UndoManager)instances.get(id);
+    updateMenuItems();
+}
+
+private void updateMenuItems() {
+	SetRedoMenuItemState cmd = (SetRedoMenuItemState)CommandManager.getInstance().getCommand("SetRedoMenuItemState");
+	if (cmd != null) {
+		cmd.setState(actions2redo() > 0);
+		cmd.execute();
+	}
+	SetUndoMenuItemState cmd2 = (SetUndoMenuItemState)CommandManager.getInstance().getCommand("SetUndoMenuItemState");
+	if (cmd2 != null) {
+		cmd2.setState(actions2undo() > 0);
+		cmd2.execute();
 	}
 }
 

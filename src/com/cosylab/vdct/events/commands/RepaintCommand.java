@@ -38,19 +38,31 @@ import com.cosylab.vdct.graphics.RepaintInterface;
  */
 public class RepaintCommand extends Command {
 	private RepaintInterface component;
+	private boolean all = false;
+	private boolean highlighted = false;
 /**
  * Insert the method's description here.
  * Creation date: (21.12.2000 22:43:26)
  * @param component javax.swing.JComponent
  */
 public RepaintCommand(RepaintInterface component) {
+	this(component, false, false);
+}
+
+public RepaintCommand(RepaintInterface component, boolean all, boolean highlighted) {
 	this.component=component;
+	this.all = all;
+	this.highlighted = highlighted;
 }
 /**
  * Insert the method's description here.
  * Creation date: (21.12.2000 22:42:23)
  */
 public void execute() {
-	component.repaint();
+	if (all) {
+		component.repaintAll(highlighted);
+	} else {
+		component.repaint(highlighted);
+	}
 }
 }

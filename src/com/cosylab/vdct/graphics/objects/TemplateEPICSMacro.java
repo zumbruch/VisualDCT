@@ -43,6 +43,7 @@ import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.events.commands.LinkCommand;
 import com.cosylab.vdct.graphics.ColorChooser;
 import com.cosylab.vdct.graphics.DrawingSurface;
+import com.cosylab.vdct.graphics.DsManager;
 import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.vdb.GUIHeader;
@@ -150,7 +151,7 @@ protected void draw(Graphics g, boolean hilited) {
 	if (!isVisible())
 		return;
 	
-	com.cosylab.vdct.graphics.ViewState view = com.cosylab.vdct.graphics.ViewState.getInstance();
+	ViewState view = ViewState.getInstance(getRootContainerId());
 	double Rscale = getRscale();
 	boolean zoom = Rscale < 1.0 && view.isZoomOnHilited() && view.isHilitedObject(this);
 	if (zoom) {
@@ -570,11 +571,13 @@ public void setRight(boolean isRight)
 
 		boolean moved = false;
 
-		ViewState view = ViewState.getInstance();
+		Object id = getRootContainerId();
+		ViewState view = ViewState.getInstance(id);
 		dx = (int)(dx*view.getScale());
 		dy = (int)(dy*view.getScale());
-		int x = DrawingSurface.getInstance().getPressedX() + view.getRx();
-		int y = DrawingSurface.getInstance().getPressedY() + view.getRy();
+		DrawingSurface drawingSurface = DsManager.getDrawingSurface(id);
+		int x = drawingSurface.getPressedX() + view.getRx();
+		int y = drawingSurface.getPressedY() + view.getRy();
 
 		if (dx > 0 && !isRight())
 		{
@@ -613,7 +616,7 @@ public void setRight(boolean isRight)
 
 		// should be done for discrete move
 		if (moved)
-			DrawingSurface.getInstance().resetDraggedPosition();
+			drawingSurface.resetDraggedPosition();
 
 		return moved;
 		

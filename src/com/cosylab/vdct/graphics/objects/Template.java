@@ -57,7 +57,7 @@ import com.cosylab.vdct.Settings;
 import com.cosylab.vdct.db.DBResolver;
 import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.events.commands.LinkCommand;
-import com.cosylab.vdct.graphics.DrawingSurface;
+import com.cosylab.vdct.graphics.DsManager;
 import com.cosylab.vdct.graphics.FontMetricsBuffer;
 import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.graphics.popup.PopUpMenu;
@@ -191,7 +191,7 @@ public class Template
 	 */
 	protected void draw(Graphics g, boolean hilited)
 	{
-		ViewState view = ViewState.getInstance();
+		ViewState view = ViewState.getInstance(getRootContainerId());
 	
 		double Rscale = getRscale();
 		boolean zoom = Rscale < 1.0 && view.isZoomOnHilited() && view.isHilitedObject(this);
@@ -458,7 +458,7 @@ public class Template
 	 */
 	public boolean checkMove(int dx, int dy)
 	{
-		ViewState view = ViewState.getInstance();
+		ViewState view = ViewState.getInstance(getRootContainerId());
 	
 		if ((getX()<-dx) || (getY()<-dy) || 
 			(getX()>(view.getWidth()-getWidth()-dx)) || (getY()>(view.getHeight()-getHeight()-dy)))
@@ -783,7 +783,7 @@ public class Template
  */
 public VisibleObject hiliteComponentsCheck(int x, int y) {
 
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(getRootContainerId());
 	VisibleObject spotted = null;
 	
 	Enumeration e = subObjectsV.elements();
@@ -1627,7 +1627,7 @@ public void fixMacrosOnCopy(String prevGroup, String group) {
 			
 				
 			// fix only selected
-			if (!ViewState.getInstance().isSelected(selectableObject))
+			if (!ViewState.getInstance(getRootContainerId()).isSelected(selectableObject))
 				continue;
 			
 			// fix ports...
@@ -2305,7 +2305,7 @@ public void setTemplateInstance(VDBTemplateInstance templateInstance)
  */
 public Object[] getTargets() {
 	
-	Stack tis = DrawingSurface.getInstance().getTemplateStack();
+	Stack tis = DsManager.getDrawingSurface(getRootContainerId()).getTemplateStack();
 
 	Enumeration templates = VDBData.getTemplates().keys();
 	ArrayList al = new ArrayList(VDBData.getTemplates().size());

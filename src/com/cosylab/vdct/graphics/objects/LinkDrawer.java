@@ -60,10 +60,9 @@ public final class LinkDrawer {
  * @param com.cosylab.vdct.graphics.objects.InLink in
  * @param isRight boolean
  */
-public static void drawInIntergroupLink(Graphics g, OutLink out, InLink in, boolean isRight) {
+public static void drawInIntergroupLink(Graphics g, ViewState view, OutLink out, InLink in, boolean isRight) {
 	if (!out.getLayerID().equals(in.getLayerID())) {
 		
-		ViewState view = ViewState.getInstance();
 		double scale = view.getScale();
 		int x1 = (int)(scale*in.getInX())-view.getRx();
 		int y1 = (int)(scale*in.getInY())-view.getRy();
@@ -139,8 +138,7 @@ private static void drawIntergroupLink(Graphics g, ViewState view, int x1, int y
  * @param com.cosylab.vdct.graphics.objects.InLink in
  * @param firstHorizontal boolean
  */
-public static void drawKneeLine(Graphics g, OutLink out, InLink in, boolean firstHorizontal) {
-	ViewState view = ViewState.getInstance();
+public static void drawKneeLine(Graphics g, ViewState view, OutLink out, InLink in, boolean firstHorizontal) {
 	double scale = view.getScale();
 	int x1 = (int)(scale*out.getOutX()-view.getRx());
 	int y1 = (int)(scale*out.getOutY()-view.getRy());
@@ -653,14 +651,13 @@ private static boolean checkConnectorOuterMost(MultiInLink evol, int outX, int i
  * @param count int
  * @param isRight boolean
  */
-public static void drawLink(Graphics g, OutLink out, InLink in, int count, boolean isRight) {
+public static void drawLink(Graphics g, ViewState view, OutLink out, InLink in, int count, boolean isRight) {
 	if (in==null)
-		drawKneeLine(g, out, null, isRight);
+		drawKneeLine(g, view, out, null, isRight);
 	else if (out.getLayerID().equals(in.getLayerID()))
-		drawKneeLine(g, out, in, ((count%2)==0));
+		drawKneeLine(g, view, out, in, ((count%2)==0));
 	else {
 		
-		ViewState view = ViewState.getInstance();
 		double scale = view.getScale();
 		int x1 = (int)(scale*out.getOutX())-view.getRx();
 		int y1 = (int)(scale*out.getOutY())-view.getRy();

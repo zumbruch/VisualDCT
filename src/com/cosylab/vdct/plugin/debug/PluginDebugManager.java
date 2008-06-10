@@ -28,14 +28,21 @@ package com.cosylab.vdct.plugin.debug;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.util.*;
-import java.beans.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 import com.cosylab.vdct.Console;
 import com.cosylab.vdct.VisualDCT;
+import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.graphics.DrawingSurface;
+import com.cosylab.vdct.graphics.DsManager;
 import com.cosylab.vdct.graphics.objects.Group;
-import com.cosylab.vdct.plugin.*;
+import com.cosylab.vdct.plugin.PluginListener;
+import com.cosylab.vdct.plugin.PluginManager;
+import com.cosylab.vdct.plugin.PluginObject;
 
 /**
  * Creation date: (7.12.2001 13:57:49)
@@ -182,27 +189,30 @@ public static void stopDebugging()
 		PluginDebugManager.setDebugState(false);
 		PluginDebugManager.setDebugPlugin(null);
 
-
-		
 		// update all fields
-		Group group = DrawingSurface.getInstance().getViewGroup();
-		Enumeration e = group.getSubObjectsV().elements();
-		while (e.hasMoreElements())
-		{
-			Object obj = e.nextElement();
-			if (obj instanceof com.cosylab.vdct.graphics.objects.Record)
+		Iterator iterator = DsManager.getAllDrawingSurfaces().iterator();
+		while (iterator.hasNext()) {
+			Group group = ((DrawingSurface)iterator.next()).getViewGroup();
+			Enumeration e = group.getSubObjectsV().elements();
+			while (e.hasMoreElements())
 			{
-				com.cosylab.vdct.vdb.VDBRecordData rec = ((com.cosylab.vdct.graphics.objects.Record)obj).getRecordData();
-				Enumeration e2 = rec.getFieldsV().elements();
-				while (e2.hasMoreElements())
-					rec.fieldValueChanged((com.cosylab.vdct.vdb.VDBFieldData)e2.nextElement());
-					
+				Object obj = e.nextElement();
+				if (obj instanceof com.cosylab.vdct.graphics.objects.Record)
+				{
+					com.cosylab.vdct.vdb.VDBRecordData rec = ((com.cosylab.vdct.graphics.objects.Record)obj).getRecordData();
+					Enumeration e2 = rec.getFieldsV().elements();
+					while (e2.hasMoreElements())
+						rec.fieldValueChanged((com.cosylab.vdct.vdb.VDBFieldData)e2.nextElement());
+
+				}
 			}
 		}
 
-		Group.getRoot().unconditionalValidateSubObjects(false);
-		DrawingSurface.getInstance().repaint();
-
+		iterator = Group.getAllRoots().iterator();
+		while (iterator.hasNext()) {
+			((Group)iterator.next()).unconditionalValidateSubObjects(false);
+		}
+		CommandManager.getInstance().execute("RepaintAllFrames");
 	}
 }
 

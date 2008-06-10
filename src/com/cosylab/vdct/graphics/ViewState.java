@@ -28,9 +28,14 @@ package com.cosylab.vdct.graphics;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Vector;
 
 import com.cosylab.vdct.Settings;
+import com.cosylab.vdct.events.CommandManager;
+import com.cosylab.vdct.events.commands.GetDsManager;
+import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.objects.InLink;
 import com.cosylab.vdct.graphics.objects.MultiInLink;
 import com.cosylab.vdct.graphics.objects.OutLink;
@@ -42,13 +47,17 @@ import com.cosylab.vdct.graphics.objects.VisibleObject;
  * @author Matej Sekoranja
  */
 
-public class ViewState {
+public class ViewState implements DsEventListener {
 
 	protected static ViewState instance = null;
+	
+	protected static HashMap instances = new HashMap();
 	
 	protected static int x0 = 0;				// origin
 	protected static int y0 = 0;
 
+	protected Object rootGroupId = null;
+	
 	protected double drx = 0.0;				// precise translation (from origin)
 	protected double dry = 0.0;
 
@@ -79,7 +88,8 @@ public class ViewState {
  * Insert the method's description here.
  * Creation date: (21.12.2000 21:00:31)
  */
-public ViewState() {
+public ViewState(Object rootGroupId) {
+	this.rootGroupId = rootGroupId;
 	selectedObjects = new Vector();
 	blinkingObjects = new Vector();
 }
@@ -88,8 +98,8 @@ public ViewState() {
  * Creation date: (3.5.2001 13:31:07)
  * @param original com.cosylab.vdct.graphics.ViewState
  */
-public ViewState(ViewState original) {
-	this();
+public ViewState(Object rootGroupId, ViewState original) {
+	this(rootGroupId);
 	
 	//this.x0 = original.x0;
 	//this.y0 = original.y0;
@@ -185,9 +195,18 @@ public boolean isHilitedObject(VisibleObject object) {
  * @return com.cosylab.vdct.graphics.ViewState
  */
 public static ViewState getInstance() {
-	if (instance==null) instance = new ViewState();
+	if (instance == null) {
+		System.err.println("Warning: view instance called while not yet initialized,"
+				+ " returning active default.");
+		instance = new ViewState(Group.getRoot().getId());
+	}
 	return instance;
 }
+
+public static ViewState getInstance(Object rootGroupId) {
+    return (ViewState)instances.get(rootGroupId);
+}
+
 /**
  * Insert the method's description here.
  * Creation date: (11.12.2000 17:56:18)
@@ -346,7 +365,7 @@ public void set(com.cosylab.vdct.graphics.objects.Group group) {
 		setInstance(group.getLocalView());
 	else
 	{
-		ViewState copy = new ViewState(this);
+		ViewState copy = new ViewState(group.getRootContainerId(), this);
 		group.setLocalView(copy);
 		setInstance(copy);
 	}
@@ -379,7 +398,7 @@ public boolean setAsHilited(VisibleObject object, boolean zoomOnHilited) {
     this.zoomOnHilited = zoomOnHilited;
     
     if(zoomOnHilited) {
-        DrawingSurface.getInstance().repaint();
+    	DsManager.getDrawingSurface(object.getRootContainerId()).repaint();
         hilitedObjects.clear();
         if (hilitedObject != null) {
             hilitedObjects.add(hilitedObject);
@@ -469,6 +488,17 @@ public void setFlat(boolean newFlat) {
  * @param newInstance com.cosylab.vdct.graphics.ViewState
  */
 public static void setInstance(ViewState newInstance) {
+    // Ignore checks for all instances with no id, as they are only temporary.
+	if (newInstance.rootGroupId != null) {
+		ViewState mapInstance = (ViewState)instances.get(newInstance.rootGroupId);
+		if (mapInstance == null) {
+			System.err.println("Warning: view instance set while not yet registered, registering it.");
+
+			System.out.println("instance id: " + instance.rootGroupId); 
+			System.out.println("new instance id: " + newInstance.rootGroupId); 
+			instances.put(newInstance.rootGroupId, newInstance);
+		}
+    }
 	instance = newInstance;
 }
 /**
@@ -574,5 +604,22 @@ public void setY0(int newY0) {
 	 */
 	public int getDotSize() {
 		return dotSize;
+	}
+	
+	public static void registerDsListener() {
+		GetDsManager command = (GetDsManager)CommandManager.getInstance().getCommand("GetDsManager");
+		if (command != null) {
+			command.getManager().addDsEventListener(new ViewState(null));
+		}
+	}
+	
+	public void onDsAdded(Object id) {
+	    instances.put(id, new ViewState(id));
+	}
+	public void onDsRemoved(Object id) {
+		instances.remove(id);
+	}
+	public void onDsFocused(Object id) {
+	    instance = (ViewState)instances.get(id);
 	}
 }

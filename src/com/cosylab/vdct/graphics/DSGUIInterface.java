@@ -52,8 +52,6 @@ import com.cosylab.vdct.DataProvider;
 import com.cosylab.vdct.Settings;
 import com.cosylab.vdct.VisualDCT;
 import com.cosylab.vdct.events.CommandManager;
-import com.cosylab.vdct.events.commands.SetRedoMenuItemState;
-import com.cosylab.vdct.events.commands.SetUndoMenuItemState;
 import com.cosylab.vdct.events.commands.ShowMorphingDialog;
 import com.cosylab.vdct.events.commands.ShowRenameDialog;
 import com.cosylab.vdct.graphics.objects.Border;
@@ -91,11 +89,12 @@ import com.cosylab.vdct.vdb.VDBTemplateInstance;
  * Creation date: (4.2.2001 15:32:01)
  * @author Matej Sekoranja
  */
-public class DSGUIInterface implements GUIMenuInterface, VDBInterface {
+public class DSGUIInterface implements VDBInterface {
 
 	private static DSGUIInterface instance = null;
 	
 	private DrawingSurface drawingSurface;
+	private Object id = null;
 
 	// to remember on cut from which group object has beed cut 
 	private ArrayList pasteNames = null;
@@ -119,6 +118,7 @@ public class DSGUIInterface implements GUIMenuInterface, VDBInterface {
  */
 public DSGUIInterface(DrawingSurface drawingSurface) {
 	this.drawingSurface=drawingSurface;
+	this.id = drawingSurface.getId();
 	DSGUIInterface.instance = this;
 	pasteNames = new ArrayList();
 	copiedObjects = new Vector();
@@ -134,7 +134,7 @@ public void moveOrigin(int direction)
 {
 	int dx = 0; 
 	int dy = 0;
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 	int d = (int)(100*view.getScale()); 
 	
 	switch (direction)
@@ -266,7 +266,7 @@ public void copyToSystemClipboard(Vector objs)
  * Creation date: (4.2.2001 15:32:01)
  */
 public void copy() {
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 	copy(view.getSelectedObjects(), true);
 }
 
@@ -275,7 +275,7 @@ public void copy() {
  * Creation date: (4.2.2001 15:32:01)
  */
 public void systemCopy() {
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 	copyToSystemClipboard(view.getSelectedObjects());
 	view.deselectAll();
 	drawingSurface.repaint();
@@ -287,7 +287,7 @@ private void copy(Vector objects, boolean firstCopy) {
     if (objects.size()==0) return;
 	Group.getClipboard().destroy();
     
-    ViewState view = ViewState.getInstance();
+    ViewState view = ViewState.getInstance(id);
     pasteNames.clear();
     if (firstCopy) {
         copiedObjects.clear();
@@ -337,7 +337,7 @@ public Box createBox()
 {
 	Group parentGroup = drawingSurface.getViewGroup();
 
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 	double scale = view.getScale();
 
 	int posX = (int)((drawingSurface.getPressedX() + view.getRx()) / scale);
@@ -360,7 +360,7 @@ public Line createLine()
 {
 	Group parentGroup = drawingSurface.getViewGroup();
 
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 	double scale = view.getScale();
 
 	int posX = (int)((drawingSurface.getPressedX() + view.getRx()) / scale);
@@ -383,7 +383,7 @@ public TextBox createTextBox()
 {
 	Group parentGroup = drawingSurface.getViewGroup();
 
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 	double scale = view.getScale();
 
 	int posX = (int)((drawingSurface.getPressedX() + view.getRx()) / scale);
@@ -422,7 +422,7 @@ public void createRecord(String name, String type, boolean relative) {
 		return;
 	}
 
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 	double scale = view.getScale();
 	int posX = drawingSurface.getPressedX();
 	int posY = drawingSurface.getPressedY();
@@ -479,7 +479,7 @@ public void createRecord(String name, String type, boolean relative) {
  * Creation date: (4.2.2001 15:32:01)
  */
 public void cut() {
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 	//copyToSystemClipboard(view.getSelectedObjects());
 	
 	if (view.getSelectedObjects().size()==0) return;
@@ -536,7 +536,7 @@ public void cut() {
  * Creation date: (4.2.2001 15:32:01)
  */
 public void delete() {
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 	if (view.getSelectedObjects().size()==0) return;
 
 	try	{
@@ -588,7 +588,7 @@ public static DSGUIInterface getInstance() {
  * Creation date: (4.2.2001 15:32:01)
  */
 public void group(String groupName) {
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 	if (view.getSelectedObjects().size()==0) return;
 
 	ComposedAction composedAction = new ComposedAction();
@@ -719,13 +719,6 @@ public void levelUp() {
  * Creation date: (4.2.2001 15:32:01)
  */
 public void newCmd() {
-	// TODO:REM
-	//drawingSurface.initializeWorkspace();
-	/*
-	SetWorkspaceFile cmd = (SetWorkspaceFile)CommandManager.getInstance().getCommand("SetFile");
-	cmd.setFile(null);
-	cmd.execute();
-	*/
 }
 /**
  * Insert the method's description here.
@@ -774,7 +767,7 @@ public void systemPaste() {
 public void paste() {
 	// do some offset (a little trick to have snapping also done) for copy only
 	final int OFFSET = Constants.GRID_SIZE;
-	double scale = ViewState.getInstance().getScale();
+	double scale = ViewState.getInstance(id).getScale();
 	if (doOffsetAtPaste)
 		pasteAtPosition((int)((pasteX+OFFSET)*scale), (int)((pasteY+OFFSET)*scale));
 	else
@@ -786,7 +779,7 @@ public void paste() {
  * Creation date: (4.2.2001 15:32:01)
  */
 public void pasteAtPosition(int pX, int pY) {
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 	String currentGroupName = drawingSurface.getViewGroup().getAbsoluteName();
 	
 	Group group = Group.getClipboard();
@@ -856,9 +849,8 @@ public void print() {}
  * Creation date: (4.2.2001 15:32:01)
  */
 public void redo() {
-	ViewState.getInstance().deselectAll();
+	ViewState.getInstance(id).deselectAll();
 	UndoManager.getInstance().redo();
-	updateMenuItems();
 	drawingSurface.repaint();
 }
 /**
@@ -867,7 +859,7 @@ public void redo() {
  */
 public void rename() {
 
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 	int size = view.getSelectedObjects().size();
 	if (size==0) return;
 
@@ -892,7 +884,7 @@ public void rename() {
  * Creation date: (3.5.2001 10:05:02)
  */
 public void rename(java.lang.String oldName, java.lang.String newName) {
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 	Object obj = Group.getRoot().findObject(oldName, true);
 	if (obj instanceof Flexible)
 	{
@@ -909,7 +901,7 @@ public void rename(java.lang.String oldName, java.lang.String newName) {
 }
 
 public void morph() {
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 
 	int size = view.getSelectedObjects().size();
 	if (size==0) return;
@@ -936,7 +928,7 @@ public void morph() {
  * Creation date: (3.5.2001 10:05:02)
  */
 public void morph(java.lang.String name, String newType) {
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 	Object oldObject = Group.getRoot().findObject(name, true);
 	if (oldObject instanceof Record)
 	{
@@ -1169,7 +1161,7 @@ public void showNavigator(boolean state) {
  * Creation date: (4.2.2001 15:57:56)
  */
 public void smartZoom() {
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 	if (view.getSelectedObjects().size()==0) return;
 
 	int minX = Integer.MAX_VALUE;
@@ -1223,9 +1215,8 @@ public void snapToGrid(boolean state) {
  * Creation date: (4.2.2001 15:32:01)
  */
 public void undo() {
-	ViewState.getInstance().deselectAll();
+	ViewState.getInstance(id).deselectAll();
 	UndoManager.getInstance().undo();
-	updateMenuItems();
 	drawingSurface.repaint();
 }
 /**
@@ -1233,7 +1224,7 @@ public void undo() {
  * Creation date: (4.2.2001 15:32:01)
  */
 public void ungroup() {
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(id);
 	int size = view.getSelectedObjects().size();
 	if (size==0) return;
 
@@ -1282,25 +1273,6 @@ public void ungroup() {
 	
 	drawingSurface.getViewGroup().manageLinks(true);
 	drawingSurface.repaint();
-}
-/**
- * Insert the method's description here.
- * Creation date: (22.4.2001 18:12:34)
- */
-public void updateMenuItems() {
-	SetRedoMenuItemState cmd = (SetRedoMenuItemState)CommandManager.getInstance().getCommand("SetRedoMenuItemState");
-	if (cmd != null)
-	{
-		cmd.setState(UndoManager.getInstance().actions2redo()>0);
-		cmd.execute();
-	}
-	
-	SetUndoMenuItemState cmd2 = (SetUndoMenuItemState)CommandManager.getInstance().getCommand("SetUndoMenuItemState");
-	if (cmd2 != null)
-	{
-		cmd2.setState(UndoManager.getInstance().actions2undo()>0);
-		cmd2.execute();
-	}
 }
 
 /**

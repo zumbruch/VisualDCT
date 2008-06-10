@@ -94,7 +94,7 @@ public VisibleObject(ContainerObject parent) {
  */
 public void destroy() {
 	destroyed=true;
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(getRootContainerId());
 	if (view.getHilitedObject() == this)
 		view.setAsHilited(null);
 }
@@ -119,7 +119,7 @@ protected void postDraw(Graphics g, boolean hilited) {}
  */
 public void forceValidation() {
 
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(getRootContainerId());
 	scale=view.getScale();
 
 	if (scale!=rscale)
@@ -481,7 +481,7 @@ public void setY(int newY) {
  * Creation date: (25.4.2001 17:56:23)
  */
 public void unconditionalValidation() {
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(getRootContainerId());
 	rscale=scale=view.getScale();
 	internalRevalidate();
 }
@@ -589,7 +589,7 @@ public int getTopOffset() {
  * @return
  */
 public Point getMoveInsideView() {
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(getRootContainerId());
 	
     int leftLimit = 0;
     int rightLimit = view.getWidth() - width;
@@ -599,6 +599,14 @@ public Point getMoveInsideView() {
 	int horMargin = (x < leftLimit) ? leftLimit - x : (x > rightLimit ? rightLimit - x: 0);
 	int vertMargin = (y < topLimit) ? topLimit - y : (y > bottomLimit ? bottomLimit - y: 0);
     return new Point(horMargin, vertMargin);
+}
+
+public ContainerObject getRootContainer() {
+	return parent != null ? parent.getRootContainer() : null;
+}
+
+public Object getRootContainerId() {
+	return parent != null ? parent.getRootContainerId() : null;
 }
 
 }

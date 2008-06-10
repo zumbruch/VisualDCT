@@ -197,4 +197,9 @@ public void updateFields() {
 //public boolean isZoomRepaint() {
 //    return isZoomRepaint;
 //}
+
+public ContainerObject getRootContainer() {
+	return getParent() != null ? getParent().getRootContainer() : this;
+}
+
 }

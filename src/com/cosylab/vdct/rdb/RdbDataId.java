@@ -41,9 +41,6 @@ public class RdbDataId implements DbDescriptor {
 	private String ioc = null;
 	private String description = null;
 	
-	// TODO:REM
-	// private static final String delimiter = ":";
-
 	public RdbDataId() {
 		super();
 	}
@@ -60,36 +57,9 @@ public class RdbDataId implements DbDescriptor {
 		this.ioc = ioc;
 	}
 	
-	// TODO:REM
-	/*
-	public RdbDataId(String string) {
-		super();
-		String[] parts = string.split(delimiter);
-		if (parts.length > 0) {
-			fileName = parts[0];
-		}
-		if (parts.length > 1) {
-			version = parts[1];
-		}
-		if (parts.length > 2) {
-			ioc = parts[2];
-		}
-	}
-	*/
-	
 	public boolean isDefined() {
 		return fileName != null && version != null && ioc != null;
 	}
-
-	// TODO: REM
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	/*
-	public String toString() {
-		return fileName + delimiter + version + delimiter + ioc;
-	}
-	*/
 
 	/**
 	 * @return the fileName

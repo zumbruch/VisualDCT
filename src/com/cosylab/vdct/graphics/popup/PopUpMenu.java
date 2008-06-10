@@ -30,13 +30,18 @@ package com.cosylab.vdct.graphics.popup;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.*;
-import javax.swing.*;
+import java.util.Enumeration;
+import java.util.Vector;
+
+import javax.swing.JComponent;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.JSeparator;
 
 import com.cosylab.vdct.VisualDCT;
 import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.events.commands.GetGUIInterface;
-import com.cosylab.vdct.graphics.DrawingSurface;
 import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.graphics.objects.EPICSVarOutLink;
 import com.cosylab.vdct.graphics.objects.Flexible;
@@ -223,7 +228,7 @@ private void addRotatableItems(final Rotatable rot, Vector items) {
 	menuitem.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 			rot.rotate();
-		    DrawingSurface.getInstance().repaint();
+	    	CommandManager.getInstance().execute("RepaintWorkspace");
 		}
 	});
 	items.add(menuitem);

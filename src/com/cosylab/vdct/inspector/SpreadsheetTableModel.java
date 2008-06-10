@@ -37,7 +37,7 @@ import java.util.Vector;
 
 import javax.swing.table.AbstractTableModel;
 
-import com.cosylab.vdct.graphics.DrawingSurface;
+import com.cosylab.vdct.graphics.DsManager;
 import com.cosylab.vdct.graphics.objects.Record;
 import com.cosylab.vdct.graphics.objects.Template;
 import com.cosylab.vdct.graphics.objects.VisibleObject;
@@ -226,7 +226,7 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 		} finally {
 			UndoManager.getInstance().stopMacroAction();
 		}
-		DrawingSurface.getInstance().repaint();
+		DsManager.getDrawingSurface().repaint();
 	}
 	
 	/* Returns the multi-line string associated with the cell at the given position, or null it there is

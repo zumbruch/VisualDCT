@@ -564,7 +564,7 @@ public boolean manageLink_(VDBFieldData field) {
  */
 public void moveConnectors(int dx, int dy) {
 	
-  ViewState view = ViewState.getInstance();
+  ViewState view = ViewState.getInstance(getRootContainerId());
   Enumeration e = subObjectsV.elements();
   Connector con; Object obj;
   while (e.hasMoreElements()) {

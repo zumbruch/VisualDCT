@@ -87,7 +87,7 @@ public class Macro extends VisibleObject implements Descriptable, Movable, InLin
 			else*/ if (action.equals(removeMacroDefString))
 			{
 				data.getTemplate().removeMacro(getName());
-				ViewState.getInstance().deselectObject(Macro.this);
+				ViewState.getInstance(Macro.this.getRootContainerId()).deselectObject(Macro.this);
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
 			else if (action.equals(inputString)) {
@@ -194,7 +194,7 @@ public void accept(Visitor visitor) {}
  * @param dy int
  */
 public boolean checkMove(int dx, int dy) {
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(getRootContainerId());
 
 	if ((getX()<-dx) || (getY()<-dy) || 
 		(getX()>(view.getWidth()-getWidth()-dx)) || (getY()>(view.getHeight()-getHeight()-dy)))
@@ -249,7 +249,7 @@ public void destroy() {
 		}
 		
 		if (lastUpdatedFullName!=null)
-			Group.getRoot().getLookupTable().remove(data.getFullName());
+			((Group)getRootContainer()).getLookupTable().remove(data.getFullName());
 		//else
 		//	((LinkManagerObject)getParent()).removeInvalidLink(this);
 
@@ -291,7 +291,7 @@ public void disconnect(Linkable disconnector) {
  */
 protected void draw(java.awt.Graphics g, boolean hilited) {
 
-	ViewState view = ViewState.getInstance();
+	ViewState view = ViewState.getInstance(getRootContainerId());
 	
 	double Rscale = getRscale();
 	boolean zoom = Rscale < 1.0 && view.isZoomOnHilited() && view.isHilitedObject(this);
@@ -756,7 +756,7 @@ public int getMode()
 
 public void setTextPositionNorth(boolean isTextPositionNorth) {
     this.textPositionNorth = isTextPositionNorth;
-    DrawingSurface.getInstance().repaint();
+    DsManager.getDrawingSurface(getRootContainerId()).repaint();
 }
 
 public boolean isTextPositionNorth() {
@@ -990,10 +990,10 @@ public void updateTemplateLink()
 		
 	// remove old one		
 	if (lastUpdatedFullName!=null)
-		Group.getRoot().getLookupTable().remove(lastUpdatedFullName);
+		((Group)getRootContainer()).getLookupTable().remove(lastUpdatedFullName);
 	
 	// ups, we already got this registered
-	if (Group.getRoot().getLookupTable().containsKey(data.getFullName()))
+	if (((Group)getRootContainer()).getLookupTable().containsKey(data.getFullName()))
 	{
 		lastUpdatedFullName = null;
 		//!!! this should never happen, but...
@@ -1003,7 +1003,7 @@ public void updateTemplateLink()
 	else
 	{
 		lastUpdatedFullName = data.getFullName();
-		Group.getRoot().getLookupTable().put(lastUpdatedFullName, this);
+		((Group)getRootContainer()).getLookupTable().put(lastUpdatedFullName, this);
 		//!!! this should never happen, but...
 		//((LinkManagerObject)getParent()).removeInvalidLink(this);
 	}

@@ -35,6 +35,7 @@ import com.cosylab.vdct.Constants;
 import javax.swing.*;
 import java.awt.event.*;
 
+import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.undo.CreateConnectorAction;
 import com.cosylab.vdct.undo.UndoManager;
 import com.cosylab.vdct.vdb.*;
@@ -209,7 +210,7 @@ private com.cosylab.vdct.graphics.objects.EPICSVarOutLink.PopupMenuHandler creat
 	protected void draw(Graphics g, boolean hilited) {
 		if (inlink!=null)
 		{
-		    com.cosylab.vdct.graphics.ViewState view = com.cosylab.vdct.graphics.ViewState.getInstance();
+			ViewState view = ViewState.getInstance(getRootContainerId());
 			
 			double Rscale = view.getScale();
 			boolean zoom = (Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this);
@@ -265,7 +266,7 @@ private com.cosylab.vdct.graphics.objects.EPICSVarOutLink.PopupMenuHandler creat
 					g.drawLine(linkx, rry, rrx-3*r, rry);
 //			}
 			
-		    LinkDrawer.drawLink(g, this, inlink, getQueueCount(), isRightSide);
+		    LinkDrawer.drawLink(g, view, this, inlink, getQueueCount(), isRightSide);
 		}
 		super.draw(g, hilited);
 	
