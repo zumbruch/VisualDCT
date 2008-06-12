@@ -236,7 +236,7 @@ public class DBResolver {
 
 
 
-	private static String loadTemplate(DBData data, String templateFile, String referencedFromFile,
+	private static String loadTemplate(Object dsId, DBData data, String templateFile, String referencedFromFile,
 			PathSpecification paths, Stack loadStack, ArrayList loadList) throws Exception
 			{
 
@@ -276,7 +276,7 @@ public class DBResolver {
 
 		Console.getInstance().println("Loading template \""+templateFile+"\"...");
 
-		DBData templateData = resolveDB(templateToResolve, loadStack, loadList);
+		DBData templateData = resolveDB(dsId, templateToResolve, loadStack, loadList);
 		if (templateData==null)
 			throw new DBException("Failed to load template: '"+templateFile+"'");
 		templateData.getTemplateData().setData(templateData);
@@ -1480,7 +1480,7 @@ public class DBResolver {
 	 * @param rootData com.cosylab.vdct.db.DBData
 	 * @param tokenizer java.io.EnhancedStreamTokenizer
 	 */
-	public static void processDB(DBData data, EnhancedStreamTokenizer tokenizer, String fileName,
+	public static void processDB(Object dsId, DBData data, EnhancedStreamTokenizer tokenizer, String fileName,
 			PathSpecification paths, Stack loadStack, ArrayList loadList) throws Exception
 			{
 
@@ -1603,7 +1603,7 @@ public class DBResolver {
 										(tokenizer.ttype == DBConstants.quoteChar)) str2 = tokenizer.sval;
 								else throw (new DBParseException("Invalid expand template instance name...", tokenizer, fileName));
 
-								String loadedTemplateId = loadTemplate(data, str, fileName, paths, loadStack, loadList);
+								String loadedTemplateId = loadTemplate(dsId, data, str, fileName, paths, loadStack, loadList);
 
 								//System.out.println("expand(\""+str+"\", "+str2+")\n{");
 
@@ -1632,7 +1632,7 @@ public class DBResolver {
 
 								File file = paths.search4File(include_filename);
 								inctokenizer = getEnhancedStreamTokenizer(file.getAbsolutePath());
-								if (inctokenizer!=null) processDB(data, inctokenizer, include_filename, new PathSpecification(file.getParentFile().getAbsolutePath(), paths), loadStack, loadList);
+								if (inctokenizer!=null) processDB(dsId, data, inctokenizer, include_filename, new PathSpecification(file.getParentFile().getAbsolutePath(), paths), loadStack, loadList);
 							}
 
 				/****************** path ********************/
@@ -1926,7 +1926,7 @@ public class DBResolver {
 	 * @return Vector
 	 * @param fileName java.lang.String
 	 */
-	public static DBData resolveDB(String fileName, Stack loadStack, ArrayList loadList) {
+	public static DBData resolveDB(Object dsId, String fileName, Stack loadStack, ArrayList loadList) {
 
 		DBData data = null; 
 
@@ -1939,9 +1939,9 @@ public class DBResolver {
 				File file = new File(fileName);
 
 				PathSpecification paths = new PathSpecification(file.getParentFile().getAbsolutePath());
-				data = new DBData(file.getName(), file.getAbsolutePath());
+				data = new DBData(dsId, file.getName(), file.getAbsolutePath());
 
-				processDB(data, tokenizer, fileName, paths, loadStack, loadList);
+				processDB(dsId, data, tokenizer, fileName, paths, loadStack, loadList);
 			}
 			catch (Exception e)
 			{
@@ -1962,7 +1962,7 @@ public class DBResolver {
 	 * @return Vector
 	 * @param fileName java.lang.String
 	 */
-	public static DBData resolveDB(InputStream is, Stack loadStack, ArrayList loadList) {
+	public static DBData resolveDB(Object dsId, InputStream is, Stack loadStack, ArrayList loadList) {
 
 		DBData data = null; 
 
@@ -1972,9 +1972,9 @@ public class DBResolver {
 			try
 			{
 				PathSpecification paths = new PathSpecification(Settings.getDefaultDir());
-				data = new DBData("System Clipboard", "System Clipboard");
+				data = new DBData(dsId, "System Clipboard", "System Clipboard");
 
-				processDB(data, tokenizer, "System Clipboard", paths, loadStack, loadList);
+				processDB(dsId, data, tokenizer, "System Clipboard", paths, loadStack, loadList);
 			}
 			catch (Exception e)
 			{
@@ -1995,10 +1995,10 @@ public class DBResolver {
 	 * @return Vector
 	 * @param fileName java.lang.String
 	 */
-	public static DBData resolveDB(String fileName) throws Exception {
+	public static DBData resolveDB(Object dsId, String fileName) throws Exception {
 		Stack loadStack = new Stack();
 		ArrayList loadList = new ArrayList();
-		return resolveDB(fileName, loadStack, loadList);
+		return resolveDB(dsId, fileName, loadStack, loadList);
 	}
 
 	/**
@@ -2006,10 +2006,10 @@ public class DBResolver {
 	 * @return Vector
 	 * @param fileName java.lang.String
 	 */
-	public static DBData resolveDB(InputStream is) throws Exception {
+	public static DBData resolveDB(Object dsId, InputStream is) throws Exception {
 		Stack loadStack = new Stack();
 		ArrayList loadList = new ArrayList();
-		return resolveDB(is, loadStack, loadList);
+		return resolveDB(dsId, is, loadStack, loadList);
 	}
 
 

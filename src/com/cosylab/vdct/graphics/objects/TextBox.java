@@ -365,7 +365,7 @@ public void destroy()
 
 protected void draw(Graphics g, boolean hilited)
 {
-	ViewState view = ViewState.getInstance(getRootContainerId());
+	ViewState view = ViewState.getInstance(getDsId());
 
 	int posX = getRx() - view.getRx();
 	int posY = getRy() - view.getRy();
@@ -443,7 +443,7 @@ protected void draw(Graphics g, boolean hilited)
 
 public void drawDashedBorder(Graphics g, boolean hilited)
 {
-	ViewState view = ViewState.getInstance(getRootContainerId());
+	ViewState view = ViewState.getInstance(getDsId());
 
 	int posX = getRx() - view.getRx();
 	int posY = getRy() - view.getRy();
@@ -695,7 +695,7 @@ public String getDescription()
 public void setDescription(String description)
 {
 	if (this.description!=null && !this.description.equals(nullString) && !this.description.equals(description))
-		com.cosylab.vdct.undo.UndoManager.getInstance().addAction(
+		com.cosylab.vdct.undo.UndoManager.getInstance(getDsId()).addAction(
 				new DescriptionChangeAction(this, this.description, description));
 
 	this.description = description;

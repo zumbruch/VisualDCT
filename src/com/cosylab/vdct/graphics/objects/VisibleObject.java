@@ -94,7 +94,7 @@ public VisibleObject(ContainerObject parent) {
  */
 public void destroy() {
 	destroyed=true;
-	ViewState view = ViewState.getInstance(getRootContainerId());
+	ViewState view = ViewState.getInstance(getDsId());
 	if (view.getHilitedObject() == this)
 		view.setAsHilited(null);
 }
@@ -119,7 +119,7 @@ protected void postDraw(Graphics g, boolean hilited) {}
  */
 public void forceValidation() {
 
-	ViewState view = ViewState.getInstance(getRootContainerId());
+	ViewState view = ViewState.getInstance(getDsId());
 	scale=view.getScale();
 
 	if (scale!=rscale)
@@ -481,7 +481,7 @@ public void setY(int newY) {
  * Creation date: (25.4.2001 17:56:23)
  */
 public void unconditionalValidation() {
-	ViewState view = ViewState.getInstance(getRootContainerId());
+	ViewState view = ViewState.getInstance(getDsId());
 	rscale=scale=view.getScale();
 	internalRevalidate();
 }
@@ -589,7 +589,7 @@ public int getTopOffset() {
  * @return
  */
 public Point getMoveInsideView() {
-	ViewState view = ViewState.getInstance(getRootContainerId());
+	ViewState view = ViewState.getInstance(getDsId());
 	
     int leftLimit = 0;
     int rightLimit = view.getWidth() - width;
@@ -605,8 +605,8 @@ public ContainerObject getRootContainer() {
 	return parent != null ? parent.getRootContainer() : null;
 }
 
-public Object getRootContainerId() {
-	return parent != null ? parent.getRootContainerId() : null;
+public Object getDsId() {
+	return parent != null ? parent.getDsId() : null;
 }
 
 }

@@ -1953,8 +1953,14 @@ public void exportPostScriptFileMenuItem_ActionPerformed()
 	if(pi == null)
 		return;
 
-	new Thread()
-	{
+	class MyOwnPostScriptExportingThread extends Thread {
+		
+		private ViewState view = null;
+		
+		public MyOwnPostScriptExportingThread(ViewState view) {
+			this.view = view;
+		}
+		
 		public void run()
 		{
 			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -2049,7 +2055,8 @@ public void exportPostScriptFileMenuItem_ActionPerformed()
 				Settings.getInstance().setShowGrid(showGrid);
 				
 				fileOutputStream = new FileOutputStream(outputFile);
-				fileOutputStream.write(printGrid(pi.getPageable().getPageFormat(0), new StringBuffer(byteArrayOutputStream.toString())));
+				fileOutputStream.write(printGrid(pi.getPageable().getPageFormat(0),
+						new StringBuffer(byteArrayOutputStream.toString()), view));
 				fileOutputStream.close();
 			}
 			catch(Exception exception)
@@ -2065,7 +2072,9 @@ public void exportPostScriptFileMenuItem_ActionPerformed()
 				CommandManager.getInstance().execute("RepaintWorkspace");
 			}
 		}
-	}.start();
+	};
+	// Copy the current view to prevent changes to it during thread run. 
+	new MyOwnPostScriptExportingThread(new ViewState(null, ViewState.getInstance())).start();
 }
 /**
  * Comment
@@ -6839,6 +6848,7 @@ public void preferences___MenuItem_ActionPerformed() {
  */
 public void spreadsheetMenuItemActionPerformed() {
 	SpreadsheetInspector spreadsheet = getSpreadsheetInspector();
+	spreadsheet.setDsId(Group.getRoot().getDsId());
 	spreadsheet.setLocationRelativeTo(this);
 	spreadsheet.setVisible(true);
 }
@@ -6851,8 +6861,7 @@ public SpreadsheetInspector getSpreadsheetInspector() {
 	return spreadsheet;
 }
 
-public byte[] printGrid(PageFormat pageFormat, StringBuffer stringBuffer) {
-		ViewState view = ViewState.getInstance();
+public byte[] printGrid(PageFormat pageFormat, StringBuffer stringBuffer, ViewState view) {
 						
 		int pageWidth = (int)pageFormat.getImageableWidth();
 		int pageHeight = (int)pageFormat.getImageableHeight();
@@ -7000,8 +7009,14 @@ public void printAsPostScriptMenuItem_ActionPerformed()
 	if(pi == null)
 		return;
 	
-	new Thread()
-	{
+	class MyOwnPostScriptPrintingThread extends Thread {
+		
+		private ViewState view = null;
+		
+		public MyOwnPostScriptPrintingThread(ViewState view) {
+			this.view = view;
+		}
+		
 		public void run()
 		{
 			boolean showGrid = Settings.getInstance().getShowGrid();
@@ -7088,9 +7103,9 @@ public void printAsPostScriptMenuItem_ActionPerformed()
 			    }
 
 //				print grid
-				ByteArrayInputStream byteArrayInputStream =
-						new ByteArrayInputStream(
-							printGrid(pi.getPageable().getPageFormat(0), new StringBuffer(byteArrayOutputStream.toString())));
+				ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(
+							printGrid(pi.getPageable().getPageFormat(0),
+									new StringBuffer(byteArrayOutputStream.toString()), view));
 
 				byteArrayOutputStream = null;
 
@@ -7117,7 +7132,10 @@ public void printAsPostScriptMenuItem_ActionPerformed()
 				CommandManager.getInstance().execute("RepaintWorkspace");
 			}
 		}
-	}.start();
+	};
+
+	// Copy the current view to prevent changes to it during thread run. 
+	new MyOwnPostScriptPrintingThread(new ViewState(null, ViewState.getInstance())).start();
 }
 /**
  * Comment

@@ -426,53 +426,59 @@ public void createRecord(String name, String type, boolean relative) {
 	double scale = view.getScale();
 	int posX = drawingSurface.getPressedX();
 	int posY = drawingSurface.getPressedY();
-	
-	UndoManager.getInstance().startMacroAction();
-	
-	for (int n = 0; n < names.length; n++) {
-		String recordName = names[n];
-		
-		String errmsg = checkRecordName(recordName, null, true);
-		if (errmsg != null && isErrorMessage(errmsg)) {
-			continue;
-		}
-		
-		if (relative) {
-			String parentName = drawingSurface.getViewGroup().getAbsoluteName();
-			if (parentName.length()>0)
-				recordName = parentName + Constants.GROUP_SEPARATOR + recordName;
-		}
-		
-		VDBRecordData recordData = VDBData.getNewVDBRecordData(
-				DataProvider.getInstance().getDbdDB(), type, recordName);
-		if (recordData==null) {
-			com.cosylab.vdct.Console.getInstance().println("o) Interal error: failed to create record "+recordName+" ("+type+")!");
-			continue;
-		}
 
-		int recPosX = (int)((posX + view.getRx()) / scale);
-		int recPosY = (int)((posY + view.getRy()) / scale);
+	UndoManager undoManager = UndoManager.getInstance(id);
 
-		Record record = new Record(null, recordData, recPosX, recPosY);
-		Point move = record.getMoveInsideView();
-		record.move(move.x, move.y);
-		
-		posX += view.getGridSize() * 2;  
-		posY += view.getGridSize() * 2;
-		drawingSurface.setPressedMousePos(posX, posY);
-		
-		Group.getRoot().addSubObject(recordName, record, true);
-		
-		if (Settings.getInstance().getSnapToGrid())
-			record.snapToGrid();
+	try {
+		undoManager.startMacroAction();
 
-		UndoManager.getInstance().addAction(new CreateAction(record));
+		for (int n = 0; n < names.length; n++) {
+			String recordName = names[n];
+
+			String errmsg = checkRecordName(recordName, null, true);
+			if (errmsg != null && isErrorMessage(errmsg)) {
+				continue;
+			}
+
+			if (relative) {
+				String parentName = drawingSurface.getViewGroup().getAbsoluteName();
+				if (parentName.length()>0)
+					recordName = parentName + Constants.GROUP_SEPARATOR + recordName;
+			}
+
+			VDBRecordData recordData = VDBData.getNewVDBRecordData(id,
+					DataProvider.getInstance().getDbdDB(), type, recordName);
+			if (recordData==null) {
+				com.cosylab.vdct.Console.getInstance().println("o) Interal error: failed to create record "+recordName+" ("+type+")!");
+				continue;
+			}
+
+			int recPosX = (int)((posX + view.getRx()) / scale);
+			int recPosY = (int)((posY + view.getRy()) / scale);
+
+			Record record = new Record(null, recordData, recPosX, recPosY);
+			Point move = record.getMoveInsideView();
+			record.move(move.x, move.y);
+
+			posX += view.getGridSize() * 2;  
+			posY += view.getGridSize() * 2;
+			drawingSurface.setPressedMousePos(posX, posY);
+
+			Group.getRoot().addSubObject(recordName, record, true);
+
+			if (Settings.getInstance().getSnapToGrid())
+				record.snapToGrid();
+
+			undoManager.addAction(new CreateAction(record));
+		}
+	} catch (Exception exception) {
+        exception.printStackTrace();
+	} finally { 
+		undoManager.stopMacroAction();
+
+		//drawingSurface.setModified(true);
+		drawingSurface.repaint();
 	}
-	
-    UndoManager.getInstance().stopMacroAction();
-
-	//drawingSurface.setModified(true);
-	drawingSurface.repaint();
 }
 /**
  * Insert the method's description here.
@@ -541,7 +547,7 @@ public void delete() {
 
 	try	{
 	
-		UndoManager.getInstance().startMacroAction();
+		UndoManager.getInstance(id).startMacroAction();
 
 		VisibleObject obj;
 		Enumeration selected = view.getSelectedObjects().elements();
@@ -556,7 +562,7 @@ public void delete() {
 			else
 			{
 				obj.destroy();
-				UndoManager.getInstance().addAction(new DeleteAction(obj));
+				UndoManager.getInstance(id).addAction(new DeleteAction(obj));
 			}
 			
 		}
@@ -567,7 +573,7 @@ public void delete() {
 	}
 	finally
 	{
-		UndoManager.getInstance().stopMacroAction();
+		UndoManager.getInstance(id).stopMacroAction();
 	}
 
 	view.deselectAll();
@@ -622,7 +628,7 @@ public void group(String groupName) {
 		}
 	}
 
-	UndoManager.getInstance().addAction(composedAction);
+	UndoManager.getInstance(id).addAction(composedAction);
 
 	//g = (Group)Group.getRoot().findObject(groupName, true);
 	if ((g!=null) && (n!=0)) {
@@ -832,7 +838,7 @@ public void pasteAtPosition(int pX, int pY) {
 		}
 	}
 
-	UndoManager.getInstance().addAction(composedAction);
+	UndoManager.getInstance(id).addAction(composedAction);
 
 	drawingSurface.getViewGroup().manageLinks(true);
 	//recopy objects for multiple paste
@@ -850,7 +856,7 @@ public void print() {}
  */
 public void redo() {
 	ViewState.getInstance(id).deselectAll();
-	UndoManager.getInstance().redo();
+	UndoManager.getInstance(id).redo();
 	drawingSurface.repaint();
 }
 /**
@@ -891,7 +897,7 @@ public void rename(java.lang.String oldName, java.lang.String newName) {
 		Flexible flex = (Flexible)obj;
 		if (flex.rename(newName))
 		{
-			UndoManager.getInstance().addAction(new RenameAction(flex, oldName, newName));
+			UndoManager.getInstance(id).addAction(new RenameAction(flex, oldName, newName));
 			
 			view.deselectObject((VisibleObject)obj);
 			drawingSurface.getViewGroup().manageLinks(true);
@@ -933,7 +939,7 @@ public void morph(java.lang.String name, String newType) {
 	if (oldObject instanceof Record)
 	{
 		try {
-			UndoManager.getInstance().startMacroAction();
+			UndoManager.getInstance(id).startMacroAction();
 		
 			Record record = (Record)oldObject;
 			
@@ -941,19 +947,19 @@ public void morph(java.lang.String name, String newType) {
 			
 			if (record.morph(newType))
 			{	
-				UndoManager.getInstance().addAction(new MorphAction(record, oldRecordData, record.getRecordData()));
+				UndoManager.getInstance(id).addAction(new MorphAction(record, oldRecordData, record.getRecordData()));
 			
 				view.deselectObject((VisibleObject)oldObject);
 				drawingSurface.repaint();
 			}
 		} finally {
-			UndoManager.getInstance().stopMacroAction();
+			UndoManager.getInstance(id).stopMacroAction();
 		}
 	}
 	else if (oldObject instanceof Template)
 	{
 		try {
-			UndoManager.getInstance().startMacroAction();
+			UndoManager.getInstance(id).startMacroAction();
 		
 			Template template = (Template)oldObject;
 			
@@ -961,13 +967,13 @@ public void morph(java.lang.String name, String newType) {
 			
 			if (template.morph(newType))
 			{	
-				UndoManager.getInstance().addAction(new MorphTemplateAction(template, oldTemplateData, template.getTemplateData()));
+				UndoManager.getInstance(id).addAction(new MorphTemplateAction(template, oldTemplateData, template.getTemplateData()));
 			
 				view.deselectObject((VisibleObject)oldObject);
 				drawingSurface.repaint();
 			}
 		} finally {
-			UndoManager.getInstance().stopMacroAction();
+			UndoManager.getInstance(id).stopMacroAction();
 		}
 	}
 }
@@ -992,7 +998,7 @@ public void save(java.io.File file) throws IOException {
  {
  	// create a new
  	// id = basename
-	data = new VDBTemplate(file.getName(), file.getAbsolutePath());
+	data = new VDBTemplate(id, file.getName(), file.getAbsolutePath());
 	
 	data.setPorts(new Hashtable());
 	data.setPortsV(new Vector());
@@ -1022,7 +1028,7 @@ public void save(java.io.File file) throws IOException {
  
  // if ok
  drawingSurface.setModified(false);
- UndoManager.getInstance().prepareAfterSaving();
+ UndoManager.getInstance(id).prepareAfterSaving();
 
  // !!!
  VisualDCT.getInstance().updateLoadLabel();	
@@ -1216,7 +1222,7 @@ public void snapToGrid(boolean state) {
  */
 public void undo() {
 	ViewState.getInstance(id).deselectAll();
-	UndoManager.getInstance().undo();
+	UndoManager.getInstance(id).undo();
 	drawingSurface.repaint();
 }
 /**
@@ -1269,7 +1275,7 @@ public void ungroup() {
 		}
 	}
 
-	UndoManager.getInstance().addAction(composedAction);
+	UndoManager.getInstance(id).addAction(composedAction);
 	
 	drawingSurface.getViewGroup().manageLinks(true);
 	drawingSurface.repaint();

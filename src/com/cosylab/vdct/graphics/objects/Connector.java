@@ -204,7 +204,7 @@ public Connector(String id, LinkManagerObject parent, OutLink outlink, InLink in
 	}
 
 	// boundaries check
-	ViewState view = ViewState.getInstance(getRootContainerId());
+	ViewState view = ViewState.getInstance(getDsId());
 	if (getX() < 0)
 		setX(0);
 	else if (getX() > view.getWidth())
@@ -246,7 +246,7 @@ public Connector addConnector() {
 	if (inlink!=null) inlinkStr = inlink.getID();
 	Connector connector = new Connector(id, (LinkManagerObject)getParent(), this, getInput());
 	getParent().addSubObject(id, connector);
-	UndoManager.getInstance().addAction(new CreateConnectorAction(connector, inlinkStr, outlinkStr));
+	UndoManager.getInstance(getDsId()).addAction(new CreateConnectorAction(connector, inlinkStr, outlinkStr));
 	return connector;
 }
 /**
@@ -271,7 +271,7 @@ public void bypass() {
 		setInput(null);
 		setOutput(null, outlink);
 		
-		UndoManager.getInstance().addAction(new DeleteConnectorAction(this, inlinkStr, outlinkStr));
+		UndoManager.getInstance(getDsId()).addAction(new DeleteConnectorAction(this, inlinkStr, outlinkStr));
 	}
 }
 /**
@@ -282,7 +282,7 @@ public void bypass() {
  * @param dy int
  */
 public boolean checkMove(int dx, int dy) {
-	ViewState view = ViewState.getInstance(getRootContainerId());
+	ViewState view = ViewState.getInstance(getDsId());
 
 	if ((getX()<-dx) || (getY()<-dy) || 
 		(getX()>(view.getWidth()-getWidth()-dx)) || (getY()>(view.getHeight()-getHeight()-dy)) /*||
@@ -314,7 +314,7 @@ public void destroy() {
 		String outlinkStr = "";
 		if (inlink!=null) inlinkStr=inlink.getID();
 		if (outlink!=null) outlinkStr=outlink.getID();
-		UndoManager.getInstance().addAction(new DeleteConnectorAction(this, inlinkStr, outlinkStr));
+		UndoManager.getInstance(getDsId()).addAction(new DeleteConnectorAction(this, inlinkStr, outlinkStr));
 		
 		setInput(null);
 		setOutput(null, outlink);
@@ -343,7 +343,7 @@ public void disconnect(Linkable disconnector) {
 protected void draw(java.awt.Graphics g, boolean hilited) {
 	if (disconnected) return;
 	
-	ViewState view = ViewState.getInstance(getRootContainerId());
+	ViewState view = ViewState.getInstance(getDsId());
 
 	int rwidth = getRwidth();
 	int rheight = getRheight();
@@ -352,7 +352,7 @@ protected void draw(java.awt.Graphics g, boolean hilited) {
 	
     boolean zoom = (view.getScale() < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this);
 	
-	if (!DsManager.getDrawingSurface(getRootContainerId()).isPrinting()) {
+	if (!DsManager.getDrawingSurface(getDsId()).isPrinting()) {
 		// clipping
 		if ((!(rrx>view.getViewWidth()) || (rry>view.getViewHeight())
 		    || ((rrx+rwidth)<0) || ((rry+rheight)<0))) {

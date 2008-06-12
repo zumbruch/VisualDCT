@@ -70,7 +70,7 @@ public void accept(Visitor visitor) {
  */
 protected void draw(Graphics g, boolean hilited) {
 
-	ViewState view = ViewState.getInstance(getRootContainerId());
+	ViewState view = ViewState.getInstance(getDsId());
 	
 	double Rscale = view.getScale();
 	boolean zoom = (Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this) && !getParent().isZoomRepaint();

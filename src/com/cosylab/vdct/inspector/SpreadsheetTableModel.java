@@ -52,6 +52,8 @@ import com.cosylab.vdct.vdb.CommentProperty;
  */
 public class SpreadsheetTableModel extends AbstractTableModel implements PropertyTableModel {
 
+	protected Object dsId = null;
+
 	protected String dataType = null;
 	protected String typeSign = null;
 	
@@ -79,14 +81,15 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 	private static final String templateType = "T"; 
 	private static final String unknownType = "U";
     
-	public SpreadsheetTableModel(String dataType, Vector displayData, Vector loadedData)
+	public SpreadsheetTableModel(Object dsId, String dataType, Vector displayData, Vector loadedData)
 			throws IllegalArgumentException {
 			
   		if (displayData == null || displayData.size() == 0) {
   			throw new IllegalArgumentException("inspectables must not be empty or null");
   		}
 		  		
-		this.dataType = dataType;
+		this.dsId = dsId;
+  		this.dataType = dataType;
 		inspectables = new Inspectable[displayData.size()];
 		displayData.copyInto(inspectables); 
         propertiesRowCount = inspectables.length;
@@ -210,7 +213,7 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 	
 	public void deleteRows(int[] rows) {
 		try	{
-			UndoManager.getInstance().startMacroAction();
+			UndoManager.getInstance(dsId).startMacroAction();
 
 			Inspectable inspectable = null;
 			for (int r = 0; r < rows.length; r++) {
@@ -218,13 +221,13 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 				if (inspectable instanceof VisibleObject) {
 					VisibleObject visible = (VisibleObject)inspectable;
 					visible.destroy();
-					UndoManager.getInstance().addAction(new DeleteAction(visible));
+					UndoManager.getInstance(dsId).addAction(new DeleteAction(visible));
 				}
 			}
 		} catch (Exception exception) {
 			// Nothing.
 		} finally {
-			UndoManager.getInstance().stopMacroAction();
+			UndoManager.getInstance(dsId).stopMacroAction();
 		}
 		DsManager.getDrawingSurface().repaint();
 	}

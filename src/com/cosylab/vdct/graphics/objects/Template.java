@@ -70,6 +70,7 @@ import com.cosylab.vdct.inspector.NameProperty;
 import com.cosylab.vdct.undo.ChangeTemplatePropertyAction;
 import com.cosylab.vdct.undo.CreateTemplatePropertyAction;
 import com.cosylab.vdct.undo.DeleteTemplatePropertyAction;
+import com.cosylab.vdct.undo.MoveFieldUpAction;
 import com.cosylab.vdct.undo.UndoManager;
 import com.cosylab.vdct.util.StringUtils;
 import com.cosylab.vdct.vdb.CommentProperty;
@@ -191,7 +192,7 @@ public class Template
 	 */
 	protected void draw(Graphics g, boolean hilited)
 	{
-		ViewState view = ViewState.getInstance(getRootContainerId());
+		ViewState view = ViewState.getInstance(getDsId());
 	
 		double Rscale = getRscale();
 		boolean zoom = Rscale < 1.0 && view.isZoomOnHilited() && view.isHilitedObject(this);
@@ -458,7 +459,7 @@ public class Template
 	 */
 	public boolean checkMove(int dx, int dy)
 	{
-		ViewState view = ViewState.getInstance(getRootContainerId());
+		ViewState view = ViewState.getInstance(getDsId());
 	
 		if ((getX()<-dx) || (getY()<-dy) || 
 			(getX()>(view.getWidth()-getWidth()-dx)) || (getY()>(view.getHeight()-getHeight()-dy)))
@@ -783,7 +784,7 @@ public class Template
  */
 public VisibleObject hiliteComponentsCheck(int x, int y) {
 
-	ViewState view = ViewState.getInstance(getRootContainerId());
+	ViewState view = ViewState.getInstance(getDsId());
 	VisibleObject spotted = null;
 	
 	Enumeration e = subObjectsV.elements();
@@ -1323,7 +1324,7 @@ public InspectableProperty  addProperty(String key, String value) {
 	}
 	templateData.addProperty(key, value);
 
-	UndoManager.getInstance().addAction(new CreateTemplatePropertyAction(this, key, value));
+	UndoManager.getInstance(getDsId()).addAction(new CreateTemplatePropertyAction(this, key, value));
 
 	updateTemplateFields();
 	InspectorManager.getInstance().updateObject(this);
@@ -1367,7 +1368,7 @@ public void addProperty()
 				{
 					templateData.addProperty(reply, nullString);
 	
-					com.cosylab.vdct.undo.UndoManager.getInstance().addAction(
+					UndoManager.getInstance(getDsId()).addAction(
 							new CreateTemplatePropertyAction(this, reply, nullString));
 	
 					updateTemplateFields();
@@ -1398,7 +1399,7 @@ public void propertyChanged(InspectableProperty property)
 	// just override value
 	templateData.getProperties().put(property.getName(), property.getValue());
 
-	com.cosylab.vdct.undo.UndoManager.getInstance().addAction(
+	UndoManager.getInstance(getDsId()).addAction(
 		new ChangeTemplatePropertyAction(this, property.getName(), property.getValue(), oldValue));
 
 	updateTemplateFields();
@@ -1414,7 +1415,7 @@ public void removeProperty(InspectableProperty property)
 {
 	templateData.removeProperty(property.getName());
 	
-	com.cosylab.vdct.undo.UndoManager.getInstance().addAction(
+	UndoManager.getInstance(getDsId()).addAction(
 					new DeleteTemplatePropertyAction(this, property.getName(), property.getValue()));
 
 	updateTemplateFields();
@@ -1465,7 +1466,7 @@ public void renameProperty(InspectableProperty property)
 				templateData.addProperty(reply, value);
 				composedAction.addAction(new CreateTemplatePropertyAction(this, reply, value));
 
-				com.cosylab.vdct.undo.UndoManager.getInstance().addAction(composedAction);
+				UndoManager.getInstance(getDsId()).addAction(composedAction);
 
 				updateTemplateFields();
 				InspectorManager.getInstance().updateObject(this);
@@ -1627,7 +1628,7 @@ public void fixMacrosOnCopy(String prevGroup, String group) {
 			
 				
 			// fix only selected
-			if (!ViewState.getInstance(getRootContainerId()).isSelected(selectableObject))
+			if (!ViewState.getInstance(getDsId()).isSelected(selectableObject))
 				continue;
 			
 			// fix ports...
@@ -2208,7 +2209,7 @@ public void moveFieldDown(Field field) {
 		revalidateFieldsPosition();
 	}
 	com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
-	com.cosylab.vdct.undo.UndoManager.getInstance().addAction(new com.cosylab.vdct.undo.MoveFieldDownAction(ef));
+	UndoManager.getInstance(getDsId()).addAction(new com.cosylab.vdct.undo.MoveFieldDownAction(ef));
 	//InspectorManager.getInstance().updateObject(this);
 }
 /**
@@ -2242,7 +2243,7 @@ public void moveFieldUp(Field field) {
 	}
 	
 	com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
-	com.cosylab.vdct.undo.UndoManager.getInstance().addAction(new com.cosylab.vdct.undo.MoveFieldUpAction(ef));
+	UndoManager.getInstance(getDsId()).addAction(new MoveFieldUpAction(ef));
 	//InspectorManager.getInstance().updateObject(this);
 }
 
@@ -2305,7 +2306,7 @@ public void setTemplateInstance(VDBTemplateInstance templateInstance)
  */
 public Object[] getTargets() {
 	
-	Stack tis = DsManager.getDrawingSurface(getRootContainerId()).getTemplateStack();
+	Stack tis = DsManager.getDrawingSurface(getDsId()).getTemplateStack();
 
 	Enumeration templates = VDBData.getTemplates().keys();
 	ArrayList al = new ArrayList(VDBData.getTemplates().size());

@@ -71,7 +71,7 @@ import com.cosylab.vdct.graphics.objects.VisibleObject;
  */
 public class Inspector extends JDialog implements InspectableObjectsListener, InspectorInterface, WindowListener, ChangeListener {
 	
-	private Object rootGroupId = null;
+	private Object dsId = null;
 	
 	private JLabel ivjCommentLabel = null;
 	private CommentTextArea ivjCommentTextArea = null;
@@ -115,9 +115,9 @@ public Inspector() {
  * Inspector constructor comment.
  * @param owner java.awt.Frame
  */
-public Inspector(Frame owner, Object rootGroupId) {
+public Inspector(Frame owner, Object dsId) {
 	super(owner);
-	this.rootGroupId = rootGroupId;
+	this.dsId = dsId;
 	initialize();
 }
 
@@ -436,7 +436,7 @@ private JButton getCenterOnScreenButton() {
                 public void actionPerformed(ActionEvent e) {
                     if (inspectedObject != null) {
                         if (inspectedObject instanceof VisibleObject) {
-                            DsManager.getDrawingSurface(rootGroupId).centerObject((VisibleObject) inspectedObject);
+                            DsManager.getDrawingSurface(dsId).centerObject((VisibleObject) inspectedObject);
                         }
                     }
                 }
@@ -481,7 +481,7 @@ private javax.swing.JTable getScrollPaneTable() {
 		try {
 			tableModel = new InspectorTableModel(this);
 
-			ivjScrollPaneTable = new InspectorTable(tableModel, InspectorManager.getInstance());
+			ivjScrollPaneTable = new InspectorTable(dsId, tableModel, InspectorManager.getInstance());
 			getTableScrollPane().setColumnHeaderView(ivjScrollPaneTable.getTableHeader());
 			// this caused visibility icon problems when scrolling
 			//getTableScrollPane().getViewport().setScrollMode(JViewport.BACKINGSTORE_SCROLL_MODE); 
@@ -680,8 +680,8 @@ public void inspectObject(Inspectable object, boolean raise) {
 	{
 		if (object instanceof VisibleObject) {
 			VisibleObject visible = (VisibleObject)object;
-		    ViewState.getInstance(visible.getRootContainerId()).setAsHilited(visible);
-		    DsManager.getDrawingSurface(rootGroupId).repaint(true);
+		    ViewState.getInstance(visible.getDsId()).setAsHilited(visible);
+		    DsManager.getDrawingSurface(dsId).repaint(true);
 		}
 	}
 }
@@ -786,7 +786,7 @@ public void updateObjectList() {
 
 		JComboBox combo = getObjectComboBox();
 		if (combo.getItemCount()>0) combo.removeAllItems();		// !!!
-		objs = com.cosylab.vdct.DataProvider.getInstance().getInspectable();
+		objs = com.cosylab.vdct.DataProvider.getInstance().getInspectable(dsId);
 		Enumeration e = objs.elements();
 		while (e.hasMoreElements()) {
 			combo.addItem(e.nextElement());
@@ -815,8 +815,8 @@ public void windowActivated(java.awt.event.WindowEvent e) {
 	InspectorManager.getInstance().fucusGained(this);
 	if (inspectedObject != null) {
 	    if (inspectedObject instanceof VisibleObject) {
-	        ViewState.getInstance(rootGroupId).setAsHilited((VisibleObject) inspectedObject);
-		    DsManager.getDrawingSurface(rootGroupId).repaint(true);
+	        ViewState.getInstance(dsId).setAsHilited((VisibleObject) inspectedObject);
+		    DsManager.getDrawingSurface(dsId).repaint(true);
 	    }
 	}
 }
@@ -840,8 +840,8 @@ public void windowClosing(java.awt.event.WindowEvent e) {}
 public void windowDeactivated(java.awt.event.WindowEvent e) {
     if (inspectedObject != null) {
 	    if (inspectedObject instanceof VisibleObject) {
-	        ViewState.getInstance(rootGroupId).setAsHilited(null);
-		    DsManager.getDrawingSurface(rootGroupId).repaint(true);
+	        ViewState.getInstance(dsId).setAsHilited(null);
+		    DsManager.getDrawingSurface(dsId).repaint(true);
 	    }
 	}
 }
@@ -930,6 +930,10 @@ private void initializeTabs(ArrayList tabs)
 		}
 		// TBD: set the last mode of the object (now it will always switch to the first one) !!!
 	}
+}
+
+public Object getDsId() {
+    return dsId;
 }
 
 }

@@ -62,9 +62,9 @@ public class SpreadsheetColumnViewModel extends SpreadsheetSplitViewModel implem
 	 * @param loadedData
 	 * @throws IllegalArgumentException
 	 */
-	public SpreadsheetColumnViewModel(String dataType, Vector displayData,
+	public SpreadsheetColumnViewModel(Object dsId, String dataType, Vector displayData,
 			Vector loadedData) throws IllegalArgumentException {
-		super(dataType, displayData, loadedData);
+		super(dsId, dataType, displayData, loadedData);
 		columnModel = new DefaultTableColumnModel();
 		columnModel.setColumnSelectionAllowed(true);
 		refreshColumns();

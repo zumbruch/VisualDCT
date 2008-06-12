@@ -29,6 +29,8 @@ package com.cosylab.vdct.vdb;
  */
 
 public interface Commentable {
+	
+	//Object getDsId();
 	/**
 	 * Returns the name.
 	 * @return String

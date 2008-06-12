@@ -53,7 +53,7 @@ public class UndoManager implements DsEventListener {
 	
 	private final int lowerbound = -1;
 	
-	protected Object rootGroupId = null;
+	protected Object dsId = null;
 	
 	private int pos;
 	private int first, last; 
@@ -73,8 +73,8 @@ public class UndoManager implements DsEventListener {
 /**
  * UndoManager constructor comment.
  */
-protected UndoManager(Object rootGroupId) {
-	this.rootGroupId = rootGroupId;
+protected UndoManager(Object dsId) {
+	this.dsId = dsId;
 	macroActionListeners = new Vector();
 	bufferSize = Constants.UNDO_STEPS_TO_REMEMBER;
 	actions = new ActionObject[bufferSize];
@@ -133,7 +133,7 @@ public void addAction(ActionObject action) {
 	}
 
 	//System.out.println("New action: "+action.getDescription());
-	DsManager.getDrawingSurface(rootGroupId).setModified(true);
+	DsManager.getDrawingSurface(dsId).setModified(true);
 
 	if (pos==lowerbound) pos=last=increment(pos);
 	else {
@@ -185,6 +185,10 @@ public static UndoManager getInstance() {
 	return instance;
 }
 
+public static UndoManager getInstance(Object dsId) {
+    return (UndoManager)instances.get(dsId);
+}
+
 /**
  * This method was created in VisualAge.
  * @return int
@@ -222,7 +226,7 @@ public void redo() {
 		fireMacroActionStop();
 		
 		//System.out.println("Redo: "+actions[pos].getDescription());
-		DsManager.getDrawingSurface(rootGroupId).setModified(true);
+		DsManager.getDrawingSurface(dsId).setModified(true);
 		updateMenuItems();
 		monitor = m;
 		setModification();
@@ -313,7 +317,7 @@ public void undo() {
 		
 		//System.out.println("Undo: "+actions[pos].getDescription());
 		pos=decrement(pos);
-		DsManager.getDrawingSurface(rootGroupId).setModified(true);
+		DsManager.getDrawingSurface(dsId).setModified(true);
 		updateMenuItems();
 		monitor = m;
 		setModification();
@@ -329,7 +333,7 @@ public void undo() {
  *
  */
 private void setModification() {
-	DsManager.getDrawingSurface(rootGroupId).setModified(pos != savedOnPos || bufferSizeReached);
+	DsManager.getDrawingSurface(dsId).setModified(pos != savedOnPos || bufferSizeReached);
 }
 
 /**

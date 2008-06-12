@@ -56,7 +56,7 @@ public class ViewState implements DsEventListener {
 	protected static int x0 = 0;				// origin
 	protected static int y0 = 0;
 
-	protected Object rootGroupId = null;
+	protected Object dsId = null;
 	
 	protected double drx = 0.0;				// precise translation (from origin)
 	protected double dry = 0.0;
@@ -88,8 +88,8 @@ public class ViewState implements DsEventListener {
  * Insert the method's description here.
  * Creation date: (21.12.2000 21:00:31)
  */
-public ViewState(Object rootGroupId) {
-	this.rootGroupId = rootGroupId;
+public ViewState(Object dsId) {
+	this.dsId = dsId;
 	selectedObjects = new Vector();
 	blinkingObjects = new Vector();
 }
@@ -98,8 +98,8 @@ public ViewState(Object rootGroupId) {
  * Creation date: (3.5.2001 13:31:07)
  * @param original com.cosylab.vdct.graphics.ViewState
  */
-public ViewState(Object rootGroupId, ViewState original) {
-	this(rootGroupId);
+public ViewState(Object dsId, ViewState original) {
+	this(dsId);
 	
 	//this.x0 = original.x0;
 	//this.y0 = original.y0;
@@ -203,8 +203,8 @@ public static ViewState getInstance() {
 	return instance;
 }
 
-public static ViewState getInstance(Object rootGroupId) {
-    return (ViewState)instances.get(rootGroupId);
+public static ViewState getInstance(Object dsId) {
+    return (ViewState)instances.get(dsId);
 }
 
 /**
@@ -365,7 +365,7 @@ public void set(com.cosylab.vdct.graphics.objects.Group group) {
 		setInstance(group.getLocalView());
 	else
 	{
-		ViewState copy = new ViewState(group.getRootContainerId(), this);
+		ViewState copy = new ViewState(group.getDsId(), this);
 		group.setLocalView(copy);
 		setInstance(copy);
 	}
@@ -398,7 +398,7 @@ public boolean setAsHilited(VisibleObject object, boolean zoomOnHilited) {
     this.zoomOnHilited = zoomOnHilited;
     
     if(zoomOnHilited) {
-    	DsManager.getDrawingSurface(object.getRootContainerId()).repaint();
+    	DsManager.getDrawingSurface(object.getDsId()).repaint();
         hilitedObjects.clear();
         if (hilitedObject != null) {
             hilitedObjects.add(hilitedObject);
@@ -489,14 +489,14 @@ public void setFlat(boolean newFlat) {
  */
 public static void setInstance(ViewState newInstance) {
     // Ignore checks for all instances with no id, as they are only temporary.
-	if (newInstance.rootGroupId != null) {
-		ViewState mapInstance = (ViewState)instances.get(newInstance.rootGroupId);
+	if (newInstance.dsId != null) {
+		ViewState mapInstance = (ViewState)instances.get(newInstance.dsId);
 		if (mapInstance == null) {
 			System.err.println("Warning: view instance set while not yet registered, registering it.");
 
-			System.out.println("instance id: " + instance.rootGroupId); 
-			System.out.println("new instance id: " + newInstance.rootGroupId); 
-			instances.put(newInstance.rootGroupId, newInstance);
+			System.out.println("instance id: " + instance.dsId); 
+			System.out.println("new instance id: " + newInstance.dsId); 
+			instances.put(newInstance.dsId, newInstance);
 		}
     }
 	instance = newInstance;

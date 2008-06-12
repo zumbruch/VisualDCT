@@ -28,21 +28,30 @@ package com.cosylab.vdct.graphics.objects;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.awt.*;
-import java.util.*;
+import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Vector;
+
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+
 import com.cosylab.vdct.Constants;
-import com.cosylab.vdct.graphics.*;
-import com.cosylab.vdct.vdb.*;
 import com.cosylab.vdct.dbd.DBDConstants;
-
-import com.cosylab.vdct.inspector.*;
-
-import com.cosylab.vdct.graphics.popup.*;
-import javax.swing.*;
-import java.awt.event.*;
-
-import com.cosylab.vdct.events.*;
-import com.cosylab.vdct.events.commands.*;
+import com.cosylab.vdct.events.CommandManager;
+import com.cosylab.vdct.events.commands.LinkCommand;
+import com.cosylab.vdct.graphics.ViewState;
+import com.cosylab.vdct.graphics.popup.PopUpMenu;
+import com.cosylab.vdct.graphics.popup.Popupable;
+import com.cosylab.vdct.inspector.Inspectable;
+import com.cosylab.vdct.undo.UndoManager;
+import com.cosylab.vdct.vdb.LinkProperties;
+import com.cosylab.vdct.vdb.VDBFieldData;
+import com.cosylab.vdct.vdb.VDBPort;
+import com.cosylab.vdct.vdb.VDBTemplateMacro;
 
 /**
  * Insert the type's description here.
@@ -564,7 +573,7 @@ public boolean manageLink_(VDBFieldData field) {
  */
 public void moveConnectors(int dx, int dy) {
 	
-  ViewState view = ViewState.getInstance(getRootContainerId());
+  ViewState view = ViewState.getInstance(getDsId());
   Enumeration e = subObjectsV.elements();
   Connector con; Object obj;
   while (e.hasMoreElements()) {
@@ -892,7 +901,7 @@ public void moveFieldDown(Field field) {
 		revalidateFieldsPosition();
 	}
 	com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
-	com.cosylab.vdct.undo.UndoManager.getInstance().addAction(new com.cosylab.vdct.undo.MoveFieldDownAction(field));
+	UndoManager.getInstance(getDsId()).addAction(new com.cosylab.vdct.undo.MoveFieldDownAction(field));
 }
 /**
  * Insert the method's description here.
@@ -914,7 +923,7 @@ public void moveFieldUp(Field field) {
 	}
 	
 	com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
-	com.cosylab.vdct.undo.UndoManager.getInstance().addAction(new com.cosylab.vdct.undo.MoveFieldUpAction(field));
+	UndoManager.getInstance(getDsId()).addAction(new com.cosylab.vdct.undo.MoveFieldUpAction(field));
 }
 
 /**

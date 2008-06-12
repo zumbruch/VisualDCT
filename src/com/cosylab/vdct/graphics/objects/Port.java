@@ -83,14 +83,14 @@ public class Port extends VisibleObject implements Descriptable, Movable, OutLin
 			else if (action.equals(removePortString))
 			{
 				destroy();
-				ViewState.getInstance(Port.this.getRootContainerId()).deselectObject(Port.this);
-				com.cosylab.vdct.undo.UndoManager.getInstance().addAction(new com.cosylab.vdct.undo.DeleteAction(Port.this));
+				ViewState.getInstance(Port.this.getDsId()).deselectObject(Port.this);
+				UndoManager.getInstance(Port.this.getDsId()).addAction(new com.cosylab.vdct.undo.DeleteAction(Port.this));
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
 			else if (action.equals(removePortDefString))
 			{
 				data.getTemplate().removePort(getName());
-				ViewState.getInstance(Port.this.getRootContainerId()).deselectObject(Port.this);
+				ViewState.getInstance(Port.this.getDsId()).deselectObject(Port.this);
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
 			else if (action.equals(constantString)) {
@@ -204,7 +204,7 @@ public void accept(Visitor visitor) {}
  * @param dy int
  */
 public boolean checkMove(int dx, int dy) {
-	ViewState view = ViewState.getInstance(getRootContainerId());
+	ViewState view = ViewState.getInstance(getDsId());
 
 	if ((getX()<-dx) || (getY()<-dy) || 
 		(getX()>(view.getWidth()-getWidth()-dx)) || (getY()>(view.getHeight()-getHeight()-dy)))
@@ -269,7 +269,7 @@ public void disconnect(Linkable disconnector) {
  */
 protected void draw(java.awt.Graphics g, boolean hilited) {
 
-	ViewState view = ViewState.getInstance(getRootContainerId());
+	ViewState view = ViewState.getInstance(getDsId());
 	
 	double Rscale = view.getScale();
 	boolean zoom = (Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this);
@@ -1028,14 +1028,14 @@ public Connector addConnector() {
 
 		Connector connector = new Connector(id, (LinkManagerObject)((EPICSLink)inlink).getParent(), this, getInput());
 		inlinkParent.addSubObject(id, connector);
-		UndoManager.getInstance().addAction(new CreateConnectorAction(connector, inlinkStr, outlinkStr));
+		UndoManager.getInstance(getDsId()).addAction(new CreateConnectorAction(connector, inlinkStr, outlinkStr));
 		return connector;
 	}
 }
 
 public void setTextPositionNorth(boolean isTextPositionNorth) {
     this.textPositionNorth = isTextPositionNorth;
-    DsManager.getDrawingSurface(getRootContainerId()).repaint();
+    DsManager.getDrawingSurface(getDsId()).repaint();
 }
 
 public boolean isTextPositionNorth() {

@@ -32,6 +32,7 @@ import java.awt.Component;
 import java.util.regex.Pattern;
 
 import com.cosylab.vdct.inspector.InspectableProperty;
+import com.cosylab.vdct.undo.UndoManager;
 import com.cosylab.vdct.util.StringUtils;
 
 /**
@@ -40,7 +41,9 @@ import com.cosylab.vdct.util.StringUtils;
  * @author 
  */
 public class CommentProperty implements com.cosylab.vdct.inspector.InspectableProperty {
+
 	Commentable record;
+	
 	private static String helpString = "\""+com.cosylab.vdct.db.DBConstants.commentString+"\" will be added automatically";
 /**
  * CommentProperty constructor comment.
@@ -180,7 +183,7 @@ public void setValue(String value) {
 	
 		// do not store undo for <null> -> ""
 		if (!(record.getComment()==null && (newValue==null || newValue.length()==0)))
-			com.cosylab.vdct.undo.UndoManager.getInstance().addAction(
+			UndoManager.getInstance().addAction(
 				new com.cosylab.vdct.undo.CommentChangeAction(this, record.getComment(), newValue)
 		);
 

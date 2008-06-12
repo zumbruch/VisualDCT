@@ -117,7 +117,7 @@ public EPICSInLink(ContainerObject parent, com.cosylab.vdct.vdb.VDBFieldData fie
 protected void draw(Graphics g, boolean hilited) {
 //	super.draw(g, hilited);
 	
-	ViewState view = ViewState.getInstance(getRootContainerId());
+	ViewState view = ViewState.getInstance(getDsId());
 
 	double Rscale = view.getScale();
 	boolean zoom = (Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this);

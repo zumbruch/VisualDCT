@@ -210,7 +210,7 @@ private com.cosylab.vdct.graphics.objects.EPICSVarOutLink.PopupMenuHandler creat
 	protected void draw(Graphics g, boolean hilited) {
 		if (inlink!=null)
 		{
-			ViewState view = ViewState.getInstance(getRootContainerId());
+			ViewState view = ViewState.getInstance(getDsId());
 			
 			double Rscale = view.getScale();
 			boolean zoom = (Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this);
@@ -460,7 +460,7 @@ public Connector addConnector() {
 		if (inlink!=null) inlinkStr = inlink.getID();
 		Connector connector = new Connector(id, (LinkManagerObject)getParent(), this, getInput());
 		getParent().addSubObject(id, connector);
-		UndoManager.getInstance().addAction(new CreateConnectorAction(connector, inlinkStr, outlinkStr));
+		UndoManager.getInstance(getDsId()).addAction(new CreateConnectorAction(connector, inlinkStr, outlinkStr));
 		return connector;
 	}
 }

@@ -88,8 +88,7 @@ public class RdbDataMapper {
 		Exception exception = null;
 		try {
 			if (loadDbId(dataId)) {
-				data = new DBData(dataId.toString(), dataId.getFileName());
-				data.getTemplateData().setDbDescriptor(dataId);
+				data = new DBData(dataId, dataId.toString(), dataId.getFileName());
 				
 				loadRecords(data);
 				loadTemplates(data);

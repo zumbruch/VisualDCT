@@ -62,9 +62,9 @@ public class SpreadsheetViewModel extends SpreadsheetTableModel {
     private boolean showAllRows = true;
     private boolean groupColumnsByGuiGroup = true;    
 	
-	public SpreadsheetViewModel(String dataType, Vector displayData,
+	public SpreadsheetViewModel(Object dsId, String dataType, Vector displayData,
 			Vector loadedData) throws IllegalArgumentException {
-		super(dataType, displayData, loadedData);
+		super(dsId, dataType, displayData, loadedData);
 		refreshTables();
 	}
 	

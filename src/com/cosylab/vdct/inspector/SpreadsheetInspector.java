@@ -80,6 +80,8 @@ import com.cosylab.vdct.vdb.VDBTemplate;
 public class SpreadsheetInspector extends JDialog
 		implements HelpDisplayer, ActionListener, InspectableObjectsListener, MacroActionEventListener {
 
+	private Object dsId = null;
+	
 	private HashMap inspectables = null;
 	private HashMap displayedInspectables = null;
 	
@@ -632,14 +634,14 @@ public class SpreadsheetInspector extends JDialog
     private SpreadsheetTable getTable(String type, Vector displayData, Vector loadedData, JScrollPane scrollPane) {
 
     	SpreadsheetTable table = new SpreadsheetTable(this, scrollPane, displayData);
-		SpreadsheetColumnViewModel tableModel = new SpreadsheetColumnViewModel(type, displayData, loadedData);
+		SpreadsheetColumnViewModel tableModel = new SpreadsheetColumnViewModel(dsId, type, displayData, loadedData);
 
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_Z, ActionEvent.CTRL_MASK, false);
 		table.registerKeyboardAction(this, undoString, keyStroke, JComponent.WHEN_FOCUSED);
         keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_Y, ActionEvent.CTRL_MASK, false);
         table.registerKeyboardAction(this, redoString, keyStroke, JComponent.WHEN_FOCUSED);
     	
-    	table.setTransferHandler(new InspectorTableClipboardAdapter(table));
+    	table.setTransferHandler(new InspectorTableClipboardAdapter(dsId, table));
     	table.setDragEnabled(true);
     	
     	InspectorCellEditor editor = new InspectorCellEditor(tableModel, this);
@@ -755,10 +757,10 @@ public class SpreadsheetInspector extends JDialog
 		inspectables = new HashMap();
 		displayedInspectables = new HashMap();
 		
-		fillTable(inspectables, DataProvider.getInstance().getInspectable());
+		fillTable(inspectables, DataProvider.getInstance().getInspectable(dsId));
 		fillTable(displayedInspectables, ViewState.getInstance().getSelectedObjects());
 		if (displayedInspectables.isEmpty()) {
-			fillTable(displayedInspectables, DataProvider.getInstance().getInspectable());
+			fillTable(displayedInspectables, DataProvider.getInstance().getInspectable(dsId));
 		}
 	}
 	
@@ -818,4 +820,12 @@ public class SpreadsheetInspector extends JDialog
     	}
     	return null;
     }
+
+	public Object getDsId() {
+		return dsId;
+	}
+
+	public void setDsId(Object dsId) {
+		this.dsId = dsId;
+	}
 }

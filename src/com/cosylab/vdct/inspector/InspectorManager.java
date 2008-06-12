@@ -53,13 +53,14 @@ public class InspectorManager implements DsEventListener, HelpDisplayer {
 	
 	private static Frame parent = null;
 
-	protected Object rootGroupId = null;
+	protected Object dsId = null;
 	
 	private Vector inspectors;
 /**
  * InspectorManager constructor comment.
  */
-protected InspectorManager(Object rootGroupId) {
+protected InspectorManager(Object dsId) {
+	this.dsId = dsId;
 	inspectors = new Vector();
 }
 /**
@@ -68,7 +69,7 @@ protected InspectorManager(Object rootGroupId) {
  * @return com.cosylab.vdct.inspector.InspectorInterface
  */
 private InspectorInterface createInspector() {
-	Inspector inspector = new Inspector(parent, rootGroupId);
+	Inspector inspector = new Inspector(parent, dsId);
 	com.cosylab.vdct.DataProvider.getInstance().addInspectableListener(inspector);
 	return inspector;
 }

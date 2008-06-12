@@ -40,12 +40,12 @@ public class InspectorTable extends JTable {
 
 	private PropertyTableModel tableModel = null;
 	private HelpDisplayer helpDisplayer = null;
-
+	
 	/**
 	 * @param tableModel
 	 * @param helpDisplayer
 	 */
-	public InspectorTable(PropertyTableModel tableModel,
+	public InspectorTable(Object dsId, PropertyTableModel tableModel,
 			HelpDisplayer helpDisplayer) {
 		super();
 		this.tableModel = tableModel;
@@ -61,7 +61,7 @@ public class InspectorTable extends JTable {
 		setRowHeight(17);
 		
 		// enable clipboard actions
-		new InspectorTableClipboardAdapter(this);
+		new InspectorTableClipboardAdapter(dsId, this);
 		setRowSelectionAllowed(true);
 		// note: selection is possible only on name column
 		setColumnSelectionAllowed(false);

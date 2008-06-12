@@ -69,6 +69,7 @@ import com.cosylab.vdct.inspector.SpreadsheetColumnData;
 import com.cosylab.vdct.inspector.SpreadsheetRowOrder;
 import com.cosylab.vdct.inspector.SpreadsheetTableViewData;
 import com.cosylab.vdct.inspector.SpreadsheetTableViewRecord;
+import com.cosylab.vdct.undo.UndoManager;
 import com.cosylab.vdct.util.DBDEntry;
 import com.cosylab.vdct.util.StringUtils;
 import com.cosylab.vdct.vdb.VDBFieldData;
@@ -220,7 +221,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 	 * @param dy int
 	 */
 	public boolean checkMove(int dx, int dy) {
-		ViewState view = ViewState.getInstance(getRootContainerId());
+		ViewState view = ViewState.getInstance(getDsId());
 
 		if ((getX()<-dx) || (getY()<-dy) || 
 				(getX()>(view.getWidth()-getWidth()-dx)) || (getY()>(view.getHeight()-getHeight()-dy)))
@@ -274,8 +275,9 @@ private void addSubObjectToLayout(VisibleObject object) {
 		}
 
 
-		boolean monitoring = com.cosylab.vdct.undo.UndoManager.getInstance().isMonitor();
-		com.cosylab.vdct.undo.UndoManager.getInstance().setMonitor(false);
+		UndoManager undoManager = UndoManager.getInstance(getDsId());
+		boolean monitoring = undoManager.isMonitor();
+		undoManager.setMonitor(false);
 		try
 		{
 
@@ -291,7 +293,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 		catch (Exception e) {}
 		finally
 		{
-			com.cosylab.vdct.undo.UndoManager.getInstance().setMonitor(monitoring);
+			undoManager.setMonitor(monitoring);
 		}
 
 		return g;
@@ -323,7 +325,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 			if ((vo instanceof Record) ||
 					(vo instanceof Group)) {
 				vo.destroy();
-				com.cosylab.vdct.undo.UndoManager.getInstance().addAction(
+				com.cosylab.vdct.undo.UndoManager.getInstance(getDsId()).addAction(
 						new com.cosylab.vdct.undo.DeleteAction(vo)
 				);
 			}
@@ -340,7 +342,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 	 */
 	protected void draw(Graphics g, boolean hilited) {
 
-		ViewState view = ViewState.getInstance(getRootContainerId());
+		ViewState view = ViewState.getInstance(getDsId());
 
 		double Rscale = getRscale();
 		boolean zoom = Rscale < 1.0 && view.isZoomOnHilited() && view.isHilitedObject(this);
@@ -514,7 +516,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 	 * @return com.cosylab.vdct.graphics.ViewState
 	 */
 	public ViewState getLocalView() {
-		if (localView==null) localView = new ViewState(getRootContainerId());
+		if (localView==null) localView = new ViewState(getDsId());
 		return localView;
 	}
 	/**
@@ -605,7 +607,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 
 	public void initializeLayout() {
 
-		ViewState view = ViewState.getInstance(getRootContainerId());
+		ViewState view = ViewState.getInstance(getDsId());
 		boolean grid = com.cosylab.vdct.Settings.getInstance().getSnapToGrid();
 		com.cosylab.vdct.Settings.getInstance().setSnapToGrid(false);     // avoid fixes in getX()
 		try
@@ -880,7 +882,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 	 */
 	public boolean selectAllComponents() {
 
-		ViewState view = ViewState.getInstance(getRootContainerId());
+		ViewState view = ViewState.getInstance(getDsId());
 		boolean anyNew = false;
 
 		Enumeration e = subObjectsV.elements();
@@ -911,7 +913,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 		if (y1>y2)
 		{ t=y1; y1=y2; y2=t; }
 
-		ViewState view = ViewState.getInstance(getRootContainerId());
+		ViewState view = ViewState.getInstance(getDsId());
 		boolean anyNew = false;
 
 		Enumeration e = subObjectsV.elements();
@@ -2257,8 +2259,8 @@ private void addSubObjectToLayout(VisibleObject object) {
 		this.id = id;
 	}
 	
-    public Object getRootContainerId() {
-    	Object rootId = getParent() != null ? getParent().getRootContainerId() : id;
+    public Object getDsId() {
+    	Object rootId = getParent() != null ? getParent().getDsId() : id;
     	if (rootId == null) {
     		System.out.println("Warning: returning null for root container id.");
     	}

@@ -29,10 +29,9 @@ package com.cosylab.vdct.vdb;
  */
 
 import java.awt.Component;
-import java.util.regex.Pattern;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.regex.Pattern;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -47,6 +46,7 @@ import com.cosylab.vdct.inspector.ChangableVisibility;
 import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.inspector.InspectorManager;
 import com.cosylab.vdct.undo.DescriptionChangeAction;
+import com.cosylab.vdct.undo.UndoManager;
 
 /**
  * RO property of macro represented on HL (template instance is parent)
@@ -164,7 +164,7 @@ public class VDBMacro implements InspectableProperty, Descriptable, ChangableVis
 		
 		if (this.description==null || !this.description.equals(description))
 		{
-			com.cosylab.vdct.undo.UndoManager.getInstance().addAction(
+			UndoManager.getInstance(template.getDsId()).addAction(
 					new DescriptionChangeAction(this, this.description, description));
 			update = true;
 		}

@@ -262,7 +262,7 @@ public class FindPanel extends JPanel
     	
         if (selectedObject instanceof VisibleObject) {
         	VisibleObject visible = (VisibleObject)selectedObject;
-            DsManager.getDrawingSurface(visible.getRootContainerId()).centerObject(visible);
+            DsManager.getDrawingSurface(visible.getDsId()).centerObject(visible);
         }
     }
 
@@ -700,7 +700,7 @@ public class FindPanel extends JPanel
                 		    for (int i = 0; i < selected.length; i++) {
                 		        if (selected[i] instanceof VisibleObject) {
                 		        	VisibleObject visible = (VisibleObject)selected[i]; 
-                		            ViewState.getInstance(visible.getRootContainerId()).setAsSelected(visible);
+                		            ViewState.getInstance(visible.getDsId()).setAsSelected(visible);
                 		        }
                 		    }
                 		    if (selected.length > 0) {

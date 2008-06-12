@@ -47,7 +47,7 @@ public class DataProvider {
 	// DBD
 	private DBDData dbdDB = null;
 	
-	private Vector inspectableListeners = null;
+	private HashMap inspectableListeners = null;
 	
 	// list of all loaded DBDs
 	private Vector loadedDBDs = null;
@@ -65,7 +65,7 @@ public class DataProvider {
  * DataProvider constructor comment.
  */
 protected DataProvider() {
-	inspectableListeners = new Vector();
+	inspectableListeners = new HashMap();
 	loadedDBDs = new Vector();
 	currentDBDs = new Vector();
 
@@ -144,8 +144,15 @@ public void addLinkTypeConfig(Hashtable table)
  * @param listener com.cosylab.vdct.inspector.InspectableObjectsListener
  */
 public void addInspectableListener(InspectableObjectsListener listener) {
-	if (!inspectableListeners.contains(listener))
-		inspectableListeners.addElement(listener);
+	Vector listeners = (Vector)inspectableListeners.get(listener.getDsId());
+	if (listeners == null) {
+		listeners = new Vector();
+		inspectableListeners.put(listener.getDsId(), listeners);
+	}
+	
+	if (!listeners.contains(listener)) {
+		listeners.addElement(listener);
+	}
 }
 /**
  * Insert the method's description here.
@@ -153,9 +160,13 @@ public void addInspectableListener(InspectableObjectsListener listener) {
  * @param object com.cosylab.vdct.inspector.Inspectable
  */
 public void fireInspectableObjectAdded(Inspectable object) {
-	Enumeration e = inspectableListeners.elements();
-	while (e.hasMoreElements())
-		((InspectableObjectsListener)e.nextElement()).inspectableObjectAdded(object);
+	Vector listeners = (Vector)inspectableListeners.get(object.getDsId());
+	if (listeners != null) {
+		Enumeration e = listeners.elements();
+		while (e.hasMoreElements()) {
+			((InspectableObjectsListener)e.nextElement()).inspectableObjectAdded(object);
+		}
+	}
 }
 /**
  * Insert the method's description here.
@@ -163,9 +174,13 @@ public void fireInspectableObjectAdded(Inspectable object) {
  * @param object com.cosylab.vdct.inspector.Inspectable
  */
 public void fireInspectableObjectRemoved(Inspectable object) {
-	Enumeration e = inspectableListeners.elements();
-	while (e.hasMoreElements())
-		((InspectableObjectsListener)e.nextElement()).inspectableObjectRemoved(object);
+	Vector listeners = (Vector)inspectableListeners.get(object.getDsId());
+	if (listeners != null) {
+		Enumeration e = listeners.elements();
+		while (e.hasMoreElements()) {
+			((InspectableObjectsListener)e.nextElement()).inspectableObjectRemoved(object);
+		}
+	}
 }
 /**
  * Insert the method's description here.
@@ -180,9 +195,9 @@ public com.cosylab.vdct.dbd.DBDData getDbdDB() {
  * Creation date: (8.1.2001 22:03:39)
  * @return java.util.Vector
  */
-public Vector getInspectable() {
+public Vector getInspectable(Object dsId) {
 	Vector objs = new Vector();
-	getInspectable(Group.getRoot(), objs, true);
+	getInspectable(Group.getRoot(dsId), objs, true);
 	return objs;
 }
 /**
@@ -229,8 +244,10 @@ public Object[] getRecordTypes() {
  * @param listener com.cosylab.vdct.inspector.InspectableObjectsListener
  */
 public void removeInspectableListener(InspectableObjectsListener listener) {
-	if (inspectableListeners.contains(listener))
-		inspectableListeners.removeElement(listener);
+	Vector listeners = (Vector)inspectableListeners.get(listener.getDsId());
+	if (listeners != null && listeners.contains(listener)) {
+		listeners.removeElement(listener);
+	}
 }
 /**
  * Insert the method's description here.

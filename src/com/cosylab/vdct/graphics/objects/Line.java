@@ -200,7 +200,7 @@ public void destroy()
 
 protected void draw(Graphics g, boolean hilited)
 {
-	ViewState view = ViewState.getInstance(getRootContainerId());
+	ViewState view = ViewState.getInstance(getDsId());
 
 	int offsetX = view.getRx();
 	int offsetY = view.getRy();

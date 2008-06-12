@@ -122,7 +122,7 @@ public Connector addConnector() {
 	if (inlink!=null) inlinkStr = inlink.getID();
 	Connector connector = new Connector(id, (LinkManagerObject)getParent(), this, getInput());
 	getParent().addSubObject(id, connector);
-	UndoManager.getInstance().addAction(new CreateConnectorAction(connector, inlinkStr, outlinkStr));
+	UndoManager.getInstance(getDsId()).addAction(new CreateConnectorAction(connector, inlinkStr, outlinkStr));
 	return connector;
 }
 /**

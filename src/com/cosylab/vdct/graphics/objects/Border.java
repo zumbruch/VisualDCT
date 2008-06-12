@@ -185,7 +185,7 @@ public class Border extends ContainerObject implements Selectable, SaveObject,
 	 */
 	public VisibleObject hiliteComponentsCheck(int x, int y) {
 
-		ViewState view = ViewState.getInstance(getRootContainerId());
+		ViewState view = ViewState.getInstance(getDsId());
 		VisibleObject spotted = null;
 		
 		Enumeration e = subObjectsV.elements();

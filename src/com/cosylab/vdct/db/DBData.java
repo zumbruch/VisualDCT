@@ -61,9 +61,9 @@ public class DBData {
 /**
  * DBDData constructor comment.
  */
-public DBData(String id, String fileName) {
+public DBData(Object dsId, String id, String fileName) {
 	
-	templateData = new DBTemplate(id, fileName);
+	templateData = new DBTemplate(dsId, id, fileName);
 
 	structure = new Vector();
 	

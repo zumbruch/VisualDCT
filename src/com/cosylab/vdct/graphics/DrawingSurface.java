@@ -351,7 +351,7 @@ public DrawingSurface(DbDescriptor id, InternalFrameInterface displayer) {
  * @param action com.cosylab.vdct.undo.ActionObject
  */
 public void addAction(ActionObject action) {
-	UndoManager.getInstance().addAction(action);
+	UndoManager.getInstance(id).addAction(action);
 }
 /**
  * Insert the method's description here.
@@ -767,7 +767,7 @@ public void initializeWorkspace() {
 	if (isModified())
 		reloadTemplate(Group.getEditingTemplateData());
 
-	UndoManager.getInstance().reset();
+	UndoManager.getInstance(id).reset();
 
 	InspectorManager.getInstance().disposeAllInspectors();
 
@@ -788,7 +788,7 @@ public void initializeWorkspace() {
 	
 	//Console.getInstance().flush();
 	
-	UndoManager.getInstance().setMonitor(true);
+	UndoManager.getInstance(id).setMonitor(true);
 	blockNavigatorRedrawOnce = false;
 	createNavigatorImage();
 	baseView();
@@ -970,7 +970,7 @@ public void mouseClicked(MouseEvent e) {
 
 					// cancel action
 					if (e.getButton() == MouseEvent.BUTTON3)
-						UndoManager.getInstance().undo();
+						UndoManager.getInstance(id).undo();
 			}
 			else if((e.getClickCount() >= 1) && (grBox != null))
 			{
@@ -981,7 +981,7 @@ public void mouseClicked(MouseEvent e) {
 
 					// cancel action
 					if (e.getButton() == MouseEvent.BUTTON3)
-						UndoManager.getInstance().undo();
+						UndoManager.getInstance(id).undo();
 			}
 			else if((e.getClickCount() >= 1) && (grTextBox != null))
 			{
@@ -995,7 +995,7 @@ public void mouseClicked(MouseEvent e) {
 
 					// cancel action
 					if (e.getButton() == MouseEvent.BUTTON3)
-						UndoManager.getInstance().undo();
+						UndoManager.getInstance(id).undo();
 			}
 			else if (e.getClickCount()==1 && e.getButton()==MouseEvent.BUTTON3)
 			{
@@ -1217,7 +1217,7 @@ private void createTextBox()
 		(GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
 
 	grTextBox = manager.getManager().createTextBox();
-	UndoManager.getInstance().addAction(new CreateAction(grTextBox));
+	UndoManager.getInstance(id).addAction(new CreateAction(grTextBox));
 }
 
 private void createBox()
@@ -1226,7 +1226,7 @@ private void createBox()
 		(GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
 
 	grBox = manager.getManager().createBox();
-	UndoManager.getInstance().addAction(new CreateAction(grBox));
+	UndoManager.getInstance(id).addAction(new CreateAction(grBox));
 }
 
 private void createLine()
@@ -1235,7 +1235,7 @@ private void createLine()
 		(GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
 
 	grLine = manager.getManager().createLine();
-	UndoManager.getInstance().addAction(new CreateAction(grLine));
+	UndoManager.getInstance(id).addAction(new CreateAction(grLine));
 }
 
 	/**
@@ -1716,7 +1716,7 @@ public void mouseReleased(MouseEvent e) {
 													o.getX() - o.getMarkedX(),
 													o.getY() - o.getMarkedY()));
 					}
-				UndoManager.getInstance().addAction(composedAction);
+				UndoManager.getInstance(id).addAction(composedAction);
 			}
 			else
 			{
@@ -1926,7 +1926,7 @@ public boolean importFields(File file, boolean ignoreLinkFields)
 	
 		try
 		{
-			dbData = DBResolver.resolveDB(file.getAbsolutePath());
+			dbData = DBResolver.resolveDB(id, file.getAbsolutePath());
 		} 
 		catch(Exception e)
 		{
@@ -1971,7 +1971,7 @@ public boolean importFields(File file, boolean ignoreLinkFields)
 		            if (!imported)
 		            {
 		                imported = true;
-		                UndoManager.getInstance().startMacroAction();
+		                UndoManager.getInstance(id).startMacroAction();
 		            }
 		            
 		            // do the override
@@ -1988,7 +1988,7 @@ public boolean importFields(File file, boolean ignoreLinkFields)
     finally {
         
         if (imported)
-            UndoManager.getInstance().stopMacroAction();
+            UndoManager.getInstance(id).stopMacroAction();
         
 		restoreCursor();
     }
@@ -2013,7 +2013,7 @@ public boolean importBorder(File file)
 	
 		try
 		{
-			dbData = DBResolver.resolveDB(file.getAbsolutePath());
+			dbData = DBResolver.resolveDB(id, file.getAbsolutePath());
 		} 
 		catch(Exception e)
 		{
@@ -2036,7 +2036,7 @@ public boolean importBorder(File file)
 		applyVisualDataOfGraphicsObjects(dbData, border);
 		rootGroup.addSubObject(border.getName(), border);
 		
-		UndoManager.getInstance().addAction(new CreateAction(border));
+		UndoManager.getInstance(id).addAction(new CreateAction(border));
 		
   		blockNavigatorRedrawOnce = false;
    		createNavigatorImage();
@@ -2098,7 +2098,7 @@ public boolean open(InputStream is, File file, boolean importDB, boolean importT
 		if (!importDB)
 			initializeWorkspace();
 		*/
-		UndoManager.getInstance().setMonitor(false);
+		UndoManager.getInstance(id).setMonitor(false);
 
 		// load
 		DBData dbData = null;
@@ -2112,9 +2112,9 @@ public boolean open(InputStream is, File file, boolean importDB, boolean importT
 		try
 		{
 			if (is != null)
-				dbData = DBResolver.resolveDB(is);
+				dbData = DBResolver.resolveDB(id, is);
 			else
-				dbData = DBResolver.resolveDB(file.getAbsolutePath());
+				dbData = DBResolver.resolveDB(id, file.getAbsolutePath());
 		} 
 		catch(Throwable e)
 		{
@@ -2124,7 +2124,7 @@ public boolean open(InputStream is, File file, boolean importDB, boolean importT
 		// check for sucess
 		if ((dbData == null) || !dbdData.consistencyCheck(dbData))
 		{
-			UndoManager.getInstance().setMonitor(true);
+			UndoManager.getInstance(id).setMonitor(true);
 			restoreCursor();
 			return false;
 		}
@@ -2132,7 +2132,7 @@ public boolean open(InputStream is, File file, boolean importDB, boolean importT
 		// check is DTYP fields are defined before any DBF_INPUT/DBF_OUTPUT fields...
 		DBData.checkDTYPfield(dbData, dbdData);
 
-		VDBData vdbData = VDBData.generateVDBData(dbdData, dbData);
+		VDBData vdbData = VDBData.generateVDBData(id, dbdData, dbData);
 
 		if (importToCurrentGroup)
 		{
@@ -2151,7 +2151,7 @@ public boolean open(InputStream is, File file, boolean importDB, boolean importT
 				
 				// import directly to workspace (current view group)
 				// imported list needed for undo action
-				HashMap importedList = applyVisualData(true, viewGroup, dbData, vdbData);
+				HashMap importedList = applyVisualData(id, true, viewGroup, dbData, vdbData);
 
 				// find 'first' template defined in this file (not via includes)
 				VDBTemplate template = (VDBTemplate)VDBData.getTemplates().get(dbData.getTemplateData().getId());
@@ -2218,7 +2218,7 @@ public boolean open(InputStream is, File file, boolean importDB, boolean importT
 
 		///!!! TODO put somewhere in try-finally block
 		restoreCursor();
-		UndoManager.getInstance().setMonitor(true);
+		UndoManager.getInstance(id).setMonitor(true);
 
 		((RdbDataId)id).setFileName(dbData.getTemplateData().getFileName());
 		
@@ -2241,7 +2241,7 @@ public boolean loadRdbDbGroup(JFrame guiContext) {
 
 	try {
 		setCursor(hourCursor);
-		UndoManager.getInstance().setMonitor(false);
+		UndoManager.getInstance(id).setMonitor(false);
 
 		dbData = RdbInstance.getInstance(guiContext).getRdbInterface().loadRdbData((RdbDataId)id);
 
@@ -2249,16 +2249,15 @@ public boolean loadRdbDbGroup(JFrame guiContext) {
 		DBDData dbdData = DataProvider.getInstance().getDbdDB();
 		if ((dbdData == null) || (dbData == null) || !dbdData.consistencyCheck(dbData))
 		{
-			UndoManager.getInstance().setMonitor(true);
+			UndoManager.getInstance(id).setMonitor(true);
 			restoreCursor();
 			return false;
 		}
-		id = dbData.getTemplateData().getDbDescriptor();
 
 		// check is DTYP fields are defined before any DBF_INPUT/DBF_OUTPUT fields...
 		DBData.checkDTYPfield(dbData, dbdData);
 
-		VDBData vdbData = VDBData.generateVDBData(dbdData, dbData);
+		VDBData vdbData = VDBData.generateVDBData(id, dbdData, dbData);
 		
 		Group.getClipboard().clear();
 		Group vg = viewGroup;
@@ -2272,7 +2271,7 @@ public boolean loadRdbDbGroup(JFrame guiContext) {
 
 			// import directly to workspace (current view group)
 			// imported list needed for undo action
-			HashMap importedList = applyVisualData(true, viewGroup, dbData, vdbData);
+			HashMap importedList = applyVisualData(id, true, viewGroup, dbData, vdbData);
 
 			// find 'first' template defined in this file (not via includes)
 			VDBTemplate template = (VDBTemplate)VDBData.getTemplates().get(dbData.getTemplateData().getId());
@@ -2308,7 +2307,7 @@ public boolean loadRdbDbGroup(JFrame guiContext) {
 		success = false;
 	} finally {
 		restoreCursor();
-		UndoManager.getInstance().setMonitor(true);
+		UndoManager.getInstance(id).setMonitor(true);
 		// free db memory	    
 		dbData = null;
 		System.gc();
@@ -2444,7 +2443,7 @@ public static void applyPortAndMacroConnectors(DBData dbData, VDBData vdbData) {
 /**
  * Insert the method's description here.
  */
-public static HashMap applyVisualData(boolean importDB, Group group, DBData dbData, VDBData vdbData)
+public static HashMap applyVisualData(Object dsId, boolean importDB, Group group, DBData dbData, VDBData vdbData)
 {
  
     if (vdbData==null)
@@ -2890,10 +2889,12 @@ public static HashMap applyVisualData(boolean importDB, Group group, DBData dbDa
 		
 		applyVisualDataOfGraphicsObjects(dbData, rootGroup);
 		if (importDB) {
-		    boolean monitor = UndoManager.getInstance().isMonitor();
-		    UndoManager.getInstance().setMonitor(true);
-		    UndoManager.getInstance().addAction(new ImportAction(importedList, rootGroup));
-		    UndoManager.getInstance().setMonitor(monitor);
+		    UndoManager undoManager = UndoManager.getInstance(dsId);
+			
+			boolean monitor = undoManager.isMonitor();
+			undoManager.setMonitor(true);
+			undoManager.addAction(new ImportAction(importedList, rootGroup));
+			undoManager.setMonitor(monitor);
 		}
 	} catch (Exception e) {
 		com.cosylab.vdct.Console.getInstance().println("Error occured while applying visual data!");
@@ -3049,7 +3050,7 @@ public boolean openDBD(File file, boolean importDBD) throws IOException {
 		DataProvider.getInstance().setDbdDB(dbdData);
 		// TODO:REM
 		//if (viewGroup==null) initializeWorkspace();
-		createNavigatorImage();
+		//createNavigatorImage();
 	}
 
 	// add to list of DBDs
@@ -3881,7 +3882,7 @@ public void createTemplateInstance(String name, String type, boolean relative) {
 	if (Settings.getInstance().getSnapToGrid())
 		templ.snapToGrid();
 
-	UndoManager.getInstance().addAction(new CreateAction(templ));
+	UndoManager.getInstance(id).addAction(new CreateAction(templ));
 
 	//drawingSurface.setModified(true);
 	repaint();
@@ -3959,8 +3960,8 @@ public void templateReloadPostInit()
 
 	// initialize
 	setModified(false);
-	UndoManager.getInstance().reset();
-	UndoManager.getInstance().setMonitor(true);
+	UndoManager.getInstance(id).reset();
+	UndoManager.getInstance(id).setMonitor(true);
 
 	// update opened file
 	if (Group.getEditingTemplateData()==null)
@@ -4202,7 +4203,7 @@ public void createPort(VDBPort vdbPort) {
 
 	getViewGroup().addSubObject(vdbPort.getName(), port);
 
-	UndoManager.getInstance().addAction(new CreateAction(port));
+	UndoManager.getInstance(id).addAction(new CreateAction(port));
 
 	//drawingSurface.setModified(true);
 	repaint();
@@ -4233,7 +4234,7 @@ public Macro createMacro(VDBMacro vdbMacro) {
 
 	getViewGroup().addSubObject(vdbMacro.getName(), macro);
 
-	UndoManager.getInstance().addAction(new CreateAction(macro));
+	UndoManager.getInstance(id).addAction(new CreateAction(macro));
 
 	// repair the links
 	Group.getRoot().manageLinks(true);

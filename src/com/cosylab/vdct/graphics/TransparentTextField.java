@@ -84,7 +84,7 @@ public com.cosylab.vdct.graphics.objects.VisibleObject getOwner() {
  * Creation date: (2.5.2001 9:48:17)
  */
 public int getX() {
-	ViewState view = ViewState.getInstance(owner.getRootContainerId());
+	ViewState view = ViewState.getInstance(owner.getDsId());
 	return (int)((owner.getX()+offsetX)*view.getScale()-view.getRx());
 }
 /**
@@ -93,7 +93,7 @@ public int getX() {
  * @return int
  */
 public int getY() {
-	ViewState view = ViewState.getInstance(owner.getRootContainerId());
+	ViewState view = ViewState.getInstance(owner.getDsId());
 	return (int)((owner.getY()+offsetY)*view.getScale()-view.getRy());
 }
 /**

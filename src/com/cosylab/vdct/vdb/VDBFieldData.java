@@ -24,6 +24,7 @@ import com.cosylab.vdct.inspector.ChangableVisibility;
 import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.inspector.InspectorManager;
 import com.cosylab.vdct.plugin.debug.PluginDebugManager;
+import com.cosylab.vdct.undo.UndoManager;
 import com.cosylab.vdct.util.StringUtils;
 
 /**
@@ -406,7 +407,7 @@ public void updateInspector()
 public void setValue(java.lang.String newValue) {
 
 	if ((value!=null) && !value.equals(newValue))
-		com.cosylab.vdct.undo.UndoManager.getInstance().addAction(
+		UndoManager.getInstance().addAction(
 			new com.cosylab.vdct.undo.FieldValueChangeAction(this, value, newValue)
 		);
 	value = newValue;

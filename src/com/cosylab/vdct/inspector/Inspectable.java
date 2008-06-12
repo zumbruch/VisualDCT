@@ -72,4 +72,6 @@ public java.util.ArrayList getModeNames();
  * @return java.lang.String
  */
 public String toString();
+
+public Object getDsId();
 }

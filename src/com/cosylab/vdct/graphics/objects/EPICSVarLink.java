@@ -152,7 +152,7 @@ public void disconnect(Linkable disconnector) {
 protected void drawOneSided(Graphics g, boolean hilited) {
 	
 
-	ViewState view = ViewState.getInstance(getRootContainerId());
+	ViewState view = ViewState.getInstance(getDsId());
 	double Rscale = view.getScale();
 	boolean zoom = (Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this);
 	
@@ -268,7 +268,7 @@ protected void draw(Graphics g, boolean hilited) {
 		return;
 	}
 
-	ViewState view = ViewState.getInstance(getRootContainerId());
+	ViewState view = ViewState.getInstance(getDsId());
 	
 	double Rscale = view.getScale();
 	boolean zoom = (Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this);

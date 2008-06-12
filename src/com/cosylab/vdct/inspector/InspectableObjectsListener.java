@@ -35,7 +35,6 @@ package com.cosylab.vdct.inspector;
  */
 public interface InspectableObjectsListener {
 /**
- * 
  * @param object com.cosylab.vdct.inspector.Inspectable
  */
 void inspectableObjectAdded(Inspectable object);
@@ -44,4 +43,6 @@ void inspectableObjectAdded(Inspectable object);
  * @param object com.cosylab.vdct.inspector.Inspectable
  */
 void inspectableObjectRemoved(Inspectable object);
+
+Object getDsId();
 }

@@ -28,14 +28,31 @@ package com.cosylab.vdct.vdb;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.util.*;
-import com.cosylab.vdct.db.*;
-import com.cosylab.vdct.dbd.*;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Vector;
+
+import com.cosylab.vdct.Console;
+import com.cosylab.vdct.db.DBData;
+import com.cosylab.vdct.db.DBEntry;
+import com.cosylab.vdct.db.DBException;
+import com.cosylab.vdct.db.DBFieldData;
+import com.cosylab.vdct.db.DBMacro;
+import com.cosylab.vdct.db.DBPort;
+import com.cosylab.vdct.db.DBRecordData;
+import com.cosylab.vdct.db.DBTemplate;
+import com.cosylab.vdct.db.DBTemplateInstance;
+import com.cosylab.vdct.dbd.DBDConstants;
+import com.cosylab.vdct.dbd.DBDData;
+import com.cosylab.vdct.dbd.DBDFieldData;
+import com.cosylab.vdct.dbd.DBDMenuData;
+import com.cosylab.vdct.dbd.DBDRecordData;
 import com.cosylab.vdct.graphics.DrawingSurface;
 import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.objects.Macro;
 import com.cosylab.vdct.graphics.objects.Port;
-import com.cosylab.vdct.Console;
+import com.cosylab.vdct.undo.UndoManager;
 
 /**
  * This type was created in VisualAge.
@@ -209,14 +226,14 @@ public static VDBPort copyVDBPort(VDBPort source) {
  * @param dbd com.cosylab.vdct.dbd.DBDData
  * @param db com.cosylab.vdct.db.DBData
  */
-public static VDBData generateVDBData(DBDData dbd, DBData db) {
+public static VDBData generateVDBData(Object dsId, DBDData dbd, DBData db) {
 	
 
 	if (dbd!=null && db!=null) {
 
 		// generate itself
 		db.getTemplateData().setData(db);
-		return generateTemplate(dbd, db.getTemplateData());
+		return generateTemplate(dsId, dbd, db.getTemplateData());
 
 	}
 	else
@@ -229,14 +246,14 @@ public static VDBData generateVDBData(DBDData dbd, DBData db) {
  * @param dbd com.cosylab.vdct.dbd.DBDData
  * @param db com.cosylab.vdct.db.DBData
  */
-private static VDBData generateVDBDataInternal(DBDData dbd, DBData db) throws DBException {
+private static VDBData generateVDBDataInternal(Object dsId, DBDData dbd, DBData db) throws DBException {
 	
 	VDBData vdb = new VDBData();
 
 	if (dbd!=null && db!=null) {
 
 		// extract templates
-		extractTemplates(dbd, db, vdb);
+		extractTemplates(dsId, dbd, db, vdb);
 		
 		// add records, template instances and entries
 		Enumeration e = db.getStructure().elements();
@@ -246,7 +263,7 @@ private static VDBData generateVDBDataInternal(DBDData dbd, DBData db) throws DB
 			if (obj instanceof DBRecordData)
 			{
 				DBRecordData dbRecord = (DBRecordData)obj;
-				vdb.addRecord(generateVDBRecordData(dbd, dbRecord));
+				vdb.addRecord(generateVDBRecordData(dsId, dbd, dbRecord));
 			}
 			else if (obj instanceof DBTemplateInstance)
 			{
@@ -270,14 +287,14 @@ private static VDBData generateVDBDataInternal(DBDData dbd, DBData db) throws DB
 /**
  * 
  */
-public static void generateRecords(DBDData dbd, DBData db, VDBData vdb) throws DBException
+public static void generateRecords(Object dsId, DBDData dbd, DBData db, VDBData vdb) throws DBException
 {
 	// add records
 	DBRecordData dbRecord;
 	Enumeration e = db.getRecordsV().elements();
 	while (e.hasMoreElements()) {
 		dbRecord = (DBRecordData)(e.nextElement());
-		vdb.addRecord(generateVDBRecordData(dbd, dbRecord));
+		vdb.addRecord(generateVDBRecordData(dsId, dbd, dbRecord));
 	}
 }
 
@@ -334,7 +351,7 @@ public static VDBTemplateInstance generateNewVDBTemplateInstance(String name, VD
 /**
  * 
  */
-public static void extractTemplates(DBDData dbd, DBData db, VDBData vdb)
+public static void extractTemplates(Object dsId, DBDData dbd, DBData db, VDBData vdb)
 {
 	Enumeration e;
 	DBTemplate dbTemplate;
@@ -349,7 +366,7 @@ public static void extractTemplates(DBDData dbd, DBData db, VDBData vdb)
 			continue;
 		}
 		
-		generateTemplate(dbd, dbTemplate);
+		generateTemplate(dsId, dbd, dbTemplate);
 	}
 
 
@@ -358,15 +375,15 @@ public static void extractTemplates(DBDData dbd, DBData db, VDBData vdb)
 /**
  * 
  */
-private static VDBData generateTemplate(DBDData dbd, DBTemplate dbTemplate)
+private static VDBData generateTemplate(Object dsId, DBDData dbd, DBTemplate dbTemplate)
 {
-	VDBTemplate vt = new VDBTemplate(dbTemplate.getId(), dbTemplate.getFileName());
+	Group root = Group.getRoot();
+	
+	VDBTemplate vt = new VDBTemplate(root.getDsId(), dbTemplate.getId(), dbTemplate.getFileName());
 	vt.setComment(dbTemplate.getComment());	
 	vt.setDescription(dbTemplate.getDescription());
 	
 	// generate vt.group / VDB data
-	Group root = Group.getRoot();
-	
 	try
 	{
 	
@@ -376,8 +393,8 @@ private static VDBData generateTemplate(DBDData dbd, DBTemplate dbTemplate)
 	
 		Group.setRoot(vt.getGroup());
 	
-		VDBData vdbData = VDBData.generateVDBDataInternal(dbd, dbTemplate.getData());
-		DrawingSurface.applyVisualData(false, vt.getGroup(), dbTemplate.getData(), vdbData);
+		VDBData vdbData = VDBData.generateVDBDataInternal(dsId, dbd, dbTemplate.getData());
+		DrawingSurface.applyVisualData(dsId, false, vt.getGroup(), dbTemplate.getData(), vdbData);
 		vt.getGroup().unconditionalValidateSubObjects(false);
 
 		Hashtable ports = new Hashtable();
@@ -519,12 +536,12 @@ public static void addPortsAndMacros(DBTemplate dbTemplate, VDBTemplate vt, VDBD
  * @param dbRecord com.cosylab.vdct.db.DBRecordData
  * @param dbdField com.cosylab.vdct.dbd.DBDFieldData
  */
-public static VDBFieldData generateVDBFieldData(DBDData dbd, DBRecordData dbRecord, VDBRecordData vdbRecord, DBDFieldData dbdField) {
+public static VDBFieldData generateVDBFieldData(Object dsId, DBDData dbd, DBRecordData dbRecord, VDBRecordData vdbRecord, DBDFieldData dbdField) {
 
 	VDBFieldData vdbField = new VDBFieldData();
 
-	boolean monitor = com.cosylab.vdct.undo.UndoManager.getInstance().isMonitor();
-	com.cosylab.vdct.undo.UndoManager.getInstance().setMonitor(false);
+	boolean monitor = UndoManager.getInstance(dsId).isMonitor();
+	UndoManager.getInstance(dsId).setMonitor(false);
 
 	vdbField.setType(dbdField.getField_type());
 	vdbField.setName(dbdField.getName());
@@ -582,7 +599,7 @@ public static VDBFieldData generateVDBFieldData(DBDData dbd, DBRecordData dbReco
 
 	vdbField.setRecord(vdbRecord);
 
-	com.cosylab.vdct.undo.UndoManager.getInstance().setMonitor(monitor);
+	UndoManager.getInstance(dsId).setMonitor(monitor);
 	
 	return vdbField;
 }
@@ -592,7 +609,7 @@ public static VDBFieldData generateVDBFieldData(DBDData dbd, DBRecordData dbReco
  * @param dbd com.cosylab.vdct.dbd.DBDData
  * @param dbRecord com.cosylab.vdct.db.DBRecordData
  */
-public static VDBRecordData generateVDBRecordData(DBDData dbd, DBRecordData dbRecord) throws DBException {
+public static VDBRecordData generateVDBRecordData(Object dsId, DBDData dbd, DBRecordData dbRecord) throws DBException {
 
 	DBDRecordData dbdRecord = dbd.getDBDRecordData(dbRecord.getRecord_type());
 	if (dbdRecord==null) {
@@ -615,14 +632,14 @@ public static VDBRecordData generateVDBRecordData(DBDData dbd, DBRecordData dbRe
 		dbdField = (DBDFieldData)(dbdRecord.getFields().get(dbField.getName()));
 		if (dbdField==null)
 			throw new DBException("DBD inconsistency detected! Field '"+dbdRecord.getName()+"."+dbField.getName()+"' is not defined in DBD.");
-		vdbRecord.addField(generateVDBFieldData(dbd, dbRecord, vdbRecord, dbdField));
+		vdbRecord.addField(generateVDBFieldData(dsId, dbd, dbRecord, vdbRecord, dbdField));
 	}
 
 	e = dbdRecord.getFieldsV().elements();
 	while (e.hasMoreElements()) {
 		dbdField = (DBDFieldData)(e.nextElement());
 		if (!vdbRecord.getFields().containsKey(dbdField.getName()))
-			vdbRecord.addField(generateVDBFieldData(dbd, dbRecord, vdbRecord, dbdField));
+			vdbRecord.addField(generateVDBFieldData(dsId, dbd, dbRecord, vdbRecord, dbdField));
 	}
 
 /*  //DBD order
@@ -643,7 +660,7 @@ public static VDBRecordData generateVDBRecordData(DBDData dbd, DBRecordData dbRe
  * @param recordType java.lang.String
  * @param recordName java.lang.String
  */
-public static VDBRecordData getNewVDBRecordData(DBDData dbd, String recordType, String recordName) {
+public static VDBRecordData getNewVDBRecordData(Object dsId, DBDData dbd, String recordType, String recordName) {
 
 	DBDRecordData dbdRecord = dbd.getDBDRecordData(recordType);
 	if (dbdRecord==null) {
@@ -659,7 +676,7 @@ public static VDBRecordData getNewVDBRecordData(DBDData dbd, String recordType, 
 	Enumeration e = dbdRecord.getFieldsV().elements();
 	while (e.hasMoreElements()) {
 		dbdField = (DBDFieldData)(e.nextElement());
-		vdbRecord.addField(generateVDBFieldData(dbd, null, vdbRecord, dbdField));
+		vdbRecord.addField(generateVDBFieldData(dsId, dbd, null, vdbRecord, dbdField));
 	}
 
 	//vdbRecord.updateDTYP(dbd);
@@ -680,9 +697,9 @@ public java.util.Vector getRecords() {
  * @param dbd epics.dbd.DBDData
  * @param dbRecord epics.db.DBRecordData
  */
-public static VDBRecordData morphVDBRecordData(DBDData dbd, VDBRecordData source, String recordType, String recordName) {
+public static VDBRecordData morphVDBRecordData(Object dsId, DBDData dbd, VDBRecordData source, String recordType, String recordName) {
 
-	VDBRecordData vdbRecord = getNewVDBRecordData(dbd, recordType, recordName);
+	VDBRecordData vdbRecord = getNewVDBRecordData(dsId, dbd, recordType, recordName);
 	if (vdbRecord==null) return null;
 	
 	VDBFieldData sourceField;

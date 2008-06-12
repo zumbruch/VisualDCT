@@ -150,7 +150,7 @@ protected void draw(Graphics g, boolean hilited) {
 	if (!isVisible())
 		return;
 
-	ViewState view = ViewState.getInstance(getRootContainerId());
+	ViewState view = ViewState.getInstance(getDsId());
 	
 	double Rscale = view.getScale();
 	boolean zoom = (Rscale < 1.0) && view.isZoomOnHilited() && view.isHilitedObject(this);
@@ -438,7 +438,7 @@ public boolean move(int dx, int dy) {
 
 	boolean moved = false;
 
-	Object id = getRootContainerId();
+	Object id = getDsId();
 	ViewState view = ViewState.getInstance(id);
 	dx = (int)(dx*view.getScale());
 	dy = (int)(dy*view.getScale());

@@ -218,7 +218,7 @@ public void addLink(Linkable link) {
  * @param dy int
  */
 public boolean checkMove(int dx, int dy) {
-	ViewState view = ViewState.getInstance(getRootContainerId());
+	ViewState view = ViewState.getInstance(getDsId());
 
 	if ((getX()<-dx) || (getY()<-dy) || 
 		(getX()>(view.getWidth()-getWidth()-dx)) || (getY()>(view.getHeight()-getHeight()-dy)))
@@ -305,7 +305,7 @@ public void fixEPICSOutLinksOnCopy(String prevGroup, String group) {
 				
 					
 				// fix only selected
-				if (!ViewState.getInstance(getRootContainerId()).isSelected(selectableObject))
+				if (!ViewState.getInstance(getDsId()).isSelected(selectableObject))
 					continue;
 				
 				// fix ports...
@@ -374,7 +374,7 @@ public void disconnect(Linkable disconnector) {
  */
 protected void draw(Graphics g, boolean hilited) {
 
-	ViewState view = ViewState.getInstance(getRootContainerId());
+	ViewState view = ViewState.getInstance(getDsId());
 
     double Rscale = getRscale();
 	boolean zoom = Rscale < 1.0 && view.isZoomOnHilited() && view.isHilitedObject(this);
@@ -654,7 +654,7 @@ public void fieldChanged(VDBFieldData field) {
 	if (repaint) {
 		// do not repaint non-viewing group
 		// might happen in debug mode and any other
-		if (DsManager.getDrawingSurface(getRootContainerId()).getViewGroup() == getParent())
+		if (DsManager.getDrawingSurface(getDsId()).getViewGroup() == getParent())
 		{
 			unconditionalValidation();
 			com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
@@ -1045,7 +1045,7 @@ public Vector getStartPoints() {
  */
 public VisibleObject hiliteComponentsCheck(int x, int y) {
 
-	ViewState view = ViewState.getInstance(getRootContainerId());
+	ViewState view = ViewState.getInstance(getDsId());
 	VisibleObject spotted = null;
 	
 	Enumeration e = subObjectsV.elements();
@@ -1138,7 +1138,7 @@ public boolean selectComponentsCheck(int x1, int y1, int x2, int y2) {
 	if (y1>y2)
 		{ t=y1; y1=y2; y2=t; }
 
-	ViewState view = ViewState.getInstance(getRootContainerId());
+	ViewState view = ViewState.getInstance(getDsId());
 	boolean anyNew = false;
 	
 	Enumeration e = subObjectsV.elements();
@@ -1214,7 +1214,7 @@ public void manageLinks() {
 public boolean morph(java.lang.String newType) {
 	
 	//	copies VDBData
-	VDBRecordData recordData = VDBData.morphVDBRecordData(
+	VDBRecordData recordData = VDBData.morphVDBRecordData(getDsId(),
 				DataProvider.getInstance().getDbdDB(), getRecordData(), newType, getName());
 				
 	if (recordData==null) {
@@ -1478,7 +1478,7 @@ public void rotate() { right=!right; }
  */
 public boolean selectAllComponents() {
 	
-	ViewState view = ViewState.getInstance(getRootContainerId());
+	ViewState view = ViewState.getInstance(getDsId());
 	boolean anyNew = false;
 	
 	Enumeration e = subObjectsV.elements();

@@ -61,9 +61,9 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 	 * @param loadedData
 	 * @throws IllegalArgumentException
 	 */
-	public SpreadsheetSplitViewModel(String dataType, Vector displayData,
+	public SpreadsheetSplitViewModel(Object dsId, String dataType, Vector displayData,
 			Vector loadedData) throws IllegalArgumentException {
-		super(dataType, displayData, loadedData);
+		super(dsId, dataType, displayData, loadedData);
 		//comparator = new SpreadsheetRowComparator(this);
         recentSplitData = new Vector();
 		refreshSplitData();
@@ -381,7 +381,7 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 
 	public void extendCounters(int[] rows, int[] columns) {
 		
-		UndoManager.getInstance().startMacroAction();
+		UndoManager.getInstance(dsId).startMacroAction();
 		for (int c = 0; c < columns.length; c++) {
 			String firstEntry = model[rows[0]][columns[c]].getValue();
 			String secondEntry = model[rows[1]][columns[c]].getValue();
@@ -409,7 +409,7 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 		for (int r = 0; r < rows.length; r++) {
 			fireTableRowsUpdated(rows[r], rows[r]);
 		}
-        UndoManager.getInstance().stopMacroAction();
+        UndoManager.getInstance(dsId).stopMacroAction();
 	}
 	
 	/* (non-Javadoc)

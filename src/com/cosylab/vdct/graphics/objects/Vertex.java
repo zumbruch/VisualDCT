@@ -70,7 +70,7 @@ public void accept(Visitor visitor)
 
 public boolean checkMove(int dx, int dy)
 {
-	ViewState view = ViewState.getInstance(getRootContainerId());
+	ViewState view = ViewState.getInstance(getDsId());
 
 	if((getX() < - dx) || (getY() < - dy)
 		|| (getX() > (view.getWidth() - getWidth() - dx))
@@ -84,7 +84,7 @@ public boolean checkMove(int dx, int dy)
 
 protected void draw(Graphics g, boolean hilited)
 {
-	ViewState view = ViewState.getInstance(getRootContainerId());
+	ViewState view = ViewState.getInstance(getDsId());
 
 	int offsetX = view.getRx();
 	int offsetY = view.getRy();

@@ -87,7 +87,7 @@ public class Macro extends VisibleObject implements Descriptable, Movable, InLin
 			else*/ if (action.equals(removeMacroDefString))
 			{
 				data.getTemplate().removeMacro(getName());
-				ViewState.getInstance(Macro.this.getRootContainerId()).deselectObject(Macro.this);
+				ViewState.getInstance(Macro.this.getDsId()).deselectObject(Macro.this);
 				com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
 			}
 			else if (action.equals(inputString)) {
@@ -194,7 +194,7 @@ public void accept(Visitor visitor) {}
  * @param dy int
  */
 public boolean checkMove(int dx, int dy) {
-	ViewState view = ViewState.getInstance(getRootContainerId());
+	ViewState view = ViewState.getInstance(getDsId());
 
 	if ((getX()<-dx) || (getY()<-dy) || 
 		(getX()>(view.getWidth()-getWidth()-dx)) || (getY()>(view.getHeight()-getHeight()-dy)))
@@ -291,7 +291,7 @@ public void disconnect(Linkable disconnector) {
  */
 protected void draw(java.awt.Graphics g, boolean hilited) {
 
-	ViewState view = ViewState.getInstance(getRootContainerId());
+	ViewState view = ViewState.getInstance(getDsId());
 	
 	double Rscale = getRscale();
 	boolean zoom = Rscale < 1.0 && view.isZoomOnHilited() && view.isHilitedObject(this);
@@ -756,7 +756,7 @@ public int getMode()
 
 public void setTextPositionNorth(boolean isTextPositionNorth) {
     this.textPositionNorth = isTextPositionNorth;
-    DsManager.getDrawingSurface(getRootContainerId()).repaint();
+    DsManager.getDrawingSurface(getDsId()).repaint();
 }
 
 public boolean isTextPositionNorth() {

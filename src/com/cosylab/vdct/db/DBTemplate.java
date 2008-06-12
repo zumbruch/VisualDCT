@@ -36,11 +36,12 @@ import java.util.Vector;
  */
 public class DBTemplate extends DBComment
 {
+	protected Object dsId = null;
+
 	protected String id = null;
 	protected String fileName = null;
 	protected String description = null;
 	
-	protected DbDescriptor dbDescriptor = null;
 
 	protected Hashtable ports = null;
 	protected Vector portsV = null;
@@ -56,8 +57,9 @@ public class DBTemplate extends DBComment
 	/**
 	 * Constructor.
 	 */
-	public DBTemplate(String id, String fileName)
+	public DBTemplate(Object dsId, String id, String fileName)
 	{
+		this.dsId = dsId;
 		this.id=id;
 		this.fileName=fileName;
 
@@ -218,17 +220,7 @@ public class DBTemplate extends DBComment
 		return macrosV;
 	}
 
-	/**
-	 * @return the dbDescriptor
-	 */
-	public DbDescriptor getDbDescriptor() {
-		return dbDescriptor;
-	}
-
-	/**
-	 * @param dbDescriptor the dbDescriptor to set
-	 */
-	public void setDbDescriptor(DbDescriptor dbDescriptor) {
-		this.dbDescriptor = dbDescriptor;
+	public Object getDsId() {
+		return dsId;
 	}
 }

@@ -61,6 +61,8 @@ public class InspectorTableClipboardAdapter extends TransferHandler implements A
      */
     private Clipboard clipboardSystem;
 
+    private Object dsId = null;
+    
     /**
      * Managed table.
      */
@@ -125,8 +127,9 @@ public class InspectorTableClipboardAdapter extends TransferHandler implements A
      * Cut-Copy-Paste and acts as a clipboard listener.
      * @param table table on which to enable to Cut-Copy-Paste actions.
      */
-    public InspectorTableClipboardAdapter(JTable table) {
-        this.table = table;
+    public InspectorTableClipboardAdapter(Object dsId, JTable table) {
+        this.dsId = dsId;
+    	this.table = table;
         
         // register to the table
         int c = JComponent.WHEN_FOCUSED;
@@ -265,7 +268,7 @@ public class InspectorTableClipboardAdapter extends TransferHandler implements A
 
         // undo support (to pack all into one action)
     	try {
-            UndoManager.getInstance().startMacroAction();
+            UndoManager.getInstance(dsId).startMacroAction();
             
             for (int i = 0; i < numOfSelRows; i++) {
                 for (int j = 0; j < numOfSelCols; j++) {
@@ -277,7 +280,7 @@ public class InspectorTableClipboardAdapter extends TransferHandler implements A
                 }
             }
     	} finally {
-	        UndoManager.getInstance().stopMacroAction();
+	        UndoManager.getInstance(dsId).stopMacroAction();
    		}
     }
 
@@ -358,7 +361,7 @@ public class InspectorTableClipboardAdapter extends TransferHandler implements A
 
         // w/ packed undo support
         try {
-   			UndoManager.getInstance().startMacroAction();
+   			UndoManager.getInstance(dsId).startMacroAction();
 
    			for (int i = 0; i < selHeight; i++) {
                 for (int j = 0; j < selWidth; j++) {
@@ -367,7 +370,7 @@ public class InspectorTableClipboardAdapter extends TransferHandler implements A
                 }
             }
     	} finally {
-   	        UndoManager.getInstance().stopMacroAction();
+   	        UndoManager.getInstance(dsId).stopMacroAction();
     	}
     }
     
