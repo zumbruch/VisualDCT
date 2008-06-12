@@ -416,7 +416,7 @@ private void createNavigatorImage() {
 		navigatorView.setScale(nscale);
 	}
 
-	ViewState.setInstance(navigatorView);
+	ViewState.setInstance(id, navigatorView);
 		
 	navigatorGraphics.setColor(Constants.BACKGROUND_COLOR);
 	navigatorGraphics.fillRect(1, 1, navigator.width - 2, navigator.height - 2);
@@ -424,7 +424,7 @@ private void createNavigatorImage() {
 	navigatorGraphics.drawRect(0, 0, navigator.width - 1, navigator.height - 1);
 	viewGroup.paintComponents(navigatorGraphics, false, isFlat());
 
-	ViewState.setInstance(view);
+	ViewState.setInstance(id, view);
 
 	recalculateNavigatorPosition();
 
@@ -748,7 +748,7 @@ private void initializeNavigator() {
 	navigatorSize = new Dimension(-1, -1);
  	navigator = new Rectangle(0, 0, 0, 0);
  	navigatorRect = new Rectangle(0, 0, 0, 0);
-	navigatorView = new ViewState(id);
+	navigatorView = new ViewState();
 /*	navigatorView.setWidth(Integer.MAX_VALUE);
 	navigatorView.setHeight(Integer.MAX_VALUE);
 	navigatorView.setViewWidth(Integer.MAX_VALUE);
@@ -762,7 +762,6 @@ public void initializeWorkspace() {
 	
 	ViewState view = ViewState.getInstance(id);
 	view.setScale(1.0);
-	ViewState.setInstance(view);
 	
 	if (isModified())
 		reloadTemplate(Group.getEditingTemplateData());
@@ -829,7 +828,7 @@ public void linkCommand(VisibleObject linkObject, LinkSource linkData) {
 		// start linking (store source field reference)
 		tmplink = linkData;
 		
-		VisibleObject fld = (VisibleObject)Group.getRoot().getLookupTable().get(linkData.getFullName());
+		VisibleObject fld = (VisibleObject)Group.getRoot(id).getLookupTable().get(linkData.getFullName());
 		if (fld!=null)
 			// field found in lookup table (it is a special link field - not owned by linkManager container)
 			ViewState.getInstance(id).setAsBlinking(fld);
@@ -1206,7 +1205,7 @@ private void showPopup(MouseEvent e)
 	}
 	
 	// add plugin items
-	PopUpMenu.addPluginItems(popUp, null);
+	PopUpMenu.addPluginItems(id, popUp, null);
 
 	popUp.show(getWorkspacePanel(), e.getX(), e.getY());
 }
@@ -1626,18 +1625,14 @@ public void mousePressed(MouseEvent e) {
 					((LinkManagerObject)hilitedObject).setTargetLink(tmplink);
 				}
 				
-				PopUpMenu.getInstance().show(
-					(Popupable)hilitedObject,
-					getWorkspacePanel(),
-					e.getX(), e.getY()
+				PopUpMenu.getInstance().show(id, (Popupable)hilitedObject,
+						getWorkspacePanel(), e.getX(), e.getY()
 				);
 
 			}
 			else  {
-				PopUpMenu.getInstance().show(
-					hilitedObject,
-					getWorkspacePanel(),
-					e.getX(), e.getY()
+				PopUpMenu.getInstance().show(id, hilitedObject, getWorkspacePanel(),
+						e.getX(), e.getY()
 				);
 			}
 		}
@@ -1936,7 +1931,7 @@ public boolean importFields(File file, boolean ignoreLinkFields)
 	    //
 	    // override fields of record which already exist in the opened DB
 	    //
-		Group rootGroup = Group.getRoot();
+		Group rootGroup = Group.getRoot(id);
 		Enumeration enumer = dbData.getRecordsV().elements();
 		while (enumer.hasMoreElements())
 		{
@@ -2023,7 +2018,7 @@ public boolean importBorder(File file)
 	    //
 	    // override fields of record which already exist in the opened DB
 	    //
-		Group rootGroup = Group.getRoot();
+		Group rootGroup = Group.getRoot(id);
 		
         // packed undo - use CreateAction(VisibleObject) instead
 //        if (!imported)
@@ -2138,7 +2133,7 @@ public boolean open(InputStream is, File file, boolean importDB, boolean importT
 		{
 			Group.getClipboard().clear();
 			Group vg = viewGroup;
-			Group rg = Group.getRoot();
+			Group rg = Group.getRoot(id);
 			try
 			{
 				// put all to dummy root group
@@ -2261,7 +2256,7 @@ public boolean loadRdbDbGroup(JFrame guiContext) {
 		
 		Group.getClipboard().clear();
 		Group vg = viewGroup;
-		Group rg = Group.getRoot();
+		Group rg = Group.getRoot(id);
 		try {
 			// put all to dummy root group
 			viewGroup = new Group(null);
@@ -3843,8 +3838,8 @@ public void createTemplateInstance(String name, String type, boolean relative) {
 		int pos = name.lastIndexOf('.');  //removes file suffix
 		if (pos>0) name = name.substring(0, pos);
 		
-		if (Group.getRoot().findObject(name, true)!=null) name = name+"2";
-		while (Group.getRoot().findObject(name, true)!=null)
+		if (Group.getRoot(id).findObject(name, true)!=null) name = name+"2";
+		while (Group.getRoot(id).findObject(name, true)!=null)
 			name = StringUtils.incrementName(name, null);
 	}
 
@@ -3877,7 +3872,7 @@ public void createTemplateInstance(String name, String type, boolean relative) {
 	posY += view.getGridSize() * 2;
 	setPressedMousePos(posX, posY);
     
-    Group.getRoot().addSubObject(name, templ, true);
+    Group.getRoot(id).addSubObject(name, templ, true);
 	
 	if (Settings.getInstance().getSnapToGrid())
 		templ.snapToGrid();
@@ -4053,7 +4048,8 @@ public void ascendFromTemplate()
 public void moveToGroup(Group group)
 {
 	viewGroup = group;
-	ViewState.getInstance(id).set(viewGroup);
+	ViewState.setInstance(id, group.getLocalView());
+	
 	//createNavigatorImage();
 	viewGroup.unconditionalValidateSubObjects(isFlat());
 
@@ -4237,7 +4233,7 @@ public Macro createMacro(VDBMacro vdbMacro) {
 	UndoManager.getInstance(id).addAction(new CreateAction(macro));
 
 	// repair the links
-	Group.getRoot().manageLinks(true);
+	Group.getRoot(id).manageLinks(true);
 
 	//drawingSurface.setModified(true);
 	repaint();
@@ -4263,7 +4259,7 @@ public void generateMacros()
 				
 	HashMap macros = new HashMap();
 	
-	Group.getRoot().generateMacros(macros, true);
+	Group.getRoot(id).generateMacros(macros, true);
 
 	Iterator i = macros.keySet().iterator();
 	while (i.hasNext())
@@ -4290,7 +4286,7 @@ public void generateMacros()
 	com.cosylab.vdct.Console.getInstance().println();
 
 	// repair the links
-	Group.getRoot().manageLinks(true);
+	Group.getRoot(id).manageLinks(true);
 
 	//drawingSurface.setModified(true);
 	repaint();
@@ -4336,7 +4332,7 @@ public DSGUIInterface getGuimenu() {
 /**
  * @return the id
  */
-public DbDescriptor getId() {
+public Object getRdId() {
 	return id;
 }
 

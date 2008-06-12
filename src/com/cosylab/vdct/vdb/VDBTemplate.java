@@ -68,8 +68,6 @@ import com.cosylab.vdct.undo.UndoManager;
 
 public class VDBTemplate implements Inspectable, Commentable, Descriptable, MonitoredPropertyListener
 {
-	protected Object dsId = null;
-	
 	protected String id = null;
 	protected String fileName = null;
 	protected String description = null;
@@ -264,9 +262,8 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 	/**
 	 * Constructor for VDBTemplate.
 	 */
-	public VDBTemplate(Object dsId, String id, String fileName)
+	public VDBTemplate(String id, String fileName)
 	{
-		this.dsId = dsId;
 		this.id = id;
 		this.fileName = fileName;
 		regeneratePortsID();
@@ -321,7 +318,7 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 				update=true;
 
 				if (this.description==null || !this.description.equals(description))
-					UndoManager.getInstance(dsId).addAction(
+					UndoManager.getInstance(getDsId()).addAction(
 							new DescriptionChangeAction(this, this.description, description));
 
 				this.description = description;
@@ -620,7 +617,7 @@ public VDBPort addPort(String name)
 	ports.put(name, vdbPort);
 	portsV.addElement(vdbPort);
 
-	UndoManager.getInstance(dsId).addAction(new CreateTemplatePortAction(this, vdbPort));
+	UndoManager.getInstance(getDsId()).addAction(new CreateTemplatePortAction(this, vdbPort));
 
 	regeneratePortsID();
 	InspectorManager.getInstance().updateObject(this);
@@ -640,7 +637,7 @@ public VDBMacro addMacro(String name)
 	macros.put(name, vdbMacro);
 	macrosV.addElement(vdbMacro);
 
-	UndoManager.getInstance(dsId).addAction(new CreateTemplateMacroAction(this, vdbMacro));
+	UndoManager.getInstance(getDsId()).addAction(new CreateTemplateMacroAction(this, vdbMacro));
 
 	regenerateMacrosID();		
 	InspectorManager.getInstance().updateObject(this);
@@ -707,7 +704,7 @@ public void removePort(String name)
 
 	ca.addAction(new DeleteTemplatePortAction(this, port));
 	
-	UndoManager.getInstance(dsId).addAction(ca);
+	UndoManager.getInstance(getDsId()).addAction(ca);
 	
 	regeneratePortsID();
 	InspectorManager.getInstance().updateObject(this);
@@ -741,7 +738,7 @@ public void removeMacro(String name)
 
 	ca.addAction(new DeleteTemplateMacroAction(this, macro));
 	
-	UndoManager.getInstance(dsId).addAction(ca);
+	UndoManager.getInstance(getDsId()).addAction(ca);
 	
 	regenerateMacrosID();		
 	InspectorManager.getInstance().updateObject(this);
@@ -802,7 +799,7 @@ public void renamePort(VDBPort port, String newName)
 	if (port.getVisibleObject()!=null)
 		port.getVisibleObject().rename(oldName, newName);
 
-	UndoManager.getInstance(dsId).addAction(
+	UndoManager.getInstance(getDsId()).addAction(
 			new RenameTemplatePortAction(this, port, oldName, newName));
 
 	regeneratePortsID();
@@ -828,7 +825,7 @@ public void renameMacro(VDBMacro macro, String newName)
 	if (macro.getVisibleObject()!=null)
 		macro.getVisibleObject().rename(oldName, newName);
 
-	UndoManager.getInstance(dsId).addAction(
+	UndoManager.getInstance(getDsId()).addAction(
 			new RenameTemplateMacroAction(this, macro, oldName, newName));
 
 	regenerateMacrosID();		
@@ -1115,6 +1112,11 @@ public void renameMacroProperty(InspectableProperty property)
 	}
 
 	public Object getDsId() {
-		return dsId;
+		if (group != null) {
+			return group.getDsId();
+		} else {
+			System.err.println("Warning: VDBTemplate.getDsId: returning null.");
+			return null;
+		}
 	}
 }

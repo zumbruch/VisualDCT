@@ -12,7 +12,6 @@ import com.cosylab.vdct.events.commands.SetRedoMenuItemState;
 import com.cosylab.vdct.events.commands.SetUndoMenuItemState;
 import com.cosylab.vdct.graphics.DsEventListener;
 import com.cosylab.vdct.graphics.DsManager;
-import com.cosylab.vdct.graphics.objects.Group;
 
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
@@ -47,8 +46,6 @@ import com.cosylab.vdct.graphics.objects.Group;
  */
 public class UndoManager implements DsEventListener {
 
-	private static UndoManager instance = null;
-	
 	protected static HashMap instances = new HashMap();
 	
 	private final int lowerbound = -1;
@@ -78,7 +75,6 @@ protected UndoManager(Object dsId) {
 	macroActionListeners = new Vector();
 	bufferSize = Constants.UNDO_STEPS_TO_REMEMBER;
 	actions = new ActionObject[bufferSize];
-	instance = this; // to prevent dead-loop reset-getInstance
 	reset();
 }
 /**
@@ -171,11 +167,14 @@ private int decrement(int pos) {
 public ComposedActionInterface getComposedAction() {
 	return composedAction;
 }
+
+// TODO:REM
 /**
  * Insert the method's description here.
  * Creation date: (22.4.2001 15:56:37)
  * @return com.cosylab.vdct.undo.UndoManager
  */
+/*
 public static UndoManager getInstance() {
 	if (instance == null) {
 		System.err.println("Warning: undo manager instance called while not yet initialized,"
@@ -184,7 +183,7 @@ public static UndoManager getInstance() {
 	}
 	return instance;
 }
-
+*/
 public static UndoManager getInstance(Object dsId) {
     return (UndoManager)instances.get(dsId);
 }
@@ -389,8 +388,7 @@ public void onDsRemoved(Object id) {
 	instances.remove(id);
 }
 public void onDsFocused(Object id) {
-    instance = (UndoManager)instances.get(id);
-    updateMenuItems();
+	((UndoManager)instances.get(id)).updateMenuItems();
 }
 
 private void updateMenuItems() {

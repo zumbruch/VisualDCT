@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
+ * Copyright (c) 2008, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -25,50 +25,53 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.cosylab.vdct.inspector;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+package com.cosylab.vdct.db;
 
 /**
  * @author ssah
+ *
  */
-public class SpreadsheetTableViewData {
+public class DBSheetColWidth {
 
-	private static SpreadsheetTableViewData data = null;
-	
-	private Map map = null;
+	private int splitIndex = -1;
+	private int width = 0;
+
 	/**
-	 * 
+	 * @param splitIndex
+	 * @param width
 	 */
-	private SpreadsheetTableViewData() {
+	public DBSheetColWidth(int splitIndex, int width) {
 		super();
-		map = new HashMap();
-	}
-	
-	public static SpreadsheetTableViewData getInstance() {
-		if (data == null) {
-			data = new SpreadsheetTableViewData(); 
-		}
-		return data ;
-	}
-	
-	public void add(SpreadsheetTableViewRecord record) {
-		map.put(record.getKey(), record);
+		this.splitIndex = splitIndex;
+		this.width = width;
 	}
 
-	/** Returns the record with the given key, or null if there is no such record.
+	/**
+	 * @return the splitIndex
 	 */
-	public SpreadsheetTableViewRecord get(String key) {
-		return (SpreadsheetTableViewRecord)map.get(key);
+	public int getSplitIndex() {
+		return splitIndex;
 	}
 
-	public void remove(String key) {
-		map.remove(key);
+	/**
+	 * @param splitIndex the splitIndex to set
+	 */
+	public void setSplitIndex(int splitIndex) {
+		this.splitIndex = splitIndex;
 	}
-	
-	public Iterator getRecords() {
-		return map.values().iterator();
+
+	/**
+	 * @return the width
+	 */
+	public int getWidth() {
+		return width;
+	}
+
+	/**
+	 * @param width the width to set
+	 */
+	public void setWidth(int width) {
+		this.width = width;
 	}
 }

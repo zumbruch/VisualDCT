@@ -33,6 +33,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
 
+import com.cosylab.vdct.graphics.objects.Template;
 import com.cosylab.vdct.util.StringUtils;
 
 /**
@@ -42,6 +43,8 @@ public class VDBTemplateInstance implements Commentable
 {
 	protected String name = null;
 	protected VDBTemplate template = null;
+	
+	protected Template visualTemplate = null; 
 	protected Vector propertiesV = null;
 	protected Hashtable properties = null;
 
@@ -201,4 +204,18 @@ public void setName(java.lang.String newName) {
 		this.template = template;
 	}
 
+	public Template getVisualTemplate() {
+		if (visualTemplate == null) {
+			System.err.println("Warning: VDBTemplateInstance.getVisualTemplate: returning null.");
+		}
+		return visualTemplate;
+	}
+
+	public void setVisualTemplate(Template visualTemplate) {
+		this.visualTemplate = visualTemplate;
+	}
+	
+	public Object getDsId() {
+		return (visualTemplate != null) ? visualTemplate.getDsId() : null;
+	}
 }

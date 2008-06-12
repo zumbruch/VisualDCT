@@ -36,8 +36,6 @@ import java.util.Vector;
  */
 public class DBTemplate extends DBComment
 {
-	protected Object dsId = null;
-
 	protected String id = null;
 	protected String fileName = null;
 	protected String description = null;
@@ -57,9 +55,8 @@ public class DBTemplate extends DBComment
 	/**
 	 * Constructor.
 	 */
-	public DBTemplate(Object dsId, String id, String fileName)
+	public DBTemplate(String id, String fileName)
 	{
-		this.dsId = dsId;
 		this.id=id;
 		this.fileName=fileName;
 
@@ -218,9 +215,5 @@ public class DBTemplate extends DBComment
 	public Vector getMacrosV()
 	{
 		return macrosV;
-	}
-
-	public Object getDsId() {
-		return dsId;
 	}
 }

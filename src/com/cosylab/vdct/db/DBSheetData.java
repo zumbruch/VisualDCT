@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
+ * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -25,30 +25,65 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package com.cosylab.vdct.db;
 
-package com.cosylab.vdct.inspector;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
-import javax.swing.table.TableColumn;
+import com.cosylab.vdct.events.CommandManager;
+import com.cosylab.vdct.events.commands.GetDsManager;
+import com.cosylab.vdct.graphics.DsEventListener;
 
 /**
  * @author ssah
- *
  */
-public class SpreadsheetColumn extends TableColumn {
+public class DBSheetData implements DsEventListener {
 
-	protected boolean defaultWidth = true;
-	/**
-	 * @param defaultWidth
-	 */
-	public SpreadsheetColumn(boolean defaultWidth) {
+	protected static HashMap instances = new HashMap();
+	
+	private Map map = null;
+
+	private DBSheetData() {
 		super();
-		this.defaultWidth = defaultWidth;
+		map = new HashMap();
 	}
-	public boolean isDefaultWidth() {
-		return defaultWidth;
+	
+	public static DBSheetData getInstance(Object dsId) {
+	    return (DBSheetData)instances.get(dsId);
+	}
+	
+	public void add(DBSheetView record) {
+		map.put(record.getKey(), record);
 	}
 
-	public void setDefaultWidth(boolean defaultWidth) {
-		this.defaultWidth = defaultWidth;
+	/** Returns the record with the given key, or null if there is no such record.
+	 */
+	public DBSheetView get(String key) {
+		return (DBSheetView)map.get(key);
+	}
+
+	public void remove(String key) {
+		map.remove(key);
+	}
+	
+	public Iterator getRecords() {
+		return map.values().iterator();
+	}
+
+	public static void registerDsListener() {
+		GetDsManager command = (GetDsManager)CommandManager.getInstance().getCommand("GetDsManager");
+		if (command != null) {
+			command.getManager().addDsEventListener(new DBSheetData());
+		}
+	}
+
+	public void onDsAdded(Object id) {
+	    instances.put(id, new DBSheetData());
+	}
+	public void onDsRemoved(Object id) {
+		instances.remove(id);
+	}
+	public void onDsFocused(Object id) {
 	}
 }

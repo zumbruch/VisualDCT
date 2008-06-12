@@ -75,7 +75,6 @@ public class GenerateFlatDatabase
 			System.out.println("Produce hierarhical names like CapFast: "+(Settings.getInstance().getHierarhicalNames()?"enabled":"disabled"));
 			System.out.println();
 						
-			// Get the same id for the group to save when implemented.
 			RdbDataId id = new RdbDataId("file", "0", "ioc");
 			DrawingSurface drawingSurface = new DrawingSurface(id, null);
 
@@ -93,7 +92,7 @@ public class GenerateFlatDatabase
 				return;
 			} 
 			System.out.println("Generating flat database.\n");
-			Group.save(Group.getRoot(), dbFile, true);
+			Group.save(id, Group.getRoot(id), dbFile, true);
 			System.out.println("Done.");
 		} catch (Throwable t) {
 			t.printStackTrace();

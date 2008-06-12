@@ -379,7 +379,7 @@ private static VDBData generateTemplate(Object dsId, DBDData dbd, DBTemplate dbT
 {
 	Group root = Group.getRoot();
 	
-	VDBTemplate vt = new VDBTemplate(root.getDsId(), dbTemplate.getId(), dbTemplate.getFileName());
+	VDBTemplate vt = new VDBTemplate(dbTemplate.getId(), dbTemplate.getFileName());
 	vt.setComment(dbTemplate.getComment());	
 	vt.setDescription(dbTemplate.getDescription());
 	

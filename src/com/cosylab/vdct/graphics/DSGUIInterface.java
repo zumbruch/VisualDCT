@@ -96,7 +96,7 @@ public class DSGUIInterface implements VDBInterface {
 	private DrawingSurface drawingSurface;
 	private Object id = null;
 
-	// to remember on cut from which group object has beed cut 
+	// to remember on cut from which group object has been cut 
 	private ArrayList pasteNames = null;
 	// to remember copied objects for multiple pasting
 	private Vector copiedObjects = null;
@@ -108,6 +108,7 @@ public class DSGUIInterface implements VDBInterface {
 	
 	//private static final String nullString = "";
 	
+	private static final String emptyString = "";
 	private static final String errorString = "Error: ";
 	private static final String warningString = "Warning: ";
 
@@ -118,7 +119,7 @@ public class DSGUIInterface implements VDBInterface {
  */
 public DSGUIInterface(DrawingSurface drawingSurface) {
 	this.drawingSurface=drawingSurface;
-	this.id = drawingSurface.getId();
+	this.id = drawingSurface.getRdId();
 	DSGUIInterface.instance = this;
 	pasteNames = new ArrayList();
 	copiedObjects = new Vector();
@@ -205,7 +206,7 @@ public java.lang.String checkRecordName(String name, String oldName, boolean rel
 		} else if (recordName.indexOf('"') != -1) {
 			return errorString + nameString + "No quotes allowed!";
 		} else if (!recordName.equals(oldName)
-				&& ((!relative && Group.getRoot().findObject(recordName, true) != null) ||
+				&& ((!relative && Group.getRoot(id).findObject(recordName, true) != null) ||
 				(relative && drawingSurface.getViewGroup().findObject(recordName, true) != null))) { 
 			return errorString + nameString + "Name already exists!";
 		} else if (recordName.length()>Settings.getInstance().getRecordLength()) {
@@ -320,7 +321,7 @@ private void copy(Vector objects, boolean firstCopy) {
 	while (selected.hasMoreElements()) {
 		obj = selected.nextElement();
 		if (obj instanceof Flexible) {
-			Flexible copy = ((Flexible)obj).copyToGroup(Constants.CLIPBOARD_NAME);
+			Flexible copy = ((Flexible)obj).copyToGroup(Constants.CLIPBOARD_NAME, emptyString);
 			if (copy instanceof Movable)
 				((Movable)copy).move(-minx, -miny);
 						
@@ -349,7 +350,7 @@ public Box createBox()
 	if (Settings.getInstance().getSnapToGrid())
 		grBox.snapToGrid();
 
-	Group.getRoot().addSubObject(grBox.getName(), grBox, true);
+	Group.getRoot(id).addSubObject(grBox.getName(), grBox, true);
 
 	drawingSurface.repaint();
 	
@@ -372,7 +373,7 @@ public Line createLine()
 	if (Settings.getInstance().getSnapToGrid())
 		grLine.snapToGrid();
 
-	Group.getRoot().addSubObject(grLine.getName(), grLine, true);
+	Group.getRoot(id).addSubObject(grLine.getName(), grLine, true);
 
 	drawingSurface.repaint();
 	
@@ -395,7 +396,7 @@ public TextBox createTextBox()
 	if (Settings.getInstance().getSnapToGrid())
 		grTextBox.snapToGrid();
 
-	Group.getRoot().addSubObject(grTextBox.getName(), grTextBox, true);
+	Group.getRoot(id).addSubObject(grTextBox.getName(), grTextBox, true);
 
 	grTextBox.setBorder(true);
 
@@ -464,7 +465,7 @@ public void createRecord(String name, String type, boolean relative) {
 			posY += view.getGridSize() * 2;
 			drawingSurface.setPressedMousePos(posX, posY);
 
-			Group.getRoot().addSubObject(recordName, record, true);
+			Group.getRoot(id).addSubObject(recordName, record, true);
 
 			if (Settings.getInstance().getSnapToGrid())
 				record.snapToGrid();
@@ -518,7 +519,7 @@ public void cut() {
 		if (obj instanceof Flexible) {
 			Flexible flex = (Flexible)obj;
 			String oldGroup = Group.substractParentName(flex.getFlexibleName());
-			if (flex.moveToGroup(Constants.CLIPBOARD_NAME))
+			if (flex.moveToGroup(Constants.CLIPBOARD_NAME, emptyString))
 			{
 				pasteNames.add(oldGroup);
 				if (obj instanceof Movable)
@@ -599,7 +600,7 @@ public void group(String groupName) {
 
 	ComposedAction composedAction = new ComposedAction();
 
-	Group g = (Group)Group.getRoot().findObject(groupName, true);
+	Group g = (Group)Group.getRoot(id).findObject(groupName, true);
 	if (g==null)
 	{
 		g = Group.createGroup(groupName);
@@ -616,9 +617,9 @@ public void group(String groupName) {
 		if (obj instanceof Flexible)
 		{
 			flex = (Flexible)obj; oldGroup = Group.substractParentName(flex.getFlexibleName()); 
-			flex.moveToGroup(groupName);
+			flex.moveToGroup(id, groupName);
 	
-			composedAction.addAction(new MoveToGroupAction(flex, oldGroup, groupName));		// if true ?!!!
+			composedAction.addAction(new MoveToGroupAction(flex, oldGroup, groupName, id));		// if true ?!!!
 			
 			if (obj instanceof VisibleObject)
 			{
@@ -818,13 +819,13 @@ public void pasteAtPosition(int pX, int pY) {
 		if (objs[i] instanceof Flexible) {
 			flex = (Flexible)objs[i];
 			
-			if (flex.moveToGroup(currentGroupName))
+			if (flex.moveToGroup(id, currentGroupName))
 			{
 				if (isCopy)
 					composedAction.addAction(new CreateAction((VisibleObject)objs[i]));		// if true ?!!!
 				else {
 					//System.out.println("Cut/paste:"+pasteNames.get(i).toString()+"->"+currentGroupName);	
-					composedAction.addAction(new MoveToGroupAction(flex, pasteNames.get(i).toString(), currentGroupName));
+					composedAction.addAction(new MoveToGroupAction(flex, pasteNames.get(i).toString(), currentGroupName, id));
 				}
 
 				
@@ -891,7 +892,7 @@ public void rename() {
  */
 public void rename(java.lang.String oldName, java.lang.String newName) {
 	ViewState view = ViewState.getInstance(id);
-	Object obj = Group.getRoot().findObject(oldName, true);
+	Object obj = Group.getRoot(id).findObject(oldName, true);
 	if (obj instanceof Flexible)
 	{
 		Flexible flex = (Flexible)obj;
@@ -935,7 +936,7 @@ public void morph() {
  */
 public void morph(java.lang.String name, String newType) {
 	ViewState view = ViewState.getInstance(id);
-	Object oldObject = Group.getRoot().findObject(name, true);
+	Object oldObject = Group.getRoot(id).findObject(name, true);
 	if (oldObject instanceof Record)
 	{
 		try {
@@ -991,14 +992,14 @@ public void save(java.io.File file) throws IOException {
  	return;
  }
 */ 
- Group.save(Group.getRoot(), file, false);
+ Group.save(id, Group.getRoot(id), file, false);
 
  VDBTemplate data = Group.getEditingTemplateData();
  if (data==null)
  {
  	// create a new
  	// id = basename
-	data = new VDBTemplate(id, file.getName(), file.getAbsolutePath());
+	data = new VDBTemplate(file.getName(), file.getAbsolutePath());
 	
 	data.setPorts(new Hashtable());
 	data.setPortsV(new Vector());
@@ -1044,7 +1045,7 @@ public void save(java.io.File file) throws IOException {
  * @param file java.io.File
  */
 public void saveAsGroup(java.io.File file) throws IOException {
- Group.save(drawingSurface.getViewGroup(), file, false);
+ Group.save(id, drawingSurface.getViewGroup(), file, false);
 
 }
 /**
@@ -1110,7 +1111,7 @@ public void saveAsTemplate(File file) throws IOException
  * @param file java.io.File
  */
 public void export(java.io.File file) throws IOException {
- Group.save(Group.getRoot(), file, true); 
+ Group.save(id, Group.getRoot(id), file, true); 
 }
 /**
  * Insert the method's description here.
@@ -1118,7 +1119,7 @@ public void export(java.io.File file) throws IOException {
  * @param file java.io.File
  */
 public void exportAsGroup(java.io.File file) throws IOException {
- Group.save(drawingSurface.getViewGroup(), file, true);
+ Group.save(id, drawingSurface.getViewGroup(), file, true);
 }
 /**
  * Insert the method's description here.
@@ -1259,9 +1260,9 @@ public void ungroup() {
 			*/
 				if (objs2[i] instanceof Flexible) {
 					Flexible flex = (Flexible)objs2[j];
-					flex.moveToGroup(currentGroupName);
+					flex.moveToGroup(id, currentGroupName);
 
-					composedAction.addAction(new MoveToGroupAction(flex, group.getAbsoluteName(), currentGroupName));		// if true ?!!!
+					composedAction.addAction(new MoveToGroupAction(flex, group.getAbsoluteName(), currentGroupName, id));		// if true ?!!!
 
 					
 					view.setAsSelected((VisibleObject)objs2[j]);

@@ -1045,7 +1045,7 @@ public boolean isTextPositionNorth() {
 /* (non-Javadoc)
  * @see com.cosylab.vdct.graphics.objects.Flexible#copyToGroup(java.lang.String)
  */
-public Flexible copyToGroup(String group) {
+public Flexible copyToGroup(Object dsId, String group) {
     String newName;
 	if (group.equals(Record.nullString))
 		newName = Group.substractObjectName(data.getName());
@@ -1054,7 +1054,7 @@ public Flexible copyToGroup(String group) {
 				  Group.substractObjectName(data.getName());
 	
 	// object with new name already exists, add suffix ///!!!
-	while (Group.getRoot().findObject(newName, true)!=null){
+	while (Group.getRoot(dsId).findObject(newName, true)!=null){
 			newName = StringUtils.incrementName(newName, Constants.COPY_SUFFIX);
 	}
 
@@ -1062,9 +1062,9 @@ public Flexible copyToGroup(String group) {
 	theDataCopy.setName(newName);
 
 	Port thePortCopy = new Port(theDataCopy, null, getX(), getY());
-	((Group)Group.getRoot().getSubObject(group)).addSubObject(newName, thePortCopy, true);
+	((Group)Group.getRoot(dsId).getSubObject(group)).addSubObject(newName, thePortCopy, true);
 
-	Group.getRoot().manageLinks(true);
+	Group.getRoot(dsId).manageLinks(true);
 	unconditionalValidation();
 	
 	return thePortCopy;
@@ -1080,7 +1080,7 @@ public String getFlexibleName() {
 /* (non-Javadoc)
  * @see com.cosylab.vdct.graphics.objects.Flexible#moveToGroup(java.lang.String)
  */
-public boolean moveToGroup(String group) {
+public boolean moveToGroup(Object dsId, String group) {
 	
 	if (Group.getEditingTemplateData()==null)
 		return false;
@@ -1099,7 +1099,7 @@ public boolean moveToGroup(String group) {
 	Object obj;
 	boolean renameNeeded = false;
 
-	while ((obj=Group.getRoot().findObject(newName, true))!=null)
+	while ((obj=Group.getRoot(dsId).findObject(newName, true))!=null)
 	{
 		if (obj==this)
 		{
@@ -1119,7 +1119,7 @@ public boolean moveToGroup(String group) {
 
 	getParent().removeObject(Group.substractObjectName(newName));
 	setParent(null);
-	((Group)Group.getRoot().getSubObject(group)).addSubObject(newName, this, true);
+	((Group)Group.getRoot(dsId).getSubObject(group)).addSubObject(newName, this, true);
 	data.setName(newName);
 
 	Group.getEditingTemplateData().addPort(data);

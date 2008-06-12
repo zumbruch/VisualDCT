@@ -26,13 +26,15 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.cosylab.vdct.inspector;
+package com.cosylab.vdct.db;
+
+import com.cosylab.vdct.inspector.sheet.SplitPropertyGroup;
 
 /**
  * @author ssah
  *
  */
-public class SplitData {
+public class DBSheetSplitCol {
 	private String name = null;
 	private boolean delimiterType = false;
     private String pattern = null;
@@ -47,7 +49,7 @@ public class SplitData {
 	 * @param delimiterType
 	 * @param pattern
 	 */
-    public SplitData(boolean delimiterType, String pattern) {
+    public DBSheetSplitCol(boolean delimiterType, String pattern) {
     	this(delimiterType, pattern, -1);
 	}
     
@@ -55,7 +57,7 @@ public class SplitData {
 	 * @param delimiterType
 	 * @param pattern
 	 */
-    public SplitData(String delimiterType, String pattern) {
+    public DBSheetSplitCol(String delimiterType, String pattern) {
     	this(isDelimiterType(delimiterType), pattern, -1);
 	}
     
@@ -64,7 +66,7 @@ public class SplitData {
 	 * @param pattern
 	 * @param parts
 	 */
-    public SplitData(boolean delimiterType, String pattern, int parts) {
+    public DBSheetSplitCol(boolean delimiterType, String pattern, int parts) {
 		this(null, delimiterType, pattern, parts);
 	}
 
@@ -73,7 +75,7 @@ public class SplitData {
 	 * @param delimiterType
 	 * @param pattern
 	 */
-    public SplitData(String name, String delimiterType, String pattern) {
+    public DBSheetSplitCol(String name, String delimiterType, String pattern) {
     	this(name, isDelimiterType(delimiterType), pattern, -1);
 	}
     
@@ -83,7 +85,7 @@ public class SplitData {
 	 * @param pattern
 	 * @param parts
 	 */
-    public SplitData(String name, boolean delimiterType, String pattern, int parts) {
+    public DBSheetSplitCol(String name, boolean delimiterType, String pattern, int parts) {
 		super();
 		this.name = name;
 		this.pattern = pattern;
@@ -91,8 +93,8 @@ public class SplitData {
 		this.parts = parts;
 	}
     
-    static SplitData getWhitespaceSplitData() {
-    	return new SplitData(true, "\\s+");
+    public static DBSheetSplitCol getWhitespaceSplitData() {
+    	return new DBSheetSplitCol(true, "\\s+");
     }
 
 	/**

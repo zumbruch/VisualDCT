@@ -231,7 +231,7 @@ public boolean checkMove(int dx, int dy) {
  * Creation date: (4.2.2001 22:02:29)
  * @param group java.lang.String
  */
-public Flexible copyToGroup(java.lang.String group) {
+public Flexible copyToGroup(Object dsId, java.lang.String group) {
 
 	String newName;
 	if (group.equals(nullString))
@@ -242,7 +242,7 @@ public Flexible copyToGroup(java.lang.String group) {
 
 	// object with new name already exists, add suffix ///!!!
 	//Object obj;
-	while (Group.getRoot().findObject(newName, true)!=null)
+	while (Group.getRoot(dsId).findObject(newName, true)!=null)
 //		newName += Constants.COPY_SUFFIX;
 			newName = StringUtils.incrementName(newName, Constants.COPY_SUFFIX);
 
@@ -253,7 +253,7 @@ public Flexible copyToGroup(java.lang.String group) {
 	theDataCopy.setName(newName);
 	Record theRecordCopy = new Record(null, theDataCopy, getX(), getY());
 	//theRecordCopy.move(20-view.getRx(), 20-view.getRy());
-	Group.getRoot().addSubObject(theDataCopy.getName(), theRecordCopy, true);
+	Group.getRoot(dsId).addSubObject(theDataCopy.getName(), theRecordCopy, true);
 	
 	// fix only valid links where target is also selected
 	theRecordCopy.fixEPICSOutLinksOnCopy(Group.substractParentName(recordData.getName()), group);
@@ -1301,7 +1301,7 @@ public boolean moveAsMuchAsPossibleTopUp(int dx, int dy) {
  * Creation date: (4.2.2001 22:02:29)
  * @param group java.lang.String
  */
-public boolean moveToGroup(java.lang.String group) {
+public boolean moveToGroup(Object dsId, String group) {
 	String currentParent = Group.substractParentName(recordData.getName());
 	if (group.equals(currentParent)) return false;
 	
@@ -1316,7 +1316,7 @@ public boolean moveToGroup(java.lang.String group) {
 	// object with new name already exists, add suffix // !!!
 	Object obj;
 	boolean renameNeeded = false;
-	while ((obj=Group.getRoot().findObject(newName, true))!=null)
+	while ((obj=Group.getRoot(dsId).findObject(newName, true))!=null)
 	{
 		if (obj==this)	// it's me :) already moved, fix data
 		{
@@ -1336,7 +1336,7 @@ public boolean moveToGroup(java.lang.String group) {
 	
 	getParent().removeObject(Group.substractObjectName(getName()));
 	setParent(null);
-	Group.getRoot().addSubObject(newName, this, true);
+	Group.getRoot(dsId).addSubObject(newName, this, true);
 
 	//String oldGroup = Group.substractParentName(recordData.getName());
 	recordData.setName(newName);
@@ -1411,7 +1411,7 @@ public boolean rename(java.lang.String newName) {
 	}
 	
 	// move if needed
-	if (!moveToGroup(Group.substractParentName(newName)))
+	if (!moveToGroup(getDsId(), Group.substractParentName(newName)))
 		fixLinks();			// fix needed
 
 	return true;

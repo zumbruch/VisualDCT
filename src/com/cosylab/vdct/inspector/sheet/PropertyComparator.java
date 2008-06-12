@@ -26,10 +26,13 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.cosylab.vdct.inspector;
+package com.cosylab.vdct.inspector.sheet;
 
 import java.util.Arrays;
 import java.util.Comparator;
+
+import com.cosylab.vdct.db.DBSheetSplitCol;
+import com.cosylab.vdct.inspector.InspectableProperty;
 
 /**
  * @author ssah
@@ -70,11 +73,11 @@ public class PropertyComparator implements Comparator {
 	    	secondString = "";
 	    }
 	    
-	    String firstName = SplitData.removeValueAtEnd(firstString);
-	    String secondName = SplitData.removeValueAtEnd(secondString);
+	    String firstName = DBSheetSplitCol.removeValueAtEnd(firstString);
+	    String secondName = DBSheetSplitCol.removeValueAtEnd(secondString);
 	    
-	    int firstNumber = SplitData.extractValueAtEnd(firstString);
-	    int secondNumber = SplitData.extractValueAtEnd(secondString);
+	    int firstNumber = DBSheetSplitCol.extractValueAtEnd(firstString);
+	    int secondNumber = DBSheetSplitCol.extractValueAtEnd(secondString);
 
 		int nameComp = firstName.compareTo(secondName); 
         if (nameComp != 0) {

@@ -1,5 +1,7 @@
 package com.cosylab.vdct.undo;
 
+import com.cosylab.vdct.graphics.objects.Flexible;
+
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
  * All rights reserved.
@@ -34,9 +36,10 @@ package com.cosylab.vdct.undo;
  * @author 
  */
 public class MoveToGroupAction extends ActionObject {
-	private com.cosylab.vdct.graphics.objects.Flexible object;
+	private Flexible object;
 	private String oldGroup;
 	private String newGroup;
+	private Object dsId; 
 /**
  * Insert the method's description here.
  * Creation date: (4.5.2001 11:40:19)
@@ -44,10 +47,11 @@ public class MoveToGroupAction extends ActionObject {
  * @param oldGroup java.lang.String
  * @param newGroup java.lang.String
  */
-public MoveToGroupAction(com.cosylab.vdct.graphics.objects.Flexible object, String oldGroup, String newGroup) {
+public MoveToGroupAction(Flexible object, String oldGroup, String newGroup, Object dsId) {
 	this.object=object;
 	this.oldGroup=oldGroup;
 	this.newGroup=newGroup;
+	this.dsId = dsId;
 }
 /**
  * Insert the method's description here.
@@ -61,12 +65,12 @@ public String getDescription() {
  * This method was created in VisualAge.
  */
 protected void redoAction() {
-	object.moveToGroup(newGroup);
+	object.moveToGroup(dsId, newGroup);
 }
 /**
  * This method was created in VisualAge.
  */
 protected void undoAction() {
-	object.moveToGroup(oldGroup);
+	object.moveToGroup(dsId, oldGroup);
 }
 }

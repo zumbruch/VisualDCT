@@ -26,10 +26,14 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.cosylab.vdct.inspector;
+package com.cosylab.vdct.inspector.sheet;
 
 import java.util.Vector;
 
+import com.cosylab.vdct.db.DBSheetRowOrder;
+import com.cosylab.vdct.db.DBSheetSplitCol;
+import com.cosylab.vdct.db.DBSheetView;
+import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.plugin.debug.PluginDebugManager;
 import com.cosylab.vdct.undo.UndoManager;
 import com.cosylab.vdct.util.StringUtils;
@@ -49,7 +53,7 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
     private String[] modelColumnNames = null;
 
     private int sortedSplitIndex = 0;
-    private SplitData[] propertiesColumnSplitData = null;
+    private DBSheetSplitCol[] propertiesColumnSplitData = null;
     private Vector recentSplitData = null;
 
     // The maximum number of recent entries for splitting columns.
@@ -235,7 +239,7 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 	}
 
 	public int getSplitParts(int baseColumn) {
-		SplitData splitData = propertiesColumnSplitData[baseColumn];
+		DBSheetSplitCol splitData = propertiesColumnSplitData[baseColumn];
 		return splitData != null ? splitData.getParts() : 1;		
 	}
 	
@@ -259,7 +263,7 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 		return recentSplitDataMaxCount;
 	}
 	
-	public void splitColumn(SplitData splitData, int column) {
+	public void splitColumn(DBSheetSplitCol splitData, int column) {
 		int propertiesColumn = splitToBaseColumn(column); 
 		if (splitData != null) {
 			splitData.setName(getPropertiesColumnNames(propertiesColumn));
@@ -270,11 +274,11 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 
 	public void splitColumnByRecentList(int recentIndex, int column) {
 		// Add the used item to the top of the list.
-		SplitData data = (SplitData)recentSplitData.remove(recentIndex);
+		DBSheetSplitCol data = (DBSheetSplitCol)recentSplitData.remove(recentIndex);
 		recentSplitData.add(0, data);
 
 		String name = super.getColumnId(modelToPropertiesColumnIndex[column]);
-		SplitData split = new SplitData(name, data.getDelimiterTypeString(), data.getPattern());
+		DBSheetSplitCol split = new DBSheetSplitCol(name, data.getDelimiterTypeString(), data.getPattern());
 		splitColumn(split, column);
 	}
 	
@@ -385,9 +389,9 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 		for (int c = 0; c < columns.length; c++) {
 			String firstEntry = model[rows[0]][columns[c]].getValue();
 			String secondEntry = model[rows[1]][columns[c]].getValue();
-			String baseString = SplitData.removeValueAtEnd(firstEntry);
-			int firstValue = SplitData.extractValueAtEnd(firstEntry);
-			int secondValue = SplitData.extractValueAtEnd(secondEntry);
+			String baseString = DBSheetSplitCol.removeValueAtEnd(firstEntry);
+			int firstValue = DBSheetSplitCol.extractValueAtEnd(firstEntry);
+			int secondValue = DBSheetSplitCol.extractValueAtEnd(secondEntry);
 
 			// Assume base at 0 and step 1 if values are absent.
 			if (firstValue == -1) {
@@ -450,7 +454,7 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 		for (int j = 0; j < viewColumnCount; j++) {
 
 		    String name = super.getColumnId(j);
-			SplitData split = propertiesColumnSplitData[super.visibleToBaseColumn(j)]; 
+			DBSheetSplitCol split = propertiesColumnSplitData[super.visibleToBaseColumn(j)]; 
 			int modelJ = propertiesToModelColumnIndex[j];
 
 			if (split != null) {
@@ -493,7 +497,7 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 		int propertiesColumnCount = getPropertiesColumnCount();
 		
 		for (int j = 0; j < propertiesColumnCount; j++) {
-			SplitData split = propertiesColumnSplitData[j];
+			DBSheetSplitCol split = propertiesColumnSplitData[j];
 			if (split != null) {
 				
                 // Check if current data is out of date.
@@ -534,7 +538,7 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 		int viewColumnCount = super.getColumnCount();
 		
 		// Create split translation tables.
-		SplitData splitData = null;
+		DBSheetSplitCol splitData = null;
 		modelColumnCount = 0;
 		for (int j = 0; j < viewColumnCount; j++) {
 			splitData = propertiesColumnSplitData[super.visibleToBaseColumn(j)];
@@ -557,13 +561,13 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 	}
 
 	private void recallSplitData() {
-		SpreadsheetTableViewRecord record = getViewRecord();
+		DBSheetView record = getViewRecord();
 
 		// Set the split data and refresh the model.
     	for (int j = 0; j < getPropertiesColumnCount(); j++) {
     		propertiesColumnSplitData[j] = null;
     	}
-    	SplitData[] splitColumns = record.getSplitColumns();
+    	DBSheetSplitCol[] splitColumns = record.getSplitColumns();
     	if (splitColumns != null) {
     		for (int j = 0; j < splitColumns.length; j++) {
     			int index = getPropertiesColumnIndex(splitColumns[j].getName());
@@ -574,7 +578,7 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
     	}
 		refreshModel();
     	
-    	SplitData[] recentSplits = record.getRecentSplits();
+    	DBSheetSplitCol[] recentSplits = record.getRecentSplits();
     	if (recentSplits != null) {
     		recentSplitData.clear();
     		for (int j = 0; j < recentSplits.length; j++) {
@@ -584,9 +588,9 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 	}
 	
 	private void recallViewData() {
-		SpreadsheetTableViewRecord record = getViewRecord();
+		DBSheetView record = getViewRecord();
 
-		SpreadsheetRowOrder rowOrder = record.getRowOrder();
+		DBSheetRowOrder rowOrder = record.getRowOrder();
         if (rowOrder != null) {
         	String orderedColumnName = rowOrder.getColumnName();
         	int index = getPropertiesColumnIndex(orderedColumnName);
@@ -604,7 +608,7 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 	}
 
 	protected void storeSplitData() {
-		SpreadsheetTableViewRecord record = getViewRecord();
+		DBSheetView record = getViewRecord();
 		
 		boolean defaultNoColumnSplit = true;
 		int propertiesColumnCount = getPropertiesColumnCount();
@@ -616,14 +620,14 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
         }
         
         if (!defaultNoColumnSplit) {
-            SplitData[] splitColumns = null;
+            DBSheetSplitCol[] splitColumns = null;
         	Vector splitColumnVector = new Vector();
         	for (int j = 0; j < propertiesColumnCount; j++) {
         		if (propertiesColumnSplitData[j] != null) {
             		splitColumnVector.add(propertiesColumnSplitData[j]);
         		}
         	}
-        	splitColumns = new SplitData[splitColumnVector.size()]; 
+        	splitColumns = new DBSheetSplitCol[splitColumnVector.size()]; 
             splitColumnVector.copyInto(splitColumns);
     		record.setSplitColumns(splitColumns);
         } else {
@@ -632,7 +636,7 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 
 		boolean defaultNoRecentSplits = recentSplitData.isEmpty();
         if (!defaultNoRecentSplits) {
-        	SplitData[] recentSplits = new SplitData[recentSplitData.size()]; 
+        	DBSheetSplitCol[] recentSplits = new DBSheetSplitCol[recentSplitData.size()]; 
         	recentSplitData.copyInto(recentSplits);
     		record.setRecentSplits(recentSplits);
         } else {
@@ -641,12 +645,12 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 	}
 	
 	protected void storeViewData() {
-		SpreadsheetTableViewRecord record = getViewRecord();
+		DBSheetView record = getViewRecord();
 
         boolean defaultNoSortOrder = (sortedColumn == -1);
         if (!defaultNoSortOrder) {
         	String name = getPropertiesColumnNames(sortedColumn);
-        	record.setRowOrder(new SpreadsheetRowOrder(name, sortedSplitIndex, sortedOrderAsc));
+        	record.setRowOrder(new DBSheetRowOrder(name, sortedSplitIndex, sortedOrderAsc));
         } else {
         	record.setRowOrder(null);
         }
@@ -657,7 +661,7 @@ public class SpreadsheetSplitViewModel extends SpreadsheetViewModel {
 		int propertiesColumnCount = getPropertiesColumnCount();
 		if (propertiesColumnSplitData == null || propertiesColumnSplitData.length != propertiesColumnCount) {
 			// Prepare space for properties column data.
-			propertiesColumnSplitData = new SplitData[propertiesColumnCount];
+			propertiesColumnSplitData = new DBSheetSplitCol[propertiesColumnCount];
 			for (int j = 0; j < propertiesColumnCount; j++) {
 			    propertiesColumnSplitData[j] = null;
 			}

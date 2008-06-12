@@ -26,7 +26,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.cosylab.vdct.inspector;
+package com.cosylab.vdct.inspector.sheet;
 
 import java.awt.Dialog;
 import java.awt.Dimension;

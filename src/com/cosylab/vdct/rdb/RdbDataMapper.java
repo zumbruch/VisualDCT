@@ -88,11 +88,11 @@ public class RdbDataMapper {
 		Exception exception = null;
 		try {
 			if (loadDbId(dataId)) {
-				data = new DBData(dataId, dataId.toString(), dataId.getFileName());
+				data = new DBData(dataId.toString(), dataId.getFileName());
 				
 				loadRecords(data);
 				loadTemplates(data);
-				loadVdctData(data);				
+				loadVdctData(dataId, data);				
 			}
 		} catch (SQLException sqlException) {
 			sqlException.printStackTrace();
@@ -115,7 +115,7 @@ public class RdbDataMapper {
 				}
 				saveDefinitionFile();
 				saveRecords();
-				saveVdctData();
+				saveVdctData(dataId);
 				
 				helper.commit();
 			}
@@ -592,19 +592,19 @@ public class RdbDataMapper {
         }
 	}
 	
-	private void loadVdctData(DBData data) throws SQLException {
+	private void loadVdctData(Object dsId, DBData data) throws SQLException {
 
 		Object[] columns = {"p_db_vdct"};
     	Object[][] keyPairs = {{"p_db_id"}, {pDbId}};
 		
    		ResultSet set = helper.loadRows("p_db", columns, keyPairs);
    		if (set.next()) {
-   			DBResolver.readVdctData(data, set.getString(1), data.getTemplateData().getId());
+   			DBResolver.readVdctData(dsId, data, set.getString(1), data.getTemplateData().getId());
    		}
 	}
 	
-	private void saveVdctData() throws SQLException {
-		String string = Group.getVDCTData();
+	private void saveVdctData(Object dsId) throws SQLException {
+		String string = Group.getVDCTData(dsId);
     	Object[][] keyPairs = {{"p_db_id"}, {pDbId}};
 		Object[][] valuePairs = {{"p_db_vdct"}, {string}};
    		helper.saveRow("p_db", keyPairs, valuePairs);

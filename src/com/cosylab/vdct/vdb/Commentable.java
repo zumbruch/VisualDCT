@@ -30,7 +30,6 @@ package com.cosylab.vdct.vdb;
 
 public interface Commentable {
 	
-	//Object getDsId();
 	/**
 	 * Returns the name.
 	 * @return String
@@ -48,4 +47,6 @@ public interface Commentable {
 	 * @param comment The comment to set
 	 */
 	void setComment(String comment);
+
+	Object getDsId();
 }

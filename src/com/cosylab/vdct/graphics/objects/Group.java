@@ -55,6 +55,12 @@ import com.cosylab.vdct.Version;
 import com.cosylab.vdct.db.DBDataEntry;
 import com.cosylab.vdct.db.DBEntry;
 import com.cosylab.vdct.db.DBResolver;
+import com.cosylab.vdct.db.DBSheetColWidth;
+import com.cosylab.vdct.db.DBSheetColumn;
+import com.cosylab.vdct.db.DBSheetData;
+import com.cosylab.vdct.db.DBSheetRowOrder;
+import com.cosylab.vdct.db.DBSheetSplitCol;
+import com.cosylab.vdct.db.DBSheetView;
 import com.cosylab.vdct.db.DBTemplateEntry;
 import com.cosylab.vdct.dbd.DBDConstants;
 import com.cosylab.vdct.events.CommandManager;
@@ -63,12 +69,6 @@ import com.cosylab.vdct.graphics.DsEventListener;
 import com.cosylab.vdct.graphics.FontMetricsBuffer;
 import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.inspector.InspectableProperty;
-import com.cosylab.vdct.inspector.SplitData;
-import com.cosylab.vdct.inspector.SplitPartWidthData;
-import com.cosylab.vdct.inspector.SpreadsheetColumnData;
-import com.cosylab.vdct.inspector.SpreadsheetRowOrder;
-import com.cosylab.vdct.inspector.SpreadsheetTableViewData;
-import com.cosylab.vdct.inspector.SpreadsheetTableViewRecord;
 import com.cosylab.vdct.undo.UndoManager;
 import com.cosylab.vdct.util.DBDEntry;
 import com.cosylab.vdct.util.StringUtils;
@@ -91,7 +91,7 @@ SaveObject, DsEventListener {
 	private static String nullString = "";
 	private static Group root = null;
 	
-	protected Object id = null; 
+	protected Object dsId = null; 
 	protected String name;
 	protected String namePrefix;
 	// local view settings
@@ -234,7 +234,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 	 * Creation date: (4.2.2001 22:02:39)
 	 * @param group java.lang.String
 	 */
-	public Flexible copyToGroup(java.lang.String group) {
+	public Flexible copyToGroup(Object dsId, String group) {
 
 		String newName;
 		String oldName = getAbsoluteName();
@@ -270,7 +270,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 		for (int i=0; i < objs.length; i++) {
 			if (objs[i] instanceof Flexible) {
 				flexible = (Flexible)objs[i];
-				flexible.copyToGroup(newName);
+				flexible.copyToGroup(dsId, newName);
 			}
 		}
 
@@ -483,6 +483,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 			clipboard = new Group(null);
 			clipboard.setAbsoluteName(Constants.CLIPBOARD_NAME);
 			clipboard.setLookupTable(new Hashtable());
+			rootGroups.put(Constants.CLIPBOARD_NAME, clipboard);
 		}
 		return clipboard;
 	}
@@ -516,7 +517,9 @@ private void addSubObjectToLayout(VisibleObject object) {
 	 * @return com.cosylab.vdct.graphics.ViewState
 	 */
 	public ViewState getLocalView() {
-		if (localView==null) localView = new ViewState(getDsId());
+		if (localView == null) {
+			localView = new ViewState();
+		}
 		return localView;
 	}
 	/**
@@ -709,8 +712,11 @@ private void addSubObjectToLayout(VisibleObject object) {
 	 * Creation date: (4.2.2001 22:02:39)
 	 * @param group java.lang.String
 	 */
-	public boolean moveToGroup(java.lang.String group) {
-		if (group.equals(getAbsoluteName())) return false; 	// move to itself
+	public boolean moveToGroup(Object dsId, String group) {
+		// move to itself
+		if (group.equals(getAbsoluteName()) && dsId.equals(getDsId())) {
+			return false; 	
+		}
 
 		//String oldName = getAbsoluteName();
 		String newName;
@@ -719,12 +725,12 @@ private void addSubObjectToLayout(VisibleObject object) {
 		else
 			newName = group+Constants.GROUP_SEPARATOR+getName();
 
-		Object obj = Group.getRoot().findObject(newName, true);
+		Object obj = Group.getRoot(dsId).findObject(newName, true);
 		while (obj!=null && obj!=this)
 		{
 			//newName += Constants.MOVE_SUFFIX;
 			newName = StringUtils.incrementName(newName, Constants.MOVE_SUFFIX);
-			obj = Group.getRoot().findObject(newName, true);
+			obj = Group.getRoot(dsId).findObject(newName, true);
 		}
 
 		//getRoot().addSubObject(newName, this, true);
@@ -735,7 +741,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 		setParent(null);
 		setAbsoluteName(newName);
 
-		Group g = (Group)getRoot().findObject(group, true);
+		Group g = (Group)getRoot(dsId).findObject(group, true);
 		if (g==null) {
 			g=Group.createGroup(group);
 			if (Settings.getInstance().getSnapToGrid())
@@ -755,7 +761,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 		for (int i=0; i < objs.length; i++) {
 			if (objs[i] instanceof Flexible) {
 				flexible = (Flexible)objs[i];
-				flexible.moveToGroup(newName);
+				flexible.moveToGroup(dsId, newName);
 			}
 		}
 
@@ -850,7 +856,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 		getParent().addSubObject(getName(), this);
 
 		// move if needed
-		if (!moveToGroup(Group.substractParentName(newName)))
+		if (!moveToGroup(getDsId(), Group.substractParentName(newName)))
 		{
 			Flexible flexible;
 			Object[] objs = new Object[subObjectsV.size()];
@@ -858,7 +864,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 			for (int i=0; i < objs.length; i++) {
 				if (objs[i] instanceof Flexible) {
 					flexible = (Flexible)objs[i];
-					flexible.moveToGroup(newName);
+					flexible.moveToGroup(getDsId(), newName);
 				}
 			}
 		}
@@ -1296,11 +1302,11 @@ private void addSubObjectToLayout(VisibleObject object) {
 
 	}
 
-	public static String getVDCTData() {
+	public static String getVDCTData(Object dsId) {
 
 		StringWriter writer = new StringWriter();
 		try {
-			writeVDCTViewData(writer);
+			writeVDCTViewData(dsId, writer);
 			NamingContext renamer = new NamingContext(null, Group.getEditingTemplateData(), null, null, false);
 			Group.getRoot().writeVDCTObjects(writer, renamer, false);
 			writer.flush();
@@ -1310,13 +1316,13 @@ private void addSubObjectToLayout(VisibleObject object) {
 		return writer.toString();
 	}
 
-	private static void writeVDCTViewData(DataOutputStream file) throws IOException {
+	private static void writeVDCTViewData(Object dsId, DataOutputStream file) throws IOException {
 		Writer writer = new OutputStreamWriter(file);
-		writeVDCTViewData(writer);
+		writeVDCTViewData(dsId, writer);
 		writer.flush();
 	}
 
-	private static void writeVDCTViewData(Writer writer) throws IOException {
+	private static void writeVDCTViewData(Object dsId, Writer writer) throws IOException {
 
 		final String nl = "\n";
 
@@ -1339,26 +1345,26 @@ private void addSubObjectToLayout(VisibleObject object) {
 		final String SPREADSHEET_SPLITCOLUMN_START = DBResolver.VDCTSPREADSHEET_SPLITCOLUMN + "(";
 		final String SPREADSHEET_RECENTSPLIT_START = DBResolver.VDCTSPREADSHEET_RECENTSPLIT + "(";
 
-		ViewState view = ViewState.getInstance();
+		ViewState view = ViewState.getInstance(dsId);
 
 		writer.write(VIEW_START + view.getRx() + comma + view.getRy() +
 				comma + view.getScale() + ending);
 
 		// Write the data on the spreadsheet views.
-		Iterator iterator = SpreadsheetTableViewData.getInstance().getRecords();
-		SpreadsheetTableViewRecord sprView = null; 
+		Iterator iterator = DBSheetData.getInstance(dsId).getRecords();
+		DBSheetView sprView = null; 
 		while (iterator.hasNext()) {
-			sprView = (SpreadsheetTableViewRecord)iterator.next();
+			sprView = (DBSheetView)iterator.next();
 
 			String modeName = sprView.getModeName();
 			Boolean showAllRows = sprView.getShowAllRows();
 			Boolean groupColumnsByGuiGroup = sprView.getGroupColumnsByGuiGroup();
 			Integer backgroundColor = sprView.getBackgroundColor();
-			SpreadsheetRowOrder rowOrder = sprView.getRowOrder();
+			DBSheetRowOrder rowOrder = sprView.getRowOrder();
 			Map columns = sprView.getColumns();
 			String[] hiddenRows = sprView.getHiddenRows();
-			SplitData[] splitColumns = sprView.getSplitColumns();
-			SplitData[] recentSplits = sprView.getRecentSplits();
+			DBSheetSplitCol[] splitColumns = sprView.getSplitColumns();
+			DBSheetSplitCol[] recentSplits = sprView.getRecentSplits();
 
 			// If no data, skip writing the entry.
 			if (modeName == null
@@ -1412,13 +1418,13 @@ private void addSubObjectToLayout(VisibleObject object) {
 				Iterator colIterator = columns.values().iterator();
 
 				while (colIterator.hasNext()) {
-					SpreadsheetColumnData column = (SpreadsheetColumnData)colIterator.next(); 
+					DBSheetColumn column = (DBSheetColumn)colIterator.next(); 
 					writer.write(comma + SPREADSHEET_COLUMN_START);
 					writer.write(quote + column.getName() + quote);
 					writer.write(comma + quote + String.valueOf(column.isHidden()) + quote);
 					writer.write(comma + String.valueOf(column.getSortIndex()));
 
-					SplitPartWidthData[] widths = column.getSplitIndices();
+					DBSheetColWidth[] widths = column.getSplitIndices();
 					for (int i = 0; i < widths.length; i++) {
 						writer.write(comma + SPREADSHEET_WIDTH_START);
 						writer.write(String.valueOf(widths[i].getSplitIndex()));
@@ -2018,7 +2024,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 	/**
 	 * Insert the method's description here.
 	 */
-	public static void save(Group group2save, File file, boolean export) throws IOException
+	public static void save(Object dsId, Group group2save, File file, boolean export) throws IOException
 	{
 		// create new namer	 
 		String path2remove = group2save.getAbsoluteName();
@@ -2036,13 +2042,13 @@ private void addSubObjectToLayout(VisibleObject object) {
 			addedPrefix=name+Constants.HIERARCHY_SEPARATOR;
 		}
 
-		save(group2save, file, new NamingContext(null, Group.getEditingTemplateData(), addedPrefix, path2remove, export), export);
+		save(dsId, group2save, file, new NamingContext(null, Group.getEditingTemplateData(), addedPrefix, path2remove, export), export);
 	}
 
 	/**
 	 * Insert the method's description here.
 	 */
-	public static void save(Group group2save, File file, NamingContext renamer, boolean export) throws IOException
+	public static void save(Object dsId, Group group2save, File file, NamingContext renamer, boolean export) throws IOException
 	{
 		DataOutputStream stream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
 
@@ -2086,7 +2092,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 			if (!export)	
 			{
 				stream.writeBytes("\n#! Further lines contain data used by VisualDCT\n");
-				writeVDCTViewData(stream);			
+				writeVDCTViewData(dsId, stream);			
 				group2save.writeVDCTObjects(stream, renamer, export);
 			}
 
@@ -2249,22 +2255,28 @@ private void addSubObjectToLayout(VisibleObject object) {
 	 }
 	 
 	public static Vector getAllRoots() {
-		return new Vector(rootGroups.values());
+		Vector vector = new Vector();
+		Iterator iterator = rootGroups.values().iterator();
+		Group group = null; 
+		while (iterator.hasNext()) {
+			group = ((Group)iterator.next());
+			if (!group.getAbsoluteName().equals(Constants.CLIPBOARD_NAME)) {
+				vector.add(group);
+			}
+		}
+		return vector;
 	}
 	 
-	public Object getId() {
-		return id;
-	}
-	public void setId(Object id) {
-		this.id = id;
-	}
-	
     public Object getDsId() {
-    	Object rootId = getParent() != null ? getParent().getDsId() : id;
+    	Object rootId = getParent() != null ? getParent().getDsId() : dsId;
     	if (rootId == null) {
     		System.out.println("Warning: returning null for root container id.");
     	}
     	return rootId;
+	}
+
+	public void setDsId(Object dsId) {
+		this.dsId = dsId;
 	}
     
     public static void registerDsListener() {
@@ -2276,7 +2288,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 
     public void onDsAdded(Object id) {
     	Group group = new Group(null);
-    	group.setId(id);
+    	group.setDsId(id);
     	group.setAbsoluteName("");
     	group.setLookupTable(new Hashtable());
         rootGroups.put(id, group);

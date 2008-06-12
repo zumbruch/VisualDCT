@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
+ * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -25,81 +25,51 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package com.cosylab.vdct.inspector.sheet;
 
-package com.cosylab.vdct.inspector;
+import com.cosylab.vdct.inspector.InspectableProperty;
+import com.cosylab.vdct.vdb.CreatorPropertyListener;
+import com.cosylab.vdct.vdb.NameValueInfoProperty;
 
 /**
  * @author ssah
  *
  */
-public class SpreadsheetColumnData implements Comparable {
-
-	private String name = null;
-	private boolean hidden = false;
-	private int sortIndex = 0;
-	private SplitPartWidthData[] splitIndices = null;
-
-	public SpreadsheetColumnData(String columnName, boolean hidden, int sortIndex) {
-		this(columnName, hidden, sortIndex, new SplitPartWidthData[0]);
-	}
+public class CreatorProperty extends NameValueInfoProperty {
 	
-	public SpreadsheetColumnData(String name, boolean hidden, int sortIndex,
-			SplitPartWidthData[] splitIndices) {
-		super();
-		this.name = name;
-		this.hidden = hidden;
-		this.sortIndex = sortIndex;
-		this.splitIndices = splitIndices;
+	private CreatorPropertyListener listener = null;
+	private InspectableProperty createdProperty = null;
+
+	public CreatorProperty(CreatorPropertyListener listener) {
+		super("", "");
+		this.listener = listener;
 	}
-	
+
 	/* (non-Javadoc)
-	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 * @see com.cosylab.vdct.vdb.NameValueInfoProperty#isEditable()
 	 */
-	public int compareTo(Object o) {
-		return sortIndex  - ((SpreadsheetColumnData)o).sortIndex;
+	public boolean isEditable() {
+		return true;
 	}
 
-	public String getName() {
-		return name;
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.vdb.NameValueInfoProperty#setValue(java.lang.String)
+	 */
+	public void setValue(String value) {
+		if (value.equals("")) {
+			name = "";
+			createdProperty = null;
+			return;
+		}
+		createdProperty = listener.addProperty(name, value);
+		super.setValue(value);
 	}
-
+	
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	public boolean isHidden() {
-		return hidden;
-	}
-
-	public void setHidden(boolean hidden) {
-		this.hidden = hidden;
-	}
-
-	/**
-	 * @return the sortIndex
-	 */
-	public int getSortIndex() {
-		return sortIndex;
-	}
-
-	/**
-	 * @param sortIndex the sortIndex to set
-	 */
-	public void setSortIndex(int sortIndex) {
-		this.sortIndex = sortIndex;
-	}
-
-	/**
-	 * @return the splitIndices
-	 */
-	public SplitPartWidthData[] getSplitIndices() {
-		return splitIndices;
-	}
-
-	/**
-	 * @param splitIndices the splitIndices to set
-	 */
-	public void setSplitIndices(SplitPartWidthData[] splitIndices) {
-		this.splitIndices = splitIndices;
+	public InspectableProperty getCreatedProperty() {
+		return createdProperty;
 	}
 }

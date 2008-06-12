@@ -26,7 +26,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.cosylab.vdct.inspector;
+package com.cosylab.vdct.inspector.sheet;
 
 import java.awt.Color;
 import java.awt.Dialog;
@@ -51,6 +51,8 @@ import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+
+import com.cosylab.vdct.db.DBSheetSplitCol;
 
 /**
  * @author ssah
@@ -373,7 +375,7 @@ public class CustomSplitDialog extends JDialog implements ActionListener, Docume
 		area.setWrapStyleWord(true);
     }
     
-    public void setSplitData(SplitData data) {
+    public void setSplitData(DBSheetSplitCol data) {
         setDelimiterType(data.isDelimiterType());
         if (delimiterType) {
             delimiterField.setText(data.getPattern());
@@ -383,9 +385,9 @@ public class CustomSplitDialog extends JDialog implements ActionListener, Docume
         checkPattern(); 
     }
 
-    public SplitData getSplitData() {
+    public DBSheetSplitCol getSplitData() {
         String pattern = delimiterType ? delimiterField.getText() : patternField.getText();
-    	return (pattern != null && pattern.length() > 0) ? new SplitData(delimiterType, pattern) : null;
+    	return (pattern != null && pattern.length() > 0) ? new DBSheetSplitCol(delimiterType, pattern) : null;
     }
 
 	public void actionPerformed(ActionEvent event) {
@@ -453,7 +455,7 @@ public class CustomSplitDialog extends JDialog implements ActionListener, Docume
 		    testData = "";
 		}
 		
-		SplitData splitData = new SplitData(delimiterType, pattern);
+		DBSheetSplitCol splitData = new DBSheetSplitCol(delimiterType, pattern);
 		SplitPropertyGroup splitGroup = new SplitPropertyGroup(testData, splitData);
 		
 		if (splitGroup.isErrorInPattern()) {

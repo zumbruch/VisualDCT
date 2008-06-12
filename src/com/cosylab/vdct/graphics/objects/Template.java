@@ -62,11 +62,10 @@ import com.cosylab.vdct.graphics.FontMetricsBuffer;
 import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.graphics.popup.PopUpMenu;
 import com.cosylab.vdct.graphics.popup.Popupable;
-import com.cosylab.vdct.inspector.CreatorProperty;
 import com.cosylab.vdct.inspector.Inspectable;
 import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.inspector.InspectorManager;
-import com.cosylab.vdct.inspector.NameProperty;
+import com.cosylab.vdct.inspector.sheet.CreatorProperty;
 import com.cosylab.vdct.undo.ChangeTemplatePropertyAction;
 import com.cosylab.vdct.undo.CreateTemplatePropertyAction;
 import com.cosylab.vdct.undo.DeleteTemplatePropertyAction;
@@ -81,6 +80,7 @@ import com.cosylab.vdct.vdb.LinkProperties;
 import com.cosylab.vdct.vdb.MonitoredActionProperty;
 import com.cosylab.vdct.vdb.MonitoredProperty;
 import com.cosylab.vdct.vdb.MonitoredPropertyListener;
+import com.cosylab.vdct.vdb.NameProperty;
 import com.cosylab.vdct.vdb.NameValueInfoProperty;
 import com.cosylab.vdct.vdb.VDBData;
 import com.cosylab.vdct.vdb.VDBFieldData;
@@ -1527,7 +1527,7 @@ public void setDestroyed(boolean newDestroyed) {
 /**
  * @see com.cosylab.vdct.graphics.objects.Flexible#copyToGroup(String)
  */
-public Flexible copyToGroup(java.lang.String group) {
+public Flexible copyToGroup(Object dsId, java.lang.String group) {
 
 	String newName;
 	if (group.equals(nullString))
@@ -1539,7 +1539,7 @@ public Flexible copyToGroup(java.lang.String group) {
 	// object with new name already exists, add suffix ///!!!
 	//Object obj;
 
-	while (Group.getRoot().findObject(newName, true)!=null)
+	while (Group.getRoot(dsId).findObject(newName, true)!=null)
 //		newName += Constants.COPY_SUFFIX;
 			newName = StringUtils.incrementName(newName, Constants.COPY_SUFFIX);
 
@@ -1549,7 +1549,7 @@ public Flexible copyToGroup(java.lang.String group) {
 	VDBTemplateInstance theDataCopy = VDBData.copyVDBTemplateInstance(templateData);
 	theDataCopy.setName(newName);
 	Template theTemplateCopy = new Template(null, theDataCopy);
-	Group.getRoot().addSubObject(theDataCopy.getName(), theTemplateCopy, true);
+	Group.getRoot(dsId).addSubObject(theDataCopy.getName(), theTemplateCopy, true);
 	//theTemplateCopy.setDescription(getTemplateData().getTemplate().getDescription());
 	theTemplateCopy.setX(getX()); theTemplateCopy.setY(getY());
 	//theTemplateCopy.move(20-view.getRx(), 20-view.getRy());
@@ -1650,7 +1650,7 @@ public void fixMacrosOnCopy(String prevGroup, String group) {
 /**
  * @see com.cosylab.vdct.graphics.objects.Flexible#moveToGroup(String)
  */
-public boolean moveToGroup(java.lang.String group) {
+public boolean moveToGroup(Object dsId, String group) {
 	String currentParent = Group.substractParentName(templateData.getName());
 	if (group.equals(currentParent)) return false;
 	
@@ -1665,7 +1665,7 @@ public boolean moveToGroup(java.lang.String group) {
 	// object with new name already exists, add suffix // !!!
 	Object obj;
 	boolean renameNeeded = false;
-	while ((obj=Group.getRoot().findObject(newName, true))!=null)
+	while ((obj=Group.getRoot(dsId).findObject(newName, true))!=null)
 	{
 		if (obj==this)	// it's me :) already moved, fix data
 		{
@@ -1686,7 +1686,7 @@ public boolean moveToGroup(java.lang.String group) {
 
 	getParent().removeObject(Group.substractObjectName(getName()));
 	setParent(null);
-	Group.getRoot().addSubObject(newName, this, true);
+	Group.getRoot(dsId).addSubObject(newName, this, true);
 
 	templateData.setName(newName);
 	this.updateTemplateFields();
@@ -1730,7 +1730,7 @@ public boolean rename(java.lang.String newName) {
 	this.updateTemplateFields();
 
 	// move if needed
-	if (!moveToGroup(Group.substractParentName(newName)))
+	if (!moveToGroup(getDsId(), Group.substractParentName(newName)))
 		fixLinks();			// fix needed
 
 	return true;

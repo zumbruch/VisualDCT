@@ -25,15 +25,15 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.cosylab.vdct.inspector;
+package com.cosylab.vdct.vdb;
 
 import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.events.commands.GetGUIInterface;
 import com.cosylab.vdct.events.commands.GetVDBManager;
 import com.cosylab.vdct.graphics.VDBInterface;
 import com.cosylab.vdct.graphics.objects.Flexible;
+import com.cosylab.vdct.inspector.Inspectable;
 import com.cosylab.vdct.plugin.config.PluginNameConfigManager;
-import com.cosylab.vdct.vdb.NameValueInfoProperty;
 
 /**
  * An InspectableProperties interface for editing names.

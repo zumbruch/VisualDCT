@@ -100,4 +100,7 @@ void updateProperty(InspectableProperty property);
 /**
  */
 int getMode();
+
+Object getDsId();
 }
+

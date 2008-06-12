@@ -28,12 +28,13 @@
 
 package com.cosylab.vdct.graphics;
 
+import com.cosylab.vdct.db.DBSheetData;
 import com.cosylab.vdct.graphics.objects.Group;
-import com.cosylab.vdct.inspector.InspectorManager;
 import com.cosylab.vdct.undo.UndoManager;
 
 /**
  * @author ssah
+ *
  *
  */
 public class DsListenerInitializer {
@@ -41,7 +42,7 @@ public class DsListenerInitializer {
 	public static void registerDsManagerListeners() {
 		Group.registerDsListener();
 		ViewState.registerDsListener();
-		InspectorManager.registerDsListener();
 		UndoManager.registerDsListener();
+		DBSheetData.registerDsListener();
 	}
 }

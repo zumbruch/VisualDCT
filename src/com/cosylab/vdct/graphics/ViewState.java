@@ -35,7 +35,6 @@ import java.util.Vector;
 import com.cosylab.vdct.Settings;
 import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.events.commands.GetDsManager;
-import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.objects.InLink;
 import com.cosylab.vdct.graphics.objects.MultiInLink;
 import com.cosylab.vdct.graphics.objects.OutLink;
@@ -49,15 +48,11 @@ import com.cosylab.vdct.graphics.objects.VisibleObject;
 
 public class ViewState implements DsEventListener {
 
-	protected static ViewState instance = null;
-	
 	protected static HashMap instances = new HashMap();
 	
 	protected static int x0 = 0;				// origin
 	protected static int y0 = 0;
 
-	protected Object dsId = null;
-	
 	protected double drx = 0.0;				// precise translation (from origin)
 	protected double dry = 0.0;
 
@@ -88,8 +83,7 @@ public class ViewState implements DsEventListener {
  * Insert the method's description here.
  * Creation date: (21.12.2000 21:00:31)
  */
-public ViewState(Object dsId) {
-	this.dsId = dsId;
+public ViewState() {
 	selectedObjects = new Vector();
 	blinkingObjects = new Vector();
 }
@@ -98,8 +92,8 @@ public ViewState(Object dsId) {
  * Creation date: (3.5.2001 13:31:07)
  * @param original com.cosylab.vdct.graphics.ViewState
  */
-public ViewState(Object dsId, ViewState original) {
-	this(dsId);
+public ViewState(ViewState original) {
+	this();
 	
 	//this.x0 = original.x0;
 	//this.y0 = original.y0;
@@ -187,20 +181,6 @@ public LinkedHashSet getHilitedObjects() {
 
 public boolean isHilitedObject(VisibleObject object) {
 	return hilitedObjects.contains(object);
-}
-
-/**
- * Insert the method's description here.
- * Creation date: (21.12.2000 21:02:40)
- * @return com.cosylab.vdct.graphics.ViewState
- */
-public static ViewState getInstance() {
-	if (instance == null) {
-		System.err.println("Warning: view instance called while not yet initialized,"
-				+ " returning active default.");
-		instance = new ViewState(Group.getRoot().getId());
-	}
-	return instance;
 }
 
 public static ViewState getInstance(Object dsId) {
@@ -356,20 +336,7 @@ public void reset() {
 	selectedObjects.removeAllElements();
 	blinkingObjects.removeAllElements();
 }
-/**
- * Insert the method's description here.
- * Creation date: (3.5.2001 13:35:59)
- */
-public void set(com.cosylab.vdct.graphics.objects.Group group) {
-	if (group.getLocalView()!=null)
-		setInstance(group.getLocalView());
-	else
-	{
-		ViewState copy = new ViewState(group.getDsId(), this);
-		group.setLocalView(copy);
-		setInstance(copy);
-	}
-}
+
 /**
  * Insert the method's description here.
  * Creation date: (3.2.2001 15:52:58)
@@ -487,19 +454,15 @@ public void setFlat(boolean newFlat) {
  * Creation date: (21.12.2000 21:02:40)
  * @param newInstance com.cosylab.vdct.graphics.ViewState
  */
-public static void setInstance(ViewState newInstance) {
+public static void setInstance(Object dsId, ViewState newInstance) {
     // Ignore checks for all instances with no id, as they are only temporary.
-	if (newInstance.dsId != null) {
-		ViewState mapInstance = (ViewState)instances.get(newInstance.dsId);
-		if (mapInstance == null) {
-			System.err.println("Warning: view instance set while not yet registered, registering it.");
-
-			System.out.println("instance id: " + instance.dsId); 
-			System.out.println("new instance id: " + newInstance.dsId); 
-			instances.put(newInstance.dsId, newInstance);
-		}
+	ViewState mappedInstance = (ViewState)instances.get(dsId);
+	if (mappedInstance != null) {
+		instances.remove(dsId);
+	} else {
+		System.err.println("Warning: view instance set with unregistered id, registering it.");
     }
-	instance = newInstance;
+    instances.put(dsId, newInstance);
 }
 /**
  * Insert the method's description here.
@@ -614,12 +577,11 @@ public void setY0(int newY0) {
 	}
 	
 	public void onDsAdded(Object id) {
-	    instances.put(id, new ViewState(id));
+	    instances.put(id, new ViewState());
 	}
 	public void onDsRemoved(Object id) {
 		instances.remove(id);
 	}
 	public void onDsFocused(Object id) {
-	    instance = (ViewState)instances.get(id);
 	}
 }

@@ -39,7 +39,7 @@ public interface Flexible {
  * Creation date: (4.2.2001 21:59:44)
  * @param group java.lang.String
  */
-Flexible copyToGroup(String group);
+Flexible copyToGroup(Object dsId, String group);
 /**
  * Insert the method's description here.
  * Creation date: (3.5.2001 10:15:48)
@@ -51,7 +51,7 @@ String getFlexibleName();
  * Creation date: (4.2.2001 22:00:01)
  * @param group java.lang.String
  */
-boolean moveToGroup(String group);
+boolean moveToGroup(Object dsId, String group);
 /**
  * Insert the method's description here.
  * Creation date: (2.5.2001 23:23:17)

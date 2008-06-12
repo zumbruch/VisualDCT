@@ -1,9 +1,8 @@
 /**
  * 
  */
-package com.cosylab.vdct.inspector;
+package com.cosylab.vdct.vdb;
 
-import com.cosylab.vdct.vdb.NameValueInfoProperty;
 
 /**
  * @author ssah

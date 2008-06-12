@@ -183,7 +183,7 @@ public void setValue(String value) {
 	
 		// do not store undo for <null> -> ""
 		if (!(record.getComment()==null && (newValue==null || newValue.length()==0)))
-			UndoManager.getInstance().addAction(
+			UndoManager.getInstance(record.getDsId()).addAction(
 				new com.cosylab.vdct.undo.CommentChangeAction(this, record.getComment(), newValue)
 		);
 

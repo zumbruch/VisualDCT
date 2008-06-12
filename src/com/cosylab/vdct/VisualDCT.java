@@ -111,7 +111,7 @@ import com.cosylab.vdct.graphics.WorkspaceDesktop;
 import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.printing.Page;
 import com.cosylab.vdct.graphics.printing.PrintPreview;
-import com.cosylab.vdct.inspector.SpreadsheetInspector;
+import com.cosylab.vdct.inspector.sheet.SpreadsheetInspector;
 import com.cosylab.vdct.plugin.config.PluginNameConfigManager;
 import com.cosylab.vdct.rdb.RdbInstance;
 import com.cosylab.vdct.util.ComboBoxFileChooser;
@@ -2073,8 +2073,9 @@ public void exportPostScriptFileMenuItem_ActionPerformed()
 			}
 		}
 	};
-	// Copy the current view to prevent changes to it during thread run. 
-	new MyOwnPostScriptExportingThread(new ViewState(null, ViewState.getInstance())).start();
+	// Copy the current active view to prevent changes to it during thread run.
+	ViewState view = new ViewState(ViewState.getInstance(Group.getRoot().getDsId()));
+	new MyOwnPostScriptExportingThread(view).start();
 }
 /**
  * Comment
@@ -7135,7 +7136,8 @@ public void printAsPostScriptMenuItem_ActionPerformed()
 	};
 
 	// Copy the current view to prevent changes to it during thread run. 
-	new MyOwnPostScriptPrintingThread(new ViewState(null, ViewState.getInstance())).start();
+	ViewState view = new ViewState(ViewState.getInstance(Group.getRoot().getDsId()));
+	new MyOwnPostScriptPrintingThread(view).start();
 }
 /**
  * Comment

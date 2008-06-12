@@ -25,7 +25,7 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.cosylab.vdct.inspector;
+package com.cosylab.vdct.inspector.sheet;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -68,6 +68,12 @@ import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.objects.Record;
 import com.cosylab.vdct.graphics.objects.Template;
+import com.cosylab.vdct.inspector.HelpDisplayer;
+import com.cosylab.vdct.inspector.Inspectable;
+import com.cosylab.vdct.inspector.InspectableObjectsListener;
+import com.cosylab.vdct.inspector.InspectorCellEditor;
+import com.cosylab.vdct.inspector.InspectorTableCellRenderer;
+import com.cosylab.vdct.inspector.InspectorTableClipboardAdapter;
 import com.cosylab.vdct.undo.MacroActionEventListener;
 import com.cosylab.vdct.undo.UndoManager;
 import com.cosylab.vdct.util.StringUtils;
@@ -158,14 +164,14 @@ public class SpreadsheetInspector extends JDialog
 			loadData();
 			refreshDynamicGUI();
 			DataProvider.getInstance().addInspectableListener(this);
-			UndoManager.getInstance().addMacroActionEventListener(this);
+			UndoManager.getInstance(dsId).addMacroActionEventListener(this);
 		} else {
 			closeEditors();
 			saveView();
 	    	currentTab = getSelectedTab();
 
 			DataProvider.getInstance().removeInspectableListener(this);
-			UndoManager.getInstance().removeMacroActionEventListener(this);
+			UndoManager.getInstance(dsId).removeMacroActionEventListener(this);
         }
 		super.setVisible(b);
 	}
@@ -702,7 +708,7 @@ public class SpreadsheetInspector extends JDialog
 
         	// Create an unique name in the same fashion as while copying.
         	String name = inspectable.getName();
-        	while (Group.getRoot().findObject(name, true) != null) {
+        	while (Group.getRoot(dsId).findObject(name, true) != null) {
         	    name = StringUtils.incrementName(name, Constants.COPY_SUFFIX);
         	}
     		GetVDBManager manager = (GetVDBManager)CommandManager.getInstance().getCommand("GetVDBManager");
@@ -758,7 +764,7 @@ public class SpreadsheetInspector extends JDialog
 		displayedInspectables = new HashMap();
 		
 		fillTable(inspectables, DataProvider.getInstance().getInspectable(dsId));
-		fillTable(displayedInspectables, ViewState.getInstance().getSelectedObjects());
+		fillTable(displayedInspectables, ViewState.getInstance(dsId).getSelectedObjects());
 		if (displayedInspectables.isEmpty()) {
 			fillTable(displayedInspectables, DataProvider.getInstance().getInspectable(dsId));
 		}

@@ -26,7 +26,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.cosylab.vdct.inspector;
+package com.cosylab.vdct.inspector.sheet;
 
 import java.awt.Color;
 import java.util.Enumeration;
@@ -43,6 +43,11 @@ import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
+
+import com.cosylab.vdct.db.DBSheetColWidth;
+import com.cosylab.vdct.db.DBSheetColumn;
+import com.cosylab.vdct.db.DBSheetSplitCol;
+import com.cosylab.vdct.db.DBSheetView;
 
 /**This table model manages the column model and persistence of column widths and background color.   
  * 
@@ -183,7 +188,7 @@ public class SpreadsheetColumnViewModel extends SpreadsheetSplitViewModel implem
 	/* (non-Javadoc)
 	 * @see com.cosylab.vdct.inspector.SpreadsheetSplitViewModel#splitColumn(com.cosylab.vdct.inspector.SplitData, int)
 	 */
-	public void splitColumn(SplitData splitData, int column) {
+	public void splitColumn(DBSheetSplitCol splitData, int column) {
 		super.splitColumn(splitData, column);
 		refreshColumns();
 	}
@@ -262,7 +267,7 @@ public class SpreadsheetColumnViewModel extends SpreadsheetSplitViewModel implem
 	}
 
 	private void recallTableColor() {
-		SpreadsheetTableViewRecord record = getViewRecord();
+		DBSheetView record = getViewRecord();
 
 		Integer recBackgroundColor = record.getBackgroundColor(); 
 		if (recBackgroundColor != null) {
@@ -271,7 +276,7 @@ public class SpreadsheetColumnViewModel extends SpreadsheetSplitViewModel implem
 	}
 	
 	private void storeTableColor() {
-		SpreadsheetTableViewRecord record = getViewRecord();
+		DBSheetView record = getViewRecord();
 
 		boolean defaultBackgroundColour = background.equals(defaultBackground);
         if (!defaultBackgroundColour) {
@@ -282,11 +287,11 @@ public class SpreadsheetColumnViewModel extends SpreadsheetSplitViewModel implem
 	}
 	
 	private void recallColumnWidths() {
-		SpreadsheetTableViewRecord record = getViewRecord();
+		DBSheetView record = getViewRecord();
 		
 		Iterator columns = record.getColumns().values().iterator();
 		while (columns.hasNext()) {
-			SpreadsheetColumnData columnData = (SpreadsheetColumnData)columns.next();
+			DBSheetColumn columnData = (DBSheetColumn)columns.next();
 
 			int baseIndex = getPropertiesColumnIndex(columnData.getName());
 			if (baseIndex == -1) {
@@ -299,7 +304,7 @@ public class SpreadsheetColumnViewModel extends SpreadsheetSplitViewModel implem
 			boolean split = isSplit(index);
 			int splitParts = getSplitParts(baseIndex);
 			
-			SplitPartWidthData[] data = columnData.getSplitIndices();
+			DBSheetColWidth[] data = columnData.getSplitIndices();
 			for (int i = 0; i < data.length; i++) {
 				int splitIndex = data[i].getSplitIndex();
 				if (split == (splitIndex != -1) && splitIndex < splitParts) {
@@ -312,12 +317,12 @@ public class SpreadsheetColumnViewModel extends SpreadsheetSplitViewModel implem
 	}
 	
 	private void storeColumnWidths() {
-		SpreadsheetTableViewRecord record = getViewRecord();
+		DBSheetView record = getViewRecord();
 		
 		Map columnsMap = record.getColumns();
 		Iterator columns = columnsMap.values().iterator();
 		while (columns.hasNext()) {
-			SpreadsheetColumnData columnData = (SpreadsheetColumnData)columns.next();
+			DBSheetColumn columnData = (DBSheetColumn)columns.next();
 
 			int baseIndex = getPropertiesColumnIndex(columnData.getName());
 			if (baseIndex == -1) {
@@ -334,10 +339,10 @@ public class SpreadsheetColumnViewModel extends SpreadsheetSplitViewModel implem
 			for (int i = 0; i < splitParts; i++) {
 				SpreadsheetColumn column = (SpreadsheetColumn)getColumn(splitIndex + i);
 				if (!column.isDefaultWidth()) {
-					widthsVector.add(new SplitPartWidthData(split ? i : -1, column.getPreferredWidth()));
+					widthsVector.add(new DBSheetColWidth(split ? i : -1, column.getPreferredWidth()));
 				}
 			}
-			SplitPartWidthData[] widths = new SplitPartWidthData[widthsVector.size()];
+			DBSheetColWidth[] widths = new DBSheetColWidth[widthsVector.size()];
 			widthsVector.copyInto(widths);
 			columnData.setSplitIndices(widths);
 		}

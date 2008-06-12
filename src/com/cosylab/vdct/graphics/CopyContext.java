@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2007, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
+ * Copyright (c) 2008, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -26,74 +26,62 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.cosylab.vdct.inspector;
+package com.cosylab.vdct.graphics;
+
+import java.util.ArrayList;
+import java.util.Vector;
 
 /**
  * @author ssah
  *
  */
-public class SpreadsheetRowOrder {
+public class CopyContext {
 
-	private String columnName = null;
-	private int columnSplitIndex = 0;
-	private boolean ascending = true;
+	// to remember on cut from which group object has been cut 
+	private ArrayList pasteNames = null;
+	// to remember copied objects for multiple pasting
+	private Vector copiedObjects = null;
+	private int pasteCount = 0;
 	
-    private static final String ascendingString = "Ascending";
-    private static final String descendingString = "Descending";
-
-    /**
-	 * @param columnName
-	 * @param columnSplitIndex
-	 * @param ascending
-	 */
-	public SpreadsheetRowOrder(String columnName, int columnSplitIndex, String ascending) {
-		this(columnName, columnSplitIndex, isAscending(ascending));
-	}
-    
-    /**
-	 * @param columnName
-	 * @param columnSplitIndex
-	 * @param ascending
-	 */
-	public SpreadsheetRowOrder(String columnName, int columnSplitIndex, boolean ascending) {
+	private double pasteX = 0;
+	private double pasteY = 0;
+	private boolean doOffsetAtPaste = false;
+	
+	
+	public CopyContext() {
 		super();
-		this.columnName = columnName;
-		this.columnSplitIndex = columnSplitIndex;
-		this.ascending = ascending;
+		pasteNames = new ArrayList();
+		copiedObjects = new Vector();
 	}
-
-	/**
-	 * @return the orderedColumnName
-	 */
-	public String getColumnName() {
-		return columnName;
+	
+	public int getPasteCount() {
+		return pasteCount;
 	}
-
-	/**
-	 * @return the orderedColumnSplitIndex
-	 */
-	public int getColumnSplitIndex() {
-		return columnSplitIndex;
+	public void setPasteCount(int pasteCount) {
+		this.pasteCount = pasteCount;
 	}
-
-	/**
-	 * @return the orderAscending
-	 */
-	public boolean isAscending() {
-		return ascending;
+	public double getPasteX() {
+		return pasteX;
 	}
-
-	/**
-	 * @return the orderAscending
-	 */
-	public String getAscendingString() {
-		return ascending ? ascendingString : descendingString;
+	public void setPasteX(double pasteX) {
+		this.pasteX = pasteX;
 	}
-
-	/**
-	 * @param ascending the orderAscending to set
-	 */
-	public static boolean isAscending(String orderAscendingString) {
-		return orderAscendingString.equals(ascendingString);
+	public double getPasteY() {
+		return pasteY;
+	}
+	public void setPasteY(double pasteY) {
+		this.pasteY = pasteY;
+	}
+	public boolean isDoOffsetAtPaste() {
+		return doOffsetAtPaste;
+	}
+	public void setDoOffsetAtPaste(boolean doOffsetAtPaste) {
+		this.doOffsetAtPaste = doOffsetAtPaste;
+	}
+	public ArrayList getPasteNames() {
+		return pasteNames;
+	}
+	public Vector getCopiedObjects() {
+		return copiedObjects;
 	}
 }

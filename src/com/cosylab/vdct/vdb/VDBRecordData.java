@@ -28,12 +28,14 @@ package com.cosylab.vdct.vdb;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.util.*;
+import java.util.Hashtable;
+import java.util.Vector;
 
 import com.cosylab.vdct.DataProvider;
 import com.cosylab.vdct.dbd.DBDDeviceData;
-import com.cosylab.vdct.graphics.objects.*;
+import com.cosylab.vdct.graphics.objects.Record;
 import com.cosylab.vdct.inspector.Inspectable;
+import com.cosylab.vdct.inspector.InspectorManager;
 
 /**
  * This type was created in VisualAge.
@@ -42,6 +44,8 @@ import com.cosylab.vdct.inspector.Inspectable;
 public class VDBRecordData implements Commentable {
 	protected String record_type;
 	protected String name;
+	
+	protected Record record = null;
 	protected Hashtable fields = null;
 	protected Vector fieldsV = null;
 	protected String comment;
@@ -93,15 +97,22 @@ public void addField(VDBFieldData fd) {
  * @param field com.cosylab.vdct.vdb.VDBFieldData
  */
 public void fieldValueChanged(VDBFieldData field) {
+	
+	Record visualRecord = getRecord();
+	if (visualRecord != null) {
+		InspectorManager.getInstance().updateProperty(visualRecord, field);
+		visualRecord.fieldChanged(field);
+	}
+
+	// TODO:REM
+	/*
 	Record visualRecord = (Record)Group.getRoot().findObject(getName(), true);
 	if (visualRecord==null) {
 		System.err.println("Warning: record '" + getName() + "' not found.");
 		//com.cosylab.vdct.Console.getInstance().println("o) Internal error: no visual representaton of record "+getName()+" found.");
 		return;
 	}
-
-	com.cosylab.vdct.inspector.InspectorManager.getInstance().updateProperty(visualRecord, field);
-	visualRecord.fieldChanged(field);
+	*/
 }
 /**
  * Insert the method's description here.
@@ -158,15 +169,21 @@ public java.lang.String getType() {
  */
 public void setComment(java.lang.String newComment) {
 	comment = newComment;
+	
+	Inspectable visualObject = getRecord();
+	if (visualObject != null) {
+		InspectorManager.getInstance().updateCommentProperty(visualObject);
+	}
 
+	// TODO:REM
+	/*
 	Inspectable visualObj = (Inspectable)Group.getRoot().findObject(getName(), true);
 	if (visualObj==null) {
 		System.err.println("Warning: record '" + getName() + "' not found.");
 		//com.cosylab.vdct.Console.getInstance().println("o) Internal error: no visual representaton of record "+getName()+" found.");
 		return;
 	}
-
-	com.cosylab.vdct.inspector.InspectorManager.getInstance().updateCommentProperty(visualObj);
+	*/
 }
 /**
  * Insert the method's description here.
@@ -192,4 +209,20 @@ public void setType(java.lang.String newRecord_type) {
 public String toString() {
 	return name+" ("+record_type+")";
 }
+
+public Record getRecord() {
+	if (record == null) {
+		System.err.println("Warning: VDBRecordData.getRecord: returning null.");
+	}
+	return record;
+}
+
+public void setRecord(Record record) {
+	this.record = record;
+}
+
+public Object getDsId() {
+	return (record != null) ? record.getDsId() : null;
+}
+
 }

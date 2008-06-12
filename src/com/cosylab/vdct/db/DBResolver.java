@@ -34,12 +34,6 @@ import com.cosylab.vdct.Console;
 import com.cosylab.vdct.Settings;
 import com.cosylab.vdct.graphics.objects.InLink;
 import com.cosylab.vdct.graphics.objects.OutLink;
-import com.cosylab.vdct.inspector.SplitData;
-import com.cosylab.vdct.inspector.SplitPartWidthData;
-import com.cosylab.vdct.inspector.SpreadsheetColumnData;
-import com.cosylab.vdct.inspector.SpreadsheetRowOrder;
-import com.cosylab.vdct.inspector.SpreadsheetTableViewData;
-import com.cosylab.vdct.inspector.SpreadsheetTableViewRecord;
 import com.cosylab.vdct.util.*;
 import com.cosylab.vdct.vdb.VDBData;
 import com.cosylab.vdct.vdb.VDBTemplate;
@@ -299,7 +293,7 @@ public class DBResolver {
 	 * @param rootData com.cosylab.vdct.db.DBData
 	 * @param tokenizer java.io.EnhancedStreamTokenizer
 	 */
-	public static String processComment(DBData data, EnhancedStreamTokenizer tokenizer, String fileName) throws Exception {
+	public static String processComment(Object dsId, DBData data, EnhancedStreamTokenizer tokenizer, String fileName) throws Exception {
 
 		if ((data==null) || !tokenizer.sval.equals(DBConstants.layoutDataString)) {	// comment
 			String comment = tokenizer.sval;
@@ -856,7 +850,7 @@ public class DBResolver {
 						Boolean showAllRows = null;
 						Boolean groupColumnsByGuiGroup = null;
 						Integer backgroundColor = null;
-						SpreadsheetRowOrder rowOrder = null;
+						DBSheetRowOrder rowOrder = null;
 						Map columnsMap = new HashMap();
 						Vector splitColumnsVector = new Vector();
 						Vector hiddenRowsVector = new Vector();
@@ -950,13 +944,13 @@ public class DBResolver {
     									} else {
     										throw (new DBGParseException(errorString, tokenizer, fileName));
     									}
-    									widthData.add(new SplitPartWidthData(splitIndex, width));
+    									widthData.add(new DBSheetColWidth(splitIndex, width));
     									tokenizer.nextToken();
                                     }
 								
-									SplitPartWidthData[] splitPartWidthData = new SplitPartWidthData[widthData.size()];
+									DBSheetColWidth[] splitPartWidthData = new DBSheetColWidth[widthData.size()];
 									widthData.copyInto(splitPartWidthData);
-    								columnsMap.put(columnName, new SpreadsheetColumnData(columnName, hidden, sortIndex, splitPartWidthData));
+    								columnsMap.put(columnName, new DBSheetColumn(columnName, hidden, sortIndex, splitPartWidthData));
     								
     								continue;
 
@@ -986,7 +980,7 @@ public class DBResolver {
 									} else {
 										throw (new DBGParseException(errorString, tokenizer, fileName));
 									}
-									rowOrder = new SpreadsheetRowOrder(columnName, splitIndex, ascOrder);
+									rowOrder = new DBSheetRowOrder(columnName, splitIndex, ascOrder);
 
 								} else if (tokenizer.sval.equalsIgnoreCase(VDCTSPREADSHEET_HIDDENROW)) {
 									tokenizer.nextToken();
@@ -1023,7 +1017,7 @@ public class DBResolver {
 									} else {
 										throw (new DBGParseException(errorString, tokenizer, fileName));
 									}
-									splitColumnsVector.add(new SplitData(columnName, delimiterTypeString, pattern));
+									splitColumnsVector.add(new DBSheetSplitCol(columnName, delimiterTypeString, pattern));
 
 								} else if (tokenizer.sval.equalsIgnoreCase(VDCTSPREADSHEET_RECENTSPLIT)) {
 									tokenizer.nextToken();
@@ -1043,14 +1037,14 @@ public class DBResolver {
 									} else {
 										throw (new DBGParseException(errorString, tokenizer, fileName));
 									}
-									recentSplitsVector.add(new SplitData(delimiterTypeString, pattern));
+									recentSplitsVector.add(new DBSheetSplitCol(delimiterTypeString, pattern));
 
 								// For backward compatibility.
 								} else if (tokenizer.sval.equalsIgnoreCase(VDCTSPREADSHEET_COL)) {
 									tokenizer.nextToken();
 									if (tokenizer.ttype == EnhancedStreamTokenizer.TT_WORD ||
 											tokenizer.ttype == DBConstants.quoteChar) {
-										columnsMap.put(tokenizer.sval, new SpreadsheetColumnData(tokenizer.sval, false, columnPropertyIndex));
+										columnsMap.put(tokenizer.sval, new DBSheetColumn(tokenizer.sval, false, columnPropertyIndex));
 									} else {
 										throw (new DBGParseException(errorString, tokenizer, fileName));
 									}
@@ -1091,14 +1085,14 @@ public class DBResolver {
 							tokenizer.nextToken();
 						}
 						
-						SplitData[] splitColumns = new SplitData[splitColumnsVector.size()];
+						DBSheetSplitCol[] splitColumns = new DBSheetSplitCol[splitColumnsVector.size()];
 						splitColumnsVector.copyInto(splitColumns);
 						String[] hiddenRows = new String[hiddenRowsVector.size()];
 						hiddenRowsVector.copyInto(hiddenRows);
-						SplitData[] recentSplits = new SplitData[recentSplitsVector.size()];
+						DBSheetSplitCol[] recentSplits = new DBSheetSplitCol[recentSplitsVector.size()];
 						recentSplitsVector.copyInto(recentSplits);
 
-						SpreadsheetTableViewRecord viewRecord = new SpreadsheetTableViewRecord(type, name);
+						DBSheetView viewRecord = new DBSheetView(type, name);
 						viewRecord.setModeName(modeName);
 						viewRecord.setShowAllRows(showAllRows);
 						viewRecord.setGroupColumnsByGuiGroup(groupColumnsByGuiGroup);
@@ -1108,7 +1102,7 @@ public class DBResolver {
 						viewRecord.setSplitColumns(splitColumns);
 						viewRecord.setHiddenRows(hiddenRows);
 						viewRecord.setRecentSplits(recentSplits);
-						SpreadsheetTableViewData.getInstance().add(viewRecord);
+						DBSheetData.getInstance(dsId).add(viewRecord);
 
 					} else if (tokenizer.sval.equalsIgnoreCase(VDCTSKIP)) {
 
@@ -1459,7 +1453,7 @@ public class DBResolver {
 		}
 	}
 	
-	public static void readVdctData(DBData data, String vdctData, String source) {
+	public static void readVdctData(Object dsId, DBData data, String vdctData, String source) {
 		StringReader reader = new StringReader(vdctData);
 		EnhancedStreamTokenizer tokenizer = new EnhancedStreamTokenizer(reader);
 		initializeTokenizer(tokenizer);
@@ -1467,7 +1461,7 @@ public class DBResolver {
 			while (tokenizer.nextToken() != EnhancedStreamTokenizer.TT_EOF) {
 				if ((tokenizer.ttype == EnhancedStreamTokenizer.TT_WORD)
 						&& (tokenizer.sval.startsWith(DBConstants.commentString))) {
-					processComment(data, tokenizer, source);
+					processComment(dsId, data, tokenizer, source);
 				}
 			}
 		} catch (Exception exception) {
@@ -1516,7 +1510,7 @@ public class DBResolver {
 				while (tokenizer.nextToken() != EnhancedStreamTokenizer.TT_EOF)
 					if (tokenizer.ttype == EnhancedStreamTokenizer.TT_WORD)
 						if (tokenizer.sval.startsWith(DBConstants.commentString))
-							comment+=processComment(data, tokenizer, fileName);
+							comment+=processComment(dsId, data, tokenizer, fileName);
 						else
 
 							/****************** records ********************/
@@ -1540,7 +1534,7 @@ public class DBResolver {
 
 								rd.setComment(comment);	comment = nullString;
 
-								processFields(rd, tokenizer, fileName, paths);
+								processFields(dsId, rd, tokenizer, fileName, paths);
 								data.addRecord(rd);
 
 							}
@@ -1610,7 +1604,7 @@ public class DBResolver {
 								DBTemplateInstance ti = new DBTemplateInstance(str2, loadedTemplateId);
 								ti.setComment(comment);	comment = nullString;
 
-								processMacros(ti, tokenizer, fileName, paths);
+								processMacros(dsId, ti, tokenizer, fileName, paths);
 
 								data.addTemplateInstance(ti);
 
@@ -1686,7 +1680,7 @@ public class DBResolver {
 	 * @param tokenizer java.io.EnhancedStreamTokenizer
 	 * @exception java.lang.Exception The exception description.
 	 */
-	public static void processMacros(DBTemplateInstance templateInstance, EnhancedStreamTokenizer tokenizer, String fileName, PathSpecification paths) throws Exception {
+	public static void processMacros(Object dsId, DBTemplateInstance templateInstance, EnhancedStreamTokenizer tokenizer, String fileName, PathSpecification paths) throws Exception {
 
 		String name;
 		String value;
@@ -1701,7 +1695,7 @@ public class DBResolver {
 				if (tokenizer.ttype == EnhancedStreamTokenizer.TT_WORD) 
 					if (tokenizer.sval.equals(ENDSTR)) break;
 					else if (tokenizer.sval.startsWith(DBConstants.commentString)) 
-						processComment(null, tokenizer, fileName);				// !!! no comments are preserved in macro part
+						processComment(dsId, null, tokenizer, fileName);				// !!! no comments are preserved in macro part
 					else if (tokenizer.sval.equalsIgnoreCase(MACRO)) {
 
 						// read name
@@ -1729,7 +1723,7 @@ public class DBResolver {
 
 						File file = paths.search4File(include_filename);
 						inctokenizer = getEnhancedStreamTokenizer(file.getAbsolutePath());
-						if (inctokenizer!=null) processMacros(templateInstance, inctokenizer, include_filename, new PathSpecification(file.getParentFile().getAbsolutePath(), paths));
+						if (inctokenizer!=null) processMacros(dsId, templateInstance, inctokenizer, include_filename, new PathSpecification(file.getParentFile().getAbsolutePath(), paths));
 
 					}	
 
@@ -1816,7 +1810,7 @@ public class DBResolver {
 	 * @param tokenizer java.io.EnhancedStreamTokenizer
 	 * @exception java.lang.Exception The exception description.
 	 */
-	public static void processFields(DBRecordData rd, EnhancedStreamTokenizer tokenizer, String fileName, PathSpecification paths) throws Exception {
+	public static void processFields(Object dsId, DBRecordData rd, EnhancedStreamTokenizer tokenizer, String fileName, PathSpecification paths) throws Exception {
 
 		String name;
 		String value;
@@ -1832,7 +1826,7 @@ public class DBResolver {
 				if (tokenizer.ttype == EnhancedStreamTokenizer.TT_WORD) 
 					if (tokenizer.sval.equals(ENDSTR)) break;
 					else if (tokenizer.sval.startsWith(DBConstants.commentString)) 
-						comment+=processComment(null, tokenizer, fileName);
+						comment+=processComment(dsId, null, tokenizer, fileName);
 					else if (tokenizer.sval.equalsIgnoreCase(FIELD)) {
 
 						// read field_name
@@ -1860,7 +1854,7 @@ public class DBResolver {
 
 						File file = paths.search4File(include_filename);
 						inctokenizer = getEnhancedStreamTokenizer(file.getAbsolutePath());
-						if (inctokenizer!=null) processFields(rd, inctokenizer, include_filename, new PathSpecification(file.getParentFile().getAbsolutePath(), paths));
+						if (inctokenizer!=null) processFields(dsId, rd, inctokenizer, include_filename, new PathSpecification(file.getParentFile().getAbsolutePath(), paths));
 
 					}	
 
@@ -1939,7 +1933,7 @@ public class DBResolver {
 				File file = new File(fileName);
 
 				PathSpecification paths = new PathSpecification(file.getParentFile().getAbsolutePath());
-				data = new DBData(dsId, file.getName(), file.getAbsolutePath());
+				data = new DBData(file.getName(), file.getAbsolutePath());
 
 				processDB(dsId, data, tokenizer, fileName, paths, loadStack, loadList);
 			}
@@ -1972,7 +1966,7 @@ public class DBResolver {
 			try
 			{
 				PathSpecification paths = new PathSpecification(Settings.getDefaultDir());
-				data = new DBData(dsId, "System Clipboard", "System Clipboard");
+				data = new DBData("System Clipboard", "System Clipboard");
 
 				processDB(dsId, data, tokenizer, "System Clipboard", paths, loadStack, loadList);
 			}

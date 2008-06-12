@@ -26,10 +26,12 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.cosylab.vdct.inspector;
+package com.cosylab.vdct.inspector.sheet;
 
 import java.awt.Component;
 import java.util.regex.Pattern;
+
+import com.cosylab.vdct.inspector.InspectableProperty;
 
 /**
  * @author ssah

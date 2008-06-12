@@ -25,7 +25,7 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.cosylab.vdct.inspector;
+package com.cosylab.vdct.db;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +34,7 @@ import java.util.Map;
  * 
  * @author ssah
  */
-public class SpreadsheetTableViewRecord {
+public class DBSheetView {
 
 	private String type = null;
 	private String name = null;
@@ -44,17 +44,17 @@ public class SpreadsheetTableViewRecord {
 	private Boolean groupColumnsByGuiGroup = null;
 	private Integer backgroundColor = null;
 
-	private SpreadsheetRowOrder rowOrder = null;
+	private DBSheetRowOrder rowOrder = null;
 	private Map columns = null;
-	private SplitData[] splitColumns = null;
+	private DBSheetSplitCol[] splitColumns = null;
 	private String[] hiddenRows = null;
-	private SplitData[] recentSplits = null;
+	private DBSheetSplitCol[] recentSplits = null;
 	
 	/**
 	 * @param type
 	 * @param name
 	 */
-	public SpreadsheetTableViewRecord(String type, String name) {
+	public DBSheetView(String type, String name) {
 		super();
 		this.type = type;
 		this.name = name;
@@ -85,21 +85,21 @@ public class SpreadsheetTableViewRecord {
 	/**
 	 * @return the rowOrder
 	 */
-	public SpreadsheetRowOrder getRowOrder() {
+	public DBSheetRowOrder getRowOrder() {
 		return rowOrder;
 	}
 
 	/**
 	 * @param rowOrder the rowOrder to set
 	 */
-	public void setRowOrder(SpreadsheetRowOrder rowOrder) {
+	public void setRowOrder(DBSheetRowOrder rowOrder) {
 		this.rowOrder = rowOrder;
 	}
 
 	/**
 	 * @return the splitColumns
 	 */
-	public SplitData[] getSplitColumns() {
+	public DBSheetSplitCol[] getSplitColumns() {
 		return splitColumns;
 	}
 
@@ -110,14 +110,14 @@ public class SpreadsheetTableViewRecord {
 	/**
 	 * @return the recentSplits
 	 */
-	public SplitData[] getRecentSplits() {
+	public DBSheetSplitCol[] getRecentSplits() {
 		return recentSplits;
 	}
 
 	/**
 	 * @param recentSplits the recentSplits to set
 	 */
-	public void setRecentSplits(SplitData[] recentSplits) {
+	public void setRecentSplits(DBSheetSplitCol[] recentSplits) {
 		this.recentSplits = recentSplits;
 	}
 
@@ -145,7 +145,7 @@ public class SpreadsheetTableViewRecord {
 	/**
 	 * @param splitColumns the splitColumns to set
 	 */
-	public void setSplitColumns(SplitData[] splitColumns) {
+	public void setSplitColumns(DBSheetSplitCol[] splitColumns) {
 		this.splitColumns = splitColumns;
 	}
 

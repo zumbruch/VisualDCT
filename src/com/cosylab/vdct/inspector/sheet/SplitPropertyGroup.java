@@ -26,12 +26,15 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.cosylab.vdct.inspector;
+package com.cosylab.vdct.inspector.sheet;
 
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
+import com.cosylab.vdct.db.DBSheetSplitCol;
+import com.cosylab.vdct.inspector.InspectableProperty;
 
 /**
  * @author ssah
@@ -57,7 +60,7 @@ public class SplitPropertyGroup {
 	 * @param owner
 	 * @param splitPattern
 	 */
-	public SplitPropertyGroup(InspectableProperty owner, SplitData splitData) {
+	public SplitPropertyGroup(InspectableProperty owner, DBSheetSplitCol splitData) {
 		this(owner.getValue(), splitData);
 		this.owner = owner;
 	}
@@ -66,7 +69,7 @@ public class SplitPropertyGroup {
 	 * @param value
 	 * @param splitPattern
 	 */
-	public SplitPropertyGroup(String value, SplitData splitData) {
+	public SplitPropertyGroup(String value, DBSheetSplitCol splitData) {
 		super();
 		
 		boolean delimiterType = splitData.isDelimiterType();
@@ -184,7 +187,7 @@ public class SplitPropertyGroup {
 		patternParts = foundParts; 
 	}
 
-	public static int getPartsCount(String value, SplitData splitData) {
+	public static int getPartsCount(String value, DBSheetSplitCol splitData) {
 		
 		if (value == null) {
 			value = "";

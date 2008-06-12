@@ -158,7 +158,7 @@ public boolean checkMove(int dx, int dy)
 	return false;
 }
 
-public Flexible copyToGroup(String group)
+public Flexible copyToGroup(Object dsId, String group)
 {
 	String newName;
 	if(group.equals(nullString))
@@ -167,13 +167,13 @@ public Flexible copyToGroup(String group)
 		newName = group + Constants.GROUP_SEPARATOR + Group.substractObjectName(getName());
 
 // object with new name already exists, add suffix ///!!!
-	while(Group.getRoot().findObject(newName, true) != null)
+	while(Group.getRoot(dsId).findObject(newName, true) != null)
 		newName = StringUtils.incrementName(newName, Constants.COPY_SUFFIX);
 
 	Line grLine = new Line(newName, null, 
 							startVertex.getX(), startVertex.getY(),
 							endVertex.getX(), endVertex.getY());
-	Group.getRoot().addSubObject(newName, grLine, true);
+	Group.getRoot(dsId).addSubObject(newName, grLine, true);
 	grLine.setStartArrow(startArrow);
 	grLine.setEndArrow(endArrow);
 	grLine.setColor(getColor());
@@ -430,7 +430,7 @@ public boolean move(int dx, int dy)
 	return false;
 }
 
-public boolean moveToGroup(String group)
+public boolean moveToGroup(Object dsId, String group)
 {
 	String currentParent = Group.substractParentName(getName());
 	if(group.equals(currentParent))
@@ -446,7 +446,7 @@ public boolean moveToGroup(String group)
 	// object with new name already exists, add suffix // !!!
 	Object obj;
 	boolean renameNeeded = false;
-	while ((obj=Group.getRoot().findObject(newName, true))!=null)
+	while ((obj=Group.getRoot(dsId).findObject(newName, true))!=null)
 	{
 		if (obj==this)	// it's me :) already moved, fix data
 		{
@@ -465,7 +465,7 @@ public boolean moveToGroup(String group)
 	
 	getParent().removeObject(Group.substractObjectName(getName()));
 	setParent(null);
-	Group.getRoot().addSubObject(newName, this, true);
+	Group.getRoot(dsId).addSubObject(newName, this, true);
 
 	name = newName;
 	unconditionalValidation();
@@ -487,7 +487,7 @@ public boolean rename(String newName)
 	}
 	
     // move if needed
-	moveToGroup(Group.substractParentName(newName));
+	moveToGroup(getDsId(), Group.substractParentName(newName));
 
 	return true;
 }

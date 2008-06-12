@@ -34,18 +34,13 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Vector;
 
-import com.cosylab.vdct.events.CommandManager;
-import com.cosylab.vdct.events.commands.GetDsManager;
-import com.cosylab.vdct.graphics.DsEventListener;
-import com.cosylab.vdct.graphics.objects.Group;
-
 /**
  * Insert the type's description here.
  * Creation date: (8.1.2001 21:35:03)
  * @author Matej Sekoranja
  * !!! inspectors are not disposed !!!! (move ins.listeners in inspectors, when this is implemented);
  */
-public class InspectorManager implements DsEventListener, HelpDisplayer {
+public class InspectorManager implements HelpDisplayer {
 
 	private static InspectorManager instance = null;
 	
@@ -53,14 +48,11 @@ public class InspectorManager implements DsEventListener, HelpDisplayer {
 	
 	private static Frame parent = null;
 
-	protected Object dsId = null;
-	
 	private Vector inspectors;
 /**
  * InspectorManager constructor comment.
  */
-protected InspectorManager(Object dsId) {
-	this.dsId = dsId;
+protected InspectorManager() {
 	inspectors = new Vector();
 }
 /**
@@ -68,7 +60,7 @@ protected InspectorManager(Object dsId) {
  * Creation date: (8.1.2001 21:52:28)
  * @return com.cosylab.vdct.inspector.InspectorInterface
  */
-private InspectorInterface createInspector() {
+private InspectorInterface createInspector(Object dsId) {
 	Inspector inspector = new Inspector(parent, dsId);
 	com.cosylab.vdct.DataProvider.getInstance().addInspectableListener(inspector);
 	return inspector;
@@ -107,18 +99,12 @@ public void fucusGained(InspectorInterface inspector) {
 public InspectorInterface getActiveInspector() {
 	return (InspectorInterface)inspectors.firstElement();
 }
-/**
- * Insert the method's description here.
- * Creation date: (8.1.2001 21:36:49)
- * @return com.cosylab.vdct.inspector.InspectorManager
- */
+
 public static InspectorManager getInstance() {
 	if (instance == null) {
-		System.err.println("Warning: inspector manager instance called while not yet initialized,"
-				+ " returning active default.");
-		instance = new InspectorManager(Group.getRoot().getId());
+		instance = new InspectorManager();
 	}
-	return instance;
+    return instance;
 }
 
 /**
@@ -165,18 +151,20 @@ public void requestInspectorFor(Inspectable object) {
 		}
 	}
 	
-	// search for first unfrozen 
+	Object dsId = object.getDsId();
+	
+	// search for first unfrozen for the same drawing surface 
 	e = inspectors.elements();
 	while (e.hasMoreElements()) {
 		inspector = (InspectorInterface)e.nextElement();
-		if (!inspector.isFrozen()) {
+		if (!inspector.isFrozen() && dsId == inspector.getDsId()) {
 			inspector.inspectObject(object);
 			return;
 		}
 	}
 
 	// otherwise create a new instance	
-	inspector = createInspector();
+	inspector = createInspector(dsId);
 	inspectors.addElement(inspector);
 	inspector.inspectObject(object);
 	inspector.setVisible(true);			// bug fix
@@ -262,25 +250,6 @@ public void setHelpText(String text) {
 
 public void setHelpTextColor(Color color) {
 	getActiveInspector().setHelpColor(color);
-}
-
-public static void registerDsListener() {
-	GetDsManager command = (GetDsManager)CommandManager.getInstance().getCommand("GetDsManager");
-	if (command != null) {
-		command.getManager().addDsEventListener(new InspectorManager(null));
-	}
-}
-
-public void onDsAdded(Object id) {
-    instances.put(id, new InspectorManager(id));
-}
-public void onDsRemoved(Object id) {
-	InspectorManager manager = (InspectorManager)instances.get(id);
-	instances.remove(id);
-	manager.disposeAllInspectors();
-}
-public void onDsFocused(Object id) {
-    instance = (InspectorManager)instances.get(id);
 }
 
 }

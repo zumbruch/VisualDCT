@@ -1,4 +1,4 @@
-package com.cosylab.vdct.inspector;
+package com.cosylab.vdct.inspector.sheet;
 
 /**
  * Copyright (c) 2007, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
@@ -37,14 +37,20 @@ import java.util.Vector;
 
 import javax.swing.table.AbstractTableModel;
 
+import com.cosylab.vdct.db.DBSheetData;
+import com.cosylab.vdct.db.DBSheetView;
 import com.cosylab.vdct.graphics.DsManager;
 import com.cosylab.vdct.graphics.objects.Record;
 import com.cosylab.vdct.graphics.objects.Template;
 import com.cosylab.vdct.graphics.objects.VisibleObject;
+import com.cosylab.vdct.inspector.Inspectable;
+import com.cosylab.vdct.inspector.InspectableProperty;
+import com.cosylab.vdct.inspector.PropertyTableModel;
 import com.cosylab.vdct.undo.DeleteAction;
 import com.cosylab.vdct.undo.UndoManager;
 import com.cosylab.vdct.util.StringUtils;
 import com.cosylab.vdct.vdb.CommentProperty;
+import com.cosylab.vdct.vdb.VisibilityProperty;
 
 /**This table model supports ordering the inspectable properties into columns based on their name.
  * 
@@ -143,13 +149,13 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 		if (values == null) {
 			return;
 		}
-		UndoManager.getInstance().startMacroAction();
+		UndoManager.getInstance(dsId).startMacroAction();
 		int curRow = row;
 		while (curRow < getRowCount() && curRow - row < values.length) {
 			internalSetValueAtAndUpdate(values[curRow - row], curRow, column);
 			curRow++;
 		}
-        UndoManager.getInstance().stopMacroAction();
+        UndoManager.getInstance(dsId).stopMacroAction();
 	}
 
 	protected void internalSetValueAtAndUpdate(Object aValue, int row, int column) {
@@ -411,7 +417,7 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 		for (int i = 0; i < propertiesRowCount; i++) {
 			properties[i] = new InspectableProperty[propertiesColumnCount];
 
-			SpreadsheetRowVisible visibilityProperty = new SpreadsheetRowVisible(true);
+			VisibilityProperty visibilityProperty = new VisibilityProperty(true);
 			for (int j = 0; j < propertiesColumnCount; j++) {
 				if (j == 0) {
 				    properties[i][j] = visibilityProperty;
@@ -441,18 +447,18 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 		}
 	}
 
-	protected SpreadsheetTableViewRecord getViewRecord() {
+	protected DBSheetView getViewRecord() {
 		String typeSign = getTypeString(inspectables[0]);
-		SpreadsheetTableViewRecord record = SpreadsheetTableViewData.getInstance().get(typeSign + dataType);
+		DBSheetView record = DBSheetData.getInstance(dsId).get(typeSign + dataType);
 		if (record == null) {
-			record = new SpreadsheetTableViewRecord(typeSign, dataType);
-		 	SpreadsheetTableViewData.getInstance().add(record);
+			record = new DBSheetView(typeSign, dataType);
+		 	DBSheetData.getInstance(dsId).add(record);
 		}
 		return record;
 	}
 	
 	private void recallTableModelData() {
-		SpreadsheetTableViewRecord record = getViewRecord();
+		DBSheetView record = getViewRecord();
 
         int newColumOrder = -1;
         String columnOrderName = record.getModeName();
@@ -465,7 +471,7 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 	}
 
 	private void storeTableModelData() {
-		SpreadsheetTableViewRecord record = getViewRecord();
+		DBSheetView record = getViewRecord();
 		
 		boolean defaultMode = columnOrder == 0;
         if (!defaultMode) {

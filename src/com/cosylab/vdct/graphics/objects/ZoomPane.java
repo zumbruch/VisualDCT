@@ -105,8 +105,9 @@ public final class ZoomPane implements ImageObserver {
 	        zoomImage.flush();
 	    }
 
-	    double scale = ViewState.getInstance().getScale();
-	    ViewState.getInstance().setScale(1.0);
+        ViewState view = ViewState.getInstance(object.getDsId());
+        double scale = view.getScale();
+        view.setScale(1.0);
 	    object.setZoomRepaint(true);
 	    object.forceValidation();
 	    
@@ -158,7 +159,7 @@ public final class ZoomPane implements ImageObserver {
                
 	    object.draw(imgGr, false);
 	    object.setZoomRepaint(false);
-	    ViewState.getInstance().setScale(scale);
+	    view.setScale(scale);
 	    object.forceValidation();       
         return zoomImage;
         

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2007, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
+ * Copyright (c) 2008, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -26,36 +26,80 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.cosylab.vdct.inspector;
-
-import com.cosylab.vdct.vdb.NameValueInfoProperty;
+package com.cosylab.vdct.db;
 
 /**
  * @author ssah
  *
  */
-public class SpreadsheetRowVisible extends NameValueInfoProperty {
+public class DBSheetColumn implements Comparable {
 
-	boolean visible = true;
+	private String name = null;
+	private boolean hidden = false;
+	private int sortIndex = 0;
+	private DBSheetColWidth[] splitIndices = null;
+
+	public DBSheetColumn(String columnName, boolean hidden, int sortIndex) {
+		this(columnName, hidden, sortIndex, new DBSheetColWidth[0]);
+	}
 	
-	/**
-	 * @param visible
-	 */
-	public SpreadsheetRowVisible(boolean visible) {
-		super("", "");
+	public DBSheetColumn(String name, boolean hidden, int sortIndex,
+			DBSheetColWidth[] splitIndices) {
+		super();
+		this.name = name;
+		this.hidden = hidden;
+		this.sortIndex = sortIndex;
+		this.splitIndices = splitIndices;
 	}
-
-	/**
-	 * @param visible the visible to set
-	 */
-	public void setVisible(boolean visible) {
-		this.visible = visible;
-	}
-
+	
 	/* (non-Javadoc)
-	 * @see com.cosylab.vdct.vdb.NameValueInfoProperty#getVisibility()
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
-	public int getVisibility() {
-		return visible ? NON_DEFAULT_VISIBLE : NEVER_VISIBLE;
+	public int compareTo(Object o) {
+		return sortIndex  - ((DBSheetColumn)o).sortIndex;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public boolean isHidden() {
+		return hidden;
+	}
+
+	public void setHidden(boolean hidden) {
+		this.hidden = hidden;
+	}
+
+	/**
+	 * @return the sortIndex
+	 */
+	public int getSortIndex() {
+		return sortIndex;
+	}
+
+	/**
+	 * @param sortIndex the sortIndex to set
+	 */
+	public void setSortIndex(int sortIndex) {
+		this.sortIndex = sortIndex;
+	}
+
+	/**
+	 * @return the splitIndices
+	 */
+	public DBSheetColWidth[] getSplitIndices() {
+		return splitIndices;
+	}
+
+	/**
+	 * @param splitIndices the splitIndices to set
+	 */
+	public void setSplitIndices(DBSheetColWidth[] splitIndices) {
+		this.splitIndices = splitIndices;
 	}
 }

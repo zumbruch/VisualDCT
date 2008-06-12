@@ -324,7 +324,7 @@ public boolean checkMove(int dx, int dy)
 	return false;
 }
 
-public Flexible copyToGroup(String group)
+public Flexible copyToGroup(Object dsId, String group)
 {
 	String newName;
 	if(group.equals(nullString))
@@ -333,7 +333,7 @@ public Flexible copyToGroup(String group)
 		newName = group + Constants.GROUP_SEPARATOR + Group.substractObjectName(getName());
 
 // object with new name already exists, add suffix ///!!!
-	while(Group.getRoot().findObject(newName, true) != null)
+	while(Group.getRoot(dsId).findObject(newName, true) != null)
 		newName = StringUtils.incrementName(newName, Constants.COPY_SUFFIX);
 
 	TextBox grTextBox = new TextBox(newName, null,
@@ -341,7 +341,7 @@ public Flexible copyToGroup(String group)
 						endVertex.getX(), endVertex.getY());
 	grTextBox.setDescription(description);
 	grTextBox.setColor(getColor());
-	Group.getRoot().addSubObject(newName, grTextBox, true);
+	Group.getRoot(dsId).addSubObject(newName, grTextBox, true);
 
 	//ViewState view = ViewState.getInstance();
 	//grTextBox.move(20 - view.getRx(), 20 - view.getRy());
@@ -576,7 +576,7 @@ public boolean move(int dx, int dy)
 	return false;
 }
 
-public boolean moveToGroup(String group)
+public boolean moveToGroup(Object dsId, String group)
 {
 	String currentParent = Group.substractParentName(getName());
 	if(group.equals(currentParent))
@@ -592,7 +592,7 @@ public boolean moveToGroup(String group)
 	// object with new name already exists, add suffix // !!!
 	Object obj;
 	boolean renameNeeded = false;
-	while ((obj=Group.getRoot().findObject(newName, true))!=null)
+	while ((obj=Group.getRoot(dsId).findObject(newName, true))!=null)
 	{
 		if (obj==this)	// it's me :) already moved, fix data
 		{
@@ -611,7 +611,7 @@ public boolean moveToGroup(String group)
 	
 	getParent().removeObject(Group.substractObjectName(getName()));
 	setParent(null);
-	Group.getRoot().addSubObject(newName, this, true);
+	Group.getRoot(dsId).addSubObject(newName, this, true);
 
 	name = newName;
 	unconditionalValidation();
@@ -632,7 +632,7 @@ public boolean rename(String newName)
 	}
 	
    // move if needed
-	moveToGroup(Group.substractParentName(newName));
+	moveToGroup(getDsId(), Group.substractParentName(newName));
 
 	return true;
 }

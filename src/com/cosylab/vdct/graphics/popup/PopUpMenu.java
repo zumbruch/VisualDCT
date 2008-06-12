@@ -133,29 +133,29 @@ public static JSeparator getSeparator() {
 	return separator;
 }
 
-class FlexiblePopupMenuHandler implements ActionListener {
-	Flexible f;
-	
-	public FlexiblePopupMenuHandler(Flexible flexible) {	
-		f = flexible;
+class VisiblePopupMenuHandler implements ActionListener {
+	VisibleObject visible;
+		
+	public VisiblePopupMenuHandler(VisibleObject visible) {	
+		this.visible = visible;
 	}
 		
 	public void actionPerformed(ActionEvent e) {
 		GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
 		String action = e.getActionCommand();
 		
-		ViewState view = ViewState.getInstance();
+		ViewState view = ViewState.getInstance(visible.getDsId());
 
 		if (action.equals(ungroupString)) {	// we only ungroup one group
 		   view.deselectAll();
-		   view.setAsSelected((VisibleObject)f);
+		   view.setAsSelected(visible);
 		   cmd.getGUIMenuInterface().ungroup();
 		   return;
 	   }
 	   
-		if (!view.isSelected(f)) {
+		if (!view.isSelected(visible)) {
 			view.deselectAll();
-			view.setAsSelected((VisibleObject)f);
+			view.setAsSelected(visible);
 		}
 		
 		
@@ -187,7 +187,7 @@ class FlexiblePopupMenuHandler implements ActionListener {
  * @param x int
  * @param y int
  */
-public void show(Object object, JComponent component, int x, int y) {
+public void show(Object dsId, Object object, JComponent component, int x, int y) {
 	// add object items
 	setLabel("");
 	Vector items = new Vector();
@@ -207,7 +207,7 @@ public void show(Object object, JComponent component, int x, int y) {
 	populate(items, component, x, y);
 	
 	if (object instanceof Popupable) 
-		addPluginItems(this, (Popupable)object);
+		addPluginItems(dsId, this, (Popupable)object);
 
 	//	show popup menu
 	 show(component, x, y);	
@@ -242,7 +242,7 @@ private void populateWithFlexible(Flexible object, Vector items) {
 		
 		if (items.size() != 0) items.add(new JSeparator());
 		
-		ActionListener l = new FlexiblePopupMenuHandler((Flexible)object);
+		ActionListener l = new VisiblePopupMenuHandler((VisibleObject)object);
 		
 		JMenuItem menuitem = new JMenuItem(cutString);
 		menuitem.addActionListener(l);
@@ -301,7 +301,7 @@ private void populate(Vector items, JComponent component, int x, int y) {
 /**
  * Helper method which adds plugin items
  */
-public static void addPluginItems(JPopupMenu menu, Popupable object)
+public static void addPluginItems(Object dsId, JPopupMenu menu, Popupable object)
 {
 	// get list of all selected object if this object is also selected
 	// otherwise only give this object
@@ -310,7 +310,7 @@ public static void addPluginItems(JPopupMenu menu, Popupable object)
 	if (object!=null)
 	{
 		selectedItems = new Vector();
-		ViewState view = ViewState.getInstance();
+		ViewState view = ViewState.getInstance(dsId);
 		if (view.isSelected(object))
 			// make a copy of vector to allow plugins to play with it
 			selectedItems.addAll(view.getSelectedObjects());

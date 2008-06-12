@@ -17,13 +17,13 @@ import com.cosylab.vdct.dbd.DBDFieldData;
 import com.cosylab.vdct.dbd.DBDMenuData;
 import com.cosylab.vdct.dbd.DBDResolver;
 import com.cosylab.vdct.graphics.objects.Debuggable;
-import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.objects.LinkSource;
 import com.cosylab.vdct.graphics.objects.Record;
 import com.cosylab.vdct.inspector.ChangableVisibility;
 import com.cosylab.vdct.inspector.InspectableProperty;
 import com.cosylab.vdct.inspector.InspectorManager;
 import com.cosylab.vdct.plugin.debug.PluginDebugManager;
+import com.cosylab.vdct.undo.FieldValueChangeAction;
 import com.cosylab.vdct.undo.UndoManager;
 import com.cosylab.vdct.util.StringUtils;
 
@@ -389,14 +389,20 @@ public void setType(int newType) {
  */
 public void updateInspector()
 {
-	Record visualRecord = (Record)Group.getRoot().findObject(record.getName(), true);
-	if (visualRecord==null) {
-		System.err.println("Warning: record '" + record.getName() + "' not found.");
-		//com.cosylab.vdct.Console.getInstance().println("o) Internal error: no visual representaton of record "+getName()+" found.");
-		return;
-	}
+	Record visualRecord = (record != null) ? record.getRecord() : null;
+	if (visualRecord != null) {
+		// TODO:REM
+		/*
 
-	InspectorManager.getInstance().updateProperty(visualRecord, this);
+		Record visualRecord = (Record)Group.getRoot().findObject(record.getName(), true);
+		if (visualRecord==null) {
+			System.err.println("Warning: record '" + record.getName() + "' not found.");
+			//com.cosylab.vdct.Console.getInstance().println("o) Internal error: no visual representaton of record "+getName()+" found.");
+			return;
+		}
+		 */
+		InspectorManager.getInstance().updateProperty(visualRecord, this);
+	}
 }
 
 /**
@@ -406,9 +412,11 @@ public void updateInspector()
  */
 public void setValue(java.lang.String newValue) {
 
-	if ((value!=null) && !value.equals(newValue))
-		UndoManager.getInstance().addAction(
-			new com.cosylab.vdct.undo.FieldValueChangeAction(this, value, newValue)
+	Object dsId = getDsId();
+
+	if ((value!=null) && !value.equals(newValue) && (dsId != null))
+		UndoManager.getInstance(dsId).addAction(
+				new FieldValueChangeAction(this, value, newValue)
 		);
 	value = newValue;
 	if (record!=null)
@@ -423,9 +431,9 @@ public void setValue(java.lang.String newValue) {
 			{
 				VDBFieldData f = (VDBFieldData)e.nextElement();
 				if (f!=this &&
-					((f.getDbdData().getField_type()==DBDConstants.DBF_INLINK) ||
-					(f.getDbdData().getField_type()==DBDConstants.DBF_OUTLINK)))
-						f.updateInspector();
+						((f.getDbdData().getField_type()==DBDConstants.DBF_INLINK) ||
+								(f.getDbdData().getField_type()==DBDConstants.DBF_OUTLINK)))
+					f.updateInspector();
 			}
 		}
 	}
@@ -626,6 +634,15 @@ private String checkExpandedValues(String value) {
 		}
 	}
 	return null;
+}
+
+public Object getDsId() {
+	if (record != null) {
+		return record.getDsId();
+	} else {
+		System.err.println("Warning: VDBFieldData.getDsId: returning null.");
+		return null;
+	}
 }
 
 }

@@ -26,7 +26,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.cosylab.vdct.inspector;
+package com.cosylab.vdct.inspector.sheet;
 
 import java.awt.Color;
 import java.awt.FontMetrics;
@@ -57,6 +57,7 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
+import com.cosylab.vdct.db.DBSheetSplitCol;
 import com.cosylab.vdct.graphics.ColorChooser;
 import com.cosylab.vdct.graphics.popup.PopUpMenu;
 
@@ -324,16 +325,16 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 
 			int index = popupModelColumn;
 			if (index >= 0) {
-				SplitData split = null; 
+				DBSheetSplitCol split = null; 
 				if (action.equals(customPattern)) {
 					CustomSplitDialog dialog = inspector.getCustomSplitDialog();
 					dialog.setLocationRelativeTo(inspector);
 
 					Vector recentSplitData = sprModel.getRecentSplitData();
 					if (recentSplitData.size() > 0) {
-						split = (SplitData)recentSplitData.get(0);
+						split = (DBSheetSplitCol)recentSplitData.get(0);
 					} else {
-						split = SplitData.getWhitespaceSplitData();
+						split = DBSheetSplitCol.getWhitespaceSplitData();
 					}
 					dialog.setSplitData(split);
 					/* Add the data from the first row of the splitting column as starting test example. If no visible
@@ -351,7 +352,7 @@ public class SpreadsheetTable extends JTable implements ActionListener{
 					}
 
 				} else {
-					split = SplitData.getWhitespaceSplitData();
+					split = DBSheetSplitCol.getWhitespaceSplitData();
 				}
 				if (split != null) {
 					sprModel.splitColumn(split, index);

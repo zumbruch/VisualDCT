@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
+ * Copyright (c) 2007, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -25,50 +25,36 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.cosylab.vdct.inspector;
 
-import com.cosylab.vdct.vdb.CreatorPropertyListener;
-import com.cosylab.vdct.vdb.NameValueInfoProperty;
+package com.cosylab.vdct.vdb;
+
 
 /**
  * @author ssah
  *
  */
-public class CreatorProperty extends NameValueInfoProperty {
-	
-	private CreatorPropertyListener listener = null;
-	private InspectableProperty createdProperty = null;
+public class VisibilityProperty extends NameValueInfoProperty {
 
-	public CreatorProperty(CreatorPropertyListener listener) {
+	boolean visible = true;
+	
+	/**
+	 * @param visible
+	 */
+	public VisibilityProperty(boolean visible) {
 		super("", "");
-		this.listener = listener;
+	}
+
+	/**
+	 * @param visible the visible to set
+	 */
+	public void setVisible(boolean visible) {
+		this.visible = visible;
 	}
 
 	/* (non-Javadoc)
-	 * @see com.cosylab.vdct.vdb.NameValueInfoProperty#isEditable()
+	 * @see com.cosylab.vdct.vdb.NameValueInfoProperty#getVisibility()
 	 */
-	public boolean isEditable() {
-		return true;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.cosylab.vdct.vdb.NameValueInfoProperty#setValue(java.lang.String)
-	 */
-	public void setValue(String value) {
-		if (value.equals("")) {
-			name = "";
-			createdProperty = null;
-			return;
-		}
-		createdProperty = listener.addProperty(name, value);
-		super.setValue(value);
-	}
-	
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public InspectableProperty getCreatedProperty() {
-		return createdProperty;
+	public int getVisibility() {
+		return visible ? NON_DEFAULT_VISIBLE : NEVER_VISIBLE;
 	}
 }
