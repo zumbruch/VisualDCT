@@ -251,8 +251,11 @@ public Flexible copyToGroup(Object dsId, java.lang.String group) {
 
 	VDBRecordData theDataCopy = VDBData.copyVDBRecordData(recordData);
 	theDataCopy.setName(newName);
-	Record theRecordCopy = new Record(null, theDataCopy, getX(), getY());
+	Record theRecordCopy = new Record(Group.getRoot(dsId), theDataCopy, getX(), getY());
+	theDataCopy.setRecord(theRecordCopy);
+
 	//theRecordCopy.move(20-view.getRx(), 20-view.getRy());
+	theRecordCopy.setParent(null);
 	Group.getRoot(dsId).addSubObject(theDataCopy.getName(), theRecordCopy, true);
 	
 	// fix only valid links where target is also selected
@@ -292,7 +295,7 @@ public void fixEPICSOutLinksOnCopy(String prevGroup, String group) {
 				old.startsWith(prevGroup)) {
 				
 				LinkProperties lp = new LinkProperties(field);
-				InLink target = EPICSLinkOut.getTarget(lp, true);
+				InLink target = EPICSLinkOut.getTarget(getDsId(), lp, true);
 				if (target == null)
 					continue;
 				
@@ -1810,7 +1813,7 @@ private static ArrayList getModes()
 public void generateMacros(HashMap macros) {
 	Enumeration e = recordData.getFieldsV().elements();
 	while (e.hasMoreElements()) 
-		LinkManagerObject.checkIfMacroCandidate((VDBFieldData)e.nextElement(), macros);
+		LinkManagerObject.checkIfMacroCandidate(getDsId(), (VDBFieldData)e.nextElement(), macros);
 }
 /* (non-Javadoc)
  * @see com.cosylab.vdct.graphics.objects.InLink#getMinX()

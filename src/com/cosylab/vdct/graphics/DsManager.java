@@ -48,6 +48,7 @@ import com.cosylab.vdct.events.commands.GetVDBManager;
 import com.cosylab.vdct.events.commands.LinkCommand;
 import com.cosylab.vdct.events.commands.RepaintCommand;
 import com.cosylab.vdct.graphics.objects.Box;
+import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.objects.Line;
 import com.cosylab.vdct.graphics.objects.LinkSource;
 import com.cosylab.vdct.graphics.objects.TextBox;
@@ -68,6 +69,7 @@ LinkCommandInterface, RepaintInterface, Pageable {
 	protected static HashMap drawingSurfaces = new HashMap();
 	
 	protected DesktopInterface desktopInterface = null;
+	protected CopyContext copyContext = null;
 	
 	protected Vector dsEventListeners = null;
 
@@ -76,6 +78,7 @@ LinkCommandInterface, RepaintInterface, Pageable {
 		
 		this.desktopInterface = desktopInterface;
 		dsEventListeners = new Vector();
+		copyContext = new CopyContext();
 		
 		CommandManager commandManager = CommandManager.getInstance();
 		commandManager.addCommand("GetDsManager", new GetDsManager(this));
@@ -106,7 +109,7 @@ LinkCommandInterface, RepaintInterface, Pageable {
 	
 	public VisualComponent addDrawingSurface(Object id, InternalFrameInterface displayer) {
 
-		DrawingSurface drawingSurface = new DrawingSurface((DbDescriptor)id, displayer);
+		DrawingSurface drawingSurface = new DrawingSurface((DbDescriptor)id, displayer, copyContext);
 		drawingSurfaces.put(id, drawingSurface);
 		
 		Iterator iterator = dsEventListeners.iterator();
@@ -119,7 +122,6 @@ LinkCommandInterface, RepaintInterface, Pageable {
 
 		// This is called after notification of listeners as it uses them.
 		drawingSurface.initializeWorkspace();
-
 		return drawingSurface;
 	}
 
@@ -361,6 +363,17 @@ LinkCommandInterface, RepaintInterface, Pageable {
 		return false;
 	}
 
+	public boolean isMacroPortsIDChanged() {
+		
+		Iterator iterator = drawingSurfaces.keySet().iterator();
+		while (iterator.hasNext()) {
+			if (Group.hasMacroPortsIDChanged(iterator.next())) {
+				return true;
+			}
+		}
+	    return false;	
+	}
+	
 	/* (non-Javadoc)
 	 * @see com.cosylab.vdct.graphics.GUIMenuInterface#levelUp()
 	 */

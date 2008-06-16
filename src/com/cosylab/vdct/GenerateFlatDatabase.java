@@ -14,6 +14,7 @@
 
 package com.cosylab.vdct;
 
+import com.cosylab.vdct.graphics.CopyContext;
 import com.cosylab.vdct.graphics.DrawingSurface;
 import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.rdb.RdbDataId;
@@ -76,7 +77,7 @@ public class GenerateFlatDatabase
 			System.out.println();
 						
 			RdbDataId id = new RdbDataId("file", "0", "ioc");
-			DrawingSurface drawingSurface = new DrawingSurface(id, null);
+			DrawingSurface drawingSurface = new DrawingSurface(id, null, new CopyContext());
 
 			for (int i=0; i<dbdEntries.size(); i++)
 				drawingSurface.openDBD(((DBDEntry)dbdEntries.get(i)).getFile(),

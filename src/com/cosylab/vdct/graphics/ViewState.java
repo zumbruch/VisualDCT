@@ -365,6 +365,9 @@ public boolean setAsHilited(VisibleObject object, boolean zoomOnHilited) {
     this.zoomOnHilited = zoomOnHilited;
     
     if(zoomOnHilited) {
+    	// TODO:REM
+    	System.out.println("object: " + object);
+    	
     	DsManager.getDrawingSurface(object.getDsId()).repaint();
         hilitedObjects.clear();
         if (hilitedObject != null) {
@@ -455,7 +458,6 @@ public void setFlat(boolean newFlat) {
  * @param newInstance com.cosylab.vdct.graphics.ViewState
  */
 public static void setInstance(Object dsId, ViewState newInstance) {
-    // Ignore checks for all instances with no id, as they are only temporary.
 	ViewState mappedInstance = (ViewState)instances.get(dsId);
 	if (mappedInstance != null) {
 		instances.remove(dsId);
@@ -572,7 +574,7 @@ public void setY0(int newY0) {
 	public static void registerDsListener() {
 		GetDsManager command = (GetDsManager)CommandManager.getInstance().getCommand("GetDsManager");
 		if (command != null) {
-			command.getManager().addDsEventListener(new ViewState(null));
+			command.getManager().addDsEventListener(new ViewState());
 		}
 	}
 	

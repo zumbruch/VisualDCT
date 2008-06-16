@@ -88,7 +88,7 @@ implements Clipboardable, Descriptable, Flexible, Movable, SaveInterface, Select
 SaveObject, DsEventListener {
 
 	private static Group clipboard = null;
-	private static String nullString = "";
+	private static final String nullString = "";
 	private static Group root = null;
 	
 	protected Object dsId = null; 
@@ -103,8 +103,8 @@ SaveObject, DsEventListener {
 	private static HashMap rootGroups = new HashMap();
 	
 	private VDBTemplate editingTemplateData = null;
-	private static long openTemplateMacroID = 0;
-	private static long openTemplatePortID = 0;
+	private long openTemplateMacroID = 0;
+	private long openTemplatePortID = 0;
 
 	// contains DB structure (entry (include, path, addpath statements), record, expand)
 	protected Vector structure = null;
@@ -243,11 +243,11 @@ private void addSubObjectToLayout(VisibleObject object) {
 		else
 			newName = group+Constants.GROUP_SEPARATOR+getName();
 
-		while (Group.getRoot().findObject(newName, true)!=null)
+		while (Group.getRoot(dsId).findObject(newName, true)!=null)
 //			newName += Constants.COPY_SUFFIX;
 			newName = StringUtils.incrementName(newName, Constants.COPY_SUFFIX);
 
-		Group g = Group.createGroup(newName);
+		Group g = Group.createGroup(dsId, newName);
 
 		if (Settings.getInstance().getSnapToGrid())
 			g.snapToGrid();
@@ -305,10 +305,10 @@ private void addSubObjectToLayout(VisibleObject object) {
 	 * Creation date: (28.1.2001 17:10:46)
 	 * @param name java.lang.String
 	 */
-	public static Group createGroup(String name) {
+	public static Group createGroup(Object dsId, String name) {
 		Group group = new Group(null);
 		group.setAbsoluteName(name);
-		getRoot().addSubObject(name, group, true);
+		getRoot(dsId).addSubObject(name, group, true);
 		return group;
 	}
 	/**
@@ -483,6 +483,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 			clipboard = new Group(null);
 			clipboard.setAbsoluteName(Constants.CLIPBOARD_NAME);
 			clipboard.setLookupTable(new Hashtable());
+			clipboard.setDsId(Constants.CLIPBOARD_NAME);
 			rootGroups.put(Constants.CLIPBOARD_NAME, clipboard);
 		}
 		return clipboard;
@@ -539,14 +540,12 @@ private void addSubObjectToLayout(VisibleObject object) {
 		return namePrefix;
 	}
 	/**
-	 * Insert the method's description here.
+	 * Returns the root group currently displayed by active drawing surface, or null in there
+	 * are no drawing surfaces open.
 	 * Creation date: (28.1.2001 11:32:14)
 	 * @return com.cosylab.vdct.graphics.objects.Group
 	 */
 	public static Group getRoot() {
-		if (root == null) {
-			System.err.println("Warning: returning null as root group.");
-		}
 		return root;
 	}
 	/**
@@ -743,7 +742,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 
 		Group g = (Group)getRoot(dsId).findObject(group, true);
 		if (g==null) {
-			g=Group.createGroup(group);
+			g=Group.createGroup(dsId, group);
 			if (Settings.getInstance().getSnapToGrid())
 				g.snapToGrid();
 		}
@@ -984,13 +983,16 @@ private void addSubObjectToLayout(VisibleObject object) {
 	public void setNamePrefix(java.lang.String newNamePrefix) {
 		namePrefix = newNamePrefix;
 	}
-	/**
-	 * Insert the method's description here.
-	 * Creation date: (28.1.2001 11:32:14)
-	 * @param newRoot com.cosylab.vdct.graphics.objects.Group
-	 */
-	public static void setRoot(Group newRoot) {
-		root = newRoot;
+
+	public static void setRoot(Object dsId, Group newRoot) {
+		Group mappedRoot = (Group)rootGroups.get(dsId);
+		if (mappedRoot != null) {
+			rootGroups.remove(dsId);
+		} else {
+			System.err.println("Group:setRoot: warning: group root set with unregistered id, registering it.");
+	    }
+		newRoot.setDsId(dsId);
+		rootGroups.put(dsId, newRoot);
 	}
 	/**
 	 * Insert the method's description here.
@@ -1113,9 +1115,9 @@ private void addSubObjectToLayout(VisibleObject object) {
 	 * @param path2remove java.lang.String
 	 * @exception java.io.IOException The exception description.
 	 */
-	public void writeObjects(java.io.DataOutputStream file, NamingContext renamer, boolean export) throws java.io.IOException {
+	public void writeObjects(DataOutputStream file, NamingContext renamer, boolean export) throws java.io.IOException {
 		//writeObjects(getSubObjectsV(), file, namer, export);
-		writeObjects(Group.getRoot().getStructure(), file, renamer, export);
+		writeObjects(getDsId(), Group.getRoot(getDsId()).getStructure(), file, renamer, export);
 	}
 
 	/**
@@ -1124,7 +1126,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 	 * @param file java.io.DataOutputStream
 	 * @exception java.io.IOException The exception description.
 	 */
-	public static void writeObjects(Vector elements, java.io.DataOutputStream file, NamingContext renamer, boolean export) throws java.io.IOException {
+	public static void writeObjects(Object dsId, Vector elements, java.io.DataOutputStream file, NamingContext renamer, boolean export) throws java.io.IOException {
 
 
 		Object obj;
@@ -1274,7 +1276,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 			}
 			else if (!export && obj instanceof DBTemplateEntry)
 			{
-				writeTemplateData(file, renamer);
+				writeTemplateData(dsId, file, renamer);
 				// !!! TBD multiple templates support
 			}	 		
 			else if (obj instanceof DBDataEntry)
@@ -1307,8 +1309,8 @@ private void addSubObjectToLayout(VisibleObject object) {
 		StringWriter writer = new StringWriter();
 		try {
 			writeVDCTViewData(dsId, writer);
-			NamingContext renamer = new NamingContext(null, Group.getEditingTemplateData(), null, null, false);
-			Group.getRoot().writeVDCTObjects(writer, renamer, false);
+			NamingContext renamer = new NamingContext(null, Group.getEditingTemplateData(dsId), null, null, false);
+			Group.getRoot(dsId).writeVDCTObjects(writer, renamer, false);
 			writer.flush();
 		} catch (IOException exception) {
 			// Does not happen with StringWriter.
@@ -1813,12 +1815,12 @@ private void addSubObjectToLayout(VisibleObject object) {
 	/**
 	 * Insert the method's description here.
 	 */
-	public static void writeTemplateData(DataOutputStream stream, NamingContext renamer) throws IOException
+	public static void writeTemplateData(Object dsId, DataOutputStream stream, NamingContext renamer) throws IOException
 	{
-		writeTemplateData(stream, renamer, null);
+		writeTemplateData(dsId, stream, renamer, null);
 	}
 
-	public static void writeTemplateData(DataOutputStream stream, NamingContext renamer, Vector allowedPortMacroSet) throws IOException
+	public static void writeTemplateData(Object dsId, DataOutputStream stream, NamingContext renamer, Vector allowedPortMacroSet) throws IOException
 	{
 		final String nl = "\n";
 
@@ -1826,7 +1828,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 		final String quote = "\"";
 		final String ending = ")"+nl;
 
-		VDBTemplate data = Group.getEditingTemplateData();
+		VDBTemplate data = Group.getEditingTemplateData(dsId);
 
 		// does not have template data (new template case)
 		if (data==null)
@@ -2033,7 +2035,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 
 		String addedPrefix=null;
 		if (export && Settings.getInstance().getHierarhicalNames()) { 
-			VDBTemplate template = Group.getEditingTemplateData();
+			VDBTemplate template = Group.getEditingTemplateData(dsId);
 			String name = template.getId(); 
 
 			int pos = name.lastIndexOf('.'); //removes file suffix
@@ -2042,7 +2044,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 			addedPrefix=name+Constants.HIERARCHY_SEPARATOR;
 		}
 
-		save(dsId, group2save, file, new NamingContext(null, Group.getEditingTemplateData(), addedPrefix, path2remove, export), export);
+		save(dsId, group2save, file, new NamingContext(null, Group.getEditingTemplateData(dsId), addedPrefix, path2remove, export), export);
 	}
 
 	/**
@@ -2064,7 +2066,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 		// if not already present
 		// optimize !!!
 		boolean found = false;
-		Iterator i = Group.getRoot().getStructure().iterator();
+		Iterator i = Group.getRoot(dsId).getStructure().iterator();
 		while (i.hasNext() && !found)
 			if (i.next() instanceof DBTemplateEntry)
 				found = true;
@@ -2073,10 +2075,10 @@ private void addSubObjectToLayout(VisibleObject object) {
 		{
 			// put it after all DBEntry objects
 			int pos = 0;
-			i = Group.getRoot().getStructure().iterator();
+			i = Group.getRoot(dsId).getStructure().iterator();
 			while (i.hasNext() && (i.next() instanceof DBEntry))
 				pos++;
-			Group.getRoot().getStructure().insertElementAt(new DBTemplateEntry(), pos);
+			Group.getRoot(dsId).getStructure().insertElementAt(new DBTemplateEntry(), pos);
 		}
 
 		// before saving, we position records in a standard way as before
@@ -2133,18 +2135,20 @@ private void addSubObjectToLayout(VisibleObject object) {
 	 * Returns the editingTemplateData.
 	 * @return VDBTemplate
 	 */
-	public static VDBTemplate getEditingTemplateData()
-	{
-		return root.editingTemplateData;
+	public static VDBTemplate getEditingTemplateData(Object dsId) {
+		return getRoot(dsId).editingTemplateData;
 	}
 
 	/**
 	 * Sets the editingTemplateData.
 	 * @param editingTemplateData The editingTemplateData to set
 	 */
-	public static void setEditingTemplateData(VDBTemplate editingTemplateData)
-	{	
-		root.editingTemplateData = editingTemplateData;
+	public static void setEditingTemplateData(Object dsId, VDBTemplate editingTemplateData) {	
+		getRoot(dsId).setEditingTemplateData(editingTemplateData);
+	}
+
+	private void setEditingTemplateData(VDBTemplate editingTemplateData) {	
+		this.editingTemplateData = editingTemplateData;
 		if (editingTemplateData != null) {
 			openTemplateMacroID = editingTemplateData.getMacrosGeneratedID();
 			openTemplatePortID = editingTemplateData.getPortsGeneratedID();
@@ -2153,21 +2157,25 @@ private void addSubObjectToLayout(VisibleObject object) {
 			openTemplatePortID = 0;
 		}
 	}
+	
+	public static boolean hasMacroPortsIDChanged(Object dsId) {
+		return getRoot(dsId).hasMacroPortsIDChanged();
+	}
 
-	public static boolean hasMacroPortsIDChanged() {
+	private boolean hasMacroPortsIDChanged() {
 //		if (editingTemplateData == null && openTemplateMacroID == 0 && openTemplatePortID == 0) {
 //		return false;
 
 		if (openTemplateMacroID == 0 && openTemplatePortID == 0) {
 			return false;
 		}   
-		if (root.editingTemplateData != null)
-			if (root.editingTemplateData.getMacrosGeneratedID() == openTemplateMacroID && root.editingTemplateData.getPortsGeneratedID() == openTemplatePortID) {
+		if (editingTemplateData != null)
+			if (editingTemplateData.getMacrosGeneratedID() == openTemplateMacroID && editingTemplateData.getPortsGeneratedID() == openTemplatePortID) {
 				return false;
 			}
 		return true;
 	}
-
+	
 	/**
 	 * Returns the structure.
 	 * @return Vector

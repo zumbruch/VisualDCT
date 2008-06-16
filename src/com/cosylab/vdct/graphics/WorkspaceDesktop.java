@@ -118,12 +118,15 @@ implements ComponentListener, DesktopInterface {
 		internalFrameCount++;
 		WorkspaceInternalFrame frame = new WorkspaceInternalFrame(id, drawingSurfaceManager);
 		frame.setVisible(true);
+		
 		add(frame);
 		try {
 			frame.setSelected(true);
 		} catch (java.beans.PropertyVetoException e) {
 			// Nothing.
 		}
+		frame.setLocation(32, 32);
+		frame.setSize(512,512);
 	}
 	/**
 	 * Insert the method's description here.

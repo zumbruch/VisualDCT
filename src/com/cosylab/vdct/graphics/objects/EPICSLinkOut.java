@@ -400,12 +400,12 @@ public static OutLink getStartPoint(Linkable link) {
 	return (OutLink)link;
 }
 
-public static InLink getTarget(LinkProperties link) {
-	return getTarget(link, false, false);
+public static InLink getTarget(Object dsId, LinkProperties link) {
+	return getTarget(dsId, link, false, false);
 }
 
-public static InLink getTarget(LinkProperties link, boolean allowLinkOutAsTarget) {
-	return getTarget(link, allowLinkOutAsTarget, false);
+public static InLink getTarget(Object dsId, LinkProperties link, boolean allowLinkOutAsTarget) {
+	return getTarget(dsId, link, allowLinkOutAsTarget, false);
 }
 
 /**
@@ -414,13 +414,13 @@ public static InLink getTarget(LinkProperties link, boolean allowLinkOutAsTarget
  * @return com.cosylab.vdct.graphics.objects.InLink
  * @param link com.cosylab.vdct.vdb.LinkProperties
  */
-public static InLink getTarget(LinkProperties link, boolean allowLinkOutAsTarget, boolean doNotSearchRecordFields) {
+public static InLink getTarget(Object dsId, LinkProperties link, boolean allowLinkOutAsTarget, boolean doNotSearchRecordFields) {
 
 	String recName = link.getRecord();
 	// !!! check for getType()==LinkProperties.NOT_VALID
 	if ((recName==null) || recName.equals(nullString)) return null;
 
-	Object otherLinkObj = Group.getRoot().getLookupTable().get(link.getTarget());
+	Object otherLinkObj = Group.getRoot(dsId).getLookupTable().get(link.getTarget());
 	if (otherLinkObj!=null && otherLinkObj instanceof InLink)
 	{
 		InLink templateLink = (InLink)otherLinkObj;
@@ -433,14 +433,14 @@ public static InLink getTarget(LinkProperties link, boolean allowLinkOutAsTarget
 	}
 	
 	// else macro check (w/o .VAL ending)
-	otherLinkObj = Group.getRoot().getLookupTable().get(link.getRecord());
+	otherLinkObj = Group.getRoot(dsId).getLookupTable().get(link.getRecord());
 	if (otherLinkObj!=null && otherLinkObj instanceof InLink)
 		return (InLink)otherLinkObj;
 		
 	if (doNotSearchRecordFields)
 		return null;	
 	
-	Object obj = Group.getRoot().findObject(recName, true);
+	Object obj = Group.getRoot(dsId).findObject(recName, true);
 	if (obj==null || !(obj instanceof Record)) return null;
 	Record record = (Record)obj;
 	if (link.getType()==LinkProperties.FWDLINK_FIELD) {
@@ -573,7 +573,7 @@ private void updateLink() {
 		}
 		if ((endpoint!=null) && hasEndpoint) ((InLink)endpoint).disconnect(preendpoint);
 		//OutLink lol = getTarget(properties).getOutput();
-		InLink il = getTarget(newProperties);
+		InLink il = getTarget(getDsId(), newProperties);
 		OutLink ol = (OutLink)preendpoint;
 		ol.setInput(il);
 		if (il!=null) { 

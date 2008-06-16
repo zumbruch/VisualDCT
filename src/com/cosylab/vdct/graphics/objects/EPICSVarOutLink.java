@@ -323,7 +323,7 @@ private com.cosylab.vdct.graphics.objects.EPICSVarOutLink.PopupMenuHandler creat
 			}
 			if ((endpoint!=null) && hasEndpoint) ((InLink)endpoint).disconnect(preendpoint);
 			//OutLink lol = getTarget(properties).getOutput();
-			InLink il = EPICSLinkOut.getTarget(newProperties, true);
+			InLink il = EPICSLinkOut.getTarget(getDsId(), newProperties, true);
 			OutLink ol = (OutLink)preendpoint;
 			ol.setInput(il);
 			if (il!=null) { 

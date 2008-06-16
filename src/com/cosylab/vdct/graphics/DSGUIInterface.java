@@ -38,7 +38,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -91,22 +90,9 @@ import com.cosylab.vdct.vdb.VDBTemplateInstance;
  */
 public class DSGUIInterface implements VDBInterface {
 
-	private static DSGUIInterface instance = null;
-	
 	private DrawingSurface drawingSurface;
 	private Object id = null;
-
-	// to remember on cut from which group object has been cut 
-	private ArrayList pasteNames = null;
-	// to remember copied objects for multiple pasting
-	private Vector copiedObjects = null;
-	private int pasteCount = 0;
-	
-	private double pasteX;
-	private double pasteY;
-	private boolean doOffsetAtPaste = false;
-	
-	//private static final String nullString = "";
+	private CopyContext copyContext;
 	
 	private static final String emptyString = "";
 	private static final String errorString = "Error: ";
@@ -117,12 +103,10 @@ public class DSGUIInterface implements VDBInterface {
  * Creation date: (4.2.2001 15:32:49)
  * @param drawingSurface com.cosylab.vdct.graphics.DrawingSurface
  */
-public DSGUIInterface(DrawingSurface drawingSurface) {
+public DSGUIInterface(DrawingSurface drawingSurface, CopyContext copyContext) {
 	this.drawingSurface=drawingSurface;
 	this.id = drawingSurface.getRdId();
-	DSGUIInterface.instance = this;
-	pasteNames = new ArrayList();
-	copiedObjects = new Vector();
+	this.copyContext = copyContext;
 	
 	// Init the name configuration.
 	PluginNameConfigManager.getInstance();
@@ -231,9 +215,9 @@ public void copyToSystemClipboard(Vector objs)
 	{
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(baos);
-		NamingContext nc = new NamingContext(null, Group.getEditingTemplateData(), null, null, false);
+		NamingContext nc = new NamingContext(null, Group.getEditingTemplateData(id), null, null, false);
 
-		if (Group.getEditingTemplateData() != null)
+		if (Group.getEditingTemplateData(id) != null)
 		{
 			boolean hasPortOrMacro = false;
 			Enumeration en = objs.elements();
@@ -247,10 +231,10 @@ public void copyToSystemClipboard(Vector objs)
 				}
 			}
 			if (hasPortOrMacro)
-				Group.writeTemplateData(dos, nc, objs);
+				Group.writeTemplateData(id, dos, nc, objs);
 		}
 		
-		Group.writeObjects(objs, dos, nc, false);
+		Group.writeObjects(id, objs, dos, nc, false);
 		Group.writeVDCTObjects(objs, dos, nc, false);
 		
 		StringSelection ss = new StringSelection(baos.toString());
@@ -289,12 +273,12 @@ private void copy(Vector objects, boolean firstCopy) {
 	Group.getClipboard().destroy();
     
     ViewState view = ViewState.getInstance(id);
-    pasteNames.clear();
+    copyContext.getPasteNames().clear();
     if (firstCopy) {
-        copiedObjects.clear();
-        pasteCount = 0;
+    	copyContext.getCopiedObjects().clear();
+    	copyContext.setPasteCount(0);
     } else {
-        pasteCount++;
+    	copyContext.setPasteCount(copyContext.getPasteCount() + 1);
     }
 	
 	Object obj;
@@ -308,13 +292,14 @@ private void copy(Vector objects, boolean firstCopy) {
 			miny = Math.min(miny, ((VisibleObject)obj).getY());
 		}
 		if (firstCopy) 
-		    copiedObjects.add(obj);
+			copyContext.getCopiedObjects().add(obj);
 	}
 	
 	// remember position for paste
-	pasteX = (minx - view.getRx()/view.getScale());
-	pasteY = (miny - view.getRy()/view.getScale());
-	doOffsetAtPaste = true;
+	copyContext.setDsId(id);
+	copyContext.setPasteX(minx - view.getRx() / view.getScale());
+	copyContext.setPasteY(miny - view.getRy() / view.getScale());
+	copyContext.setDoOffsetAtPaste(true);
 	
 	selected = objects.elements();	
 	
@@ -457,7 +442,9 @@ public void createRecord(String name, String type, boolean relative) {
 			int recPosX = (int)((posX + view.getRx()) / scale);
 			int recPosY = (int)((posY + view.getRy()) / scale);
 
-			Record record = new Record(null, recordData, recPosX, recPosY);
+			Record record = new Record(Group.getRoot(id), recordData, recPosX, recPosY);
+			recordData.setRecord(record);
+			
 			Point move = record.getMoveInsideView();
 			record.move(move.x, move.y);
 
@@ -465,6 +452,7 @@ public void createRecord(String name, String type, boolean relative) {
 			posY += view.getGridSize() * 2;
 			drawingSurface.setPressedMousePos(posX, posY);
 
+			record.setParent(null);
 			Group.getRoot(id).addSubObject(recordName, record, true);
 
 			if (Settings.getInstance().getSnapToGrid())
@@ -492,8 +480,8 @@ public void cut() {
 	if (view.getSelectedObjects().size()==0) return;
 	Group.getClipboard().destroy();
     
-    pasteNames.clear();
-	copiedObjects.clear();
+	copyContext.getPasteNames().clear();
+	copyContext.getCopiedObjects().clear();
 	
 	Object obj;
 	Enumeration selected = view.getSelectedObjects().elements();	
@@ -505,13 +493,14 @@ public void cut() {
 			minx = Math.min(minx, ((VisibleObject)obj).getX());
 			miny = Math.min(miny, ((VisibleObject)obj).getY());
 		}
-		copiedObjects.add(obj);
+		copyContext.getCopiedObjects().add(obj);
 	}
 	
 	// remember position for paste
-	pasteX = (minx - view.getRx()/view.getScale());
-	pasteY = (miny - view.getRy()/view.getScale());
-	doOffsetAtPaste = false;
+	copyContext.setDsId(id);
+	copyContext.setPasteX(minx - view.getRx() / view.getScale());
+	copyContext.setPasteY(miny - view.getRy() / view.getScale());
+	copyContext.setDoOffsetAtPaste(false);
 	
 	selected = view.getSelectedObjects().elements();
 	while (selected.hasMoreElements()) {
@@ -521,7 +510,7 @@ public void cut() {
 			String oldGroup = Group.substractParentName(flex.getFlexibleName());
 			if (flex.moveToGroup(Constants.CLIPBOARD_NAME, emptyString))
 			{
-				pasteNames.add(oldGroup);
+				copyContext.getPasteNames().add(oldGroup);
 				if (obj instanceof Movable)
 					//((Movable)obj).move(-view.getRx(), -view.getRy());
 					((Movable)obj).move(-minx, -miny);
@@ -533,10 +522,7 @@ public void cut() {
 	view.setAsHilited(null);
 	drawingSurface.setModified(true);
 	drawingSurface.repaint();
-	
-	
 }
-
 
 /**
  * Insert the method's description here.
@@ -582,14 +568,7 @@ public void delete() {
 	view.setAsHilited(null);
 	drawingSurface.repaint();
 }
-/**
- * Insert the method's description here.
- * Creation date: (3.5.2001 18:08:42)
- * @return com.cosylab.vdct.graphics.DSGUIInterface
- */
-public static DSGUIInterface getInstance() {
-	return instance;
-}
+
 /**
  * Insert the method's description here.
  * Creation date: (4.2.2001 15:32:01)
@@ -603,7 +582,7 @@ public void group(String groupName) {
 	Group g = (Group)Group.getRoot(id).findObject(groupName, true);
 	if (g==null)
 	{
-		g = Group.createGroup(groupName);
+		g = Group.createGroup(id, groupName);
 		if (Settings.getInstance().getSnapToGrid())
 			g.snapToGrid();
 		composedAction.addAction(new CreateAction(g));
@@ -775,7 +754,9 @@ public void paste() {
 	// do some offset (a little trick to have snapping also done) for copy only
 	final int OFFSET = Constants.GRID_SIZE;
 	double scale = ViewState.getInstance(id).getScale();
-	if (doOffsetAtPaste)
+	double pasteX = copyContext.getPasteX();
+	double pasteY = copyContext.getPasteY();
+	if (copyContext.isDoOffsetAtPaste())
 		pasteAtPosition((int)((pasteX+OFFSET)*scale), (int)((pasteY+OFFSET)*scale));
 	else
 		pasteAtPosition((int)(pasteX*scale), (int)(pasteY*scale));
@@ -792,9 +773,15 @@ public void pasteAtPosition(int pX, int pY) {
 	Group group = Group.getClipboard();
 	
 	int size = group.getSubObjectsV().size();
-	if (size==0) return;
+	Object sourceDsId = copyContext.getDsId();
+
+	// If source of the data not set, treat as no data.
+	if (size == 0 || sourceDsId == null) {
+		return;
+	}
 
 	double scale = view.getScale();
+	int pasteCount = copyContext.getPasteCount();
 	int posX = (int)((pX + view.getRx()) / scale) + pasteCount*Constants.MULTIPLE_PASTE_GAP;
 	int posY = (int)((pY + view.getRy()) / scale) + pasteCount*Constants.MULTIPLE_PASTE_GAP;
 
@@ -811,8 +798,11 @@ public void pasteAtPosition(int pX, int pY) {
 				view.setAsSelected((VisibleObject)objs[i]);
 	}
 
-	boolean isCopy = pasteNames.size()!=size;
-	ComposedAction composedAction = new ComposedAction();
+	boolean isCopy = copyContext.getPasteNames().size()!=size;
+	boolean betweenSurfaces = !id.equals(sourceDsId);
+	
+	ComposedAction targetAction = new ComposedAction();
+	ComposedAction sourceAction = new ComposedAction();
 
 	Flexible flex; 
 	for(int i=0; i<size; i++) {
@@ -822,12 +812,21 @@ public void pasteAtPosition(int pX, int pY) {
 			if (flex.moveToGroup(id, currentGroupName))
 			{
 				if (isCopy)
-					composedAction.addAction(new CreateAction((VisibleObject)objs[i]));		// if true ?!!!
+					targetAction.addAction(new CreateAction((VisibleObject)objs[i]));		// if true ?!!!
 				else {
-					//System.out.println("Cut/paste:"+pasteNames.get(i).toString()+"->"+currentGroupName);	
-					composedAction.addAction(new MoveToGroupAction(flex, pasteNames.get(i).toString(), currentGroupName, id));
+					//System.out.println("Cut/paste:"+pasteNames.get(i).toString()+"->"+currentGroupName);
+					
+					
+				    /* When cutting from one drawingsurface to another, store separate undo
+				     * actions for both undo managers.
+				     */
+					if (betweenSurfaces) {
+						sourceAction.addAction(new DeleteAction((VisibleObject)objs[i]));
+						targetAction.addAction(new CreateAction((VisibleObject)objs[i]));
+					} else {
+						targetAction.addAction(new MoveToGroupAction(flex, copyContext.getPasteNames().get(i).toString(), currentGroupName, id));
+					}
 				}
-
 				
 				if (objs[i] instanceof Movable) {
 					//((Movable)objs[i]).move(view.getRx(), view.getRy());
@@ -839,11 +838,14 @@ public void pasteAtPosition(int pX, int pY) {
 		}
 	}
 
-	UndoManager.getInstance(id).addAction(composedAction);
+	UndoManager.getInstance(id).addAction(targetAction);
+	if (betweenSurfaces) {
+		UndoManager.getInstance(sourceDsId).addAction(sourceAction);
+	}
 
 	drawingSurface.getViewGroup().manageLinks(true);
 	//recopy objects for multiple paste
-	copy(copiedObjects, false);
+	copy(copyContext.getCopiedObjects(), false);
 	drawingSurface.repaint();
 }
 /**
@@ -994,7 +996,7 @@ public void save(java.io.File file) throws IOException {
 */ 
  Group.save(id, Group.getRoot(id), file, false);
 
- VDBTemplate data = Group.getEditingTemplateData();
+ VDBTemplate data = Group.getEditingTemplateData(id);
  if (data==null)
  {
  	// create a new
@@ -1007,9 +1009,9 @@ public void save(java.io.File file) throws IOException {
 	data.setMacros(new Hashtable());
 	data.setMacrosV(new Vector());
 	
-	data.setGroup(Group.getRoot());
+	data.setGroup(Group.getRoot(id));
 	
-	Group.setEditingTemplateData(data);
+	Group.setEditingTemplateData(id, data);
 	drawingSurface.getTemplateStack().push(data);
 
 	VDBData.addTemplate(data);

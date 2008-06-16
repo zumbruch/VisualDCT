@@ -32,7 +32,6 @@ import java.util.regex.Pattern;
 
 import com.cosylab.vdct.dbd.DBDConstants;
 import com.cosylab.vdct.graphics.objects.Descriptable;
-import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.objects.Template;
 import com.cosylab.vdct.inspector.ChangableVisibility;
 import com.cosylab.vdct.inspector.InspectableProperty;
@@ -121,12 +120,19 @@ public class VDBTemplatePort extends VDBFieldData implements Descriptable, Chang
 								 (visibility == InspectableProperty.NON_DEFAULT_VISIBLE && !hasDefaultValue));
 			if (oldVisible != newVisible)
 			{						 
+				// TODO:REM
+				/*
 				Template visualTemplate = (Template)Group.getRoot().findObject(templateInstance.getName(), true);
 				if (visualTemplate!=null) {
 					visualTemplate.fieldVisibilityChange(this, newVisible);
 				} else {
 					System.err.println("Warning: template instance '" + templateInstance.getName()
 							+ "' not found.");
+				}
+				*/
+				Template visualTemplate = templateInstance.getVisualTemplate();
+				if (visualTemplate != null) {
+					visualTemplate.fieldVisibilityChange(this, newVisible);
 				}
 			}
 		}
@@ -205,6 +211,8 @@ public class VDBTemplatePort extends VDBFieldData implements Descriptable, Chang
 	 */
 	public void updateInspector()
 	{
+		// TODO:REM
+		/*
 		Template visualTemplate = (Template)Group.getRoot().findObject(templateInstance.getName(), true);
 		if (visualTemplate==null) {
 			System.err.println("Warning: template instance '" + templateInstance.getName()
@@ -214,6 +222,11 @@ public class VDBTemplatePort extends VDBFieldData implements Descriptable, Chang
 		}
 	
 		InspectorManager.getInstance().updateProperty(visualTemplate, this);
+		*/
+		Template visualTemplate = templateInstance.getVisualTemplate();
+		if (visualTemplate != null) {
+			InspectorManager.getInstance().updateProperty(visualTemplate, this);
+		}
 	}
 
 	/**

@@ -68,8 +68,6 @@ implements InternalFrameInterface, InternalFrameListener {
 		setFrameTitle(id.getFileName());
 
 		setContentPane(contentPanel);
-		setSize(256, 256);
-		setLocation(32, 32);
 	}
 
 	public JComponent getDisplayingComponent() {

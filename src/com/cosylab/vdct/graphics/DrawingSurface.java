@@ -299,7 +299,8 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 /**
  * displayer can be null when no gui is linked to this. 
  */
-public DrawingSurface(DbDescriptor id, InternalFrameInterface displayer) {
+public DrawingSurface(DbDescriptor id, InternalFrameInterface displayer,
+		CopyContext copyContext) {
 
 	this.id = id;
 	this.displayer = displayer;
@@ -340,7 +341,7 @@ public DrawingSurface(DbDescriptor id, InternalFrameInterface displayer) {
 	    }
 	});
 
-	guimenu = new DSGUIInterface(this);
+	guimenu = new DSGUIInterface(this, copyContext);
 	
 	if (VisualDCT.getInstance() != null)
 		new Thread(this, "DrawingSurface Repaint Thread").start();
@@ -764,7 +765,7 @@ public void initializeWorkspace() {
 	view.setScale(1.0);
 	
 	if (isModified())
-		reloadTemplate(Group.getEditingTemplateData());
+		reloadTemplate(Group.getEditingTemplateData(id));
 
 	UndoManager.getInstance(id).reset();
 
@@ -781,7 +782,7 @@ public void initializeWorkspace() {
 	// clear all stacks
 	viewStack.clear();
 	templateStack.clear();
-	Group.setEditingTemplateData(null);
+	Group.setEditingTemplateData(id, null);
 	
 	moveToGroup(group);
 	
@@ -1054,7 +1055,7 @@ private void showPopup(MouseEvent e)
 			else if (action.equals(newTextBoxString))
 				createTextBox();
 			else if (action.equals(templatePropertiesString))
-				InspectorManager.getInstance().requestInspectorFor(Group.getEditingTemplateData());
+				InspectorManager.getInstance().requestInspectorFor(Group.getEditingTemplateData(id));
 			else if (action.equals(pasteString)) {
 				((GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface")).getGUIMenuInterface().pasteAtPosition(pressedX, pressedY);
 			}
@@ -1068,7 +1069,7 @@ private void showPopup(MouseEvent e)
 	{
 		public void actionPerformed(ActionEvent e) {
 			String action = e.getActionCommand();
-			createPort((VDBPort)Group.getEditingTemplateData().getPorts().get(action));			
+			createPort((VDBPort)Group.getEditingTemplateData(id).getPorts().get(action));			
 		}
 	
 	};
@@ -1077,7 +1078,7 @@ private void showPopup(MouseEvent e)
 	{
 		public void actionPerformed(ActionEvent e) {
 			String action = e.getActionCommand();
-			createMacro((VDBMacro)Group.getEditingTemplateData().getMacros().get(action));			
+			createMacro((VDBMacro)Group.getEditingTemplateData(id).getMacros().get(action));			
 		}
 	
 	};
@@ -1110,7 +1111,7 @@ private void showPopup(MouseEvent e)
 	if (templatesMenu.getItemCount()==0)
 		templatesMenu.setEnabled(false);
 	
-	if (Group.getEditingTemplateData()!=null)
+	if (Group.getEditingTemplateData(id)!=null)
 	{
 
 		popUp.add(new JSeparator());
@@ -1120,7 +1121,7 @@ private void showPopup(MouseEvent e)
 		popUp.add(addPortMenu);
 		
 		// add templates
-		Enumeration ports = Group.getEditingTemplateData().getPortsV().elements();
+		Enumeration ports = Group.getEditingTemplateData(id).getPortsV().elements();
 		while (ports.hasMoreElements())
 		{
 			VDBPort port = (VDBPort)ports.nextElement();
@@ -1140,7 +1141,7 @@ private void showPopup(MouseEvent e)
 		popUp.add(addMacroMenu);
 		
 		// add templates
-		Enumeration macros = Group.getEditingTemplateData().getMacrosV().elements();
+		Enumeration macros = Group.getEditingTemplateData(id).getMacrosV().elements();
 		while (macros.hasMoreElements())
 		{
 			VDBMacro macro = (VDBMacro)macros.nextElement();
@@ -1188,7 +1189,7 @@ private void showPopup(MouseEvent e)
 
 	// every file is a template
 	//if (isTemplateMode())
-	if (Group.getEditingTemplateData()!=null)
+	if (Group.getEditingTemplateData(id)!=null)
 	{
 		popUp.add(new JSeparator());
 		JMenuItem templatePropertiesMenuItem = new JMenuItem(templatePropertiesString);
@@ -2028,7 +2029,7 @@ public boolean importBorder(File file)
 //        }
 
         Border border = new Border(null, rootGroup);
-		applyVisualDataOfGraphicsObjects(dbData, border);
+		applyVisualDataOfGraphicsObjects(id, dbData, border);
 		rootGroup.addSubObject(border.getName(), border);
 		
 		UndoManager.getInstance(id).addAction(new CreateAction(border));
@@ -2140,7 +2141,7 @@ public boolean open(InputStream is, File file, boolean importDB, boolean importT
 				viewGroup = new Group(null);
 				viewGroup.setAbsoluteName("");
 				viewGroup.setLookupTable(new Hashtable());
-				Group.setRoot(viewGroup);
+				Group.setRoot(id, viewGroup);
 				
 				boolean validate = (is != null);
 				
@@ -2152,7 +2153,7 @@ public boolean open(InputStream is, File file, boolean importDB, boolean importT
 				VDBTemplate template = (VDBTemplate)VDBData.getTemplates().get(dbData.getTemplateData().getId());
 				if (template != null)
 				{
-					VDBData.addPortsAndMacros(dbData.getTemplateData(), template, vdbData, importedList);
+					VDBData.addPortsAndMacros(id, dbData.getTemplateData(), template, vdbData, importedList);
 					validate = true;
 				}
 				
@@ -2170,7 +2171,7 @@ public boolean open(InputStream is, File file, boolean importDB, boolean importT
 			finally
 			{
 				viewGroup = vg;
-				Group.setRoot(rg);
+				Group.setRoot(id, rg);
 			}
 			
 			((GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface")).getGUIMenuInterface().paste();
@@ -2185,12 +2186,12 @@ public boolean open(InputStream is, File file, boolean importDB, boolean importT
 			// found
 			if (template!=null)
 			{
-			    if (Group.hasMacroPortsIDChanged()) {
+			    if (Group.hasMacroPortsIDChanged(id)) {
 			        JOptionPane.showMessageDialog(VisualDCT.getInstance(),
 			                "Macros/Ports in this template have changed. \nReload and save files that include this template to apply changes.", "Template changed!", JOptionPane.WARNING_MESSAGE);
 			    }
-				Group.setRoot(template.getGroup());
-				Group.setEditingTemplateData(template);
+				Group.setRoot(id, template.getGroup());
+				Group.setEditingTemplateData(id, template);
 				templateStack.push(template);
 
 				InspectorManager.getInstance().updateObjectLists();
@@ -2262,7 +2263,7 @@ public boolean loadRdbDbGroup(JFrame guiContext) {
 			viewGroup = new Group(null);
 			viewGroup.setAbsoluteName("");
 			viewGroup.setLookupTable(new Hashtable());
-			Group.setRoot(viewGroup);
+			Group.setRoot(id, viewGroup);
 
 			// import directly to workspace (current view group)
 			// imported list needed for undo action
@@ -2271,7 +2272,7 @@ public boolean loadRdbDbGroup(JFrame guiContext) {
 			// find 'first' template defined in this file (not via includes)
 			VDBTemplate template = (VDBTemplate)VDBData.getTemplates().get(dbData.getTemplateData().getId());
 			if (template != null) {
-				VDBData.addPortsAndMacros(dbData.getTemplateData(), template, vdbData, importedList);
+				VDBData.addPortsAndMacros(id, dbData.getTemplateData(), template, vdbData, importedList);
 			}
 
 			viewGroup.manageLinks(true);
@@ -2281,7 +2282,7 @@ public boolean loadRdbDbGroup(JFrame guiContext) {
 			((GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface")).getGUIMenuInterface().cut();
 		} finally {
 			viewGroup = vg;
-			Group.setRoot(rg);
+			Group.setRoot(id, rg);
 		}
 
 		((GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface")).getGUIMenuInterface().paste();
@@ -2348,9 +2349,9 @@ public boolean importDB(File file) throws IOException {
     return open(file, true, true);
 }
 
-public static void applyPortAndMacroConnectors(DBData dbData, VDBData vdbData) {
+public static void applyPortAndMacroConnectors(Object dsId, DBData dbData, VDBData vdbData) {
     
-    Group rootGroup = Group.getRoot();
+    Group rootGroup = Group.getRoot(dsId);
     int pos;
 	String objectName = null;
 	String fieldName = null;
@@ -2449,7 +2450,7 @@ public static HashMap applyVisualData(Object dsId, boolean importDB, Group group
 	// apply visual-data && generate visual object, group hierarchy
 	try {
 
-		Group rootGroup = Group.getRoot();
+		Group rootGroup = Group.getRoot(dsId);
 
 		// read current view
 		if (dbData.getView()!=null)
@@ -2507,7 +2508,12 @@ public static HashMap applyVisualData(Object dsId, boolean importDB, Group group
 					continue;
 				} 
 	
-				record = new Record(null, vdbRec, dbRec.getX(), dbRec.getY());
+				System.out.println("Group.getRoot(dsId): " + Group.getRoot(dsId));
+				System.out.println("id:  " + Group.getRoot(dsId).getDsId());
+				
+				record = new Record(Group.getRoot(dsId), vdbRec, dbRec.getX(), dbRec.getY());
+				vdbRec.setRecord(record);
+				
 				record.setRight(dbRec.isRotated());
 				record.setColor(dbRec.getColor());
 				record.setDescription(dbRec.getDescription());
@@ -2525,6 +2531,7 @@ public static HashMap applyVisualData(Object dsId, boolean importDB, Group group
 					}
 				}
 				
+				record.setParent(null);
 				group.addSubObject(vdbRec.getName(), record, true);
 				if (importDB) importedList.put(vdbRec.getName(), record);
 
@@ -2554,9 +2561,12 @@ public static HashMap applyVisualData(Object dsId, boolean importDB, Group group
 					continue;
 				}			
 	
-				Template templ = new Template(null, templateInstance, false);
+				Template templ = new Template(group, templateInstance, false);
+				templateInstance.setVisualTemplate(templ);
+
 				templ.move(dbTemplate.getX(), dbTemplate.getY());
 				
+				templ.setParent(null);
 				group.addSubObject(dbTemplate.getTemplateInstanceId(), templ, true);
 				if (importDB) importedList.put(dbTemplate.getTemplateInstanceId(), templ);
 				
@@ -2626,7 +2636,7 @@ public static HashMap applyVisualData(Object dsId, boolean importDB, Group group
 				continue;
 			}
 			if (grp == null)
-				grp = Group.createGroup(dbGrp.getName());
+				grp = Group.createGroup(dsId, dbGrp.getName());
 			grp.setColor(dbGrp.getColor());
 			grp.setDescription(dbGrp.getDescription());
 			grp.setX(dbGrp.getX()); grp.setY(dbGrp.getY());
@@ -2712,7 +2722,7 @@ public static HashMap applyVisualData(Object dsId, boolean importDB, Group group
 					    continue;
 					}
 					
-					InLink templateLink = (InLink)Group.getRoot().getLookupTable().get(target);
+					InLink templateLink = (InLink)Group.getRoot(dsId).getLookupTable().get(target);
 					if (templateLink!=null)
 					{
 						templateLink.setOutput(outlink, null);
@@ -2752,7 +2762,7 @@ public static HashMap applyVisualData(Object dsId, boolean importDB, Group group
 					}
 					else
 					{
-                        Object unknown = Group.getRoot().getSubObject(target);
+                        Object unknown = Group.getRoot(dsId).getSubObject(target);
                         if (unknown instanceof InLink)
 						{
 							InLink inlink2 = (InLink)unknown;
@@ -2807,7 +2817,7 @@ public static HashMap applyVisualData(Object dsId, boolean importDB, Group group
 					}
 					
 					// is in lookup table ?
-					InLink templateLink = (InLink)Group.getRoot().getLookupTable().get(target);
+					InLink templateLink = (InLink)Group.getRoot(dsId).getLookupTable().get(target);
 					if (templateLink!=null)
 					{
 						templateLink.setOutput(outlink, null);
@@ -2882,7 +2892,7 @@ public static HashMap applyVisualData(Object dsId, boolean importDB, Group group
 		    ((Template)i.next()).manageLinks();
 		}
 		
-		applyVisualDataOfGraphicsObjects(dbData, rootGroup);
+		applyVisualDataOfGraphicsObjects(dsId, dbData, rootGroup);
 		if (importDB) {
 		    UndoManager undoManager = UndoManager.getInstance(dsId);
 			
@@ -2908,7 +2918,7 @@ public static HashMap applyVisualData(Object dsId, boolean importDB, Group group
  * @param dbData
  * @param container
  */
-private static void applyVisualDataOfGraphicsObjects(DBData dbData, ContainerObject container) {
+private static void applyVisualDataOfGraphicsObjects(Object dsId, DBData dbData, ContainerObject container) {
 	Enumeration e;
 	// lines 
 	DBLine dbLine;
@@ -2916,7 +2926,7 @@ private static void applyVisualDataOfGraphicsObjects(DBData dbData, ContainerObj
 	while (e.hasMoreElements())
 	{
 		dbLine = (DBLine)e.nextElement();
-		Line line = new Line(dbLine.getName(), null, dbLine.getX(), dbLine.getY(), dbLine.getX2(), dbLine.getY2());
+		Line line = new Line(dbLine.getName(), Group.getRoot(dsId), dbLine.getX(), dbLine.getY(), dbLine.getX2(), dbLine.getY2());
 		line.setDashed(dbLine.isDashed());
 		line.setStartArrow(dbLine.isStartArrow());
 		line.setEndArrow(dbLine.isEndArrow());
@@ -2933,10 +2943,13 @@ private static void applyVisualDataOfGraphicsObjects(DBData dbData, ContainerObj
 				border = new Border(null, (Group)container);
 				container.addSubObject(border.getName(), border);
 			}
+			line.setParent(null);
 			border.addSubObject(line.getName(), line, true);
 		}
-		else
+		else {
+			line.setParent(null);
 			container.addSubObject(line.getName(), line, true);
+		}
 	}
 
 	// boxes 
@@ -2945,7 +2958,7 @@ private static void applyVisualDataOfGraphicsObjects(DBData dbData, ContainerObj
 	while (e.hasMoreElements())
 	{
 		dbBox = (DBBox)e.nextElement();
-		Box box = new Box(dbBox.getName(), null, dbBox.getX(), dbBox.getY(), dbBox.getX2(), dbBox.getY2());
+		Box box = new Box(dbBox.getName(), Group.getRoot(dsId), dbBox.getX(), dbBox.getY(), dbBox.getX2(), dbBox.getY2());
 		box.setIsDashed(dbBox.isDashed());
 		box.setColor(dbBox.getColor());
 
@@ -2960,10 +2973,13 @@ private static void applyVisualDataOfGraphicsObjects(DBData dbData, ContainerObj
 				border = new Border(null, (Group)container);
 				container.addSubObject(border.getName(), border);
 			}
+			box.setParent(null);
 			border.addSubObject(box.getName(), box, true);
 		}
-		else
+		else {
+			box.setParent(null);
 			container.addSubObject(box.getName(), box, true);
+		}
 	}
 
 	// textboxes 
@@ -2972,7 +2988,7 @@ private static void applyVisualDataOfGraphicsObjects(DBData dbData, ContainerObj
 	while (e.hasMoreElements())
 	{
 		dbTextBox = (DBTextBox)e.nextElement();
-		TextBox textbox = new TextBox(dbTextBox.getName(), null, dbTextBox.getX(), dbTextBox.getY(), dbTextBox.getX2(), dbTextBox.getY2());
+		TextBox textbox = new TextBox(dbTextBox.getName(), Group.getRoot(dsId), dbTextBox.getX(), dbTextBox.getY(), dbTextBox.getX2(), dbTextBox.getY2());
 		textbox.setBorder(dbTextBox.getBorder());
 		
 		Font font = FontMetricsBuffer.getInstance().getFont(dbTextBox.getFontName(), dbTextBox.getFontSize(), dbTextBox.getFontStyle());
@@ -2992,10 +3008,13 @@ private static void applyVisualDataOfGraphicsObjects(DBData dbData, ContainerObj
 				border = new Border(null, (Group)container);
 				container.addSubObject(border.getName(), border);
 			}
+			textbox.setParent(null);
 			border.addSubObject(textbox.getName(), textbox, true);
 		}
-		else
+		else {
+			textbox.setParent(null);
 			container.addSubObject(textbox.getName(), textbox, true);
+		}
 	}
 }
 /**
@@ -3855,7 +3874,8 @@ public void createTemplateInstance(String name, String type, boolean relative) {
 	ViewState view = ViewState.getInstance(id);
 	double scale = view.getScale();
 	
-	Template templ = new Template(null, templateInstance);
+	Template templ = new Template(Group.getRoot(id), templateInstance);
+	templateInstance.setVisualTemplate(templ);
 
 	//templ.setDescription(dbTemplate.getDescription());
 	//templ.setDescription(template.getDescription());
@@ -3872,7 +3892,8 @@ public void createTemplateInstance(String name, String type, boolean relative) {
 	posY += view.getGridSize() * 2;
 	setPressedMousePos(posX, posY);
     
-    Group.getRoot(id).addSubObject(name, templ, true);
+    templ.setParent(null);
+	Group.getRoot(id).addSubObject(name, templ, true);
 	
 	if (Settings.getInstance().getSnapToGrid())
 		templ.snapToGrid();
@@ -3924,10 +3945,10 @@ public boolean prepareTemplateLeave()
 	
 	//template should be reloaded because user could save the template prior
 	//to ascending/descending into another level
-	if (isModified() || Group.hasMacroPortsIDChanged()) {
+	if (isModified() || Group.hasMacroPortsIDChanged(id)) {
 		VDBTemplate backup = (VDBTemplate)templateStack.pop();
 		// reload template
-		boolean ok = reloadTemplate(Group.getEditingTemplateData());
+		boolean ok = reloadTemplate(Group.getEditingTemplateData(id));
 		// push new
 		VDBTemplate reloaded = (VDBTemplate)VDBData.getTemplates().get(backup.getId());
 		
@@ -3959,10 +3980,10 @@ public void templateReloadPostInit()
 	UndoManager.getInstance(id).setMonitor(true);
 
 	// update opened file
-	if (Group.getEditingTemplateData()==null)
+	if (Group.getEditingTemplateData(id)==null)
 		VisualDCT.getInstance().setOpenedFile(null);
 	else
-		VisualDCT.getInstance().setOpenedFile(new File(Group.getEditingTemplateData().getFileName()));
+		VisualDCT.getInstance().setOpenedFile(new File(Group.getEditingTemplateData(id).getFileName()));
 
 	InspectorManager.getInstance().updateObjectLists();
 
@@ -3981,7 +4002,7 @@ public void descendIntoTemplate(Template template)
 
 	ViewState.getInstance(id).setAsHilited(null);
 	
-	if (Group.hasMacroPortsIDChanged()) {
+	if (Group.hasMacroPortsIDChanged(id)) {
 	    viewGroup.reset();
         JOptionPane.showMessageDialog(VisualDCT.getInstance(),
                 "Macros/Ports in this template have changed. \nReload and save files that include this template to apply changes.", "Template changed!", JOptionPane.WARNING_MESSAGE);
@@ -3991,9 +4012,9 @@ public void descendIntoTemplate(Template template)
 	templateStack.push(template.getTemplateData().getTemplate());
 	
 	Group group = template.getTemplateData().getTemplate().getGroup();
-	Group.setRoot(group);
+	Group.setRoot(id, group);
 
-	Group.setEditingTemplateData(template.getTemplateData().getTemplate());
+	Group.setEditingTemplateData(id, template.getTemplateData().getTemplate());
 	
 	// initialize
 	templateReloadPostInit();
@@ -4012,7 +4033,7 @@ public void ascendFromTemplate()
 	if (!prepareTemplateLeave())
 		return;
 	
-	if (Group.hasMacroPortsIDChanged()) {
+	if (Group.hasMacroPortsIDChanged(id)) {
 	    viewGroup.reset();
         JOptionPane.showMessageDialog(VisualDCT.getInstance(),
                 "Macros/Ports in this template have changed. \nReload and save files that include this template to apply changes.", "Template changed!", JOptionPane.WARNING_MESSAGE);
@@ -4023,14 +4044,14 @@ public void ascendFromTemplate()
 	templateStack.pop();
 	
 	if (!templateStack.isEmpty())
-		Group.setEditingTemplateData((VDBTemplate)templateStack.peek());
+		Group.setEditingTemplateData(id, (VDBTemplate)templateStack.peek());
 	else
-		Group.setEditingTemplateData(null);
+		Group.setEditingTemplateData(id, null);
 		
 	Group grp = viewGroup;
 	while (grp.getParent()!=null)
 		grp = (Group)grp.getParent();
-	Group.setRoot(grp);
+	Group.setRoot(id, grp);
 
 	// initialize
 	templateReloadPostInit();
@@ -4183,7 +4204,7 @@ public void createPort(VDBPort vdbPort) {
 	
 	// if null bring up dialog and ask for name, then create port
 	if (vdbPort==null)
-		vdbPort = Group.getEditingTemplateData().addPort();
+		vdbPort = Group.getEditingTemplateData(id).addPort();
 		
 	if (vdbPort==null)
 		return;
@@ -4214,7 +4235,7 @@ public Macro createMacro(VDBMacro vdbMacro) {
 	
 	// if null bring up dialog and ask for name, then create port
 	if (vdbMacro==null)
-		vdbMacro = Group.getEditingTemplateData().addMacro();
+		vdbMacro = Group.getEditingTemplateData(id).addMacro();
 		
 	if (vdbMacro==null)
 		return null;
@@ -4267,7 +4288,7 @@ public void generateMacros()
 		String macroName = (String)i.next();
 		String name = macroName.substring(2, macroName.length()-1);
 		
-		Group.getEditingTemplateData().addMacro(name);
+		Group.getEditingTemplateData(id).addMacro(name);
 
 		// output to console
 		com.cosylab.vdct.Console.getInstance().print("Creating macro '"+name+"', referenced from: ");

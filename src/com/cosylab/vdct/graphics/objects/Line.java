@@ -170,9 +170,10 @@ public Flexible copyToGroup(Object dsId, String group)
 	while(Group.getRoot(dsId).findObject(newName, true) != null)
 		newName = StringUtils.incrementName(newName, Constants.COPY_SUFFIX);
 
-	Line grLine = new Line(newName, null, 
+	Line grLine = new Line(newName, Group.getRoot(dsId), 
 							startVertex.getX(), startVertex.getY(),
 							endVertex.getX(), endVertex.getY());
+	grLine.setParent(null);
 	Group.getRoot(dsId).addSubObject(newName, grLine, true);
 	grLine.setStartArrow(startArrow);
 	grLine.setEndArrow(endArrow);

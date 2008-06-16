@@ -65,6 +65,9 @@ public class DebugStartMenu extends JMenu implements PluginListener
 {
 	private class DebugPluginMenuItem extends JMenuItem implements PropertyChangeListener, ActionListener, Runnable
 	{
+
+        private Group rootGroup = null;
+		
 /**
  * Insert the method's description here.
  * Creation date: (7.12.2001 17:06:52)
@@ -78,7 +81,10 @@ public DebugPluginMenuItem(PluginObject plugin)
 
 public void actionPerformed(ActionEvent event)
 {
-	if (plugin!=null)
+	
+	rootGroup = Group.getRoot();
+	// Do nothing if no drawing surface.
+	if (plugin != null && rootGroup != null)
 	{
 
 		if (PluginDebugManager.getDebugPlugin()!=null)
@@ -107,7 +113,6 @@ public void actionPerformed(ActionEvent event)
  */
 public void run()
 {
-
 	DebugPlugin debugPlugin = PluginDebugManager.getDebugPlugin();
 	
 
@@ -119,8 +124,6 @@ public void run()
 	// count loop
 	int recordCount = 0;
 	Stack groupStack = new Stack();
-	
-	Group rootGroup = Group.getRoot();
 	
 	groupStack.push(rootGroup);
 

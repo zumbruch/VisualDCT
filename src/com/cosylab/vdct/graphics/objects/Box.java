@@ -110,7 +110,7 @@ private String getAvailableHashId()
 public Box(String parName, Group parentGroup, int posX, int posY, int posX2, int posY2)
 {
 	super(parentGroup);
-
+	
 	startVertex = new Vertex(this, posX, posY);
 	endVertex = new Vertex(this, posX2, posY2);
 
@@ -162,10 +162,11 @@ public Flexible copyToGroup(Object dsId, String group)
 	while(Group.getRoot(dsId).findObject(newName, true) != null)
 		newName = StringUtils.incrementName(newName, Constants.COPY_SUFFIX);
 
-	Box grBox = new Box(newName, null,
+	Box grBox = new Box(newName, Group.getRoot(dsId),
 						startVertex.getX(), startVertex.getY(),
 						endVertex.getX(), endVertex.getY());
 	grBox.setColor(getColor());
+	grBox.setParent(null);
 	Group.getRoot(dsId).addSubObject(newName, grBox, true);
 
 	//ViewState view = ViewState.getInstance();

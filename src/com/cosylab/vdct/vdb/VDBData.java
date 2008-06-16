@@ -377,7 +377,7 @@ public static void extractTemplates(Object dsId, DBDData dbd, DBData db, VDBData
  */
 private static VDBData generateTemplate(Object dsId, DBDData dbd, DBTemplate dbTemplate)
 {
-	Group root = Group.getRoot();
+	Group root = Group.getRoot(dsId);
 	
 	VDBTemplate vt = new VDBTemplate(dbTemplate.getId(), dbTemplate.getFileName());
 	vt.setComment(dbTemplate.getComment());	
@@ -391,7 +391,7 @@ private static VDBData generateTemplate(Object dsId, DBDData dbd, DBTemplate dbT
 		vt.getGroup().setAbsoluteName("");
 		vt.getGroup().setLookupTable(new Hashtable());
 	
-		Group.setRoot(vt.getGroup());
+		Group.setRoot(dsId, vt.getGroup());
 	
 		VDBData vdbData = VDBData.generateVDBDataInternal(dsId, dbd, dbTemplate.getData());
 		DrawingSurface.applyVisualData(dsId, false, vt.getGroup(), dbTemplate.getData(), vdbData);
@@ -407,7 +407,7 @@ private static VDBData generateTemplate(Object dsId, DBDData dbd, DBTemplate dbT
 		vt.setMacros(macros);
 		vt.setMacrosV(macrosV);
 
-		addPortsAndMacros(dbTemplate, vt, vdbData);
+		addPortsAndMacros(dsId, dbTemplate, vt, vdbData);
 
 		VDBData.addTemplate(vt);
 		
@@ -423,9 +423,9 @@ private static VDBData generateTemplate(Object dsId, DBDData dbd, DBTemplate dbT
 	finally
 	{
 		// validate all links
-		Group.getRoot().manageLinks(true);
-		Group.getRoot().updateFields();
-		Group.setRoot(root); 
+		Group.getRoot(dsId).manageLinks(true);
+		Group.getRoot(dsId).updateFields();
+		Group.setRoot(dsId, root); 
 	}
 	
 	return null;
@@ -441,14 +441,14 @@ private static VDBData generateTemplate(Object dsId, DBDData dbd, DBTemplate dbT
  */
 // NOTE adds to root!!!
 
-public static void addPortsAndMacros(DBTemplate dbTemplate, VDBTemplate vt, VDBData vdbData) {
-	addPortsAndMacros(dbTemplate, vt, vdbData, null);
+public static void addPortsAndMacros(Object dsId, DBTemplate dbTemplate, VDBTemplate vt, VDBData vdbData) {
+	addPortsAndMacros(dsId, dbTemplate, vt, vdbData, null);
 }
 
-public static void addPortsAndMacros(DBTemplate dbTemplate, VDBTemplate vt, VDBData vdbData, HashMap importedList) {
+public static void addPortsAndMacros(Object dsId, DBTemplate dbTemplate, VDBTemplate vt, VDBData vdbData, HashMap importedList) {
 	
 	// noop (importing into DB w/o editing template data)
-	if (importedList != null && Group.getEditingTemplateData() == null)
+	if (importedList != null && Group.getEditingTemplateData(dsId) == null)
 		return;
 	
 	Hashtable ports = vt.getPorts();
@@ -465,7 +465,7 @@ public static void addPortsAndMacros(DBTemplate dbTemplate, VDBTemplate vt, VDBD
 		VDBPort vdbPort = new VDBPort(vt, port);	
 		
 		// skip
-		if (Group.getRoot().getSubObject(vdbPort.getName())!= null)
+		if (Group.getRoot(dsId).getSubObject(vdbPort.getName())!= null)
 		{
 			Console.getInstance().println("WARNING: port with name '" + vdbPort.getName() + "' already exists, skipping its redefinition...");
 			continue;
@@ -474,7 +474,7 @@ public static void addPortsAndMacros(DBTemplate dbTemplate, VDBTemplate vt, VDBD
 		// has visual
 		if (port.isHasVisual())
 		{
-			Port visualPort = new Port(vdbPort, Group.getRoot(),
+			Port visualPort = new Port(vdbPort, Group.getRoot(dsId),
 								  port.getX(), port.getY());
 			visualPort.setColor(port.getColor());
 			visualPort.setMode(port.getMode());
@@ -483,7 +483,7 @@ public static void addPortsAndMacros(DBTemplate dbTemplate, VDBTemplate vt, VDBD
 			// delegate defaultVisibility
 			vdbPort.setVisibility(port.getDefaultVisibility());
 			
-			Group.getRoot().addSubObject(vdbPort.getName(), visualPort);
+			Group.getRoot(dsId).addSubObject(vdbPort.getName(), visualPort);
 			if (importedList != null) importedList.put(vdbPort.getName(), visualPort);
 		}
 
@@ -500,7 +500,7 @@ public static void addPortsAndMacros(DBTemplate dbTemplate, VDBTemplate vt, VDBD
 		VDBMacro vdbMacro = new VDBMacro(vt, macro);	
 
 		// skip
-		if (Group.getRoot().getSubObject(vdbMacro.getName())!= null)
+		if (Group.getRoot(dsId).getSubObject(vdbMacro.getName())!= null)
 		{
 			Console.getInstance().println("WARNING: macro with name '" + vdbMacro.getName() + "' already exists, skipping its redefinition...");
 			continue;
@@ -509,7 +509,7 @@ public static void addPortsAndMacros(DBTemplate dbTemplate, VDBTemplate vt, VDBD
 		// has visual
 		if (macro.isHasVisual())
 		{
-			Macro visualMacro = new Macro(vdbMacro, Group.getRoot(),
+			Macro visualMacro = new Macro(vdbMacro, Group.getRoot(dsId),
 								  macro.getX(), macro.getY());
 			visualMacro.setColor(macro.getColor());
 			visualMacro.setMode(macro.getMode());
@@ -518,7 +518,7 @@ public static void addPortsAndMacros(DBTemplate dbTemplate, VDBTemplate vt, VDBD
 			// delegate defaultVisibility
 			vdbMacro.setVisibility(macro.getDefaultVisibility());
 			
-			Group.getRoot().addSubObject(vdbMacro.getName(), visualMacro);
+			Group.getRoot(dsId).addSubObject(vdbMacro.getName(), visualMacro);
 			if (importedList != null) importedList.put(vdbMacro.getName(), visualMacro);
 		}
 
@@ -527,7 +527,7 @@ public static void addPortsAndMacros(DBTemplate dbTemplate, VDBTemplate vt, VDBD
 		
 	}
 
-	DrawingSurface.applyPortAndMacroConnectors(dbTemplate.getData(), vdbData);
+	DrawingSurface.applyPortAndMacroConnectors(dsId, dbTemplate.getData(), vdbData);
 }
 /**
  * This method was created in VisualAge.

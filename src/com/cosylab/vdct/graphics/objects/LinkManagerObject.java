@@ -412,7 +412,7 @@ public boolean manageLink(VDBFieldData field) {
 		
 		// check new VAR->PORT/macro link
 		LinkProperties properties = new LinkProperties(field);
-		InLink portLink = EPICSLinkOut.getTarget(properties, false, true);
+		InLink portLink = EPICSLinkOut.getTarget(getDsId(), properties, false, true);
 		
 		if (portLink==null || (!(portLink instanceof TemplateEPICSPort) && !(portLink instanceof Macro)))
 		{
@@ -460,7 +460,7 @@ public boolean manageLink(VDBFieldData field) {
 				
 			// new link
 			LinkProperties properties = new LinkProperties(field);
-			InLink varlink = EPICSLinkOut.getTarget(properties);
+			InLink varlink = EPICSLinkOut.getTarget(getDsId(), properties);
 			// can point to null? OK, cross will be showed
 
 			// assume constant (this is not perfect but handles almost all the cases)
@@ -530,7 +530,7 @@ public boolean manageLink_(VDBFieldData field) {
 				
 			// new link
 			LinkProperties properties = new LinkProperties(field);
-			InLink varlink = EPICSLinkOut.getTarget(properties);
+			InLink varlink = EPICSLinkOut.getTarget(getDsId(), properties);
 			// can point to null? OK, cross will be showed
 
 			EPICSLinkOut outlink = null;
@@ -795,7 +795,7 @@ protected void destroyFields() {
  * @param macros
  * @param deep
  */
-public static void checkIfMacroCandidate(VDBFieldData field, HashMap macros) {
+public static void checkIfMacroCandidate(Object dsId, VDBFieldData field, HashMap macros) {
 
 	String value = field.getValue();
 	final String macroStart = "$(";
@@ -826,7 +826,7 @@ public static void checkIfMacroCandidate(VDBFieldData field, HashMap macros) {
 
 		// check if not already defined
 		String macroName = value.substring(startMacroPos-1, endMacroPos+1);
-		if (Group.getRoot().getLookupTable().get(macroName)!=null)
+		if (Group.getRoot(dsId).getLookupTable().get(macroName)!=null)
 			continue;
 		
 		// we have got undefined macro, add it to the list

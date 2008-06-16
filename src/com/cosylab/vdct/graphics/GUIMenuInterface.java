@@ -117,6 +117,9 @@ void saveAsRdbGroup(JFrame guiContext);
  * @return boolean
  */
 boolean isModified();
+
+boolean isMacroPortsIDChanged();
+
 /**
  * Insert the method's description here.
  * Creation date: (4.2.2001 15:11:41)

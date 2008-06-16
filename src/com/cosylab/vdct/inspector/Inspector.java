@@ -593,7 +593,9 @@ private void initialize() {
 	}
 	// user code begin {2}
 
-	updateObjectList();
+	if (dsId != null) {
+	    updateObjectList();
+	}
 	addWindowListener(this);
 	getHelpLabel().setText("");
 	// user code end

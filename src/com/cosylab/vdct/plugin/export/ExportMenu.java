@@ -28,13 +28,21 @@ package com.cosylab.vdct.plugin.export;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.HashMap;
+import java.util.Map;
 
-import java.util.*;
-import java.beans.*;
-import java.awt.event.*;
+import javax.swing.Icon;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 
-import com.cosylab.vdct.plugin.*;
+import com.cosylab.vdct.graphics.objects.Group;
+import com.cosylab.vdct.plugin.PluginListener;
+import com.cosylab.vdct.plugin.PluginManager;
+import com.cosylab.vdct.plugin.PluginObject;
 
 /**
  * Insert the class' description here.
@@ -58,8 +66,10 @@ public ExportPluginMenuItem(PluginObject plugin)
 
 public void actionPerformed(ActionEvent event)
 {
-	if (plugin!=null)
-		((ExportPlugin)plugin.getPlugin()).export(com.cosylab.vdct.graphics.objects.Group.getRoot());
+    Group root = Group.getRoot();
+	if (plugin != null && root != null) {
+		((ExportPlugin)plugin.getPlugin()).export(root);
+	}
 }
 
 /**

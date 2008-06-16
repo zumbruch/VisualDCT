@@ -912,7 +912,7 @@ private void updateLink() {
 		}
 		if ((endpoint!=null) && hasEndpoint) ((InLink)endpoint).disconnect(preendpoint);
 		//OutLink lol = getTarget(properties).getOutput();
-		InLink il = EPICSLinkOut.getTarget(newProperties, true);
+		InLink il = EPICSLinkOut.getTarget(getDsId(), newProperties, true);
 		OutLink ol = (OutLink)preendpoint;
 		ol.setInput(il);
 		if (il!=null) { 
@@ -1061,7 +1061,8 @@ public Flexible copyToGroup(Object dsId, String group) {
 	VDBPort theDataCopy = VDBData.copyVDBPort(data);
 	theDataCopy.setName(newName);
 
-	Port thePortCopy = new Port(theDataCopy, null, getX(), getY());
+	Port thePortCopy = new Port(theDataCopy, Group.getRoot(dsId), getX(), getY());
+	thePortCopy.setParent(null);
 	((Group)Group.getRoot(dsId).getSubObject(group)).addSubObject(newName, thePortCopy, true);
 
 	Group.getRoot(dsId).manageLinks(true);
@@ -1082,10 +1083,12 @@ public String getFlexibleName() {
  */
 public boolean moveToGroup(Object dsId, String group) {
 	
-	if (Group.getEditingTemplateData()==null)
+	if (Group.getEditingTemplateData(getDsId()) == null
+			|| Group.getEditingTemplateData(dsId) == null) { 
 		return false;
+	}
 
-	Group.getEditingTemplateData().removePort(data);
+	Group.getEditingTemplateData(getDsId()).removePort(data);
 	//String oldName = getName();
 	String newName;
 	if (group.equals(Record.nullString)){
@@ -1122,7 +1125,7 @@ public boolean moveToGroup(Object dsId, String group) {
 	((Group)Group.getRoot(dsId).getSubObject(group)).addSubObject(newName, this, true);
 	data.setName(newName);
 
-	Group.getEditingTemplateData().addPort(data);
+	Group.getEditingTemplateData(dsId).addPort(data);
 	unconditionalValidation();
 
 	return true;
@@ -1131,10 +1134,10 @@ public boolean moveToGroup(Object dsId, String group) {
  * @see com.cosylab.vdct.graphics.objects.Flexible#rename(java.lang.String)
  */
 public boolean rename(String newName) {
-	if (Group.getEditingTemplateData()==null)
+	if (Group.getEditingTemplateData(getDsId())==null)
 		return false;
 
-	Group.getEditingTemplateData().renamePort(data, newName);
+	Group.getEditingTemplateData(getDsId()).renamePort(data, newName);
     String newObjName = Group.substractObjectName(newName);
 	String oldObjName = Group.substractObjectName(getName());
 

@@ -37,6 +37,9 @@ import java.util.Vector;
  */
 public class CopyContext {
 
+	// Id of the copy/cut source group.
+	private Object dsId = null;
+	
 	// to remember on cut from which group object has been cut 
 	private ArrayList pasteNames = null;
 	// to remember copied objects for multiple pasting
@@ -47,13 +50,18 @@ public class CopyContext {
 	private double pasteY = 0;
 	private boolean doOffsetAtPaste = false;
 	
-	
 	public CopyContext() {
 		super();
 		pasteNames = new ArrayList();
 		copiedObjects = new Vector();
 	}
 	
+	public Object getDsId() {
+		return dsId;
+	}
+	public void setDsId(Object dsId) {
+		this.dsId = dsId;
+	}
 	public int getPasteCount() {
 		return pasteCount;
 	}

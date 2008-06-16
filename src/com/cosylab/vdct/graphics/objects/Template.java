@@ -1548,7 +1548,9 @@ public Flexible copyToGroup(Object dsId, java.lang.String group) {
 
 	VDBTemplateInstance theDataCopy = VDBData.copyVDBTemplateInstance(templateData);
 	theDataCopy.setName(newName);
-	Template theTemplateCopy = new Template(null, theDataCopy);
+	Template theTemplateCopy = new Template(Group.getRoot(dsId), theDataCopy);
+	theDataCopy.setVisualTemplate(theTemplateCopy);
+	theTemplateCopy.setParent(null);
 	Group.getRoot(dsId).addSubObject(theDataCopy.getName(), theTemplateCopy, true);
 	//theTemplateCopy.setDescription(getTemplateData().getTemplate().getDescription());
 	theTemplateCopy.setX(getX()); theTemplateCopy.setY(getY());
@@ -1615,7 +1617,7 @@ public void fixMacrosOnCopy(String prevGroup, String group) {
 			old.startsWith(prevGroup)) {
 			
 			LinkProperties lp = new LinkProperties(field);
-			InLink target = EPICSLinkOut.getTarget(lp, true);
+			InLink target = EPICSLinkOut.getTarget(getDsId(), lp, true);
 			if (target == null)
 				continue;
 			
@@ -1864,15 +1866,18 @@ public void writeObjects(DataOutputStream file, NamingContext context, boolean e
 
 	 file.writeBytes("\n# expand(\""+getTemplateData().getTemplate().getFileName()+"\", "+templateName+")\n");
 
-	 Group currentRoot = Group.getRoot();
+     Group group = getTemplateData().getTemplate().getGroup();
+     Object dsId = group.getDsId();
+	 
+	 Group currentRoot = Group.getRoot(dsId);
 	 try
 	 {
-	 	Group.setRoot(getTemplateData().getTemplate().getGroup());
-	 	getTemplateData().getTemplate().getGroup().writeObjects(file, context.createNamingContextFor(getTemplateData()), export);
+		Group.setRoot(dsId, group);
+		group.writeObjects(file, context.createNamingContextFor(getTemplateData()), export);
 	 }
 	 finally
 	 {
-	 	Group.setRoot(currentRoot);	
+	 	Group.setRoot(dsId, currentRoot);	
 	 }
 	 file.writeBytes("\n# end("+templateName+")\n");
 	 
@@ -2050,7 +2055,7 @@ public void generateMacros(HashMap macros) {
 	{
 		obj = e.nextElement();
 		if (obj instanceof TemplateEPICSMacro)
-			LinkManagerObject.checkIfMacroCandidate(((Field)obj).getFieldData(), macros);
+			LinkManagerObject.checkIfMacroCandidate(getDsId(), ((Field)obj).getFieldData(), macros);
 	}
 }
 

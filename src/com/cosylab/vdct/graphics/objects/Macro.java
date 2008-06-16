@@ -1089,7 +1089,8 @@ public Flexible copyToGroup(Object dsId, String group) {
 	VDBMacro theDataCopy = VDBData.copyVDBMacro(data);
 	theDataCopy.setName(newName);
 
-	Macro theMacroCopy = new Macro(theDataCopy, null, getX(), getY());
+	Macro theMacroCopy = new Macro(theDataCopy, Group.getRoot(dsId), getX(), getY());
+	theMacroCopy.setParent(null);
 	((Group)Group.getRoot(dsId).getSubObject(group)).addSubObject(newName, theMacroCopy, true);
 
 	Group.getRoot(dsId).manageLinks(true);
@@ -1110,10 +1111,12 @@ public String getFlexibleName() {
  */
 public boolean moveToGroup(Object dsId, String group) {
 	
-	if (Group.getEditingTemplateData()==null)
+	if (Group.getEditingTemplateData(getDsId()) == null
+			|| Group.getEditingTemplateData(dsId) == null) { 
 		return false;
+	}
 		
-	Group.getEditingTemplateData().removeMacro(data);
+	Group.getEditingTemplateData(getDsId()).removeMacro(data);
 	//String oldName = getName();
 	String newName;
 	if (group.equals(Record.nullString)){
@@ -1150,7 +1153,7 @@ public boolean moveToGroup(Object dsId, String group) {
 	((Group)Group.getRoot(dsId).getSubObject(group)).addSubObject(newName, this, true);
 	data.setName(newName);
 
-	Group.getEditingTemplateData().addMacro(data);
+	Group.getEditingTemplateData(dsId).addMacro(data);
 	unconditionalValidation();
 
 	return true;
@@ -1159,10 +1162,10 @@ public boolean moveToGroup(Object dsId, String group) {
  * @see com.cosylab.vdct.graphics.objects.Flexible#rename(java.lang.String)
  */
 public boolean rename(String newName) {
-	if (Group.getEditingTemplateData()==null)
+	if (Group.getEditingTemplateData(getDsId())==null)
 		return false;
 
-	Group.getEditingTemplateData().renameMacro(data, newName);
+	Group.getEditingTemplateData(getDsId()).renameMacro(data, newName);
     String newObjName = Group.substractObjectName(newName);
 	String oldObjName = Group.substractObjectName(getName());
 

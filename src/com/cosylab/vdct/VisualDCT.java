@@ -1892,7 +1892,7 @@ public void exitMenuItem_ActionPerformed() {
 		    switch(choice) {
 
 		    	case JOptionPane.NO_OPTION: {
-		    	    if (Group.hasMacroPortsIDChanged()) {
+		    	    if (cmd.getGUIMenuInterface().isMacroPortsIDChanged()) {
 		    	        int check = JOptionPane.showConfirmDialog(VisualDCT.getInstance(),
 		    	                "Macros/Ports in this template have changed. \nReload and save files that include this template to apply changes. \nAre you sure you want to exit VisualDCT?", "Template changed!",
 		    	                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
@@ -1906,7 +1906,7 @@ public void exitMenuItem_ActionPerformed() {
 		    	
 		    	case JOptionPane.YES_OPTION: {
 		    	    saveMenuItem_ActionPerformed();
-		    	    if (Group.hasMacroPortsIDChanged()) {
+		    	    if (cmd.getGUIMenuInterface().isMacroPortsIDChanged()) {
 		    	        int check = JOptionPane.showConfirmDialog(VisualDCT.getInstance(),
 		    	                "Macros/Ports in this template have changed. \nReload and save files that include this template to apply changes. \nAre you sure you want to exit VisualDCT?", "Template changed!",
 		    	                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
@@ -1926,7 +1926,7 @@ public void exitMenuItem_ActionPerformed() {
 		}
 		else
 		{
-		    if (Group.hasMacroPortsIDChanged()) {
+		    if (cmd.getGUIMenuInterface().isMacroPortsIDChanged()) {
     	        int check = JOptionPane.showConfirmDialog(VisualDCT.getInstance(),
     	                "Macros/Ports in this template have changed. \nReload and save files that include this template to apply changes. \nAre you sure you want to exit VisualDCT?", "Template changed!",
     	                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
@@ -2073,8 +2073,14 @@ public void exportPostScriptFileMenuItem_ActionPerformed()
 			}
 		}
 	};
+    // Do nothing if no drawing surface.
+	Group root = Group.getRoot();
+	if (root == null) {
+		return;
+	}
+	
 	// Copy the current active view to prevent changes to it during thread run.
-	ViewState view = new ViewState(ViewState.getInstance(Group.getRoot().getDsId()));
+	ViewState view = new ViewState(ViewState.getInstance(root.getDsId()));
 	new MyOwnPostScriptExportingThread(view).start();
 }
 /**
@@ -6848,8 +6854,15 @@ public void preferences___MenuItem_ActionPerformed() {
  * Comment
  */
 public void spreadsheetMenuItemActionPerformed() {
+	
+    // Do nothing if no drawing surface.
+	Group root = Group.getRoot();
+	if (root == null) {
+		return;
+	}
+	
 	SpreadsheetInspector spreadsheet = getSpreadsheetInspector();
-	spreadsheet.setDsId(Group.getRoot().getDsId());
+	spreadsheet.setDsId(root.getDsId());
 	spreadsheet.setLocationRelativeTo(this);
 	spreadsheet.setVisible(true);
 }
@@ -7135,8 +7148,14 @@ public void printAsPostScriptMenuItem_ActionPerformed()
 		}
 	};
 
+    // Do nothing if no drawing surface.
+	Group root = Group.getRoot();
+	if (root == null) {
+		return;
+	}
+	
 	// Copy the current view to prevent changes to it during thread run. 
-	ViewState view = new ViewState(ViewState.getInstance(Group.getRoot().getDsId()));
+	ViewState view = new ViewState(ViewState.getInstance(root.getDsId()));
 	new MyOwnPostScriptPrintingThread(view).start();
 }
 /**

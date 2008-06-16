@@ -66,8 +66,14 @@ public class CosyBeansPlugin implements ContextPopupPlugin, MenuPlugin {
 
 			// TBD: special case for "Show all..." -> should have other handler, etc...			
 			
+			Group root = Group.getRoot();
+			if (root == null) {
+				Console.getInstance().println("CosyBeansPlugin: failed to find database.");
+				return;
+			}
+			
 			// search for record object
-			Record record = (Record)Group.getRoot().findObject(recordName, true);
+			Record record = (Record)root.findObject(recordName, true);
 			if (record==null)
 			{
 				Console.getInstance().println("CosyBeansPlugin: failed to find '"+recordName+"' record.");

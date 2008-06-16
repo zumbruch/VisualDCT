@@ -114,7 +114,7 @@ public class RdbDataMapper {
 					saveDataDef();
 				}
 				saveDefinitionFile();
-				saveRecords();
+				saveRecords(dataId);
 				saveVdctData(dataId);
 				
 				helper.commit();
@@ -513,7 +513,7 @@ public class RdbDataMapper {
 		}
 	}
 	
-	private void saveRecords() throws SQLException {
+	private void saveRecords(Object dsId) throws SQLException {
 
 		// rec type code usage: remove when Group and rec_type_code usage is defined  
 		/*
@@ -523,7 +523,7 @@ public class RdbDataMapper {
         		+ " AND rec_type_code='E'");
         */
 		
-        Iterator iterator = Group.getRoot().getStructure().iterator();
+        Iterator iterator = Group.getRoot(dsId).getStructure().iterator();
 
 		VDBRecordData recordData = null;
 		String name = null;

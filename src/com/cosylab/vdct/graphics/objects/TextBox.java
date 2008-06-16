@@ -336,11 +336,12 @@ public Flexible copyToGroup(Object dsId, String group)
 	while(Group.getRoot(dsId).findObject(newName, true) != null)
 		newName = StringUtils.incrementName(newName, Constants.COPY_SUFFIX);
 
-	TextBox grTextBox = new TextBox(newName, null,
+	TextBox grTextBox = new TextBox(newName, Group.getRoot(dsId),
 						startVertex.getX(), startVertex.getY(),
 						endVertex.getX(), endVertex.getY());
 	grTextBox.setDescription(description);
 	grTextBox.setColor(getColor());
+	grTextBox.setParent(null);
 	Group.getRoot(dsId).addSubObject(newName, grTextBox, true);
 
 	//ViewState view = ViewState.getInstance();
