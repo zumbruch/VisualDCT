@@ -90,7 +90,7 @@ SaveObject, DsEventListener {
 	private static Group clipboard = null;
 	private static final String nullString = "";
 	private static Group root = null;
-	
+
 	protected Object dsId = null; 
 	protected String name;
 	protected String namePrefix;
@@ -99,10 +99,10 @@ SaveObject, DsEventListener {
 
 	// template instances fields lookuptable 
 	private Hashtable lookupTable = null;
-	
+
 	private static HashMap rootGroups = new HashMap();
 	protected boolean disposed = false;
-	
+
 	private VDBTemplate editingTemplateData = null;
 	private long openTemplateMacroID = 0;
 	private long openTemplatePortID = 0;
@@ -991,7 +991,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 			rootGroups.remove(dsId);
 		} else {
 			System.err.println("Group:setRoot: warning: group root set with unregistered id, registering it.");
-	    }
+		}
 		newRoot.setDsId(dsId);
 		rootGroups.put(dsId, newRoot);
 	}
@@ -2158,7 +2158,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 			openTemplatePortID = 0;
 		}
 	}
-	
+
 	public static boolean hasMacroPortsIDChanged(Object dsId) {
 		return getRoot(dsId).hasMacroPortsIDChanged();
 	}
@@ -2176,7 +2176,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 			}
 		return true;
 	}
-	
+
 	/**
 	 * Returns the structure.
 	 * @return Vector
@@ -2226,43 +2226,43 @@ private void addSubObjectToLayout(VisibleObject object) {
 	 * @param macros
 	 * @param deep
 	 */
-	 public void generateMacros(HashMap macros, boolean deep) {
+	public void generateMacros(HashMap macros, boolean deep) {
 
-		 Enumeration e = subObjectsV.elements();
-		 Object obj;
-		 while (e.hasMoreElements()) {
-			 obj = e.nextElement();
-			 if (obj instanceof Record)
-				 ((Record)obj).generateMacros(macros);
-			 if (obj instanceof Template)
-				 ((Template)obj).generateMacros(macros);
-			 else if (deep && (obj instanceof Group))
-				 ((Group)obj).generateMacros(macros, deep);
-		 }
-	 }
+		Enumeration e = subObjectsV.elements();
+		Object obj;
+		while (e.hasMoreElements()) {
+			obj = e.nextElement();
+			if (obj instanceof Record)
+				((Record)obj).generateMacros(macros);
+			if (obj instanceof Template)
+				((Template)obj).generateMacros(macros);
+			else if (deep && (obj instanceof Group))
+				((Group)obj).generateMacros(macros, deep);
+		}
+	}
 
-	 /**
-	  * 
-	  * Resets certain parameters of the subobjects (validationsCounter in Record).
-	  * @param settingsChanged flag whether this method was invoked when settings (settings dialog) were changed
-	  */
-	 public void reset() {
-		 Enumeration en = getSubObjectsV().elements();
-		 Object obj;
-		 while (en.hasMoreElements()) {
-			 obj = en.nextElement();
-			 if (obj instanceof Record) {
-				 ((Record)obj).resetValidationsCounter();
-			 } else if (obj instanceof Group) {
-				 ((Group)obj).reset();
-			 }
-		 }
-	 }
+	/**
+	 * 
+	 * Resets certain parameters of the subobjects (validationsCounter in Record).
+	 * @param settingsChanged flag whether this method was invoked when settings (settings dialog) were changed
+	 */
+	public void reset() {
+		Enumeration en = getSubObjectsV().elements();
+		Object obj;
+		while (en.hasMoreElements()) {
+			obj = en.nextElement();
+			if (obj instanceof Record) {
+				((Record)obj).resetValidationsCounter();
+			} else if (obj instanceof Group) {
+				((Group)obj).reset();
+			}
+		}
+	}
 
-	 public static Group getRoot(Object id) {
-		 return (Group)rootGroups.get(id);
-	 }
-	 
+	public static Group getRoot(Object id) {
+		return (Group)rootGroups.get(id);
+	}
+
 	public static Vector getAllRoots() {
 		Vector vector = new Vector();
 		Iterator iterator = rootGroups.values().iterator();
@@ -2276,52 +2276,52 @@ private void addSubObjectToLayout(VisibleObject object) {
 		}
 		return vector;
 	}
-	 
-    public Object getDsId() {
-    	Object rootId = getParent() != null ? getParent().getDsId() : dsId;
-    	if (rootId == null) {
-    		System.out.println("Warning: returning null for root container id.");
-    	}
-    	return rootId;
+
+	public Object getDsId() {
+		Object rootId = getParent() != null ? getParent().getDsId() : dsId;
+		if (rootId == null) {
+			System.out.println("Warning: returning null for root container id.");
+		}
+		return rootId;
 	}
 
 	public void setDsId(Object dsId) {
 		this.dsId = dsId;
 	}
 
-    public boolean isDisposed() {
+	public boolean isDisposed() {
 		return disposed;
 	}
-    
-	public static void registerDsListener() {
-    	GetDsManager command = (GetDsManager)CommandManager.getInstance().getCommand("GetDsManager");
-    	if (command != null) {
-    		command.getManager().addDsEventListener(getClipboard());
-    	}
-    }
 
-    public void onDsAdded(Object id) {
-    	Group group = new Group(null);
-    	group.setDsId(id);
-    	group.setAbsoluteName("");
-    	group.setLookupTable(new Hashtable());
-        
-    	rootGroups.put(id, group);
-    	// TODO:REM
-    	System.out.println();
-    	System.out.println("inserted: " + id);
-    	System.out.println("content:");
+	public static void registerDsListener() {
+		GetDsManager command = (GetDsManager)CommandManager.getInstance().getCommand("GetDsManager");
+		if (command != null) {
+			command.getManager().addDsEventListener(getClipboard());
+		}
+	}
+
+	public void onDsAdded(Object id) {
+		Group group = new Group(null);
+		group.setDsId(id);
+		group.setAbsoluteName("");
+		group.setLookupTable(new Hashtable());
+
+		rootGroups.put(id, group);
+		// TODO:REM
+		System.out.println();
+		System.out.println("inserted: " + id);
+		System.out.println("content:");
 		Iterator iterator = rootGroups.values().iterator();
 		while (iterator.hasNext()) {
 			group = ((Group)iterator.next());
-	    	System.out.print("group: " + group.getDsId() + "dis:" + group.isDisposed());
-	    	System.out.println("eq to inserted: " + group.getDsId().equals(id));
+			System.out.print("group: " + group.getDsId() + "dis:" + group.isDisposed());
+			System.out.println("eq to inserted: " + group.getDsId().equals(id));
 		}
-    }
-    public void onDsRemoved(Object id) {
-    	((Group)rootGroups.get(id)).disposed = true;
-    }
-    public void onDsFocused(Object id) {
-    	root = (Group)rootGroups.get(id);
-    }
+	}
+	public void onDsRemoved(Object id) {
+		((Group)rootGroups.get(id)).disposed = true;
+	}
+	public void onDsFocused(Object id) {
+		root = (Group)rootGroups.get(id);
+	}
 }
