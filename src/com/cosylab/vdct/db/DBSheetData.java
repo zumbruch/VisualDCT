@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.events.commands.GetDsManager;
 import com.cosylab.vdct.graphics.DsEventListener;
@@ -72,9 +73,13 @@ public class DBSheetData implements DsEventListener {
 	}
 
 	public static void registerDsListener() {
+		
+		DBSheetData data = new DBSheetData();
+	    instances.put(Constants.DEFAULT_NAME, data);
+		
 		GetDsManager command = (GetDsManager)CommandManager.getInstance().getCommand("GetDsManager");
 		if (command != null) {
-			command.getManager().addDsEventListener(new DBSheetData());
+			command.getManager().addDsEventListener(data);
 		}
 	}
 
@@ -82,7 +87,6 @@ public class DBSheetData implements DsEventListener {
 	    instances.put(id, new DBSheetData());
 	}
 	public void onDsRemoved(Object id) {
-		instances.remove(id);
 	}
 	public void onDsFocused(Object id) {
 	}

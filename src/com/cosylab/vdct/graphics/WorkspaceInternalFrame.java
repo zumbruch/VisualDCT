@@ -34,7 +34,6 @@ import javax.swing.WindowConstants;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 
-import com.cosylab.vdct.db.DbDescriptor;
 import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.events.MouseEventManager;
 import com.cosylab.vdct.events.commands.SetWorkspaceFile;
@@ -46,26 +45,26 @@ import com.cosylab.vdct.events.commands.SetWorkspaceFile;
 public class WorkspaceInternalFrame extends JInternalFrame
 implements InternalFrameInterface, InternalFrameListener {
 
-	DbDescriptor id = null; 
+	Object dsId = null; 
 	protected PanelDecorator contentPanel = null;
 	protected DsManagerInterface drawingSurfaceManager = null;
 
-	public WorkspaceInternalFrame(DbDescriptor id, DsManagerInterface drawingSurfaceManager) {
-		super(id.getFileName(), true, true, true, true);
-		this.id = id;
+	protected static final String defaultName = "Name";
+
+	public WorkspaceInternalFrame(Object dsId, DsManagerInterface drawingSurfaceManager) {
+		super(defaultName, true, true, true, true);
+		this.dsId = dsId;
 		this.drawingSurfaceManager = drawingSurfaceManager;
 		contentPanel = new PanelDecorator();
 		/* First register the component, then create the drawing surface which adds listeners to
 		 * it.
 		 */
 		MouseEventManager.getInstance().registerSubscriber(
-				"WorkspaceInternalFrame:" + id.toString(), contentPanel);
-		contentPanel.setComponent(drawingSurfaceManager.addDrawingSurface(id, this));
+				"WorkspaceInternalFrame:" + dsId.toString(), contentPanel);
+		contentPanel.setComponent(drawingSurfaceManager.addDrawingSurface(dsId, this));
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
 		addInternalFrameListener(this);
-
-		setFrameTitle(id.getFileName());
 
 		setContentPane(contentPanel);
 	}
@@ -82,7 +81,7 @@ implements InternalFrameInterface, InternalFrameListener {
 	}
 
 	public void internalFrameActivated(InternalFrameEvent e) {
-		drawingSurfaceManager.setFocusedDrawingSurface(id);
+		drawingSurfaceManager.setFocusedDrawingSurface(dsId);
 		sendActiveGroupNotification();
 	}
 
@@ -91,7 +90,7 @@ implements InternalFrameInterface, InternalFrameListener {
 	}
 
 	public void internalFrameClosed(InternalFrameEvent e) {
-		drawingSurfaceManager.removeDrawingSurface(id);
+		drawingSurfaceManager.removeDrawingSurface(dsId);
 	}
 
 	public void internalFrameClosing(InternalFrameEvent e) {

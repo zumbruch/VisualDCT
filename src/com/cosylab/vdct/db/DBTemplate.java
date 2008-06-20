@@ -40,6 +40,8 @@ public class DBTemplate extends DBComment
 	protected String fileName = null;
 	protected String description = null;
 	
+	protected String version = null;
+	protected String ioc = null;
 
 	protected Hashtable ports = null;
 	protected Vector portsV = null;
@@ -215,5 +217,21 @@ public class DBTemplate extends DBComment
 	public Vector getMacrosV()
 	{
 		return macrosV;
+	}
+
+	public String getVersion() {
+		return version;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
+	}
+
+	public String getIoc() {
+		return ioc;
+	}
+
+	public void setIoc(String ioc) {
+		this.ioc = ioc;
 	}
 }

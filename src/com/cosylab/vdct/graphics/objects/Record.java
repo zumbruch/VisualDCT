@@ -657,10 +657,10 @@ public void fieldChanged(VDBFieldData field) {
 	if (repaint) {
 		// do not repaint non-viewing group
 		// might happen in debug mode and any other
-		if (DsManager.getDrawingSurface(getDsId()).getViewGroup() == getParent())
-		{
+		DrawingSurface surface = DsManager.getDrawingSurface(getDsId());
+		if (surface.getViewGroup() == getParent()) {
 			unconditionalValidation();
-			com.cosylab.vdct.events.CommandManager.getInstance().execute("RepaintWorkspace");
+			surface.repaint();
 		}
 	}
 }
@@ -1306,7 +1306,11 @@ public boolean moveAsMuchAsPossibleTopUp(int dx, int dy) {
  */
 public boolean moveToGroup(Object dsId, String group) {
 	String currentParent = Group.substractParentName(recordData.getName());
-	if (group.equals(currentParent)) return false;
+	if (group.equals(currentParent) && dsId.equals(getDsId())) {
+		// TODO:REM
+		System.out.println("same dsid: " + dsId + " + group: " + currentParent);
+		return false;
+	}
 	
 	//String oldName = getName();
 	String newName;
@@ -1325,6 +1329,8 @@ public boolean moveToGroup(Object dsId, String group) {
 		{
 			recordData.setName(newName);
 			fixLinks();
+			// TODO:REM
+			System.out.println("same obj");
 			return true;
 		}
 		else
@@ -1334,8 +1340,11 @@ public boolean moveToGroup(Object dsId, String group) {
 		}
 	}
 
-	if (renameNeeded)
-		return rename(newName);
+	if (renameNeeded) {
+		// TODO:REM
+		System.out.println("rename: from "  + getName() + " to " + newName );
+		return rename(dsId, newName);
+	}
 	
 	getParent().removeObject(Group.substractObjectName(getName()));
 	setParent(null);
@@ -1348,6 +1357,8 @@ public boolean moveToGroup(Object dsId, String group) {
 	fixLinks();
 	unconditionalValidation();
 
+	// TODO:REM
+	System.out.println("normal");
 	return true;
 }
 /**
@@ -1383,7 +1394,7 @@ public void removeLink(Linkable link) {
  * Creation date: (2.5.2001 23:23:32)
  * @param newName java.lang.String
  */
-public boolean rename(java.lang.String newName) {
+public boolean rename(Object dsId, String newName) {
 	
 	// name has to be valid
 	
@@ -1414,7 +1425,7 @@ public boolean rename(java.lang.String newName) {
 	}
 	
 	// move if needed
-	if (!moveToGroup(getDsId(), Group.substractParentName(newName)))
+	if (!moveToGroup(dsId, Group.substractParentName(newName)))
 		fixLinks();			// fix needed
 
 	return true;

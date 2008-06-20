@@ -640,7 +640,8 @@ public Object getDsId() {
 	if (record != null) {
 		return record.getDsId();
 	} else {
-		System.err.println("Warning: VDBFieldData.getDsId: returning null.");
+		// TODO: reactivate
+		//System.err.println("Warning: VDBFieldData.getDsId: returning null.");
 		return null;
 	}
 }

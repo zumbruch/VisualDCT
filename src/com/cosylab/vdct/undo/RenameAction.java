@@ -1,5 +1,7 @@
 package com.cosylab.vdct.undo;
 
+import com.cosylab.vdct.graphics.objects.Flexible;
+
 /**
  * Copyright (c) 2002, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
  * All rights reserved.
@@ -34,7 +36,8 @@ package com.cosylab.vdct.undo;
  * @author 
  */
 public class RenameAction extends ActionObject {
-	private com.cosylab.vdct.graphics.objects.Flexible object;
+	private Object dsId;
+	private Flexible object;
 	private String oldName;
 	private String newName;
 /**
@@ -44,10 +47,11 @@ public class RenameAction extends ActionObject {
  * @param oldName java.lang.String
  * @param newName java.lang.String
  */
-public RenameAction(com.cosylab.vdct.graphics.objects.Flexible object, String oldName, String newName) {
-	this.object=object;
-	this.oldName=oldName;
-	this.newName=newName;
+public RenameAction(Object dsId, Flexible object, String oldName, String newName) {
+	this.dsId = dsId;
+	this.object = object;
+	this.oldName = oldName;
+	this.newName = newName;
 }
 /**
  * Insert the method's description here.
@@ -61,12 +65,12 @@ public String getDescription() {
  * This method was created in VisualAge.
  */
 protected void redoAction() {
-	object.rename(newName);
+	object.rename(dsId, newName);
 }
 /**
  * This method was created in VisualAge.
  */
 protected void undoAction() {
-	object.rename(oldName);
+	object.rename(dsId, oldName);
 }
 }

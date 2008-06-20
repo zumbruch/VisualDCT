@@ -584,7 +584,7 @@ public class Template
 			items.addElement(GUIHeader.getDefaultHeader());
 
 			items.addElement(getTemplateSeparator());
-			items.addElement(new NameValueInfoProperty("Template", templateData.getTemplate().getId()));
+			items.addElement(new NameValueInfoProperty("Template", templateData.getTemplate().getId().toString()));
 			items.addElement(new NameValueInfoProperty("FileName", templateData.getTemplate().getFileName()));
 
 			items.addElement(getTemplateInstanceSeparator());
@@ -1654,7 +1654,7 @@ public void fixMacrosOnCopy(String prevGroup, String group) {
  */
 public boolean moveToGroup(Object dsId, String group) {
 	String currentParent = Group.substractParentName(templateData.getName());
-	if (group.equals(currentParent)) return false;
+	if (group.equals(currentParent) && dsId.equals(getDsId())) return false;
 	
 	//String oldName = getName();
 	String newName;
@@ -1684,7 +1684,7 @@ public boolean moveToGroup(Object dsId, String group) {
 	}
 
 	if (renameNeeded)
-		return rename(newName);
+		return rename(dsId, newName);
 
 	getParent().removeObject(Group.substractObjectName(getName()));
 	setParent(null);
@@ -1701,7 +1701,7 @@ public boolean moveToGroup(Object dsId, String group) {
 /**
  * @see com.cosylab.vdct.graphics.objects.Flexible#rename(String)
  */
-public boolean rename(java.lang.String newName) {
+public boolean rename(Object dsId, String newName) {
 	
 	String newObjName = Group.substractObjectName(newName);
 	String oldObjName = Group.substractObjectName(getName());
@@ -1732,7 +1732,7 @@ public boolean rename(java.lang.String newName) {
 	this.updateTemplateFields();
 
 	// move if needed
-	if (!moveToGroup(getDsId(), Group.substractParentName(newName)))
+	if (!moveToGroup(dsId, Group.substractParentName(newName)))
 		fixLinks();			// fix needed
 
 	return true;

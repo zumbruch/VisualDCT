@@ -68,10 +68,13 @@ import com.cosylab.vdct.undo.UndoManager;
 
 public class VDBTemplate implements Inspectable, Commentable, Descriptable, MonitoredPropertyListener
 {
-	protected String id = null;
+	protected VDBTemplateId id = null;
 	protected String fileName = null;
 	protected String description = null;
 
+	protected String version = null;
+	protected String ioc = null;
+	
 	protected Hashtable ports = null;
 	protected Vector portsV = null;
 
@@ -262,7 +265,7 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 	/**
 	 * Constructor for VDBTemplate.
 	 */
-	public VDBTemplate(String id, String fileName)
+	public VDBTemplate(VDBTemplateId id, String fileName)
 	{
 		this.id = id;
 		this.fileName = fileName;
@@ -349,11 +352,11 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 		if (this.description==null || this.description.length()==0)
 		{
 			// remove extension
-			int pos = id.lastIndexOf('.');
+			int pos = id.toString().lastIndexOf('.');
 			if (pos>0)
-				tempDescription = id.substring(0, pos);
+				tempDescription = id.toString().substring(0, pos);
 			else
-				tempDescription = id;
+				tempDescription = id.toString();
 		}
 		else
 			tempDescription = null;
@@ -381,7 +384,7 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 	 * Returns the id.
 	 * @return String
 	 */
-	public String getId()
+	public VDBTemplateId getId()
 	{
 		return id;
 	}
@@ -419,7 +422,7 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 	 */
 	public String getName()
 	{
-		return id;
+		return id.toString();
 	}
 
 	/**
@@ -441,7 +444,7 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 		items.addElement(GUIHeader.getDefaultHeader());
 
 		items.addElement(getTemplateSeparator());
-		items.addElement(new NameValueInfoProperty("Class", id));
+		items.addElement(new NameValueInfoProperty("Class", id.toString()));
 		items.addElement(new NameValueInfoProperty("FileName", fileName));
 		items.addElement(new DescriptionProperty());
 
@@ -1081,7 +1084,7 @@ public void renameMacroProperty(InspectableProperty property)
 	 * Sets the id.
 	 * @param id The id to set
 	 */
-	public void setId(String id)
+	public void setId(VDBTemplateId id)
 	{
 		this.id = id;
 		updateDescription();			
@@ -1109,6 +1112,22 @@ public void renameMacroProperty(InspectableProperty property)
 	public long getMacrosGeneratedID()
 	{
 		return macrosGeneratedID;
+	}
+	
+	public String getVersion() {
+		return version;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
+	}
+
+	public String getIoc() {
+		return ioc;
+	}
+
+	public void setIoc(String ioc) {
+		this.ioc = ioc;
 	}
 
 	public Object getDsId() {

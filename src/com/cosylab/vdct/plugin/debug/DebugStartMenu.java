@@ -35,8 +35,10 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Stack;
+import java.util.Vector;
 
 import javax.swing.Icon;
 import javax.swing.JMenu;
@@ -66,7 +68,7 @@ public class DebugStartMenu extends JMenu implements PluginListener
 	private class DebugPluginMenuItem extends JMenuItem implements PropertyChangeListener, ActionListener, Runnable
 	{
 
-        private Group rootGroup = null;
+        private Vector rootGroups = null;
 		
 /**
  * Insert the method's description here.
@@ -82,9 +84,8 @@ public DebugPluginMenuItem(PluginObject plugin)
 public void actionPerformed(ActionEvent event)
 {
 	
-	rootGroup = Group.getRoot();
-	// Do nothing if no drawing surface.
-	if (plugin != null && rootGroup != null)
+	rootGroups = Group.getAllRoots();
+	if (plugin != null)
 	{
 
 		if (PluginDebugManager.getDebugPlugin()!=null)
@@ -125,7 +126,10 @@ public void run()
 	int recordCount = 0;
 	Stack groupStack = new Stack();
 	
-	groupStack.push(rootGroup);
+	Iterator iterator = rootGroups.iterator();
+	while (iterator.hasNext()) {
+	    groupStack.push(iterator.next());
+	}
 
 	while (!groupStack.isEmpty())
 	{
@@ -143,7 +147,10 @@ public void run()
 
 
 	// connect loop
-	groupStack.push(rootGroup);
+	iterator = rootGroups.iterator();
+	while (iterator.hasNext()) {
+	    groupStack.push(iterator.next());
+	}
 
 	int progress = 0;
 	ProgressMonitor progressMonitor = new ProgressMonitor(VisualDCT.getInstance(),
@@ -207,7 +214,10 @@ public void run()
 
 	progressMonitor.close();
 
-	rootGroup.unconditionalValidateSubObjects(false);
+	iterator = rootGroups.iterator();
+	while (iterator.hasNext()) {
+		((Group)iterator.next()).unconditionalValidateSubObjects(false);
+	}
 	CommandManager.getInstance().execute("RepaintAllFrames");
 }
 	

@@ -55,8 +55,9 @@ import com.cosylab.vdct.vdb.VDBTemplate;
  */
 public class NewTemplateInstanceDialog extends JDialog implements ActionListener {
 	
+	private Object dsId = null;  
 	private JComboBox templateComboBox = null;
-	JButton okButton = null; 
+	private JButton okButton = null; 
 
 	private static final String titleString = "New template instance";
 	private static final String templateTypeString = "Type:";
@@ -153,7 +154,7 @@ public class NewTemplateInstanceDialog extends JDialog implements ActionListener
     private void refreshTemplateComboBox() {
     	templateComboBox.removeAllItems();
     	
-    	Stack templateStack = DsManager.getDrawingSurface().getTemplateStack();
+    	Stack templateStack = DsManager.getDrawingSurface(dsId).getTemplateStack();
     	Enumeration templates = VDBData.getTemplates().keys();
     	while (templates.hasMoreElements()) {
     		String key = templates.nextElement().toString();
@@ -173,10 +174,14 @@ public class NewTemplateInstanceDialog extends JDialog implements ActionListener
 
 		if (action.equals(okString)) {
 			String type = templateComboBox.getSelectedItem().toString();
-	        DsManager.getDrawingSurface().createTemplateInstance(null, type, true);
+	        DsManager.getDrawingSurface(dsId).createTemplateInstance(null, type, true);
         	setVisible(false);
 		} else if (action.equals(cancelString)) {
         	setVisible(false);
 		}
+	}
+
+	public void setDsId(Object dsId) {
+		this.dsId = dsId;
 	}
 }

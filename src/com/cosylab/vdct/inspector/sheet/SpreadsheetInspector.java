@@ -690,7 +690,7 @@ public class SpreadsheetInspector extends JDialog
         return commentDialog;
     }
 
-    public JDialog getTemplateDialog() {
+    public NewTemplateInstanceDialog getTemplateDialog() {
         if (templateDialog == null) {
         	templateDialog = new NewTemplateInstanceDialog(this);
         }
@@ -699,6 +699,7 @@ public class SpreadsheetInspector extends JDialog
     
     private void showTemplateDialog() {
     	getTemplateDialog().setLocationRelativeTo(this);
+    	getTemplateDialog().setDsId(dsId);
     	getTemplateDialog().setVisible(true);
     }
 
@@ -716,7 +717,7 @@ public class SpreadsheetInspector extends JDialog
 
         } else if (inspectable instanceof Template) {
         	
-        	DsManager.getDrawingSurface().createTemplateInstance(null, getTypeName(inspectable).toString(), true);
+        	DsManager.getDrawingSurface(dsId).createTemplateInstance(null, getTypeName(inspectable).toString(), true);
         }
     }
     
@@ -822,7 +823,7 @@ public class SpreadsheetInspector extends JDialog
     	if (object instanceof Record) {
     		return key.toString();
     	} else if (object instanceof Template) {
-    		return ((VDBTemplate)(key)).getId();
+    		return ((VDBTemplate)(key)).getId().toString();
     	}
     	return null;
     }

@@ -81,6 +81,7 @@ import com.cosylab.vdct.util.StringUtils;
 import com.cosylab.vdct.vdb.VDBData;
 import com.cosylab.vdct.vdb.VDBRecordData;
 import com.cosylab.vdct.vdb.VDBTemplate;
+import com.cosylab.vdct.vdb.VDBTemplateId;
 import com.cosylab.vdct.vdb.VDBTemplateInstance;
 
 /**
@@ -93,6 +94,9 @@ public class DSGUIInterface implements VDBInterface {
 	private DrawingSurface drawingSurface;
 	private Object id = null;
 	private CopyContext copyContext;
+
+	private double pasteX = 0;
+	private double pasteY = 0;
 	
 	private static final String emptyString = "";
 	private static final String errorString = "Error: ";
@@ -105,7 +109,7 @@ public class DSGUIInterface implements VDBInterface {
  */
 public DSGUIInterface(DrawingSurface drawingSurface, CopyContext copyContext) {
 	this.drawingSurface=drawingSurface;
-	this.id = drawingSurface.getRdId();
+	this.id = drawingSurface.getDsId();
 	this.copyContext = copyContext;
 	
 	// Init the name configuration.
@@ -297,8 +301,8 @@ private void copy(Vector objects, boolean firstCopy) {
 	
 	// remember position for paste
 	copyContext.setDsId(id);
-	copyContext.setPasteX(minx - view.getRx() / view.getScale());
-	copyContext.setPasteY(miny - view.getRy() / view.getScale());
+	pasteX = minx - view.getRx() / view.getScale();
+	pasteY = miny - view.getRy() / view.getScale();
 	copyContext.setDoOffsetAtPaste(true);
 	
 	selected = objects.elements();	
@@ -306,7 +310,7 @@ private void copy(Vector objects, boolean firstCopy) {
 	while (selected.hasMoreElements()) {
 		obj = selected.nextElement();
 		if (obj instanceof Flexible) {
-			Flexible copy = ((Flexible)obj).copyToGroup(Constants.CLIPBOARD_NAME, emptyString);
+			Flexible copy = ((Flexible)obj).copyToGroup(Constants.DEFAULT_NAME, emptyString);
 			if (copy instanceof Movable)
 				((Movable)copy).move(-minx, -miny);
 						
@@ -498,8 +502,8 @@ public void cut() {
 	
 	// remember position for paste
 	copyContext.setDsId(id);
-	copyContext.setPasteX(minx - view.getRx() / view.getScale());
-	copyContext.setPasteY(miny - view.getRy() / view.getScale());
+	pasteX = minx - view.getRx() / view.getScale();
+	pasteY = miny - view.getRy() / view.getScale();
 	copyContext.setDoOffsetAtPaste(false);
 	
 	selected = view.getSelectedObjects().elements();
@@ -508,7 +512,7 @@ public void cut() {
 		if (obj instanceof Flexible) {
 			Flexible flex = (Flexible)obj;
 			String oldGroup = Group.substractParentName(flex.getFlexibleName());
-			if (flex.moveToGroup(Constants.CLIPBOARD_NAME, emptyString))
+			if (flex.moveToGroup(Constants.DEFAULT_NAME, emptyString))
 			{
 				copyContext.getPasteNames().add(oldGroup);
 				if (obj instanceof Movable)
@@ -754,8 +758,6 @@ public void paste() {
 	// do some offset (a little trick to have snapping also done) for copy only
 	final int OFFSET = Constants.GRID_SIZE;
 	double scale = ViewState.getInstance(id).getScale();
-	double pasteX = copyContext.getPasteX();
-	double pasteY = copyContext.getPasteY();
 	if (copyContext.isDoOffsetAtPaste())
 		pasteAtPosition((int)((pasteX+OFFSET)*scale), (int)((pasteY+OFFSET)*scale));
 	else
@@ -774,9 +776,14 @@ public void pasteAtPosition(int pX, int pY) {
 	
 	int size = group.getSubObjectsV().size();
 	Object sourceDsId = copyContext.getDsId();
+	
+	// TODO:REM
+	System.out.println("Got here!" + id);
 
 	// If source of the data not set, treat as no data.
 	if (size == 0 || sourceDsId == null) {
+		// TODO:REM
+		System.out.println("Returning.");
 		return;
 	}
 
@@ -802,15 +809,16 @@ public void pasteAtPosition(int pX, int pY) {
 	boolean betweenSurfaces = !id.equals(sourceDsId);
 	
 	ComposedAction targetAction = new ComposedAction();
-	ComposedAction sourceAction = new ComposedAction();
+	ComposedAction sourceAction = new ComposedAction(); 
 
 	Flexible flex; 
 	for(int i=0; i<size; i++) {
 		if (objs[i] instanceof Flexible) {
 			flex = (Flexible)objs[i];
 			
-			if (flex.moveToGroup(id, currentGroupName))
-			{
+			if (flex.moveToGroup(id, currentGroupName)) {
+				// TODO:REM
+				System.out.println("moved!");
 				if (isCopy)
 					targetAction.addAction(new CreateAction((VisibleObject)objs[i]));		// if true ?!!!
 				else {
@@ -832,14 +840,18 @@ public void pasteAtPosition(int pX, int pY) {
 					//((Movable)objs[i]).move(view.getRx(), view.getRy());
 				    ((Movable)objs[i]).move(posX, posY);
 				}
-			}
-			else
+			} else {
 				view.deselectObject((VisibleObject)objs[i]);
+				// TODO:REM
+				System.out.println("couldn't move: " + objs[i] + "id: " + id );
+			}
 		}
 	}
 
-	UndoManager.getInstance(id).addAction(targetAction);
-	if (betweenSurfaces) {
+	if (!targetAction.isEmpty()) {
+	    UndoManager.getInstance(id).addAction(targetAction);
+	}
+	if (!sourceAction.isEmpty()) {
 		UndoManager.getInstance(sourceDsId).addAction(sourceAction);
 	}
 
@@ -898,9 +910,9 @@ public void rename(java.lang.String oldName, java.lang.String newName) {
 	if (obj instanceof Flexible)
 	{
 		Flexible flex = (Flexible)obj;
-		if (flex.rename(newName))
+		if (flex.rename(id, newName))
 		{
-			UndoManager.getInstance(id).addAction(new RenameAction(flex, oldName, newName));
+			UndoManager.getInstance(id).addAction(new RenameAction(id, flex, oldName, newName));
 			
 			view.deselectObject((VisibleObject)obj);
 			drawingSurface.getViewGroup().manageLinks(true);
@@ -986,7 +998,7 @@ public void morph(java.lang.String name, String newType) {
  * Creation date: (4.2.2001 15:48:27)
  * @param file java.io.File
  */
-public void save(java.io.File file) throws IOException {
+public void save(File file) throws IOException {
 /*
  if (drawingSurface.isTemplateMode())
  {
@@ -997,11 +1009,13 @@ public void save(java.io.File file) throws IOException {
  Group.save(id, Group.getRoot(id), file, false);
 
  VDBTemplate data = Group.getEditingTemplateData(id);
+ VDBTemplateId templateId = new VDBTemplateId(file.getName(), id);
+ 
  if (data==null)
  {
  	// create a new
  	// id = basename
-	data = new VDBTemplate(file.getName(), file.getAbsolutePath());
+	data = new VDBTemplate(templateId, file.getAbsolutePath());
 	
 	data.setPorts(new Hashtable());
 	data.setPortsV(new Vector());
@@ -1025,8 +1039,7 @@ public void save(java.io.File file) throws IOException {
  	
  	// ... and fix current id (basename) and path
 	data.setFileName(file.getAbsolutePath()); 	
-	data.setId(file.getName());
-
+	data.setId(templateId);
  }
  
  // if ok

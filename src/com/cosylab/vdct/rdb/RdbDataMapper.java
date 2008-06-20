@@ -28,6 +28,7 @@
 
 package com.cosylab.vdct.rdb;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -42,6 +43,7 @@ import com.cosylab.vdct.db.DBData;
 import com.cosylab.vdct.db.DBFieldData;
 import com.cosylab.vdct.db.DBRecordData;
 import com.cosylab.vdct.db.DBResolver;
+import com.cosylab.vdct.db.DBTemplate;
 import com.cosylab.vdct.dbd.DBDConstants;
 import com.cosylab.vdct.dbd.DBDData;
 import com.cosylab.vdct.dbd.DBDDeviceData;
@@ -55,6 +57,7 @@ import com.cosylab.vdct.graphics.objects.Template;
 import com.cosylab.vdct.util.StringUtils;
 import com.cosylab.vdct.vdb.VDBFieldData;
 import com.cosylab.vdct.vdb.VDBRecordData;
+import com.cosylab.vdct.vdb.VDBTemplate;
 
 /**
  * @author ssah
@@ -82,17 +85,24 @@ public class RdbDataMapper {
 		helper.setParameters(host, database, user, password);
 	}
 
-	public DBData loadRdbData(RdbDataId dataId) throws Exception {
+	public DBData loadRdbData(Object dsId, RdbDataId dataId) throws Exception {
 
 		DBData data = null;
 		Exception exception = null;
 		try {
 			if (loadDbId(dataId)) {
-				data = new DBData(dataId.toString(), dataId.getFileName());
+				
+				String fileName = dataId.getFileName();
+				data = new DBData(new File(fileName).getName(), fileName);
+				DBTemplate template = data.getTemplateData();
+				template.setFileName(dataId.getFileName()); 
+				template.setVersion(dataId.getVersion()); 
+				template.setIoc(dataId.getIoc()); 
+				template.setDescription(dataId.getDescription()); 
 				
 				loadRecords(data);
 				loadTemplates(data);
-				loadVdctData(dataId, data);				
+				loadVdctData(dsId, data);				
 			}
 		} catch (SQLException sqlException) {
 			sqlException.printStackTrace();
@@ -105,17 +115,17 @@ public class RdbDataMapper {
 		return data;
 	}
 	
-	public void saveRdbData(RdbDataId dataId) throws Exception {
+	public void saveRdbData(VDBTemplate template) throws Exception {
 		
 		Exception exception = null;
 		try {
-			if (loadDbId(dataId)) {
+			if (isSaveable(template)) {
 				if (manageDbds) {
 					saveDataDef();
 				}
 				saveDefinitionFile();
-				saveRecords(dataId);
-				saveVdctData(dataId);
+				saveRecords(template);
+				saveVdctData(template);
 				
 				helper.commit();
 			}
@@ -200,6 +210,16 @@ public class RdbDataMapper {
 		Object[][] valuePairs = {{"p_db_desc"}, {desription}};
    		helper.saveRow("p_db", keyPairs, valuePairs);
         helper.commit();
+	}
+	
+	public boolean isSaveable(VDBTemplate template) {
+		if (template != null) {
+			// Add checking for existence of ioc.
+			return template.getFileName() != null && template.getVersion() != null
+					&& template.getIoc() != null;
+		}
+		
+		return false;
 	}
 	
 	private boolean loadDbId(RdbDataId dataId) throws SQLException {
@@ -513,7 +533,7 @@ public class RdbDataMapper {
 		}
 	}
 	
-	private void saveRecords(Object dsId) throws SQLException {
+	private void saveRecords(VDBTemplate template) throws SQLException {
 
 		// rec type code usage: remove when Group and rec_type_code usage is defined  
 		/*
@@ -523,7 +543,7 @@ public class RdbDataMapper {
         		+ " AND rec_type_code='E'");
         */
 		
-        Iterator iterator = Group.getRoot(dsId).getStructure().iterator();
+        Iterator iterator = template.getGroup().getStructure().iterator();
 
 		VDBRecordData recordData = null;
 		String name = null;
@@ -603,8 +623,8 @@ public class RdbDataMapper {
    		}
 	}
 	
-	private void saveVdctData(Object dsId) throws SQLException {
-		String string = Group.getVDCTData(dsId);
+	private void saveVdctData(VDBTemplate template) throws SQLException {
+		String string = Group.getVDCTData(template.getId().getDsId());
     	Object[][] keyPairs = {{"p_db_id"}, {pDbId}};
 		Object[][] valuePairs = {{"p_db_vdct"}, {string}};
    		helper.saveRow("p_db", keyPairs, valuePairs);

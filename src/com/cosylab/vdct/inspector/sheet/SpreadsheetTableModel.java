@@ -235,7 +235,7 @@ public class SpreadsheetTableModel extends AbstractTableModel implements Propert
 		} finally {
 			UndoManager.getInstance(dsId).stopMacroAction();
 		}
-		DsManager.getDrawingSurface().repaint();
+		DsManager.getDrawingSurface(dsId).repaint();
 	}
 	
 	/* Returns the multi-line string associated with the cell at the given position, or null it there is

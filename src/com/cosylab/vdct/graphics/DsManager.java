@@ -39,7 +39,7 @@ import java.util.Vector;
 
 import javax.swing.JFrame;
 
-import com.cosylab.vdct.db.DbDescriptor;
+import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.events.commands.GetDsManager;
 import com.cosylab.vdct.events.commands.GetGUIInterface;
@@ -72,6 +72,8 @@ LinkCommandInterface, RepaintInterface, Pageable {
 	protected CopyContext copyContext = null;
 	
 	protected Vector dsEventListeners = null;
+	
+	protected int dsCount = 0;
 
 	public DsManager(DesktopInterface desktopInterface) {
 		instance = this;
@@ -104,12 +106,30 @@ LinkCommandInterface, RepaintInterface, Pageable {
 	}
 
 	public static Vector getAllDrawingSurfaces() {
-		return new Vector(drawingSurfaces.values());
+		Vector vector = new Vector();
+		Iterator iterator = drawingSurfaces.values().iterator();
+		DrawingSurface surface = null; 
+		while (iterator.hasNext()) {
+			surface = ((DrawingSurface)iterator.next());
+			if (!surface.isDisposed()) {
+				vector.add(surface);
+			}
+		}
+		return vector;
+	}
+	
+	public void createDummyDrawingSurface() {
+		DrawingSurface drawingSurface = new DrawingSurface(Constants.DEFAULT_NAME, 0, null, copyContext);
+		drawingSurface.setDisposed(true);
+		drawingSurfaces.put(Constants.DEFAULT_NAME, drawingSurface);
+		drawingSurface.initializeWorkspace();
 	}
 	
 	public VisualComponent addDrawingSurface(Object id, InternalFrameInterface displayer) {
 
-		DrawingSurface drawingSurface = new DrawingSurface((DbDescriptor)id, displayer, copyContext);
+		DrawingSurface drawingSurface = new DrawingSurface(id, dsCount, displayer, copyContext);
+		dsCount++;
+
 		drawingSurfaces.put(id, drawingSurface);
 		
 		Iterator iterator = dsEventListeners.iterator();
@@ -128,7 +148,7 @@ LinkCommandInterface, RepaintInterface, Pageable {
 	public void removeDrawingSurface(Object id) {
 		DrawingSurface drawingSurface = getDrawingSurface(id);
 		if (drawingSurface != null) {
-			drawingSurfaces.remove(id);
+			drawingSurface.setDisposed(true);
 			
 			Iterator iterator = dsEventListeners.iterator();
 			while (iterator.hasNext()) {
@@ -365,9 +385,9 @@ LinkCommandInterface, RepaintInterface, Pageable {
 
 	public boolean isMacroPortsIDChanged() {
 		
-		Iterator iterator = drawingSurfaces.keySet().iterator();
+		Iterator iterator = getAllDrawingSurfaces().iterator();
 		while (iterator.hasNext()) {
-			if (Group.hasMacroPortsIDChanged(iterator.next())) {
+			if (Group.hasMacroPortsIDChanged(((DrawingSurface)iterator.next()).getDsId())) {
 				return true;
 			}
 		}
@@ -670,14 +690,14 @@ LinkCommandInterface, RepaintInterface, Pageable {
 	}
 
 	public void repaintAll(boolean highlighted) {
-		Iterator iterator = drawingSurfaces.values().iterator();
+		Iterator iterator = getAllDrawingSurfaces().iterator();
 		while (iterator.hasNext()) {
 			((DrawingSurface)iterator.next()).repaint(highlighted);
 		}
 	}
 	
 	public void reset() {
-		Iterator iterator = drawingSurfaces.values().iterator();
+		Iterator iterator = getAllDrawingSurfaces().iterator();
 		while (iterator.hasNext()) {
 			((DrawingSurface)iterator.next()).reset();
 		}

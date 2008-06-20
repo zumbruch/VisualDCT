@@ -101,6 +101,7 @@ SaveObject, DsEventListener {
 	private Hashtable lookupTable = null;
 	
 	private static HashMap rootGroups = new HashMap();
+	protected boolean disposed = false;
 	
 	private VDBTemplate editingTemplateData = null;
 	private long openTemplateMacroID = 0;
@@ -483,8 +484,8 @@ private void addSubObjectToLayout(VisibleObject object) {
 			clipboard = new Group(null);
 			clipboard.setAbsoluteName(Constants.CLIPBOARD_NAME);
 			clipboard.setLookupTable(new Hashtable());
-			clipboard.setDsId(Constants.CLIPBOARD_NAME);
-			rootGroups.put(Constants.CLIPBOARD_NAME, clipboard);
+			clipboard.setDsId(Constants.DEFAULT_NAME);
+			rootGroups.put(Constants.DEFAULT_NAME, clipboard);
 		}
 		return clipboard;
 	}
@@ -557,7 +558,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 	public Object getSubObject(String id) {
 		if (id.equals(nullString))
 			return getRootContainer();
-		else if (id.equals(Constants.CLIPBOARD_NAME))		// ?!! no ignore case
+		else if (id.equals(Constants.DEFAULT_NAME))		// ?!! no ignore case
 			return getClipboard();
 		else
 			return super.getSubObject(id);
@@ -845,7 +846,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 	 * Creation date: (2.5.2001 23:23:42)
 	 * @param newName java.lang.String
 	 */
-	public boolean rename(java.lang.String newName) {
+	public boolean rename(Object dsId, String newName) {
 
 		//String oldName = getAbsoluteName();
 		String newObjName = Group.substractObjectName(newName);
@@ -855,7 +856,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 		getParent().addSubObject(getName(), this);
 
 		// move if needed
-		if (!moveToGroup(getDsId(), Group.substractParentName(newName)))
+		if (!moveToGroup(dsId, Group.substractParentName(newName)))
 		{
 			Flexible flexible;
 			Object[] objs = new Object[subObjectsV.size()];
@@ -863,7 +864,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 			for (int i=0; i < objs.length; i++) {
 				if (objs[i] instanceof Flexible) {
 					flexible = (Flexible)objs[i];
-					flexible.moveToGroup(getDsId(), newName);
+					flexible.moveToGroup(dsId, newName);
 				}
 			}
 		}
@@ -2036,7 +2037,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 		String addedPrefix=null;
 		if (export && Settings.getInstance().getHierarhicalNames()) { 
 			VDBTemplate template = Group.getEditingTemplateData(dsId);
-			String name = template.getId(); 
+			String name = template.getId().toString(); 
 
 			int pos = name.lastIndexOf('.'); //removes file suffix
 			if (pos>0) name = name.substring(0, pos);
@@ -2268,7 +2269,8 @@ private void addSubObjectToLayout(VisibleObject object) {
 		Group group = null; 
 		while (iterator.hasNext()) {
 			group = ((Group)iterator.next());
-			if (!group.getAbsoluteName().equals(Constants.CLIPBOARD_NAME)) {
+			if (!group.isDisposed()
+					&& !group.getAbsoluteName().equals(Constants.CLIPBOARD_NAME)) {
 				vector.add(group);
 			}
 		}
@@ -2286,11 +2288,15 @@ private void addSubObjectToLayout(VisibleObject object) {
 	public void setDsId(Object dsId) {
 		this.dsId = dsId;
 	}
+
+    public boolean isDisposed() {
+		return disposed;
+	}
     
-    public static void registerDsListener() {
+	public static void registerDsListener() {
     	GetDsManager command = (GetDsManager)CommandManager.getInstance().getCommand("GetDsManager");
     	if (command != null) {
-    		command.getManager().addDsEventListener(new Group(null));
+    		command.getManager().addDsEventListener(getClipboard());
     	}
     }
 
@@ -2299,10 +2305,21 @@ private void addSubObjectToLayout(VisibleObject object) {
     	group.setDsId(id);
     	group.setAbsoluteName("");
     	group.setLookupTable(new Hashtable());
-        rootGroups.put(id, group);
+        
+    	rootGroups.put(id, group);
+    	// TODO:REM
+    	System.out.println();
+    	System.out.println("inserted: " + id);
+    	System.out.println("content:");
+		Iterator iterator = rootGroups.values().iterator();
+		while (iterator.hasNext()) {
+			group = ((Group)iterator.next());
+	    	System.out.print("group: " + group.getDsId() + "dis:" + group.isDisposed());
+	    	System.out.println("eq to inserted: " + group.getDsId().equals(id));
+		}
     }
     public void onDsRemoved(Object id) {
-    	rootGroups.remove(id);
+    	((Group)rootGroups.get(id)).disposed = true;
     }
     public void onDsFocused(Object id) {
     	root = (Group)rootGroups.get(id);

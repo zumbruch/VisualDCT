@@ -212,7 +212,8 @@ public String toString() {
 
 public Record getRecord() {
 	if (record == null) {
-		System.err.println("Warning: VDBRecordData.getRecord: returning null.");
+		// TODO:REACT
+		//System.err.println("Warning: VDBRecordData.getRecord: returning null.");
 	}
 	return record;
 }

@@ -21,6 +21,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 
 import com.cosylab.vdct.db.DBData;
+import com.cosylab.vdct.vdb.VDBTemplate;
 
 /** SQLTableGUI
  * GUI for SQLTableModel,
@@ -31,7 +32,10 @@ public class RdbDataChooserDialog extends JDialog implements ActionListener {
 	
 	private boolean loadMode = true;
 	private RdbDataMapper mapper = null;
-	
+
+	private Object dsId = null;
+	private VDBTemplate template = null;
+
 	private RdbDataId rdbDataId = null;
 	
 	private String selectedIoc = null;
@@ -62,13 +66,10 @@ public class RdbDataChooserDialog extends JDialog implements ActionListener {
 	public RdbDataChooserDialog(RdbDataMapper mapper, JFrame guiContext) {
 		super(guiContext, true);
 		this.mapper = mapper;
+		rdbDataId = new RdbDataId();
         makeGUI(guiContext);
 	}
 
-	public void setRdbDataId(RdbDataId dataId) {
-		rdbDataId = dataId;
-	}
-	
 	/**
 	 * @param loadMode the loadMode to set
 	 */
@@ -95,6 +96,14 @@ public class RdbDataChooserDialog extends JDialog implements ActionListener {
 			setLocationRelativeTo(getParent());			
 		}
 		super.setVisible(arg0);
+	}
+
+	public void setTemplate(VDBTemplate template) {
+		this.template = template;
+	}
+	
+	public void setDsId(Object dsId) {
+		this.dsId = dsId;
 	}
 
 	private void makeGUI(JFrame guiContext) {
@@ -266,13 +275,6 @@ public class RdbDataChooserDialog extends JDialog implements ActionListener {
 		groupAction.setEnabled(false);
 	}
 	
-	/**
-	 * @return the rdbDataId
-	 */
-	public RdbDataId getRdbDataId() {
-		return rdbDataId;
-	}
-
 	private void performGroupAction() {
 		try {
 			rdbDataId.setFileName(selectedGroup);
@@ -280,9 +282,9 @@ public class RdbDataChooserDialog extends JDialog implements ActionListener {
 			rdbDataId.setIoc(selectedIoc);
 			
 			if (loadMode) {
-				data = mapper.loadRdbData(rdbDataId);
+				data = mapper.loadRdbData(dsId, rdbDataId);
 			} else {
-				mapper.saveRdbData(rdbDataId);
+				mapper.saveRdbData(template);
 			}
 			setVisible(false);
 		} catch (Exception exception) {

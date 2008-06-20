@@ -51,9 +51,6 @@ implements ComponentListener, DesktopInterface {
 	protected WorkspaceInternalFrame frame = null;
 	protected DsManagerInterface drawingSurfaceManager = null;
 	
-	protected static int internalFrameCount = 0;
-	protected static final String untitledString = "untitled";
-
 	/**
 	 * VisualAge support
 	 * Creation date: (10.12.2000 12:34:33)
@@ -114,8 +111,6 @@ implements ComponentListener, DesktopInterface {
 
 	public void createNewInternalFrame() {
 		RdbDataId id = new RdbDataId();
-		id.setFileName(untitledString + internalFrameCount);
-		internalFrameCount++;
 		WorkspaceInternalFrame frame = new WorkspaceInternalFrame(id, drawingSurfaceManager);
 		frame.setVisible(true);
 		

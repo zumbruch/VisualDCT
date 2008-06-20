@@ -26,16 +26,28 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.cosylab.vdct.db;
+package com.cosylab.vdct.vdb;
 
 /**
  * @author ssah
  *
  */
-public interface DbDescriptor {
+public class VDBTemplateId {
 
-	public String getFileName();
-	public String getVersion();
-	public String getIoc();
-	public String getDescription();
+	private String id = null;
+	private Object dsId = null;
+
+	public VDBTemplateId(String id, Object dsId) {
+		super();
+		this.id = id;
+		this.dsId = dsId;
+	}
+
+	public String toString() {
+		return id;
+	}
+
+	public Object getDsId() {
+		return dsId;
+	}
 }

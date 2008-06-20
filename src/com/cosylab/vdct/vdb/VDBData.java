@@ -372,16 +372,16 @@ public static void extractTemplates(Object dsId, DBDData dbd, DBData db, VDBData
 
 }
 
-/**
- * 
- */
 private static VDBData generateTemplate(Object dsId, DBDData dbd, DBTemplate dbTemplate)
 {
 	Group root = Group.getRoot(dsId);
 	
-	VDBTemplate vt = new VDBTemplate(dbTemplate.getId(), dbTemplate.getFileName());
+	VDBTemplateId templateId = new VDBTemplateId(dbTemplate.getId(), dsId);
+	VDBTemplate vt = new VDBTemplate(templateId, dbTemplate.getFileName());
 	vt.setComment(dbTemplate.getComment());	
 	vt.setDescription(dbTemplate.getDescription());
+	vt.setVersion(dbTemplate.getVersion());
+	vt.setIoc(dbTemplate.getIoc());
 	
 	// generate vt.group / VDB data
 	try

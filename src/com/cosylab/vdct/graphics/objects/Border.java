@@ -250,7 +250,7 @@ public class Border extends ContainerObject implements Selectable, SaveObject,
 	public boolean moveToGroup(Object dsId, String group)
 	{
 		String currentParent = Group.substractParentName(getName());
-		if(group.equals(currentParent))
+		if(group.equals(currentParent) && dsId.equals(getDsId()))
 			return false;
 		
 		//String oldName = getName();
@@ -278,7 +278,7 @@ public class Border extends ContainerObject implements Selectable, SaveObject,
 		}
 	
 		if (renameNeeded)
-			return rename(newName);
+			return rename(dsId, newName);
 		
 		getParent().removeObject(Group.substractObjectName(getName()));
 		setParent(null);
@@ -290,7 +290,7 @@ public class Border extends ContainerObject implements Selectable, SaveObject,
 		return true;
 	}
 
-	public boolean rename(String newName)
+	public boolean rename(Object dsId, String newName)
 	{
 		String newObjName = Group.substractObjectName(newName);
 		String oldObjName = Group.substractObjectName(getName());
@@ -304,7 +304,7 @@ public class Border extends ContainerObject implements Selectable, SaveObject,
 		}
 		
 	// move if needed
-		moveToGroup(getDsId(), Group.substractParentName(newName));
+		moveToGroup(dsId, Group.substractParentName(newName));
 	
 		return true;
 	}

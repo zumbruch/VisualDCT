@@ -1145,7 +1145,7 @@ public boolean moveToGroup(Object dsId, String group) {
 	}
 
 	if (renameNeeded){
-	    rename(newName);
+	    rename(dsId, newName);
 	}
 
 	getParent().removeObject(Group.substractObjectName(newName));
@@ -1161,7 +1161,7 @@ public boolean moveToGroup(Object dsId, String group) {
 /* (non-Javadoc)
  * @see com.cosylab.vdct.graphics.objects.Flexible#rename(java.lang.String)
  */
-public boolean rename(String newName) {
+public boolean rename(Object dsId, String newName) {
 	if (Group.getEditingTemplateData(getDsId())==null)
 		return false;
 

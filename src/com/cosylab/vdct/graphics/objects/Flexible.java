@@ -57,7 +57,7 @@ boolean moveToGroup(Object dsId, String group);
  * Creation date: (2.5.2001 23:23:17)
  * @param newName java.lang.String
  */
-boolean rename(String newName);
+boolean rename(Object dsId, String newName);
 /**
  * Insert the method's description here.
  * Creation date: (3.5.2001 10:15:48)

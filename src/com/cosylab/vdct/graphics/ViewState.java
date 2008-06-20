@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Vector;
 
+import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.Settings;
 import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.events.commands.GetDsManager;
@@ -49,6 +50,7 @@ import com.cosylab.vdct.graphics.objects.VisibleObject;
 public class ViewState implements DsEventListener {
 
 	protected static HashMap instances = new HashMap();
+	protected Object dsId = null;
 	
 	protected static int x0 = 0;				// origin
 	protected static int y0 = 0;
@@ -365,10 +367,9 @@ public boolean setAsHilited(VisibleObject object, boolean zoomOnHilited) {
     this.zoomOnHilited = zoomOnHilited;
     
     if(zoomOnHilited) {
-    	// TODO:REM
-    	System.out.println("object: " + object);
-    	
-    	DsManager.getDrawingSurface(object.getDsId()).repaint();
+    	if (dsId != null) {
+    	    DsManager.getDrawingSurface(dsId).repaint();
+    	}
         hilitedObjects.clear();
         if (hilitedObject != null) {
             hilitedObjects.add(hilitedObject);
@@ -464,7 +465,8 @@ public static void setInstance(Object dsId, ViewState newInstance) {
 	} else {
 		System.err.println("Warning: view instance set with unregistered id, registering it.");
     }
-    instances.put(dsId, newInstance);
+    newInstance.setDsId(dsId);
+	instances.put(dsId, newInstance);
 }
 /**
  * Insert the method's description here.
@@ -571,18 +573,30 @@ public void setY0(int newY0) {
 		return dotSize;
 	}
 	
+	public Object getDsId() {
+		return dsId;
+	}
+	public void setDsId(Object dsId) {
+		this.dsId = dsId;
+	}
+	
 	public static void registerDsListener() {
-		GetDsManager command = (GetDsManager)CommandManager.getInstance().getCommand("GetDsManager");
+		ViewState viewState = new ViewState();
+		viewState.setDsId(Constants.DEFAULT_NAME);
+	    instances.put(Constants.DEFAULT_NAME, viewState);
+
+	    GetDsManager command = (GetDsManager)CommandManager.getInstance().getCommand("GetDsManager");
 		if (command != null) {
-			command.getManager().addDsEventListener(new ViewState());
+			command.getManager().addDsEventListener(viewState);
 		}
 	}
 	
 	public void onDsAdded(Object id) {
-	    instances.put(id, new ViewState());
+		ViewState viewState = new ViewState();
+		viewState.setDsId(id);
+	    instances.put(id, viewState);
 	}
 	public void onDsRemoved(Object id) {
-		instances.remove(id);
 	}
 	public void onDsFocused(Object id) {
 	}

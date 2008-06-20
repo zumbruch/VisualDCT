@@ -103,6 +103,7 @@ public class Constants {
     public final static String NONE = "<none>";
 	public final static String MENU_DEFAULT_VALUE_INDICATOR = "*";
     public final static String CLIPBOARD_NAME = "<clipboard>";
+    public final static String DEFAULT_NAME = "<default>";
 
 //    public final static int WARNING_RECORD_NAME_LENGTH = 40;
 

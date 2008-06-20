@@ -93,7 +93,6 @@ import com.cosylab.vdct.db.DBTemplateField;
 import com.cosylab.vdct.db.DBTemplateInstance;
 import com.cosylab.vdct.db.DBTextBox;
 import com.cosylab.vdct.db.DBView;
-import com.cosylab.vdct.db.DbDescriptor;
 import com.cosylab.vdct.dbd.DBDConstants;
 import com.cosylab.vdct.dbd.DBDData;
 import com.cosylab.vdct.dbd.DBDResolver;
@@ -134,7 +133,6 @@ import com.cosylab.vdct.graphics.popup.Popupable;
 import com.cosylab.vdct.graphics.printing.Page;
 import com.cosylab.vdct.inspector.Inspectable;
 import com.cosylab.vdct.inspector.InspectorManager;
-import com.cosylab.vdct.rdb.RdbDataId;
 import com.cosylab.vdct.rdb.RdbInstance;
 import com.cosylab.vdct.undo.ActionObject;
 import com.cosylab.vdct.undo.ComposedAction;
@@ -195,9 +193,10 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 			terminated = true;
 		}
 	}
-	private DbDescriptor id = null;
+	private Object id = null;
 	
 	private DSGUIInterface guimenu = null;
+	private boolean disposed = false;
 	
 	// decorator support (viewport size)
 	private int x0 = 0;
@@ -272,6 +271,8 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 	
 	//private ComposedAction undoAction = null;
 	
+	protected static final String untitledString = "untitled";
+	
 	private static final String newRecordString = "New record...";
 	private static final String newTemplesString = "New template instance";
 	private static final String addPortString = "Show port";
@@ -295,15 +296,17 @@ public final class DrawingSurface extends Decorator implements Pageable, Printab
 	private Vector selectedConnectorsForMove = null;
 	
 	private InternalFrameInterface displayer = null;
+	private int serialNumber = 0;
 	
 /**
  * displayer can be null when no gui is linked to this. 
  */
-public DrawingSurface(DbDescriptor id, InternalFrameInterface displayer,
+public DrawingSurface(Object id, int serialNumber, InternalFrameInterface displayer,
 		CopyContext copyContext) {
 
 	this.id = id;
 	this.displayer = displayer;
+	this.serialNumber = serialNumber;
 	
 	setModified(false);
 
@@ -317,7 +320,9 @@ public DrawingSurface(DbDescriptor id, InternalFrameInterface displayer,
 	hourCursor = new Cursor(Cursor.WAIT_CURSOR);
 	crossCursor = new Cursor(Cursor.CROSSHAIR_CURSOR);
 
-	MouseEventManager.getInstance().subscribe("WorkspaceInternalFrame:" + id.toString(), this);
+	if (displayer != null) {
+	    MouseEventManager.getInstance().subscribe("WorkspaceInternalFrame:" + id.toString(), this);
+	}
 	KeyEventManager.getInstance().subscribe("ContentPane", new KeyAdapter() {
 	    public void keyPressed(KeyEvent e) {
 	    	ViewState view = ViewState.getInstance(DrawingSurface.this.id);
@@ -403,9 +408,10 @@ private void createNavigatorImage() {
 		(navigatorSize.width!=navigator.width) || 
 		(navigatorSize.height!=navigator.height)) {
 	
-		if (navigator.width > 0 && navigator.height > 0)
+		if (navigator.width > 0 && navigator.height > 0 && getWorkspacePanel() != null) {
 		    navigatorImage = getWorkspacePanel().createImage(navigator.width, 
 			    											 navigator.height);
+		}
 	    if (navigatorImage==null) return;
 	    navigatorSize = new Dimension(navigator.width, navigator.height);
 	    navigatorGraphics = navigatorImage.getGraphics();
@@ -733,7 +739,11 @@ public com.cosylab.vdct.graphics.objects.Group getViewGroup() {
  * @return javax.swing.JComponent
  */
 public javax.swing.JComponent getWorkspacePanel() {
-	return displayer.getDisplayingComponent();
+	if (displayer != null) {
+		return displayer.getDisplayingComponent();
+	} else {
+		return null;
+	}
 	// TODO: REM
 	/*
 	NullCommand pm = (NullCommand)CommandManager.getInstance().getCommand("NullCommand");
@@ -792,6 +802,8 @@ public void initializeWorkspace() {
 	blockNavigatorRedrawOnce = false;
 	createNavigatorImage();
 	baseView();
+	
+	refreshTitle();
 }
 /**
  * Insert the method's description here.
@@ -1861,8 +1873,6 @@ public void checkForIncodedDBDs(File file) throws IOException
 	File relativeTo = file.getParentFile();
 	DBDEntry.setBaseDir(relativeTo);
 	
-	com.cosylab.vdct.Console.getInstance().println();
-	
 	Vector dbds = com.cosylab.vdct.DataProvider.getInstance().getCurrentDBDs();
 	String[] dbd = DBResolver.resolveIncodedDBDs(file.getAbsolutePath());
 	
@@ -1877,7 +1887,8 @@ public void checkForIncodedDBDs(File file) throws IOException
 			// skip if already loaded
 			if (!dbds.contains(entry))
 			{
-				com.cosylab.vdct.Console.getInstance().println("Loading DBD file: '"+f.getAbsolutePath()+"'.");
+				// No output to console if everything is ok.
+				//com.cosylab.vdct.Console.getInstance().println("Loading DBD file: '"+f.getAbsolutePath()+"'.");
 				openDBD(f, com.cosylab.vdct.DataProvider.getInstance().getDbdDB()!=null);
 			}
 			else {			
@@ -2083,7 +2094,7 @@ public boolean open(InputStream is, File file, boolean importDB, boolean importT
 	/// load DB if we have DBD 
 	///
 
-	DBDData dbdData = com.cosylab.vdct.DataProvider.getInstance().getDbdDB();
+	DBDData dbdData = DataProvider.getInstance().getDbdDB();
 	if (dbdData != null)
 	{
 		setCursor(hourCursor);
@@ -2114,7 +2125,7 @@ public boolean open(InputStream is, File file, boolean importDB, boolean importT
 		} 
 		catch(Throwable e)
 		{
-			com.cosylab.vdct.Console.getInstance().println(e);
+			Console.getInstance().println(e);
 		}
 
 		// check for sucess
@@ -2130,13 +2141,12 @@ public boolean open(InputStream is, File file, boolean importDB, boolean importT
 
 		VDBData vdbData = VDBData.generateVDBData(id, dbdData, dbData);
 
-		if (importToCurrentGroup)
-		{
+		if (importToCurrentGroup) {
 			Group.getClipboard().clear();
 			Group vg = viewGroup;
 			Group rg = Group.getRoot(id);
-			try
-			{
+			
+			try {
 				// put all to dummy root group
 				viewGroup = new Group(null);
 				viewGroup.setAbsoluteName("");
@@ -2151,15 +2161,13 @@ public boolean open(InputStream is, File file, boolean importDB, boolean importT
 
 				// find 'first' template defined in this file (not via includes)
 				VDBTemplate template = (VDBTemplate)VDBData.getTemplates().get(dbData.getTemplateData().getId());
-				if (template != null)
-				{
+				if (template != null) {
 					VDBData.addPortsAndMacros(id, dbData.getTemplateData(), template, vdbData, importedList);
 					validate = true;
 				}
 				
 				// clipboard import -> needs checks
-				if (validate)
-				{
+				if (validate) {
 					viewGroup.manageLinks(true);
 					viewGroup.unconditionalValidateSubObjects(isFlat());
 				}
@@ -2167,9 +2175,7 @@ public boolean open(InputStream is, File file, boolean importDB, boolean importT
 				viewGroup.selectAllComponents();
 				
 				((GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface")).getGUIMenuInterface().cut();
-			}
-			finally
-			{
+			} finally {
 				viewGroup = vg;
 				Group.setRoot(id, rg);
 			}
@@ -2177,15 +2183,13 @@ public boolean open(InputStream is, File file, boolean importDB, boolean importT
 			((GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface")).getGUIMenuInterface().paste();
 			Group.getClipboard().clear();
 			
-		}
-		else if (!importDB)
-		{
+		} else if (!importDB) {
+			
 			// find 'first' template defined in this file (not via includes)
 			VDBTemplate template = (VDBTemplate)VDBData.getTemplates().get(dbData.getTemplateData().getId());
 			
 			// found
-			if (template!=null)
-			{
+			if (template != null) {
 			    if (Group.hasMacroPortsIDChanged(id)) {
 			        JOptionPane.showMessageDialog(VisualDCT.getInstance(),
 			                "Macros/Ports in this template have changed. \nReload and save files that include this template to apply changes.", "Template changed!", JOptionPane.WARNING_MESSAGE);
@@ -2216,13 +2220,13 @@ public boolean open(InputStream is, File file, boolean importDB, boolean importT
 		restoreCursor();
 		UndoManager.getInstance(id).setMonitor(true);
 
-		((RdbDataId)id).setFileName(dbData.getTemplateData().getFileName());
-		
 		// free db memory	    
 		dbData = null;
 		System.gc();
 		
-		displayer.setFrameTitle(id.getFileName());
+		refreshTitle();
+		// TODO:REM
+		//displayer.setFrameTitle(((RdbDataId)id).getFileName());
 
 		return true;
 	} 
@@ -2239,7 +2243,7 @@ public boolean loadRdbDbGroup(JFrame guiContext) {
 		setCursor(hourCursor);
 		UndoManager.getInstance(id).setMonitor(false);
 
-		dbData = RdbInstance.getInstance(guiContext).getRdbInterface().loadRdbData((RdbDataId)id);
+		dbData = RdbInstance.getInstance(guiContext).getRdbInterface().loadRdbData(id);
 
 		// check for sucess
 		DBDData dbdData = DataProvider.getInstance().getDbdDB();
@@ -2288,7 +2292,9 @@ public boolean loadRdbDbGroup(JFrame guiContext) {
 		((GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface")).getGUIMenuInterface().paste();
 		Group.getClipboard().clear();
 
-		displayer.setFrameTitle(id.getFileName());
+		refreshTitle();
+		// TODO:REM
+		//displayer.setFrameTitle(((RdbDataId)id).getFileName());
 
 		if (VisualDCT.getInstance() != null) {
 			VisualDCT.getInstance().updateLoadLabel();
@@ -2313,7 +2319,7 @@ public boolean loadRdbDbGroup(JFrame guiContext) {
 
 public void saveRdbGroup(JFrame guiContext) {
 	try {
-		RdbInstance.getInstance(guiContext).getRdbInterface().saveRdbData((RdbDataId)id);
+		RdbInstance.getInstance(guiContext).getRdbInterface().saveRdbData(Group.getEditingTemplateData(id));
 	} catch (Exception exception) {
 		Console.getInstance().println(exception);
 	}
@@ -2321,15 +2327,12 @@ public void saveRdbGroup(JFrame guiContext) {
 
 public void saveAsRdbGroup(JFrame guiContext) {
 	try {
-		RdbInstance.getInstance(guiContext).getRdbInterface().saveAsRdbData((RdbDataId)id);
+		RdbInstance.getInstance(guiContext).getRdbInterface().saveAsRdbData(Group.getEditingTemplateData(id));
 	} catch (Exception exception) {
 		Console.getInstance().println(exception);
 	}
 }
 
-/**
- * 
- */
 private void cleanDBDList() {
 	// clean list of unexisting DBDs
 	DBDEntry[] dbds = new DBDEntry[com.cosylab.vdct.DataProvider.getInstance().getCurrentDBDs().size()];
@@ -2508,9 +2511,6 @@ public static HashMap applyVisualData(Object dsId, boolean importDB, Group group
 					continue;
 				} 
 	
-				System.out.println("Group.getRoot(dsId): " + Group.getRoot(dsId));
-				System.out.println("id:  " + Group.getRoot(dsId).getDsId());
-				
 				record = new Record(Group.getRoot(dsId), vdbRec, dbRec.getX(), dbRec.getY());
 				vdbRec.setRecord(record);
 				
@@ -3449,7 +3449,9 @@ private synchronized void redraw(Graphics g) {
 	
 		if (width == 0 || height == 0) return;
 		
-	    canvasImage = getWorkspacePanel().createImage(width, height);
+		if (getWorkspacePanel() != null) {
+		    canvasImage = getWorkspacePanel().createImage(width, height);
+		}
 	    if (canvasImage==null) return;
 	    canvasSize = new Dimension(width, height);
 	    canvasGraphics = canvasImage.getGraphics();
@@ -3561,7 +3563,7 @@ public void run() {
 		{
 		}
 		
-		if (redrawRequest)
+		if (redrawRequest && getWorkspacePanel() != null)
 		{
 			redrawRequest = false;
 			getWorkspacePanel().repaint();
@@ -3852,7 +3854,7 @@ public void createTemplateInstance(String name, String type, boolean relative) {
 	if (name==null)
 	{
 		//name = "template000";
-		name = template.getId();
+		name = template.getId().toString();
 		
 		int pos = name.lastIndexOf('.');  //removes file suffix
 		if (pos>0) name = name.substring(0, pos);
@@ -4353,8 +4355,27 @@ public DSGUIInterface getGuimenu() {
 /**
  * @return the id
  */
-public Object getRdId() {
+public Object getDsId() {
 	return id;
 }
 
+public boolean isDisposed() {
+	return disposed;
 }
+public void setDisposed(boolean disposed) {
+	this.disposed = disposed;
+}
+
+private void refreshTitle() {
+	if (displayer != null) {
+		VDBTemplate template = Group.getEditingTemplateData(id);
+		if (template != null) {
+		    displayer.setFrameTitle(template.getFileName());
+		} else {
+		    displayer.setFrameTitle(untitledString + serialNumber);
+		}
+	}
+}
+
+}
+

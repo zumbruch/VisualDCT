@@ -32,6 +32,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import com.cosylab.vdct.db.DBData;
+import com.cosylab.vdct.vdb.VDBTemplate;
 
 /**
  * @author ssah
@@ -69,13 +70,14 @@ public class Rdb implements RdbInterface {
 	/* (non-Javadoc)
 	 * @see com.cosylab.vdct.rdb.RdbInterface#loadDbGroup(java.lang.String)
 	 */
-	public DBData loadRdbData(RdbDataId dataId) {
+	public DBData loadRdbData(Object dsId) {
 		if (!mapper.isConnection()) {
 			connectionDialog.setVisible(true);
 		}
 		if (mapper.isConnection()) {
 			groupDialog.setLoadMode(true);		
-			groupDialog.setRdbDataId(dataId);		
+			groupDialog.setDsId(dsId);		
+			groupDialog.setTemplate(null);		
 			groupDialog.setVisible(true);
 			return groupDialog.getData();
 		}
@@ -85,7 +87,7 @@ public class Rdb implements RdbInterface {
 	/* (non-Javadoc)
 	 * @see com.cosylab.vdct.rdb.RdbInterface#saveDbGroup(java.lang.String)
 	 */
-	public void saveRdbData(RdbDataId dataId) {
+	public void saveRdbData(VDBTemplate template) {
 		if (!mapper.isConnection()) {
 			connectionDialog.setVisible(true);
 		}
@@ -93,21 +95,18 @@ public class Rdb implements RdbInterface {
 			
 			boolean success = false;
 			// Check if enough data is known to perform a direct save. 
-			if (dataId != null && dataId.isDefined()) {
+			if (mapper.isSaveable(template)) {
 				try {
-					mapper.saveRdbData(dataId);
+					mapper.saveRdbData(template);
 					success = true;
 				} catch (Exception exception) {
 					JOptionPane.showMessageDialog(guiContext, exception.getMessage(),
 							"Database error", JOptionPane.ERROR_MESSAGE);
 				}
 			}
-			
 			// If something failed fall back to save as dialog.
 			if (!success) {
-				groupDialog.setLoadMode(false);
-				groupDialog.setRdbDataId(dataId);		
-				groupDialog.setVisible(true);
+			    saveAsRdbData(template);
 			}
 		}
 	}
@@ -115,13 +114,13 @@ public class Rdb implements RdbInterface {
 	/* (non-Javadoc)
 	 * @see com.cosylab.vdct.rdb.RdbInterface#saveAsDbGroup(java.lang.String)
 	 */
-	public void saveAsRdbData(RdbDataId dataId) {
+	public void saveAsRdbData(VDBTemplate template) {
 		if (!mapper.isConnection()) {
 			connectionDialog.setVisible(true);
 		}
 		if (mapper.isConnection()) {
 			groupDialog.setLoadMode(false);
-			groupDialog.setRdbDataId(dataId);
+			groupDialog.setTemplate(template);		
 			groupDialog.setVisible(true);
 		}
 	}

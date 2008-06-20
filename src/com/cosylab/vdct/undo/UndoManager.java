@@ -111,6 +111,9 @@ private int actions2undo() {
  */
 public void addAction(ActionObject action) {
     
+	// TODO:REM
+	System.out.println("Action(" + dsId + "):" + action);
+	
 	if (!monitor) return;
 
 	if (composedAction!=null)
@@ -375,9 +378,13 @@ private void packComposedAction() {
 }
 
 public static void registerDsListener() {
+
+    UndoManager manager = new UndoManager(Constants.DEFAULT_NAME);
+	instances.put(Constants.DEFAULT_NAME, manager);
+	
 	GetDsManager command = (GetDsManager)CommandManager.getInstance().getCommand("GetDsManager");
 	if (command != null) {
-		command.getManager().addDsEventListener(new UndoManager(null));
+		command.getManager().addDsEventListener(manager);
 	}
 }
 
@@ -385,7 +392,6 @@ public void onDsAdded(Object id) {
     instances.put(id, new UndoManager(id));
 }
 public void onDsRemoved(Object id) {
-	instances.remove(id);
 }
 public void onDsFocused(Object id) {
 	((UndoManager)instances.get(id)).updateMenuItems();

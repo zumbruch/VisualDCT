@@ -77,7 +77,7 @@ public class GenerateFlatDatabase
 			System.out.println();
 						
 			RdbDataId id = new RdbDataId("file", "0", "ioc");
-			DrawingSurface drawingSurface = new DrawingSurface(id, null, new CopyContext());
+			DrawingSurface drawingSurface = new DrawingSurface(id, 0, null, new CopyContext());
 
 			for (int i=0; i<dbdEntries.size(); i++)
 				drawingSurface.openDBD(((DBDEntry)dbdEntries.get(i)).getFile(),

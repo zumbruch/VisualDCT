@@ -64,6 +64,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 
 import com.cosylab.vdct.events.CommandManager;
+import com.cosylab.vdct.graphics.DrawingSurface;
 import com.cosylab.vdct.graphics.DsManager;
 import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.graphics.objects.Group;
@@ -243,7 +244,10 @@ public class FindPanel extends JPanel
         {
             actionStart.setEnabled(false);
             actionStop.setEnabled(true);
-            runFind(DsManager.getDrawingSurface().getViewGroup(), newFind());
+            DrawingSurface surface = DsManager.getDrawingSurface();
+            if (surface != null) {
+                runFind(surface.getViewGroup(), newFind());
+            }
         } catch (InterruptedException e)
         {
         } finally

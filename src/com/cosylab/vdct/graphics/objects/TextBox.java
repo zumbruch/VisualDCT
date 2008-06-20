@@ -580,7 +580,7 @@ public boolean move(int dx, int dy)
 public boolean moveToGroup(Object dsId, String group)
 {
 	String currentParent = Group.substractParentName(getName());
-	if(group.equals(currentParent))
+	if(group.equals(currentParent) && dsId.equals(getDsId()))
 		return false;
 	
 	//String oldName = getName();
@@ -608,7 +608,7 @@ public boolean moveToGroup(Object dsId, String group)
 	}
 
 	if (renameNeeded)
-		return rename(newName);
+		return rename(dsId, newName);
 	
 	getParent().removeObject(Group.substractObjectName(getName()));
 	setParent(null);
@@ -620,7 +620,7 @@ public boolean moveToGroup(Object dsId, String group)
 	return true;
 }
 
-public boolean rename(String newName)
+public boolean rename(Object dsId, String newName)
 {
 	String newObjName = Group.substractObjectName(newName);
 	String oldObjName = Group.substractObjectName(getName());
@@ -633,7 +633,7 @@ public boolean rename(String newName)
 	}
 	
    // move if needed
-	moveToGroup(getDsId(), Group.substractParentName(newName));
+	moveToGroup(dsId, Group.substractParentName(newName));
 
 	return true;
 }

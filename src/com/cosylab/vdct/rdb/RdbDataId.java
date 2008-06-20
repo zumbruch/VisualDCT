@@ -28,13 +28,11 @@
 
 package com.cosylab.vdct.rdb;
 
-import com.cosylab.vdct.db.DbDescriptor;
-
 /**
  * @author ssah
  *
  */
-public class RdbDataId implements DbDescriptor {
+public class RdbDataId {
 
 	private String fileName = null;
 	private String version = null;

@@ -46,8 +46,6 @@ public class CopyContext {
 	private Vector copiedObjects = null;
 	private int pasteCount = 0;
 	
-	private double pasteX = 0;
-	private double pasteY = 0;
 	private boolean doOffsetAtPaste = false;
 	
 	public CopyContext() {
@@ -67,18 +65,6 @@ public class CopyContext {
 	}
 	public void setPasteCount(int pasteCount) {
 		this.pasteCount = pasteCount;
-	}
-	public double getPasteX() {
-		return pasteX;
-	}
-	public void setPasteX(double pasteX) {
-		this.pasteX = pasteX;
-	}
-	public double getPasteY() {
-		return pasteY;
-	}
-	public void setPasteY(double pasteY) {
-		this.pasteY = pasteY;
 	}
 	public boolean isDoOffsetAtPaste() {
 		return doOffsetAtPaste;
