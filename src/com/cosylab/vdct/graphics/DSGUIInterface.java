@@ -69,6 +69,7 @@ import com.cosylab.vdct.graphics.objects.Template;
 import com.cosylab.vdct.graphics.objects.TextBox;
 import com.cosylab.vdct.graphics.objects.VisibleObject;
 import com.cosylab.vdct.plugin.config.PluginNameConfigManager;
+import com.cosylab.vdct.rdb.RdbDataId;
 import com.cosylab.vdct.undo.ComposedAction;
 import com.cosylab.vdct.undo.CreateAction;
 import com.cosylab.vdct.undo.DeleteAction;
@@ -81,7 +82,6 @@ import com.cosylab.vdct.util.StringUtils;
 import com.cosylab.vdct.vdb.VDBData;
 import com.cosylab.vdct.vdb.VDBRecordData;
 import com.cosylab.vdct.vdb.VDBTemplate;
-import com.cosylab.vdct.vdb.VDBTemplateId;
 import com.cosylab.vdct.vdb.VDBTemplateInstance;
 
 /**
@@ -681,12 +681,32 @@ public class DSGUIInterface implements VDBInterface {
 		drawingSurface.loadRdbDbGroup(guiContext);
 	}
 
-	public void saveRdbGroup(JFrame guiContext) {
-		drawingSurface.saveRdbGroup(guiContext);
-	}
+	public void saveRdbGroup(JFrame guiContext, boolean dialog) {
+		
+		RdbDataId rdbId = new RdbDataId();
+		VDBTemplate template = Group.getEditingTemplateData(id);
+		if (template != null) {
+			rdbId.setFileName(template.getFileName());
+			rdbId.setVersion(template.getVersion());
+			rdbId.setIoc(template.getIoc());
+			rdbId.setDescription(template.getDescription());
+		}
+		
+		boolean saved = drawingSurface.saveRdbGroup(guiContext, rdbId, dialog);
+		
+		if (saved) {
+			String path = rdbId.getFileName();
+			String fileName = new File(path).getName(); 
+			String ioc = rdbId.getIoc(); 
+			String version = rdbId.getVersion(); 
+			String description = rdbId.getDescription(); 
+			updateEditingTemplate(fileName, path, version, ioc, description);
 
-	public void saveAsRdbGroup(JFrame guiContext) {
-		drawingSurface.saveAsRdbGroup(guiContext);
+			drawingSurface.setModified(false);
+			UndoManager.getInstance(id).prepareAfterSaving();
+
+			VisualDCT.getInstance().updateLoadLabel();	
+		}
 	}
 
 	/**
@@ -1009,38 +1029,15 @@ public class DSGUIInterface implements VDBInterface {
 		Group.save(id, Group.getRoot(id), file, false);
 
 		VDBTemplate data = Group.getEditingTemplateData(id);
-		VDBTemplateId templateId = new VDBTemplateId(file.getName(), id);
-
-		if (data==null)
-		{
-			// create a new
-			// id = basename
-			data = new VDBTemplate(templateId, file.getAbsolutePath());
-
-			data.setPorts(new Hashtable());
-			data.setPortsV(new Vector());
-
-			data.setMacros(new Hashtable());
-			data.setMacrosV(new Vector());
-
-			data.setGroup(Group.getRoot(id));
-
-			Group.setEditingTemplateData(id, data);
-			drawingSurface.getTemplateStack().push(data);
-
-			VDBData.addTemplate(data);
-		} 
+		
 		// save as check
-		//	fileName & id has been changed, fix them
-		else if (!file.getAbsolutePath().equals(data.getFileName()))
-		{
+		if (data != null && !file.getAbsolutePath().equals(data.getFileName())) {
 			// reload previous ...
 			drawingSurface.reloadTemplate(data);
-
-			// ... and fix current id (basename) and path
-			data.setFileName(file.getAbsolutePath()); 	
-			data.setId(templateId);
 		}
+		
+		// possibly fix current id (basename) and path
+		updateEditingTemplate(file.getName(), file.getAbsolutePath(), null, null, null);
 
 		// if ok
 		drawingSurface.setModified(false);
@@ -1052,7 +1049,6 @@ public class DSGUIInterface implements VDBInterface {
 		//SetWorkspaceFile cmd = (SetWorkspaceFile)CommandManager.getInstance().getCommand("SetFile");
 		//cmd.setFile(file.getCanonicalPath());
 		//cmd.execute();
-
 	}
 	/**
 	 * Insert the method's description here.
@@ -1310,5 +1306,46 @@ public class DSGUIInterface implements VDBInterface {
 	public DrawingSurface getDrawingSurface() {
 		return drawingSurface;
 	}
+	
+	private void updateEditingTemplate(String fileName, String path, String version,
+			String ioc, String description) {
+		
+		VDBTemplate data = Group.getEditingTemplateData(id);
 
+		if (data == null) {
+			data = new VDBTemplate(fileName, path);
+			
+			if (version != null) {
+				data.setVersion(version);
+			}
+
+			data.setPorts(new Hashtable());
+			data.setPortsV(new Vector());
+
+			data.setMacros(new Hashtable());
+			data.setMacrosV(new Vector());
+
+			data.setGroup(Group.getRoot(id));
+
+			Group.setEditingTemplateData(id, data);
+			drawingSurface.getTemplateStack().push(data);
+
+			VDBData.getInstance(id).addTemplate(data);
+		}
+		
+		if (!path.equals(data.getFileName())) {
+			data.setFileName(path); 	
+			data.setId(id, fileName);
+		}
+		
+		if (version != null) {
+			data.setVersion(version);
+		}
+		if (ioc != null) {
+			data.setIoc(ioc);
+		}
+		if (description != null) {
+			data.setDescription(description);
+		}
+	}
 }

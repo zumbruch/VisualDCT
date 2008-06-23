@@ -32,7 +32,6 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import com.cosylab.vdct.db.DBData;
-import com.cosylab.vdct.vdb.VDBTemplate;
 
 /**
  * @author ssah
@@ -45,9 +44,6 @@ public class Rdb implements RdbInterface {
 	private RdbDataChooserDialog groupDialog = null;
 	private JFrame guiContext = null;
 
-	/**
-	 * 
-	 */
 	public Rdb(JFrame guiContext) {
 		super();
 		this.guiContext = guiContext; 
@@ -60,16 +56,10 @@ public class Rdb implements RdbInterface {
 		groupDialog = new RdbDataChooserDialog(mapper, guiContext);
 	}
 
-	/* (non-Javadoc)
-	 * @see com.cosylab.vdct.rdb.RdbInterface#connect(java.awt.Frame)
-	 */
 	public void connect() {
 		connectionDialog.setVisible(true);
 	}
-
-	/* (non-Javadoc)
-	 * @see com.cosylab.vdct.rdb.RdbInterface#loadDbGroup(java.lang.String)
-	 */
+	
 	public DBData loadRdbData(Object dsId) {
 		if (!mapper.isConnection()) {
 			connectionDialog.setVisible(true);
@@ -77,51 +67,38 @@ public class Rdb implements RdbInterface {
 		if (mapper.isConnection()) {
 			groupDialog.setLoadMode(true);		
 			groupDialog.setDsId(dsId);		
-			groupDialog.setTemplate(null);		
+			groupDialog.setRdbDataId(new RdbDataId());		
 			groupDialog.setVisible(true);
 			return groupDialog.getData();
 		}
 		return null;
 	}
-
-	/* (non-Javadoc)
-	 * @see com.cosylab.vdct.rdb.RdbInterface#saveDbGroup(java.lang.String)
-	 */
-	public void saveRdbData(VDBTemplate template) {
+	
+	public boolean saveRdbData(Object dsId, RdbDataId rdbId, boolean dialog) {
+		boolean success = false;
 		if (!mapper.isConnection()) {
 			connectionDialog.setVisible(true);
 		}
 		if (mapper.isConnection()) {
 			
-			boolean success = false;
-			// Check if enough data is known to perform a direct save. 
-			if (mapper.isSaveable(template)) {
+			// If no dialog requested try a direct save. 
+			if (!dialog) {
 				try {
-					mapper.saveRdbData(template);
-					success = true;
+                   	success = mapper.saveRdbData(dsId, rdbId);
 				} catch (Exception exception) {
 					JOptionPane.showMessageDialog(guiContext, exception.getMessage(),
 							"Database error", JOptionPane.ERROR_MESSAGE);
 				}
 			}
-			// If something failed fall back to save as dialog.
+			// If not saved yet bring up saveas dialog.
 			if (!success) {
-			    saveAsRdbData(template);
+				groupDialog.setLoadMode(false);
+				groupDialog.setDsId(dsId);		
+				groupDialog.setRdbDataId(rdbId);		
+				groupDialog.setVisible(true);
+				success = groupDialog.isSuccess();
 			}
 		}
-	}
-
-	/* (non-Javadoc)
-	 * @see com.cosylab.vdct.rdb.RdbInterface#saveAsDbGroup(java.lang.String)
-	 */
-	public void saveAsRdbData(VDBTemplate template) {
-		if (!mapper.isConnection()) {
-			connectionDialog.setVisible(true);
-		}
-		if (mapper.isConnection()) {
-			groupDialog.setLoadMode(false);
-			groupDialog.setTemplate(template);		
-			groupDialog.setVisible(true);
-		}
+		return success;
 	}
 }

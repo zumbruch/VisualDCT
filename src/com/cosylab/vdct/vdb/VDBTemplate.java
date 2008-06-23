@@ -68,7 +68,7 @@ import com.cosylab.vdct.undo.UndoManager;
 
 public class VDBTemplate implements Inspectable, Commentable, Descriptable, MonitoredPropertyListener
 {
-	protected VDBTemplateId id = null;
+	protected String id = null;
 	protected String fileName = null;
 	protected String description = null;
 
@@ -265,7 +265,7 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 	/**
 	 * Constructor for VDBTemplate.
 	 */
-	public VDBTemplate(VDBTemplateId id, String fileName)
+	public VDBTemplate(String id, String fileName)
 	{
 		this.id = id;
 		this.fileName = fileName;
@@ -352,11 +352,11 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 		if (this.description==null || this.description.length()==0)
 		{
 			// remove extension
-			int pos = id.toString().lastIndexOf('.');
+			int pos = id.lastIndexOf('.');
 			if (pos>0)
-				tempDescription = id.toString().substring(0, pos);
+				tempDescription = id.substring(0, pos);
 			else
-				tempDescription = id.toString();
+				tempDescription = id;
 		}
 		else
 			tempDescription = null;
@@ -384,7 +384,7 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 	 * Returns the id.
 	 * @return String
 	 */
-	public VDBTemplateId getId()
+	public String getId()
 	{
 		return id;
 	}
@@ -422,7 +422,7 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 	 */
 	public String getName()
 	{
-		return id.toString();
+		return id;
 	}
 
 	/**
@@ -444,7 +444,7 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 		items.addElement(GUIHeader.getDefaultHeader());
 
 		items.addElement(getTemplateSeparator());
-		items.addElement(new NameValueInfoProperty("Class", id.toString()));
+		items.addElement(new NameValueInfoProperty("Class", id));
 		items.addElement(new NameValueInfoProperty("FileName", fileName));
 		items.addElement(new DescriptionProperty());
 
@@ -1084,16 +1084,16 @@ public void renameMacroProperty(InspectableProperty property)
 	 * Sets the id.
 	 * @param id The id to set
 	 */
-	public void setId(VDBTemplateId id)
+	public void setId(Object dsId, String id)
 	{
 		this.id = id;
 		updateDescription();			
-		if (VDBData.getTemplates().containsKey(this.getId()))
+		if (VDBData.getInstance(dsId).getTemplates().containsKey(this.getId()))
 		{
 			Console.getInstance().print("Template with ID '"+this.getId()+"' is already loaded. Failed to store template '"+getFileName()+"' to the template repository.");
 		}
 		else
-			VDBData.addTemplate(this);
+			VDBData.getInstance(dsId).addTemplate(this);
 	}
 
 	/**

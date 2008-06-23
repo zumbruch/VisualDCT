@@ -34,6 +34,7 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 import com.cosylab.vdct.Console;
+import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.db.DBData;
 import com.cosylab.vdct.db.DBEntry;
 import com.cosylab.vdct.db.DBException;
@@ -48,7 +49,10 @@ import com.cosylab.vdct.dbd.DBDData;
 import com.cosylab.vdct.dbd.DBDFieldData;
 import com.cosylab.vdct.dbd.DBDMenuData;
 import com.cosylab.vdct.dbd.DBDRecordData;
+import com.cosylab.vdct.events.CommandManager;
+import com.cosylab.vdct.events.commands.GetDsManager;
 import com.cosylab.vdct.graphics.DrawingSurface;
+import com.cosylab.vdct.graphics.DsEventListener;
 import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.graphics.objects.Macro;
 import com.cosylab.vdct.graphics.objects.Port;
@@ -57,10 +61,13 @@ import com.cosylab.vdct.undo.UndoManager;
 /**
  * This type was created in VisualAge.
  */
-public class VDBData {
+public class VDBData implements DsEventListener {
+	
+	protected static HashMap instances = new HashMap();
+	
 	private Vector records = null;
 	//private Hashtable templates = null;
-	private static Hashtable templates = new Hashtable();
+	private Hashtable templates = new Hashtable();
 	private Hashtable templateInstances = null;
 	private Vector templateInstancesV = null;
 
@@ -69,7 +76,7 @@ public class VDBData {
 /**
  * DBDData constructor comment.
  */
-public VDBData() {
+private VDBData() {
 	records = new Vector();
 	//templates = new Hashtable();
 	templateInstances = new Hashtable();
@@ -105,7 +112,7 @@ public void addEntry(DBEntry ed) {
  * This method was created in VisualAge.
  * @param 
  */
-public static void addTemplate(VDBTemplate templ) {
+public void addTemplate(VDBTemplate templ) {
 	if (templ!=null)
 		if (!templates.containsKey(templ.getId()))
 			templates.put(templ.getId(), templ);
@@ -248,12 +255,12 @@ public static VDBData generateVDBData(Object dsId, DBDData dbd, DBData db) {
  */
 private static VDBData generateVDBDataInternal(Object dsId, DBDData dbd, DBData db) throws DBException {
 	
-	VDBData vdb = new VDBData();
+	VDBData vdb = getInstance(dsId);
 
 	if (dbd!=null && db!=null) {
 
 		// extract templates
-		extractTemplates(dsId, dbd, db, vdb);
+		vdb.extractTemplates(dsId, dbd, db, vdb);
 		
 		// add records, template instances and entries
 		Enumeration e = db.getStructure().elements();
@@ -268,7 +275,7 @@ private static VDBData generateVDBDataInternal(Object dsId, DBDData dbd, DBData 
 			else if (obj instanceof DBTemplateInstance)
 			{
 				DBTemplateInstance dbTemplateInstance = (DBTemplateInstance)obj;
-				VDBTemplateInstance vti = generateVDBTemplateInstance(dbTemplateInstance);
+				VDBTemplateInstance vti = vdb.generateVDBTemplateInstance(dbTemplateInstance);
 				if (vti!=null)
 					vdb.addTemplateInstance(vti);
 			}
@@ -308,7 +315,7 @@ public static void generateTemplateInstances(DBData db, VDBData vdb)
 	e = db.getTemplateInstances().elements();
 	while (e.hasMoreElements()) {
 		dbTemplateInstance = (DBTemplateInstance)(e.nextElement());
-		VDBTemplateInstance vti = generateVDBTemplateInstance(dbTemplateInstance);
+		VDBTemplateInstance vti = vdb.generateVDBTemplateInstance(dbTemplateInstance);
 		if (vti!=null)
 			vdb.addTemplateInstance(vti);
 	}
@@ -318,9 +325,9 @@ public static void generateTemplateInstances(DBData db, VDBData vdb)
 /**
  * 
  */
-public static VDBTemplateInstance generateVDBTemplateInstance(DBTemplateInstance dbTemplateInstance)
+public VDBTemplateInstance generateVDBTemplateInstance(DBTemplateInstance dbTemplateInstance)
 {
-	VDBTemplate t = (VDBTemplate)VDBData.getTemplates().get(dbTemplateInstance.getTemplateId());
+	VDBTemplate t = (VDBTemplate)getTemplates().get(dbTemplateInstance.getTemplateId());
 	if (t==null)
 	{
 		Console.getInstance().println(
@@ -351,7 +358,7 @@ public static VDBTemplateInstance generateNewVDBTemplateInstance(String name, VD
 /**
  * 
  */
-public static void extractTemplates(Object dsId, DBDData dbd, DBData db, VDBData vdb)
+public void extractTemplates(Object dsId, DBDData dbd, DBData db, VDBData vdb)
 {
 	Enumeration e;
 	DBTemplate dbTemplate;
@@ -359,9 +366,9 @@ public static void extractTemplates(Object dsId, DBDData dbd, DBData db, VDBData
 	while (e.hasMoreElements()) {
 		dbTemplate = (DBTemplate)(e.nextElement());
 
-		if (VDBData.getTemplates().containsKey(dbTemplate.getId()))
+		if (getTemplates().containsKey(dbTemplate.getId()))
 		{
-			VDBTemplate t = (VDBTemplate)VDBData.getTemplates().get(dbTemplate.getId());
+			VDBTemplate t = (VDBTemplate)vdb.getTemplates().get(dbTemplate.getId());
 			Console.getInstance().println("Template with id '"+dbTemplate.getId()+"' ('"+t.getFileName()+"') already exists in repository. Skipping template from file '"+dbTemplate.getFileName()+"'...");
 			continue;
 		}
@@ -376,8 +383,7 @@ private static VDBData generateTemplate(Object dsId, DBDData dbd, DBTemplate dbT
 {
 	Group root = Group.getRoot(dsId);
 	
-	VDBTemplateId templateId = new VDBTemplateId(dbTemplate.getId(), dsId);
-	VDBTemplate vt = new VDBTemplate(templateId, dbTemplate.getFileName());
+	VDBTemplate vt = new VDBTemplate(dbTemplate.getId(), dbTemplate.getFileName());
 	vt.setComment(dbTemplate.getComment());	
 	vt.setDescription(dbTemplate.getDescription());
 	vt.setVersion(dbTemplate.getVersion());
@@ -409,7 +415,7 @@ private static VDBData generateTemplate(Object dsId, DBDData dbd, DBTemplate dbT
 
 		addPortsAndMacros(dsId, dbTemplate, vt, vdbData);
 
-		VDBData.addTemplate(vt);
+		vdbData.addTemplate(vt);
 		
 		return vdbData;
 	}
@@ -430,15 +436,7 @@ private static VDBData generateTemplate(Object dsId, DBDData dbd, DBTemplate dbT
 	
 	return null;
 }
-/**
- * @param dbTemplate
- * @param vt
- * @param vdbData
- * @param ports
- * @param portsV
- * @param macros
- * @param macrosV
- */
+
 // NOTE adds to root!!!
 
 public static void addPortsAndMacros(Object dsId, DBTemplate dbTemplate, VDBTemplate vt, VDBData vdbData) {
@@ -737,9 +735,9 @@ public static VDBRecordData morphVDBRecordData(Object dsId, DBDData dbd, VDBReco
 	return vdbRecord;
 }
 
-public static VDBTemplateInstance morphVDBTemplateInstance(VDBTemplateInstance templateData, String templateType, String templateName) {
+public VDBTemplateInstance morphVDBTemplateInstance(VDBTemplateInstance templateData, String templateType, String templateName) {
 	
-	VDBTemplate template = (VDBTemplate)VDBData.getTemplates().get(templateType);
+	VDBTemplate template = (VDBTemplate)getTemplates().get(templateType);
 	if (template==null) return null;
 	
 	VDBTemplateInstance ti = generateNewVDBTemplateInstance(templateName, template);
@@ -781,7 +779,7 @@ public Vector getTemplateInstancesV()
  * Returns the templates.
  * @return Hashtable
  */
-public static Hashtable getTemplates()
+public Hashtable getTemplates()
 {
 	return templates;
 }
@@ -791,7 +789,7 @@ public static Hashtable getTemplates()
  * Creation date: (10.1.2001 14:44:44)
  * @param record com.cosylab.vdct.vdb.VDBTemplate
  */
-public static void removeTemplate(VDBTemplate template) {
+public void removeTemplate(VDBTemplate template) {
 	templates.remove(template.getId());
 }
 /**
@@ -812,5 +810,27 @@ public void removeTemplateInstance(VDBTemplateInstance templateInstance) {
 	{
 		return structure;
 	}
+	
+	public static VDBData getInstance(Object dsId) {
+	    return (VDBData)instances.get(dsId);
+	}
 
+	public static void registerDsListener() {
+
+		VDBData vdbData = new VDBData();
+		instances.put(Constants.DEFAULT_NAME, vdbData);
+		
+		GetDsManager command = (GetDsManager)CommandManager.getInstance().getCommand("GetDsManager");
+		if (command != null) {
+			command.getManager().addDsEventListener(vdbData);
+		}
+	}
+
+	public void onDsAdded(Object id) {
+	    instances.put(id, new VDBData());
+	}
+	public void onDsRemoved(Object id) {
+	}
+	public void onDsFocused(Object id) {
+	}
 }

@@ -31,6 +31,7 @@ package com.cosylab.vdct.graphics;
 import com.cosylab.vdct.db.DBSheetData;
 import com.cosylab.vdct.graphics.objects.Group;
 import com.cosylab.vdct.undo.UndoManager;
+import com.cosylab.vdct.vdb.VDBData;
 
 /**
  * @author ssah
@@ -44,5 +45,6 @@ public class DsListenerInitializer {
 		ViewState.registerDsListener();
 		UndoManager.registerDsListener();
 		DBSheetData.registerDsListener();
+		VDBData.registerDsListener();
 	}
 }

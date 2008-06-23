@@ -133,6 +133,7 @@ import com.cosylab.vdct.graphics.popup.Popupable;
 import com.cosylab.vdct.graphics.printing.Page;
 import com.cosylab.vdct.inspector.Inspectable;
 import com.cosylab.vdct.inspector.InspectorManager;
+import com.cosylab.vdct.rdb.RdbDataId;
 import com.cosylab.vdct.rdb.RdbInstance;
 import com.cosylab.vdct.undo.ActionObject;
 import com.cosylab.vdct.undo.ComposedAction;
@@ -1105,11 +1106,11 @@ MouseInputListener, Runnable, LinkCommandInterface {
 		popUp.add(templatesMenu);
 
 		// add templates
-		Enumeration templates = VDBData.getTemplates().keys();
+		Enumeration templates = VDBData.getInstance(id).getTemplates().keys();
 		while (templates.hasMoreElements())
 		{
 			String key = templates.nextElement().toString();
-			VDBTemplate t = (VDBTemplate)VDBData.getTemplates().get(key);
+			VDBTemplate t = (VDBTemplate)VDBData.getInstance(id).getTemplates().get(key);
 			JMenuItem item2 = new JMenuItem(t.getDescription());
 			item2.setActionCommand(key);
 			item2.addActionListener(al);
@@ -2078,26 +2079,23 @@ MouseInputListener, Runnable, LinkCommandInterface {
 	 */
 	public boolean open(InputStream is, File file, boolean importDB, boolean importToCurrentGroup) throws IOException {
 
-
-		///
-		/// DBD managment (not on system clipboard import)
-		///
-		if (file != null)
-			cleanDBDList();
-
-		// check for in-coded DBDs
-		if (file != null)
-			checkForIncodedDBDs(file);
-
-
-		///
-		/// load DB if we have DBD 
-		///
-
-		DBDData dbdData = DataProvider.getInstance().getDbdDB();
-		if (dbdData != null)
-		{
+		try {
 			setCursor(hourCursor);
+			UndoManager.getInstance(id).setMonitor(false);
+
+			// DBD managment (not on system clipboard import)
+			if (file != null)
+				cleanDBDList();
+
+			// check for in-coded DBDs
+			if (file != null)
+				checkForIncodedDBDs(file);
+
+			/// load DB if we have DBD 
+			DBDData dbdData = DataProvider.getInstance().getDbdDB();
+			if (dbdData == null) {
+				return false;
+			}
 
 			// prepare workspace
 			// TODO:REM
@@ -2105,7 +2103,6 @@ MouseInputListener, Runnable, LinkCommandInterface {
 		if (!importDB)
 			initializeWorkspace();
 			 */
-			UndoManager.getInstance(id).setMonitor(false);
 
 			// load
 			DBData dbData = null;
@@ -2116,23 +2113,18 @@ MouseInputListener, Runnable, LinkCommandInterface {
 			} catch (java.net.MalformedURLException e) { com.cosylab.vdct.Console.getInstance().println(e); }
 		else  */
 
-			try
-			{
-				if (is != null)
+			try {
+				if (is != null) {
 					dbData = DBResolver.resolveDB(id, is);
-				else
+				} else {
 					dbData = DBResolver.resolveDB(id, file.getAbsolutePath());
-			} 
-			catch(Throwable e)
-			{
+				}
+			} catch(Throwable e) {
 				Console.getInstance().println(e);
 			}
 
 			// check for sucess
-			if ((dbData == null) || !dbdData.consistencyCheck(dbData))
-			{
-				UndoManager.getInstance(id).setMonitor(true);
-				restoreCursor();
+			if ((dbData == null) || !dbdData.consistencyCheck(dbData)) {
 				return false;
 			}
 
@@ -2160,7 +2152,7 @@ MouseInputListener, Runnable, LinkCommandInterface {
 					HashMap importedList = applyVisualData(id, true, viewGroup, dbData, vdbData);
 
 					// find 'first' template defined in this file (not via includes)
-					VDBTemplate template = (VDBTemplate)VDBData.getTemplates().get(dbData.getTemplateData().getId());
+					VDBTemplate template = (VDBTemplate)VDBData.getInstance(id).getTemplates().get(dbData.getTemplateData().getId());
 					if (template != null) {
 						VDBData.addPortsAndMacros(id, dbData.getTemplateData(), template, vdbData, importedList);
 						validate = true;
@@ -2186,7 +2178,7 @@ MouseInputListener, Runnable, LinkCommandInterface {
 			} else if (!importDB) {
 
 				// find 'first' template defined in this file (not via includes)
-				VDBTemplate template = (VDBTemplate)VDBData.getTemplates().get(dbData.getTemplateData().getId());
+				VDBTemplate template = (VDBTemplate)VDBData.getInstance(id).getTemplates().get(dbData.getTemplateData().getId());
 
 				// found
 				if (template != null) {
@@ -2207,8 +2199,9 @@ MouseInputListener, Runnable, LinkCommandInterface {
 			}
 
 			// !!!
-			if (VisualDCT.getInstance() != null)
-				VisualDCT.getInstance().updateLoadLabel();	
+			if (VisualDCT.getInstance() != null) {
+				VisualDCT.getInstance().updateLoadLabel();
+			}
 			//updateWorkspaceGroup();
 
 			blockNavigatorRedrawOnce = false;
@@ -2217,8 +2210,6 @@ MouseInputListener, Runnable, LinkCommandInterface {
 			repaint();
 
 			///!!! TODO put somewhere in try-finally block
-			restoreCursor();
-			UndoManager.getInstance(id).setMonitor(true);
 
 			// free db memory	    
 			dbData = null;
@@ -2229,108 +2220,88 @@ MouseInputListener, Runnable, LinkCommandInterface {
 			//displayer.setFrameTitle(((RdbDataId)id).getFileName());
 
 			return true;
-		} 
-		else
-			return false;
+		} finally {
+			restoreCursor();
+			UndoManager.getInstance(id).setMonitor(true);
+		}
 	}
 
 	public boolean loadRdbDbGroup(JFrame guiContext) {
 
 		DBData dbData = null;
-		boolean success = true;
-
 		try {
 			setCursor(hourCursor);
 			UndoManager.getInstance(id).setMonitor(false);
 
-			dbData = RdbInstance.getInstance(guiContext).getRdbInterface().loadRdbData(id);
+			DBDData dbdData = DataProvider.getInstance().getDbdDB();
+			if (dbdData == null) {
+				return false;
+			}
+
+			try {
+				dbData = RdbInstance.getInstance(guiContext).getRdbInterface().loadRdbData(id);
+			} catch (Throwable e) {
+				Console.getInstance().println(e);
+			}
 
 			// check for sucess
-			DBDData dbdData = DataProvider.getInstance().getDbdDB();
-			if ((dbdData == null) || (dbData == null) || !dbdData.consistencyCheck(dbData))
-			{
-				UndoManager.getInstance(id).setMonitor(true);
-				restoreCursor();
+			if ((dbData == null) || !dbdData.consistencyCheck(dbData)) {
 				return false;
 			}
 
 			// check is DTYP fields are defined before any DBF_INPUT/DBF_OUTPUT fields...
 			DBData.checkDTYPfield(dbData, dbdData);
 
-			VDBData vdbData = VDBData.generateVDBData(id, dbdData, dbData);
+			VDBData.generateVDBData(id, dbdData, dbData);
 
-			Group.getClipboard().clear();
-			Group vg = viewGroup;
-			Group rg = Group.getRoot(id);
-			try {
-				// put all to dummy root group
-				viewGroup = new Group(null);
-				viewGroup.setAbsoluteName("");
-				viewGroup.setLookupTable(new Hashtable());
-				Group.setRoot(id, viewGroup);
+			// find 'first' template defined in this file (not via includes)
+			VDBTemplate template = (VDBTemplate)VDBData.getInstance(id).getTemplates().get(dbData.getTemplateData().getId());
 
-				// import directly to workspace (current view group)
-				// imported list needed for undo action
-				HashMap importedList = applyVisualData(id, true, viewGroup, dbData, vdbData);
-
-				// find 'first' template defined in this file (not via includes)
-				VDBTemplate template = (VDBTemplate)VDBData.getTemplates().get(dbData.getTemplateData().getId());
-				if (template != null) {
-					VDBData.addPortsAndMacros(id, dbData.getTemplateData(), template, vdbData, importedList);
+			// found
+			if (template != null) {
+				if (Group.hasMacroPortsIDChanged(id)) {
+					JOptionPane.showMessageDialog(VisualDCT.getInstance(),
+							"Macros/Ports in this template have changed. \nReload and save files that include this template to apply changes.", "Template changed!", JOptionPane.WARNING_MESSAGE);
 				}
+				Group.setRoot(id, template.getGroup());
+				Group.setEditingTemplateData(id, template);
+				templateStack.push(template);
 
-				viewGroup.manageLinks(true);
-				viewGroup.unconditionalValidateSubObjects(isFlat());
-				viewGroup.selectAllComponents();
-
-				((GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface")).getGUIMenuInterface().cut();
-			} finally {
-				viewGroup = vg;
-				Group.setRoot(id, rg);
+				InspectorManager.getInstance().updateObjectLists();
+				moveToGroup(template.getGroup());
 			}
 
-			((GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface")).getGUIMenuInterface().paste();
-			Group.getClipboard().clear();
-
-			refreshTitle();
-			// TODO:REM
-			//displayer.setFrameTitle(((RdbDataId)id).getFileName());
+			setModified(false);
+			viewGroup.unconditionalValidateSubObjects(isFlat());
 
 			if (VisualDCT.getInstance() != null) {
 				VisualDCT.getInstance().updateLoadLabel();
 			}
-
 			blockNavigatorRedrawOnce = false;
 			createNavigatorImage();
 			forceRedraw = true;
 			repaint();
-		} catch (Exception exception) {
-			Console.getInstance().println(exception);
-			success = false;
+
+			refreshTitle();
+			return true;
+			
 		} finally {
-			restoreCursor();
-			UndoManager.getInstance(id).setMonitor(true);
-			// free db memory	    
 			dbData = null;
 			System.gc();
-		}
-		return success;
-	}
-
-	public void saveRdbGroup(JFrame guiContext) {
-		try {
-			RdbInstance.getInstance(guiContext).getRdbInterface().saveRdbData(Group.getEditingTemplateData(id));
-		} catch (Exception exception) {
-			Console.getInstance().println(exception);
+			
+			restoreCursor();
+			UndoManager.getInstance(id).setMonitor(true);
 		}
 	}
 
-	public void saveAsRdbGroup(JFrame guiContext) {
+	public boolean saveRdbGroup(JFrame guiContext, RdbDataId rdbId, boolean dialog) {
+
 		try {
-			RdbInstance.getInstance(guiContext).getRdbInterface().saveAsRdbData(Group.getEditingTemplateData(id));
+			return RdbInstance.getInstance(guiContext).getRdbInterface().saveRdbData(id, rdbId, dialog);
 		} catch (Exception exception) {
 			Console.getInstance().println(exception);
 		}
+		return false;
 	}
 
 	private void cleanDBDList() {
@@ -2511,6 +2482,17 @@ MouseInputListener, Runnable, LinkCommandInterface {
 						continue;
 					} 
 
+					// TODO:REM
+					System.out.println("vname:" + vdbRec.getName());
+					Iterator iterator = dbData.getRecords().values().iterator();
+					while (iterator.hasNext()) {
+						System.out.println(((DBRecordData)iterator.next()).getName());
+					}
+					
+					Group.getRoot(dsId);
+					dbRec.getX();
+					dbRec.getY();
+					
 					record = new Record(Group.getRoot(dsId), vdbRec, dbRec.getX(), dbRec.getY());
 					vdbRec.setRecord(record);
 
@@ -2542,7 +2524,7 @@ MouseInputListener, Runnable, LinkCommandInterface {
 
 					dbTemplate = (DBTemplateInstance)dbData.getTemplateInstances().get(vdbTemplate.getName());
 
-					VDBTemplate template = (VDBTemplate)VDBData.getTemplates().get(dbTemplate.getTemplateId());
+					VDBTemplate template = (VDBTemplate)vdbData.getTemplates().get(dbTemplate.getTemplateId());
 					if (template==null)
 					{
 						/*// already issued
@@ -3840,7 +3822,7 @@ MouseInputListener, Runnable, LinkCommandInterface {
 	 * @param relative boolean
 	 */
 	public void createTemplateInstance(String name, String type, boolean relative) {
-		VDBTemplate template = (VDBTemplate)VDBData.getTemplates().get(type);
+		VDBTemplate template = (VDBTemplate)VDBData.getInstance(id).getTemplates().get(type);
 		if (template==null)
 		{
 			com.cosylab.vdct.Console.getInstance().println(
@@ -3952,11 +3934,11 @@ MouseInputListener, Runnable, LinkCommandInterface {
 			// reload template
 			boolean ok = reloadTemplate(Group.getEditingTemplateData(id));
 			// push new
-			VDBTemplate reloaded = (VDBTemplate)VDBData.getTemplates().get(backup.getId());
+			VDBTemplate reloaded = (VDBTemplate)VDBData.getInstance(id).getTemplates().get(backup.getId());
 
 			if (!ok || reloaded==null)
 			{
-				VDBData.addTemplate(backup);
+				VDBData.getInstance(id).addTemplate(backup);
 				templateStack.push(backup);
 			}
 			else
@@ -4123,7 +4105,7 @@ MouseInputListener, Runnable, LinkCommandInterface {
 			return true;
 
 		// remove from template repository
-		VDBData.removeTemplate(data);
+		VDBData.getInstance(id).removeTemplate(data);
 
 		InspectorManager.getInstance().updateObjectLists();
 
@@ -4135,7 +4117,7 @@ MouseInputListener, Runnable, LinkCommandInterface {
 			// import
 			boolean ok = open(new File(data.getFileName()), true);
 
-			if (!ok || !VDBData.getTemplates().containsKey(data.getId()))
+			if (!ok || !VDBData.getInstance(id).getTemplates().containsKey(data.getId()))
 			{
 				com.cosylab.vdct.Console.getInstance().println("Failed to reload template '"+data.getFileName()+"'. Using in-memory definitions...");	
 			}

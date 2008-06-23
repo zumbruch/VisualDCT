@@ -29,7 +29,6 @@
 package com.cosylab.vdct.rdb;
 
 import com.cosylab.vdct.db.DBData;
-import com.cosylab.vdct.vdb.VDBTemplate;
 
 /**
  * @author ssah
@@ -40,6 +39,5 @@ public interface RdbInterface {
     public void connect();
 	
 	public DBData loadRdbData(Object dsId);
-	public void saveRdbData(VDBTemplate template);
-	public void saveAsRdbData(VDBTemplate template);
+	public boolean saveRdbData(Object dsId, RdbDataId rdbId, boolean dialog);
 }

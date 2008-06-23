@@ -21,7 +21,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 
 import com.cosylab.vdct.db.DBData;
-import com.cosylab.vdct.vdb.VDBTemplate;
 
 /** SQLTableGUI
  * GUI for SQLTableModel,
@@ -34,9 +33,8 @@ public class RdbDataChooserDialog extends JDialog implements ActionListener {
 	private RdbDataMapper mapper = null;
 
 	private Object dsId = null;
-	private VDBTemplate template = null;
-
 	private RdbDataId rdbDataId = null;
+	private boolean success = false;
 	
 	private String selectedIoc = null;
 	private String selectedGroup = null;
@@ -66,7 +64,6 @@ public class RdbDataChooserDialog extends JDialog implements ActionListener {
 	public RdbDataChooserDialog(RdbDataMapper mapper, JFrame guiContext) {
 		super(guiContext, true);
 		this.mapper = mapper;
-		rdbDataId = new RdbDataId();
         makeGUI(guiContext);
 	}
 
@@ -98,12 +95,16 @@ public class RdbDataChooserDialog extends JDialog implements ActionListener {
 		super.setVisible(arg0);
 	}
 
-	public void setTemplate(VDBTemplate template) {
-		this.template = template;
-	}
-	
 	public void setDsId(Object dsId) {
 		this.dsId = dsId;
+	}
+	
+	public void setRdbDataId(RdbDataId rdbDataId) {
+		this.rdbDataId = rdbDataId;
+	}
+	
+	public boolean isSuccess() {
+		return success;
 	}
 
 	private void makeGUI(JFrame guiContext) {
@@ -264,6 +265,7 @@ public class RdbDataChooserDialog extends JDialog implements ActionListener {
 			performGroupAction();
 		} else if (action.equals(cancelString)) {
 			data = null;
+			success = false;
 			setVisible(false);
 		} 
 	}
@@ -284,7 +286,7 @@ public class RdbDataChooserDialog extends JDialog implements ActionListener {
 			if (loadMode) {
 				data = mapper.loadRdbData(dsId, rdbDataId);
 			} else {
-				mapper.saveRdbData(template);
+				success = mapper.saveRdbData(dsId, rdbDataId);
 			}
 			setVisible(false);
 		} catch (Exception exception) {

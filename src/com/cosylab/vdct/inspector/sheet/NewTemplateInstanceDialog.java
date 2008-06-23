@@ -155,10 +155,11 @@ public class NewTemplateInstanceDialog extends JDialog implements ActionListener
     	templateComboBox.removeAllItems();
     	
     	Stack templateStack = DsManager.getDrawingSurface(dsId).getTemplateStack();
-    	Enumeration templates = VDBData.getTemplates().keys();
+    	VDBData vdbData = VDBData.getInstance(dsId);    	
+    	Enumeration templates = vdbData.getTemplates().keys();
     	while (templates.hasMoreElements()) {
     		String key = templates.nextElement().toString();
-    		VDBTemplate t = (VDBTemplate)VDBData.getTemplates().get(key);
+    		VDBTemplate t = (VDBTemplate)vdbData.getTemplates().get(key);
     		if (templateStack.isEmpty() || !templateStack.contains(t)) {
         		templateComboBox.addItem(key);
     		}

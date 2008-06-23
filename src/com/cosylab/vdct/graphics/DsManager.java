@@ -407,6 +407,7 @@ LinkCommandInterface, RepaintInterface, Pageable {
 	 * @see com.cosylab.vdct.graphics.GUIMenuInterface#loadRdbGroup(javax.swing.JFrame)
 	 */
 	public void loadRdbGroup(JFrame guiContext) {
+		desktopInterface.createNewInternalFrame();
 		if (dsInterface != null) {
 			dsInterface.loadRdbGroup(guiContext);
 		}
@@ -543,9 +544,9 @@ LinkCommandInterface, RepaintInterface, Pageable {
 	/* (non-Javadoc)
 	 * @see com.cosylab.vdct.graphics.GUIMenuInterface#saveAsRdbGroup(javax.swing.JFrame)
 	 */
-	public void saveAsRdbGroup(JFrame guiContext) {
+	public void saveRdbGroup(JFrame guiContext, boolean dialog) {
 		if (dsInterface != null) {
-			dsInterface.saveAsRdbGroup(guiContext);
+			dsInterface.saveRdbGroup(guiContext, dialog);
 		}
 	}
 
@@ -555,15 +556,6 @@ LinkCommandInterface, RepaintInterface, Pageable {
 	public void saveAsTemplate(File file) throws IOException {
 		if (dsInterface != null) {
 			dsInterface.saveAsTemplate(file);
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see com.cosylab.vdct.graphics.GUIMenuInterface#saveRdbGroup(javax.swing.JFrame)
-	 */
-	public void saveRdbGroup(JFrame guiContext) {
-		if (dsInterface != null) {
-			dsInterface.saveRdbGroup(guiContext);
 		}
 	}
 

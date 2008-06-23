@@ -107,9 +107,7 @@ void importDBD(File file) throws IOException;
 
 void loadRdbGroup(JFrame guiContext);
 
-void saveRdbGroup(JFrame guiContext);
-
-void saveAsRdbGroup(JFrame guiContext);
+void saveRdbGroup(JFrame guiContext, boolean dialog);
 
 /**
  * Insert the method's description here.

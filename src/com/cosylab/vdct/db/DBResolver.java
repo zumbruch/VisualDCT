@@ -246,7 +246,7 @@ public class DBResolver {
 		// check central VDB repository
 		if (!alreadyLoaded)
 		{
-			Enumeration enumer = VDBData.getTemplates().elements();
+			Enumeration enumer = VDBData.getInstance(dsId).getTemplates().elements();
 			while (enumer.hasMoreElements())
 			{
 				VDBTemplate t = (VDBTemplate)enumer.nextElement();

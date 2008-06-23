@@ -48,6 +48,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.Hashtable;
 
 import javax.print.Doc;
 import javax.print.DocFlavor;
@@ -2630,7 +2631,7 @@ private JMenuItem getRdbSaveMenuItem() {
 			rdbSaveMenuItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 				    GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
-		  		 	cmd.getGUIMenuInterface().saveRdbGroup(VisualDCT.getInstance());
+		  		 	cmd.getGUIMenuInterface().saveRdbGroup(VisualDCT.getInstance(), false);
 				}
 			});
 		} catch (Throwable ivjExc) {
@@ -2651,7 +2652,7 @@ private JMenuItem getRdbSaveAsMenuItem() {
 			rdbSaveAsMenuItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 				    GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
-		  		 	cmd.getGUIMenuInterface().saveAsRdbGroup(VisualDCT.getInstance());
+		  		 	cmd.getGUIMenuInterface().saveRdbGroup(VisualDCT.getInstance(), true);
 				}
 			});
 		} catch (Throwable ivjExc) {
@@ -2854,22 +2855,6 @@ private javax.swing.JMenu getFileMenu() {
 			ivjFileMenu.setMnemonic('F');
 			ivjFileMenu.setText("File");
 			ivjFileMenu.add(getNewMenuItem());
-			
-			// TODO:REM temporary for tests
-			JMenuItem menuItem = new JMenuItem("New window");
-			menuItem.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					// TODO:REM
-					/*
-					RdbDataId id = new RdbDataId(String.valueOf(internalFrameNum));
-					internalFrameNum++;
-					*/
-					getworkspace().createNewInternalFrame();
-				}
-			});
-			ivjFileMenu.add(menuItem);
-			
-			
 			ivjFileMenu.add(getOpenMenuItem());
 			ivjFileMenu.add(getImport_DBMenuItem());
 			ivjFileMenu.add(getImportFieldsMenuItem());
@@ -7907,17 +7892,23 @@ public void updateLoadLabel() {
 		tip.append("</b></ul>");
 	}
 	
-	if (VDBData.getTemplates().size()==0)
+	Hashtable templates = null;
+	Group root = Group.getRoot();
+	if (root != null) {
+		templates = VDBData.getInstance(root.getDsId()).getTemplates();
+	}
+	
+	if (templates == null || templates.size()==0)
 		tip.append("<p>No loaded templates.</p>");
 	else
 	{	
 		tip.append("Loaded template(s):<b><ul>");
-		Enumeration e = VDBData.getTemplates().keys();
+		Enumeration e = templates.keys();
 		while (e.hasMoreElements())
 		{
 				tip.append("<li>");
 				String key = e.nextElement().toString();
-				VDBTemplate t = (VDBTemplate)VDBData.getTemplates().get(key);
+				VDBTemplate t = (VDBTemplate)templates.get(key);
 				
 				// TODO:TEST
 				System.out.println("t:" + t + "desc" + t.getDescription());
@@ -7946,11 +7937,11 @@ public void updateLoadLabel() {
 	
 	label.append(", ");
 
-	if (VDBData.getTemplates().size()==0)
+	if (templates == null || templates.size()==0)
 		label.append("no loaded templates");
 	else
 	{
-		label.append(VDBData.getTemplates().size());
+		label.append(templates.size());
 		label.append(" loaded templates(s)");
 	}
 

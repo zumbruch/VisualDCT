@@ -416,7 +416,7 @@ public class Template
 			validating = true;
 
 			  // template change check
-			  VDBTemplate tmpl = (VDBTemplate)VDBData.getTemplates().get(getTemplateData().getTemplate().getId());		
+			  VDBTemplate tmpl = (VDBTemplate)VDBData.getInstance(getDsId()).getTemplates().get(getTemplateData().getTemplate().getId());		
 			  if (tmpl!=getTemplateData().getTemplate())
 			  {
 			  	getTemplateData().setTemplate(tmpl);
@@ -2265,11 +2265,12 @@ public boolean morph(String newType) {
 
 	// desc -> type
 	String type = null;
-	Enumeration templates = VDBData.getTemplates().keys();
+	VDBData vdbData = VDBData.getInstance(getDsId());
+	Enumeration templates = vdbData.getTemplates().keys();
 	while (templates.hasMoreElements())
 	{
 		String key = templates.nextElement().toString();
-		VDBTemplate t = (VDBTemplate)VDBData.getTemplates().get(key);
+		VDBTemplate t = (VDBTemplate)vdbData.getTemplates().get(key);
 		if (newType.equals(t.getDescription()))
 		{
 			type = key; break;
@@ -2280,7 +2281,7 @@ public boolean morph(String newType) {
 		return false;
 	
 	//	copies VDBData
-	VDBTemplateInstance templateInstance = VDBData.morphVDBTemplateInstance(templateData, type, getName());
+	VDBTemplateInstance templateInstance = vdbData.morphVDBTemplateInstance(templateData, type, getName());
 				
 	if (templateInstance==null) {
 		Console.getInstance().println("o) Interal error: failed to morph template "+getName()+" ("+getType()+")!");
@@ -2313,12 +2314,13 @@ public Object[] getTargets() {
 	
 	Stack tis = DsManager.getDrawingSurface(getDsId()).getTemplateStack();
 
-	Enumeration templates = VDBData.getTemplates().keys();
-	ArrayList al = new ArrayList(VDBData.getTemplates().size());
+	VDBData vdbData = VDBData.getInstance(getDsId());
+	Enumeration templates = vdbData.getTemplates().keys();
+	ArrayList al = new ArrayList(vdbData.getTemplates().size());
 	while (templates.hasMoreElements())
 	{
 		String key = templates.nextElement().toString();
-		VDBTemplate t = (VDBTemplate)VDBData.getTemplates().get(key);
+		VDBTemplate t = (VDBTemplate)vdbData.getTemplates().get(key);
 		if (t != this.getTemplateData().getTemplate() &&
 			!tis.contains(t))	// do not allow cyclic...
 			al.add(t.getDescription());
