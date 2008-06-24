@@ -26,14 +26,23 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.cosylab.vdct.graphics;
+package com.cosylab.vdct.events.commands;
 
-import java.io.File;
+import com.cosylab.vdct.VisualDCT;
+import com.cosylab.vdct.events.Command;
 
-import javax.swing.JComponent;
+/**
+ * @author ssah
+ *
+ */
+public class UpdateLoadLabel extends Command {
 
-public interface InternalFrameInterface {
+	private VisualDCT visualDCT;
+	public UpdateLoadLabel(VisualDCT visualDCT) {
+		this.visualDCT = visualDCT;
+	}
 
-	public JComponent getDisplayingComponent();
-	public void setFile(File file, String title);
+	public void execute() {
+		visualDCT.updateLoadLabel();
+	}
 }

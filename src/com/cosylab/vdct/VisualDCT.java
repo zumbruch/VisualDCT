@@ -104,6 +104,7 @@ import com.cosylab.vdct.events.commands.SetWorkspaceScale;
 import com.cosylab.vdct.events.commands.ShowMorphingDialog;
 import com.cosylab.vdct.events.commands.ShowNewDialog;
 import com.cosylab.vdct.events.commands.ShowRenameDialog;
+import com.cosylab.vdct.events.commands.UpdateLoadLabel;
 import com.cosylab.vdct.find.FindDialog;
 import com.cosylab.vdct.graphics.DsListenerInitializer;
 import com.cosylab.vdct.graphics.DsManager;
@@ -1101,6 +1102,9 @@ private void connEtoC35(java.awt.event.ActionEvent arg1) {
 private void connEtoC36(java.awt.event.ActionEvent arg1) {
 	try {
 		// user code begin {1}
+		// TODO:REM
+		System.out.println("Up!");
+
 		// user code end
 		this.level_UpMenuItem_ActionPerformed();
 		// user code begin {2}
@@ -3773,7 +3777,7 @@ private javax.swing.JMenuItem getLevel_UpMenuItem() {
 			ivjLevel_UpMenuItem.setName("Level_UpMenuItem");
 			ivjLevel_UpMenuItem.setMnemonic('L');
 			ivjLevel_UpMenuItem.setText("Level Up");
-			ivjLevel_UpMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_UP,java.awt.Event.SHIFT_MASK));
+			ivjLevel_UpMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_UP, Event.SHIFT_MASK));
 			// user code begin {1}
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
@@ -6143,6 +6147,7 @@ private void initialize() {
 		CommandManager.getInstance().addCommand("SetRedoMenuItemState", new SetRedoMenuItemState(this));
 		CommandManager.getInstance().addCommand("SetFile", new SetWorkspaceFile(this));
 		CommandManager.getInstance().addCommand("SetGroup", new SetWorkspaceGroup(this));
+		CommandManager.getInstance().addCommand("UpdateLoadLabel", new UpdateLoadLabel(this));
 		// user code end
 		setName("VisualDCT");
 //		setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -7657,10 +7662,13 @@ public void setDefaultDirectory(String dir) {
  * @param fileName java.lang.String
  */
 public void setFileInTitle(String fileName) {
-	if (fileName==null) fileName = Constants.UNTITLED;
-	setTitle("VisualDCT - ["+fileName+"]");
-	addedToTitle =  " - ["+fileName+"]";
+	if (fileName == null) {
+		fileName = Constants.UNTITLED;
+	}
+	addedToTitle = " - [" + fileName + "]";
+	setTitle("VisualDCT " + addedToTitle);
 }
+	
 
 public void setLineButtonEnabled(boolean parLineButtonEnabled)
 {
@@ -7963,13 +7971,10 @@ public void updateLoadLabel() {
 	 * Sets the openedFile.
 	 * @param openedFile The openedFile to set
 	 */
-	public void setOpenedFile(java.io.File openedFile)
+	public void setOpenedFile(File openedFile, String title)
 	{
 		this.openedFile = openedFile;
-		if (openedFile==null)
-			setFileInTitle(null);
-		else 
-			setFileInTitle(openedFile.getAbsolutePath());
+		setFileInTitle(title);
 	}
 
 	/**

@@ -804,7 +804,7 @@ MouseInputListener, Runnable, LinkCommandInterface {
 		createNavigatorImage();
 		baseView();
 
-		refreshTitle();
+		updateFile(null);
 	}
 	/**
 	 * Insert the method's description here.
@@ -2079,6 +2079,9 @@ MouseInputListener, Runnable, LinkCommandInterface {
 	 */
 	public boolean open(InputStream is, File file, boolean importDB, boolean importToCurrentGroup) throws IOException {
 
+		// TODO:REM
+		System.out.println("Opening: " + file.getName());
+		
 		try {
 			setCursor(hourCursor);
 			UndoManager.getInstance(id).setMonitor(false);
@@ -2131,7 +2134,8 @@ MouseInputListener, Runnable, LinkCommandInterface {
 			// check is DTYP fields are defined before any DBF_INPUT/DBF_OUTPUT fields...
 			DBData.checkDTYPfield(dbData, dbdData);
 
-			VDBData vdbData = VDBData.generateVDBData(id, dbdData, dbData);
+			VDBData vdbData = VDBData.generateVDBData(id, dbdData, dbData,
+					!importToCurrentGroup && !importDB);
 
 			if (importToCurrentGroup) {
 				Group.getClipboard().clear();
@@ -2198,10 +2202,8 @@ MouseInputListener, Runnable, LinkCommandInterface {
 				viewGroup.unconditionalValidateSubObjects(isFlat());
 			}
 
-			// !!!
-			if (VisualDCT.getInstance() != null) {
-				VisualDCT.getInstance().updateLoadLabel();
-			}
+			
+			CommandManager.getInstance().execute("UpdateLoadLabel");
 			//updateWorkspaceGroup();
 
 			blockNavigatorRedrawOnce = false;
@@ -2215,7 +2217,9 @@ MouseInputListener, Runnable, LinkCommandInterface {
 			dbData = null;
 			System.gc();
 
-			refreshTitle();
+			if (file != null) {
+			    updateFile(file);
+			}
 			// TODO:REM
 			//displayer.setFrameTitle(((RdbDataId)id).getFileName());
 
@@ -2252,7 +2256,7 @@ MouseInputListener, Runnable, LinkCommandInterface {
 			// check is DTYP fields are defined before any DBF_INPUT/DBF_OUTPUT fields...
 			DBData.checkDTYPfield(dbData, dbdData);
 
-			VDBData.generateVDBData(id, dbdData, dbData);
+			VDBData.generateVDBData(id, dbdData, dbData, true);
 
 			// find 'first' template defined in this file (not via includes)
 			VDBTemplate template = (VDBTemplate)VDBData.getInstance(id).getTemplates().get(dbData.getTemplateData().getId());
@@ -2274,15 +2278,13 @@ MouseInputListener, Runnable, LinkCommandInterface {
 			setModified(false);
 			viewGroup.unconditionalValidateSubObjects(isFlat());
 
-			if (VisualDCT.getInstance() != null) {
-				VisualDCT.getInstance().updateLoadLabel();
-			}
+			CommandManager.getInstance().execute("UpdateLoadLabel");
 			blockNavigatorRedrawOnce = false;
 			createNavigatorImage();
 			forceRedraw = true;
 			repaint();
 
-			refreshTitle();
+			updateFile(null);
 			return true;
 			
 		} finally {
@@ -2471,6 +2473,20 @@ MouseInputListener, Runnable, LinkCommandInterface {
 
 					vdbRec = (VDBRecordData)obj;
 					dbRec = (DBRecordData) dbData.getRecords().get(vdbRec.getName());
+					
+					// TODO:REM
+					System.out.println("searched for:" + vdbRec.getName());
+					System.out.println("all:");
+					Iterator iterator = dbData.getRecords().values().iterator();
+					while (iterator.hasNext()) {
+						System.out.print(((DBRecordData)iterator.next()).getName() + ";");
+					}
+					System.out.println("got:" + dbRec);
+					System.out.println();
+					Group.getRoot(dsId);
+					dbRec.getX();
+					dbRec.getY();
+					
 					// check if record already exists
 					if ((record = (Record) rootGroup.findObject(vdbRec.getName(), true))
 							!= null) {
@@ -2482,17 +2498,6 @@ MouseInputListener, Runnable, LinkCommandInterface {
 						continue;
 					} 
 
-					// TODO:REM
-					System.out.println("vname:" + vdbRec.getName());
-					Iterator iterator = dbData.getRecords().values().iterator();
-					while (iterator.hasNext()) {
-						System.out.println(((DBRecordData)iterator.next()).getName());
-					}
-					
-					Group.getRoot(dsId);
-					dbRec.getX();
-					dbRec.getY();
-					
 					record = new Record(Group.getRoot(dsId), vdbRec, dbRec.getX(), dbRec.getY());
 					vdbRec.setRecord(record);
 
@@ -3052,9 +3057,7 @@ MouseInputListener, Runnable, LinkCommandInterface {
 		// add to list of DBDs
 		DataProvider.getInstance().getLoadedDBDs().addElement(file);
 
-		// !!!
-		if (VisualDCT.getInstance()!=null)
-			VisualDCT.getInstance().updateLoadLabel();	
+		CommandManager.getInstance().execute("UpdateLoadLabel");
 
 		restoreCursor();
 		return true;
@@ -3964,13 +3967,11 @@ MouseInputListener, Runnable, LinkCommandInterface {
 		UndoManager.getInstance(id).setMonitor(true);
 
 		// update opened file
-		if (Group.getEditingTemplateData(id)==null)
-			VisualDCT.getInstance().setOpenedFile(null);
-		else
-			VisualDCT.getInstance().setOpenedFile(new File(Group.getEditingTemplateData(id).getFileName()));
-
+		VDBTemplate template = Group.getEditingTemplateData(id);
+		File file = template != null ? new File(template.getFileName()) : null;
+		updateFile(file);
+		
 		InspectorManager.getInstance().updateObjectLists();
-
 	}
 
 	/**
@@ -4348,14 +4349,11 @@ MouseInputListener, Runnable, LinkCommandInterface {
 		this.disposed = disposed;
 	}
 
-	private void refreshTitle() {
+	public void updateFile(File file) {
 		if (displayer != null) {
-			VDBTemplate template = Group.getEditingTemplateData(id);
-			if (template != null) {
-				displayer.setFrameTitle(template.getFileName());
-			} else {
-				displayer.setFrameTitle(untitledString + serialNumber);
-			}
+			String title = file != null ? file.getAbsolutePath()
+					: untitledString + serialNumber;
+			displayer.setFile(file, title);
 		}
 	}
 }

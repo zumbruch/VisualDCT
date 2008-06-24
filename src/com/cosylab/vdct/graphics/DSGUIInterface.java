@@ -705,7 +705,7 @@ public class DSGUIInterface implements VDBInterface {
 			drawingSurface.setModified(false);
 			UndoManager.getInstance(id).prepareAfterSaving();
 
-			VisualDCT.getInstance().updateLoadLabel();	
+			CommandManager.getInstance().execute("UpdateLoadLabel");
 		}
 	}
 
@@ -736,14 +736,7 @@ public class DSGUIInterface implements VDBInterface {
 	 * @param file java.io.File
 	 */
 	public void openDB(java.io.File file) throws IOException {
-		if (drawingSurface.open(file))
-		{
-			//!!!
-			VisualDCT.getInstance().setOpenedFile(file);
-			//SetWorkspaceFile cmd = (SetWorkspaceFile)CommandManager.getInstance().getCommand("SetFile");
-			//cmd.setFile(file.getCanonicalPath());
-			//cmd.execute();
-		}
+		drawingSurface.open(file);
 	}
 	/**
 	 * Insert the method's description here.
@@ -1043,12 +1036,8 @@ public class DSGUIInterface implements VDBInterface {
 		drawingSurface.setModified(false);
 		UndoManager.getInstance(id).prepareAfterSaving();
 
-		// !!!
-		VisualDCT.getInstance().updateLoadLabel();	
-		VisualDCT.getInstance().setOpenedFile(file);
-		//SetWorkspaceFile cmd = (SetWorkspaceFile)CommandManager.getInstance().getCommand("SetFile");
-		//cmd.setFile(file.getCanonicalPath());
-		//cmd.execute();
+		CommandManager.getInstance().execute("UpdateLoadLabel");
+		drawingSurface.updateFile(file);
 	}
 	/**
 	 * Insert the method's description here.

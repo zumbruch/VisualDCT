@@ -330,15 +330,13 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 
 		updateDescription();			
 
-		if (update)
-		{
+		if (update) {
 			InspectorManager.getInstance().updateObject(this);
-			/// !!!
-			if (com.cosylab.vdct.VisualDCT.getInstance() != null)
-				com.cosylab.vdct.VisualDCT.getInstance().updateLoadLabel();			
+			CommandManager.getInstance().execute("UpdateLoadLabel");
 		    GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
-		    if (cmd!=null)
+		    if (cmd != null) {
 		    	cmd.getGUIMenuInterface().updateGroupLabel();
+		    }
 		}
 	}
 

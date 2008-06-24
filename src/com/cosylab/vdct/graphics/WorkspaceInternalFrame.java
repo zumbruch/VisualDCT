@@ -28,8 +28,16 @@
 
 package com.cosylab.vdct.graphics;
 
+import java.awt.Event;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.io.File;
+
+import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
+import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
@@ -45,9 +53,10 @@ import com.cosylab.vdct.events.commands.SetWorkspaceFile;
 public class WorkspaceInternalFrame extends JInternalFrame
 implements InternalFrameInterface, InternalFrameListener {
 
-	Object dsId = null; 
+	protected Object dsId = null; 
 	protected PanelDecorator contentPanel = null;
 	protected DsManagerInterface drawingSurfaceManager = null;
+	protected File file = null;
 
 	protected static final String defaultName = "Name";
 
@@ -67,13 +76,32 @@ implements InternalFrameInterface, InternalFrameListener {
 		addInternalFrameListener(this);
 
 		setContentPane(contentPanel);
+		
+		contentPanel.getInputMap().put(KeyStroke.getKeyStroke("SPACE"), "doNothing");
+		
+		contentPanel.getActionMap().put("doNothing", new AbstractAction() {
+		    public void actionPerformed(ActionEvent e) {
+		        //do nothing
+		    }
+		});
+		
+		contentPanel.addKeyListener(new KeyAdapter() {
+			public void keyPressed(KeyEvent e) {
+				System.out.println("contentpanel");
+				System.out.println("e.getKeyCode()" + e.getKeyCode() + "e.getModifiers()" + e.getModifiers());
+				if (e.getKeyCode() == KeyEvent.VK_UP && e.getModifiers() == Event.SHIFT_MASK) {
+					System.out.println("Got it!");
+				}
+			}
+		});
 	}
 
 	public JComponent getDisplayingComponent() {
 		return contentPanel;
 	}
 
-	public void setFrameTitle(String title) {
+	public void setFile(File file, String title) {
+		this.file = file;
 		setTitle(title);
 		if (isSelected()) {
 			sendActiveGroupNotification();
@@ -105,7 +133,10 @@ implements InternalFrameInterface, InternalFrameListener {
 	private void sendActiveGroupNotification() {
 		SetWorkspaceFile command =
 			(SetWorkspaceFile)CommandManager.getInstance().getCommand("SetFile");
-		command.setFile(title);
-		command.execute();
+		if (command != null) {
+			command.setFile(file);
+			command.setFilename(title);
+			command.execute();
+		}
 	}
 }

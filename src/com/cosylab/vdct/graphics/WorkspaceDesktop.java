@@ -29,6 +29,7 @@ package com.cosylab.vdct.graphics;
  */
 
 import java.awt.Component;
+import java.awt.FocusTraversalPolicy;
 import java.awt.Graphics;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;

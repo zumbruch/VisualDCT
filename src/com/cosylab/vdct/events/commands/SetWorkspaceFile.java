@@ -28,38 +28,29 @@ package com.cosylab.vdct.events.commands;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import com.cosylab.vdct.events.Command;
-import com.cosylab.vdct.VisualDCT;
+import java.io.File;
 
-/**
- * Insert the type's description here.
- * Creation date: (29.12.2000 12:37:43)
- * @author 
- */
+import com.cosylab.vdct.VisualDCT;
+import com.cosylab.vdct.events.Command;
+
 public class SetWorkspaceFile extends Command {
 	private VisualDCT visualDCT;
+	private File file = null;
 	private String fileName = null;
-/**
- * Insert the method's description here.
- * Creation date: (29.12.2000 12:37:58)
- */
 
 public SetWorkspaceFile(VisualDCT visualDCT) {
 	this.visualDCT=visualDCT;
 }
-/**
- * Insert the method's description here.
- * Creation date: (29.12.2000 12:37:43)
- */
+
 public void execute() {
-	visualDCT.setFileInTitle(fileName);
+	visualDCT.setOpenedFile(file, fileName);
 }
-/**
- * Insert the method's description here.
- * Creation date: (29.12.2000 12:39:32)
- * @param fileName java.lang.String
- */
-public void setFile(String fileName) {
-	this.fileName=fileName;
+
+public void setFile(File file) {
+	this.file = file;
+}
+
+public void setFilename(String fileName) {
+	this.fileName = fileName;
 }
 }
