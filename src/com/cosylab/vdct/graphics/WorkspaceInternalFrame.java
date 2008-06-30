@@ -28,16 +28,10 @@
 
 package com.cosylab.vdct.graphics;
 
-import java.awt.Event;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.io.File;
 
-import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
-import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
@@ -76,24 +70,6 @@ implements InternalFrameInterface, InternalFrameListener {
 		addInternalFrameListener(this);
 
 		setContentPane(contentPanel);
-		
-		contentPanel.getInputMap().put(KeyStroke.getKeyStroke("SPACE"), "doNothing");
-		
-		contentPanel.getActionMap().put("doNothing", new AbstractAction() {
-		    public void actionPerformed(ActionEvent e) {
-		        //do nothing
-		    }
-		});
-		
-		contentPanel.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent e) {
-				System.out.println("contentpanel");
-				System.out.println("e.getKeyCode()" + e.getKeyCode() + "e.getModifiers()" + e.getModifiers());
-				if (e.getKeyCode() == KeyEvent.VK_UP && e.getModifiers() == Event.SHIFT_MASK) {
-					System.out.println("Got it!");
-				}
-			}
-		});
 	}
 
 	public JComponent getDisplayingComponent() {
@@ -111,6 +87,7 @@ implements InternalFrameInterface, InternalFrameListener {
 	public void internalFrameActivated(InternalFrameEvent e) {
 		drawingSurfaceManager.setFocusedDrawingSurface(dsId);
 		sendActiveGroupNotification();
+		CommandManager.getInstance().execute("SetDefaultFocus");
 	}
 
 	public void internalFrameDeactivated(InternalFrameEvent e) {

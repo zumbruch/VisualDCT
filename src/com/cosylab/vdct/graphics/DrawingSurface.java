@@ -66,6 +66,7 @@ import java.util.LinkedHashSet;
 import java.util.Stack;
 import java.util.Vector;
 
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -565,7 +566,7 @@ MouseInputListener, Runnable, LinkCommandInterface {
 		if (navigatorImage==null) return;
 
 		ViewState view = ViewState.getInstance(id);
-
+		
 		// draw navigator image && position
 		copyNavigatorImage(g);
 
@@ -739,18 +740,12 @@ MouseInputListener, Runnable, LinkCommandInterface {
 	 * Creation date: (25.12.2000 17:31:15)
 	 * @return javax.swing.JComponent
 	 */
-	public javax.swing.JComponent getWorkspacePanel() {
+	public JComponent getWorkspacePanel() {
 		if (displayer != null) {
 			return displayer.getDisplayingComponent();
 		} else {
 			return null;
 		}
-		// TODO: REM
-		/*
-	NullCommand pm = (NullCommand)CommandManager.getInstance().getCommand("NullCommand");
-	if (pm!=null) return pm.getComponent();
-	else return null;
-		 */
 	}
 	/**
 	 * Insert the method's description here.
@@ -2079,9 +2074,6 @@ MouseInputListener, Runnable, LinkCommandInterface {
 	 */
 	public boolean open(InputStream is, File file, boolean importDB, boolean importToCurrentGroup) throws IOException {
 
-		// TODO:REM
-		System.out.println("Opening: " + file.getName());
-		
 		try {
 			setCursor(hourCursor);
 			UndoManager.getInstance(id).setMonitor(false);
@@ -2099,13 +2091,6 @@ MouseInputListener, Runnable, LinkCommandInterface {
 			if (dbdData == null) {
 				return false;
 			}
-
-			// prepare workspace
-			// TODO:REM
-			/*
-		if (!importDB)
-			initializeWorkspace();
-			 */
 
 			// load
 			DBData dbData = null;
@@ -2134,8 +2119,7 @@ MouseInputListener, Runnable, LinkCommandInterface {
 			// check is DTYP fields are defined before any DBF_INPUT/DBF_OUTPUT fields...
 			DBData.checkDTYPfield(dbData, dbdData);
 
-			VDBData vdbData = VDBData.generateVDBData(id, dbdData, dbData,
-					!importToCurrentGroup && !importDB);
+			VDBData vdbData = VDBData.generateVDBData(id, dbdData, dbData);
 
 			if (importToCurrentGroup) {
 				Group.getClipboard().clear();
@@ -2211,8 +2195,6 @@ MouseInputListener, Runnable, LinkCommandInterface {
 			forceRedraw = true;
 			repaint();
 
-			///!!! TODO put somewhere in try-finally block
-
 			// free db memory	    
 			dbData = null;
 			System.gc();
@@ -2220,9 +2202,6 @@ MouseInputListener, Runnable, LinkCommandInterface {
 			if (file != null) {
 			    updateFile(file);
 			}
-			// TODO:REM
-			//displayer.setFrameTitle(((RdbDataId)id).getFileName());
-
 			return true;
 		} finally {
 			restoreCursor();
@@ -2256,7 +2235,7 @@ MouseInputListener, Runnable, LinkCommandInterface {
 			// check is DTYP fields are defined before any DBF_INPUT/DBF_OUTPUT fields...
 			DBData.checkDTYPfield(dbData, dbdData);
 
-			VDBData.generateVDBData(id, dbdData, dbData, true);
+			VDBData.generateVDBData(id, dbdData, dbData);
 
 			// find 'first' template defined in this file (not via includes)
 			VDBTemplate template = (VDBTemplate)VDBData.getInstance(id).getTemplates().get(dbData.getTemplateData().getId());
@@ -2474,19 +2453,6 @@ MouseInputListener, Runnable, LinkCommandInterface {
 					vdbRec = (VDBRecordData)obj;
 					dbRec = (DBRecordData) dbData.getRecords().get(vdbRec.getName());
 					
-					// TODO:REM
-					System.out.println("searched for:" + vdbRec.getName());
-					System.out.println("all:");
-					Iterator iterator = dbData.getRecords().values().iterator();
-					while (iterator.hasNext()) {
-						System.out.print(((DBRecordData)iterator.next()).getName() + ";");
-					}
-					System.out.println("got:" + dbRec);
-					System.out.println();
-					Group.getRoot(dsId);
-					dbRec.getX();
-					dbRec.getY();
-					
 					// check if record already exists
 					if ((record = (Record) rootGroup.findObject(vdbRec.getName(), true))
 							!= null) {
@@ -2529,7 +2495,7 @@ MouseInputListener, Runnable, LinkCommandInterface {
 
 					dbTemplate = (DBTemplateInstance)dbData.getTemplateInstances().get(vdbTemplate.getName());
 
-					VDBTemplate template = (VDBTemplate)vdbData.getTemplates().get(dbTemplate.getTemplateId());
+					VDBTemplate template = (VDBTemplate)VDBData.getInstance(dsId).getTemplates().get(dbTemplate.getTemplateId());
 					if (template==null)
 					{
 						/*// already issued
@@ -3049,8 +3015,6 @@ MouseInputListener, Runnable, LinkCommandInterface {
 		if (!importDBD)
 		{
 			DataProvider.getInstance().setDbdDB(dbdData);
-			// TODO:REM
-			//if (viewGroup==null) initializeWorkspace();
 			//createNavigatorImage();
 		}
 
@@ -3404,7 +3368,7 @@ MouseInputListener, Runnable, LinkCommandInterface {
 	 */
 	public void recalculateNavigatorPosition() {
 		ViewState view = ViewState.getInstance(id);
-
+		
 		double ratio = navigatorView.getScale()/view.getScale();
 		/// bug was here
 		navigatorRect.x = (int)(view.getRx()*ratio) + navigator.x;
@@ -4028,15 +3992,16 @@ MouseInputListener, Runnable, LinkCommandInterface {
 		viewGroup = (Group)viewStack.pop();
 		templateStack.pop();
 
-		if (!templateStack.isEmpty())
-			Group.setEditingTemplateData(id, (VDBTemplate)templateStack.peek());
-		else
-			Group.setEditingTemplateData(id, null);
-
 		Group grp = viewGroup;
 		while (grp.getParent()!=null)
 			grp = (Group)grp.getParent();
 		Group.setRoot(id, grp);
+		
+		if (!templateStack.isEmpty()) {
+			Group.setEditingTemplateData(id, (VDBTemplate)templateStack.peek());
+		} else {
+			Group.setEditingTemplateData(id, null);
+		}
 
 		// initialize
 		templateReloadPostInit();
@@ -4251,7 +4216,7 @@ MouseInputListener, Runnable, LinkCommandInterface {
 	 */
 	public void generateMacros()
 	{
-		// TODO gui w/ macro (w/ visible representation option) would be welcome here
+		// TASK:MACROSER: gui w/ macro (w/ visible representation option) would be welcome here
 
 		// iterate through all the records
 		// for each record iterate through all the fields

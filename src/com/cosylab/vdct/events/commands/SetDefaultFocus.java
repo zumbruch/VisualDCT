@@ -26,41 +26,24 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.cosylab.vdct.graphics;
+package com.cosylab.vdct.events.commands;
 
+import com.cosylab.vdct.VisualDCT;
+import com.cosylab.vdct.events.Command;
 
 /**
  * @author ssah
  *
  */
-public class CopyContext {
+public class SetDefaultFocus extends Command {
 
-	// Id of the copy/cut source group.
-	private Object dsId = null;
-	private int pasteCount = 0;
-	
-	private boolean doOffsetAtPaste = false;
-	
-	public CopyContext() {
-		super();
+	private VisualDCT visualDCT;
+	public SetDefaultFocus(VisualDCT visualDCT) {
+		this.visualDCT = visualDCT;
+	}
+
+	public void execute() {
+		visualDCT.setDefaultFocus();
 	}
 	
-	public Object getDsId() {
-		return dsId;
-	}
-	public void setDsId(Object dsId) {
-		this.dsId = dsId;
-	}
-	public int getPasteCount() {
-		return pasteCount;
-	}
-	public void setPasteCount(int pasteCount) {
-		this.pasteCount = pasteCount;
-	}
-	public boolean isDoOffsetAtPaste() {
-		return doOffsetAtPaste;
-	}
-	public void setDoOffsetAtPaste(boolean doOffsetAtPaste) {
-		this.doOffsetAtPaste = doOffsetAtPaste;
-	}
 }

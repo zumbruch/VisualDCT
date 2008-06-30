@@ -391,16 +391,6 @@ public void updateInspector()
 {
 	Record visualRecord = (record != null) ? record.getRecord() : null;
 	if (visualRecord != null) {
-		// TODO:REM
-		/*
-
-		Record visualRecord = (Record)Group.getRoot().findObject(record.getName(), true);
-		if (visualRecord==null) {
-			System.err.println("Warning: record '" + record.getName() + "' not found.");
-			//com.cosylab.vdct.Console.getInstance().println("o) Internal error: no visual representaton of record "+getName()+" found.");
-			return;
-		}
-		 */
 		InspectorManager.getInstance().updateProperty(visualRecord, this);
 	}
 }
@@ -625,7 +615,7 @@ private String checkExpandedValues(String value) {
 
 	String[] values = StringUtils.expandMacros(value);
 	if (values == null) {
-		return getHelp() + ": Error: Won't set more tban " + Constants.MAX_NAME_MACRO_EXPANSIONS + " fields!";
+		return getHelp() + ": Error: Won't set more than " + Constants.MAX_NAME_MACRO_EXPANSIONS + " fields!";
 	}
 	
 	for (int n = 0; n < values.length; n++) {
@@ -640,7 +630,7 @@ public Object getDsId() {
 	if (record != null) {
 		return record.getDsId();
 	} else {
-		// TODO: reactivate
+		// TASK:VISREPACT: uncomment when done
 		//System.err.println("Warning: VDBFieldData.getDsId: returning null.");
 		return null;
 	}

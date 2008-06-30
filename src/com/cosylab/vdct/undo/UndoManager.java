@@ -111,9 +111,6 @@ private int actions2undo() {
  */
 public void addAction(ActionObject action) {
     
-	// TODO:REM
-	System.out.println("Action(" + dsId + "):" + action);
-	
 	if (!monitor) return;
 
 	if (composedAction!=null)
@@ -171,24 +168,16 @@ public ComposedActionInterface getComposedAction() {
 	return composedAction;
 }
 
-// TODO:REM
-/**
- * Insert the method's description here.
- * Creation date: (22.4.2001 15:56:37)
- * @return com.cosylab.vdct.undo.UndoManager
- */
-/*
-public static UndoManager getInstance() {
-	if (instance == null) {
-		System.err.println("Warning: undo manager instance called while not yet initialized,"
-				+ " returning active default.");
-		instance = new UndoManager(Group.getRoot().getId());
-	}
-	return instance;
-}
-*/
 public static UndoManager getInstance(Object dsId) {
-    return (UndoManager)instances.get(dsId);
+
+	UndoManager undoManager = (UndoManager)instances.get(dsId);
+    if (undoManager == null) {
+    	System.err.println("Warning: UndoManager.getInstance: instance with id does not exist,"
+    			+ " creating new one.");
+    	undoManager = new UndoManager(dsId);
+    	instances.put(dsId, undoManager);
+    }
+	return undoManager;
 }
 
 /**

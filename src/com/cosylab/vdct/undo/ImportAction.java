@@ -33,10 +33,6 @@ public class ImportAction extends ActionObject {
     private HashMap importedObjects;
     private Group parent;
     
-    /**
-     * TODO DOCUMENT ME!
-     * @param object
-     */
     public ImportAction(HashMap importedVisibleObjects, Group parent) {
         this.importedObjects = importedVisibleObjects;
         this.parent = parent;

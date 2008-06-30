@@ -123,7 +123,7 @@ public class VDBTemplateInstance implements Commentable
 	 */
 	public static String applyProperties(String s, Map properties)
 	{
-		// TODO !!! algorithm is wrong, try applying macros on string $(macro1$(macro2))($macro2$(macro1)), where macro1="", macro2=""
+		// TASK:RECMACROS: !!! algorithm is wrong, try applying macros on string $(macro1$(macro2))($macro2$(macro1)), where macro1="", macro2=""
 		Iterator e = properties.keySet().iterator();
 		while (s.indexOf('$')>=0 && e.hasNext())
 		{

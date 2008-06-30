@@ -118,25 +118,13 @@ public class VDBTemplatePort extends VDBFieldData implements Descriptable, Chang
 								 (oldValue == InspectableProperty.NON_DEFAULT_VISIBLE && !hasDefaultValue));
 			boolean newVisible = (visibility == InspectableProperty.ALWAYS_VISIBLE ||
 								 (visibility == InspectableProperty.NON_DEFAULT_VISIBLE && !hasDefaultValue));
-			if (oldVisible != newVisible)
-			{						 
-				// TODO:REM
-				/*
-				Template visualTemplate = (Template)Group.getRoot().findObject(templateInstance.getName(), true);
-				if (visualTemplate!=null) {
-					visualTemplate.fieldVisibilityChange(this, newVisible);
-				} else {
-					System.err.println("Warning: template instance '" + templateInstance.getName()
-							+ "' not found.");
-				}
-				*/
+			if (oldVisible != newVisible) {						 
 				Template visualTemplate = templateInstance.getVisualTemplate();
 				if (visualTemplate != null) {
 					visualTemplate.fieldVisibilityChange(this, newVisible);
 				}
 			}
 		}
-					
 		updateInspector();
 	}
 
@@ -209,20 +197,7 @@ public class VDBTemplatePort extends VDBFieldData implements Descriptable, Chang
 	 * Insert the method's description here.
 	 * Creation date: (9.12.2000 18:11:46)
 	 */
-	public void updateInspector()
-	{
-		// TODO:REM
-		/*
-		Template visualTemplate = (Template)Group.getRoot().findObject(templateInstance.getName(), true);
-		if (visualTemplate==null) {
-			System.err.println("Warning: template instance '" + templateInstance.getName()
-					+ "' not found.");
-			//com.cosylab.vdct.Console.getInstance().println("o) Internal error: no visual representaton of record "+getName()+" found.");
-			return;
-		}
-	
-		InspectorManager.getInstance().updateProperty(visualTemplate, this);
-		*/
+	public void updateInspector() {
 		Template visualTemplate = templateInstance.getVisualTemplate();
 		if (visualTemplate != null) {
 			InspectorManager.getInstance().updateProperty(visualTemplate, this);

@@ -493,7 +493,7 @@ public java.util.Vector getItems() {
 	outputModeItem.addActionListener(al);
 	modeMenu.add(outputModeItem);
 
-	//TODO is this needed
+	//is this needed?
 	JMenu textMenu = new JMenu(textPosition);
 	items.addElement(textMenu);
 

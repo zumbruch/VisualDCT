@@ -52,8 +52,8 @@ public class ViewState implements DsEventListener {
 	protected static HashMap instances = new HashMap();
 	protected Object dsId = null;
 	
-	protected static int x0 = 0;				// origin
-	protected static int y0 = 0;
+	protected int x0 = 0;				// origin
+	protected int y0 = 0;
 
 	protected double drx = 0.0;				// precise translation (from origin)
 	protected double dry = 0.0;
@@ -64,10 +64,10 @@ public class ViewState implements DsEventListener {
 	protected double scale = 1.0;		// scale
 	
  	// viewport size 
- 	protected static int viewWidth = com.cosylab.vdct.Constants.VDCT_WIDTH;
-	protected static int viewHeight = com.cosylab.vdct.Constants.VDCT_HEIGHT;
+ 	protected int viewWidth = com.cosylab.vdct.Constants.VDCT_WIDTH;
+	protected int viewHeight = com.cosylab.vdct.Constants.VDCT_HEIGHT;
 
-	protected static boolean flat = false;
+	protected boolean flat = false;
 	
 	protected VisibleObject hilitedObject = null;
 	protected LinkedHashSet hilitedObjects = new LinkedHashSet(); 
@@ -186,7 +186,17 @@ public boolean isHilitedObject(VisibleObject object) {
 }
 
 public static ViewState getInstance(Object dsId) {
-    return (ViewState)instances.get(dsId);
+	ViewState viewState = (ViewState)instances.get(dsId);
+    
+    if (viewState == null) {
+		System.err.println("Warning: ViewState.getInstance: instance with id does not exist,"
+				+ " creating new one.");
+    	
+		viewState = new ViewState();
+		viewState.setDsId(dsId);
+	    instances.put(dsId, viewState);
+    }
+    return viewState;
 }
 
 /**

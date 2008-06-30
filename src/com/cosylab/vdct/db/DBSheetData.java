@@ -51,7 +51,16 @@ public class DBSheetData implements DsEventListener {
 	}
 	
 	public static DBSheetData getInstance(Object dsId) {
-	    return (DBSheetData)instances.get(dsId);
+
+		DBSheetData dbSheetData = (DBSheetData)instances.get(dsId);
+		if (dbSheetData == null) {
+			System.err.println("Warning: DBSheetData.getInstance: instance with id does not exist,"
+					+ " creating new one.");
+
+			dbSheetData = new DBSheetData();
+			instances.put(dsId, dbSheetData);
+		}
+		return dbSheetData;
 	}
 	
 	public void add(DBSheetView record) {

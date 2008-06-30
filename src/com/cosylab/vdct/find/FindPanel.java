@@ -282,7 +282,7 @@ public class FindPanel extends JPanel
      * @exception InterruptedException
      *                if thread is interrupted
      */
-    // TODO only recursive record search implemented 
+    // only recursive record search implemented 
     protected void runFind(Group base, FindFilter[] filters)
             throws InterruptedException
     {
@@ -564,7 +564,7 @@ public class FindPanel extends JPanel
             
             //all criteria on one tab
             addTab(TAB_CRITERIA, getCriteriaPanel());
-//             TODO add panels here...
+//             add panels here...
 
             // Add results panel
             resultsScroller = new JScrollPane(resultsPanel = new FindResults());

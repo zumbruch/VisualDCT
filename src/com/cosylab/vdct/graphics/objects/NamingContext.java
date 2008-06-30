@@ -227,7 +227,6 @@ public class NamingContext {
 	 */
 	public String resolveLink(String target) {
 		//DebugSystem.out.println("resolve link "+target);
-		//TODO
 		
 		String record=LinkProperties.getRecordFromString(target);
 		Object rec=null;								
@@ -321,7 +320,7 @@ public class NamingContext {
 
 	/**
 	 * Finds $() and $(.) in strings and replaces them.
-	 * TODO currently it doesn't handle something like $($()) very well.
+	 * TASK:RECMACROS: currently it doesn't handle something like $($()) very well.
 	 * I don't think this is a simple problem, which could be done with regex.
 	 * Hierarchy prevents it. 
 	 * @param value

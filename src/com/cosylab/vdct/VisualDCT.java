@@ -96,6 +96,7 @@ import com.cosylab.vdct.events.commands.GetPrintableInterface;
 import com.cosylab.vdct.events.commands.GetVDBManager;
 import com.cosylab.vdct.events.commands.NullCommand;
 import com.cosylab.vdct.events.commands.SetCursorCommand;
+import com.cosylab.vdct.events.commands.SetDefaultFocus;
 import com.cosylab.vdct.events.commands.SetRedoMenuItemState;
 import com.cosylab.vdct.events.commands.SetUndoMenuItemState;
 import com.cosylab.vdct.events.commands.SetWorkspaceFile;
@@ -106,7 +107,6 @@ import com.cosylab.vdct.events.commands.ShowNewDialog;
 import com.cosylab.vdct.events.commands.ShowRenameDialog;
 import com.cosylab.vdct.events.commands.UpdateLoadLabel;
 import com.cosylab.vdct.find.FindDialog;
-import com.cosylab.vdct.graphics.DsListenerInitializer;
 import com.cosylab.vdct.graphics.DsManager;
 import com.cosylab.vdct.graphics.VDBInterface;
 import com.cosylab.vdct.graphics.ViewState;
@@ -207,11 +207,6 @@ public class VisualDCT extends JFrame {
 	private JSlider ivjZoomSlider = null;
 	private JLabel ivjZoomLabel = null;
 	private JPanel ivjZoomPanel = null;
-	//TODO:REM
-    /*
-	private com.cosylab.vdct.graphics.BorderDecorator ivjborder = null;
-	private com.cosylab.vdct.graphics.DrawingSurface ivjcanvas = null;
-	*/
 	private JFileChooser ivjfileChooser = null;
 	private JCheckBoxMenuItem ivjSnapToGridMenuItem = null;
 	private JCheckBoxMenuItem ivjWindowsPanMenuItem = null;
@@ -306,9 +301,6 @@ public class VisualDCT extends JFrame {
 	private SpreadsheetInspector spreadsheet = null; 
 	
 	private static VisualDCT instance = null;
-	
-	// TODO:REM
-	//private static int internalFrameNum = 0;
 	
 class IvjEventHandler implements java.awt.event.ActionListener, java.awt.event.ItemListener, java.awt.event.MouseListener, java.awt.event.MouseMotionListener, java.awt.event.WindowListener {
 		public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -1102,9 +1094,6 @@ private void connEtoC35(java.awt.event.ActionEvent arg1) {
 private void connEtoC36(java.awt.event.ActionEvent arg1) {
 	try {
 		// user code begin {1}
-		// TODO:REM
-		System.out.println("Up!");
-
 		// user code end
 		this.level_UpMenuItem_ActionPerformed();
 		// user code begin {2}
@@ -1812,47 +1801,7 @@ private void connEtoM3(java.awt.event.ActionEvent arg1) {
 		handleException(ivjExc);
 	}
 }
-//TODO:REM
 
-
-/**
- * connPtoP1SetTarget:  (canvas.this <--> border.component)
- */
-/* WARNING: THIS METHOD WILL BE REGENERATED. */
-/*
-private void connPtoP1SetTarget() {
-	/* Set the target from the source */
-/*
-	try {
-		getborder().setComponent(getcanvas());
-		// user code begin {1}
-		// user code end
-	} catch (java.lang.Throwable ivjExc) {
-		// user code begin {3}
-		// user code end
-		handleException(ivjExc);
-	}
-}
-*/
-/**
- * connPtoP2SetTarget:  (workspace.this <--> border.component)
- */
-/* WARNING: THIS METHOD WILL BE REGENERATED. */
-/*
-private void connPtoP2SetTarget() {
-	/* Set the target from the source */
-/*
-	try {
-		getworkspace().setComponent(getborder());
-		// user code begin {1}
-		// user code end
-	} catch (java.lang.Throwable ivjExc) {
-		// user code begin {3}
-		// user code end
-		handleException(ivjExc);
-	}
-}
-*/
 public void systemCopy() {
     GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
     cmd.getGUIMenuInterface().systemCopy();
@@ -2164,28 +2113,7 @@ private javax.swing.JMenuItem getBooks_OnlineMenuItem() {
 	}
 	return ivjBooks_OnlineMenuItem;
 }
-/**
- * Return the border property value.
- * @return com.cosylab.vdct.graphics.BorderDecorator
- */
-/* WARNING: THIS METHOD WILL BE REGENERATED. */
-//TODO:REM
-/*
-private com.cosylab.vdct.graphics.BorderDecorator getborder() {
-	if (ivjborder == null) {
-		try {
-			ivjborder = new com.cosylab.vdct.graphics.BorderDecorator();
-			// user code begin {1}
-			// user code end
-		} catch (java.lang.Throwable ivjExc) {
-			// user code begin {2}
-			// user code end
-			handleException(ivjExc);
-		}
-	}
-	return ivjborder;
-}
-*/
+
 private javax.swing.JButton getBoxButton() {
 	if (boxButton == null) {
 		try {
@@ -2393,31 +2321,6 @@ private javax.swing.JButton getCancelButton1() {
 	}
 	return ivjCancelButton1;
 }
-//TODO:REM
-
-/**
- * Return the canvas property value.
- * @return com.cosylab.vdct.graphics.DrawingSurface
- */
-/* WARNING: THIS METHOD WILL BE REGENERATED. */
-/*
-private com.cosylab.vdct.graphics.DrawingSurface getcanvas() {
-	if (ivjcanvas == null) {
-		try {
-			RdbDataId id = new RdbDataId(String.valueOf(internalFrameNum));
-			internalFrameNum++;
-			ivjcanvas = new com.cosylab.vdct.graphics.DrawingSurface(id, null);
-			// user code begin {1}
-			// user code end
-		} catch (java.lang.Throwable ivjExc) {
-			// user code begin {2}
-			// user code end
-			handleException(ivjExc);
-		}
-	}
-	return ivjcanvas;
-}
-*/
 
 /**
  * Return the CopyButton property value.
@@ -3470,7 +3373,7 @@ private javax.swing.JPanel getJFrameContentPane() {
 			ivjJFrameContentPane.addMouseListener(new MouseAdapter() {
 			    public void mouseEntered(MouseEvent e) {
 			        if (VisualDCT.this.isActive()) {	
-			            ivjJFrameContentPane.requestFocus();
+			        	ivjJFrameContentPane.requestFocus();
 			        }
 			    }
 			});
@@ -5604,16 +5507,7 @@ private com.cosylab.vdct.graphics.WorkspaceDesktop getworkspace() {
 			// user code begin {1}
 			DsManager drawingSurfaceManager = new DsManager(ivjworkspace);
 			ivjworkspace.setDrawingSurfaceManager(drawingSurfaceManager);
-			DsListenerInitializer.registerDsManagerListeners();
-			drawingSurfaceManager.createDummyDrawingSurface();			
 			ivjworkspace.createNewInternalFrame();
-			
-			// TODO:REM
-			/*
-			RdbDataId id = new RdbDataId(String.valueOf(internalFrameNum));
-			internalFrameNum++;
-			ivjworkspace.createNewDrawingSurface(id);
-			*/
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
 			// user code begin {2}
@@ -6123,12 +6017,6 @@ private void initConnections() throws java.lang.Exception {
 
 	getSystemCopyMenuItem().addActionListener(ivjEventHandler);
 	getSystemPasteMenuItem().addActionListener(ivjEventHandler);
-
-	// TODO:REM this and the functions
-	/*
-	connPtoP1SetTarget();
-	connPtoP2SetTarget();
-	*/
 }
 /**
  * Initialize the class.
@@ -6148,6 +6036,7 @@ private void initialize() {
 		CommandManager.getInstance().addCommand("SetFile", new SetWorkspaceFile(this));
 		CommandManager.getInstance().addCommand("SetGroup", new SetWorkspaceGroup(this));
 		CommandManager.getInstance().addCommand("UpdateLoadLabel", new UpdateLoadLabel(this));
+		CommandManager.getInstance().addCommand("SetDefaultFocus", new SetDefaultFocus(this));
 		// user code end
 		setName("VisualDCT");
 //		setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -7918,9 +7807,6 @@ public void updateLoadLabel() {
 				String key = e.nextElement().toString();
 				VDBTemplate t = (VDBTemplate)templates.get(key);
 				
-				// TODO:TEST
-				System.out.println("t:" + t + "desc" + t.getDescription());
-				
 				tip.append(t.getDescription());
 				tip.append(" - ");
 				tip.append(t.getFileName());
@@ -7994,5 +7880,8 @@ public void updateLoadLabel() {
 			comboBoxFileChooser = new ComboBoxFileChooser();
 		return comboBoxFileChooser;
 	}
-
+	
+	public void setDefaultFocus() {
+    	getJFrameContentPane().requestFocusInWindow();
+	}
 }

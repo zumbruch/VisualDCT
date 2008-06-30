@@ -44,6 +44,7 @@ public class PanelDecorator extends javax.swing.JPanel implements VisualComponen
  * Creation date: (10.12.2000 13:25:27)
  */
 public PanelDecorator() {
+	super();
 	addComponentListener(this);
 }
 /**

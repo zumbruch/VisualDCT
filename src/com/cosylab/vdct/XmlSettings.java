@@ -80,7 +80,7 @@ public class XmlSettings {
 	    	}
 
 	    	/* Sometimes fileName is in a format with backslashes and sometimes slashes.
-	    	 * TODO: replace this hack with a general rule on how the file names should be passed.
+	    	 * TASK:SLASH: replace this hack with a general rule on how the file names should be passed.
 	    	 */
 	    	if (fileName.indexOf('\\') >= 0) {
 	    		try {

@@ -120,17 +120,6 @@ public class VDBTemplateMacro extends VDBFieldData implements Descriptable, Chan
 								 (visibility == InspectableProperty.NON_DEFAULT_VISIBLE && !hasDefaultValue));
 			if (oldVisible != newVisible)
 			{						 
-                // TODO:REM
-				/*
-				Template visualTemplate = (Template)Group.getRoot().findObject(templateInstance.getName(), true);
-				if (visualTemplate!=null) {
-					visualTemplate.fieldVisibilityChange(this, newVisible);
-				} else {
-					System.err.println("Warning: template instance '" + templateInstance.getName()
-							+ "' not found.");
-				}
-				*/
-
 				Template visualTemplate = templateInstance.getVisualTemplate();
 				if (visualTemplate != null) {
 					visualTemplate.fieldVisibilityChange(this, newVisible);
@@ -181,18 +170,6 @@ public class VDBTemplateMacro extends VDBFieldData implements Descriptable, Chan
 	 */
 	public void updateInspector()
 	{
-        // TODO:REM
-		/*
-		Template visualTemplate = (Template)Group.getRoot().findObject(templateInstance.getName(), true);
-		if (visualTemplate==null) {
-			System.err.println("Warning: template instance '" + templateInstance.getName()
-					+ "' not found.");
-			//com.cosylab.vdct.Console.getInstance().println("o) Internal error: no visual representaton of record "+getName()+" found.");
-			return;
-		}
-		InspectorManager.getInstance().updateProperty(visualTemplate, this);
-		*/
-		
 		Template visualTemplate = templateInstance.getVisualTemplate();
 		if (visualTemplate != null) {
 			InspectorManager.getInstance().updateProperty(visualTemplate, this);
@@ -300,17 +277,6 @@ public void setValue(java.lang.String newValue) {
 	Template visualTemplate = null;
 	if (oldVisible != newVisible)
 	{						 
-		// TODO:REM
-		/*
-		visualTemplate = (Template)Group.getRoot().findObject(templateInstance.getName(), true);
-		if (visualTemplate!=null) {
-			visualTemplate.fieldVisibilityChange(this, newVisible);
-		} else {
-			System.err.println("Warning: template instance '" + templateInstance.getName()
-					+ "' not found.");
-		}
-		*/
-
         visualTemplate = templateInstance.getVisualTemplate();
 		if (visualTemplate != null) {
 			visualTemplate.fieldVisibilityChange(this, newVisible);
@@ -319,17 +285,6 @@ public void setValue(java.lang.String newValue) {
 
 	// mapping to property 
 	updateProperty();
-
-	// TODO:REM
-	/*
-	if (visualTemplate==null)
-		visualTemplate = (Template)Group.getRoot().findObject(templateInstance.getName(), true);
-	if (visualTemplate!=null)
-	{
-		visualTemplate.fieldChanged(this);
-		InspectorManager.getInstance().updateProperty(visualTemplate, this);
-	}
-    */
 
 	// field changed
 	if (visualTemplate == null) {

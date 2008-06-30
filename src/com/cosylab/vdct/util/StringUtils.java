@@ -214,12 +214,12 @@ public static java.awt.Color string2color(String str) {
  * @return java.lang.String
  * @param str java.lang.String
  */
-// TODO implement more efficient algorithm
+// TASK:STRUTILOPT: implement more efficient algorithm
 public static String removeQuotesAndLineBreaks(String str) {
 	return str.replaceAll("\\\"", "\\\\\"").replaceAll("\\n", "\\\\n");
 }
 
-//TODO implement more efficient algorithm
+// TASK:STRUTILOPT: implement more efficient algorithm
 public static String substituteTabsAndNewLinesWithSpaces(String str) {
 	return str.replaceAll("\\t", " ").replaceAll("\\n", " ");
 }
@@ -229,7 +229,7 @@ public static String substituteTabsAndNewLinesWithSpaces(String str) {
  * @return java.lang.String
  * @param str java.lang.String
  */
-//TODO implement more efficient algorithm
+// TASK:STRUTILOPT: implement more efficient algorithm
 public static String removeQuotes(String str) {
 	if (str.indexOf('"')>=0)
 		str = str.replaceAll("\\\"", "\\\\\"");

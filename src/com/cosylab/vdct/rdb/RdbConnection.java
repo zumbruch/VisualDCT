@@ -46,6 +46,11 @@ public class RdbConnection {
 	private String database = null;
 	private Connection connection = null;
 	
+	private int selectCount = 0;
+	private int updateCount = 0;
+	private int insertCount = 0;
+	private int deleteCount = 0;
+	
 	public RdbConnection() throws Exception {
 		Class.forName("com.mysql.jdbc.Driver").newInstance();
 	}
@@ -175,57 +180,85 @@ public class RdbConnection {
         }
         PreparedStatement statement = connection.prepareStatement(sqlString);
         insertValues(statement, keyPairs[1]);
-        
-		return statement.executeQuery();
+        selectCount++;
+        return statement.executeQuery();
 	}
 	
 	private boolean isRowPresent(String table, Object[][] keyPairs) throws SQLException {
 		ResultSet set = loadRows(table, null, keyPairs);
-		return set.next(); 
+		return set.next();
 	}
 
-	public void saveRow(String table, Object[][] keyPairs, Object[][] valuePairs) throws SQLException {
-		saveRow(table, keyPairs, valuePairs, true);
+	// Performs insert.
+	public void insertRow(String table, Object[][] keyPairs, Object[][] valuePairs) throws SQLException {
+		int keyLen = keyPairs[1].length;
+		int valueLen = valuePairs[1].length;
+
+		String columnString = getList(keyPairs[0]) + (valueLen > 0 ?  "," + getList(valuePairs[0]) : "");
+		String valueString = getQuestionMarkList(keyLen + valueLen);
+		String sqlString = "INSERT INTO " + table
+		+ " (" + columnString + ") VALUES (" + valueString + ")";
+
+		PreparedStatement statement = connection.prepareStatement(sqlString);
+		insertValues(statement, keyPairs[1], valuePairs[1]);
+		statement.execute();
+		insertCount++;
 	}
 
-	/* Only saves data if the row doesn't exist yet.
-	 */
-	public void appendRow(String table, Object[][] keyPairs, Object[][] valuePairs) throws SQLException {
-		saveRow(table, keyPairs, valuePairs, false);
-	}
-	
-	private void saveRow(String table, Object[][] keyPairs, Object[][] valuePairs, boolean update) throws SQLException {
-		
-		boolean exists = isRowPresent(table, keyPairs);
-		if (!exists) {
-			int keyLen = keyPairs[1].length;
-			int valueLen = valuePairs[1].length;
-			
-			String columnString = getList(keyPairs[0]) + (valueLen > 0 ?  "," + getList(valuePairs[0]) : "");
-			String valueString = getQuestionMarkList(keyLen + valueLen);
-			String sqlString = "INSERT INTO " + table
-			      + " (" + columnString + ") VALUES (" + valueString + ")";
-			
-			PreparedStatement statement = connection.prepareStatement(sqlString);
-	        insertValues(statement, keyPairs[1], valuePairs[1]);
-	        
-	        statement.execute();
-		} else if (update && valuePairs[0].length > 0) {
+	// Performs update.
+	public void updateRow(String table, Object[][] keyPairs, Object[][] valuePairs) throws SQLException {
+		if (valuePairs[0].length > 0) {
 			String condition = getEqualityStatement(keyPairs[0]);
 			String setString = getEqualityList(valuePairs[0]);
 			String sqlString = "UPDATE " + table + " SET " + setString + " WHERE " + condition;
+
 			PreparedStatement statement = connection.prepareStatement(sqlString);
-	        insertValues(statement, valuePairs[1], keyPairs[1]);
-			
-	        statement.execute();
+			insertValues(statement, valuePairs[1], keyPairs[1]);
+			statement.execute();
+			updateCount++;
 		}
 	}
 
-	public void deleteRow(String table, Object[][] keyPairs) throws SQLException {
+	// Performs delete.
+	public void deleteRows(String table, Object[][] keyPairs) throws SQLException {
 		String sqlString = "DELETE FROM " + table + " WHERE " + getEqualityStatement(keyPairs[0]);
 		PreparedStatement statement = connection.prepareStatement(sqlString);
         insertValues(statement, keyPairs[1]);
 
         statement.execute();
+        deleteCount++;
+	}
+	
+	// Performs insert or update if the row already exist.
+	public void saveRow(String table, Object[][] keyPairs, Object[][] valuePairs) throws SQLException {
+		if (!isRowPresent(table, keyPairs)) {
+			insertRow(table, keyPairs, valuePairs);
+		} else {
+			updateRow(table, keyPairs, valuePairs);
+		}
+	}
+	
+	// Performs insert or does nothing if the row already exists.
+	public void appendRow(String table, Object[][] keyPairs, Object[][] valuePairs) throws SQLException {
+		if (!isRowPresent(table, keyPairs)) {
+			insertRow(table, keyPairs, valuePairs);
+		}
+	}
+	
+	public void displayStatistics() {
+		System.out.println("select statements " + selectCount);
+		System.out.println("update statements " + updateCount);
+		System.out.println("insert statements " + insertCount);
+		System.out.println("delete statements " + deleteCount);
+		System.out.println("total statements "
+				+ (selectCount + updateCount + insertCount + deleteCount)); 
+		System.out.println(); 
+	}
+	
+	public void resetStatistics() {
+		selectCount = 0;
+		updateCount = 0;
+		insertCount = 0;
+		deleteCount = 0;
 	}
 }

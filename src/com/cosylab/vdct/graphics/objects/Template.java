@@ -95,8 +95,7 @@ import com.cosylab.vdct.vdb.VDBTemplatePort;
  * Graphical representation of templates.
  * @author Matej
  */
-// TODO do not show hidden macros (with fields?) in properties or not?!
-// TODO make serialization of macro w/o vis. rep. work, but macro is defined only as visible object?!
+// TASK:MACROSER: make serialization of macro w/o vis. rep. work, but macro is defined only as visible object?!
 public class Template
 	extends LinkManagerObject
 	implements /*Descriptable,*/ Movable, Inspectable, Popupable, Flexible, Selectable,
@@ -1830,7 +1829,7 @@ public void writeObjects(DataOutputStream file, NamingContext context, boolean e
 	*/
 	//Map properties = prepareSubstitutions(getTemplateData(), namer.getSubstitutions(), null);
 	//Map ports = preparePorts(getTemplateData().getTemplate().getGroup(), properties, namer);
-	// TODO !!! some strange path could break this code 
+	// !!! some strange path could break this code 
 	
 	 // new removedPrefix
 	 //String removedPrefix = namer.getRemovedPrefix();
@@ -2281,7 +2280,7 @@ public boolean morph(String newType) {
 		return false;
 	
 	//	copies VDBData
-	VDBTemplateInstance templateInstance = vdbData.morphVDBTemplateInstance(templateData, type, getName());
+	VDBTemplateInstance templateInstance = vdbData.morphVDBTemplateInstance(getDsId(), templateData, type, getName());
 				
 	if (templateInstance==null) {
 		Console.getInstance().println("o) Interal error: failed to morph template "+getName()+" ("+getType()+")!");

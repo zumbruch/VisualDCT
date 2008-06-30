@@ -255,8 +255,20 @@ public class DSGUIInterface implements VDBInterface {
 	 * Creation date: (4.2.2001 15:32:01)
 	 */
 	public void copy() {
+
 		ViewState view = ViewState.getInstance(id);
-		copy(view.getSelectedObjects(), true);
+		
+		Vector objects = view.getSelectedObjects();
+
+		if (objects.size() == 0) {
+			return;
+		}
+		copy(objects);
+		copyContext.setPasteCount(0);
+		copyContext.setDoOffsetAtPaste(true);
+		
+		ViewState.getInstance(id).deselectAll();
+		drawingSurface.repaint();
 	}
 
 	/**
@@ -270,20 +282,11 @@ public class DSGUIInterface implements VDBInterface {
 		drawingSurface.repaint();
 	}
 
-
-	private void copy(Vector objects, boolean firstCopy) {
-
-		if (objects.size()==0) return;
+	private void copy(Vector objects) {
+		
 		Group.getClipboard().destroy();
 
 		ViewState view = ViewState.getInstance(id);
-		copyContext.getPasteNames().clear();
-		if (firstCopy) {
-			copyContext.getCopiedObjects().clear();
-			copyContext.setPasteCount(0);
-		} else {
-			copyContext.setPasteCount(copyContext.getPasteCount() + 1);
-		}
 
 		Object obj;
 		Enumeration selected = objects.elements();
@@ -295,32 +298,25 @@ public class DSGUIInterface implements VDBInterface {
 				minx = Math.min(minx, ((VisibleObject)obj).getX());
 				miny = Math.min(miny, ((VisibleObject)obj).getY());
 			}
-			if (firstCopy) 
-				copyContext.getCopiedObjects().add(obj);
 		}
 
 		// remember position for paste
 		copyContext.setDsId(id);
 		pasteX = minx - view.getRx() / view.getScale();
 		pasteY = miny - view.getRy() / view.getScale();
-		copyContext.setDoOffsetAtPaste(true);
 
 		selected = objects.elements();	
-
 		while (selected.hasMoreElements()) {
 			obj = selected.nextElement();
-			if (obj instanceof Flexible) {
+			if (obj instanceof Flexible && obj instanceof VisibleObject) {
 				Flexible copy = ((Flexible)obj).copyToGroup(Constants.DEFAULT_NAME, emptyString);
-				if (copy instanceof Movable)
+				if (copy instanceof Movable) {
 					((Movable)copy).move(-minx, -miny);
-
+				}
 			}
 		}
 		// fix links (due to order of copying links might not be validated...)
 		Group.getClipboard().manageLinks(true);
-		view.deselectAll();
-		drawingSurface.repaint();
-
 	}
 
 	public Box createBox()
@@ -478,53 +474,39 @@ public class DSGUIInterface implements VDBInterface {
 	 * Creation date: (4.2.2001 15:32:01)
 	 */
 	public void cut() {
+		
 		ViewState view = ViewState.getInstance(id);
 		//copyToSystemClipboard(view.getSelectedObjects());
 
-		if (view.getSelectedObjects().size()==0) return;
-		Group.getClipboard().destroy();
-
-		copyContext.getPasteNames().clear();
-		copyContext.getCopiedObjects().clear();
-
-		Object obj;
-		Enumeration selected = view.getSelectedObjects().elements();	
-
-		int minx=Integer.MAX_VALUE, miny=Integer.MAX_VALUE;
-		while (selected.hasMoreElements()) {
-			obj = selected.nextElement();
-			if (obj instanceof VisibleObject) {
-				minx = Math.min(minx, ((VisibleObject)obj).getX());
-				miny = Math.min(miny, ((VisibleObject)obj).getY());
-			}
-			copyContext.getCopiedObjects().add(obj);
+		Vector objects = view.getSelectedObjects();
+		if (objects.size() == 0) {
+			return;
 		}
+		
+		copy(objects);
 
-		// remember position for paste
-		copyContext.setDsId(id);
-		pasteX = minx - view.getRx() / view.getScale();
-		pasteY = miny - view.getRy() / view.getScale();
-		copyContext.setDoOffsetAtPaste(false);
+		try	{
+			UndoManager.getInstance(id).startMacroAction();
 
-		selected = view.getSelectedObjects().elements();
-		while (selected.hasMoreElements()) {
-			obj = selected.nextElement();
-			if (obj instanceof Flexible) {
-				Flexible flex = (Flexible)obj;
-				String oldGroup = Group.substractParentName(flex.getFlexibleName());
-				if (flex.moveToGroup(Constants.DEFAULT_NAME, emptyString))
-				{
-					copyContext.getPasteNames().add(oldGroup);
-					if (obj instanceof Movable)
-						//((Movable)obj).move(-view.getRx(), -view.getRy());
-						((Movable)obj).move(-minx, -miny);
+			Object obj = null;
+			Enumeration selected = objects.elements();
+			while (selected.hasMoreElements()) {
+				obj = selected.nextElement();
+				if (obj instanceof Flexible && obj instanceof VisibleObject) {
+					((VisibleObject)obj).destroy();
+					UndoManager.getInstance(id).addAction(new DeleteAction((VisibleObject)obj));
 				}
 			}
+		} catch (Exception exception) {
+			exception.printStackTrace();
+		} finally {
+			UndoManager.getInstance(id).stopMacroAction();
 		}
 
 		view.deselectAll();
+		view.deblinkAll();
 		view.setAsHilited(null);
-		drawingSurface.setModified(true);
+		copyContext.setDoOffsetAtPaste(false);
 		drawingSurface.repaint();
 	}
 
@@ -558,12 +540,8 @@ public class DSGUIInterface implements VDBInterface {
 
 			}
 
-		}
-		catch (Exception e)
-		{
-		}
-		finally
-		{
+		} catch (Exception e) {
+		} finally {
 			UndoManager.getInstance(id).stopMacroAction();
 		}
 
@@ -790,13 +768,8 @@ public class DSGUIInterface implements VDBInterface {
 		int size = group.getSubObjectsV().size();
 		Object sourceDsId = copyContext.getDsId();
 
-		// TODO:REM
-		System.out.println("Got here!" + id);
-
 		// If source of the data not set, treat as no data.
 		if (size == 0 || sourceDsId == null) {
-			// TODO:REM
-			System.out.println("Returning.");
 			return;
 		}
 
@@ -804,6 +777,7 @@ public class DSGUIInterface implements VDBInterface {
 		int pasteCount = copyContext.getPasteCount();
 		int posX = (int)((pX + view.getRx()) / scale) + pasteCount*Constants.MULTIPLE_PASTE_GAP;
 		int posY = (int)((pY + view.getRy()) / scale) + pasteCount*Constants.MULTIPLE_PASTE_GAP;
+		copyContext.setPasteCount(pasteCount + 1);
 
 		posX = posX <= 0 ? 0 : posX;
 		posX = posX >= view.getWidth() - group.getAbsoulteWidth() ? view.getWidth() - group.getAbsoulteWidth() : posX;
@@ -813,64 +787,30 @@ public class DSGUIInterface implements VDBInterface {
 		Object objs[] = new Object[size];
 		group.getSubObjectsV().copyInto(objs);
 
-		for(int i=0; i<size; i++) {
-			if (objs[i] instanceof Flexible)
-				view.setAsSelected((VisibleObject)objs[i]);
-		}
+		view.deselectAll();
+		
+		ComposedAction action = new ComposedAction();
 
-		boolean isCopy = copyContext.getPasteNames().size()!=size;
-		boolean betweenSurfaces = !id.equals(sourceDsId);
-
-		ComposedAction targetAction = new ComposedAction();
-		ComposedAction sourceAction = new ComposedAction(); 
-
-		Flexible flex; 
-		for(int i=0; i<size; i++) {
-			if (objs[i] instanceof Flexible) {
-				flex = (Flexible)objs[i];
-
-				if (flex.moveToGroup(id, currentGroupName)) {
-					// TODO:REM
-					System.out.println("moved!");
-					if (isCopy)
-						targetAction.addAction(new CreateAction((VisibleObject)objs[i]));		// if true ?!!!
-					else {
-						//System.out.println("Cut/paste:"+pasteNames.get(i).toString()+"->"+currentGroupName);
-
-
-						/* When cutting from one drawingsurface to another, store separate undo
-						 * actions for both undo managers.
-						 */
-						if (betweenSurfaces) {
-							sourceAction.addAction(new DeleteAction((VisibleObject)objs[i]));
-							targetAction.addAction(new CreateAction((VisibleObject)objs[i]));
-						} else {
-							targetAction.addAction(new MoveToGroupAction(flex, copyContext.getPasteNames().get(i).toString(), currentGroupName, id));
-						}
-					}
-
-					if (objs[i] instanceof Movable) {
-						//((Movable)objs[i]).move(view.getRx(), view.getRy());
-						((Movable)objs[i]).move(posX, posY);
-					}
-				} else {
-					view.deselectObject((VisibleObject)objs[i]);
-					// TODO:REM
-					System.out.println("couldn't move: " + objs[i] + "id: " + id );
+		Flexible flexible = null; 
+		Flexible copy = null;
+		for(int i = 0; i < size; i++) {
+			if (objs[i] instanceof Flexible && objs[i] instanceof VisibleObject) {
+				flexible = (Flexible)objs[i];
+				
+				copy = flexible.copyToGroup(id, currentGroupName);
+				action.addAction(new CreateAction((VisibleObject)copy));
+				if (copy instanceof Movable) {
+					((Movable)copy).move(posX, posY);
 				}
+				view.setAsSelected((VisibleObject)copy);
 			}
 		}
 
-		if (!targetAction.isEmpty()) {
-			UndoManager.getInstance(id).addAction(targetAction);
-		}
-		if (!sourceAction.isEmpty()) {
-			UndoManager.getInstance(sourceDsId).addAction(sourceAction);
+		if (!action.isEmpty()) {
+			UndoManager.getInstance(id).addAction(action);
 		}
 
 		drawingSurface.getViewGroup().manageLinks(true);
-		//recopy objects for multiple paste
-		copy(copyContext.getCopiedObjects(), false);
 		drawingSurface.repaint();
 	}
 	/**

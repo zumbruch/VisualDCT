@@ -233,8 +233,7 @@ public static VDBPort copyVDBPort(VDBPort source) {
  * @param dbd com.cosylab.vdct.dbd.DBDData
  * @param db com.cosylab.vdct.db.DBData
  */
-public static VDBData generateVDBData(Object dsId, DBDData dbd, DBData db,
-		boolean replaceDsInstance) {
+public static VDBData generateVDBData(Object dsId, DBDData dbd, DBData db) {
 	
 	if (dbd != null && db != null) {
 
@@ -242,16 +241,7 @@ public static VDBData generateVDBData(Object dsId, DBDData dbd, DBData db,
 		db.getTemplateData().setData(db);
 		
 		VDBData vdbData = new VDBData();
-		if (replaceDsInstance) {
-			if (instances.containsKey(dsId)) {
-				instances.remove(dsId);
-			}
-			instances.put(dsId, vdbData);
-		}
-		
-		// TODO:REM
-		System.out.println("Generating template for: " + db.getTemplateData().getFileName());
-		
+
 		vdbData.generateTemplate(dsId, dbd, db.getTemplateData());
 		return vdbData;
 	}
@@ -715,9 +705,9 @@ public static VDBRecordData morphVDBRecordData(Object dsId, DBDData dbd, VDBReco
 	return vdbRecord;
 }
 
-public VDBTemplateInstance morphVDBTemplateInstance(VDBTemplateInstance templateData, String templateType, String templateName) {
+public VDBTemplateInstance morphVDBTemplateInstance(Object dsId, VDBTemplateInstance templateData, String templateType, String templateName) {
 	
-	VDBTemplate template = (VDBTemplate)getTemplates().get(templateType);
+	VDBTemplate template = (VDBTemplate)VDBData.getInstance(dsId).getTemplates().get(templateType);
 	if (template==null) return null;
 	
 	VDBTemplateInstance ti = generateNewVDBTemplateInstance(templateName, template);
@@ -792,7 +782,17 @@ public void removeTemplateInstance(VDBTemplateInstance templateInstance) {
 	}
 	
 	public static VDBData getInstance(Object dsId) {
-	    return (VDBData)instances.get(dsId);
+
+		VDBData vdbData = (VDBData)instances.get(dsId);
+		if (vdbData == null) {
+			System.err.println("Warning: VDBData.getInstance: instance with id does not exist,"
+					+ " creating new one.");
+
+			vdbData = new VDBData();
+			instances.put(dsId, vdbData);
+		}
+		
+		return vdbData;
 	}
 
 	public static void registerDsListener() {

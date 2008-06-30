@@ -103,16 +103,6 @@ public void fieldValueChanged(VDBFieldData field) {
 		InspectorManager.getInstance().updateProperty(visualRecord, field);
 		visualRecord.fieldChanged(field);
 	}
-
-	// TODO:REM
-	/*
-	Record visualRecord = (Record)Group.getRoot().findObject(getName(), true);
-	if (visualRecord==null) {
-		System.err.println("Warning: record '" + getName() + "' not found.");
-		//com.cosylab.vdct.Console.getInstance().println("o) Internal error: no visual representaton of record "+getName()+" found.");
-		return;
-	}
-	*/
 }
 /**
  * Insert the method's description here.
@@ -174,16 +164,6 @@ public void setComment(java.lang.String newComment) {
 	if (visualObject != null) {
 		InspectorManager.getInstance().updateCommentProperty(visualObject);
 	}
-
-	// TODO:REM
-	/*
-	Inspectable visualObj = (Inspectable)Group.getRoot().findObject(getName(), true);
-	if (visualObj==null) {
-		System.err.println("Warning: record '" + getName() + "' not found.");
-		//com.cosylab.vdct.Console.getInstance().println("o) Internal error: no visual representaton of record "+getName()+" found.");
-		return;
-	}
-	*/
 }
 /**
  * Insert the method's description here.
@@ -212,7 +192,7 @@ public String toString() {
 
 public Record getRecord() {
 	if (record == null) {
-		// TODO:REACT
+		// TASK:VISREPACT: uncomment when done
 		//System.err.println("Warning: VDBRecordData.getRecord: returning null.");
 	}
 	return record;

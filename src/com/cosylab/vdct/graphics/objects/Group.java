@@ -2144,7 +2144,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 	 * Sets the editingTemplateData.
 	 * @param editingTemplateData The editingTemplateData to set
 	 */
-	public static void setEditingTemplateData(Object dsId, VDBTemplate editingTemplateData) {	
+	public static void setEditingTemplateData(Object dsId, VDBTemplate editingTemplateData) {
 		getRoot(dsId).setEditingTemplateData(editingTemplateData);
 	}
 
@@ -2260,7 +2260,18 @@ private void addSubObjectToLayout(VisibleObject object) {
 	}
 
 	public static Group getRoot(Object id) {
-		return (Group)rootGroups.get(id);
+		Group group = (Group)rootGroups.get(id);
+		if (group == null) {
+			System.err.println("Warning: Group.getRoot: instance with id does not exist,"
+					+ " creating new one.");
+
+			group = new Group(null);
+			group.setDsId(id);
+			group.setAbsoluteName("");
+			group.setLookupTable(new Hashtable());
+			rootGroups.put(id, group);
+		}
+		return group;
 	}
 
 	public static Vector getAllRoots() {
@@ -2307,15 +2318,9 @@ private void addSubObjectToLayout(VisibleObject object) {
 		group.setLookupTable(new Hashtable());
 
 		rootGroups.put(id, group);
-		// TODO:REM
-		System.out.println();
-		System.out.println("inserted: " + id);
-		System.out.println("content:");
 		Iterator iterator = rootGroups.values().iterator();
 		while (iterator.hasNext()) {
 			group = ((Group)iterator.next());
-			System.out.print("group: " + group.getDsId() + "dis:" + group.isDisposed());
-			System.out.println("eq to inserted: " + group.getDsId().equals(id));
 		}
 	}
 	public void onDsRemoved(Object id) {

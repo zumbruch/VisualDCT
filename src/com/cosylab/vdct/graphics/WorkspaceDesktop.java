@@ -29,16 +29,15 @@ package com.cosylab.vdct.graphics;
  */
 
 import java.awt.Component;
-import java.awt.FocusTraversalPolicy;
 import java.awt.Graphics;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.beans.PropertyVetoException;
 
 import javax.swing.JInternalFrame;
 
 import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.events.commands.NullCommand;
-import com.cosylab.vdct.rdb.RdbDataId;
 
 /**
  * Insert the type's description here.
@@ -67,7 +66,7 @@ implements ComponentListener, DesktopInterface {
     		if (component instanceof JInternalFrame) {
     			try {
     				((JInternalFrame)component).setSelected(true);
-    			} catch (java.beans.PropertyVetoException exception) {
+    			} catch (PropertyVetoException exception) {
     				// Nothing.
     			}
 			}
@@ -111,7 +110,7 @@ implements ComponentListener, DesktopInterface {
 	}
 
 	public void createNewInternalFrame() {
-		RdbDataId id = new RdbDataId();
+		Object id = new Object();
 		WorkspaceInternalFrame frame = new WorkspaceInternalFrame(id, drawingSurfaceManager);
 		frame.setVisible(true);
 		

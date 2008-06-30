@@ -487,7 +487,7 @@ protected void draw(Graphics g, boolean hilited) {
 				fd = (VDBFieldData) (e.nextElement());
 				val = fd.getName() + "=" + fd.getValue();
 				while (val.length() > 1 && (fm.stringWidth(val) + ox) > rwidth)
-					val = val.substring(0, val.length() - 2); // !!! TODO !!!
+					val = val.substring(0, val.length() - 2); // !!! 
 					
 				// make monitored fields visible
 				if (inDebugMode && fd.getVisibility() == InspectableProperty.ALWAYS_VISIBLE)
@@ -1307,11 +1307,9 @@ public boolean moveAsMuchAsPossibleTopUp(int dx, int dy) {
 public boolean moveToGroup(Object dsId, String group) {
 	String currentParent = Group.substractParentName(recordData.getName());
 	if (group.equals(currentParent) && dsId.equals(getDsId())) {
-		// TODO:REM
-		System.out.println("same dsid: " + dsId + " + group: " + currentParent);
 		return false;
 	}
-	
+
 	//String oldName = getName();
 	String newName;
 	if (group.equals(nullString))
@@ -1329,8 +1327,6 @@ public boolean moveToGroup(Object dsId, String group) {
 		{
 			recordData.setName(newName);
 			fixLinks();
-			// TODO:REM
-			System.out.println("same obj");
 			return true;
 		}
 		else
@@ -1339,10 +1335,46 @@ public boolean moveToGroup(Object dsId, String group) {
 			newName = StringUtils.incrementName(newName, Constants.MOVE_SUFFIX);
 		}
 	}
+	
+	// New functionality, not yet tested.
+	/*
+    String name = Group.substractObjectName(recordData.getName());
+	String oldGroup = Group.substractParentName(recordData.getName());
+    String newGroup = group;
 
+    if (!oldGroup.equals(nullString)) {
+    	oldGroup += Constants.GROUP_SEPARATOR;
+    }
+    if (!newGroup.equals(nullString)) {
+    	newGroup += Constants.GROUP_SEPARATOR;
+    }
+				  
+	System.out.println("From " + oldGroup + " to " + newGroup + "|" + name);
+    
+    boolean renameNeeded = false;
+	Object object = Group.getRoot(dsId).findObject(newGroup + name, true);
+	Object object2 = Group.getRoot(getDsId()).findObject(oldGroup + name, true);
+	System.out.println("Found: " + object + "||" + object2);
+	while ((object != null && object != this) || (object2 != null && object2 != this)) {
+		renameNeeded = true;
+		name = StringUtils.incrementName(name, Constants.MOVE_SUFFIX);
+		object = Group.getRoot(dsId).findObject(newGroup + name, true);
+		object2 = Group.getRoot(getDsId()).findObject(oldGroup + name, true);
+		System.out.println("Found: " + object + "||" + object2);
+	}
+	String newName = newGroup + name;
+
+	System.out.println("Result: " + newName);
+	
+	// it's me :) already moved, fix data
+	if (object == this) {
+		recordData.setName(newName);
+		fixLinks();
+		return true;
+	}
+	*/
+	
 	if (renameNeeded) {
-		// TODO:REM
-		System.out.println("rename: from "  + getName() + " to " + newName );
 		return rename(dsId, newName);
 	}
 	
@@ -1357,8 +1389,6 @@ public boolean moveToGroup(Object dsId, String group) {
 	fixLinks();
 	unconditionalValidation();
 
-	// TODO:REM
-	System.out.println("normal");
 	return true;
 }
 /**
@@ -1679,7 +1709,7 @@ protected void validate() {
 
   rheight = validateFont(scale, rwidth, rheight);
   // not navigator redraw (it should not fix height!!!)
-  // TODO hardcoded minumum scale!!!
+  // TASK:SCALING: hardcoded minumum scale!!!
   if (scale >= 0.2)
   {
 	  int height = (int) (rheight/scale);
@@ -1750,7 +1780,7 @@ private void validateDebug(VDBFieldData valField)
 			debugValueColor = Constants.LINE_COLOR;
 	}
 
-	// TODO for timestamp this could be optimized
+	// for timestamp this could be optimized
 	timestamp = valField.getDebugValueTimeStamp();
 	timestampFont = FontMetricsBuffer.getInstance().getAppropriateFont(
 					Constants.DEFAULT_FONT, Font.PLAIN, 
@@ -1875,7 +1905,7 @@ public void updateFields() {
 public void snapToGrid()
 {
 	int mx = x % Constants.GRID_SIZE;
-	// TODO za en piksel strize!!!
+	// TASK:SNAP: za en piksel strize!!!
 //	int my = (y+getHeight()) % Constants.GRID_SIZE;
 	int my = (getY()+getHeight()) % Constants.GRID_SIZE;
 	

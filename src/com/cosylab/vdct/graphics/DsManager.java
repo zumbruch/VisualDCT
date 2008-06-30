@@ -91,6 +91,9 @@ LinkCommandInterface, RepaintInterface, Pageable {
 		commandManager.addCommand("RepaintWorkspace", new RepaintCommand(this));
 		commandManager.addCommand("RepaintAllFrames", new RepaintCommand(this, true, false));
 		commandManager.addCommand("RepaintHighlighted", new RepaintCommand(this, false, true));
+	
+		DsListenerInitializer.registerDsManagerListeners();
+		createDummyDrawingSurface();			
 	}
 	
 	public static DrawingSurface getDrawingSurface() {
