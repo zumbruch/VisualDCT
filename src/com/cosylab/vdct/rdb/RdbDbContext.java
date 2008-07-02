@@ -92,7 +92,6 @@ public class RdbDbContext {
 		String fileName = dataId.getFileName();
 		DBData data = new DBData(new File(fileName).getName(), fileName);
 		DBTemplate template = data.getTemplateData();
-		template.setFileName(dataId.getFileName()); 
 		template.setVersion(dataId.getVersion()); 
 		template.setIoc(dataId.getIoc()); 
 		template.setDescription(dataId.getDescription()); 
@@ -566,8 +565,6 @@ public class RdbDbContext {
 			map = new HashMap();
 			while (fieldSet.next()) {
 				map.put(fieldSet.getString(2), new Integer(fieldSet.getInt(1)));
-				// TODO
-				System.out.println("def: " + fieldSet.getString(2) + ":" + fieldSet.getInt(1));
 			}
 			recordTypes.put(recType, map);
 		}

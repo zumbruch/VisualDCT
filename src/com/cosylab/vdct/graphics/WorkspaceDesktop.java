@@ -38,6 +38,7 @@ import javax.swing.JInternalFrame;
 
 import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.events.commands.NullCommand;
+import com.cosylab.vdct.events.commands.SetWorkspaceFile;
 
 /**
  * Insert the type's description here.
@@ -48,8 +49,7 @@ import com.cosylab.vdct.events.commands.NullCommand;
 public class WorkspaceDesktop extends DesktopPaneDecorator
 implements ComponentListener, DesktopInterface {
 
-	protected WorkspaceInternalFrame frame = null;
-	protected DsManagerInterface drawingSurfaceManager = null;
+	private DsManagerInterface drawingSurfaceManager = null;
 	
 	/**
 	 * VisualAge support
@@ -70,6 +70,14 @@ implements ComponentListener, DesktopInterface {
     				// Nothing.
     			}
 			}
+    	} else {
+    		SetWorkspaceFile command =
+    			(SetWorkspaceFile)CommandManager.getInstance().getCommand("SetFile");
+    		if (command != null) {
+    			command.setFile(null);
+    			command.setFilename("");
+    			command.execute();
+    		}
     	}
 	}
 
@@ -111,7 +119,7 @@ implements ComponentListener, DesktopInterface {
 
 	public void createNewInternalFrame() {
 		Object id = new Object();
-		WorkspaceInternalFrame frame = new WorkspaceInternalFrame(id, drawingSurfaceManager);
+		WorkspaceInternalFrame frame = new WorkspaceInternalFrame(id, this, drawingSurfaceManager);
 		frame.setVisible(true);
 		
 		add(frame);
@@ -123,6 +131,11 @@ implements ComponentListener, DesktopInterface {
 		frame.setLocation(32, 32);
 		frame.setSize(512,512);
 	}
+	
+	public void onInternalFrameClosed() {
+		selectFirstInternalFrame();
+	}
+
 	/**
 	 * Insert the method's description here.
 	 * Creation date: (11.12.2000 15:44:25)

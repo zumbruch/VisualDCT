@@ -272,4 +272,7 @@ void systemPaste();
 
 void reset();
 
+void close();
+void closeAll();
+
 }

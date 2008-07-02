@@ -26,14 +26,54 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.cosylab.vdct.graphics;
+package com.cosylab.vdct.events.commands;
+
+import javax.swing.JOptionPane;
+
+import com.cosylab.vdct.VisualDCT;
+import com.cosylab.vdct.events.Command;
+import com.cosylab.vdct.graphics.DrawingSurface;
+import com.cosylab.vdct.graphics.DsManager;
 
 /**
  * @author ssah
  *
  */
-public interface DesktopInterface {
+public class ShowModifiedDialog extends Command {
 
-	public void createNewInternalFrame();
-	public void onInternalFrameClosed();
+	private VisualDCT visualDCT = null;
+	private Object dsId = null;
+	private int selection = JOptionPane.DEFAULT_OPTION;
+
+	public ShowModifiedDialog(VisualDCT visualDCT) {
+		this.visualDCT = visualDCT;
+	}
+	
+	public void execute() {
+		DrawingSurface drawingSurface = DsManager.getDrawingSurface(dsId);
+		if (drawingSurface != null) {
+			if (drawingSurface.isModified()) {
+				selection = JOptionPane.showConfirmDialog(visualDCT, "The file has been"
+						+ " modified. Save changes?", drawingSurface.getTitle(),
+						JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+				if (selection == JOptionPane.YES_OPTION) {
+					if (!visualDCT.saveMenuItem_ActionPerformed()) {
+						selection = JOptionPane.CANCEL_OPTION;				
+					}
+				}
+			} else {
+				selection = JOptionPane.YES_OPTION;
+			}
+		} else {
+			selection = JOptionPane.CANCEL_OPTION;
+		}
+	}
+
+	public int getSelection() {
+		return selection;
+	}
+
+	public void setDsId(Object dsId) {
+		this.dsId = dsId;
+	}
 }

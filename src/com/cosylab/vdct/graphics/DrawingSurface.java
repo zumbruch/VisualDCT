@@ -299,6 +299,7 @@ MouseInputListener, Runnable, LinkCommandInterface {
 
 	private InternalFrameInterface displayer = null;
 	private int serialNumber = 0;
+	private String title = null;
 
 	/**
 	 * displayer can be null when no gui is linked to this. 
@@ -2263,7 +2264,8 @@ MouseInputListener, Runnable, LinkCommandInterface {
 			forceRedraw = true;
 			repaint();
 
-			updateFile(null);
+		    File file = template != null ? new File(template.getFileName()) : null;			    
+		    updateFile(file);
 			return true;
 			
 		} finally {
@@ -4316,10 +4318,20 @@ MouseInputListener, Runnable, LinkCommandInterface {
 
 	public void updateFile(File file) {
 		if (displayer != null) {
-			String title = file != null ? file.getAbsolutePath()
-					: untitledString + serialNumber;
+			title = file != null ? file.getAbsolutePath() : untitledString + serialNumber;
 			displayer.setFile(file, title);
 		}
+	}
+	
+	public String getTitle() {
+		return title;
+	}
+	
+	public boolean close() {
+		if (displayer != null) {
+			return displayer.onClose();
+		}
+		return false;
 	}
 }
 

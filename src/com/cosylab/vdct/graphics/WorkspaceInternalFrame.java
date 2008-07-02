@@ -28,10 +28,12 @@
 
 package com.cosylab.vdct.graphics;
 
+import java.beans.PropertyVetoException;
 import java.io.File;
 
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
+import javax.swing.JOptionPane;
 import javax.swing.WindowConstants;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
@@ -39,6 +41,7 @@ import javax.swing.event.InternalFrameListener;
 import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.events.MouseEventManager;
 import com.cosylab.vdct.events.commands.SetWorkspaceFile;
+import com.cosylab.vdct.events.commands.ShowModifiedDialog;
 
 /**
  * @author ssah
@@ -50,13 +53,15 @@ implements InternalFrameInterface, InternalFrameListener {
 	protected Object dsId = null; 
 	protected PanelDecorator contentPanel = null;
 	protected DsManagerInterface drawingSurfaceManager = null;
+	protected DesktopInterface desktop = null;
 	protected File file = null;
 
 	protected static final String defaultName = "Name";
 
-	public WorkspaceInternalFrame(Object dsId, DsManagerInterface drawingSurfaceManager) {
+	public WorkspaceInternalFrame(Object dsId, DesktopInterface desktop, DsManagerInterface drawingSurfaceManager) {
 		super(defaultName, true, true, true, true);
 		this.dsId = dsId;
+		this.desktop = desktop;
 		this.drawingSurfaceManager = drawingSurfaceManager;
 		contentPanel = new PanelDecorator();
 		/* First register the component, then create the drawing surface which adds listeners to
@@ -65,7 +70,7 @@ implements InternalFrameInterface, InternalFrameListener {
 		MouseEventManager.getInstance().registerSubscriber(
 				"WorkspaceInternalFrame:" + dsId.toString(), contentPanel);
 		contentPanel.setComponent(drawingSurfaceManager.addDrawingSurface(dsId, this));
-		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
 		addInternalFrameListener(this);
 
@@ -84,6 +89,23 @@ implements InternalFrameInterface, InternalFrameListener {
 		}
 	}
 
+	public boolean onClose() {
+		try {
+			setSelected(true);
+		} catch (PropertyVetoException e) {
+		}
+		
+		ShowModifiedDialog command = 
+			(ShowModifiedDialog)CommandManager.getInstance().getCommand("ShowModifiedDialog");
+		command.setDsId(dsId);
+		command.execute();
+		if (command.getSelection() != JOptionPane.CANCEL_OPTION) {
+			dispose();
+			return true;
+		}
+		return false;
+	}
+
 	public void internalFrameActivated(InternalFrameEvent e) {
 		drawingSurfaceManager.setFocusedDrawingSurface(dsId);
 		sendActiveGroupNotification();
@@ -96,9 +118,11 @@ implements InternalFrameInterface, InternalFrameListener {
 
 	public void internalFrameClosed(InternalFrameEvent e) {
 		drawingSurfaceManager.removeDrawingSurface(dsId);
+		desktop.onInternalFrameClosed();
 	}
 
 	public void internalFrameClosing(InternalFrameEvent e) {
+		onClose();
 	}
 	public void internalFrameDeiconified(InternalFrameEvent e) {
 	}
@@ -116,4 +140,5 @@ implements InternalFrameInterface, InternalFrameListener {
 			command.execute();
 		}
 	}
+	
 }

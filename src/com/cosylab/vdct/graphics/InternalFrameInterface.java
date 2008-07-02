@@ -36,4 +36,5 @@ public interface InternalFrameInterface {
 
 	public JComponent getDisplayingComponent();
 	public void setFile(File file, String title);
+	public boolean onClose();
 }

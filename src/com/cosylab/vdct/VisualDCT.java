@@ -102,6 +102,7 @@ import com.cosylab.vdct.events.commands.SetUndoMenuItemState;
 import com.cosylab.vdct.events.commands.SetWorkspaceFile;
 import com.cosylab.vdct.events.commands.SetWorkspaceGroup;
 import com.cosylab.vdct.events.commands.SetWorkspaceScale;
+import com.cosylab.vdct.events.commands.ShowModifiedDialog;
 import com.cosylab.vdct.events.commands.ShowMorphingDialog;
 import com.cosylab.vdct.events.commands.ShowNewDialog;
 import com.cosylab.vdct.events.commands.ShowRenameDialog;
@@ -179,6 +180,8 @@ public class VisualDCT extends JFrame {
 	private JButton ivjRedoButton = null;
 	private JMenuItem ivjRedoMenuItem = null;
 	private JMenuItem ivjSave_As_GroupMenuItem = null;
+	private JMenuItem closeMenuItem = null;
+	private JMenuItem closeAllMenuItem = null;
 	private JMenuItem ivjSave_AsMenuItem = null;
 	private JButton ivjSaveButton = null;
 	private JMenuItem ivjSaveMenuItem = null;
@@ -2773,6 +2776,8 @@ private javax.swing.JMenu getFileMenu() {
 			ivjFileMenu.add(getSave_AsMenuItem());
 			ivjFileMenu.add(getSave_As_GroupMenuItem());
 			//ivjFileMenu.add(getSaveAsTemplateMenuItem());
+			ivjFileMenu.add(getCloseMenuItem());
+			ivjFileMenu.add(getCloseAllMenuItem());
 			ivjFileMenu.add(getJSeparator11a());
 			ivjFileMenu.add(getGenerateMenuItem());
 			ivjFileMenu.add(getGenerateAsGroupMenuItem());
@@ -4634,6 +4639,9 @@ private javax.swing.JMenuItem getSave_As_GroupMenuItem() {
 	}
 	return ivjSave_As_GroupMenuItem;
 }
+
+
+
 /**
  * Return the Save_AsMenuItem property value.
  * @return javax.swing.JMenuItem
@@ -4655,6 +4663,47 @@ private javax.swing.JMenuItem getSave_AsMenuItem() {
 	}
 	return ivjSave_AsMenuItem;
 }
+
+private JMenuItem getCloseMenuItem() {
+	if (closeMenuItem == null) {
+		try {
+			closeMenuItem = new JMenuItem("Close");
+			closeMenuItem.setName("Close");
+			closeMenuItem.setMnemonic('C');
+			
+			closeMenuItem.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
+				 	cmd.getGUIMenuInterface().close();
+				}
+			});
+		} catch (Throwable ivjExc) {
+			handleException(ivjExc);
+		}
+	}
+	return closeMenuItem;
+}
+
+private JMenuItem getCloseAllMenuItem() {
+	if (closeAllMenuItem == null) {
+		try {
+			closeAllMenuItem = new JMenuItem("Close All");
+			closeAllMenuItem.setName("CloseAll");
+			closeAllMenuItem.setMnemonic('L');
+			
+			closeAllMenuItem.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
+				 	cmd.getGUIMenuInterface().closeAll();
+				}
+			});
+		} catch (Throwable ivjExc) {
+			handleException(ivjExc);
+		}
+	}
+	return closeAllMenuItem;
+}
+
 /**
  * Return the SaveButton property value.
  * @return javax.swing.JButton
@@ -4762,37 +4811,7 @@ private javax.swing.JMenuItem getRecentFilesMenuItem() {
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-
-					GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
-					if (cmd!=null && cmd.getGUIMenuInterface().isModified())
-					{
-					    int choice = JOptionPane.showConfirmDialog(VisualDCT.this, "The file has been modified. Save changes?", "Confirmation", 
-								JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
-					    switch(choice) {
-					    
-					    	case JOptionPane.NO_OPTION: {
-					    	    VisualDCT.this.openDB(e.getActionCommand());
-					    	    break;
-					    	}
-					    	
-					    	case JOptionPane.YES_OPTION: {
-					    	    saveMenuItem_ActionPerformed();
-					    	    VisualDCT.this.openDB(e.getActionCommand());
-					    	    break;
-					    	}
-					    	
-					    	default: {
-					    	    break;
-					    	}
-					    	    
-					    }
-					}
-					else
-					{
-						VisualDCT.this.openDB(e.getActionCommand());
-					}
-				
-
+					VisualDCT.this.openDB(e.getActionCommand());
 				}
 			}
 			ivjRecentFilesMenuItem.addActionListener(new OpenRecentFile());
@@ -6037,6 +6056,7 @@ private void initialize() {
 		CommandManager.getInstance().addCommand("SetGroup", new SetWorkspaceGroup(this));
 		CommandManager.getInstance().addCommand("UpdateLoadLabel", new UpdateLoadLabel(this));
 		CommandManager.getInstance().addCommand("SetDefaultFocus", new SetDefaultFocus(this));
+		CommandManager.getInstance().addCommand("ShowModifiedDialog", new ShowModifiedDialog(this));
 		// user code end
 		setName("VisualDCT");
 //		setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -6260,41 +6280,10 @@ public void windowsPanMenuItem_ItemStateChanged(java.awt.event.ItemEvent itemEve
  * Creation date: (3.2.2001 19:55:14)
  */
 public void newMenuItem_ActionPerformed() {
-	GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
-	if (cmd.getGUIMenuInterface().isModified())
-	{
-	    
-	    int choice = JOptionPane.showConfirmDialog(this, "The file has been modified. Save changes?", "Confirmation", 
-				JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
-	    switch(choice) {
-	    
-	    	case JOptionPane.NO_OPTION: {
-	    	    GetGUIInterface cmd2 = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
-	 			cmd2.getGUIMenuInterface().newCmd();
-				openedFile = null;
-				break;
-	    	}
-	    	
-	    	case JOptionPane.YES_OPTION: {
-	    	    saveMenuItem_ActionPerformed();
-	    	    GetGUIInterface cmd2 = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
-	 			cmd2.getGUIMenuInterface().newCmd();
-				openedFile = null;
-				break;
-	    	}
-    	
-	    	default: {
-	    	    break;
-	    	}
-	    	    
-	    }
-	}
-	else
-	{
-		GetGUIInterface cmd2 = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
- 		cmd2.getGUIMenuInterface().newCmd();
-		openedFile = null;
-	}
+	
+	GetGUIInterface cmd2 = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
+		cmd2.getGUIMenuInterface().newCmd();
+	openedFile = null;
 }
 /**
  * Comment
@@ -6577,30 +6566,6 @@ public boolean openDBD(String fileName, boolean allowDB) {
  * Comment
  */
 public void openMenuItem_ActionPerformed() {
-	GetGUIInterface cmd2 = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
-	if (cmd2.getGUIMenuInterface().isModified())
-	{
-	    
-	    int choice = JOptionPane.showConfirmDialog(this, "The file has been modified. Save changes?", "Confirmation", 
-				JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
-	    switch(choice) {
-	    
-	    	case JOptionPane.NO_OPTION: {
-	    	    break;
-	    	}
-	    	
-	    	case JOptionPane.YES_OPTION: {
-	    	    saveMenuItem_ActionPerformed();
-	    	    break;
-	    	}
-	    	
-	    	default: {
-	    	    return;
-	    	}
-	    	    
-	    }
-	}
-	
 	JFileChooser chooser = getfileChooser();
 	chooser.resetChoosableFileFilters();
 
@@ -7300,7 +7265,7 @@ public void generateAsGroupMenuItem_ActionPerformed() {
 /**
  * Comment
  */
-public void save_AsMenuItem_ActionPerformed() {
+public boolean save_AsMenuItem_ActionPerformed() {
 	JFileChooser chooser = getfileChooser();
 	UniversalFileFilter filter = new UniversalFileFilter(
 		new String[] {"db", "vdb"}, "EPICS DB files");
@@ -7317,7 +7282,7 @@ public void save_AsMenuItem_ActionPerformed() {
 		int retval = chooser.showSaveDialog(this);
 
 		if(retval == JFileChooser.CANCEL_OPTION)
-			return;
+			return false;
 			
 	    theFile = chooser.getSelectedFile();
 
@@ -7354,8 +7319,10 @@ public void save_AsMenuItem_ActionPerformed() {
 	 		Console.getInstance().println("o) Failed to save DB to file: '"
 	 			+ theFile.toString() + "'");
 		    Console.getInstance().println(e);
+		    return false;
 		}
 	}
+    return true;
 }
 /**
  * Comment
@@ -7476,13 +7443,12 @@ public void generateMenuItem_ActionPerformed() {
 /**
  * Comment
  */
-public void saveMenuItem_ActionPerformed() {
+public boolean saveMenuItem_ActionPerformed() {
 
 	// if no file is open -> saveAs
 	if (openedFile==null)
 	{
-		save_AsMenuItem_ActionPerformed();
-		return;
+		return save_AsMenuItem_ActionPerformed();
 	}
 		
 	GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
@@ -7491,7 +7457,9 @@ public void saveMenuItem_ActionPerformed() {
 	} catch (java.io.IOException e) {
  		Console.getInstance().println("o) Failed to save DB...");
 	    Console.getInstance().println(e);
+	    return false;
 	}
+	return true;
 }
 /**
  * Comment

@@ -727,4 +727,17 @@ LinkCommandInterface, RepaintInterface, Pageable {
 		}
 		throw new IndexOutOfBoundsException();
 	}
+	
+	public void close() {
+		if (dsInterface != null) {
+			dsInterface.getDrawingSurface().close();
+		}
+	}
+	public void closeAll() {
+		boolean confirmed = true;
+		Iterator iterator = getAllDrawingSurfaces().iterator();
+		while (iterator.hasNext() && confirmed) {
+			confirmed = ((DrawingSurface)iterator.next()).close();
+		}
+	}
 }
