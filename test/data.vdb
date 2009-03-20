@@ -165,17 +165,20 @@ record(ao, sds) {
 record(motor, Mottorrad) {
 }
 
+expand("template1.vdb", template15) {
+}
+
 #! Further lines contain data used by VisualDCT
-#! View(2066,2017,1.0)
-#! SpreadsheetView(R,"ai","Group","true",-1,RowOrder("SIML",0,"Descending"),Col("Name"),Col("Comment"),Col("DTYP"),Col("FLNK"),Col("SIML"),Col("SDIS"),Col("SDIS[2]"),Col("SDIS[3]>"),Col("TSEL"),Col("TSEL[2]"),Col("TSEL[3]>"),SplitCol("INP","Delimiter","\s+"),SplitCol("TSEL","Delimiter","\s+"),SplitCol("SDIS","Pattern","#(L\d+) (A\d+)[ ]*@(.*)"),RecentSplit("Delimiter","i"),RecentSplit("Pattern","#(L\d+) (A\d+)[ ]*@(.*)"))
-#! SpreadsheetView(T,"template1.vdb","Default view","true",-13434625,HiddenRow("template13"),SplitCol("macro2","Delimiter","a"),RecentSplit("Delimiter","a"),RecentSplit("Delimiter","\s+"))
-#! SpreadsheetView(T,"template2.vdb","Default view","true",-3355444,Col("Name"),Col("macro"),Col("Comment"),HiddenRow("template22"),HiddenRow("template23"))
-#! SpreadsheetView(R,"compress","DBD Order","false",-3368449,RowOrder("Name",0,"Ascending"),Col("Name"),Col("PHAS"),Col("TSEL"),Col("EVNT"),Col("Comment"),Col("DTYP"),Col("DISV"),Col("SDIS"),Col("DISS"),Col("PRIO"),Col("FLNK"),Col("VAL"),Col("INP"),Col("ALG"),Col("NSAM"),Col("N"),Col("IHIL"),Col("ILIL"),Col("HOPR"),Col("LOPR"),Col("PREC"),Col("EGU"),HiddenRow("Compress_number1"),HiddenRow("Compress_number4"),HiddenRow("Compress_number5"),HiddenRow("Compress_number6"),HiddenRow("Compress_number7"),SplitCol("Comment","Delimiter","\n+"),SplitCol("EVNT","Delimiter","\s+"),RecentSplit("Delimiter","\n+"))
-#! Record(Compress_number1,2040,2189,0,1,"Compress_number1")
+#! View(1936,1685,0.9)
+#! SpreadsheetView(T,"template1.vdb",ColumnOrder("Default view"),ShowAllRows("true"),BackgroundColor(-13434625),HiddenRow("template13"),SplitCol("macro2","Delimiter","a"),RecentSplit("Delimiter","a"),RecentSplit("Delimiter","\s+"))
+#! SpreadsheetView(R,"ai",ColumnOrder("Group"),ShowAllRows("true"),BackgroundColor(-1),RowOrder("SIML",0,"Descending"),Column("Name","false",0),Column("SDIS","false",5),Column("SIML","false",4),Column("TSEL[3]>","false",10),Column("SDIS[3]>","false",7),Column("DTYP","false",2),Column("FLNK","false",3),Column("Comment","false",1),Column("TSEL","false",8),Column("SDIS[2]","false",6),Column("TSEL[2]","false",9),SplitCol("INP","Delimiter","\s+"),SplitCol("TSEL","Delimiter","\s+"),SplitCol("SDIS","Pattern","#(L\d+) (A\d+)[ ]*@(.*)"),RecentSplit("Delimiter","i"),RecentSplit("Pattern","#(L\d+) (A\d+)[ ]*@(.*)"))
+#! SpreadsheetView(R,"compress",ColumnOrder("DBD Order"),ShowAllRows("false"),BackgroundColor(-3368449),RowOrder("Name",0,"Ascending"),Column("SDIS","false",7),Column("DTYP","false",5),Column("IHIL","false",16),Column("Comment","false",4),Column("FLNK","false",10),Column("EGU","false",21),Column("LOPR","false",19),Column("N","false",15),Column("PREC","false",20),Column("EVNT","false",3),Column("PRIO","false",9),Column("Name","false",0),Column("INP","false",12),Column("DISS","false",8),Column("VAL","false",11),Column("ILIL","false",17),Column("PHAS","false",1),Column("TSEL","false",2),Column("NSAM","false",14),Column("HOPR","false",18),Column("ALG","false",13),Column("DISV","false",6),HiddenRow("Compress_number1"),HiddenRow("Compress_number4"),HiddenRow("Compress_number5"),HiddenRow("Compress_number6"),HiddenRow("Compress_number7"),SplitCol("Comment","Delimiter","\n+"),SplitCol("EVNT","Delimiter","\s+"),RecentSplit("Delimiter","\n+"))
+#! SpreadsheetView(T,"template2.vdb",ColumnOrder("Default view"),ShowAllRows("true"),BackgroundColor(-3355444),Column("Name","false",0),Column("macro","false",1),Column("Comment","false",2),HiddenRow("template22"),HiddenRow("template23"))
+#! Record(Compress_number1,2040,2190,0,1,"Compress_number1")
 
 #! TemplateInstance("template12",2600,2200,0,"")
-#! TemplateField("template12","MacroForGroup",16777215,0,1)
 #! TemplateField("template12","Port1",16777215,0,1)
+#! TemplateField("template12","MacroForGroup",16777215,0,1)
 
 
 #! TemplateInstance("template22",2600,2500,0,"")
@@ -190,19 +193,19 @@ record(motor, Mottorrad) {
 
 
 #! TemplateInstance("template13",2080,2420,0,"")
-#! TemplateField("template13","MacroForGroup",16777215,0,1)
 #! TemplateField("template13","Port1",16777215,0,1)
+#! TemplateField("template13","MacroForGroup",16777215,0,1)
 
 
 #! TemplateInstance("template14",2340,2480,0,"")
 #! TemplateField("template14","Port1",16777215,0,1)
 #! TemplateField("template14","MacroForGroup",16777215,0,1)
 
-#! Record(NewAI2,2060,2673,0,1,"NewAI2")
+#! Record(NewAI2,2060,2674,0,1,"NewAI2")
 #! Record(NewAI3,2070,2659,0,1,"NewAI3")
 #! Field("NewAI3.SIML",16777215,1,"NewAI3.SIML")
-#! Record(NewAI4,2080,2693,0,1,"NewAI4")
-#! Record(NewAI0,2040,2653,0,1,"NewAI0")
+#! Record(NewAI4,2080,2694,0,1,"NewAI4")
+#! Record(NewAI0,2040,2654,0,1,"NewAI0")
 #! Record(NewAI12,2090,2679,0,1,"NewAI12")
 #! Field("NewAI12.SIML",16777215,1,"NewAI12.SIML")
 #! Record(NewAI15,2100,2685,0,1,"NewAI15")
@@ -210,14 +213,19 @@ record(motor, Mottorrad) {
 #! Record(NewAI18,2110,2727,0,1,"NewAI18")
 #! Record(NewAI21,2120,2719,0,1,"NewAI21")
 #! Field("NewAI21.SIML",16777215,1,"NewAI21.SIML")
-#! Record(NewAI24,2140,2673,0,1,"NewAI24")
-#! Record(NewAI27,2360,2733,0,1,"NewAI27")
+#! Record(NewAI24,2140,2674,0,1,"NewAI24")
+#! Record(NewAI27,2360,2734,0,1,"NewAI27")
 #! Visibility("NewAI27.INP",1)
-#! Record(Compress_number2,2060,2209,0,1,"Compress_number2")
-#! Record(Compress_number3,2070,2181,0,1,"Compress_number3")
-#! Record(Compress_number4,2080,2229,0,1,"Compress_number4")
-#! Record(Compress_number5,2090,2229,0,1,"Compress_number5")
-#! Record(Compress_number6,2100,2249,0,1,"Compress_number6")
-#! Record(Compress_number7,2110,2249,0,1,"Compress_number7")
-#! Record(sds,2680,2722,0,1,"sds")
-#! Record(Mottorrad,2860,2682,0,1,"Mottorrad")
+#! Record(Compress_number2,2060,2210,0,1,"Compress_number2")
+#! Record(Compress_number3,2070,2182,0,1,"Compress_number3")
+#! Record(Compress_number4,2080,2230,0,1,"Compress_number4")
+#! Record(Compress_number5,2090,2230,0,1,"Compress_number5")
+#! Record(Compress_number6,2100,2250,0,1,"Compress_number6")
+#! Record(Compress_number7,2110,2250,0,1,"Compress_number7")
+#! Record(sds,2680,2724,0,1,"sds")
+#! Record(Mottorrad,2860,2684,0,1,"Mottorrad")
+
+#! TemplateInstance("template15",2300,1940,0,"")
+#! TemplateField("template15","Port1",16777215,0,1)
+#! TemplateField("template15","MacroForGroup",16777215,0,1)
+

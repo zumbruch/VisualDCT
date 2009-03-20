@@ -53,6 +53,7 @@ import javax.swing.JOptionPane;
 
 import com.cosylab.vdct.Console;
 import com.cosylab.vdct.Constants;
+import com.cosylab.vdct.DataSynchronizer;
 import com.cosylab.vdct.Settings;
 import com.cosylab.vdct.db.DBResolver;
 import com.cosylab.vdct.events.CommandManager;
@@ -415,7 +416,9 @@ public class Template
 			validating = true;
 
 			  // template change check
-			  VDBTemplate tmpl = (VDBTemplate)VDBData.getInstance(getDsId()).getTemplates().get(getTemplateData().getTemplate().getId());		
+			  // TODO:REM
+			  //VDBTemplate tmpl = (VDBTemplate)VDBData.getInstance(getDsId()).getTemplates().get(getTemplateData().getTemplate().getId());		
+			  VDBTemplate tmpl = DataSynchronizer.getInstance().getTemplate(getDsId(), getTemplateData().getTemplate().getId());		
 			  if (tmpl!=getTemplateData().getTemplate())
 			  {
 			  	getTemplateData().setTemplate(tmpl);
