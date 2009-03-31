@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
+ * Copyright (c) 2009, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -28,52 +28,28 @@
 
 package com.cosylab.vdct.events.commands;
 
-import javax.swing.JOptionPane;
-
 import com.cosylab.vdct.VisualDCT;
 import com.cosylab.vdct.events.Command;
-import com.cosylab.vdct.graphics.DrawingSurface;
-import com.cosylab.vdct.graphics.DsManager;
 
 /**
  * @author ssah
  *
  */
-public class ShowModifiedDialog extends Command {
+public class SaveCommand extends Command {
 
-	private VisualDCT visualDCT = null;
-	private Object dsId = null;
-	private int selection = JOptionPane.DEFAULT_OPTION;
+	private VisualDCT visualDCT;
+	private boolean success;
 
-	public ShowModifiedDialog(VisualDCT visualDCT) {
-		this.visualDCT = visualDCT;
+	public SaveCommand(VisualDCT visualDCT) {
+		this.visualDCT=visualDCT;
+	}
+
+	public void execute() {
+		success = visualDCT.saveMenuItem_ActionPerformed();
 	}
 	
-	public void execute() {
-		DrawingSurface drawingSurface = DsManager.getDrawingSurface(dsId);
-		if (drawingSurface != null) {
-			if (drawingSurface.isModified()) {
-				selection = JOptionPane.showConfirmDialog(visualDCT, "The file has been"
-						+ " modified. Save changes?", drawingSurface.getTitle(),
-						JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
-				if (selection == JOptionPane.YES_OPTION) {
-					if (!visualDCT.saveMenuItem_ActionPerformed()) {
-						selection = JOptionPane.CANCEL_OPTION;				
-					}
-				}
-			} else {
-				selection = JOptionPane.YES_OPTION;
-			}
-		} else {
-			selection = JOptionPane.CANCEL_OPTION;
-		}
+	public boolean isSuccess() {
+		return success;
 	}
-
-	public int getSelection() {
-		return selection;
-	}
-
-	public void setDsId(Object dsId) {
-		this.dsId = dsId;
-	}
+	
 }

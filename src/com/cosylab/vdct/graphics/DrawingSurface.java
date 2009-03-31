@@ -78,6 +78,7 @@ import javax.swing.event.MouseInputListener;
 import com.cosylab.vdct.Console;
 import com.cosylab.vdct.Constants;
 import com.cosylab.vdct.DataProvider;
+import com.cosylab.vdct.DataSynchronizer;
 import com.cosylab.vdct.Settings;
 import com.cosylab.vdct.VisualDCT;
 import com.cosylab.vdct.db.DBBox;
@@ -159,7 +160,7 @@ import com.cosylab.vdct.vdb.VDBTemplatePort;
  * Creation date: (10.12.2000 13:19:16)
  * @author Matej Sekoranja
  */
-public final class DrawingSurface extends Decorator implements Pageable, Printable,
+public final class DrawingSurface extends Decorator implements DrawingSurfaceInterface, Pageable, Printable,
 MouseInputListener, Runnable, LinkCommandInterface {
 
 	class Hiliter extends Thread {
@@ -2171,10 +2172,6 @@ MouseInputListener, Runnable, LinkCommandInterface {
 
 				// found
 				if (template != null) {
-					if (Group.hasMacroPortsIDChanged(id)) {
-						JOptionPane.showMessageDialog(VisualDCT.getInstance(),
-								"Macros/Ports in this template have changed. \nReload and save files that include this template to apply changes.", "Template changed!", JOptionPane.WARNING_MESSAGE);
-					}
 					Group.setRoot(id, template.getGroup());
 					Group.setEditingTemplateData(id, template);
 					templateStack.push(template);
@@ -2200,7 +2197,7 @@ MouseInputListener, Runnable, LinkCommandInterface {
 			dbData = null;
 			System.gc();
 
-			if (file != null) {
+			if (file != null && !importDB && !importToCurrentGroup) {
 			    updateFile(file);
 			}
 			return true;
@@ -2243,10 +2240,6 @@ MouseInputListener, Runnable, LinkCommandInterface {
 
 			// found
 			if (template != null) {
-				if (Group.hasMacroPortsIDChanged(id)) {
-					JOptionPane.showMessageDialog(VisualDCT.getInstance(),
-							"Macros/Ports in this template have changed. \nReload and save files that include this template to apply changes.", "Template changed!", JOptionPane.WARNING_MESSAGE);
-				}
 				Group.setRoot(id, template.getGroup());
 				Group.setEditingTemplateData(id, template);
 				templateStack.push(template);
@@ -2497,7 +2490,7 @@ MouseInputListener, Runnable, LinkCommandInterface {
 
 					dbTemplate = (DBTemplateInstance)dbData.getTemplateInstances().get(vdbTemplate.getName());
 
-					VDBTemplate template = (VDBTemplate)VDBData.getInstance(dsId).getTemplates().get(dbTemplate.getTemplateId());
+					VDBTemplate template = DataSynchronizer.getInstance().getTemplate(dsId, dbTemplate.getTemplateId());
 					if (template==null)
 					{
 						/*// already issued
@@ -3791,7 +3784,8 @@ MouseInputListener, Runnable, LinkCommandInterface {
 	 * @param relative boolean
 	 */
 	public void createTemplateInstance(String name, String type, boolean relative) {
-		VDBTemplate template = (VDBTemplate)VDBData.getInstance(id).getTemplates().get(type);
+		
+		VDBTemplate template = DataSynchronizer.getInstance().getTemplate(id, type);
 		if (template==null)
 		{
 			com.cosylab.vdct.Console.getInstance().println(
@@ -3863,47 +3857,25 @@ MouseInputListener, Runnable, LinkCommandInterface {
 	public boolean prepareTemplateLeave()
 	{
 		/// !!! getInstance()
-		if (isModified())
-		{
-			if (templateStack.isEmpty())
-			{
+		if (isModified()) {
+			if (templateStack.isEmpty()) {
 				JOptionPane.showMessageDialog(VisualDCT.getInstance(), "The file has to be saved first...");
 				return false;
-			}
-			else {
-
-				int select = JOptionPane.showConfirmDialog(VisualDCT.getInstance(), "The file has been modified. Save changes?", "Confirmation", 
-						JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
-				switch(select) {
-
-				case JOptionPane.YES_OPTION: {
-					VisualDCT.getInstance().saveMenuItem_ActionPerformed();
-
-					break;
-				}
-
-				case JOptionPane.NO_OPTION: {
-
-					break;
-				}
-
-				default: {
+			} else {
+				if (!DataSynchronizer.getInstance().confirmFileClose(id, false)) {
 					return false;
 				}
-				}		
 			}
-
-
 		}
 
 		//template should be reloaded because user could save the template prior
 		//to ascending/descending into another level
-		if (isModified() || Group.hasMacroPortsIDChanged(id)) {
+		if (isModified() || isTemplateChanged()) {
 			VDBTemplate backup = (VDBTemplate)templateStack.pop();
 			// reload template
 			boolean ok = reloadTemplate(Group.getEditingTemplateData(id));
 			// push new
-			VDBTemplate reloaded = (VDBTemplate)VDBData.getInstance(id).getTemplates().get(backup.getId());
+			VDBTemplate reloaded = DataSynchronizer.getInstance().getTemplate(id, backup.getId());		
 
 			if (!ok || reloaded==null)
 			{
@@ -3953,10 +3925,8 @@ MouseInputListener, Runnable, LinkCommandInterface {
 
 		ViewState.getInstance(id).setAsHilited(null);
 
-		if (Group.hasMacroPortsIDChanged(id)) {
+		if (isTemplateChanged()) {
 			viewGroup.reset();
-			JOptionPane.showMessageDialog(VisualDCT.getInstance(),
-					"Macros/Ports in this template have changed. \nReload and save files that include this template to apply changes.", "Template changed!", JOptionPane.WARNING_MESSAGE);
 		}
 
 		viewStack.push(viewGroup);
@@ -3984,10 +3954,8 @@ MouseInputListener, Runnable, LinkCommandInterface {
 		if (!prepareTemplateLeave())
 			return;
 
-		if (Group.hasMacroPortsIDChanged(id)) {
+		if (isTemplateChanged()) {
 			viewGroup.reset();
-			JOptionPane.showMessageDialog(VisualDCT.getInstance(),
-					"Macros/Ports in this template have changed. \nReload and save files that include this template to apply changes.", "Template changed!", JOptionPane.WARNING_MESSAGE);
 		}
 
 		ViewState.getInstance(id).setAsHilited(null);
@@ -4332,6 +4300,16 @@ MouseInputListener, Runnable, LinkCommandInterface {
 			return displayer.onClose();
 		}
 		return false;
+	}
+	public InternalFrameInterface getDisplayer() {
+		return displayer;
+	}
+	public boolean isTemplateChanged() {
+		return Group.hasMacroPortsIDChanged(id);
+	}
+
+	public VDBTemplate getTemplate() {
+		return Group.getEditingTemplateData(id);
 	}
 }
 

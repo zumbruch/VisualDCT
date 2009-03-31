@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
+ * Copyright (c) 2009, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -29,13 +29,21 @@
 package com.cosylab.vdct.graphics;
 
 import java.io.File;
+import java.io.IOException;
 
-import javax.swing.JComponent;
+import com.cosylab.vdct.vdb.VDBTemplate;
 
-public interface InternalFrameInterface {
+/**
+ * @author ssah
+ *
+ */
+public interface DrawingSurfaceInterface {
 
-	public JComponent getDisplayingComponent();
-	public void setFile(File file, String title);
-	public boolean onClose();
-	public void setFocused();
+	public Object getDsId();
+	public boolean isModified();
+	public String getTitle();
+	public boolean reloadTemplate(VDBTemplate data);
+	public boolean open(File file, boolean importDB) throws IOException;
+	public boolean isTemplateChanged();
+	public VDBTemplate getTemplate();
 }

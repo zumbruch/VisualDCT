@@ -36,4 +36,5 @@ public interface DesktopInterface {
 
 	public void createNewInternalFrame();
 	public void onInternalFrameClosed();
+	public void setFocused(InternalFrameInterface frame);
 }

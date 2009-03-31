@@ -39,6 +39,8 @@ public class DBTemplate extends DBComment
 	protected String id = null;
 	protected String fileName = null;
 	protected String description = null;
+
+	protected long modificationTime = 0; 
 	
 	protected String version = null;
 	protected String ioc = null;
@@ -61,6 +63,7 @@ public class DBTemplate extends DBComment
 	{
 		this.id=id;
 		this.fileName=fileName;
+		modificationTime = 0;
 
 		ports = new Hashtable();
 		portsV = new Vector();
@@ -132,6 +135,20 @@ public class DBTemplate extends DBComment
 	public void setData(DBData data)
 	{
 		this.data = data;
+	}
+	
+	/**
+	 * @return the modificationTime
+	 */
+	public long getModificationTime() {
+		return modificationTime;
+	}
+
+	/**
+	 * @param modificationTime the modificationTime to set
+	 */
+	public void setModificationTime(long modificationTime) {
+		this.modificationTime = modificationTime;
 	}
 
 	/**

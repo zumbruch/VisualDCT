@@ -3,13 +3,6 @@
 
 1.1. code {13}
 
-  -uncommited changes dialogs {2}
-   -check all positions of warning dialogs
-   -all done except
-    -on close vdct
-     -warn as on close all
-     -warn also about changed templates
-
   -refreshing workspace data {1}
    -refreshing magnification slider at switching ds
    -refresh template desc at window focus change/close/new
@@ -37,16 +30,6 @@
 
   -enable cut/copy/pasting macros/ports in/between templates {2}
    -if difficult this can be skipped
-
-
-  -minor improvements {3}
-   -repair shift+up action key {1}
-    -does not focus correctly sometimes
-
-   -pasting always relative to the prev paste, position {1}
-    -on separate ds copy:
-     -position of the first record should be in the view centre
-    -on cut on the same ds first same pos, then offsets
 
    -trivial ones {1}
     -position management: displace at each new frame

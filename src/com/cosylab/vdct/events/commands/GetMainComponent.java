@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
+ * Copyright (c) 2009, Cosylab, Ltd., Control System Laboratory, www.cosylab.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -26,16 +26,28 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.cosylab.vdct.graphics;
+package com.cosylab.vdct.events.commands;
 
-import java.io.File;
+import java.awt.Component;
 
-import javax.swing.JComponent;
+import com.cosylab.vdct.events.Command;
 
-public interface InternalFrameInterface {
+/**
+ * @author ssah
+ *
+ */
+public class GetMainComponent extends Command {
 
-	public JComponent getDisplayingComponent();
-	public void setFile(File file, String title);
-	public boolean onClose();
-	public void setFocused();
+	private Component component;
+
+	public GetMainComponent(Component component) {
+		this.component = component;
+	}
+
+	public void execute() {
+	}
+
+	public Component getComponent() {
+		return component;
+	}
 }

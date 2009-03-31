@@ -38,6 +38,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowEvent;
 import java.awt.print.PageFormat;
 import java.awt.print.Paper;
 import java.awt.print.PrinterException;
@@ -92,9 +93,11 @@ import com.cosylab.vdct.about.VisualDCTAboutDialogEngine;
 import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.events.KeyEventManager;
 import com.cosylab.vdct.events.commands.GetGUIInterface;
+import com.cosylab.vdct.events.commands.GetMainComponent;
 import com.cosylab.vdct.events.commands.GetPrintableInterface;
 import com.cosylab.vdct.events.commands.GetVDBManager;
 import com.cosylab.vdct.events.commands.NullCommand;
+import com.cosylab.vdct.events.commands.SaveCommand;
 import com.cosylab.vdct.events.commands.SetCursorCommand;
 import com.cosylab.vdct.events.commands.SetDefaultFocus;
 import com.cosylab.vdct.events.commands.SetRedoMenuItemState;
@@ -102,7 +105,6 @@ import com.cosylab.vdct.events.commands.SetUndoMenuItemState;
 import com.cosylab.vdct.events.commands.SetWorkspaceFile;
 import com.cosylab.vdct.events.commands.SetWorkspaceGroup;
 import com.cosylab.vdct.events.commands.SetWorkspaceScale;
-import com.cosylab.vdct.events.commands.ShowModifiedDialog;
 import com.cosylab.vdct.events.commands.ShowMorphingDialog;
 import com.cosylab.vdct.events.commands.ShowNewDialog;
 import com.cosylab.vdct.events.commands.ShowRenameDialog;
@@ -1839,66 +1841,8 @@ public void deleteMenuItem_ActionPerformed() {
  * Comment
  */
 public void exitMenuItem_ActionPerformed() {
-
-	GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
-	if (cmd!=null)
-	{
-		Settings.getInstance().save();
-		if (cmd.getGUIMenuInterface().isModified())
-		{
-		    int choice = JOptionPane.showConfirmDialog(this, "The file has been modified. Save changes?", "Confirmation", 
-					JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
-		    switch(choice) {
-
-		    	case JOptionPane.NO_OPTION: {
-		    	    if (cmd.getGUIMenuInterface().isMacroPortsIDChanged()) {
-		    	        int check = JOptionPane.showConfirmDialog(VisualDCT.getInstance(),
-		    	                "Macros/Ports in this template have changed. \nReload and save files that include this template to apply changes. \nAre you sure you want to exit VisualDCT?", "Template changed!",
-		    	                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-		    	        if (check == JOptionPane.NO_OPTION) {
-		    	            return;
-		    	        }
-		    	    }
-		    	    this.dispose();
-		    	    break;
-		    	}
-		    	
-		    	case JOptionPane.YES_OPTION: {
-		    	    saveMenuItem_ActionPerformed();
-		    	    if (cmd.getGUIMenuInterface().isMacroPortsIDChanged()) {
-		    	        int check = JOptionPane.showConfirmDialog(VisualDCT.getInstance(),
-		    	                "Macros/Ports in this template have changed. \nReload and save files that include this template to apply changes. \nAre you sure you want to exit VisualDCT?", "Template changed!",
-		    	                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-		    	        if (check == JOptionPane.NO_OPTION) {
-		    	            return;
-		    	        }
-		    	    }
-		    	    this.dispose();
-		    	    break;
-		    	}
-		    	
-		    	default: {
-		    	    break;
-		    	}
-		    	    
-		    }
-		}
-		else
-		{
-		    if (cmd.getGUIMenuInterface().isMacroPortsIDChanged()) {
-    	        int check = JOptionPane.showConfirmDialog(VisualDCT.getInstance(),
-    	                "Macros/Ports in this template have changed. \nReload and save files that include this template to apply changes. \nAre you sure you want to exit VisualDCT?", "Template changed!",
-    	                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-    	        if (check == JOptionPane.NO_OPTION) {
-    	            return;
-    	        }
-    	    }
-			this.dispose();
-		}
-	}
-	else
-	{
-		this.dispose();
+	if (DataSynchronizer.getInstance().confirmFileClose(null, true)) {
+	    this.dispose();
 	}
 }
 /**
@@ -6056,7 +6000,8 @@ private void initialize() {
 		CommandManager.getInstance().addCommand("SetGroup", new SetWorkspaceGroup(this));
 		CommandManager.getInstance().addCommand("UpdateLoadLabel", new UpdateLoadLabel(this));
 		CommandManager.getInstance().addCommand("SetDefaultFocus", new SetDefaultFocus(this));
-		CommandManager.getInstance().addCommand("ShowModifiedDialog", new ShowModifiedDialog(this));
+		CommandManager.getInstance().addCommand("SaveCommand", new SaveCommand(this));
+		CommandManager.getInstance().addCommand("GetMainComponent", new GetMainComponent(this));
 		// user code end
 		setName("VisualDCT");
 //		setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -6219,6 +6164,12 @@ public static void main(final java.lang.String[] args) {
 
 		/* Add a windowListener for the windowClosedEvent */
 		aVisualDCT.addWindowListener(new java.awt.event.WindowAdapter() {
+			
+			public void windowActivated(WindowEvent arg0) {
+				super.windowActivated(arg0);
+				DataSynchronizer.getInstance().checkFilesystemChanges(null);
+			}
+
 			public void windowClosing(java.awt.event.WindowEvent e) {
 				aVisualDCT.exitMenuItem_ActionPerformed();
 			};

@@ -40,6 +40,7 @@ import java.util.Vector;
 import javax.swing.JFrame;
 
 import com.cosylab.vdct.Constants;
+import com.cosylab.vdct.DataSynchronizer;
 import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.events.commands.GetDsManager;
 import com.cosylab.vdct.events.commands.GetGUIInterface;
@@ -148,6 +149,10 @@ LinkCommandInterface, RepaintInterface, Pageable {
 		return drawingSurface;
 	}
 
+	public DrawingSurfaceInterface getDrawingSurfaceById(Object id) {
+		return getDrawingSurface(id);
+	}
+
 	public void removeDrawingSurface(Object id) {
 		DrawingSurface drawingSurface = getDrawingSurface(id);
 		if (drawingSurface != null) {
@@ -174,12 +179,24 @@ LinkCommandInterface, RepaintInterface, Pageable {
 				while (iterator.hasNext()) {
 					((DsEventListener)iterator.next()).onDsFocused(id);
 				}
+				
+				desktopInterface.setFocused(drawingSurface.getDisplayer());
 			} else {
 				dsInterface = null;
 			}
+
+		    // check the filesystem changes when a frame gets focus 
+			DataSynchronizer.getInstance().checkFilesystemChanges(null);
 		} else {
 			dsInterface = null;
 		}
+	}
+
+	public DrawingSurfaceInterface[] getDrawingSurfaces() {
+		Vector vector = getAllDrawingSurfaces();
+		DrawingSurfaceInterface[] array = new DrawingSurfaceInterface[vector.size()];
+		vector.copyInto(array);
+		return array;
 	}
 
 	public void addDsEventListener(DsEventListener listener) {
@@ -532,6 +549,7 @@ LinkCommandInterface, RepaintInterface, Pageable {
 	public void save(File file) throws IOException {
 		if (dsInterface != null) {
 			dsInterface.save(file);
+			DataSynchronizer.getInstance().checkFilesystemChanges(dsInterface.getDsId());
 		}
 	}
 
@@ -541,6 +559,7 @@ LinkCommandInterface, RepaintInterface, Pageable {
 	public void saveAsGroup(File file) throws IOException {
 		if (dsInterface != null) {
 			dsInterface.saveAsGroup(file);
+			DataSynchronizer.getInstance().checkFilesystemChanges(dsInterface.getDsId());
 		}
 	}
 
@@ -730,14 +749,17 @@ LinkCommandInterface, RepaintInterface, Pageable {
 	
 	public void close() {
 		if (dsInterface != null) {
-			dsInterface.getDrawingSurface().close();
+			if (DataSynchronizer.getInstance().confirmFileClose(dsInterface.getDsId(), false)) {
+    			dsInterface.getDrawingSurface().close();
+			}
 		}
 	}
 	public void closeAll() {
-		boolean confirmed = true;
-		Iterator iterator = getAllDrawingSurfaces().iterator();
-		while (iterator.hasNext() && confirmed) {
-			confirmed = ((DrawingSurface)iterator.next()).close();
+		if (DataSynchronizer.getInstance().confirmFileClose(null, false)) {
+			Iterator iterator = getAllDrawingSurfaces().iterator();
+			while (iterator.hasNext()) {
+				((DrawingSurface)iterator.next()).close();
+			}
 		}
 	}
 }

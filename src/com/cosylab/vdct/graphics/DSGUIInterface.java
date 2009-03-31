@@ -972,6 +972,8 @@ public class DSGUIInterface implements VDBInterface {
 		// possibly fix current id (basename) and path
 		updateEditingTemplate(file.getName(), file.getAbsolutePath(), null, null, null);
 
+		Group.getEditingTemplateData(id).setModificationTime(file.lastModified());
+
 		// if ok
 		drawingSurface.setModified(false);
 		UndoManager.getInstance(id).prepareAfterSaving();
@@ -1276,5 +1278,11 @@ public class DSGUIInterface implements VDBInterface {
 		if (description != null) {
 			data.setDescription(description);
 		}
+	}
+	/**
+	 * @return the id
+	 */
+	public Object getDsId() {
+		return id;
 	}
 }

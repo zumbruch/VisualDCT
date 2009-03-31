@@ -35,6 +35,7 @@ import java.util.Vector;
 
 import com.cosylab.vdct.Console;
 import com.cosylab.vdct.Constants;
+import com.cosylab.vdct.DataSynchronizer;
 import com.cosylab.vdct.db.DBData;
 import com.cosylab.vdct.db.DBEntry;
 import com.cosylab.vdct.db.DBException;
@@ -113,9 +114,12 @@ public void addEntry(DBEntry ed) {
  * @param 
  */
 public void addTemplate(VDBTemplate templ) {
-	if (templ!=null)
-		if (!templates.containsKey(templ.getId()))
-			templates.put(templ.getId(), templ);
+	if (templ != null && templ.getId() != null) {
+		if (templates.containsKey(templ.getId())) {
+			templates.remove(templ.getId());
+		}
+		templates.put(templ.getId(), templ);
+	}
 }
 
 /**
@@ -305,7 +309,8 @@ public static void generateRecords(Object dsId, DBDData dbd, DBData db, VDBData 
 
 public VDBTemplateInstance generateVDBTemplateInstance(Object dsId, DBTemplateInstance dbTemplateInstance)
 {
-	VDBTemplate t = (VDBTemplate)VDBData.getInstance(dsId).getTemplates().get(dbTemplateInstance.getTemplateId());
+	VDBTemplate t = DataSynchronizer.getInstance().getTemplate(dsId, dbTemplateInstance.getTemplateId());
+	
 	if (t==null)
 	{
 		Console.getInstance().println(
@@ -360,6 +365,7 @@ private void generateTemplate(Object dsId, DBDData dbd, DBTemplate dbTemplate)
 	VDBTemplate vt = new VDBTemplate(dbTemplate.getId(), dbTemplate.getFileName());
 	vt.setComment(dbTemplate.getComment());	
 	vt.setDescription(dbTemplate.getDescription());
+	vt.setModificationTime(dbTemplate.getModificationTime());
 	vt.setVersion(dbTemplate.getVersion());
 	vt.setIoc(dbTemplate.getIoc());
 	
@@ -707,7 +713,7 @@ public static VDBRecordData morphVDBRecordData(Object dsId, DBDData dbd, VDBReco
 
 public VDBTemplateInstance morphVDBTemplateInstance(Object dsId, VDBTemplateInstance templateData, String templateType, String templateName) {
 	
-	VDBTemplate template = (VDBTemplate)VDBData.getInstance(dsId).getTemplates().get(templateType);
+    VDBTemplate template = DataSynchronizer.getInstance().getTemplate(dsId, templateType);		
 	if (template==null) return null;
 	
 	VDBTemplateInstance ti = generateNewVDBTemplateInstance(templateName, template);

@@ -28,13 +28,20 @@
 
 package com.cosylab.vdct;
 
+import java.awt.Component;
 import java.io.File;
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.Vector;
 
-import com.cosylab.vdct.graphics.DrawingSurface;
-import com.cosylab.vdct.graphics.DsManager;
-import com.cosylab.vdct.graphics.objects.Group;
+import javax.swing.JOptionPane;
+
+import com.cosylab.vdct.events.CommandManager;
+import com.cosylab.vdct.events.commands.GetDsManager;
+import com.cosylab.vdct.events.commands.GetMainComponent;
+import com.cosylab.vdct.events.commands.SaveCommand;
+import com.cosylab.vdct.graphics.DrawingSurfaceInterface;
+import com.cosylab.vdct.graphics.DsManagerInterface;
 import com.cosylab.vdct.vdb.VDBData;
 import com.cosylab.vdct.vdb.VDBTemplate;
 
@@ -45,7 +52,9 @@ import com.cosylab.vdct.vdb.VDBTemplate;
 public class DataSynchronizer {
 
 	private static DataSynchronizer instance = null;
-	
+	private Component dialogParent = null;
+	private DsManagerInterface dsManager = null;
+
 	public static DataSynchronizer getInstance() {
 		if (instance == null) {
 			instance = new DataSynchronizer();
@@ -53,21 +62,26 @@ public class DataSynchronizer {
 		return instance;
 	}
 
+	public DataSynchronizer() {
+		super();
+		dialogParent = ((GetMainComponent)CommandManager.getInstance().getCommand("GetMainComponent")).getComponent();
+		dsManager = ((GetDsManager)CommandManager.getInstance().getCommand("GetDsManager")).getManager();
+	}
+
 	public VDBTemplate getTemplate(Object dsId, String templateId) {
-		
+
 		VDBTemplate template = (VDBTemplate)VDBData.getInstance(dsId).getTemplates().get(templateId);
 		if (template == null) {
 			// Try to find template in another drawing surface.
-			Enumeration drawingSurfaces = DsManager.getAllDrawingSurfaces().elements();
-			while (drawingSurfaces.hasMoreElements() && template == null) {
-				Object sourceTemplateDsId = ((DrawingSurface)drawingSurfaces.nextElement()).getDsId();
-				template = (VDBTemplate)VDBData.getInstance(sourceTemplateDsId).getTemplates().get(templateId);
+			DrawingSurfaceInterface[] surfaces = dsManager.getDrawingSurfaces();
+			for (int i = 0; i < surfaces.length && template == null; i++) {
+				template = (VDBTemplate)VDBData.getInstance(surfaces[i].getDsId()).getTemplates().get(templateId);
 			}
 			if (template != null) {
 				File file = new File(template.getFileName());
 				boolean loadSuccessful = false;
 				try {
-					loadSuccessful = DsManager.getDrawingSurface(dsId).open(file, true);
+					loadSuccessful = dsManager.getDrawingSurfaceById(dsId).open(file, true);
 				} catch (Exception exception) {
 					Console.getInstance().println("Failed to load template file '" + template.getFileName() + "'.");	
 				}
@@ -80,5 +94,142 @@ public class DataSynchronizer {
 			Console.getInstance().println("Could not load template '" + templateId + "'.");
 		}
 		return template;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.DataSynchronizerInterface#confirmWithUnsavedChanges(java.lang.Object)
+	 */
+	/* (non-Javadoc)
+	 * @see com.cosylab.vdct.DataSynchronizerInterface#confirmWithUnsavedChanges(java.lang.Object)
+	 */
+	public boolean confirmFileClose(Object dsId, boolean exit) {
+		boolean confirmed = true;
+		if (dsId != null) {
+			if (confirmUnsavedChangesDialog(dsManager.getDrawingSurfaceById(dsId))) {
+				showChangedMacrosPortsDialog(dsId);
+			} else {
+				confirmed = false;
+			}
+		} else {
+			DrawingSurfaceInterface[] surfaces = dsManager.getDrawingSurfaces();
+			for (int i = 0; i < surfaces.length && confirmed; i++) {
+				confirmed = confirmUnsavedChangesDialog(surfaces[i]);
+			}
+
+			if (confirmed) {
+				surfaces = dsManager.getDrawingSurfaces();
+				String changedTemplateTitles = new String();
+				for (int i = 0; i < surfaces.length && confirmed; i++) {
+					if (surfaces[i].isTemplateChanged()) {
+						changedTemplateTitles = changedTemplateTitles + surfaces[i].getTitle() + "\n";
+					}
+				}
+
+				if (changedTemplateTitles.length() > 0) {
+					String description = "Macros and/or ports in the following templates have changed.\n" + changedTemplateTitles + "Reload and save files that include these templates to apply changes.";
+					String title = "Templates changed!";
+
+					if (exit) {
+						int selection = JOptionPane.showConfirmDialog(
+								dialogParent,
+								description + "\n\nAre you sure you want to exit VisualDCT?\n",
+								title, JOptionPane.YES_NO_OPTION,
+								JOptionPane.WARNING_MESSAGE);
+						confirmed = selection == JOptionPane.YES_OPTION;
+					} else {
+						JOptionPane.showMessageDialog(dialogParent,
+								description, title, JOptionPane.WARNING_MESSAGE);
+					} 
+				}
+			}
+		}
+		return confirmed;
+	}
+
+	public void checkFilesystemChanges(Object dsId) {
+
+		VDBTemplate template = null; 
+
+		if (dsId != null) {
+			template = dsManager.getDrawingSurfaceById(dsId).getTemplate();
+		}
+
+		DrawingSurfaceInterface[] surfaces = dsManager.getDrawingSurfaces();
+		for (int i = 0; i < surfaces.length; i++) {
+			Object id = surfaces[i].getDsId();
+			template = dsManager.getDrawingSurfaceById(id).getTemplate();
+
+			if (template != null && newerFileExists(template)) {
+				dsManager.setFocusedDrawingSurface(id);
+				int selection = JOptionPane.showConfirmDialog(dialogParent,
+						"There is a newer file on the file system. Reload?",
+						surfaces[i].getTitle(), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+				if (selection == JOptionPane.YES_OPTION) {
+					String fileName = template.getFileName();
+					boolean success = false;
+					try {
+						success = surfaces[i].open(new File(fileName), false);
+					} catch (IOException exception) {
+						Console.getInstance().println(exception);
+					}
+					if (!success) {
+						Console.getInstance().println("Failed to reload '" + fileName + "'.");
+					}
+				}
+			}
+
+			Vector templatesVector = new Vector(VDBData.getInstance(id).getTemplates().values());
+			Iterator templatesIterator = templatesVector.iterator();
+			while (templatesIterator.hasNext()) {
+				template = (VDBTemplate)templatesIterator.next();
+				if (newerFileExists(template)) {
+					surfaces[i].reloadTemplate(template);
+				}
+			}
+		}
+	}
+
+	private boolean confirmUnsavedChangesDialog(DrawingSurfaceInterface drawingSurface) {
+
+		boolean confirmed = true;
+
+		if (drawingSurface != null && drawingSurface.isModified()) {
+			dsManager.setFocusedDrawingSurface(drawingSurface.getDsId());
+			int selection = JOptionPane.showConfirmDialog(dialogParent, "The file has been modified. Save changes?",
+					drawingSurface.getTitle(), JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+			confirmed = selection != JOptionPane.YES_OPTION;
+
+			if (selection == JOptionPane.YES_OPTION) {
+
+				dialogParent = ((GetMainComponent)CommandManager.getInstance().getCommand("GetMainComponent")).getComponent();
+
+				SaveCommand saveCommand = (SaveCommand)CommandManager.getInstance().getCommand("SaveCommand");
+				saveCommand.execute();
+				confirmed = saveCommand.isSuccess();
+			} else if (selection == JOptionPane.NO_OPTION) {
+			} else {
+				confirmed = false;
+			}
+		}
+		return confirmed;
+	}
+
+	private void showChangedMacrosPortsDialog(Object dsId) {
+		if (dsManager.getDrawingSurfaceById(dsId).isTemplateChanged()) {
+			dsManager.setFocusedDrawingSurface(dsId);
+			JOptionPane.showMessageDialog(dialogParent,
+					"Macros and/or ports in this template have changed. \nReload and save files that include this template to apply changes.",
+					"Template '" + dsManager.getDrawingSurfaceById(dsId).getTitle() + "' changed!",
+					JOptionPane.WARNING_MESSAGE);
+		}
+	}
+
+	private boolean newerFileExists(VDBTemplate template) {
+		long storedModificationTime = template.getModificationTime();
+		long currentModificationTime = new File(template.getFileName()).lastModified();
+
+		// set the modified date so that the dialog is brought up at most once per file system change
+		template.setModificationTime(currentModificationTime);
+		return storedModificationTime != 0 && storedModificationTime < currentModificationTime;
 	}
 }

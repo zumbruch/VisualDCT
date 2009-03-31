@@ -1934,6 +1934,7 @@ public class DBResolver {
 
 				PathSpecification paths = new PathSpecification(file.getParentFile().getAbsolutePath());
 				data = new DBData(file.getName(), file.getAbsolutePath());
+				data.getTemplateData().setModificationTime(file.lastModified());
 
 				processDB(dsId, data, tokenizer, fileName, paths, loadStack, loadList);
 			}

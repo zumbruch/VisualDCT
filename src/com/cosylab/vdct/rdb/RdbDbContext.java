@@ -90,8 +90,10 @@ public class RdbDbContext {
 	public DBData load() throws SQLException {
 
 		String fileName = dataId.getFileName();
-		DBData data = new DBData(new File(fileName).getName(), fileName);
+		File file = new File(fileName);
+		DBData data = new DBData(file.getName(), fileName);
 		DBTemplate template = data.getTemplateData();
+		template.setModificationTime(file.lastModified());
 		template.setVersion(dataId.getVersion()); 
 		template.setIoc(dataId.getIoc()); 
 		template.setDescription(dataId.getDescription()); 

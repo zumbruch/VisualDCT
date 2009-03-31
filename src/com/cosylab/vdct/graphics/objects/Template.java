@@ -416,8 +416,6 @@ public class Template
 			validating = true;
 
 			  // template change check
-			  // TODO:REM
-			  //VDBTemplate tmpl = (VDBTemplate)VDBData.getInstance(getDsId()).getTemplates().get(getTemplateData().getTemplate().getId());		
 			  VDBTemplate tmpl = DataSynchronizer.getInstance().getTemplate(getDsId(), getTemplateData().getTemplate().getId());		
 			  if (tmpl!=getTemplateData().getTemplate())
 			  {

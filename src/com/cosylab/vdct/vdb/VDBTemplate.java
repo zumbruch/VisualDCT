@@ -71,6 +71,8 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 	protected String id = null;
 	protected String fileName = null;
 	protected String description = null;
+	
+	protected long modificationTime = 0;
 
 	protected String version = null;
 	protected String ioc = null;
@@ -269,6 +271,7 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 	{
 		this.id = id;
 		this.fileName = fileName;
+		modificationTime = 0;
 		regeneratePortsID();
 		updateDescription();			
 	}
@@ -385,6 +388,20 @@ public class VDBTemplate implements Inspectable, Commentable, Descriptable, Moni
 	public String getId()
 	{
 		return id;
+	}
+
+	/**
+	 * @return the modificationTime
+	 */
+	public long getModificationTime() {
+		return modificationTime;
+	}
+
+	/**
+	 * @param modificationTime the modificationTime to set
+	 */
+	public void setModificationTime(long modificationTime) {
+		this.modificationTime = modificationTime;
 	}
 
 	/**

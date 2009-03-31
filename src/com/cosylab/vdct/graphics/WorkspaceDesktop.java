@@ -136,6 +136,10 @@ implements ComponentListener, DesktopInterface {
 		selectFirstInternalFrame();
 	}
 
+	public void setFocused(InternalFrameInterface frame) {
+		frame.setFocused();
+	}
+
 	/**
 	 * Insert the method's description here.
 	 * Creation date: (11.12.2000 15:44:25)

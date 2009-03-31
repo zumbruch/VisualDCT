@@ -33,7 +33,6 @@ import java.io.File;
 
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
-import javax.swing.JOptionPane;
 import javax.swing.WindowConstants;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
@@ -41,7 +40,6 @@ import javax.swing.event.InternalFrameListener;
 import com.cosylab.vdct.events.CommandManager;
 import com.cosylab.vdct.events.MouseEventManager;
 import com.cosylab.vdct.events.commands.SetWorkspaceFile;
-import com.cosylab.vdct.events.commands.ShowModifiedDialog;
 
 /**
  * @author ssah
@@ -90,20 +88,17 @@ implements InternalFrameInterface, InternalFrameListener {
 	}
 
 	public boolean onClose() {
-		try {
-			setSelected(true);
-		} catch (PropertyVetoException e) {
+		dispose();
+		return true;
+	}
+
+	public void setFocused() {
+		if (!isSelected()) {
+			try {
+				setSelected(true);
+			} catch (PropertyVetoException e) {
+			}
 		}
-		
-		ShowModifiedDialog command = 
-			(ShowModifiedDialog)CommandManager.getInstance().getCommand("ShowModifiedDialog");
-		command.setDsId(dsId);
-		command.execute();
-		if (command.getSelection() != JOptionPane.CANCEL_OPTION) {
-			dispose();
-			return true;
-		}
-		return false;
 	}
 
 	public void internalFrameActivated(InternalFrameEvent e) {
