@@ -268,7 +268,7 @@ public class DBResolver {
 			return file.getName();
 		}
 
-		Console.getInstance().println("Loading template \""+templateFile+"\"...");
+		//Console.getInstance().println("Loading template \""+templateFile+"\"...");
 
 		DBData templateData = resolveDB(dsId, templateToResolve, loadStack, loadList);
 		if (templateData==null)
@@ -281,7 +281,7 @@ public class DBResolver {
 		// add to loaded list
 		//DataProvider.getInstance().getLoadedDBs().addElement(templateData.getTemplateData().getFileName());
 
-		Console.getInstance().println("Template \""+templateFile+"\" loaded.");
+		//Console.getInstance().println("Template \""+templateFile+"\" loaded.");
 
 		return templateData.getTemplateData().getId();
 			}

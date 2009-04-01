@@ -36,7 +36,6 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Enumeration;
-import java.util.Stack;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -45,6 +44,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
+import com.cosylab.vdct.events.CommandManager;
+import com.cosylab.vdct.events.commands.GetDsManager;
+import com.cosylab.vdct.graphics.DrawingSurfaceInterface;
 import com.cosylab.vdct.graphics.DsManager;
 import com.cosylab.vdct.vdb.VDBData;
 import com.cosylab.vdct.vdb.VDBTemplate;
@@ -154,13 +156,13 @@ public class NewTemplateInstanceDialog extends JDialog implements ActionListener
     private void refreshTemplateComboBox() {
     	templateComboBox.removeAllItems();
     	
-    	Stack templateStack = DsManager.getDrawingSurface(dsId).getTemplateStack();
+        DrawingSurfaceInterface surface = ((GetDsManager)CommandManager.getInstance().getCommand("GetDsManager")).getManager().getDrawingSurfaceById(dsId); 
     	VDBData vdbData = VDBData.getInstance(dsId);    	
     	Enumeration templates = vdbData.getTemplates().keys();
     	while (templates.hasMoreElements()) {
     		String key = templates.nextElement().toString();
     		VDBTemplate t = (VDBTemplate)vdbData.getTemplates().get(key);
-    		if (templateStack.isEmpty() || !templateStack.contains(t)) {
+    		if (surface.isTemplateAllowed(t)) {
         		templateComboBox.addItem(key);
     		}
     	}

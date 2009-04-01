@@ -51,6 +51,8 @@ implements ComponentListener, DesktopInterface {
 
 	private DsManagerInterface drawingSurfaceManager = null;
 	
+	private int frameOffset = 0; 
+	
 	/**
 	 * VisualAge support
 	 * Creation date: (10.12.2000 12:34:33)
@@ -58,6 +60,7 @@ implements ComponentListener, DesktopInterface {
 	public WorkspaceDesktop() {
 		super();
 		initialize();
+		frameOffset = 0;
 	}
 
 	public void selectFirstInternalFrame() {
@@ -128,8 +131,22 @@ implements ComponentListener, DesktopInterface {
 		} catch (java.beans.PropertyVetoException e) {
 			// Nothing.
 		}
-		frame.setLocation(32, 32);
-		frame.setSize(512,512);
+		
+		frame.setLocation(frameOffset, frameOffset);
+		frame.setSize(768, 512);
+		
+		if (getComponentCount() == 1) {
+			try {
+				frame.setMaximum(true);
+			} catch (java.beans.PropertyVetoException e) {
+				// Nothing.
+			}
+		}
+
+		frameOffset += 32;
+		if (frameOffset > 320) {
+			frameOffset = 0;
+		}
 	}
 	
 	public void onInternalFrameClosed() {

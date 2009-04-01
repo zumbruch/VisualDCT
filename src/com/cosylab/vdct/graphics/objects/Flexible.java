@@ -35,7 +35,8 @@ package com.cosylab.vdct.graphics.objects;
  */
 public interface Flexible {
 /**
- * Insert the method's description here.
+ * Returns the copied instance or null if the object cannot be copied. 
+ * 
  * Creation date: (4.2.2001 21:59:44)
  * @param group java.lang.String
  */

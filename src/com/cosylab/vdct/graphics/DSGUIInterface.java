@@ -310,7 +310,7 @@ public class DSGUIInterface implements VDBInterface {
 			obj = selected.nextElement();
 			if (obj instanceof Flexible && obj instanceof VisibleObject) {
 				Flexible copy = ((Flexible)obj).copyToGroup(Constants.DEFAULT_NAME, emptyString);
-				if (copy instanceof Movable) {
+				if (copy != null && copy instanceof Movable) {
 					((Movable)copy).move(-minx, -miny);
 				}
 			}
@@ -798,11 +798,13 @@ public class DSGUIInterface implements VDBInterface {
 				flexible = (Flexible)objs[i];
 				
 				copy = flexible.copyToGroup(id, currentGroupName);
-				action.addAction(new CreateAction((VisibleObject)copy));
-				if (copy instanceof Movable) {
-					((Movable)copy).move(posX, posY);
+				if (copy != null) {
+					action.addAction(new CreateAction((VisibleObject)copy));
+					if (copy instanceof Movable) {
+						((Movable)copy).move(posX, posY);
+					}
+					view.setAsSelected((VisibleObject)copy);
 				}
-				view.setAsSelected((VisibleObject)copy);
 			}
 		}
 

@@ -99,7 +99,6 @@ LinkCommandInterface, RepaintInterface, Pageable {
 	
 	public static DrawingSurface getDrawingSurface() {
 		if (instance.dsInterface == null) {
-			System.err.println("Warning: returning null for drawing surface.");
 			return null;
 		}
 		return instance.dsInterface.getDrawingSurface();
@@ -157,7 +156,7 @@ LinkCommandInterface, RepaintInterface, Pageable {
 		DrawingSurface drawingSurface = getDrawingSurface(id);
 		if (drawingSurface != null) {
 			drawingSurface.setDisposed(true);
-			
+
 			Iterator iterator = dsEventListeners.iterator();
 			while (iterator.hasNext()) {
 				((DsEventListener)iterator.next()).onDsRemoved(id);
@@ -169,10 +168,17 @@ LinkCommandInterface, RepaintInterface, Pageable {
 		}
 	}
 
+	public DrawingSurfaceInterface getFocusedDrawingSurface() {
+		if (dsInterface != null) {
+			return dsInterface.getDrawingSurface(); 
+		}
+		return null;
+	}
+	
 	public void setFocusedDrawingSurface(Object id) {
 		if (id != null) {
 			DrawingSurface drawingSurface = getDrawingSurface(id);
-			if (drawingSurface != null) {
+			if (drawingSurface != null && !drawingSurface.isDisposed()) {
 				dsInterface = drawingSurface.getGuimenu();
 				
 				Iterator iterator = dsEventListeners.iterator();
@@ -181,10 +187,12 @@ LinkCommandInterface, RepaintInterface, Pageable {
 				}
 				
 				desktopInterface.setFocused(drawingSurface.getDisplayer());
+				
+				drawingSurface.updateWorkspaceScale();
 			} else {
 				dsInterface = null;
 			}
-
+			
 		    // check the filesystem changes when a frame gets focus 
 			DataSynchronizer.getInstance().checkFilesystemChanges(null);
 		} else {
@@ -199,6 +207,15 @@ LinkCommandInterface, RepaintInterface, Pageable {
 		return array;
 	}
 
+	public void closeDrawingSurface(Object id) {
+		DrawingSurfaceInterface surface = getDrawingSurfaceById(id);
+		if (surface != null) {
+			if (DataSynchronizer.getInstance().confirmFileClose(surface.getDsId(), false)) {
+				surface.close();
+			}
+		}
+	}
+	
 	public void addDsEventListener(DsEventListener listener) {
 		dsEventListeners.add(listener);
 	}
@@ -474,7 +491,9 @@ LinkCommandInterface, RepaintInterface, Pageable {
 	 * @see com.cosylab.vdct.graphics.GUIMenuInterface#openDB(java.io.File)
 	 */
 	public void openDB(File file) throws IOException {
-		desktopInterface.createNewInternalFrame();
+		if (dsInterface == null || dsInterface.isModified()) {
+			desktopInterface.createNewInternalFrame();
+		}
 		if (dsInterface != null) {
 			dsInterface.openDB(file);
 		}
@@ -612,8 +631,9 @@ LinkCommandInterface, RepaintInterface, Pageable {
 	 * @see com.cosylab.vdct.graphics.GUIMenuInterface#showGrid(boolean)
 	 */
 	public void showGrid(boolean state) {
-		if (dsInterface != null) {
-			dsInterface.showGrid(state);
+		Iterator iterator = getAllDrawingSurfaces().iterator();
+		while (iterator.hasNext()) {
+			((DrawingSurface)iterator.next()).repaint();
 		}
 	}
 

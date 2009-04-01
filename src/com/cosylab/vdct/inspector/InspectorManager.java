@@ -32,7 +32,13 @@ import java.awt.Color;
 import java.awt.Frame;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Vector;
+
+import com.cosylab.vdct.DataProvider;
+import com.cosylab.vdct.events.CommandManager;
+import com.cosylab.vdct.events.commands.GetDsManager;
+import com.cosylab.vdct.graphics.DsEventListener;
 
 /**
  * Insert the type's description here.
@@ -40,7 +46,7 @@ import java.util.Vector;
  * @author Matej Sekoranja
  * !!! inspectors are not disposed !!!! (move ins.listeners in inspectors, when this is implemented);
  */
-public class InspectorManager implements HelpDisplayer {
+public class InspectorManager implements HelpDisplayer, DsEventListener {
 
 	private static InspectorManager instance = null;
 	
@@ -54,6 +60,11 @@ public class InspectorManager implements HelpDisplayer {
  */
 protected InspectorManager() {
 	inspectors = new Vector();
+
+	GetDsManager command = (GetDsManager)CommandManager.getInstance().getCommand("GetDsManager");
+	if (command != null) {
+		command.getManager().addDsEventListener(this);
+	}
 }
 /**
  * Insert the method's description here.
@@ -69,15 +80,17 @@ private InspectorInterface createInspector(Object dsId) {
  * Insert the method's description here.
  * Creation date: (8.1.2001 21:39:00)
  */
-public void disposeAllInspectors() {
-	Object obj;
-	Enumeration e = inspectors.elements();
-	while (e.hasMoreElements()) {
-		obj = e.nextElement();
-		((InspectorInterface)obj).dispose();
-		com.cosylab.vdct.DataProvider.getInstance().removeInspectableListener((InspectableObjectsListener)obj);
+public void disposeAllInspectors(Object dsId) {
+	Inspector inspector;
+	Iterator iterator = inspectors.iterator();
+	while (iterator.hasNext()) {
+		inspector = (Inspector)iterator.next();
+		if (inspector.getDsId().equals(dsId)) {
+			inspector.dispose();
+			DataProvider.getInstance().removeInspectableListener(inspector);
+			iterator.remove();
+		}
 	}
-	inspectors.removeAllElements();
 }
 /**
  * Insert the method's description here.
@@ -250,6 +263,13 @@ public void setHelpText(String text) {
 
 public void setHelpTextColor(Color color) {
 	getActiveInspector().setHelpColor(color);
+}
+
+public void onDsAdded(Object id) {}
+public void onDsFocused(Object id) {}
+
+public void onDsRemoved(Object id) {
+	disposeAllInspectors(id);
 }
 
 }

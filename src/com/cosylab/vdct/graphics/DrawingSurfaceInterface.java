@@ -45,5 +45,7 @@ public interface DrawingSurfaceInterface {
 	public boolean reloadTemplate(VDBTemplate data);
 	public boolean open(File file, boolean importDB) throws IOException;
 	public boolean isTemplateChanged();
+	public boolean isTemplateAllowed(VDBTemplate template);
 	public VDBTemplate getTemplate();
+	public boolean close();
 }

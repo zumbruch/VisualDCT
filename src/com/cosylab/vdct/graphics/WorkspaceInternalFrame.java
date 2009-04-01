@@ -58,6 +58,7 @@ implements InternalFrameInterface, InternalFrameListener {
 
 	public WorkspaceInternalFrame(Object dsId, DesktopInterface desktop, DsManagerInterface drawingSurfaceManager) {
 		super(defaultName, true, true, true, true);
+		
 		this.dsId = dsId;
 		this.desktop = desktop;
 		this.drawingSurfaceManager = drawingSurfaceManager;
@@ -117,7 +118,7 @@ implements InternalFrameInterface, InternalFrameListener {
 	}
 
 	public void internalFrameClosing(InternalFrameEvent e) {
-		onClose();
+		drawingSurfaceManager.closeDrawingSurface(dsId);
 	}
 	public void internalFrameDeiconified(InternalFrameEvent e) {
 	}
@@ -135,5 +136,4 @@ implements InternalFrameInterface, InternalFrameListener {
 			command.execute();
 		}
 	}
-	
 }

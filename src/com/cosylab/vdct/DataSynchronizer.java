@@ -46,8 +46,10 @@ import com.cosylab.vdct.vdb.VDBData;
 import com.cosylab.vdct.vdb.VDBTemplate;
 
 /**
+ * <code>DataSynchronizer</code> handles synchronization between loaded files and files on the file
+ * system. It checks for unsaved changes or file system changes and brings up the appropriate dialogs.    
+ * 
  * @author ssah
- *
  */
 public class DataSynchronizer {
 
@@ -96,12 +98,6 @@ public class DataSynchronizer {
 		return template;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.cosylab.vdct.DataSynchronizerInterface#confirmWithUnsavedChanges(java.lang.Object)
-	 */
-	/* (non-Javadoc)
-	 * @see com.cosylab.vdct.DataSynchronizerInterface#confirmWithUnsavedChanges(java.lang.Object)
-	 */
 	public boolean confirmFileClose(Object dsId, boolean exit) {
 		boolean confirmed = true;
 		if (dsId != null) {

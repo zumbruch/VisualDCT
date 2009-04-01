@@ -42,7 +42,6 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Stack;
 import java.util.Vector;
 
 import javax.swing.Icon;
@@ -57,8 +56,9 @@ import com.cosylab.vdct.DataSynchronizer;
 import com.cosylab.vdct.Settings;
 import com.cosylab.vdct.db.DBResolver;
 import com.cosylab.vdct.events.CommandManager;
+import com.cosylab.vdct.events.commands.GetDsManager;
 import com.cosylab.vdct.events.commands.LinkCommand;
-import com.cosylab.vdct.graphics.DsManager;
+import com.cosylab.vdct.graphics.DrawingSurfaceInterface;
 import com.cosylab.vdct.graphics.FontMetricsBuffer;
 import com.cosylab.vdct.graphics.ViewState;
 import com.cosylab.vdct.graphics.popup.PopUpMenu;
@@ -1529,6 +1529,14 @@ public void setDestroyed(boolean newDestroyed) {
  */
 public Flexible copyToGroup(Object dsId, java.lang.String group) {
 
+	// check if template is allowed under the target drawing surface
+	if (!((GetDsManager)CommandManager.getInstance().getCommand("GetDsManager")).getManager()
+			.getDrawingSurfaceById(dsId).isTemplateAllowed(templateData.getTemplate())) {
+		Console.getInstance().println("Template instance '" + templateData.getName()
+				+ "' cannot be pasted due to cyclic dependency.");
+		return null;
+	}
+	
 	String newName;
 	if (group.equals(nullString))
 		newName = Group.substractObjectName(templateData.getName());
@@ -2312,8 +2320,8 @@ public void setTemplateInstance(VDBTemplateInstance templateInstance)
  */
 public Object[] getTargets() {
 	
-	Stack tis = DsManager.getDrawingSurface(getDsId()).getTemplateStack();
-
+    DrawingSurfaceInterface surface = ((GetDsManager)CommandManager.getInstance().getCommand("GetDsManager")).getManager().getDrawingSurfaceById(getDsId()); 
+	
 	VDBData vdbData = VDBData.getInstance(getDsId());
 	Enumeration templates = vdbData.getTemplates().keys();
 	ArrayList al = new ArrayList(vdbData.getTemplates().size());
@@ -2321,9 +2329,9 @@ public Object[] getTargets() {
 	{
 		String key = templates.nextElement().toString();
 		VDBTemplate t = (VDBTemplate)vdbData.getTemplates().get(key);
-		if (t != this.getTemplateData().getTemplate() &&
-			!tis.contains(t))	// do not allow cyclic...
+		if (t != this.getTemplateData().getTemplate() && surface.isTemplateAllowed(t)) {	// do not allow cyclic...
 			al.add(t.getDescription());
+		}
 	}	
 
 	Object[] desc = new Object[al.size()];

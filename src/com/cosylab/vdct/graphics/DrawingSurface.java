@@ -573,9 +573,11 @@ MouseInputListener, Runnable, LinkCommandInterface {
 		copyNavigatorImage(g);
 
 		Rectangle currentClip = g.getClipBounds();
-
-		g.setClip(navigator.x, navigator.y, 
-				navigator.width, navigator.height);
+		
+		Rectangle navigatorClip = new Rectangle(navigator.x, navigator.y, navigator.width, navigator.height);
+		Rectangle.intersect(navigatorClip, currentClip, navigatorClip);
+		
+		g.setClip(navigatorClip);
 
 		g.setColor(Color.red);
 		g.drawRect(navigatorRect.x,
@@ -742,7 +744,7 @@ MouseInputListener, Runnable, LinkCommandInterface {
 	 * Creation date: (25.12.2000 17:31:15)
 	 * @return javax.swing.JComponent
 	 */
-	public JComponent getWorkspacePanel() {
+	private JComponent getWorkspacePanel() {
 		if (displayer != null) {
 			return displayer.getDisplayingComponent();
 		} else {
@@ -777,7 +779,7 @@ MouseInputListener, Runnable, LinkCommandInterface {
 
 		UndoManager.getInstance(id).reset();
 
-		InspectorManager.getInstance().disposeAllInspectors();
+		InspectorManager.getInstance().disposeAllInspectors(id);
 
 		// !!! call all destory() in objects?!
 		//if (Group.getRoot()!=null)
@@ -1114,7 +1116,7 @@ MouseInputListener, Runnable, LinkCommandInterface {
 			templatesMenu.add(item2);
 
 			// do not allow circular dependencies
-			if (!templateStack.isEmpty() && templateStack.contains(t))
+			if (!isTemplateAllowed(t))
 				item2.setEnabled(false);
 		}	
 
@@ -2078,7 +2080,8 @@ MouseInputListener, Runnable, LinkCommandInterface {
 
 		try {
 			setCursor(hourCursor);
-			UndoManager.getInstance(id).setMonitor(false);
+			UndoManager undoManager = UndoManager.getInstance(id);
+			undoManager.setMonitor(false);
 
 			// DBD managment (not on system clipboard import)
 			if (file != null)
@@ -2162,7 +2165,11 @@ MouseInputListener, Runnable, LinkCommandInterface {
 					Group.setRoot(id, rg);
 				}
 
+				boolean monitor = undoManager.isMonitor();
+				undoManager.setMonitor(true);
 				((GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface")).getGUIMenuInterface().paste();
+				undoManager.setMonitor(monitor);
+
 				Group.getClipboard().clear();
 
 			} else if (!importDB) {
@@ -3572,6 +3579,8 @@ MouseInputListener, Runnable, LinkCommandInterface {
 
 		recalculateNavigatorPosition();
 		forceRedraw = true;	
+
+    	repaint();
 	}
 	/**
 	 * Insert the method's description here.
@@ -3721,7 +3730,7 @@ MouseInputListener, Runnable, LinkCommandInterface {
 	 * Insert the method's description here.
 	 * Creation date: (29.12.2000 12:49:54)
 	 */
-	private void updateWorkspaceScale() {
+	public void updateWorkspaceScale() {
 		SetWorkspaceScale cmd = (SetWorkspaceScale)CommandManager.getInstance().getCommand("SetWorkspaceScale");
 		if (cmd == null)
 			return;
@@ -4310,6 +4319,23 @@ MouseInputListener, Runnable, LinkCommandInterface {
 
 	public VDBTemplate getTemplate() {
 		return Group.getEditingTemplateData(id);
+	}
+	
+	/**
+	 * Returns true if a template instance of the given template can be added as an element to
+	 * currently edited template.
+	 * 
+	 * Returns false if there is a cyclic template dependency. 
+	 */
+	public boolean isTemplateAllowed(VDBTemplate template) {
+		
+		Enumeration enumeration = templateStack.elements();
+		while (enumeration.hasMoreElements()) {
+			if (((VDBTemplate)enumeration.nextElement()).getId().equals(template.getId())) {
+				return false;
+			}
+		}
+		return true;
 	}
 }
 
