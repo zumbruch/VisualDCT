@@ -4166,7 +4166,7 @@ private javax.swing.JMenuItem getOpenMenuItem() {
 			ivjOpenMenuItem = new javax.swing.JMenuItem();
 			ivjOpenMenuItem.setName("OpenMenuItem");
 			ivjOpenMenuItem.setMnemonic('O');
-			ivjOpenMenuItem.setText("Open");
+			ivjOpenMenuItem.setText("Open...");
 			// user code begin {1}
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {

@@ -56,7 +56,7 @@ public class FindDialog extends JDialog implements WindowListener {
         addWindowListener(this);
         setLocationRelativeTo(owner);
         
-        panel = new FindPanel();
+        panel = new FindPanel(this);
         getContentPane().add(panel);
     }
 

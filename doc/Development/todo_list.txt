@@ -1,22 +1,7 @@
 --------------------------------------------------------------------
 1. vdct package-f multiple views support 
---------------------------------------------------------------------
-1.2. documentation {1}
-  -documentation
-   -code documentation
-    -one clipboard
-     -all roots work with a single clipboard gotten by name
-    -copy/paste functionality with a single active group
-     -copy always copies to clipboard, active group ignored
-     -paste always moves from clipboard to active group
-  -release documentation
-   -known issues
-    -drag and drop can block with early java versions
-On older java 1.4 releases, using drag and drop can cause the blocks
-that last for up to 10 secods and more. To resolve this update your
-java 1.4 version to the latest (java 1.4.2_16)
-   -general
-    -columns now sorted by double click
+
+* morphing template gives a returning null warning
 --------------------------------------------------------------------
 2. vdct package-f rdb support 
 

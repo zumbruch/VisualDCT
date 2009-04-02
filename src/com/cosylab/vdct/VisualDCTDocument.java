@@ -28,7 +28,12 @@ package com.cosylab.vdct;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.net.URL;
+
+import javax.swing.JButton;
+import javax.swing.JPanel;
 
 /**
  * Insert the type's description here.
@@ -36,6 +41,7 @@ import java.net.URL;
  * @author 
  */
 public class VisualDCTDocument extends javax.swing.JDialog {
+	private JPanel buttonPanel = null;
 	private javax.swing.JEditorPane ivjEditorPane = null;
 	private javax.swing.JPanel ivjJDialogContentPane = null;
 /**
@@ -103,6 +109,7 @@ private javax.swing.JPanel getJDialogContentPane() {
 			ivjJDialogContentPane.setName("JDialogContentPane");
 			ivjJDialogContentPane.setLayout(new java.awt.BorderLayout());
 			getJDialogContentPane().add(getEditorPane(), "Center");
+			getJDialogContentPane().add(getButtonPanel(), "South");
 			// user code begin {1}
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
@@ -140,6 +147,23 @@ private void initialize() {
 	// user code begin {2}
 	// user code end
 }
+
+private JPanel getButtonPanel() {
+	if (buttonPanel == null) {
+		buttonPanel = new JPanel();
+		
+		JButton closeButton = new JButton();
+		closeButton.setText("Close");
+		closeButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				setVisible(false);
+			}
+		});
+		buttonPanel.add(closeButton);
+	}
+	return buttonPanel;
+}
+
 /**
  * main entrypoint - starts the part when it is run as an application
  * @param args java.lang.String[]

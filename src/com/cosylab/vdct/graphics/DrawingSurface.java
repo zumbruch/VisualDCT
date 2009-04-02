@@ -4054,7 +4054,7 @@ MouseInputListener, Runnable, LinkCommandInterface {
 
 		InspectorManager.getInstance().updateObjectLists();
 
-		com.cosylab.vdct.Console.getInstance().println("Reloading template '"+data.getFileName()+"'.");	
+		//com.cosylab.vdct.Console.getInstance().println("Reloading template '"+data.getFileName()+"'.");	
 
 		// reload
 		try

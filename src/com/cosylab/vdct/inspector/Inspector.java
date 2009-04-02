@@ -33,6 +33,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -82,7 +83,10 @@ public class Inspector extends JDialog implements InspectableObjectsListener, In
 	private JScrollPane ivjTableScrollPane = null;
 	private JScrollPane ivjCommentScrollPane = null;
 	private JComboBox ivjObjectComboBox = null;
+
+	private JPanel buttonPanel;
 	private JButton centerOnScreen;
+	private JButton closeButton;
 	
 	// inspector components
 	private InspectorTableModel tableModel;
@@ -410,8 +414,8 @@ private javax.swing.JPanel getJDialogContentPane() {
 			constraintsFrozeCheckBox.insets = new java.awt.Insets(4, 4, 4, 4);
 			getJDialogContentPane().add(getFrozeCheckBox(), constraintsFrozeCheckBox);
 
-			getJDialogContentPane().add(getCenterOnScreenButton(), new GridBagConstraints(
-			        0,6,1,1,0,0,GridBagConstraints.WEST, GridBagConstraints.NONE,
+			getJDialogContentPane().add(getButtonPanel(), new GridBagConstraints(
+			        0,6,2,1,0,0,GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			        new Insets(4,4,4,4),0,0));
 			
 			// user code begin {1}
@@ -448,6 +452,45 @@ private JButton getCenterOnScreenButton() {
     }
     
     return centerOnScreen;
+}
+
+private JPanel getButtonPanel() {
+    if (buttonPanel == null) {
+
+    	buttonPanel = new JPanel();
+    	buttonPanel.setName("JButtonPanel");
+    	buttonPanel.setLayout(new GridBagLayout());
+
+		GridBagConstraints constraints = new GridBagConstraints();
+		constraints.insets = new Insets(0, 8, 0, 8);
+		buttonPanel.add(getCenterOnScreenButton(), constraints);
+
+		constraints = new java.awt.GridBagConstraints();
+		constraints.gridx = 1;
+		constraints.insets = new Insets(0, 8, 0, 8);
+		buttonPanel.add(getCloseButton(), constraints);
+    }
+    	
+    return buttonPanel;
+}
+
+private JButton getCloseButton() {
+    if (closeButton == null) {
+        try {
+        	closeButton = new JButton("Close");
+        	closeButton.setName("Close");
+        	closeButton.setFont(new Font("dialog", 0, 12));
+        	closeButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    setVisible(false);
+                }
+            });
+        } catch (Throwable e) {
+            handleException(e);
+        }
+    }
+    
+    return closeButton;
 }
 
 /**

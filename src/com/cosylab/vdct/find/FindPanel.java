@@ -30,6 +30,7 @@ package com.cosylab.vdct.find;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -110,9 +111,18 @@ public class FindPanel extends JPanel
      */
     static public final String ACTION_STOP = "Stop";
 
+    /**
+     * Close action name
+     */
+    static public final String ACTION_CLOSE = "Close";
+    
+    protected Dialog owner = null; 
+    
     protected FindAction actionStart = null;
 
     protected FindAction actionStop = null;
+
+    protected FindAction actionClose = null;
 
     /**
      * This version of FindAccesory supports only one active search thread
@@ -158,18 +168,20 @@ public class FindPanel extends JPanel
      * Construct a search panel with start and stop actions, option panes and a
      * results list pane that can display up to DEFAULT_MAX_SEARCH_HITS items.
      */
-    public FindPanel() {
+    public FindPanel(Dialog owner) {
         super();
+        this.owner = owner;
 
         //setBorder(new TitledBorder(ACCESSORY_NAME));
         setLayout(new BorderLayout());
 
         actionStart = new FindAction(ACTION_START, null);
         actionStop = new FindAction(ACTION_STOP, null);
+        actionClose = new FindAction(ACTION_CLOSE, null);
 
         add(pathPanel = new FindTitle(), BorderLayout.NORTH);
         add(searchTabs = new FindTabs(), BorderLayout.CENTER);
-        add(controlPanel = new FindControls(actionStart, actionStop, true), BorderLayout.SOUTH);
+        add(controlPanel = new FindControls(actionStart, actionStop, actionClose, true), BorderLayout.SOUTH);
         
     }
 
@@ -403,12 +415,16 @@ public class FindPanel extends JPanel
      */
     public void action(String command)
     {
-        if (command == null)
+        if (command == null) {
             return;
-        if (command.equals(ACTION_START))
+        } if (command.equals(ACTION_START)) {
             start();
-        else if (command.equals(ACTION_STOP))
+        } else if (command.equals(ACTION_STOP)) {
             stop();
+        } else if (command.equals(ACTION_CLOSE)) {
+            stop();
+            owner.setVisible(false);
+        }
     }
 
     /**
@@ -484,7 +500,7 @@ public class FindPanel extends JPanel
          * Construct a simple search control panel with buttons for starting and
          * stopping a search and a simple display for search progress.
          */
-        FindControls(FindAction find, FindAction stop, boolean recurse) {
+        FindControls(FindAction find, FindAction stop, FindAction close, boolean recurse) {
             super();
             setLayout(new BorderLayout());
 
@@ -492,6 +508,7 @@ public class FindPanel extends JPanel
             tools.setFloatable(false);
             tools.add(actionStart = new FindAction(ACTION_START, null));
             tools.add(actionStop = new FindAction(ACTION_STOP, null));
+            tools.add(actionClose = new FindAction(ACTION_CLOSE, null));
             add(tools, BorderLayout.WEST);
 
             progress = new JLabel("", SwingConstants.RIGHT);

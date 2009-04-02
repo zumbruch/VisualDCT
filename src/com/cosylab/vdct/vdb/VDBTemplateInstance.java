@@ -206,7 +206,7 @@ public void setName(java.lang.String newName) {
 
 	public Template getVisualTemplate() {
 		if (visualTemplate == null) {
-			System.err.println("Warning: VDBTemplateInstance.getVisualTemplate: returning null.");
+			//System.err.println("Warning: VDBTemplateInstance.getVisualTemplate: returning null.");
 		}
 		return visualTemplate;
 	}
