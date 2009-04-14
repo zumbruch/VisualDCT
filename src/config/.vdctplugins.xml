@@ -19,5 +19,6 @@
     <param name="lastrun" value="Wed Jul 10 11:14:13 CEST 2002" />
   </plugin>
   <plugin class="com.cosylab.vdct.plugins.ExportSimulator" autostart="true" />
+  <plugin class="com.cosylab.vdct.plugins.NameConfigExample" autostart="true"/>
 </plugins>
 
