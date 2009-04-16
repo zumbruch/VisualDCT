@@ -69,6 +69,7 @@ import javax.print.attribute.standard.OrientationRequested;
 import javax.swing.AbstractAction;
 import javax.swing.ComboBoxEditor;
 import javax.swing.ComboBoxModel;
+import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
@@ -3332,6 +3333,34 @@ private javax.swing.JPanel getJFrameContentPane() {
 			        }
 			    }
 			});
+			
+            // In Java > 1.6.0_0 the hidden items in menu do not activate for key inputs, map here: 
+			InputMap map = ivjJFrameContentPane.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.CTRL_DOWN_MASK), "ctrlUp");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.CTRL_DOWN_MASK), "ctrlDown");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.CTRL_DOWN_MASK), "ctrlLeft");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.CTRL_DOWN_MASK), "ctrlRight");
+
+			ivjJFrameContentPane.getActionMap().put("ctrlUp", new AbstractAction() {
+				public void actionPerformed(ActionEvent arg0) {
+					VisualDCT.this.moveOrigin(SwingConstants.SOUTH);
+				}
+	        });
+			ivjJFrameContentPane.getActionMap().put("ctrlDown", new AbstractAction() {
+				public void actionPerformed(ActionEvent arg0) {
+					VisualDCT.this.moveOrigin(SwingConstants.NORTH);
+				}
+	        });
+			ivjJFrameContentPane.getActionMap().put("ctrlLeft", new AbstractAction() {
+				public void actionPerformed(ActionEvent arg0) {
+					VisualDCT.this.moveOrigin(SwingConstants.WEST);
+				}
+	        });
+			ivjJFrameContentPane.getActionMap().put("ctrlRight", new AbstractAction() {
+				public void actionPerformed(ActionEvent arg0) {
+					VisualDCT.this.moveOrigin(SwingConstants.EAST);
+				}
+	        });
 			// user code begin {1}
 			// user code end
 		} catch (java.lang.Throwable ivjExc) {
@@ -5478,12 +5507,25 @@ private com.cosylab.vdct.graphics.WorkspaceDesktop getworkspace() {
 			});
 			// user code begin {1}
 			
-			// An override for desktop default shift up operation. 
-			ivjworkspace.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(
-					KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.SHIFT_DOWN_MASK), "shiftUp");
+			// An override for desktop default shift direction key operation.
+			InputMap map = ivjworkspace.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.SHIFT_DOWN_MASK), "shiftUp");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.SHIFT_DOWN_MASK), "shiftLeft");
+			map.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.SHIFT_DOWN_MASK), "shiftRight");
+
 			ivjworkspace.getActionMap().put("shiftUp", new AbstractAction() {
 				public void actionPerformed(ActionEvent arg0) {
 					level_UpMenuItem_ActionPerformed();
+				}
+	        });
+			ivjworkspace.getActionMap().put("shiftLeft", new AbstractAction() {
+				public void actionPerformed(ActionEvent arg0) {
+					zoom_OutMenuItem_ActionPerformed();
+				}
+	        });
+			ivjworkspace.getActionMap().put("shiftRight", new AbstractAction() {
+				public void actionPerformed(ActionEvent arg0) {
+					zoom_InMenuItem_ActionPerformed();
 				}
 	        });
 			

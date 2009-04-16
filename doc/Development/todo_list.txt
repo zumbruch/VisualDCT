@@ -2,6 +2,14 @@
 1. vdct package-f multiple views support 
 
 * morphing template gives a returning null warning
+
+1.1.
+* simplify arrow key supports
+
+Currently the actions are doubled between WorkspaceDesktop and its
+parent component so that no matter which is focused it works.
+The hidden items key inputs do not work anymore in Java 1.6; this
+should be removed.     
 --------------------------------------------------------------------
 2. vdct package-f rdb support 
 
