@@ -695,6 +695,11 @@ public class DSGUIInterface implements VDBInterface {
 	public boolean isModified() {
 		return drawingSurface.isModified();
 	}
+
+	public boolean isEmpty() {
+		return Group.getRoot(id).getStructure().isEmpty();
+	}
+	
 	/**
 	 * Insert the method's description here.
 	 * Creation date: (4.2.2001 15:32:01)

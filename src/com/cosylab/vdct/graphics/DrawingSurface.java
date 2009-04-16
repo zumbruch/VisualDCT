@@ -3202,7 +3202,7 @@ MouseInputListener, Runnable, LinkCommandInterface {
 					view.setViewWidth(viewWidth);
 					view.setViewHeight(viewHeight);
 				}
-				printLegend(graphics, pageWidth, pageHeight, pageIndex+1, maxNumPage, printScale);
+				printLegend(graphics, pageWidth, pageHeight, pageIndex+1, maxNumPage, printScale, scale);
 			}
 
 		}
@@ -3239,7 +3239,7 @@ MouseInputListener, Runnable, LinkCommandInterface {
 	/**
 	 * @param graphics
 	 */
-	private void printLegend(Graphics graphics, int width, int height, int page, int pagenum, double scale) {
+	private void printLegend(Graphics graphics, int width, int height, int page, int pagenum, double scale, double viewScale) {
 		Settings s = Settings.getInstance();
 
 		//prepare
@@ -3328,7 +3328,8 @@ MouseInputListener, Runnable, LinkCommandInterface {
 
 
 			double rx=(double)view.getRx()*nscale, ry=(double)view.getRy()*nscale;
-			int rwidth = (int)(view.getViewWidth()*nscale), rheight = (int)(view.getViewHeight()*nscale);
+			int rwidth = (int)(view.getViewWidth() * nscale / viewScale);
+			int rheight = (int)(view.getViewHeight() * nscale / viewScale);
 
 			view.setRx(0); view.setRy(0);
 			viewGroup.paintComponents(graphics, false, isFlat());

@@ -491,7 +491,8 @@ LinkCommandInterface, RepaintInterface, Pageable {
 	 * @see com.cosylab.vdct.graphics.GUIMenuInterface#openDB(java.io.File)
 	 */
 	public void openDB(File file) throws IOException {
-		if (dsInterface == null || dsInterface.isModified()) {
+		// Recycle exiting drawing surface if it is empty and unmodified.
+		if (dsInterface == null || dsInterface.isModified() || !dsInterface.isEmpty()) {
 			desktopInterface.createNewInternalFrame();
 		}
 		if (dsInterface != null) {
