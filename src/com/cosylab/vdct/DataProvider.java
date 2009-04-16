@@ -200,6 +200,15 @@ public Vector getInspectable(Object dsId) {
 	getInspectable(Group.getRoot(dsId), objs, true);
 	return objs;
 }
+
+public Vector getInspectable() {
+	Vector objs = new Vector();
+	Iterator iterator = Group.getAllRoots().iterator();
+	while (iterator.hasNext()) {
+		objs.addAll(getInspectable(((Group)iterator.next()).getDsId()));
+	}
+	return objs;
+}
 /**
  * Insert the method's description here.
  * Creation date: (2.2.2001 21:59:25)
