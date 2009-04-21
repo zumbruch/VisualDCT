@@ -214,10 +214,6 @@ public void run()
 
 	progressMonitor.close();
 
-	iterator = rootGroups.iterator();
-	while (iterator.hasNext()) {
-		((Group)iterator.next()).unconditionalValidateSubObjects(false);
-	}
 	CommandManager.getInstance().execute("RepaintAllFrames");
 }
 	

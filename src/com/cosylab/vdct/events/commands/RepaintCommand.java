@@ -28,11 +28,16 @@ package com.cosylab.vdct.events.commands;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.util.Iterator;
+
 import com.cosylab.vdct.events.Command;
 import com.cosylab.vdct.graphics.RepaintInterface;
+import com.cosylab.vdct.graphics.objects.Group;
 
 /**
- * Insert the type's description here.
+ * Repaints the component in various ways. If "all" repaint is used, also
+ * revalidates all visible objects.
+ * 
  * Creation date: (21.12.2000 22:42:23)
  * @author Matej Sekoranja
  */
@@ -60,6 +65,10 @@ public RepaintCommand(RepaintInterface component, boolean all, boolean highlight
  */
 public void execute() {
 	if (all) {
+		Iterator iterator = Group.getAllRoots().iterator();
+		while (iterator.hasNext()) {
+			((Group)iterator.next()).unconditionalValidateSubObjects(false);
+		}
 		component.repaintAll(highlighted);
 	} else {
 		component.repaint(highlighted);

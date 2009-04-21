@@ -208,10 +208,6 @@ public static void stopDebugging()
 			}
 		}
 
-		iterator = Group.getAllRoots().iterator();
-		while (iterator.hasNext()) {
-			((Group)iterator.next()).unconditionalValidateSubObjects(false);
-		}
 		CommandManager.getInstance().execute("RepaintAllFrames");
 	}
 }
