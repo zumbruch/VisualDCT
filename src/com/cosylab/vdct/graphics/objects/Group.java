@@ -2262,8 +2262,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 	public static Group getRoot(Object id) {
 		Group group = (Group)rootGroups.get(id);
 		if (group == null) {
-			System.err.println("Warning: Group.getRoot: instance with id does not exist,"
-					+ " creating new one.");
+			//System.err.println("Warning: Group.getRoot: instance with id does not exist, creating new one.");
 
 			group = new Group(null);
 			group.setDsId(id);
@@ -2291,7 +2290,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 	public Object getDsId() {
 		Object rootId = getParent() != null ? getParent().getDsId() : dsId;
 		if (rootId == null) {
-			System.out.println("Warning: returning null for root container id.");
+			//System.err.println("Warning: returning null for root container id.");
 		}
 		return rootId;
 	}

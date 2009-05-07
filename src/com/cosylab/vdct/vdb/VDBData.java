@@ -361,24 +361,24 @@ public void extractTemplates(Object dsId, DBDData dbd, DBData db)
 private void generateTemplate(Object dsId, DBDData dbd, DBTemplate dbTemplate)
 {
 	Group root = Group.getRoot(dsId);
-	
-	VDBTemplate vt = new VDBTemplate(dbTemplate.getId(), dbTemplate.getFileName());
-	vt.setComment(dbTemplate.getComment());	
-	vt.setDescription(dbTemplate.getDescription());
-	vt.setModificationTime(dbTemplate.getModificationTime());
-	vt.setVersion(dbTemplate.getVersion());
-	vt.setIoc(dbTemplate.getIoc());
-	
+
 	// generate vt.group / VDB data
 	try
 	{
+		VDBTemplate vt = new VDBTemplate(dbTemplate.getId(), dbTemplate.getFileName());
 	
 		vt.setGroup(new Group(null));
 		vt.getGroup().setAbsoluteName("");
 		vt.getGroup().setLookupTable(new Hashtable());
 	
 		Group.setRoot(dsId, vt.getGroup());
-	
+
+		vt.setComment(dbTemplate.getComment());	
+		vt.setDescription(dbTemplate.getDescription());
+		vt.setModificationTime(dbTemplate.getModificationTime());
+		vt.setVersion(dbTemplate.getVersion());
+		vt.setIoc(dbTemplate.getIoc());
+		
 		generateVDBDataInternal(dsId, dbd, dbTemplate.getData());
 		DrawingSurface.applyVisualData(dsId, false, vt.getGroup(), dbTemplate.getData(), this);
 		vt.getGroup().unconditionalValidateSubObjects(false);
@@ -791,8 +791,7 @@ public void removeTemplateInstance(VDBTemplateInstance templateInstance) {
 
 		VDBData vdbData = (VDBData)instances.get(dsId);
 		if (vdbData == null) {
-			System.err.println("Warning: VDBData.getInstance: instance with id does not exist,"
-					+ " creating new one.");
+			//System.err.println("Warning: VDBData.getInstance: instance with id does not exist, creating new one.");
 
 			vdbData = new VDBData();
 			instances.put(dsId, vdbData);
