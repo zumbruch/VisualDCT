@@ -40,7 +40,8 @@
   <news date="2005-05-27" developer="msekoranja" title="Package D2 release."/>
   <news date="2005-12-20" developer="msekoranja" title="Package F release."/>
   <news date="2008-01-22" developer="msekoranja" title="Package E release."/>
- 
+  <news date="2009-04-21" developer="msekoranja" title="Package F2 release."/> 
+
   <!-- additional documentation -->
   <document url="http://visualdct.cosylab.com" comment="VisualDCT homepage where you can find all related manuals, articles and presentations." title="VisualDCT homepage"/>
   <document url="http://visualdct.cosylab.com/builds/VisualDCT-JCADebugPlugin" comment="JCA Debug Plugin is a VisualDCT plugin allowing to display actual values in the control system inside the control boxes for records displayed within VisualDCT." title="VisualDCT JCA Debug Plugin homepage"/>
