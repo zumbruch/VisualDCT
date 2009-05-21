@@ -1164,16 +1164,22 @@ private void addSubObjectToLayout(VisibleObject object) {
 				{
 					name = renamer.matchAndReplace(name);
 					// warning if macros still exist
-					if (name.indexOf("$(") >= 0 || name.indexOf("${") >= 0)
-						Console.getInstance().println("WARNING: record name '" + name + "' is not fully resolved.");
+					if (!Settings.getInstance().getDisableMacroWarnings()) {
+				 		if (name.indexOf("$(") >= 0 || name.indexOf("${") >= 0)
+				 			Console.getInstance().println("WARNING: record name '" + name + "' is not fully resolved.");
+					}
 				}
 
 				name = StringUtils.quoteIfMacro(name);
 
 				// write comment
-				if (recordData.getComment()!=null)
-					file.writeBytes(nl+recordData.getComment());
-
+				String comment = recordData.getComment();
+			 	if (comment!=null) {
+			 		// substitute any macros first
+			 		comment = renamer.matchAndReplace(comment);
+			 		file.writeBytes(nl+comment);
+			 	}
+				
 				// write "record" block
 				file.writeBytes(recordStart+recordData.getType()+comma+name+") {"+nl);
 
@@ -1233,8 +1239,10 @@ private void addSubObjectToLayout(VisibleObject object) {
 								 value = VDBTemplateInstance.applyProperties(value, namer.getSubstitutions());*/
 						value = renamer.matchAndReplace(value);							  	 
 						// warning if macros still exist
-						if (value != null && (value.indexOf("$(") >= 0 || value.indexOf("${") >= 0))
-							Console.getInstance().println("WARNING: field value '" + value + "' of '" + fieldData.getFullName() + "' is not fully resolved.");
+						if (!Settings.getInstance().getDisableMacroWarnings()) {
+					 		if (value != null && (value.indexOf("$(") >= 0 || value.indexOf("${") >= 0))
+					 			Console.getInstance().println("WARNING: field value '" + value + "' of '" + fieldData.getFullName() + "' is not fully resolved.");
+						}
 					}
 
 					// if value is different from init value
@@ -2290,7 +2298,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 	public Object getDsId() {
 		Object rootId = getParent() != null ? getParent().getDsId() : dsId;
 		if (rootId == null) {
-			//System.err.println("Warning: returning null for root container id.");
+			//System.out.println("Warning: returning null for root container id.");
 		}
 		return rootId;
 	}
