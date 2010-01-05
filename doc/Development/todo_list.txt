@@ -1,4 +1,32 @@
 --------------------------------------------------------------------
+O) Exceptions
+
+Clicking with a mouse, unsure how to reproduce it exactly. 
+
+Exception in thread "AWT-EventQueue-0" java.lang.NullPointerException
+        at com.cosylab.vdct.graphics.DrawingSurface.mouseDragged(DrawingSurface.java:1220)
+        at com.cosylab.vdct.util.DoubleClickProxy.mouseDragged(DoubleClickProxy.java:119)
+        at java.awt.Component.processMouseMotionEvent(Component.java:6311)
+        at javax.swing.JComponent.processMouseMotionEvent(JComponent.java:3273)
+        at java.awt.Component.processEvent(Component.java:6032)
+        at java.awt.Container.processEvent(Container.java:2041)
+        at java.awt.Component.dispatchEventImpl(Component.java:4630)
+        at java.awt.Container.dispatchEventImpl(Container.java:2099)
+        at java.awt.Component.dispatchEvent(Component.java:4460)
+        at java.awt.LightweightDispatcher.retargetMouseEvent(Container.java:4574)
+        at java.awt.LightweightDispatcher.processMouseEvent(Container.java:4255)
+        at java.awt.LightweightDispatcher.dispatchEvent(Container.java:4168)
+        at java.awt.Container.dispatchEventImpl(Container.java:2085)
+        at java.awt.Window.dispatchEventImpl(Window.java:2475)
+        at java.awt.Component.dispatchEvent(Component.java:4460)
+        at java.awt.EventQueue.dispatchEvent(EventQueue.java:599)
+        at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:269)
+        at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:184)
+        at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:174)
+        at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:169)
+        at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:161)
+        at java.awt.EventDispatchThread.run(EventDispatchThread.java:122)
+--------------------------------------------------------------------
 O) vdct package-f multiple views support 
 
 * morphing template gives a returning null warning
