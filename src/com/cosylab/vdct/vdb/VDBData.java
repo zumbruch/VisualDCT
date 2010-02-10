@@ -206,6 +206,18 @@ public static VDBRecordData copyVDBRecordData(VDBRecordData source) {
 		vdbRecord.addField(targetField);
 	}
 
+	if (source.getInfoFields() != null)
+	{
+		Vector infoFieldsCopy = new Vector();
+		e = source.getInfoFields().elements();
+		while (e.hasMoreElements()) {
+			DBFieldData sfd = (DBFieldData)(e.nextElement());
+			DBFieldData tfd = new DBFieldData(sfd.getName(), sfd.getValue());
+			infoFieldsCopy.add(tfd);
+		}
+		vdbRecord.setInfoFields(infoFieldsCopy);
+	}
+	
 	return vdbRecord;
 }
 
@@ -616,7 +628,10 @@ public static VDBRecordData generateVDBRecordData(Object dsId, DBDData dbd, DBRe
 			vdbRecord.addField(generateVDBFieldData(dsId, dbd, dbRecord, vdbRecord, dbdField));
 	}
 
-/*  //DBD order
+	// just link to info fields list
+	vdbRecord.setInfoFields(dbRecord.getInfoFieldsV());
+
+	/*  //DBD order
  	Enumeration e = dbdRecord.getFieldsV().elements();
 	while (e.hasMoreElements()) {
 		dbdField = (DBDFieldData)(e.nextElement());

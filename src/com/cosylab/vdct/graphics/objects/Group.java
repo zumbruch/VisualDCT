@@ -54,6 +54,7 @@ import com.cosylab.vdct.Settings;
 import com.cosylab.vdct.Version;
 import com.cosylab.vdct.db.DBDataEntry;
 import com.cosylab.vdct.db.DBEntry;
+import com.cosylab.vdct.db.DBFieldData;
 import com.cosylab.vdct.db.DBResolver;
 import com.cosylab.vdct.db.DBSheetColWidth;
 import com.cosylab.vdct.db.DBSheetColumn;
@@ -1145,6 +1146,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 		final String nl = "\n";
 		final String recordStart = nl+DBResolver.RECORD+"("; 
 		final String fieldStart = "  "+DBResolver.FIELD+"("; 
+		final String infoStart = "  "+DBResolver.INFO+"("; 
 
 		Enumeration e = elements.elements();
 		while (e.hasMoreElements()) 
@@ -1267,6 +1269,43 @@ private void addSubObjectToLayout(VisibleObject object) {
 					}
 				}
 
+				
+			
+				// write info fields
+				if (recordData.getInfoFields() != null) {
+		 		e2 = recordData.getInfoFields().elements();
+				while (e2.hasMoreElements())
+					{
+						DBFieldData infoData = (DBFieldData)(e2.nextElement());
+
+						// write comment
+						if (infoData.getComment()!=null)
+							file.writeBytes(infoData.getComment()+nl);
+							
+						String value = StringUtils.removeQuotes(infoData.getValue());
+						
+						if (export)
+						{
+							/*// apply ports
+							if (namer.getPorts()!=null && value!=null) 
+								value = VDBTemplateInstance.applyPorts(value, namer.getPorts());
+							
+							// apply macro substitutions
+							if (namer.getSubstitutions()!=null && value!=null) 								
+								 value = VDBTemplateInstance.applyProperties(value, namer.getSubstitutions());*/
+							value = renamer.matchAndReplace(value);							  	 
+					 		// warning if macros still exist
+					 		if (value != null && (value.indexOf("$(") >= 0 || value.indexOf("${") >= 0))
+					 			Console.getInstance().println("WARNING: info field value '" + value + "' of '" + recordData.getName() + "#" + infoData.getName() + "' is not fully resolved.");
+						}
+												
+						// write field value						 		
+						file.writeBytes(infoStart+infoData.getName()+comma+"\""+value+"\")"+nl);
+	 				}
+				}
+				
+
+				
 				file.writeBytes("}"+nl);
 			}
 			/*else if (obj instanceof Group)
