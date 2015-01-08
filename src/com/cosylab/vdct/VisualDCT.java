@@ -6166,7 +6166,7 @@ public static void main(final java.lang.String[] args) {
 					
 		/* Create the frame */
        // JFrame.setDefaultLookAndFeelDecorated(true);
-        JDialog.setDefaultLookAndFeelDecorated(true);
+        //JDialog.setDefaultLookAndFeelDecorated(true);
 		final VisualDCT aVisualDCT = new VisualDCT();
 		aVisualDCT.setSize(Constants.VDCT_WIDTH, Constants.VDCT_HEIGHT);
 		aVisualDCT.getworkspace();
