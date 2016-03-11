@@ -6,7 +6,7 @@ This README is intended to inform the EPICS community of the development status 
 
 VDCT is the Visual Database Configuration Tool. It began as a project funded by the Swiss Light Source and developed by [Cosylab](http://www.cosylab.com/). Later development was funded by the APS, Diamond and the SNS. The code is maintained by Cosylab under a Free Software license (GPLv3). Source code and binaries are available from the Cosylab web site.
 
-Any bugs should be reported [here](mailto:bug@visualdct.cosylab.com).
+Any bugs should be reported [here](https://github.com/epics-extensions/VisualDCT/issues).
 
 ## Where to find it
 
