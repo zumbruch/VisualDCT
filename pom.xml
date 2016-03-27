@@ -1,6 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
+    <name>Visual DCT</name>
+    <description>
+        EPICS Visual Database Configuration Tool.
+        Developed by Cosylab, funded by SLS, APS, Diamond and SNS.
+    </description>
+    <inceptionYear>2002</inceptionYear>
+
+    <organization>
+        <name>Cosylab</name>
+        <url>http://www.cosylab.com/</url>
+    </organization>
+    <developers>
+        <developer>
+            <name>Matej Sekoranja</name>
+            <email>matej.sekonranja@cosylab.com</email>
+        </developer>
+        <developer>
+            <name>Jaka Bobnar</name>
+            <email>jaka.bobnar@cosylab.com</email>
+        </developer>
+        <developer>
+            <name>Sunil Sah</name>
+            <email>sunil.sah@cosylab.com</email>
+        </developer>
+    </developers>
+
+    <url>https://github.com/epics-extensions/VisualDCT</url>
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/epics-extensions/VisualDCT/issues</url>
+    </issueManagement>
+    <scm>
+        <connection>https://github.com/epics-extensions/VisualDCT.git</connection>
+        <url>https://github.com/epics-extensions/VisualDCT</url>
+    </scm>
+
     <groupId>com.cosylab.vdct</groupId>
     <artifactId>VisualDCT</artifactId>
     <version>2.6-SNAPSHOT</version>
