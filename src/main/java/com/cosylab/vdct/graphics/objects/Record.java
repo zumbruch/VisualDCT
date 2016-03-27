@@ -114,6 +114,9 @@ public class Record
 /**
  * Group constructor comment.
  * @param parent com.cosylab.vdct.graphics.objects.ContainerObject
+ * @param recordData
+ * @param x int
+ * @param y int
  */
 public Record(ContainerObject parent, VDBRecordData recordData, int x, int y) {
 	super(parent);
@@ -229,7 +232,9 @@ public boolean checkMove(int dx, int dy) {
 /**
  * Insert the method's description here.
  * Creation date: (4.2.2001 22:02:29)
+ * @param dsId
  * @param group java.lang.String
+ * @return 
  */
 public Flexible copyToGroup(Object dsId, java.lang.String group) {
 
@@ -274,7 +279,6 @@ public Flexible copyToGroup(Object dsId, java.lang.String group) {
 /**
  * Insert the method's description here.
  * Creation date: (5.2.2001 9:42:29)
- * @param e java.util.Enumeration list of VDBFieldData fields
  * @param prevGroup java.lang.String
  * @param group java.lang.String
  */
@@ -362,6 +366,7 @@ public void destroy() {
 /**
  * Insert the method's description here.
  * Creation date: (30.1.2001 11:47:53)
+ * @param disconnector
  */
 public void disconnect(Linkable disconnector) {
 	if (!disconnected && outlinks.contains(disconnector)) {
@@ -728,7 +733,7 @@ private void fixForwardLinks() {
 		{
 			// not the same, fix it gently as a doctor :)
 			String value = source.getFieldData().getValue();
-			value = targetName + com.cosylab.vdct.util.StringUtils.removeBegining(value, oldTarget);
+			value = targetName + com.cosylab.vdct.util.StringUtils.removeBeginning(value, oldTarget);
 			source.getFieldData().setValueSilently(value);
 			source.fixLinkProperties();
 		}
@@ -908,6 +913,8 @@ public OutLink getOutput() {
 /**
  * Return properties to be inspected
  * Creation date: (11.1.2001 21:43:31)
+ * @param mode
+ * @param spreadsheet
  * @return com.cosylab.vdct.inspector.InspectableProperty[]
  */
 public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode, boolean spreadsheet) {
@@ -1068,6 +1075,7 @@ public VisibleObject hiliteComponentsCheck(int x, int y) {
  * Insert the method's description here.
  * Creation date: (30.1.2001 9:36:15)
  * @param field com.cosylab.vdct.vdb.VDBFieldData
+ * @return 
  */
 public EPICSLink initializeLinkField(VDBFieldData field) {
 
@@ -1213,6 +1221,7 @@ public void manageLinks() {
  * Insert the method's description here.
  * Creation date: (4.2.2001 21:58:46)
  * @param newType java.lang.String
+ * @return 
  */
 public boolean morph(java.lang.String newType) {
 	
@@ -1289,6 +1298,9 @@ public boolean move(int dx, int dy) {
 }
 /**
  * NOTE: only dy &lt; 0 is checked
+     * @param dx
+     * @param dy
+     * @return 
  */
 public boolean moveAsMuchAsPossibleTopUp(int dx, int dy) {
 
@@ -1302,7 +1314,9 @@ public boolean moveAsMuchAsPossibleTopUp(int dx, int dy) {
 /**
  * Insert the method's description here.
  * Creation date: (4.2.2001 22:02:29)
+ * @param dsId
  * @param group java.lang.String
+ * @return 
  */
 public boolean moveToGroup(Object dsId, String group) {
 	String currentParent = Group.substractParentName(recordData.getName());
@@ -1422,7 +1436,9 @@ public void removeLink(Linkable link) {
 /**
  * Insert the method's description here.
  * Creation date: (2.5.2001 23:23:32)
+ * @param dsId
  * @param newName java.lang.String
+ * @return 
  */
 public boolean rename(Object dsId, String newName) {
 	
@@ -1847,9 +1863,7 @@ private static ArrayList getModes()
 }
 
 /**
- * @param linkableMacros
  * @param macros
- * @param deep
  */
 public void generateMacros(HashMap macros) {
 	Enumeration e = recordData.getFieldsV().elements();

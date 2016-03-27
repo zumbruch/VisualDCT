@@ -63,7 +63,7 @@ public java.util.Hashtable getSubscriber() {
  * Insert the method's description here.
  * Creation date: (18.12.2000 16:12:53)
  * @param id java.lang.String
- * @param subscriber java.lang.Object
+ * @param newSubscriber java.lang.Object
  */
 public void registerSubscriber(String id, Object newSubscriber) {
 	if (subscriber.containsKey(id))
@@ -74,7 +74,7 @@ public void registerSubscriber(String id, Object newSubscriber) {
  * Insert the method's description here.
  * Creation date: (18.12.2000 16:12:53)
  * @param id java.lang.String
- * @param subscriber java.lang.Object
+ * @param newSubscriber java.lang.Object
  */
 public void unregisterSubscriber(String id, Object newSubscriber) {
 	subscriber.remove(id);

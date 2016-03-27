@@ -75,6 +75,7 @@ protected DataProvider() {
 /**
  * Insert the method's description here.
  * Creation date: (8.1.2001 22:03:39)
+ * @param linkType
  * @return java.util.regex.Pattern
  */
 public Pattern getEditPatternLinkType(String linkType)
@@ -88,6 +89,7 @@ public Pattern getEditPatternLinkType(String linkType)
 /**
  * Insert the method's description here.
  * Creation date: (8.1.2001 22:03:39)
+ * @param linkType
  * @return java.lang.String
  */
 public String getEditInitialValueLinkType(String linkType)
@@ -101,6 +103,7 @@ public String getEditInitialValueLinkType(String linkType)
 /**
  * Insert the method's description here.
  * Creation date: (8.1.2001 22:03:39)
+ * @param linkType
  * @return java.lang.String
  */
 public String getEditDescriptionLinkType(String linkType)
@@ -133,6 +136,7 @@ private void loadDefaultLinkTypeConfig()
 /**
  * Insert the method's description here.
  * Creation date: (8.1.2001 22:03:39)
+ * @param table
  */
 public void addLinkTypeConfig(Hashtable table)
 {
@@ -193,6 +197,7 @@ public com.cosylab.vdct.dbd.DBDData getDbdDB() {
 /**
  * Insert the method's description here.
  * Creation date: (8.1.2001 22:03:39)
+ * @param dsId
  * @return java.util.Vector
  */
 public Vector getInspectable(Object dsId) {
@@ -201,7 +206,7 @@ public Vector getInspectable(Object dsId) {
 	return objs;
 }
 
-public Vector getInspectable() {
+    public Vector getInspectable() {
 	Vector objs = new Vector();
 	Iterator iterator = Group.getAllRoots().iterator();
 	while (iterator.hasNext()) {

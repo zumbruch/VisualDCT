@@ -38,7 +38,6 @@ import javax.swing.JPanel;
 /**
  * Insert the type's description here.
  * Creation date: (13.5.2001 20:29:29)
- * @author 
  */
 public class VisualDCTDocument extends javax.swing.JDialog {
 	private JPanel buttonPanel = null;
@@ -54,6 +53,7 @@ public VisualDCTDocument() {
 /**
  * VisualDCTDocument constructor comment.
  * @param owner java.awt.Frame
+ * @param document
  */
 public VisualDCTDocument(java.awt.Frame owner, URL document) {
 	super(owner);

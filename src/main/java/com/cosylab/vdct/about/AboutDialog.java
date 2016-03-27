@@ -306,14 +306,15 @@ public static void main(java.lang.String[] args) {
 	}
 }
 	/**
-	 * @see com.cosylab.gui.components.about.AboutTabReceiver#AddTab(AboutTab)
+     * @param tabToAdd
+	 * @see com.cosylab.vdct.about.AboutTabReceiver#addAboutTab(AboutTab)
 	 */
 	public void addAboutTab(AboutTab tabToAdd) {
 		getJTabbedPane().addTab(tabToAdd.getName(), tabToAdd.getPanel());
 	}
 
 	/**
-	 * @see com.cosylab.gui.components.about.AboutTabReceiver#ReceiverPerform()
+	 * @see com.cosylab.vdct.about.AboutTabReceiver#receiverPerform()
 	 */
 	public void receiverPerform() {
 		this.setVisible(true);

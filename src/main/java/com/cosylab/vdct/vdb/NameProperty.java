@@ -46,7 +46,7 @@ public class NameProperty extends NameValueInfoProperty {
 	private boolean flexible = false;
 	/**
 	 * @param name
-	 * @param value
+	 * @param namedObject
 	 */
 	public NameProperty(String name, Inspectable namedObject) {
 		super(name, namedObject.getName());

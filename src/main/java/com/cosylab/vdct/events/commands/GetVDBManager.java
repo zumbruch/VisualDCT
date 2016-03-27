@@ -40,7 +40,7 @@ public class GetVDBManager extends com.cosylab.vdct.events.Command {
 /**
  * Insert the method's description here.
  * Creation date: (3.2.2001 22:08:10)
- * @param validator com.cosylab.vdct.graphics.VDBInterface
+ * @param manager com.cosylab.vdct.graphics.VDBInterface
  */
 public GetVDBManager(VDBInterface manager) {
 	this.manager=manager;

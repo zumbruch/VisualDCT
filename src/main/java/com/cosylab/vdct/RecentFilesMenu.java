@@ -87,9 +87,7 @@ public class RecentFilesMenu extends JMenu
 
 /**
  * Insert the method's description here.
- * Creation date: (7.12.2001 17:08:53)
- * @param
- */
+ * Creation date: (7.12.2001 17:08:53) */
 public RecentFilesMenu()
 {
 	setEnabled(false);
@@ -99,8 +97,7 @@ public RecentFilesMenu()
 /**
  * Insert the method's description here.
  * Creation date: (7.12.2001 17:09:23)
- * @param
- */
+ * @param file */
 public void addFile(File file)
 {
 	addFile(file, false);
@@ -109,8 +106,8 @@ public void addFile(File file)
 /**
  * Insert the method's description here.
  * Creation date: (7.12.2001 17:09:23)
- * @param
- */
+ * @param file
+ * @param makeLast */
 public synchronized void addFile(File file, boolean makeLast)
 {
 	

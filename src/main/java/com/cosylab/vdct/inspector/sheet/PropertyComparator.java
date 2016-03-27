@@ -89,7 +89,15 @@ public class PropertyComparator implements Comparator {
 		return sign * (firstNumber - secondNumber); 
 	}
 	
-	public static int[] getOrder(InspectableProperty[][] properties, boolean rows,
+    /**
+     *
+     * @param properties
+     * @param rows
+     * @param sortingIndex
+     * @param ascending
+     * @return
+     */
+    public static int[] getOrder(InspectableProperty[][] properties, boolean rows,
 			int sortingIndex, boolean ascending) {
 		
 		int orderLen = rows ? properties.length : properties[0].length; 

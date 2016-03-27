@@ -139,6 +139,7 @@ public boolean deselectAll() {
 /**
  * Insert the method's description here.
  * Creation date: (27.12.2000 11:54:42)
+ * @param object
  */
 public void deselectObject(VisibleObject object) {
 	selectedObjects.remove(object);
@@ -465,6 +466,7 @@ public void setFlat(boolean newFlat) {
 /**
  * Insert the method's description here.
  * Creation date: (21.12.2000 21:02:40)
+ * @param dsId
  * @param newInstance com.cosylab.vdct.graphics.ViewState
  */
 public static void setInstance(Object dsId, ViewState newInstance) {
@@ -589,7 +591,10 @@ public void setY0(int newY0) {
 		this.dsId = dsId;
 	}
 	
-	public static void registerDsListener() {
+    /**
+     *
+     */
+    public static void registerDsListener() {
 		ViewState viewState = new ViewState();
 		viewState.setDsId(Constants.DEFAULT_NAME);
 	    instances.put(Constants.DEFAULT_NAME, viewState);
@@ -600,13 +605,15 @@ public void setY0(int newY0) {
 		}
 	}
 	
-	public void onDsAdded(Object id) {
+    public void onDsAdded(Object id) {
 		ViewState viewState = new ViewState();
 		viewState.setDsId(id);
 	    instances.put(id, viewState);
 	}
-	public void onDsRemoved(Object id) {
+
+    public void onDsRemoved(Object id) {
 	}
-	public void onDsFocused(Object id) {
+
+    public void onDsFocused(Object id) {
 	}
 }

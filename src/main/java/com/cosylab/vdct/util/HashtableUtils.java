@@ -37,7 +37,7 @@ public class HashtableUtils {
 /**
  * This method was created in VisualAge.
  * @param hash Hashtable
- * @param obj java.lang.Object[]
+ * @return 
  */
 public static Object[] getArray(Hashtable hash) {
 

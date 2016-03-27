@@ -42,6 +42,7 @@ public interface GUIMenuInterface {
 /**
  * Insert the method's description here.
  * Creation date: (4.2.2001 15:12:21)
+ * @param direction
  */
 void moveOrigin(int direction);
 /**
@@ -67,6 +68,7 @@ void delete();
 /**
  * Insert the method's description here.
  * Creation date: (4.2.2001 15:08:14)
+ * @param groupName
  */
 void group(String groupName);
 /**
@@ -105,8 +107,17 @@ void importBorder(File file) throws IOException;
  */
 void importDBD(File file) throws IOException;
 
+/**
+ *
+ * @param guiContext
+ */
 void loadRdbGroup(JFrame guiContext);
 
+/**
+ *
+ * @param guiContext
+ * @param dialog
+ */
 void saveRdbGroup(JFrame guiContext, boolean dialog);
 
 /**
@@ -116,6 +127,10 @@ void saveRdbGroup(JFrame guiContext, boolean dialog);
  */
 boolean isModified();
 
+/**
+ *
+ * @return
+ */
 boolean isMacroPortsIDChanged();
 
 /**
@@ -150,6 +165,8 @@ void paste();
 /**
  * Insert the method's description here.
  * Creation date: (4.2.2001 15:07:54)
+ * @param pX
+ * @param pY
  */
 void pasteAtPosition(int pX, int pY);
 /**
@@ -170,11 +187,19 @@ void rename();
 /**
  * Insert the method's description here.
  * Creation date: (4.2.2001 15:08:06)
+ * @param oldName
+ * @param newName
  */
 void rename(String oldName, String newName);
-
+/**
+ *
+ */
 void morph();
-
+/**
+ *
+ * @param name
+ * @param newType
+ */
 void morph(String name, String newType);
 /**
  * Insert the method's description here.

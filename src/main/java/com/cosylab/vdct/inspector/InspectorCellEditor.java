@@ -331,8 +331,8 @@ public class InspectorCellEditor implements TableCellEditor, TreeCellEditor {
 
 	/**
 	 * Constructs a InspectorCellEditor that uses a text field.
-	 *
-	 * @param textField javax.swing.JTextField
+	 */
+	/* @param formattedTextField javax.swing.JFormattedTextField
 	 */
 	/*public InspectorCellEditor(final JFormattedTextField formattedTextField) {
 		editorComponent = formattedTextField;
@@ -372,7 +372,7 @@ public class InspectorCellEditor implements TableCellEditor, TreeCellEditor {
 		fireEditingCanceled();
 		helpDisplayer.setHelpText(null);
 	}
-	/*
+	/* (non-javadoc)
 	 * Notify all listeners that have registered interest for
 	 * notification on this event type.  The event instance 
 	 * is lazily created using the parameters passed into 
@@ -394,7 +394,7 @@ public class InspectorCellEditor implements TableCellEditor, TreeCellEditor {
 			}	       
 		}
 	}
-	/*
+	/* (non-javadoc)
 	 * Notify all listeners that have registered interest for
 	 * notification on this event type.  The event instance 
 	 * is lazily created using the parameters passed into 

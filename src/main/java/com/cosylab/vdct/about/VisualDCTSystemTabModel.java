@@ -34,9 +34,9 @@ import java.util.Properties;
  * @author
  *
  * To change this generated comment edit the template variable "typecomment":
- * Window>Preferences>Java>Templates.
+ * Window&gt;Preferences&gt;Java&gt;Templates.
  * To enable and disable the creation of type comments go to
- * Window>Preferences>Java>Code Generation.
+ * Window&gt;Preferences&gt;Java&gt;Code Generation.
  */
 public class VisualDCTSystemTabModel implements SystemTabModel {
 
@@ -48,14 +48,14 @@ public class VisualDCTSystemTabModel implements SystemTabModel {
 	}
 
 	/**
-	 * @see com.cosylab.gui.components.about.SystemTabModel#getSystemProperties()
+	 * @see com.cosylab.vdct.about.SystemTabModel#getSystemProperties()
 	 */
 	public Properties getSystemProperties() {
 		return System.getProperties();
 	}
 
 	/**
-	 * @see com.cosylab.gui.components.about.AboutTabModel#aquireData()
+	 * @see com.cosylab.vdct.about.AboutTabModel#aquireData()
 	 */
 	public void aquireData() {}
 

@@ -49,7 +49,7 @@ public class LinkCommand extends com.cosylab.vdct.events.Command {
 /**
  * Insert the method's description here.
  * Creation date: (21.12.2000 22:43:26)
- * @param drawingSurface com.cosylab.vdct.graphics.DrawingSurface 
+ * @param linkCommandInterface 
  */
 public LinkCommand(LinkCommandInterface linkCommandInterface) {
 	this.linkCommandInterface=linkCommandInterface;
@@ -64,7 +64,7 @@ public void execute() {
 /**
  * Insert the method's description here.
  * Creation date: (3.2.2001 13:29:40)
- * @param record com.cosylab.vdct.graphics.objects.VisibleObject
+ * @param obj com.cosylab.vdct.graphics.objects.VisibleObject
  * @param field com.cosylab.vdct.graphics.objects.LinkSource
  */
 public void setData(VisibleObject obj, LinkSource field) {

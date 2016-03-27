@@ -56,8 +56,9 @@ public final class LinkDrawer {
 /**
  * Creation date: (30.1.2001 14:43:02)
  * @param g java.awt.Graphics
- * @param com.cosylab.vdct.graphics.objects.OutLink out
- * @param com.cosylab.vdct.graphics.objects.InLink in
+ * @param view
+ * @param out com.cosylab.vdct.graphics.objects.OutLink
+ * @param in com.cosylab.vdct.graphics.objects.InLink
  * @param isRight boolean
  */
 public static void drawInIntergroupLink(Graphics g, ViewState view, OutLink out, InLink in, boolean isRight) {
@@ -134,8 +135,9 @@ private static void drawIntergroupLink(Graphics g, ViewState view, int x1, int y
 /**
  * This method was created in VisualAge.
  * @param g java.awt.Graphics
- * @param com.cosylab.vdct.graphics.objects.OutLink out
- * @param com.cosylab.vdct.graphics.objects.InLink in
+ * @param view
+ * @param out com.cosylab.vdct.graphics.objects.OutLink
+ * @param in com.cosylab.vdct.graphics.objects.InLink
  * @param firstHorizontal boolean
  */
 public static void drawKneeLine(Graphics g, ViewState view, OutLink out, InLink in, boolean firstHorizontal) {
@@ -646,8 +648,9 @@ private static boolean checkConnectorOuterMost(MultiInLink evol, int outX, int i
 /**
  * Creation date: (30.1.2001 14:43:02)
  * @param g java.awt.Graphics
- * @param com.cosylab.vdct.graphics.objects.OutLink out
- * @param com.cosylab.vdct.graphics.objects.InLink in
+ * @param view
+ * @param out com.cosylab.vdct.graphics.objects.OutLink
+ * @param in com.cosylab.vdct.graphics.objects.InLink
  * @param count int
  * @param isRight boolean
  */

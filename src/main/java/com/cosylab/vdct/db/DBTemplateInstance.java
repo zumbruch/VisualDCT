@@ -49,6 +49,8 @@ public class DBTemplateInstance extends DBComment
 	protected Vector templateFields = null;
 	/**
 	 * Constructor.
+     * @param templateInstanceId
+     * @param templateId
 	 */
 	public DBTemplateInstance(String templateInstanceId, String templateId)
 	{
@@ -78,8 +80,9 @@ public class DBTemplateInstance extends DBComment
 	}
 
 	/**
-	 * Returns the properties.
-	 * @return Vector
+	 * Add a property.
+     * @param key
+     * @param value
 	 */
 	public void addProperty(Object key, String value)
 	{

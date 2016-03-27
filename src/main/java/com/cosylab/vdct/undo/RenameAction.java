@@ -43,6 +43,7 @@ public class RenameAction extends ActionObject {
 /**
  * Insert the method's description here.
  * Creation date: (4.5.2001 11:40:19)
+ * @param dsId
  * @param object com.cosylab.vdct.graphics.objects.Flexible
  * @param oldName java.lang.String
  * @param newName java.lang.String

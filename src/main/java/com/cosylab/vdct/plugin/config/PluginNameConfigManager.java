@@ -60,6 +60,7 @@ public class PluginNameConfigManager implements PluginListener {
 	/**
 	 * If name is valid, the function returns null, otherwise it returns a
 	 * String with the description of the error. 
+     * @return 
 	 */
 	public String checkValidity(String name) {
 		// Use only the most recently loaded running plugin.
@@ -69,6 +70,7 @@ public class PluginNameConfigManager implements PluginListener {
 	
 	/**
 	 * Returns the description of the valid names.    
+     * @return 
 	 */
 	public String getNameDescription() {
 		// Use only the most recently loaded plugin.

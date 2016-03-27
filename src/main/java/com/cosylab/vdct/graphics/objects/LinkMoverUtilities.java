@@ -82,6 +82,7 @@ public class LinkMoverUtilities {
      * 
      * @param x the absolute horizontal position of the pointer
      * @param y the absolute vertical position of the pointer
+     * @param viewGroup
      * @return a Vector of the connectors that are affected by the move started at the point (x,y)
      */
     public Vector isMousePositionLinkMovable(int x, int y, Group viewGroup) {

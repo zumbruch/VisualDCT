@@ -125,6 +125,7 @@ public class InspectorTableClipboardAdapter extends TransferHandler implements A
     /**
      * The adapter is constructed with a JTable on which it enables
      * Cut-Copy-Paste and acts as a clipboard listener.
+     * @param dsId
      * @param table table on which to enable to Cut-Copy-Paste actions.
      */
     public InspectorTableClipboardAdapter(Object dsId, JTable table) {

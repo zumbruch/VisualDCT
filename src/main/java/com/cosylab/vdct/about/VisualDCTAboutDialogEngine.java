@@ -7,9 +7,9 @@ import javax.swing.JFrame;
  * @author administrator
  *
  * To change this generated comment edit the template variable "typecomment":
- * Window>Preferences>Java>Templates.
+ * Window&gt;Preferences&gt;Java&gt;Templates.
  * To enable and disable the creation of type comments go to
- * Window>Preferences>Java>Code Generation.
+ * Window&gt;Preferences&gt;Java&gt;Code Generation.
  */
 public class VisualDCTAboutDialogEngine extends AboutDialogEngine {
 
@@ -24,7 +24,7 @@ public class VisualDCTAboutDialogEngine extends AboutDialogEngine {
 	}
 
 	/**
-	 * @see com.cosylab.gui.components.about.AboutDialogEngine#initializeReceiver()
+	 * @see com.cosylab.vdct.about.AboutDialogEngine#initializeReceiver()
 	 */
 	protected void initializeReceiver() {
 
@@ -60,7 +60,7 @@ public class VisualDCTAboutDialogEngine extends AboutDialogEngine {
 	} 
 
 	/**
-	 * @see com.cosylab.gui.components.about.AboutDialogEngine#perform()
+	 * @see com.cosylab.vdct.about.AboutDialogEngine#perform()
 	 */
 	protected void perform() {
 	
@@ -70,7 +70,10 @@ public class VisualDCTAboutDialogEngine extends AboutDialogEngine {
 	
 	}
 	
-	protected void aquireDefaultTabs(){
+    /**
+     *
+     */
+    protected void aquireDefaultTabs(){
 	
 	ProgramTabPanel ptp = new ProgramTabPanel(new VisualDCTProgramTabModel(aboutedObject));
 	
@@ -82,7 +85,11 @@ public class VisualDCTAboutDialogEngine extends AboutDialogEngine {
 	
 	}
 	
-	protected void instanceOfJFrame(javax.swing.JFrame jf) {
+    /**
+     *
+     * @param jf
+     */
+    protected void instanceOfJFrame(javax.swing.JFrame jf) {
 
 		int x = (int) (jf.getX() + 0.5 * jf.getWidth() - 0.5 * ((AboutDialog)receiver).getWidth());
 		int y = (int) (jf.getY() + 0.5 * jf.getHeight() - 0.5 * ((AboutDialog)receiver).getHeight());
@@ -96,7 +103,12 @@ public class VisualDCTAboutDialogEngine extends AboutDialogEngine {
 		((AboutDialog)receiver).setBounds(x,y,((AboutDialog)receiver).getWidth(),((AboutDialog)receiver).getHeight());
 
 	}
-	protected void instanceOfComponent(Component c) {
+
+    /**
+     *
+     * @param c
+     */
+    protected void instanceOfComponent(Component c) {
 
 		int x = (int) (c.getX() + 0.5 * c.getWidth() - 0.5 * ((AboutDialog)receiver).getWidth());
 		int y = (int) (c.getY() + 0.5 * c.getHeight() - 0.5 * ((AboutDialog)receiver).getHeight());

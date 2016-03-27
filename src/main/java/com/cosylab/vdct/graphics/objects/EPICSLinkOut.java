@@ -114,6 +114,7 @@ protected EPICSLinkOut(ContainerObject parent, VDBFieldData fieldData) {
 /**
  * Insert the method's description here.
  * Creation date: (4.2.2001 12:50:51)
+ * @return 
  */
 public Connector addConnector() {
 	String id = generateConnectorID(this);
@@ -177,6 +178,7 @@ public static void destroyChain(Linkable link, OutLink out) {
 /**
  * Insert the method's description here.
  * Creation date: (29.1.2001 21:44:32)
+ * @param disconnector
  */
 public void disconnect(Linkable disconnector) {
 	if (!disconnected && (disconnector==inlink)) {
@@ -360,6 +362,8 @@ public int getOutY() {
 /**
  * Return properties to be inspected
  * Creation date: (1.2.2001 22:22:37)
+ * @param mode
+ * @param spreadsheet
  * @return com.cosylab.vdct.inspector.InspectableProperty[]
  */
 public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode, boolean spreadsheet) {
@@ -411,6 +415,9 @@ public static InLink getTarget(Object dsId, LinkProperties link, boolean allowLi
 /**
  * get/create target link field
  * Creation date: (30.1.2001 13:40:51)
+ * @param dsId
+ * @param doNotSearchRecordFields
+ * @param allowLinkOutAsTarget
  * @return com.cosylab.vdct.graphics.objects.InLink
  * @param link com.cosylab.vdct.vdb.LinkProperties
  */
@@ -527,6 +534,7 @@ public void setColor(Color newColor) {
 /**
  * Insert the method's description here.
  * Creation date: (29.1.2001 22:22:13)
+ * @param input
  */
 public void setInput(InLink input) {
 	if (inlink==input) return;

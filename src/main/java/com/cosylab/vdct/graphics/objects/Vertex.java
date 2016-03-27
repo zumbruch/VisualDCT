@@ -38,7 +38,7 @@ import com.cosylab.vdct.graphics.popup.*;
  * @author ssah
  *
  * To change this generated comment edit the template variable "typecomment":
- * Window>Preferences>Java>Templates.
+ * Window&gt;Preferences&gt;Java&gt;Templates.
  */
 public class Vertex extends VisibleObject implements Movable, Popupable
 {

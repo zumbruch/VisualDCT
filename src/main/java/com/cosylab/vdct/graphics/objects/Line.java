@@ -42,7 +42,7 @@ import com.cosylab.vdct.util.*;
  * @author ssah
  *
  * To change this generated comment edit the template variable "typecomment":
- * Window>Preferences>Java>Templates.
+ * Window&gt;Preferences&gt;Java&gt;Templates.
  */
 public class Line extends VisibleObject implements BorderObject, Flexible, Movable, Popupable, Selectable, Clipboardable
 {
@@ -112,7 +112,16 @@ private static boolean currentEndArrow = false;
 
 private static final String hashIdPrefix = "Line";
 
-public Line(String parName, Group parentGroup, int posX, int posY, int posX2, int posY2)
+    /**
+     *
+     * @param parName
+     * @param parentGroup
+     * @param posX
+     * @param posY
+     * @param posX2
+     * @param posY2
+     */
+    public Line(String parName, Group parentGroup, int posX, int posY, int posX2, int posY2)
 {
 	super(parentGroup);
 

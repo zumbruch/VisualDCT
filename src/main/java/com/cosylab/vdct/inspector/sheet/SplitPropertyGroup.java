@@ -58,7 +58,7 @@ public class SplitPropertyGroup {
 	
 	/**
 	 * @param owner
-	 * @param splitPattern
+	 * @param splitData
 	 */
 	public SplitPropertyGroup(InspectableProperty owner, DBSheetSplitCol splitData) {
 		this(owner.getValue(), splitData);
@@ -67,7 +67,7 @@ public class SplitPropertyGroup {
 		
 	/**
 	 * @param value
-	 * @param splitPattern
+	 * @param splitData
 	 */
 	public SplitPropertyGroup(String value, DBSheetSplitCol splitData) {
 		super();
@@ -187,7 +187,13 @@ public class SplitPropertyGroup {
 		patternParts = foundParts; 
 	}
 
-	public static int getPartsCount(String value, DBSheetSplitCol splitData) {
+    /**
+     *
+     * @param value
+     * @param splitData
+     * @return
+     */
+    public static int getPartsCount(String value, DBSheetSplitCol splitData) {
 		
 		if (value == null) {
 			value = "";
@@ -210,7 +216,11 @@ public class SplitPropertyGroup {
 		}
 	}
 	
-	public void setValuePart(SplitPropertyPart part) {
+    /**
+     *
+     * @param part
+     */
+    public void setValuePart(SplitPropertyPart part) {
 		String value = "";
 		for (int p = 0; p < parts.length; p++) {
 			value += parts[p].getLead() + parts[p].getValue();

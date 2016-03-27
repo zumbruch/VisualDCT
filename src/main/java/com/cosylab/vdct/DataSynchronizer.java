@@ -57,14 +57,14 @@ public class DataSynchronizer {
 	private Component dialogParent = null;
 	private DsManagerInterface dsManager = null;
 
-	public static DataSynchronizer getInstance() {
+    public static DataSynchronizer getInstance() {
 		if (instance == null) {
 			instance = new DataSynchronizer();
 		}
 		return instance;
 	}
 
-	public DataSynchronizer() {
+    public DataSynchronizer() {
 		super();
 		GetMainComponent command = (GetMainComponent)CommandManager.getInstance().getCommand("GetMainComponent");
 		if (command != null) {
@@ -73,7 +73,13 @@ public class DataSynchronizer {
 		dsManager = ((GetDsManager)CommandManager.getInstance().getCommand("GetDsManager")).getManager();
 	}
 
-	public VDBTemplate getTemplate(Object dsId, String templateId) {
+    /**
+     *
+     * @param dsId
+     * @param templateId
+     * @return
+     */
+    public VDBTemplate getTemplate(Object dsId, String templateId) {
 
 		VDBTemplate template = (VDBTemplate)VDBData.getInstance(dsId).getTemplates().get(templateId);
 		if (template == null) {
@@ -101,7 +107,13 @@ public class DataSynchronizer {
 		return template;
 	}
 
-	public boolean confirmFileClose(Object dsId, boolean exit) {
+    /**
+     *
+     * @param dsId
+     * @param exit
+     * @return
+     */
+    public boolean confirmFileClose(Object dsId, boolean exit) {
 		boolean confirmed = true;
 		if (dsId != null) {
 			if (confirmUnsavedChangesDialog(dsManager.getDrawingSurfaceById(dsId))) {
@@ -145,7 +157,11 @@ public class DataSynchronizer {
 		return confirmed;
 	}
 
-	public void checkFilesystemChanges(Object dsId) {
+    /**
+     *
+     * @param dsId
+     */
+    public void checkFilesystemChanges(Object dsId) {
 
 		VDBTemplate template = null; 
 

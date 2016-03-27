@@ -40,6 +40,7 @@ public interface VDBInterface {
 /**
  * Returns error message or null if OK
  * Creation date: (3.2.2001 22:11:01)
+ * @param relative
  * @return java.lang.String
  * @param name java.lang.String
  */
@@ -47,6 +48,8 @@ java.lang.String checkGroupName(String name, boolean relative);
 /**
  * Returns error message or null if OK. oldName can be null if not applicable.
  * Creation date: (3.2.2001 22:11:01)
+ * @param oldName
+ * @param relative
  * @return java.lang.String
  * @param name java.lang.String
  */
@@ -54,11 +57,8 @@ java.lang.String checkRecordName(String name, String oldName, boolean relative);
 /**
  * Insert the method's description here.
  * Creation date: (3.2.2001 23:27:30)
- * @param name java.lang.String
- * @param type java.lang.String
- * @param relative boolean
+ * @return 
  */
-
 Box createBox();
 
 Line createLine();
@@ -70,6 +70,8 @@ void createRecord(String name, String type, boolean relative);
 /**
  * Returns true if the string returned by checkGroupName(...) and checkRecordName(...) is an error
  * message and false when it is a warning.
+ * @param message
+ * @return 
  */
 public boolean isErrorMessage(String message);
 }

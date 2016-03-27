@@ -153,9 +153,7 @@ public Icon getIcon()
 	private Map exportMenuItems = new HashMap();
 /**
  * Insert the method's description here.
- * Creation date: (7.12.2001 17:08:53)
- * @param
- */
+ * Creation date: (7.12.2001 17:08:53) */
 public ExportMenu()
 {
 }
@@ -173,9 +171,7 @@ public void init()
 }
 /**
  * Insert the method's description here.
- * Creation date: (7.12.2001 17:09:23)
- * @param
- */
+ * Creation date: (7.12.2001 17:09:23) */
 public void pluginAdded(PluginObject plugin)
 {
 	if (plugin.getPlugin() instanceof ExportPlugin)
@@ -196,9 +192,7 @@ public void pluginAdded(PluginObject plugin)
 }
 /**
  * Insert the method's description here.
- * Creation date: (7.12.2001 17:10:37)
- * @param
- */
+ * Creation date: (7.12.2001 17:10:37) */
 public void pluginRemoved(PluginObject plugin)
 {
 	if (plugin.getPlugin() instanceof ExportPlugin)

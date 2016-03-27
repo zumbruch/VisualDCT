@@ -34,9 +34,9 @@ import javax.swing.JPanel;
  * @author 
  *
  * To change this generated comment edit the template variable "typecomment":
- * Window>Preferences>Java>Templates.
+ * Window&gt;Preferences&gt;Java&gt;Templates.
  * To enable and disable the creation of type comments go to
- * Window>Preferences>Java>Code Generation.
+ * Window&gt;Preferences&gt;Java&gt;Code Generation.
  */
 public abstract class AboutTabPanel extends JPanel implements AboutTab {
 
@@ -47,6 +47,7 @@ protected AboutTabModel model = null;
 
 	/**
 	 * Constructor for AboutTabPanel.
+     * @param tabModel
 	 */
 	public AboutTabPanel(AboutTabModel tabModel) {
 		super();
@@ -58,14 +59,15 @@ protected AboutTabModel model = null;
 
 	}
 	
-	protected abstract void initializePanel();
+    protected abstract void initializePanel();
 	
-	protected abstract void processData();
+    protected abstract void processData();
 
 
 
 	/**
-	 * @see com.cosylab.gui.components.about.AboutTab#getPanel()
+     * @return 
+	 * @see com.cosylab.vdct.about.AboutTab#getPanel()
 	 */
 	public JPanel getPanel() {
 		return null;

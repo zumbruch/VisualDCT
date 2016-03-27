@@ -38,19 +38,19 @@ public class SetWorkspaceFile extends Command {
 	private File file = null;
 	private String fileName = null;
 
-public SetWorkspaceFile(VisualDCT visualDCT) {
-	this.visualDCT=visualDCT;
-}
+    public SetWorkspaceFile(VisualDCT visualDCT) {
+        this.visualDCT=visualDCT;
+    }
 
-public void execute() {
-	visualDCT.setOpenedFile(file, fileName);
-}
+    public void execute() {
+        visualDCT.setOpenedFile(file, fileName);
+    }
 
-public void setFile(File file) {
-	this.file = file;
-}
+    public void setFile(File file) {
+        this.file = file;
+    }
 
-public void setFilename(String fileName) {
-	this.fileName = fileName;
-}
+    public void setFilename(String fileName) {
+    	this.fileName = fileName;
+    }
 }

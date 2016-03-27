@@ -56,6 +56,7 @@ public abstract class EPICSLinkOutIn extends EPICSLinkOut implements MultiInLink
 
 	/**
 	 * Extra lasy initalization pattern for <code>outlinks</code> object.
+     * @return 
 	 */
 	public Vector getOutlinks()
 	{
@@ -161,6 +162,7 @@ public abstract class EPICSLinkOutIn extends EPICSLinkOut implements MultiInLink
 		
 	}
 	/**
+     * @param disconnector
 	 */
 	public void disconnect(Linkable disconnector) {
 		if (!disconnected && outlinks!=null && outlinks.contains(disconnector)) {

@@ -70,8 +70,7 @@ public PluginSerializer getPluginSerializer()
 /**
  * Insert the method's description here.
  * Creation date: (6.12.2001 22:17:37)
- * @param
- * @return
+ * @param plugin 
  */
 public void addPlugin(PluginObject plugin)
 {
@@ -89,8 +88,7 @@ public void addPlugin(PluginObject plugin)
 /**
  * Insert the method's description here.
  * Creation date: (6.12.2001 22:17:37)
- * @param
- * @return
+ * @param listener 
  */
 public void addPluginListener(PluginListener listener)
 {
@@ -103,8 +101,6 @@ public void addPluginListener(PluginListener listener)
 /**
  * Insert the method's description here.
  * Creation date: (6.12.2001 22:17:37)
- * @param
- * @return
  */
 public void checkAutoStartPlugins()
 {
@@ -121,8 +117,6 @@ public void checkAutoStartPlugins()
 /**
  * Insert the method's description here.
  * Creation date: (6.12.2001 22:17:37)
- * @param
- * @return
  */
 public void destroyAllPlugins()
 {
@@ -161,7 +155,6 @@ public static PluginManager getInstance() {
 /**
  * Insert the method's description here.
  * Creation date: (6.12.2001 22:17:37)
- * @param
  * @return
  */
 public Iterator getPlugins()
@@ -199,8 +192,7 @@ private void load()
 /**
  * Insert the method's description here.
  * Creation date: (6.12.2001 22:17:37)
- * @param
- * @return
+ * @param plugin
  */
 public void removePlugin(PluginObject plugin)
 {
@@ -217,8 +209,7 @@ public void removePlugin(PluginObject plugin)
 /**
  * Insert the method's description here.
  * Creation date: (6.12.2001 22:17:37)
- * @param
- * @return
+ * @param listener
  */
 public void removePluginListener(PluginListener listener)
 {
@@ -227,8 +218,6 @@ public void removePluginListener(PluginListener listener)
 /**
  * Insert the method's description here.
  * Creation date: (6.12.2001 22:17:37)
- * @param
- * @return
  */
 public void save()
 {

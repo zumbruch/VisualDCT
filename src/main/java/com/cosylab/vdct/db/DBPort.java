@@ -51,6 +51,8 @@ public class DBPort extends DBComment
 	
 	/**
 	 * Insert the method's description here.
+     * @param name
+     * @param target
 	 */
 	public DBPort(String name, String target)
 	{

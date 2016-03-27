@@ -79,7 +79,13 @@ public void addSubObject(String id, VisibleObject object) {
 	
 }
 
-public void addSubObject(String id, VisibleObject object, int position) {
+    /**
+     *
+     * @param id
+     * @param object
+     * @param position
+     */
+    public void addSubObject(String id, VisibleObject object, int position) {
     if (useHashtable)
 	{
 		if (subObjects.containsKey(id))
@@ -181,7 +187,7 @@ public Object removeObject(String id) {
 		return null;
 }
 
-public void updateFields() {
+    public void updateFields() {
 	Enumeration e = getSubObjectsV().elements();
 	while (e.hasMoreElements()) {
 		Object o = e.nextElement();
@@ -198,6 +204,7 @@ public void updateFields() {
 //    return isZoomRepaint;
 //}
 
+    
 public ContainerObject getRootContainer() {
 	return getParent() != null ? getParent().getRootContainer() : this;
 }

@@ -69,8 +69,8 @@ public class NewRdbDataDialog extends JDialog implements ActionListener {
 	private static final String cancelString = "Cancel";
 	
 	/**
-	 * @param arg0
-	 * @param arg1
+     * @param mapper
+     * @param parent
 	 * @throws HeadlessException
 	 */
 	public NewRdbDataDialog(RdbDataMapper mapper, JDialog parent) {

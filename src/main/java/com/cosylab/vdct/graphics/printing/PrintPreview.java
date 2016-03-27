@@ -98,7 +98,9 @@ public PrintPreview() {
 }
 /**
  * PrintPreviewFrame constructor comment.
+ * @param parent
  * @param title java.lang.String
+ * @param target
  */
 public PrintPreview(Frame parent, Pageable target, String title) {
 	super(parent);
@@ -667,6 +669,7 @@ private void initialize() {
 }
 /**
  * Comment
+ * @param actionEvent
  */
 public void jTextField1_ActionPerformed(java.awt.event.ActionEvent actionEvent) {
 	try {
@@ -809,6 +812,7 @@ public static void main(java.lang.String[] args) {
 }
 /**
  * Comment
+ * @param itemEvent
  */
 public void modeComboBox_ItemStateChanged(java.awt.event.ItemEvent itemEvent) {
 	if (Page.getPrintMode()==getModeComboBox().getSelectedIndex())

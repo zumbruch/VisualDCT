@@ -234,7 +234,9 @@ private void addSubObjectToLayout(VisibleObject object) {
 	/**
 	 * Insert the method's description here.
 	 * Creation date: (4.2.2001 22:02:39)
+     * @param dsId
 	 * @param group java.lang.String
+     * @return 
 	 */
 	public Flexible copyToGroup(Object dsId, String group) {
 
@@ -305,7 +307,9 @@ private void addSubObjectToLayout(VisibleObject object) {
 	 * Insert the method's description here.
 	 * IDs are relative
 	 * Creation date: (28.1.2001 17:10:46)
+     * @param dsId
 	 * @param name java.lang.String
+     * @return 
 	 */
 	public static Group createGroup(Object dsId, String name) {
 		Group group = new Group(null);
@@ -711,7 +715,9 @@ private void addSubObjectToLayout(VisibleObject object) {
 	/**
 	 * Insert the method's description here.
 	 * Creation date: (4.2.2001 22:02:39)
+     * @param dsId
 	 * @param group java.lang.String
+     * @return 
 	 */
 	public boolean moveToGroup(Object dsId, String group) {
 		// move to itself
@@ -786,6 +792,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 	 * Creation date: (21.12.2000 21:58:56)
 	 * @param g java.awt.Graphics
 	 * @param hilited boolean
+     * @param flatten
 	 */
 	public void paintComponents(Graphics g, boolean hilited, boolean flatten) {
 		Enumeration e = subObjectsV.elements();
@@ -845,7 +852,9 @@ private void addSubObjectToLayout(VisibleObject object) {
 	/**
 	 * Insert the method's description here.
 	 * Creation date: (2.5.2001 23:23:42)
+     * @param dsId
 	 * @param newName java.lang.String
+     * @return 
 	 */
 	public boolean rename(Object dsId, String newName) {
 
@@ -986,7 +995,12 @@ private void addSubObjectToLayout(VisibleObject object) {
 		namePrefix = newNamePrefix;
 	}
 
-	public static void setRoot(Object dsId, Group newRoot) {
+    /**
+     *
+     * @param dsId
+     * @param newRoot
+     */
+    public static void setRoot(Object dsId, Group newRoot) {
 		Group mappedRoot = (Group)rootGroups.get(dsId);
 		if (mappedRoot != null) {
 			rootGroups.remove(dsId);
@@ -1021,6 +1035,9 @@ private void addSubObjectToLayout(VisibleObject object) {
 	/**
 	 * Insert the method's description here.
 	 * Creation date: (28.1.2001 11:36:31)
+     * @param groupName
+     * @param objName
+     * @return 
 	 */
 	public static String substractRelativeName(String groupName, String objName) {
 		if (!objName.startsWith(groupName)) return null;
@@ -1041,6 +1058,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 	/**
 	 * Insert the method's description here.
 	 * Creation date: (26.1.2001 17:19:47)
+     * @param flat
 	 */
 	public void unconditionalValidateSubObjects(boolean flat) {
 
@@ -1114,7 +1132,8 @@ private void addSubObjectToLayout(VisibleObject object) {
 	 * Insert the method's description here.
 	 * Creation date: (22.4.2001 21:51:25)
 	 * @param file java.io.DataOutputStream
-	 * @param path2remove java.lang.String
+     * @param renamer
+     * @param export
 	 * @exception java.io.IOException The exception description.
 	 */
 	public void writeObjects(DataOutputStream file, NamingContext renamer, boolean export) throws java.io.IOException {
@@ -1125,7 +1144,11 @@ private void addSubObjectToLayout(VisibleObject object) {
 	/**
 	 * Insert the method's description here.
 	 * Creation date: (22.4.2001 21:51:25)
+     * @param dsId
+     * @param elements
 	 * @param file java.io.DataOutputStream
+     * @param export
+     * @param renamer
 	 * @exception java.io.IOException The exception description.
 	 */
 	public static void writeObjects(Object dsId, Vector elements, java.io.DataOutputStream file, NamingContext renamer, boolean export) throws java.io.IOException {
@@ -1352,7 +1375,12 @@ private void addSubObjectToLayout(VisibleObject object) {
 
 	}
 
-	public static String getVDCTData(Object dsId) {
+    /**
+     *
+     * @param dsId
+     * @return
+     */
+    public static String getVDCTData(Object dsId) {
 
 		StringWriter writer = new StringWriter();
 		try {
@@ -1517,7 +1545,8 @@ private void addSubObjectToLayout(VisibleObject object) {
 	 * Insert the method's description here.
 	 * Creation date: (22.4.2001 21:51:25)
 	 * @param file java.io.DataOutputStream
-	 * @param path2remove java.lang.String
+     * @param renamer
+     * @param export
 	 * @exception java.io.IOException The exception description.
 	 */
 	public void writeVDCTObjects(DataOutputStream file, NamingContext renamer, boolean export) throws java.io.IOException {
@@ -1526,11 +1555,26 @@ private void addSubObjectToLayout(VisibleObject object) {
 		writer.flush();
 	}
 
-	public void writeVDCTObjects(Writer writer, NamingContext renamer, boolean export) throws java.io.IOException {
+    /**
+     *
+     * @param writer
+     * @param renamer
+     * @param export
+     * @throws IOException
+     */
+    public void writeVDCTObjects(Writer writer, NamingContext renamer, boolean export) throws java.io.IOException {
 		writeVDCTObjects(getSubObjectsV(), writer, renamer, export);
 	}
 
-	public static void writeVDCTObjects(Vector elements, DataOutputStream file, NamingContext renamer, boolean export) throws java.io.IOException {
+    /**
+     *
+     * @param elements
+     * @param file
+     * @param renamer
+     * @param export
+     * @throws IOException
+     */
+    public static void writeVDCTObjects(Vector elements, DataOutputStream file, NamingContext renamer, boolean export) throws java.io.IOException {
 		Writer writer = new OutputStreamWriter(file);
 		writeVDCTObjects(elements, writer, renamer, export);
 		writer.flush();
@@ -1539,8 +1583,10 @@ private void addSubObjectToLayout(VisibleObject object) {
 	/**
 	 * Insert the method's description here.
 	 * Creation date: (22.4.2001 21:51:25)
+     * @param elements
 	 * @param writer java.io.DataOutputStream
-	 * @param path2remove java.lang.String
+     * @param renamer
+     * @param export
 	 * @exception java.io.IOException The exception description.
 	 */
 	public static void writeVDCTObjects(Vector elements, Writer writer, NamingContext renamer, boolean export) throws java.io.IOException {
@@ -1619,7 +1665,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 										target
 								) + comma + connector.getX() + comma + connector.getY() + 
 								comma + StringUtils.color2string(connector.getColor()) +
-								comma + quote + /*!!!+ StringUtils.removeBegining(connector.getDescription(), path2remove) +*/ quote +
+								comma + quote + /*!!!+ StringUtils.removeBeginning(connector.getDescription(), path2remove) +*/ quote +
 								comma + connector.getMode() +
 								ending);
 					}
@@ -1816,7 +1862,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 										target
 								) + comma + connector.getX() + comma + connector.getY() + 
 								comma + StringUtils.color2string(connector.getColor()) +
-								comma + quote + /*!!!+ StringUtils.removeBegining(connector.getDescription(), path2remove) +*/ quote +
+								comma + quote + /*!!!+ StringUtils.removeBeginning(connector.getDescription(), path2remove) +*/ quote +
 								comma + connector.getMode() +
 								ending);
 					}
@@ -1862,13 +1908,25 @@ private void addSubObjectToLayout(VisibleObject object) {
 
 	/**
 	 * Insert the method's description here.
+     * @param dsId
+     * @param stream
+     * @param renamer
+     * @throws java.io.IOException
 	 */
 	public static void writeTemplateData(Object dsId, DataOutputStream stream, NamingContext renamer) throws IOException
 	{
 		writeTemplateData(dsId, stream, renamer, null);
 	}
 
-	public static void writeTemplateData(Object dsId, DataOutputStream stream, NamingContext renamer, Vector allowedPortMacroSet) throws IOException
+    /**
+     *
+     * @param dsId
+     * @param stream
+     * @param renamer
+     * @param allowedPortMacroSet
+     * @throws IOException
+     */
+    public static void writeTemplateData(Object dsId, DataOutputStream stream, NamingContext renamer, Vector allowedPortMacroSet) throws IOException
 	{
 		final String nl = "\n";
 
@@ -2073,6 +2131,11 @@ private void addSubObjectToLayout(VisibleObject object) {
 
 	/**
 	 * Insert the method's description here.
+     * @param dsId
+     * @param file
+     * @param group2save
+     * @param export
+     * @throws java.io.IOException
 	 */
 	public static void save(Object dsId, Group group2save, File file, boolean export) throws IOException
 	{
@@ -2097,6 +2160,12 @@ private void addSubObjectToLayout(VisibleObject object) {
 
 	/**
 	 * Insert the method's description here.
+     * @param dsId
+     * @param group2save
+     * @param file
+     * @param renamer
+     * @param export
+     * @throws java.io.IOException
 	 */
 	public static void save(Object dsId, Group group2save, File file, NamingContext renamer, boolean export) throws IOException
 	{
@@ -2181,6 +2250,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 
 	/**
 	 * Returns the editingTemplateData.
+     * @param dsId
 	 * @return VDBTemplate
 	 */
 	public static VDBTemplate getEditingTemplateData(Object dsId) {
@@ -2189,6 +2259,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 
 	/**
 	 * Sets the editingTemplateData.
+     * @param dsId
 	 * @param editingTemplateData The editingTemplateData to set
 	 */
 	public static void setEditingTemplateData(Object dsId, VDBTemplate editingTemplateData) {
@@ -2234,7 +2305,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 	}
 
 
-	public int getAbsoulteWidth() {
+	public int getAbsoluteWidth() {
 		if (subObjectsV.size() == 0) return getWidth();
 
 		int tempw;
@@ -2251,7 +2322,7 @@ private void addSubObjectToLayout(VisibleObject object) {
 
 	}
 
-	public int getAbsoulteHeight() {
+	public int getAbsoluteHeight() {
 		if (subObjectsV.size() == 0) return getHeight();
 
 		int temph;
@@ -2269,7 +2340,6 @@ private void addSubObjectToLayout(VisibleObject object) {
 
 	}
 	/**
-	 * @param linkableMacros
 	 * @param macros
 	 * @param deep
 	 */
@@ -2291,7 +2361,6 @@ private void addSubObjectToLayout(VisibleObject object) {
 	/**
 	 * 
 	 * Resets certain parameters of the subobjects (validationsCounter in Record).
-	 * @param settingsChanged flag whether this method was invoked when settings (settings dialog) were changed
 	 */
 	public void reset() {
 		Enumeration en = getSubObjectsV().elements();

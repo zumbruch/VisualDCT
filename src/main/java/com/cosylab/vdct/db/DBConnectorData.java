@@ -45,10 +45,12 @@ public class DBConnectorData {
  * Insert the method's description here.
  * Creation date: (23.4.2001 17:31:15)
  * @param id java.lang.String
+ * @param targetID java.lang.String
  * @param x int
  * @param y int
  * @param color java.awt.Color
  * @param description java.lang.String
+ * @param mode int
  */
 public DBConnectorData(String id, String targetID, int x, int y, java.awt.Color color, String description, int mode) {
 	this.connectorID = id;

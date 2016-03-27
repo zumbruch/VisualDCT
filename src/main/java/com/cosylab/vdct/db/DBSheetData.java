@@ -62,25 +62,33 @@ public class DBSheetData implements DsEventListener {
 		return dbSheetData;
 	}
 	
-	public void add(DBSheetView record) {
+    /** Adds a record.
+     * @param record
+     */
+    public void add(DBSheetView record) {
 		map.put(record.getKey(), record);
 	}
 
-	/** Returns the record with the given key, or null if there is no such record.
-	 */
+    /** Returns the record with the given key, or null if there is no such record.
+     * @param key
+     * @return 
+     */
 	public DBSheetView get(String key) {
 		return (DBSheetView)map.get(key);
 	}
 
-	public void remove(String key) {
+    /** Removes the record with the given key.
+     * @param key
+     */
+    public void remove(String key) {
 		map.remove(key);
 	}
 	
-	public Iterator getRecords() {
+    public Iterator getRecords() {
 		return map.values().iterator();
 	}
 
-	public static void registerDsListener() {
+    public static void registerDsListener() {
 		
 		DBSheetData data = new DBSheetData();
 	    instances.put(Constants.DEFAULT_NAME, data);

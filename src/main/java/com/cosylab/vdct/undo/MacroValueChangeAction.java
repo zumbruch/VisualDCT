@@ -41,7 +41,7 @@ public class MacroValueChangeAction extends ActionObject {
 /**
  * Insert the method's description here.
  * Creation date: (3.5.2001 15:30:47)
- * @param field com.cosylab.vdct.vdb.VDBMacro
+ * @param macro com.cosylab.vdct.vdb.VDBMacro
  * @param oldValue java.lang.String
  * @param newValue java.lang.String
  */

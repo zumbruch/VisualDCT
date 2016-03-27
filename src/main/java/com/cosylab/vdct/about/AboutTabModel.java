@@ -32,11 +32,11 @@ package com.cosylab.vdct.about;
  * @author 
  *
  * To change this generated comment edit the template variable "typecomment":
- * Window>Preferences>Java>Templates.
+ * Window&gt;Preferences&gt;Java&gt;Templates.
  * To enable and disable the creation of type comments go to
- * Window>Preferences>Java>Code Generation.
+ * Window&gt;Preferences&gt;Java&gt;Code Generation.
  */
 public interface AboutTabModel {
 
-	public void aquireData();
+    public void aquireData();
 }

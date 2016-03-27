@@ -304,6 +304,10 @@ MouseInputListener, Runnable, LinkCommandInterface {
 
 	/**
 	 * displayer can be null when no gui is linked to this. 
+     * @param id
+     * @param copyContext
+     * @param serialNumber
+     * @param displayer
 	 */
 	public DrawingSurface(Object id, int serialNumber, InternalFrameInterface displayer,
 			CopyContext copyContext) {
@@ -443,6 +447,7 @@ MouseInputListener, Runnable, LinkCommandInterface {
 	/**
 	 * Insert the method's description here.
 	 * Creation date: (10.12.2000 13:19:16)
+     * @param g
 	 */
 	public void draw(Graphics g) {
 
@@ -607,6 +612,7 @@ MouseInputListener, Runnable, LinkCommandInterface {
 	/**
 	 * Insert the method's description here.
 	 * Creation date: (11.12.2000 16:23:31)
+     * @return 
 	 */
 	public int getComponentHeight() {
 		if (getComponent()==null) return height;
@@ -681,7 +687,7 @@ MouseInputListener, Runnable, LinkCommandInterface {
 	 *            <code>PageFormat</code> is being requested
 	 * @return the <code>PageFormat</code> describing the size and
 	 *		orientation.
-	 * @exception <code>IndexOutOfBoundsException</code>
+	 * @throws java.lang.IndexOutOfBoundsException
 	 *          the <code>Pageable</code> does not contain the requested
 	 *		page.
 	 */
@@ -716,7 +722,7 @@ MouseInputListener, Runnable, LinkCommandInterface {
 	 * @param pageIndex the zero based index of the page whose
 	 *            <code>Printable</code> is being requested
 	 * @return the <code>Printable</code> that renders the page.
-	 * @exception <code>IndexOutOfBoundsException</code>
+	 * @throws java.lang.IndexOutOfBoundsException
 	 *            the <code>Pageable</code> does not contain the requested
 	 *		  page.
 	 */
@@ -825,6 +831,8 @@ MouseInputListener, Runnable, LinkCommandInterface {
 	/**
 	 * Insert the method's description here.
 	 * Creation date: (3.2.2001 13:31:09)
+     * @param linkObject
+     * @param linkData
 	 */
 	public void linkCommand(VisibleObject linkObject, LinkSource linkData) {
 //		Cursor previous = drawingSurface.getCursor();
@@ -1857,6 +1865,8 @@ MouseInputListener, Runnable, LinkCommandInterface {
 	 * Insert the method's description here.
 	 * Creation date: (6.1.2001 22:35:40)
 	 * @param file java.io.File
+     * @return 
+     * @throws java.io.IOException
 	 */
 	public boolean open(File file) throws IOException {
 		return open(file, false, false);
@@ -1865,6 +1875,9 @@ MouseInputListener, Runnable, LinkCommandInterface {
 	 * Insert the method's description here.
 	 * Creation date: (6.1.2001 22:35:40)
 	 * @param file java.io.File
+     * @param importDB
+     * @return 
+     * @throws java.io.IOException 
 	 */
 	public boolean open(File file, boolean importDB) throws IOException {
 		return open(file, importDB, false);
@@ -1872,6 +1885,8 @@ MouseInputListener, Runnable, LinkCommandInterface {
 	/**
 	 * jh
 	 * Creation date: (6.1.2001 22:35:40)
+     * @param file
+     * @throws java.io.IOException
 	 */
 	public void checkForIncodedDBDs(File file) throws IOException
 	{
@@ -1920,6 +1935,9 @@ MouseInputListener, Runnable, LinkCommandInterface {
 	 * are already defined in VDCT are overriden with the new settings. This
 	 * would allow easy definition of the limits, hardware addresses, display
 	 * range etc.
+     * @param file
+     * @param ignoreLinkFields
+     * @return 
 	 */
 	public boolean importFields(File file, boolean ignoreLinkFields)
 	{
@@ -2008,6 +2026,8 @@ MouseInputListener, Runnable, LinkCommandInterface {
 	}
 
 	/**
+     * @param file
+     * @return 
 	 */
 	public boolean importBorder(File file)
 	{
@@ -2080,7 +2100,12 @@ MouseInputListener, Runnable, LinkCommandInterface {
 	/**
 	 * SEPARATE DOWN CODE TO METHODS
 	 * Creation date: (6.1.2001 22:35:40)
+     * @param is
 	 * @param file java.io.File
+     * @param importToCurrentGroup
+     * @param importDB
+     * @return 
+     * @throws java.io.IOException 
 	 */
 	public boolean open(InputStream is, File file, boolean importDB, boolean importToCurrentGroup) throws IOException {
 
@@ -2307,6 +2332,8 @@ MouseInputListener, Runnable, LinkCommandInterface {
 	 * SEPARATE DOWN CODE TO METHODS
 	 * Creation date: (6.1.2001 22:35:40)
 	 * @param file java.io.File
+     * @return 
+     * @throws java.io.IOException 
 	 */
 	public boolean importDB(File file) throws IOException {
 		return open(file, true, true);
@@ -2401,6 +2428,12 @@ MouseInputListener, Runnable, LinkCommandInterface {
 
 	/**
 	 * Insert the method's description here.
+     * @param dsId
+     * @param importDB
+     * @param group
+     * @param dbData
+     * @param vdbData
+     * @return 
 	 */
 	public static HashMap applyVisualData(Object dsId, boolean importDB, Group group, DBData dbData, VDBData vdbData)
 	{
@@ -2982,6 +3015,8 @@ MouseInputListener, Runnable, LinkCommandInterface {
 	 * Insert the method's description here.
 	 * Creation date: (6.1.2001 22:35:40)
 	 * @param file java.io.File
+     * @return 
+     * @throws java.io.IOException
 	 */
 	public boolean openDBD(File file) throws IOException {
 		return openDBD(file, false);
@@ -2990,6 +3025,9 @@ MouseInputListener, Runnable, LinkCommandInterface {
 	 * Insert the method's description here.
 	 * Creation date: (6.1.2001 22:35:40)
 	 * @param file java.io.File
+     * @param importDBD
+     * @return 
+     * @throws java.io.IOException
 	 */
 	public boolean openDBD(File file, boolean importDBD) throws IOException {
 
@@ -3535,6 +3573,7 @@ MouseInputListener, Runnable, LinkCommandInterface {
 	/**
 	 * Insert the method's description here.
 	 * Creation date: (25.12.2000 14:59:05)
+     * @param drawOnlyHilitedOnce
 	 */
 	public void repaint(boolean drawOnlyHilitedOnce) {
 		// set clip to x0, y0, width, height !!!?
@@ -3561,6 +3600,10 @@ MouseInputListener, Runnable, LinkCommandInterface {
 	/**
 	 * Insert the method's description here.
 	 * Creation date: (10.12.2000 13:19:16)
+     * @param x0
+     * @param y0
+     * @param width
+     * @param height
 	 */
 	public void resize(int x0, int y0, int width, int height) {
 		if (getComponent()!=null) resize(x0, y0, width, height);
@@ -3680,7 +3723,7 @@ MouseInputListener, Runnable, LinkCommandInterface {
 	/**
 	 * Insert the method's description here.
 	 * Creation date: (29.12.2000 12:40:13)
-	 * @param scale double
+     * @param object
 	 */
 	public void centerObject(VisibleObject object) {
 
@@ -3869,6 +3912,7 @@ MouseInputListener, Runnable, LinkCommandInterface {
 
 	/**
 	 * true - OK, false - denied
+     * @return 
 	 */
 	public boolean prepareTemplateLeave()
 	{
@@ -3963,7 +4007,6 @@ MouseInputListener, Runnable, LinkCommandInterface {
 	/**
 	 * Insert the method's description here.
 	 * Creation date: (22.4.2001 18:44:03)
-	 * @param template com.cosylab.vdct.graphics.objects.Template
 	 */
 	public void ascendFromTemplate()
 	{
@@ -4058,6 +4101,8 @@ MouseInputListener, Runnable, LinkCommandInterface {
 	}
 
 	/**
+     * @param data
+     * @return 
 	 */
 	public boolean reloadTemplate(VDBTemplate data)
 	{	
@@ -4142,7 +4187,7 @@ MouseInputListener, Runnable, LinkCommandInterface {
 	/**
 	 * Insert the method's description here.
 	 * Creation date: (3.2.2001 23:27:30)
-	 * @param name java.lang.String
+     * @param vdbPort
 	 */
 	public void createPort(VDBPort vdbPort) {
 
@@ -4173,7 +4218,8 @@ MouseInputListener, Runnable, LinkCommandInterface {
 	/**
 	 * Insert the method's description here.
 	 * Creation date: (3.2.2001 23:27:30)
-	 * @param name java.lang.String
+     * @param vdbMacro
+     * @return 
 	 */
 	public Macro createMacro(VDBMacro vdbMacro) {
 
@@ -4282,7 +4328,8 @@ MouseInputListener, Runnable, LinkCommandInterface {
 	}
 
 	/**
-	 * @param pressedMousePosValid the pressedMousePosValid to set
+     * @param x
+     * @param y
 	 */
 	public void setPressedMousePos(int x, int y) {
 		pressedX = x;
@@ -4341,6 +4388,8 @@ MouseInputListener, Runnable, LinkCommandInterface {
 	 * currently edited template.
 	 * 
 	 * Returns false if there is a cyclic template dependency. 
+     * @param template
+     * @return 
 	 */
 	public boolean isTemplateAllowed(VDBTemplate template) {
 		

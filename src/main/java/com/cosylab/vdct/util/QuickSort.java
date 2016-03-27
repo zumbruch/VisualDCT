@@ -31,7 +31,7 @@ package com.cosylab.vdct.util;
 import java.util.*;
 
 /**
- * QuickSort algorithm (divide & conquer)
+ * QuickSort algorithm (divide &amp; conquer)
  * !!! replace qs alg with other !!!
  */
 

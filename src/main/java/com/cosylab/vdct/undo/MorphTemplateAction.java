@@ -45,8 +45,8 @@ public class MorphTemplateAction extends ActionObject {
  * Insert the method's description here.
  * Creation date: (4.5.2001 11:40:19)
  * @param object com.cosylab.vdct.graphics.objects.Flexible
- * @param oldName java.lang.String
- * @param newName java.lang.String
+ * @param oldTemplateData VDBTemplateInstance
+ * @param newTemplateData VDBTemplateInstance
  */
 public MorphTemplateAction(Template object, VDBTemplateInstance oldTemplateData, VDBTemplateInstance newTemplateData) {
 	this.object=object;

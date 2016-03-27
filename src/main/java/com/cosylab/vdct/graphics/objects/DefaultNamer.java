@@ -49,6 +49,13 @@ public class DefaultNamer implements NameManipulator {
 
 	/**
 	 *
+     * @param file
+     * @param removedPrefix
+     * @param removedPrefix
+     * @param addedPrefix
+     * @param properties
+     * @param ports
+     * @param ports
 	 */
 	public DefaultNamer(File file, String removedPrefix, String addedPrefix, Map properties, Map ports)
 	{
@@ -81,7 +88,7 @@ public class DefaultNamer implements NameManipulator {
 	public String getResolvedName(String name)
 	{
 		if (removedPrefix!=null)
-			name = StringUtils.removeBegining(name, removedPrefix); 
+			name = StringUtils.removeBeginning(name, removedPrefix); 
 		if (addedPrefix!=null)
 			name = addedPrefix + name;
 		if (properties!=null)

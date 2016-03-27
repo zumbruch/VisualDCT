@@ -13,7 +13,9 @@ import javax.swing.JFileChooser;
  */
 public class ComboBoxFileChooserDialog extends javax.swing.JDialog {
         
-    /** Creates new form ComboBoxFileChooser */
+    /** Creates new form ComboBoxFileChooser
+     * @param parent
+     * @param jfc */
     public ComboBoxFileChooserDialog(java.awt.Frame parent, JFileChooser jfc) {
         super(parent, true);
         jFileChooser = jfc;

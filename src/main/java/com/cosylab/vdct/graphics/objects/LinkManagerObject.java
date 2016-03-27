@@ -88,12 +88,14 @@ public LinkManagerObject(ContainerObject parent)
 }
 
 /**
+ * @param field
  */
 public void addInvalidLink(EPICSLink field)
 {
 }
 
 /**
+ * @param field
  */
 public void removeInvalidLink(EPICSLink field)
 {
@@ -173,8 +175,10 @@ public void fixLinks() {
 	
 }
 
-
-public void fixLinks_() {
+    /**
+     *
+     */
+    public void fixLinks_() {
 
 	Object unknownField;
 	EPICSVarLink varlink;
@@ -206,7 +210,7 @@ public void fixLinks_() {
 					{
 						// not the same, fix it gently as a doctor :)
 						String value = source.getFieldData().getValue();
-						value = targetName + com.cosylab.vdct.util.StringUtils.removeBegining(value, oldTarget);
+						value = targetName + com.cosylab.vdct.util.StringUtils.removeBeginning(value, oldTarget);
 						source.getFieldData().setValueSilently(value);
 						source.fixLinkProperties();
 					}
@@ -219,7 +223,11 @@ public void fixLinks_() {
 	
 }
 
-public static void fixLink(EPICSVarLink varlink)
+    /**
+     *
+     * @param varlink
+     */
+    public static void fixLink(EPICSVarLink varlink)
 {
 	LinkSource data = null;
 	String targetName = varlink.getFieldData().getFullName();
@@ -245,7 +253,7 @@ public static void fixLink(EPICSVarLink varlink)
 			// not the same, fix it gently as a doctor :)
 			String value = data.getValue();
 			// value = targetName + link properties
-			value = targetName + com.cosylab.vdct.util.StringUtils.removeBegining(value, oldTarget);
+			value = targetName + com.cosylab.vdct.util.StringUtils.removeBeginning(value, oldTarget);
 			data.setValueSilently(value);
 			
 			// !!!!
@@ -287,7 +295,7 @@ public static void fixMacroLink(Macro macro)
 			// not the same, fix it gently as a doctor :)
 			String value = data.getValue();
 			// value = targetName + link properties
-			value = targetName + com.cosylab.vdct.util.StringUtils.removeBegining(value, oldTarget);
+			value = targetName + com.cosylab.vdct.util.StringUtils.removeBeginning(value, oldTarget);
 			data.setValueSilently(value);
 			
 			// !!!!
@@ -299,7 +307,11 @@ public static void fixMacroLink(Macro macro)
 	}
 }
 
-public static void fixLink(EPICSLinkOutIn linkoutin)
+    /**
+     *
+     * @param linkoutin
+     */
+    public static void fixLink(EPICSLinkOutIn linkoutin)
 {
 	LinkSource data = null;
 	String targetName = linkoutin.getFieldData().getFullName();
@@ -325,7 +337,7 @@ public static void fixLink(EPICSLinkOutIn linkoutin)
 			// not the same, fix it gently as a doctor :)
 			String value = data.getValue();
 			// value = targetName + link properties
-			value = targetName + com.cosylab.vdct.util.StringUtils.removeBegining(value, oldTarget);
+			value = targetName + com.cosylab.vdct.util.StringUtils.removeBeginning(value, oldTarget);
 			data.setValueSilently(value);
 			
 			// !!!!
@@ -337,7 +349,11 @@ public static void fixLink(EPICSLinkOutIn linkoutin)
 	}
 }
 
-public static void fixLink_(EPICSVarLink varlink)
+    /**
+     *
+     * @param varlink
+     */
+    public static void fixLink_(EPICSVarLink varlink)
 {
 	EPICSLinkOut source;
 	String targetName = varlink.getFieldData().getFullName();
@@ -358,7 +374,7 @@ public static void fixLink_(EPICSVarLink varlink)
 			// not the same, fix it gently as a doctor :)
 			String value = source.getFieldData().getValue();
 			// value = targetName + link properties
-			value = targetName + com.cosylab.vdct.util.StringUtils.removeBegining(value, oldTarget);
+			value = targetName + com.cosylab.vdct.util.StringUtils.removeBeginning(value, oldTarget);
 			source.getFieldData().setValueSilently(value);
 			source.fixLinkProperties();
 		}
@@ -619,6 +635,7 @@ public void postDraw(Graphics g, boolean hilited) {
 /**
  * Insert the method's description here.
  * Creation date: (2.2.2001 20:31:29)
+ * @param vdbFields
  * @return java.util.Vector
  */
 public Vector getLinkMenus(Enumeration vdbFields) {
@@ -791,9 +808,9 @@ protected void destroyFields() {
 	}
 
 /**
- * @param linkableMacros
+ * @param dsId
+ * @param field
  * @param macros
- * @param deep
  */
 public static void checkIfMacroCandidate(Object dsId, VDBFieldData field, HashMap macros) {
 
@@ -869,6 +886,7 @@ public boolean isFirstField(Field field) {
  * Insert the method's description here.
  * Creation date: (3.5.2001 22:53:47)
  * @param field com.cosylab.vdct.graphics.objects.Field
+ * @return 
  */
 public boolean isLastField(Field field) {
 	for (int i= subObjectsV.size()-1; i>=0; i--)
@@ -929,7 +947,6 @@ public void moveFieldUp(Field field) {
 /**
  * Insert the method's description here.
  * Creation date: (3.5.2001 22:36:11)
- * @param field com.cosylab.vdct.graphics.objects.Field
  */
 public abstract void revalidateFieldsPosition();
 

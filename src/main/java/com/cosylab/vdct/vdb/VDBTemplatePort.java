@@ -165,7 +165,7 @@ public class VDBTemplatePort extends VDBFieldData implements Descriptable, Chang
 	/**
 	 * Insert the method's description here.
 	 * Creation date: (7.12.2001 19:13:20)
-	 * @param value java.lang.String
+	 * @param newValue java.lang.String
 	 */
 	public void setDebugValue(String newValue)
 	{

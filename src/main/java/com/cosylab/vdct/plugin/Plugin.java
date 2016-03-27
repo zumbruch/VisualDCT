@@ -37,10 +37,7 @@ public interface Plugin
 {
 /**
  * Insert the method's description here.
- * Creation date: (6.12.2001 22:04:45)
- * @param 
- * @return
- */
+ * Creation date: (6.12.2001 22:04:45) */
 public void destroy();
 /**
  * Insert the method's description here.
@@ -57,7 +54,6 @@ public String getDescription();
 /**
  * Insert the method's description here.
  * Creation date: (6.12.2001 22:04:45)
- * @param 
  * @return
  */
 public String getName();
@@ -70,22 +66,16 @@ public String getVersion();
 /**
  * Insert the method's description here.
  * Creation date: (6.12.2001 22:04:45)
- * @param 
- * @return
+ * @param properties
+ * @param context
  */
 public void init(java.util.Properties properties, PluginContext context);
 /**
  * Insert the method's description here.
- * Creation date: (6.12.2001 22:04:45)
- * @param 
- * @return
- */
+ * Creation date: (6.12.2001 22:04:45) */
 public void start();
 /**
  * Insert the method's description here.
- * Creation date: (6.12.2001 22:04:45)
- * @param 
- * @return
- */
+ * Creation date: (6.12.2001 22:04:45) */
 public void stop();
 }

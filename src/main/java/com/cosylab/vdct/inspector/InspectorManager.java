@@ -213,7 +213,6 @@ public static void setParent(java.awt.Frame newParent) {
 /**
  * Insert the method's description here.
  * Creation date: (27.1.2001 14:20:50)
- * @return com.cosylab.vdct.inspector.InspectorInterface
  * @param object com.cosylab.vdct.inspector.Inspectable
  */
 public void updateCommentProperty(Inspectable object) {
@@ -239,8 +238,8 @@ public void updateObjectLists() {
 /**
  * Insert the method's description here.
  * Creation date: (27.1.2001 14:20:50)
- * @return com.cosylab.vdct.inspector.InspectorInterface
  * @param object com.cosylab.vdct.inspector.Inspectable
+ * @param property com.cosylab.vdct.inspector.InspectableProperty
  */
 public void updateProperty(Inspectable object, InspectableProperty property) {
 	

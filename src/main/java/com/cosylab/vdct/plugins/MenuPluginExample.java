@@ -102,8 +102,6 @@ protected JMenu getPluginMenu() {
 /**
  * Insert the method's description here.
  * Creation date: (8.12.2001 13:29:26)
- * @param 
- * @return
  */
 public void destroy() {}
 
@@ -126,8 +124,7 @@ public String getDescription() {
 /**
  * Insert the method's description here.
  * Creation date: (8.12.2001 13:29:26)
- * @param 
- * @return
+ * @return java.lang.String
  */
 public String getName() {
 	return "Menu Example Plugin";
@@ -143,22 +140,18 @@ public String getVersion() {
 /**
  * Insert the method's description here.
  * Creation date: (8.12.2001 13:29:26)
- * @param 
- * @return
+ * @param properties java.util.Properties
+ * @param context com.cosylab.vdct.plugin.PluginContext
  */
 public void init(java.util.Properties properties, com.cosylab.vdct.plugin.PluginContext context) {}
 /**
  * Insert the method's description here.
  * Creation date: (8.12.2001 13:29:26)
- * @param 
- * @return
  */
 public void start() {}
 /**
  * Insert the method's description here.
  * Creation date: (8.12.2001 13:29:26)
- * @param 
- * @return
  */
 public void stop() {}
 

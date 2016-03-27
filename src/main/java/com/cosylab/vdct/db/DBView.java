@@ -38,6 +38,9 @@ public class DBView {
 	
 /**
  * FieldData constructor comment.
+ * @param rx
+ * @param ry
+ * @param scale
  */
 public DBView(int rx, int ry, double scale) {
 	this.rx = rx;

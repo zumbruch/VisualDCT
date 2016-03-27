@@ -42,6 +42,7 @@ public class InspectorTable extends JTable {
 	private HelpDisplayer helpDisplayer = null;
 	
 	/**
+     * @param dsId
 	 * @param tableModel
 	 * @param helpDisplayer
 	 */

@@ -38,15 +38,13 @@ public interface PluginListener
 /**
  * Insert the method's description here.
  * Creation date: (6.12.2001 22:16:08)
- * @param
- * @return
+ * @param plugin
  */
 public void pluginAdded(PluginObject plugin);
 /**
  * Insert the method's description here.
  * Creation date: (6.12.2001 22:15:59)
- * @param
- * @return
+ * @param plugin 
  */
 public void pluginRemoved(PluginObject plugin);
 }

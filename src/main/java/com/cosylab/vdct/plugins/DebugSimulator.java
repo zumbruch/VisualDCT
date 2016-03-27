@@ -82,8 +82,6 @@ public void deregisterMonitor(Debuggable field)
 /**
  * Insert the method's description here.
  * Creation date: (7.12.2001 16:40:05)
- * @param 
- * @return
  */
 public void destroy()
 {
@@ -108,7 +106,6 @@ public String getDescription() {
 /**
  * Insert the method's description here.
  * Creation date: (7.12.2001 16:40:05)
- * @param 
  * @return
  */
 public String getName() {
@@ -134,9 +131,8 @@ public String getVersion() {
 /**
  * Insert the method's description here.
  * Creation date: (7.12.2001 16:40:05)
- * @param 
- * @return
- */
+     * @param properties
+     * @param context */
 public void init(java.util.Properties properties, PluginContext context)
 {
 	// read properties
@@ -210,10 +206,7 @@ public void run()
 }
 /**
  * Insert the method's description here.
- * Creation date: (7.12.2001 16:40:05)
- * @param 
- * @return
- */
+ * Creation date: (7.12.2001 16:40:05) */
 public void start()
 {
 }
@@ -229,10 +222,7 @@ public void startDebugging()
 }
 /**
  * Insert the method's description here.
- * Creation date: (7.12.2001 16:40:05)
- * @param 
- * @return
- */
+ * Creation date: (7.12.2001 16:40:05) */
 public void stop()
 {
 	stopDebugging();

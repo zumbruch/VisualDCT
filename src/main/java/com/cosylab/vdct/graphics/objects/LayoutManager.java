@@ -83,11 +83,20 @@ public class LayoutManager {
 		defaultPosition = new LayoutPosition(offsetX, offsetY);
 	}
 	
-	public LayoutPosition getVacantPosition() {
+    /**
+     *
+     * @return
+     */
+    public LayoutPosition getVacantPosition() {
 		return (firstVacant != null) ? firstVacant : defaultPosition;
 	}
 	
-	public void fillPosition(int posX, int posY) {
+    /**
+     *
+     * @param posX
+     * @param posY
+     */
+    public void fillPosition(int posX, int posY) {
 		
 		posX -= offsetX;
 		posY -= offsetY;

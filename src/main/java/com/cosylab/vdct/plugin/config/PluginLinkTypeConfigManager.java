@@ -65,8 +65,7 @@ public static PluginLinkTypeConfigManager getInstance() {
 /**
  * Insert the method's description here.
  * Creation date: (6.12.2001 22:23:57)
- * @param
- * @return
+ * @param plugin
  */
 public void pluginAdded(PluginObject plugin)
 {
@@ -88,8 +87,7 @@ public void pluginAdded(PluginObject plugin)
 /**
  * Insert the method's description here.
  * Creation date: (6.12.2001 22:23:57)
- * @param
- * @return
+ * @param plugin
  */
 public void pluginRemoved(PluginObject plugin)
 {
@@ -102,8 +100,6 @@ public void pluginRemoved(PluginObject plugin)
 /**
  * Not implemented
  * Creation date: (6.12.2001 22:23:57)
- * @param
- * @return
  */
 public void propertyChange(PropertyChangeEvent evt)
 {

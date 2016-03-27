@@ -42,8 +42,8 @@ public class ShowNewDialog extends Command {
 /**
  * Insert the method's description here.
  * Creation date: (29.12.2000 12:37:58)
+ * @param visualDCT
  */
-
 public ShowNewDialog(VisualDCT visualDCT) {
 	this.visualDCT=visualDCT;
 }

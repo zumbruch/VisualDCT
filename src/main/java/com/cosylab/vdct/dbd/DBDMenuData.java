@@ -54,6 +54,7 @@ public void addMenuChoice(String choice_name, String choice_value) {
 /**
  * This method was created in VisualAge.
  * @param value java.lang.String
+ * @return boolean
  */
 public boolean containsValue(String value) {
 	String val;

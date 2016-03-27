@@ -91,7 +91,8 @@ public class DBSheetRowOrder {
 	}
 
 	/**
-	 * @param ascending the orderAscending to set
+     * @param orderAscendingString
+     * @return 
 	 */
 	public static boolean isAscending(String orderAscendingString) {
 		return orderAscendingString.equals(ascendingString);

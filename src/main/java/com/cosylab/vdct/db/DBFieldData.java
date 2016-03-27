@@ -50,6 +50,8 @@ public class DBFieldData extends DBComment {
 	
 /**
  * FieldData constructor comment.
+ * @param name
+ * @param value
  */
 public DBFieldData(String name, String value) {
 	this.name=name;
@@ -57,6 +59,12 @@ public DBFieldData(String name, String value) {
 }
 /**
  * FieldData constructor comment.
+ * @param name java.lang.String
+ * @param value java.lang.String
+ * @param color java.awt.Color
+ * @param rotated boolean
+ * @param description java.lang.String
+ * @param visibility int
  */
 public DBFieldData(String name, String value, java.awt.Color color, boolean rotated, String description, int visibility) {
 	this.name=name;

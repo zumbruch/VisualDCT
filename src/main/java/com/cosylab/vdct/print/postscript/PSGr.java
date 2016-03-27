@@ -77,8 +77,9 @@ public class PSGr extends java.awt.Graphics {
  * Unlike regular Graphics objects,
  * PSGr contexts can be created directly.
  * @param o Output stream for PostScript output
- * @param g The "real g" from AWT
  * @see #create
+ */
+/* @param g The "real g" from AWT
  */
 
     public PSGr (OutputStream o/*, Graphics g*/) {
@@ -103,12 +104,13 @@ public class PSGr extends java.awt.Graphics {
 
 /** Constructor for non-default page dimensions and orientation.
  * @param o Output stream for PostScript output
- * @param g The "real g" from AWT
- * @param margin Page_MarginX (left side) in points.
- * @param margin Page_MarginY (bottom side) in points.
+ * @param marginX Page_MarginX (left side) in points.
+ * @param marginY Page_MarginY (bottom side) in points.
  * @param width Page_Width in points.
  * @param height Page_Height in points.
  * @param portrait Portrait if true, otherwise landscape.
+ */
+/* @param g The "real g" from AWT
  */
 
 //    public PSGr (OutputStream o, Graphics g, int margin, int width, int height) {
@@ -184,6 +186,7 @@ public class PSGr extends java.awt.Graphics {
  * @param y the y coordinate, pixels positive down from top.
  * @param width the width of the area
  * @param height the height of the area
+ * @return 
  * @see #translate
  */
     public Graphics create (int x, int y, int width, int height) {
@@ -220,7 +223,6 @@ public class PSGr extends java.awt.Graphics {
  * @param y the y coordinate, pixels positive down from top.
  * Note: PostScript y coordinate is positive up from bottom.
  * Note: PostScript default units are points (1/72 inch).
- * @see #rotate
  * @see #scale
  */
 
@@ -238,7 +240,6 @@ public class PSGr extends java.awt.Graphics {
  * @param sx the scaled x coordinate
  * @param sy the scaled y coordinate
  * @see #translate
- * @see #rotate
  * This is NOT part of the graphics API (although translate is).
  * It is used internally to map from pixels to points,
  * such that the entire top-level object will fit the page.
@@ -329,7 +330,7 @@ public class PSGr extends java.awt.Graphics {
 
 /**
  * Sets the font for all subsequent text-drawing operations.
- * @param font the specified font
+ * @param f the specified font
  * @see Font
  * @see #getFont
  * @see #drawString
@@ -907,7 +908,7 @@ public class PSGr extends java.awt.Graphics {
 /**
  * Draws the specified String using the current font and color.
  * The x,y position is the starting point of the baseline of the String.
- * @param str the String to be drawn
+ * @param iterator the String to be drawn
  * @param x the x coordinate
  * @param y the y coordinate
  * @see #drawChars
@@ -1555,6 +1556,11 @@ public class PSGr extends java.awt.Graphics {
         os.println (s);
     }
 
+    /**
+     *
+     * @param comp
+     * @param edge
+     */
     protected void myBasicPaint (Component comp, boolean edge) {
         Dimension tb = comp.getSize ();
 
@@ -1582,7 +1588,8 @@ public class PSGr extends java.awt.Graphics {
  * to convert all pixels to points.
  * Only reduce scale if needed -- do not ever magnify.
  * PostScript scale operator also changes text sizes.
- * Must allow for non-printing margins all around. */
+ * Must allow for non-printing margins all around.
+ * @param top */
 
     public void scalePaint (Component top) {
 

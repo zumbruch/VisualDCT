@@ -47,6 +47,9 @@ public class NamingContext {
 	 * template instance
 	 * @param parent
 	 * @param template
+     * @param addedPrefix
+     * @param removedPrefix
+     * @param export
 	 */
 	public NamingContext(NamingContext parent, VDBTemplate template, String addedPrefix, String removedPrefix, boolean export) {
 		this.parent=parent;
@@ -191,7 +194,7 @@ public class NamingContext {
 	 */ 
 	public String getResolvedName(String name) {
 		if (removedPrefix!=null)
-			name = StringUtils.removeBegining(name, removedPrefix); 
+			name = StringUtils.removeBeginning(name, removedPrefix); 
 		if (addedPrefix!=null)
 			name = addedPrefix + name;		
 		return name;
@@ -199,7 +202,7 @@ public class NamingContext {
 
 	/**
 	 * Adds a port to this naming context
-	 * @param string
+	 * @param name
 	 * @param value
 	 */
 	public void addPort(String name, String value) {

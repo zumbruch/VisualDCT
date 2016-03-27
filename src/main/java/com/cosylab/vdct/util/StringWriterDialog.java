@@ -23,7 +23,9 @@ public class StringWriterDialog extends javax.swing.JDialog {
 
 	private String returnValue = null;
     
-    /** Creates new form StringWriterDialog */
+    /** Creates new form StringWriterDialog
+     * @param parent
+     * @param modal */
     public StringWriterDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();

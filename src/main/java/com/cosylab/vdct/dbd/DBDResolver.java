@@ -67,7 +67,7 @@ public static int getBaseType(String bt) {
 	else return DBDConstants.NOT_DEFINED;
 }
 
-public static String getBaseType(int type) {
+    public static String getBaseType(int type) {
 	switch (type)
 	{
 		case DBDConstants.DECIMAL:	return "DECIMAL";
@@ -222,7 +222,7 @@ public static EnhancedStreamTokenizer getEnhancedStreamTokenizer(String fileName
 }
 /**
  * This method was created in VisualAge.
- * @param st java.io.EnhancedStreamTokenizer
+ * @param tokenizer java.io.EnhancedStreamTokenizer
  */
 public static void initializeTokenizer(EnhancedStreamTokenizer tokenizer) {
 	tokenizer.setParseEscapeSequences(false);
@@ -240,6 +240,9 @@ public static void initializeTokenizer(EnhancedStreamTokenizer tokenizer) {
  * This method was created in VisualAge.
  * @param data com.cosylab.vdct.dbd.DBDData
  * @param tokenizer java.io.EnhancedStreamTokenizer
+ * @param fileName
+ * @param paths
+ * @throws java.lang.Exception
  */
 public static void processDBD(DBDData data, EnhancedStreamTokenizer tokenizer, String fileName, PathSpecification paths) throws Exception {
 	
@@ -370,7 +373,11 @@ public static void processDBD(DBDData data, EnhancedStreamTokenizer tokenizer, S
 }
 /**
  * This method was created in VisualAge.
+ * @param rd
  * @param tokenizer java.io.EnhancedStreamTokenizer
+ * @param fileName
+ * @param paths
+ * @throws java.lang.Exception
  */
 public static void processFields(DBDRecordData rd, EnhancedStreamTokenizer tokenizer, String fileName, PathSpecification paths) throws Exception {
 
@@ -473,6 +480,8 @@ public static void processFields(DBDRecordData rd, EnhancedStreamTokenizer token
  * This method was created in VisualAge.
  * @param md com.cosylab.vdct.dbd.DBDMenuData
  * @param tokenizer java.io.EnhancedStreamTokenizer
+ * @param fileName
+ * @param paths
  * @exception java.lang.Exception The exception description.
  */
 public static void processMenuChoices(DBDMenuData md, EnhancedStreamTokenizer tokenizer, String fileName, PathSpecification paths) throws Exception {
@@ -524,6 +533,7 @@ public static void processMenuChoices(DBDMenuData md, EnhancedStreamTokenizer to
 }
 /**
  * This method was created in VisualAge.
+ * @param data
  * @return Vector
  * @param fileName java.lang.String
  */
@@ -556,8 +566,9 @@ public static DBDData resolveDBD(DBDData data, String fileName) {
 }
 /**
  * This method was created in VisualAge.
+ * @param data
+ * @param url java.net.URL
  * @return Vector
- * @param fileName java.lang.String
  */
 public static DBDData resolveDBDasURL(DBDData data, java.net.URL url) {
 	

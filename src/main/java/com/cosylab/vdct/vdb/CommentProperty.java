@@ -65,16 +65,16 @@ private String addCommentChars(String str) {
 	StringBuffer output = new StringBuffer("");
 	int pos;
 	
-	str = StringUtils.removeBegining(str.trim(), com.cosylab.vdct.db.DBConstants.commentString).trim();
+	str = StringUtils.removeBeginning(str.trim(), com.cosylab.vdct.db.DBConstants.commentString).trim();
 	
 	pos = str.indexOf(eofChar);
 	while (pos>=0) {
-		output.append(com.cosylab.vdct.db.DBConstants.commentString).append(space).append(StringUtils.removeBegining(str.substring(0, pos).trim(), com.cosylab.vdct.db.DBConstants.commentString).trim()).append(eofChar);
+		output.append(com.cosylab.vdct.db.DBConstants.commentString).append(space).append(StringUtils.removeBeginning(str.substring(0, pos).trim(), com.cosylab.vdct.db.DBConstants.commentString).trim()).append(eofChar);
 		str = str.substring(pos+1);
 		pos = str.indexOf(eofChar);
 	}
 
-	str = com.cosylab.vdct.db.DBConstants.commentString+space+StringUtils.removeBegining(str.trim(), com.cosylab.vdct.db.DBConstants.commentString).trim();
+	str = com.cosylab.vdct.db.DBConstants.commentString+space+StringUtils.removeBeginning(str.trim(), com.cosylab.vdct.db.DBConstants.commentString).trim();
 	output.append(str);
 	
 	return output.toString();
@@ -157,16 +157,16 @@ private String removeCommentChars(String str) {
 	StringBuffer output = new StringBuffer("");
 	int pos;
 	
-	str = StringUtils.removeBegining(str.trim(), com.cosylab.vdct.db.DBConstants.commentString).trim();
+	str = StringUtils.removeBeginning(str.trim(), com.cosylab.vdct.db.DBConstants.commentString).trim();
 	
 	pos = str.indexOf(eofChar);
 	while (pos>=0) {
-		output.append(StringUtils.removeBegining(str.substring(0, pos).trim(), com.cosylab.vdct.db.DBConstants.commentString).trim()).append(eofChar);
+		output.append(StringUtils.removeBeginning(str.substring(0, pos).trim(), com.cosylab.vdct.db.DBConstants.commentString).trim()).append(eofChar);
 		str = str.substring(pos+1);
 		pos = str.indexOf(eofChar);
 	}
 
-	str = StringUtils.removeBegining(str.trim(), com.cosylab.vdct.db.DBConstants.commentString).trim();
+	str = StringUtils.removeBeginning(str.trim(), com.cosylab.vdct.db.DBConstants.commentString).trim();
 	output.append(str);
 	
 	return output.toString();
@@ -229,7 +229,7 @@ public int getVisibility()
 /**
  * Insert the method's description here.
  * Creation date: (11.1.2001 21:30:04)
- * @param java.awt.Component
+ * @param component java.awt.Component
  * @param x
  * @param y
  */

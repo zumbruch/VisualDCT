@@ -57,8 +57,8 @@ public class RdbDataChooserDialog extends JDialog implements ActionListener {
 	private static final String cancelString = "Cancel";
 	
 	/**
-	 * @param arg0
-	 * @param arg1
+     * @param mapper
+     * @param guiContext
 	 * @throws HeadlessException
 	 */
 	public RdbDataChooserDialog(RdbDataMapper mapper, JFrame guiContext) {

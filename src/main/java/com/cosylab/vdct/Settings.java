@@ -300,7 +300,7 @@ public void setToolbar(boolean state) {
 /**
  * Insert the method's description here.
  * Creation date: (27.4.2001 18:46:17)
- * @param char group separator character
+ * @param sep group separator character
  */
 public void setGroupSeparator(char sep) {
 	if (!grouping)

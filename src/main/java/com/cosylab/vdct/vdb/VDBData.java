@@ -87,7 +87,7 @@ private VDBData() {
 }
 /**
  * This method was created in VisualAge.
- * @param 
+ * @param rd
  */
 public void addRecord(VDBRecordData rd) {
 	if (rd!=null)
@@ -102,7 +102,7 @@ public void addRecord(VDBRecordData rd) {
 
 /**
  * This method was created in VisualAge.
- * @param 
+ * @param ed
  */
 public void addEntry(DBEntry ed) {
 	if (!structure.contains(ed))
@@ -111,7 +111,7 @@ public void addEntry(DBEntry ed) {
 
 /**
  * This method was created in VisualAge.
- * @param 
+ * @param templ
  */
 public void addTemplate(VDBTemplate templ) {
 	if (templ != null && templ.getId() != null) {
@@ -124,8 +124,7 @@ public void addTemplate(VDBTemplate templ) {
 
 /**
  * This method was created in VisualAge.
- * @param 
- */
+     * @param ti */
 public void addTemplateInstance(VDBTemplateInstance ti) {
 	if (ti!=null)
 		if (!templateInstances.contains(ti))
@@ -139,9 +138,7 @@ public void addTemplateInstance(VDBTemplateInstance ti) {
 /**
  * This method was created in VisualAge.
  * @return com.cosylab.vdct.vdb.VDBFieldData
- * @param dbd com.cosylab.vdct.dbd.DBDData
- * @param dbRecord com.cosylab.vdct.db.DBRecordData
- * @param dbdField com.cosylab.vdct.dbd.DBDFieldData
+ * @param sourceField com.cosylab.vdct.dbd.DBDFieldData
  */
 public static VDBFieldData copyVDBFieldData(VDBFieldData sourceField) {
 
@@ -153,10 +150,8 @@ public static VDBFieldData copyVDBFieldData(VDBFieldData sourceField) {
 }
 /**
  * This method was created in VisualAge.
- * @return com.cosylab.vdct.vdb.VDBFieldData
- * @param dbd com.cosylab.vdct.dbdDBDData
- * @param dbRecord com.cosylab.vdct.db.DBRecordData
- * @param dbdField com.cosylab.vdct.dbd.DBDFieldData
+ * @param sourceField com.cosylab.vdct.dbd.DBDFieldData
+ * @param targetField com.cosylab.vdct.dbd.DBDFieldData
  */
 public static void copyVDBFieldData(VDBFieldData sourceField, VDBFieldData targetField) {
 	targetField.setType(sourceField.getType());
@@ -185,8 +180,7 @@ public static VDBTemplateInstance copyVDBTemplateInstance(VDBTemplateInstance so
 /**
  * This method was created in VisualAge.
  * @return com.cosylab.vdct.vdb.VDBRecordData
- * @param dbd com.cosylab.vdct.dbd.DBDData
- * @param dbRecord com.cosylab.vdct.db.DBRecordData
+ * @param source com.cosylab.vdct.vdb.VDBRecordData
  */
 public static VDBRecordData copyVDBRecordData(VDBRecordData source) {
 
@@ -246,6 +240,7 @@ public static VDBPort copyVDBPort(VDBPort source) {
 /**
  * This method was created in VisualAge.
  * @return com.cosylab.vdct.vdb.VDBData
+ * @param dsId
  * @param dbd com.cosylab.vdct.dbd.DBDData
  * @param db com.cosylab.vdct.db.DBData
  */
@@ -592,8 +587,10 @@ public static VDBFieldData generateVDBFieldData(Object dsId, DBDData dbd, DBReco
 /**
  * This method was created in VisualAge.
  * @return com.cosylab.vdct.vdb.VDBRecordData
+ * @param dsId
  * @param dbd com.cosylab.vdct.dbd.DBDData
  * @param dbRecord com.cosylab.vdct.db.DBRecordData
+ * @throws com.cosylab.vdct.db.DBException
  */
 public static VDBRecordData generateVDBRecordData(Object dsId, DBDData dbd, DBRecordData dbRecord) throws DBException {
 
@@ -645,6 +642,7 @@ public static VDBRecordData generateVDBRecordData(Object dsId, DBDData dbd, DBRe
 /**
  * This method was created in VisualAge.
  * @return epics.vdb.VDBRecordData
+ * @param dsId
  * @param dbd epics.dbd.DBDData
  * @param recordType java.lang.String
  * @param recordName java.lang.String
@@ -683,8 +681,11 @@ public java.util.Vector getRecords() {
 /**
  * This method was created in VisualAge.
  * @return epics.vdb.VDBRecordData
+ * @param dsId
  * @param dbd epics.dbd.DBDData
- * @param dbRecord epics.db.DBRecordData
+ * @param source epics.vdb.VDBRecordData
+ * @param recordType
+ * @param recordName
  */
 public static VDBRecordData morphVDBRecordData(Object dsId, DBDData dbd, VDBRecordData source, String recordType, String recordName) {
 
@@ -778,7 +779,7 @@ public Hashtable getTemplates()
 /**
  * Insert the method's description here.
  * Creation date: (10.1.2001 14:44:44)
- * @param record com.cosylab.vdct.vdb.VDBTemplate
+ * @param template com.cosylab.vdct.vdb.VDBTemplate
  */
 public void removeTemplate(VDBTemplate template) {
 	templates.remove(template.getId());
@@ -786,7 +787,7 @@ public void removeTemplate(VDBTemplate template) {
 /**
  * Insert the method's description here.
  * Creation date: (10.1.2001 14:44:44)
- * @param record com.cosylab.vdct.vdb.VDBTemplateInstance
+ * @param templateInstance com.cosylab.vdct.vdb.VDBTemplateInstance
  */
 public void removeTemplateInstance(VDBTemplateInstance templateInstance) {
 	templateInstancesV.remove(templateInstance);

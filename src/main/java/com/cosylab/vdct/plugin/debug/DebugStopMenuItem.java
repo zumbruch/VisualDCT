@@ -41,9 +41,7 @@ public class DebugStopMenuItem extends JMenuItem implements ActionListener//impl
 {
 /**
  * Insert the method's description here.
- * Creation date: (7.12.2001 17:08:53)
- * @param
- */
+ * Creation date: (7.12.2001 17:08:53) */
 public DebugStopMenuItem()
 {
 	addActionListener(this);

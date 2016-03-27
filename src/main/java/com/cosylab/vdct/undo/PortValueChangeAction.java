@@ -41,7 +41,7 @@ public class PortValueChangeAction extends ActionObject {
 /**
  * Insert the method's description here.
  * Creation date: (3.5.2001 15:30:47)
- * @param field com.cosylab.vdct.vdb.VDBPort 
+ * @param port com.cosylab.vdct.vdb.VDBPort 
  * @param oldValue java.lang.String
  * @param newValue java.lang.String
  */

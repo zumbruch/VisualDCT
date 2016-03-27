@@ -49,6 +49,7 @@ public class DBMacro extends DBComment
 	
 	/**
 	 * Insert the method's description here.
+     * @param name
 	 */
 	public DBMacro(String name)
 	{

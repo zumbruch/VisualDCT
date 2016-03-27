@@ -56,7 +56,13 @@ implements InternalFrameInterface, InternalFrameListener {
 
 	protected static final String defaultName = "Name";
 
-	public WorkspaceInternalFrame(Object dsId, DesktopInterface desktop, DsManagerInterface drawingSurfaceManager) {
+    /**
+     *
+     * @param dsId
+     * @param desktop
+     * @param drawingSurfaceManager
+     */
+    public WorkspaceInternalFrame(Object dsId, DesktopInterface desktop, DsManagerInterface drawingSurfaceManager) {
 		super(defaultName, true, true, true, true);
 		
 		this.dsId = dsId;
@@ -76,11 +82,11 @@ implements InternalFrameInterface, InternalFrameListener {
 		setContentPane(contentPanel);
 	}
 
-	public JComponent getDisplayingComponent() {
+    public JComponent getDisplayingComponent() {
 		return contentPanel;
 	}
 
-	public void setFile(File file, String title) {
+    public void setFile(File file, String title) {
 		this.file = file;
 		setTitle(title);
 		if (isSelected()) {

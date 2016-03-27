@@ -63,7 +63,10 @@ implements ComponentListener, DesktopInterface {
 		frameOffset = 0;
 	}
 
-	public void selectFirstInternalFrame() {
+    /**
+     *
+     */
+    public void selectFirstInternalFrame() {
     	if (getComponentCount() > 0) {
     		Component component = getComponent(0);
     		if (component instanceof JInternalFrame) {

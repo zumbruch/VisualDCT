@@ -56,6 +56,8 @@ public Icon getIcon();
 public String getName();
 /**
  * 
+ * @param mode
+ * @param spreadsheet
  * @return com.cosylab.vdct.inspector.InspectableProperty[]
  */
 com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode, boolean spreadsheet);

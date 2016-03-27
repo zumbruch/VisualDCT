@@ -156,6 +156,10 @@ public class Macro extends VisibleObject implements Descriptable, Movable, InLin
 /**
  * Insert the method's description here.
  * Creation date: (1.2.2001 17:22:29)
+ * @param data
+ * @param y
+ * @param parent
+ * @param x
  */
 public Macro(VDBMacro data, ContainerObject parent, int x, int y) {
 	super(parent);
@@ -267,6 +271,7 @@ public void destroy() {
 /**
  * Insert the method's description here.
  * Creation date: (29.1.2001 21:23:04)
+ * @param disconnector
  */
 public void disconnect(Linkable disconnector) {
 	if (!disconnected && outlinks.contains(disconnector)) {
@@ -764,6 +769,7 @@ public boolean isTextPositionNorth() {
 }
 
 /**
+ * @param mode
  */
 public void setMode(int mode)
 {
@@ -865,6 +871,8 @@ public void setDestroyed(boolean newDestroyed)
 }
 
 /**
+ * @param oldName
+ * @param newName
  */
 public void rename(String oldName, String newName)
 {
@@ -981,7 +989,6 @@ public OutLink getOutput() {
 /**
  * Insert the method's description here.
  * Creation date: (30.1.2001 16:58:58)
- * @return boolean
  */
 public void updateTemplateLink()
 {

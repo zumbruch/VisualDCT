@@ -188,7 +188,7 @@ public void setColor(java.awt.Color newColor) {
 /**
  * Insert the method's description here.
  * Creation date: (23.4.2001 17:22:37)
- * @param newDescriprion java.lang.String
+ * @param newDescription java.lang.String
  */
 public void setDescription(java.lang.String newDescription) {
 	description = newDescription;

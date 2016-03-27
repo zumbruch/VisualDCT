@@ -3965,6 +3965,7 @@ private javax.swing.JComboBox getNameTextField() {
 
 /**
  * Returns new record name checker or null if there isn't one.
+ * @return 
  */
 protected NameChecker getNewRecordNameChecker() {
 	if (newRecordNameChecker == null) {
@@ -5763,6 +5764,7 @@ private javax.swing.JSlider getZoomSlider() {
 }
 /**
  * Comment
+     * @param windowEvent
  */
 public void groupDialog_WindowOpened(java.awt.event.WindowEvent windowEvent) {
 	String groupName = getStatusMsg2().getText().trim();
@@ -5784,6 +5786,7 @@ public void groupMenuItem_ActionPerformed() {
 }
 /**
  * Comment
+ * @param actionEvent
  */
 public void groupOKButton_ActionPerformed(java.awt.event.ActionEvent actionEvent) {
 	if (getGroupOKButton().isEnabled()) {
@@ -6279,6 +6282,7 @@ public void morphMenuItem_ActionPerformed() {
 }
 /**
  * Comment
+ * @param itemEvent
  */
 public void navigatorMenuItem_ItemStateChanged(java.awt.event.ItemEvent itemEvent) {
 	GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
@@ -6305,6 +6309,7 @@ public void newMenuItem_ActionPerformed() {
 }
 /**
  * Comment
+ * @param windowEvent
  */
 public void newRecordDialog_WindowOpened(
     java.awt.event.WindowEvent windowEvent) {
@@ -6385,6 +6390,7 @@ public void morphingDialog_WindowOpened(
 
 /**
  * Comment
+ * @param actionEvent
  */
 public void oKButton_ActionPerformed(java.awt.event.ActionEvent actionEvent) {
 
@@ -6502,6 +6508,8 @@ public void openDB(String fileName) {
 /**
  * Insert the method's description here.
  * Creation date: (8.1.2001 20:30:58)
+ * @param fileName
+ * @return 
  */
 public boolean openDBD(String fileName) {
 	return openDBD(fileName, false);
@@ -6510,6 +6518,9 @@ public boolean openDBD(String fileName) {
 /**
  * Insert the method's description here.
  * Creation date: (8.1.2001 20:30:58)
+ * @param fileName
+ * @param allowDB
+ * @return 
  */
 public boolean openDBD(String fileName, boolean allowDB) {
 	if (fileName!=null && fileName.indexOf(java.io.File.separatorChar)<0)
@@ -6629,6 +6640,7 @@ public void openMenuItem_ActionPerformed() {
 
 /**
  * Comment
+ * @param actionEvent
  */
 public void pageSetupMenuItem_ActionPerformed(java.awt.event.ActionEvent actionEvent) {
 //	new Thread() {
@@ -6704,6 +6716,7 @@ public void pasteMenuItem_ActionPerformed() {
 }
 /**
  * Comment
+ * @param actionEvent
  */
 public void pluginManagerMenuItem_ActionPerformed(java.awt.event.ActionEvent actionEvent)
 {
@@ -7123,6 +7136,7 @@ public void printMenuItem_ActionPerformed() {
 }
 /**
  * Comment
+ * @param actionEvent
  */
 public void printPreviewMenuItem_ActionPerformed(java.awt.event.ActionEvent actionEvent) {
 	final GetPrintableInterface pi = (GetPrintableInterface)CommandManager.getInstance().getCommand("GetPrintableInterface");
@@ -7148,6 +7162,7 @@ public void redoMenuItem_ActionPerformed() {
 }
 /**
  * Comment
+ * @param windowEvent
  */
 public void renameDialog_WindowOpened(java.awt.event.WindowEvent windowEvent) {
 	getNewNameTextField().setText(getOldNameLabel().getText());
@@ -7155,6 +7170,7 @@ public void renameDialog_WindowOpened(java.awt.event.WindowEvent windowEvent) {
 }
 /**
  * Comment
+ * @param actionEvent
  */
 public void renameOKButton_ActionPerformed(java.awt.event.ActionEvent actionEvent) {
 	if (getRenameOKButton().isEnabled()) {
@@ -7289,6 +7305,7 @@ public void generateAsGroupMenuItem_ActionPerformed() {
 }
 /**
  * Comment
+ * @return 
  */
 public boolean save_AsMenuItem_ActionPerformed() {
 	JFileChooser chooser = getfileChooser();
@@ -7467,6 +7484,7 @@ public void generateMenuItem_ActionPerformed() {
 }
 /**
  * Comment
+ * @return 
  */
 public boolean saveMenuItem_ActionPerformed() {
 
@@ -7520,7 +7538,7 @@ public void setCurrentGroup(String groupName) {
 /**
  * Insert the method's description here.
  * Creation date: (29.4.2001 11:17:11)
- * @param groupName java.lang.String
+ * @param mode
  */
 public void setMode(String mode) {
 	getModeStatus().setText(" "+mode+" ");
@@ -7594,6 +7612,7 @@ public void setTextBoxButtonEnabled(boolean parTextBoxButtonEnabled)
 }
 /**
  * Comment
+ * @param itemEvent
  */
 public void show_PointsMenuItem_ItemStateChanged(java.awt.event.ItemEvent itemEvent) {
 	GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
@@ -7638,6 +7657,7 @@ public void showMorphingDialog(String name, String oldType, Object[] targets) {
 /**
  * Insert the method's description here.
  * Creation date: (2.5.2001 10:30:28)
+ * @param oldName
  */
 public void showRenameDialog(String oldName) {
 	getOldNameLabel().setText(oldName);
@@ -7653,6 +7673,7 @@ public void smart_ZoomMenuItem_ActionPerformed() {
 }
 /**
  * Comment
+ * @param itemEvent
  */
 public void snapToGridMenuItem_ItemStateChanged(java.awt.event.ItemEvent itemEvent) {
 	Settings.getInstance().setSnapToGrid(getSnapToGridMenuItem().isSelected());
@@ -7729,12 +7750,14 @@ public void zoom_OutMenuItem_ActionPerformed() {
 }
 /**
  * Comment
+ * @param mouseEvent
  */
 public void zoomSlider_MouseReleased(java.awt.event.MouseEvent mouseEvent) {
 	zoomSlider_updateLabel();
 }
 /**
  * Comment
+ * @param propertyChangeEvent
  */
 public void zoomSlider_PropertyChange(java.beans.PropertyChangeEvent propertyChangeEvent) {
 	zoomSlider_updateLabel();
@@ -7751,6 +7774,7 @@ public void zoomSlider_updateLabel() {
 }
 /**
  * Comment
+ * @param direction
  */
 public void moveOrigin(int direction) {
     GetGUIInterface cmd = (GetGUIInterface)CommandManager.getInstance().getCommand("GetGUIMenuInterface");
@@ -7851,6 +7875,7 @@ public void updateLoadLabel() {
 	/**
 	 * Sets the openedFile.
 	 * @param openedFile The openedFile to set
+     * @param title
 	 */
 	public void setOpenedFile(File openedFile, String title)
 	{

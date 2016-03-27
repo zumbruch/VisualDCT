@@ -40,6 +40,7 @@ public class CommentTextArea extends JTextArea implements java.awt.event.FocusLi
 	HelpDisplayer helpDisplayer = null;
 /**
  * CommentTextArea constructor comment.
+ * @param helpDisplayer
  */
 public CommentTextArea(HelpDisplayer helpDisplayer) {
 	this.helpDisplayer = helpDisplayer;

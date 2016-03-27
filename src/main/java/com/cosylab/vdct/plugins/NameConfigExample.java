@@ -49,11 +49,15 @@ import com.cosylab.vdct.xml.XMLManager;
  * this default setting.
 
  * An example of XML file:
+ * <pre>
+ * {@code
  * <?xml version="1.0" encoding="UTF-8"?>
  * 
  * <name pattern="VDCT_.*" default="VDCT_Name1" description="Must start with VDCT_"/>
  * 
  * Default and description parameters are optional.
+ * }
+ * </pre>
  * 
  * @author ssah
  */

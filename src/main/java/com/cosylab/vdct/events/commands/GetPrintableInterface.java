@@ -41,7 +41,7 @@ public class GetPrintableInterface extends Command {
 /**
  * Insert the method's description here.
  * Creation date: (12.5.2001 17:41:08)
- * @param printable java.awt.print.Printable
+ * @param intf java.awt.print.Pageable
  */
 public GetPrintableInterface(Pageable intf) {
 	this.pageable=intf;

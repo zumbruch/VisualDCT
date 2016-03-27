@@ -231,7 +231,7 @@ public DBDMenuData getDBDMenuData(String menuName) {
 }
 /**
  * This method was created in VisualAge.
- * @returncom.cosylab.vdct.dbd.DBDRecordData
+ * @return com.cosylab.vdct.dbd.DBDRecordData
  * @param recordName java.lang.String
  */
 public DBDRecordData getDBDRecordData(String recordName) {

@@ -47,6 +47,8 @@ import com.cosylab.vdct.xml.XMLManager;
  * It reads link type configuration from an XML file. The file name is defined by VDCT_LINK_CONFIG_FILE filename located
  * in user home directory (or in VDCT_CONFIG_DIR dir). Use VDCT_LINK_CONFIG_FILE_ENV environment variable to override this default setting.
  * An example of XML file:
+ * <pre>
+ * {@code
  * <?xml version="1.0" encoding="UTF-8"?>
  * 
  * <links>
@@ -62,7 +64,8 @@ import com.cosylab.vdct.xml.XMLManager;
  *    <link type="RF_IO" pattern="#R\d+ M\d+ D\d+ E\d+( )*( @.*)?" default="#R0 M0 D0 E0 @" description="RF_IO - #Rcryo Mmicro Ddataset Eelement"  />
  *    <link type="VXI_IO" pattern="#V\d+ (C\d+)?+  S\d+( )*( @.*)?" default="#V0 C0 S0 @" description="VXI_IO - #Vframe Cslot Ssignal @parm"  />
  * </links>
- * 
+ * }
+ * </pre>
  * @author Matej Sekoranja
  */
 public class LinkTypeConfig implements LinkTypeConfigPlugin

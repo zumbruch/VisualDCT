@@ -40,21 +40,22 @@ import com.cosylab.vdct.Version;
  * @author 
  *
  * To change this generated comment edit the template variable "typecomment":
- * Window>Preferences>Java>Templates.
+ * Window&gt;Preferences&gt;Java&gt;Templates.
  * To enable and disable the creation of type comments go to
- * Window>Preferences>Java>Code Generation.
+ * Window&gt;Preferences&gt;Java&gt;Code Generation.
  */
 public class VisualDCTProgramTabModel implements ProgramTabModel {
 
 	/**
 	 * Constructor for DefaultProgramTabModel.
+     * @param toAbout
 	 */
 	public VisualDCTProgramTabModel(Object toAbout) {
 		super();
 	}
 
 	/**
-	 * @see com.cosylab.gui.components.about.ProgramTabModel#getProductBuild()
+	 * @see com.cosylab.vdct.about.ProgramTabModel#getProductBuild()
 	 */
 	public String getProductBuild()
 	{
@@ -62,7 +63,7 @@ public class VisualDCTProgramTabModel implements ProgramTabModel {
 	}
 
 	/**
-	 * @see com.cosylab.gui.components.about.ProgramTabModel#getProductBuildDate()
+	 * @see com.cosylab.vdct.about.ProgramTabModel#getProductBuildDate()
 	 */
 	public String getProductBuildDate()
 	{
@@ -70,7 +71,7 @@ public class VisualDCTProgramTabModel implements ProgramTabModel {
 	}
 
 	/**
-	 * @see com.cosylab.gui.components.about.ProgramTabModel#getProductDocsURL()
+	 * @see com.cosylab.vdct.about.ProgramTabModel#getProductDocsURL()
 	 */
 	public URL getProductDocsURL()
 	{
@@ -84,7 +85,7 @@ public class VisualDCTProgramTabModel implements ProgramTabModel {
 	}
 
 	/**
-	 * @see com.cosylab.gui.components.about.ProgramTabModel#getProductLogoImage()
+	 * @see com.cosylab.vdct.about.ProgramTabModel#getProductLogoImage()
 	 */
 	public Icon getProductLogoImage()
 	{
@@ -98,7 +99,7 @@ public class VisualDCTProgramTabModel implements ProgramTabModel {
 	}
 
 	/**
-	 * @see com.cosylab.gui.components.about.ProgramTabModel#getProductName()
+	 * @see com.cosylab.vdct.about.ProgramTabModel#getProductName()
 	 */
 	public String getProductName()
 	{
@@ -106,7 +107,7 @@ public class VisualDCTProgramTabModel implements ProgramTabModel {
 	}
 
 	/**
-	 * @see com.cosylab.gui.components.about.ProgramTabModel#getProductURL()
+	 * @see com.cosylab.vdct.about.ProgramTabModel#getProductURL()
 	 */
 	public URL getProductURL()
 	{
@@ -120,7 +121,7 @@ public class VisualDCTProgramTabModel implements ProgramTabModel {
 	}
 
 	/**
-	 * @see com.cosylab.gui.components.about.ProgramTabModel#getProductVersion()
+	 * @see com.cosylab.vdct.about.ProgramTabModel#getProductVersion()
 	 */
 	public String getProductVersion()
 	{
@@ -128,7 +129,7 @@ public class VisualDCTProgramTabModel implements ProgramTabModel {
 	}
 
 	/**
-	 * @see com.cosylab.gui.components.about.ProgramTabModel#getVendor()
+	 * @see com.cosylab.vdct.about.ProgramTabModel#getVendor()
 	 */
 	public String getVendor()
 	{
@@ -136,7 +137,7 @@ public class VisualDCTProgramTabModel implements ProgramTabModel {
 	}
 
 	/**
-	 * @see com.cosylab.gui.components.about.ProgramTabModel#getVendorEmail()
+	 * @see com.cosylab.vdct.about.ProgramTabModel#getVendorEmail()
 	 */
 	public String getVendorEmail()
 	{
@@ -144,7 +145,7 @@ public class VisualDCTProgramTabModel implements ProgramTabModel {
 	}
 
 	/**
-	 * @see com.cosylab.gui.components.about.ProgramTabModel#getVendorURL()
+	 * @see com.cosylab.vdct.about.ProgramTabModel#getVendorURL()
 	 */
 	public URL getVendorURL()
 	{
@@ -158,7 +159,7 @@ public class VisualDCTProgramTabModel implements ProgramTabModel {
 	}
 
 	/**
-	 * @see com.cosylab.gui.components.about.AboutTabModel#aquireData()
+	 * @see com.cosylab.vdct.about.AboutTabModel#aquireData()
 	 */
 	public void aquireData()
 	{

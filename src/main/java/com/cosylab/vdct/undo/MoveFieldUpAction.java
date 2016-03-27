@@ -34,11 +34,10 @@ import com.cosylab.vdct.graphics.objects.LinkManagerObject;
 /**
  * Insert the type's description here.
  * Creation date: (5.5.2001 12:07:47)
- * @author 
  */
 public class MoveFieldUpAction extends ActionObject {
-	protected com.cosylab.vdct.graphics.objects.Field field;
-	protected LinkManagerObject parentObject;
+    protected com.cosylab.vdct.graphics.objects.Field field;
+    protected LinkManagerObject parentObject;
 /**
  * Insert the method's description here.
  * Creation date: (5.5.2001 12:08:29)

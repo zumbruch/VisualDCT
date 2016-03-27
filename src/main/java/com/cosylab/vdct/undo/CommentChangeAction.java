@@ -41,7 +41,7 @@ public class CommentChangeAction extends ActionObject {
 /**
  * Insert the method's description here.
  * Creation date: (3.5.2001 15:30:47)
- * @param field com.cosylab.vdct.vdb.CommentProperty
+ * @param commentProperty com.cosylab.vdct.vdb.CommentProperty
  * @param oldValue java.lang.String
  * @param newValue java.lang.String
  */

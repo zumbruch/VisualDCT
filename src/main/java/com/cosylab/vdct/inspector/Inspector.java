@@ -118,6 +118,7 @@ public Inspector() {
 /**
  * Inspector constructor comment.
  * @param owner java.awt.Frame
+ * @param dsId
  */
 public Inspector(Frame owner, Object dsId) {
 	super(owner);
@@ -682,6 +683,7 @@ public void inspectObject(Inspectable object) {
  * Insert the method's description here.
  * Creation date: (8.1.2001 17:50:20)
  * @param object com.cosylab.vdct.inspector.Inspectable
+ * @param raise
  */
 public void inspectObject(Inspectable object, boolean raise) {
 

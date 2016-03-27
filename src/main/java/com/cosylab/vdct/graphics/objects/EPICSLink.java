@@ -65,6 +65,7 @@ public void destroy() {
 /**
  * Insert the method's description here.
  * Creation date: (29.1.2001 21:23:04)
+     * @param disconnector
  */
 public void disconnect(Linkable disconnector) {
 	disconnected=true;

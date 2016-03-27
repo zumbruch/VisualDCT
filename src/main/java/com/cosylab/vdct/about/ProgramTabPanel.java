@@ -35,9 +35,9 @@ import javax.swing.JPanel;
  * @author 
  *
  * To change this generated comment edit the template variable "typecomment":
- * Window>Preferences>Java>Templates.
+ * Window&gt;Preferences&gt;Java&gt;Templates.
  * To enable and disable the creation of type comments go to
- * Window>Preferences>Java>Code Generation.
+ * Window&gt;Preferences&gt;Java&gt;Code Generation.
  */
 public class ProgramTabPanel extends AboutTabPanel {
 	
@@ -83,7 +83,7 @@ private javax.swing.JLabel getJLabelCopyright1() {
 	return JLabelCopyright1;
 }
 
-public String getTitle(){
+    public String getTitle(){
 	return ((ProgramTabModel)model).getProductName();
 }
 
@@ -477,7 +477,7 @@ private javax.swing.JPanel getJPanelURLs() {
 	}
 
 	/**
-	 * @see com.cosylab.gui.components.about.AboutTabPanel#initializePanel()
+	 * @see com.cosylab.vdct.about.AboutTabPanel#initializePanel()
 	 */
 	protected void initializePanel() {
 	
@@ -528,7 +528,7 @@ private javax.swing.JPanel getJPanelURLs() {
 	}
 
 	/**
-	 * @see com.cosylab.gui.components.about.AboutTabPanel#processData()
+	 * @see com.cosylab.vdct.about.AboutTabPanel#processData()
 	 */
 	protected void processData() {
 
@@ -577,7 +577,7 @@ private javax.swing.JPanel getJPanelURLs() {
 }
 
 	/**
-	 * @see com.cosylab.gui.components.about.AboutTab#getPanel()
+	 * @see com.cosylab.vdct.about.AboutTab#getPanel()
 	 */
 	public JPanel getPanel() {
 		return this;

@@ -42,7 +42,7 @@ import com.cosylab.vdct.util.*;
  * @author ssah
  *
  * To change this generated comment edit the template variable "typecomment":
- * Window>Preferences>Java>Templates.
+ * Window&gt;Preferences&gt;Java&gt;Templates.
  */
 public class Box extends VisibleObject implements BorderObject, Flexible, Movable, Popupable, Selectable, Clipboardable
 {
@@ -107,7 +107,16 @@ private String getAvailableHashId()
 	return testHashId;
 }
 
-public Box(String parName, Group parentGroup, int posX, int posY, int posX2, int posY2)
+    /**
+     *
+     * @param parName
+     * @param parentGroup
+     * @param posX
+     * @param posY
+     * @param posX2
+     * @param posY2
+     */
+    public Box(String parName, Group parentGroup, int posX, int posY, int posX2, int posY2)
 {
 	super(parentGroup);
 	

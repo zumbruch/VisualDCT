@@ -108,6 +108,7 @@ public class VDBTemplateInstance implements Commentable
 	/**
 	 * Sets the properties.
 	 * @param properties The properties to set
+     * @param propertiesV
 	 */
 	public void setProperties(Hashtable properties, Vector propertiesV)
 	{
@@ -139,7 +140,7 @@ public class VDBTemplateInstance implements Commentable
 
 	/**
 	 * Make port substitutions on a string using port table.
-	 * @param s The string to be applied
+	 * @param value The string to be applied
 	 * @param ports The ports to use
 	 * @return String  
 	 */

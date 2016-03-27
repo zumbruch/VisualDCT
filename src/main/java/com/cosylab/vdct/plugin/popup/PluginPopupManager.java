@@ -68,8 +68,7 @@ public static PluginPopupManager getInstance() {
 /**
  * Insert the method's description here.
  * Creation date: (6.12.2001 22:23:57)
- * @param
- * @return
+ * @param plugin
  */
 public void pluginAdded(PluginObject plugin)
 {
@@ -87,8 +86,7 @@ public void pluginAdded(PluginObject plugin)
 /**
  * Insert the method's description here.
  * Creation date: (6.12.2001 22:23:57)
- * @param
- * @return
+ * @param plugin
  */
 public void pluginRemoved(PluginObject plugin)
 {
@@ -100,10 +98,7 @@ public void pluginRemoved(PluginObject plugin)
 }
 /**
  * Not implemented
- * Creation date: (6.12.2001 22:23:57)
- * @param
- * @return
- */
+ * Creation date: (6.12.2001 22:23:57) */
 public void propertyChange(PropertyChangeEvent evt)
 {
 	PluginObject plugin = (PluginObject)evt.getSource();

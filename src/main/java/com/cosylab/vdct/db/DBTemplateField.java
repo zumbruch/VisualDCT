@@ -48,6 +48,10 @@ public class DBTemplateField {
 	
 /**
  * FieldData constructor comment.
+ * @param name
+ * @param color
+ * @param isRight
+ * @param visibility
  */
 public DBTemplateField(String name, Color color, boolean isRight, int visibility) {
 	this.name=name;

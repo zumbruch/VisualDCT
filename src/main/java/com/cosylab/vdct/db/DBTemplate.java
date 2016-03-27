@@ -58,6 +58,8 @@ public class DBTemplate extends DBComment
 
 	/**
 	 * Constructor.
+     * @param id
+     * @param fileName
 	 */
 	public DBTemplate(String id, String fileName)
 	{
@@ -188,6 +190,7 @@ public class DBTemplate extends DBComment
 	}
 
 	/**
+     * @param port
 	 */
 	public void addPort(DBPort port)
 	{
@@ -199,6 +202,7 @@ public class DBTemplate extends DBComment
 	}
 
 	/**
+     * @param macro
 	 */
 	public void addMacro(DBMacro macro)
 	{

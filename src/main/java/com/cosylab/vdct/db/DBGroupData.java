@@ -40,6 +40,11 @@ public class DBGroupData {
 	protected String name;
 /**
  * DBGroupData constructor comment.
+ * @param name java.lang.String
+ * @param x int
+ * @param y int
+ * @param color java.awt.Color
+ * @param description java.lang.String
  */
 public DBGroupData(String name, int x, int y, java.awt.Color color, String description) {
 	this.name=name;

@@ -41,34 +41,41 @@ public interface NameManipulator {
 	/**
 	 * Insert the type's description here.
 	 * Creation date: (27.12.2000 11:47:12)
+     * @param name
+     * @return 
 	 */	
 	public String getResolvedName(String name);
 	
 	/**
 	 * Insert the type's description here.
 	 * Creation date: (27.12.2000 11:47:12)
+     * @return 
 	 */	
 	public String getAddedPrefix();
 
 	/**
 	 * Insert the type's description here.
 	 * Creation date: (27.12.2000 11:47:12)
+     * @return 
 	 */	
 	public String getRemovedPrefix();
 
 	/**
 	 * Insert the type's description here.
 	 * Creation date: (27.12.2000 11:47:12)
+     * @return 
 	 */	
 	public Map getSubstitutions();
 	/**
 	 * Insert the type's description here.
 	 * Creation date: (27.12.2000 11:47:12)
+     * @return 
 	 */	
 	public Map getPorts();
 	/**
 	 * Insert the type's description here.
 	 * Creation date: (27.12.2000 11:47:12)
+     * @return 
 	 */	
 	public File getFile();
 }

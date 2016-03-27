@@ -132,7 +132,7 @@ public class DBDEntry {
 	}
 
 	/**
-	 * @param string
+     * @param file
 	 */
 	public static void setBaseDir(File file) {
 		baseDir = file;

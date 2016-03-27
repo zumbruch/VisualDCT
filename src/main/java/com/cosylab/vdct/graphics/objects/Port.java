@@ -166,6 +166,10 @@ public class Port extends VisibleObject implements Descriptable, Movable, OutLin
 /**
  * Insert the method's description here.
  * Creation date: (1.2.2001 17:22:29)
+ * @param data
+ * @param y
+ * @param parent
+ * @param x
  */
 public Port(VDBPort data, ContainerObject parent, int x, int y) {
 	super(parent);
@@ -254,6 +258,7 @@ public void removeLink() {
 /**
  * ...
  * Creation date: (29.1.2001 20:05:51)
+ * @param disconnector
  */
 public void disconnect(Linkable disconnector) {
 	if (!disconnected && (inlink==disconnector) ) {
@@ -623,6 +628,7 @@ public void setDescription(java.lang.String description) {}
 /**
  * Insert the method's description here.
  * Creation date: (29.1.2001 20:05:52)
+ * @param input
  */
 public void setInput(InLink input) {
 	if (inlink==input) return;
@@ -811,6 +817,7 @@ public int getMode()
 }
 
 /**
+     * @param mode
  */
 public void setMode(int mode)
 {
@@ -873,7 +880,7 @@ public static com.cosylab.vdct.vdb.GUISeparator getPortSeparator() {
 }
 
 /**
- * @see com.cosylab.vdct.inspector.Inspectable#getProperties(int)
+ * @see com.cosylab.vdct.inspector.Inspectable#getProperties(int, boolean)
  */
 public InspectableProperty[] getProperties(int mode, boolean spreadsheet)
 {

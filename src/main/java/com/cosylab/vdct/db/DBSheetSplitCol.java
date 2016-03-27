@@ -93,6 +93,10 @@ public class DBSheetSplitCol {
 		this.parts = parts;
 	}
     
+    /**
+     *
+     * @return
+     */
     public static DBSheetSplitCol getWhitespaceSplitData() {
     	return new DBSheetSplitCol(true, "\\s+");
     }
@@ -139,7 +143,11 @@ public class DBSheetSplitCol {
 		this.parts = parts;
 	}
 	
-	public String getDelimiterTypeString() {
+    /**
+     *
+     * @return
+     */
+    public String getDelimiterTypeString() {
 		return delimiterType ? delimiterString : patternString;
 	}
 	
@@ -170,6 +178,8 @@ public class DBSheetSplitCol {
 	
 	
 	/** Returns the number at the end of the given string. If there is no such number, it returns -1.
+     * @param string
+     * @return 
 	 */
     public static int extractValueAtEnd(String string) {
 		int value = -1;
@@ -187,6 +197,8 @@ public class DBSheetSplitCol {
 		return value;
 	}
 	/** Returns the string without the trailing number, or the string itself if there is no number at the end.
+     * @param string
+     * @return 
 	 */
     public static String removeValueAtEnd(String string) {
     	int j = string.length() - 1;

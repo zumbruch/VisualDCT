@@ -77,7 +77,7 @@ class CellRenderer extends DefaultTableCellRenderer {
 	}
 }
 
-public class TableModel extends AbstractTableModel {
+    public class TableModel extends AbstractTableModel {
 
 	// table header
 	//private final String[] columnNames = { "Loaded Database Definition File(s)" };
@@ -98,6 +98,7 @@ public class TableModel extends AbstractTableModel {
 	
 	/**
 	 * getColumnCount method comment.
+         * @return 
 	 */
 	public int getColumnCount() {
 		return columnClasses.length;
@@ -156,7 +157,6 @@ public class TableModel extends AbstractTableModel {
 	 * @param   aValue          the new value.  This can be null.
 	 * @param   row             the row whose value is to be looked up
 	 * @param   column          the column whose value is to be looked up
-	 * @return                  the value Object at the specified cell
 	 */
 
 	public void setValueAt(Object aValue, int row, int column) {
@@ -270,6 +270,7 @@ public DBDDialog(java.awt.Frame owner, boolean modal) {
 }
 /**
  * Comment
+ * @param actionEvent
  */
 public void addDBDButton_ActionPerformed(java.awt.event.ActionEvent actionEvent) {
 	ComboBoxFileChooser chooser = ((VisualDCT)getParent()).getComboBoxFileChooser();
@@ -711,6 +712,7 @@ public static void main(java.lang.String[] args) {
 }
 /**
  * Comment
+ * @param actionEvent
  */
 public void removeDBDButton_ActionPerformed(java.awt.event.ActionEvent actionEvent) {
 	int[] selected = getScrollPaneTable().getSelectedRows();

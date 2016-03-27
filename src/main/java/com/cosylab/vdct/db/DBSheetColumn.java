@@ -39,11 +39,24 @@ public class DBSheetColumn implements Comparable {
 	private int sortIndex = 0;
 	private DBSheetColWidth[] splitIndices = null;
 
-	public DBSheetColumn(String columnName, boolean hidden, int sortIndex) {
+    /**
+     *
+     * @param columnName
+     * @param hidden
+     * @param sortIndex
+     */
+    public DBSheetColumn(String columnName, boolean hidden, int sortIndex) {
 		this(columnName, hidden, sortIndex, new DBSheetColWidth[0]);
 	}
 	
-	public DBSheetColumn(String name, boolean hidden, int sortIndex,
+    /**
+     *
+     * @param name
+     * @param hidden
+     * @param sortIndex
+     * @param splitIndices
+     */
+    public DBSheetColumn(String name, boolean hidden, int sortIndex,
 			DBSheetColWidth[] splitIndices) {
 		super();
 		this.name = name;

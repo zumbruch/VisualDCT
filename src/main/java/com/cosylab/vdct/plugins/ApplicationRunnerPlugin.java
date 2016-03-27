@@ -39,8 +39,9 @@ import com.cosylab.vdct.Console;
 import com.cosylab.vdct.plugin.menu.*;
 
 /**
- * Application runner plugin, runs external applications from the VDCT. <br/>
- * A menu Tools->Applications is added.<br/>Applications are configured via plugins configuration file.<br/> 
+ * Application runner plugin, runs external applications from the VDCT.
+ * A menu Tools-&gt;Applications is added. 
+ * Applications are configured via plugins configuration file.
  * Add the following lines to the
  * ${user.home}/.vdctplugins.xml or /etc/vdct/.vdctplugins.xml (system config)
  * file:
@@ -90,9 +91,6 @@ public class ApplicationRunnerPlugin implements MenuPlugin {
 
     /**
      * Insert the method's description here. Creation date: (8.12.2001 13:29:26)
-     * 
-     * @param
-     * @return
      */
     public void destroy()
     {
@@ -120,8 +118,6 @@ public class ApplicationRunnerPlugin implements MenuPlugin {
 
     /**
      * Insert the method's description here. Creation date: (8.12.2001 13:29:26)
-     * 
-     * @param
      * @return
      */
     public String getName()
@@ -141,9 +137,8 @@ public class ApplicationRunnerPlugin implements MenuPlugin {
 
     /**
      * Insert the method's description here. Creation date: (8.12.2001 13:29:26)
-     * 
-     * @param
-     * @return
+     * @param properties
+     * @param context
      */
     public void init(java.util.Properties properties,
             com.cosylab.vdct.plugin.PluginContext context)
@@ -170,8 +165,6 @@ public class ApplicationRunnerPlugin implements MenuPlugin {
     /**
      * Insert the method's description here.
      * Creation date: (8.12.2001 13:29:26)
-     * @param 
-     * @return
      */
     public void start()
     {
@@ -180,8 +173,6 @@ public class ApplicationRunnerPlugin implements MenuPlugin {
     /**
      * Insert the method's description here.
      * Creation date: (8.12.2001 13:29:26)
-     * @param 
-     * @return
      */
     public void stop()
     {

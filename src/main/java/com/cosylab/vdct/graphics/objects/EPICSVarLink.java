@@ -131,6 +131,7 @@ public void destroy() {
 /**
  * Insert the method's description here.
  * Creation date: (29.1.2001 21:23:04)
+ * @param disconnector
  */
 public void disconnect(Linkable disconnector) {
 	if (!disconnected && outlinks.contains(disconnector)) {
@@ -486,6 +487,8 @@ public OutLink getOutput() {
 /**
  * Return properties to be inspected
  * Creation date: (1.2.2001 22:22:37)
+ * @param mode
+ * @param spreadsheet
  * @return com.cosylab.vdct.inspector.InspectableProperty[]
  */
 public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode, boolean spreadsheet) {

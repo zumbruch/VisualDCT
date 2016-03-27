@@ -41,6 +41,7 @@ public class DeleteTemplateMacroAction extends CreateTemplateMacroAction {
 /**
  * DeleteAction constructor comment.
  * @param object com.cosylab.vdct.graphics.objects.VisibleObject
+ * @param macro
  */
 public DeleteTemplateMacroAction(VDBTemplate object, VDBMacro macro) {
 	super(object, macro);

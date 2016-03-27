@@ -71,6 +71,7 @@ public class ConnectionDialog extends JDialog implements ActionListener {
 
 	/**
 	 * @param arg0
+     * @param mapper
 	 */
 	public ConnectionDialog(JFrame arg0, RdbDataMapper mapper) {
         super(arg0, true);

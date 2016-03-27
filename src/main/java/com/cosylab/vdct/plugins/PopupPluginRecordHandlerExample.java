@@ -73,10 +73,7 @@ private PopupPluginRecordHandlerExample.PopupMenuHandler getPopupmenuHandler() {
 
 /**
  * Insert the method's description here.
- * Creation date: (8.12.2001 13:29:26)
- * @param 
- * @return
- */
+ * Creation date: (8.12.2001 13:29:26) */
 public void destroy() {}
 
 /**
@@ -98,7 +95,6 @@ public String getDescription() {
 /**
  * Insert the method's description here.
  * Creation date: (8.12.2001 13:29:26)
- * @param 
  * @return
  */
 public String getName() {
@@ -115,22 +111,17 @@ public String getVersion() {
 /**
  * Insert the method's description here.
  * Creation date: (8.12.2001 13:29:26)
- * @param 
- * @return
+ * @param properties
+ * @param context
  */
 public void init(java.util.Properties properties, com.cosylab.vdct.plugin.PluginContext context) {}
 /**
  * Insert the method's description here.
- * Creation date: (8.12.2001 13:29:26)
- * @param 
- * @return
- */
+ * Creation date: (8.12.2001 13:29:26) */
 public void start() {}
 /**
  * Insert the method's description here.
- * Creation date: (8.12.2001 13:29:26)
- * @param 
- * @return
+ * Creation date: (8.12.2001 13:29:26)@return
  */
 public void stop() {}
 

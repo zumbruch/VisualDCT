@@ -55,6 +55,8 @@ public class InspectorTableCellRenderer extends DefaultTableCellRenderer {
 
 	/**
 	 * InspectorTableCellRenderer constructor comment.
+     * @param table
+     * @param tableModel
 	 */
 	public InspectorTableCellRenderer(JTable table, PropertyTableModel tableModel) {
 		super();

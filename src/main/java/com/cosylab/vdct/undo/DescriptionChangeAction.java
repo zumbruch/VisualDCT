@@ -43,7 +43,7 @@ public class DescriptionChangeAction extends ActionObject {
 /**
  * Insert the method's description here.
  * Creation date: (3.5.2001 15:30:47)
- * @param objectDescriptable
+ * @param object Descriptable
  * @param oldValue java.lang.String
  * @param newValue java.lang.String
  */

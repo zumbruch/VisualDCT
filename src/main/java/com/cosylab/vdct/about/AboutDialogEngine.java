@@ -46,6 +46,7 @@ public AboutDialogEngine()
 
 /**
  * Default constructor with "abouted object" as parameter
+ * @param toAbout
  */
 public AboutDialogEngine(Object toAbout) {
 	super();
@@ -57,7 +58,7 @@ public AboutDialogEngine(Object toAbout) {
 /**
  * This method is intended for adding Tab object into tabs ArrayList.
  * Creation date: (29.5.2002 16:43:05)
- * @param newTabs java.util.ArrayList
+ * @param newTab java.util.ArrayList
  */
 public void addAboutTab(AboutTab newTab) {
 
@@ -111,7 +112,7 @@ protected abstract void perform() ;
 	
 	}
 
-	protected void arrangeTabs(){
+    protected void arrangeTabs(){
 	
 	
 	    for (int i = 0; i < tabs.size(); i++) {

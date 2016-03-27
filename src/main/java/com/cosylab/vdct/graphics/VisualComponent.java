@@ -40,11 +40,13 @@ public interface VisualComponent {
 /**
  * Insert the method's description here.
  * Creation date: (10.12.2000 11:25:20)
+ * @param g
  */
 public void draw(Graphics g);
 /**
  * Insert the method's description here.
  * Creation date: (11.12.2000 16:23:31)
+ * @return 
  */
 public int getComponentHeight();
 /**

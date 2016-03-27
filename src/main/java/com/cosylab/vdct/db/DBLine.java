@@ -46,6 +46,16 @@ public class DBLine {
 /**
  * Insert the method's description here.
  * Creation date: (23.4.2001 21:12:09)
+ * @param name
+ * @param x
+ * @param y
+ * @param y2
+ * @param parentBorderID
+ * @param dashed
+ * @param x2
+ * @param endArrow
+ * @param color
+ * @param startArrow
  */
 public DBLine(String name, int x, int y, int x2, int y2, boolean dashed, 
 			   boolean startArrow, boolean endArrow, Color color, String parentBorderID)

@@ -41,6 +41,8 @@ public class DeleteTemplatePropertyAction extends CreateTemplatePropertyAction {
 /**
  * DeleteAction constructor comment.
  * @param object com.cosylab.vdct.graphics.objects.VisibleObject
+ * @param name
+ * @param value
  */
 public DeleteTemplatePropertyAction(Template object, String name, String value) {
 	super(object, name, value);

@@ -194,8 +194,8 @@ public class DBResolver {
 	}
 	/**
 	 * This method was created in VisualAge.
+     * @param is
 	 * @return java.io.EnhancedStreamTokenizer
-	 * @param fileName java.lang.String
 	 */
 	public static EnhancedStreamTokenizer getEnhancedStreamTokenizer(InputStream is) {
 
@@ -213,7 +213,7 @@ public class DBResolver {
 	}
 	/**
 	 * This method was created in VisualAge.
-	 * @param st java.io.EnhancedStreamTokenizer
+	 * @param tokenizer java.io.EnhancedStreamTokenizer
 	 */
 	public static void initializeTokenizer(EnhancedStreamTokenizer tokenizer) {
 		tokenizer.setParseEscapeSequences(false);
@@ -291,8 +291,12 @@ public class DBResolver {
 
 	/**
 	 * VisualDCT layout data is also processed here
-	 * @param rootData com.cosylab.vdct.db.DBData
+     * @param dsId
+	 * @param data com.cosylab.vdct.db.DBData
 	 * @param tokenizer java.io.EnhancedStreamTokenizer
+     * @param fileName
+     * @return 
+     * @throws java.lang.Exception
 	 */
 	public static String processComment(Object dsId, DBData data, EnhancedStreamTokenizer tokenizer, String fileName) throws Exception {
 
@@ -1261,8 +1265,11 @@ public class DBResolver {
 
 	/**
 	 * VisualDCT layout data is also processed here
-	 * @param rootData com.cosylab.vdct.db.DBData
+     * @param template
 	 * @param tokenizer java.io.EnhancedStreamTokenizer
+     * @param fileName
+     * @return 
+     * @throws java.lang.Exception
 	 */
 	public static String processTemplateComment(DBTemplate template, EnhancedStreamTokenizer tokenizer, String fileName) throws Exception {
 
@@ -1436,7 +1443,10 @@ public class DBResolver {
 
 	/**
 	 * VisualDCT layout data is also processed here
+     * @param linesToSkip
 	 * @param tokenizer java.io.EnhancedStreamTokenizer
+     * @param fileName
+     * @throws java.lang.Exception
 	 */
 	public static void skipLines(int linesToSkip, EnhancedStreamTokenizer tokenizer, String fileName) throws Exception {
 
@@ -1454,7 +1464,14 @@ public class DBResolver {
 		}
 	}
 	
-	public static void readVdctData(Object dsId, DBData data, String vdctData, String source) {
+    /**
+     *
+     * @param dsId
+     * @param data
+     * @param vdctData
+     * @param source
+     */
+    public static void readVdctData(Object dsId, DBData data, String vdctData, String source) {
 		StringReader reader = new StringReader(vdctData);
 		EnhancedStreamTokenizer tokenizer = new EnhancedStreamTokenizer(reader);
 		initializeTokenizer(tokenizer);
@@ -1472,8 +1489,14 @@ public class DBResolver {
 
 	/**
 	 * This method was created in VisualAge.
-	 * @param rootData com.cosylab.vdct.db.DBData
+     * @param dsId
+	 * @param data com.cosylab.vdct.db.DBData
 	 * @param tokenizer java.io.EnhancedStreamTokenizer
+     * @param loadStack
+     * @param paths
+     * @param fileName
+     * @param loadList
+     * @throws java.lang.Exception
 	 */
 	public static void processDB(Object dsId, DBData data, EnhancedStreamTokenizer tokenizer, String fileName,
 			PathSpecification paths, Stack loadStack, ArrayList loadList) throws Exception
@@ -1677,8 +1700,11 @@ public class DBResolver {
 
 	/**
 	 * This method was created in VisualAge.
-	 * @param rd com.cosylab.vdct.db.DBRecordData
+     * @param dsId
+     * @param templateInstance
 	 * @param tokenizer java.io.EnhancedStreamTokenizer
+     * @param fileName
+     * @param paths
 	 * @exception java.lang.Exception The exception description.
 	 */
 	public static void processMacros(Object dsId, DBTemplateInstance templateInstance, EnhancedStreamTokenizer tokenizer, String fileName, PathSpecification paths) throws Exception {
@@ -1734,8 +1760,10 @@ public class DBResolver {
 
 	/**
 	 * This method was created in VisualAge.
-	 * @param rd com.cosylab.vdct.db.DBRecordData
+     * @param template
 	 * @param tokenizer java.io.EnhancedStreamTokenizer
+     * @param fileName
+     * @param paths
 	 * @exception java.lang.Exception The exception description.
 	 */
 	public static void processPorts(DBTemplate template, EnhancedStreamTokenizer tokenizer, String fileName, PathSpecification paths) throws Exception {
@@ -1807,8 +1835,11 @@ public class DBResolver {
 
 	/**
 	 * This method was created in VisualAge.
+     * @param dsId
 	 * @param rd com.cosylab.vdct.db.DBRecordData
 	 * @param tokenizer java.io.EnhancedStreamTokenizer
+     * @param fileName
+     * @param paths
 	 * @exception java.lang.Exception The exception description.
 	 */
 	public static void processFields(Object dsId, DBRecordData rd, EnhancedStreamTokenizer tokenizer, String fileName, PathSpecification paths) throws Exception {
@@ -1887,6 +1918,7 @@ public class DBResolver {
 	 * This method was created in VisualAge.
 	 * @return Vector
 	 * @param fileName java.lang.String
+     * @throws java.io.IOException
 	 */
 	public static String[] resolveIncodedDBDs(String fileName) throws IOException {
 
@@ -1936,6 +1968,9 @@ public class DBResolver {
 
 	/**
 	 * This method was created in VisualAge.
+     * @param dsId
+     * @param loadList
+     * @param loadStack
 	 * @return Vector
 	 * @param fileName java.lang.String
 	 */
@@ -1973,8 +2008,11 @@ public class DBResolver {
 
 	/**
 	 * This method was created in VisualAge.
+     * @param dsId
+     * @param is
+     * @param loadList
+     * @param loadStack
 	 * @return Vector
-	 * @param fileName java.lang.String
 	 */
 	public static DBData resolveDB(Object dsId, InputStream is, Stack loadStack, ArrayList loadList) {
 
@@ -2006,8 +2044,10 @@ public class DBResolver {
 
 	/**
 	 * This method was created in VisualAge.
+     * @param dsId
 	 * @return Vector
 	 * @param fileName java.lang.String
+     * @throws java.lang.Exception
 	 */
 	public static DBData resolveDB(Object dsId, String fileName) throws Exception {
 		Stack loadStack = new Stack();
@@ -2017,8 +2057,10 @@ public class DBResolver {
 
 	/**
 	 * This method was created in VisualAge.
+     * @param dsId
+     * @param is
 	 * @return Vector
-	 * @param fileName java.lang.String
+     * @throws java.lang.Exception
 	 */
 	public static DBData resolveDB(Object dsId, InputStream is) throws Exception {
 		Stack loadStack = new Stack();
@@ -2029,8 +2071,9 @@ public class DBResolver {
 
 	/**
 	 * This method was created in VisualAge.
+     * @param url
 	 * @return Vector
-	 * @param fileName java.lang.String
+     * @throws java.lang.Exception
 	 */
 	public static DBData resolveDBasURL(java.net.URL url) throws Exception {
 

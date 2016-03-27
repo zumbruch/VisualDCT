@@ -48,6 +48,18 @@ public class DBTextBox {
 /**
  * Insert the method's description here.
  * Creation date: (23.4.2001 21:12:09)
+ * @param name
+ * @param x
+ * @param y
+ * @param fontStyle
+ * @param color
+ * @param border
+ * @param x2
+ * @param fontSize
+ * @param y2
+ * @param fontName
+ * @param description
+ * @param parentBorderID
  */
 public DBTextBox(String name, int x, int y, int x2, int y2, boolean border, String fontName, int fontSize, 
 				  int fontStyle, Color color, String description, String parentBorderID)
@@ -140,8 +152,8 @@ public DBTextBox(String name, int x, int y, int x2, int y2, boolean border, Stri
 	}
 
 	/**
-	 * Sets the dashed.
-	 * @param dashed The dashed to set
+	 * Sets the border flag.
+     * @param border
 	 */
 	public void setBorder(boolean border)
 	{

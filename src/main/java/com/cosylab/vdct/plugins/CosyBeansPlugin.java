@@ -110,6 +110,7 @@ public class CosyBeansPlugin implements ContextPopupPlugin, MenuPlugin {
 /**
  * Insert the method's description here.
  * Creation date: (2.2.2001 23:00:51)
+ * @param type
  * @return com.cosylab.vdct.graphics.objects.Connector.PopupMenuHandler
  */
 protected static String getFieldType(int type) {
@@ -169,8 +170,6 @@ protected JMenu getPluginMenu() {
 /**
  * Insert the method's description here.
  * Creation date: (8.12.2001 13:29:26)
- * @param 
- * @return
  */
 public void destroy() {}
 
@@ -193,7 +192,6 @@ public String getDescription() {
 /**
  * Insert the method's description here.
  * Creation date: (8.12.2001 13:29:26)
- * @param 
  * @return
  */
 public String getName() {
@@ -210,22 +208,17 @@ public String getVersion() {
 /**
  * Insert the method's description here.
  * Creation date: (8.12.2001 13:29:26)
- * @param 
- * @return
+ * @param properties
  */
 public void init(java.util.Properties properties, com.cosylab.vdct.plugin.PluginContext context) {}
 /**
  * Insert the method's description here.
  * Creation date: (8.12.2001 13:29:26)
- * @param 
- * @return
  */
 public void start() {}
 /**
  * Insert the method's description here.
  * Creation date: (8.12.2001 13:29:26)
- * @param 
- * @return
  */
 public void stop() {}
 

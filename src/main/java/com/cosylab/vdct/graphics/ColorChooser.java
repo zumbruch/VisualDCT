@@ -44,7 +44,13 @@ public class ColorChooser
 		return instance;
 	}
 
-	public static Color getColor(String selectTitle, Color color)
+    /**
+     *
+     * @param selectTitle
+     * @param color
+     * @return
+     */
+    public static Color getColor(String selectTitle, Color color)
 	{
 		JColorChooser chooser = getInstance();
 		if (instance==null) return null;

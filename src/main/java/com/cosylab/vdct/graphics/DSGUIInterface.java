@@ -106,6 +106,7 @@ public class DSGUIInterface implements VDBInterface {
 	 * Insert the method's description here.
 	 * Creation date: (4.2.2001 15:32:49)
 	 * @param drawingSurface com.cosylab.vdct.graphics.DrawingSurface
+     * @param copyContext
 	 */
 	public DSGUIInterface(DrawingSurface drawingSurface, CopyContext copyContext) {
 		this.drawingSurface=drawingSurface;
@@ -118,6 +119,7 @@ public class DSGUIInterface implements VDBInterface {
 	/**
 	 * Insert the method's description here.
 	 * Creation date: (4.2.2001 15:12:21)
+     * @param direction
 	 */
 	public void moveOrigin(int direction)
 	{
@@ -160,6 +162,7 @@ public class DSGUIInterface implements VDBInterface {
 	/**
 	 * Returns error message or null if OK
 	 * Creation date: (3.2.2001 22:11:01)
+     * @param relative
 	 * @return java.lang.String
 	 * @param name java.lang.String
 	 */
@@ -169,6 +172,8 @@ public class DSGUIInterface implements VDBInterface {
 	/**
 	 * Returns error message or null if OK
 	 * Creation date: (3.2.2001 22:11:01)
+     * @param oldName
+     * @param relative
 	 * @return java.lang.String
 	 * @param name java.lang.String
 	 */
@@ -213,7 +218,11 @@ public class DSGUIInterface implements VDBInterface {
 		return message != null && !message.startsWith(warningString);
 	}
 
-	public void copyToSystemClipboard(Vector objs)
+    /**
+     *
+     * @param objs
+     */
+    public void copyToSystemClipboard(Vector objs)
 	{
 		try
 		{
@@ -342,7 +351,11 @@ public class DSGUIInterface implements VDBInterface {
 		return grBox;
 	}
 
-	public Line createLine()
+    /**
+     *
+     * @return
+     */
+    public Line createLine()
 	{
 		Group parentGroup = drawingSurface.getViewGroup();
 
@@ -365,7 +378,11 @@ public class DSGUIInterface implements VDBInterface {
 		return grLine;
 	}
 
-	public TextBox createTextBox()
+    /**
+     *
+     * @return
+     */
+    public TextBox createTextBox()
 	{
 		Group parentGroup = drawingSurface.getViewGroup();
 
@@ -554,6 +571,7 @@ public class DSGUIInterface implements VDBInterface {
 	/**
 	 * Insert the method's description here.
 	 * Creation date: (4.2.2001 15:32:01)
+     * @param groupName
 	 */
 	public void group(String groupName) {
 		ViewState view = ViewState.getInstance(id);
@@ -607,6 +625,7 @@ public class DSGUIInterface implements VDBInterface {
 	 * Insert the method's description here.
 	 * Creation date: (4.2.2001 15:32:01)
 	 * @param file java.io.File
+     * @throws java.io.IOException
 	 */
 	public void importDB(java.io.File file) throws IOException {
 		drawingSurface.importDB(file);
@@ -615,6 +634,7 @@ public class DSGUIInterface implements VDBInterface {
 	 * Insert the method's description here.
 	 * Creation date: (4.2.2001 15:32:01)
 	 * @param file java.io.File
+     * @throws java.io.IOException
 	 */
 	public void importTemplateDB(java.io.File file) throws IOException {
 		drawingSurface.open(file, true);
@@ -623,6 +643,7 @@ public class DSGUIInterface implements VDBInterface {
 	 * Insert the method's description here.
 	 * Creation date: (4.2.2001 15:32:01)
 	 * @param file java.io.File
+     * @throws java.io.IOException
 	 */
 	public void importFields(java.io.File file) throws IOException {
 		int result = JOptionPane.showConfirmDialog(VisualDCT.getInstance(),
@@ -642,6 +663,7 @@ public class DSGUIInterface implements VDBInterface {
 	 * Insert the method's description here.
 	 * Creation date: (4.2.2001 15:32:01)
 	 * @param file java.io.File
+     * @throws java.io.IOException
 	 */
 	public void importBorder(java.io.File file) throws IOException {
 		drawingSurface.importBorder(file);
@@ -650,16 +672,26 @@ public class DSGUIInterface implements VDBInterface {
 	 * Insert the method's description here.
 	 * Creation date: (4.2.2001 15:32:01)
 	 * @param file java.io.File
+     * @throws java.io.IOException
 	 */
 	public void importDBD(java.io.File file) throws IOException {
 		drawingSurface.openDBD(file, true);
 	}
 
-	public void loadRdbGroup(JFrame guiContext) {
+    /**
+     *
+     * @param guiContext
+     */
+    public void loadRdbGroup(JFrame guiContext) {
 		drawingSurface.loadRdbDbGroup(guiContext);
 	}
 
-	public void saveRdbGroup(JFrame guiContext, boolean dialog) {
+    /**
+     *
+     * @param guiContext
+     * @param dialog
+     */
+    public void saveRdbGroup(JFrame guiContext, boolean dialog) {
 		
 		RdbDataId rdbId = new RdbDataId();
 		VDBTemplate template = Group.getEditingTemplateData(id);
@@ -696,7 +728,11 @@ public class DSGUIInterface implements VDBInterface {
 		return drawingSurface.isModified();
 	}
 
-	public boolean isEmpty() {
+    /**
+     *
+     * @return
+     */
+    public boolean isEmpty() {
 		return Group.getRoot(id).getStructure().isEmpty();
 	}
 	
@@ -717,6 +753,7 @@ public class DSGUIInterface implements VDBInterface {
 	 * Insert the method's description here.
 	 * Creation date: (4.2.2001 15:32:01)
 	 * @param file java.io.File
+     * @throws java.io.IOException
 	 */
 	public void openDB(java.io.File file) throws IOException {
 		drawingSurface.open(file);
@@ -725,12 +762,16 @@ public class DSGUIInterface implements VDBInterface {
 	 * Insert the method's description here.
 	 * Creation date: (4.2.2001 15:32:01)
 	 * @param file java.io.File
+     * @throws java.io.IOException
 	 */
 	public void openDBD(java.io.File file) throws IOException {
 		drawingSurface.openDBD(file);
 	}
 
-	public void systemPaste() {
+    /**
+     *
+     */
+    public void systemPaste() {
 		try
 		{
 			Transferable contents = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(this);
@@ -750,7 +791,10 @@ public class DSGUIInterface implements VDBInterface {
 		}
 	}
 
-	public void paste() {
+    /**
+     *
+     */
+    public void paste() {
 		// do some offset (a little trick to have snapping also done) for copy only
 		final int OFFSET = Constants.GRID_SIZE;
 		double scale = ViewState.getInstance(id).getScale();
@@ -763,6 +807,8 @@ public class DSGUIInterface implements VDBInterface {
 	/**
 	 * Insert the method's description here.
 	 * Creation date: (4.2.2001 15:32:01)
+     * @param pX
+     * @param pY
 	 */
 	public void pasteAtPosition(int pX, int pY) {
 		ViewState view = ViewState.getInstance(id);
@@ -785,9 +831,9 @@ public class DSGUIInterface implements VDBInterface {
 		copyContext.setPasteCount(pasteCount + 1);
 
 		posX = posX <= 0 ? 0 : posX;
-		posX = posX >= view.getWidth() - group.getAbsoulteWidth() ? view.getWidth() - group.getAbsoulteWidth() : posX;
+		posX = posX >= view.getWidth() - group.getAbsoluteWidth() ? view.getWidth() - group.getAbsoluteWidth() : posX;
 		posY = posY <= 0 ? 0 : posY;
-		posY = posY >= view.getHeight() - group.getAbsoulteHeight() ? view.getHeight() - group.getAbsoulteHeight() : posY;
+		posY = posY >= view.getHeight() - group.getAbsoluteHeight() ? view.getHeight() - group.getAbsoluteHeight() : posY;
 
 		Object objs[] = new Object[size];
 		group.getSubObjectsV().copyInto(objs);
@@ -863,6 +909,8 @@ public class DSGUIInterface implements VDBInterface {
 	/**
 	 * Insert the method's description here.
 	 * Creation date: (3.5.2001 10:05:02)
+     * @param oldName
+     * @param newName
 	 */
 	public void rename(java.lang.String oldName, java.lang.String newName) {
 		ViewState view = ViewState.getInstance(id);
@@ -881,7 +929,10 @@ public class DSGUIInterface implements VDBInterface {
 		}
 	}
 
-	public void morph() {
+    /**
+     *
+     */
+    public void morph() {
 		ViewState view = ViewState.getInstance(id);
 
 		int size = view.getSelectedObjects().size();
@@ -907,6 +958,8 @@ public class DSGUIInterface implements VDBInterface {
 	/**
 	 * Insert the method's description here.
 	 * Creation date: (3.5.2001 10:05:02)
+     * @param name
+     * @param newType
 	 */
 	public void morph(java.lang.String name, String newType) {
 		ViewState view = ViewState.getInstance(id);
@@ -957,6 +1010,7 @@ public class DSGUIInterface implements VDBInterface {
 	 * Insert the method's description here.
 	 * Creation date: (4.2.2001 15:48:27)
 	 * @param file java.io.File
+     * @throws java.io.IOException
 	 */
 	public void save(File file) throws IOException {
 		/*
@@ -992,6 +1046,7 @@ public class DSGUIInterface implements VDBInterface {
 	 * Insert the method's description here.
 	 * Creation date: (4.2.2001 15:32:01)
 	 * @param file java.io.File
+     * @throws java.io.IOException
 	 */
 	public void saveAsGroup(java.io.File file) throws IOException {
 		Group.save(id, drawingSurface.getViewGroup(), file, false);
@@ -1058,6 +1113,7 @@ public class DSGUIInterface implements VDBInterface {
 	 * Insert the method's description here.
 	 * Creation date: (4.2.2001 15:48:27)
 	 * @param file java.io.File
+     * @throws java.io.IOException
 	 */
 	public void export(java.io.File file) throws IOException {
 		Group.save(id, Group.getRoot(id), file, true); 
@@ -1066,6 +1122,7 @@ public class DSGUIInterface implements VDBInterface {
 	 * Insert the method's description here.
 	 * Creation date: (4.2.2001 15:32:01)
 	 * @param file java.io.File
+     * @throws java.io.IOException
 	 */
 	public void exportAsGroup(java.io.File file) throws IOException {
 		Group.save(id, drawingSurface.getViewGroup(), file, true);

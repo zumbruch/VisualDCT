@@ -38,6 +38,7 @@ public interface Morphable {
  * Insert the method's description here.
  * Creation date: (4.2.2001 21:57:20)
  * @param newType java.lang.String
+ * @return 
  */
 boolean morph(String newType);
 

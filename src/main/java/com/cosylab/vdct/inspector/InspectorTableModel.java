@@ -57,6 +57,7 @@ public Class getColumnClass(int column) {
 }
 /**
  * getColumnCount method comment.
+ * @return 
  */
 public int getColumnCount() {
 	return 3;			// visibility & name & value
@@ -153,10 +154,8 @@ public void setDataObject(Inspectable object) {
  * @param   aValue          the new value.  This can be null.
  * @param   row             the row whose value is to be looked up
  * @param   column          the column whose value is to be looked up
- * @return                  the value Object at the specified cell
  */
-
-public void setValueAt(Object aValue, int row, int column) {
+    public void setValueAt(Object aValue, int row, int column) {
 	data[row].setValue(aValue.toString());
 	// generate notification
 	fireTableCellUpdated(row, column);

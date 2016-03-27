@@ -126,7 +126,8 @@ public class VDBMacro implements InspectableProperty, Descriptable, ChangableVis
 
 	/**
 	 * Sets the target.
-	 * @param target The target to set
+     */
+	/* @param target The target to set
 	 */
 /*	public void setTarget(String target)
 	{
@@ -187,6 +188,7 @@ public class VDBMacro implements InspectableProperty, Descriptable, ChangableVis
 	/**
 	 * Returns macro name
 	 * @param templateInstanceName The name of the template instance
+     * @return 
 	 */
 	public String getMacroDefinition(String templateInstanceName)
 	{

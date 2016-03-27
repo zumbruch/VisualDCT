@@ -41,8 +41,6 @@ public class CreateAction extends ActionObject {
  * Insert the method's description here.
  * Creation date: (3.5.2001 16:27:58)
  * @param object com.cosylab.vdct.graphics.objects.VisibleObject
- * @param x int
- * @param y int
  */
 public CreateAction(com.cosylab.vdct.graphics.objects.VisibleObject object) {
 	this.object=object;

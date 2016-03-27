@@ -97,7 +97,6 @@ public TemplateEPICSMacro(ContainerObject parent, VDBFieldData fieldData) {
 /**
  * Insert the method's description here.
  * Creation date: (30.1.2001 16:58:58)
- * @return boolean
  */
 public void updateTemplateLink()
 {
@@ -306,6 +305,8 @@ public static com.cosylab.vdct.vdb.GUISeparator getMacroSeparator() {
 /**
  * Return properties to be inspected
  * Creation date: (1.2.2001 22:22:37)
+     * @param mode
+     * @param spreadsheet
  * @return com.cosylab.vdct.inspector.InspectableProperty[]
  */
 public com.cosylab.vdct.inspector.InspectableProperty[] getProperties(int mode, boolean spreadsheet) {
@@ -518,7 +519,7 @@ public void valueChanged() {
 }
 
 /**
- * @param visibile
+     * @param visible
  */
 public void visilibityChanged(boolean visible)
 {
@@ -535,7 +536,7 @@ public void visilibityChanged(boolean visible)
 }
 
 /**
- * @see com.cosylab.vdct.graphics.objects.TemplateEPICSLink#isVisible()
+ * @see com.cosylab.vdct.graphics.objects.VisibleObject#isVisible() 
  */
 public boolean isVisible() {
 	 return (fieldData.getVisibility() == InspectableProperty.ALWAYS_VISIBLE ||

@@ -74,8 +74,7 @@ public class PluginObject
 /**
  * Insert the method's description here.
  * Creation date: (6.12.2001 22:46:06)
- * @param
- */
+ * @param pluginNode */
 public PluginObject(Element pluginNode)
 {
 	propChangeSupport = new PropertyChangeSupport(this);
@@ -86,9 +85,7 @@ public PluginObject(Element pluginNode)
 /**
  * Insert the method's description here.
  * Creation date: (6.12.2001 22:46:06)
- * @param
- * @return
- */
+ * @param listener */
 public void addPropertyChangeListener(PropertyChangeListener listener)
 {
 	propChangeSupport.addPropertyChangeListener(listener);
@@ -96,8 +93,6 @@ public void addPropertyChangeListener(PropertyChangeListener listener)
 /**
  * Insert the method's description here.
  * Creation date: (6.12.2001 22:46:06)
- * @param
- * @return
  */
 public void destroy()
 {
@@ -120,7 +115,6 @@ public void firePropertyChange(String property, Object oldValue, Object newValue
 /**
  * Insert the method's description here.
  * Creation date: (6.12.2001 22:46:06)
- * @param
  * @return
  */
 public String getAuthor()
@@ -142,7 +136,6 @@ public String getAuthor()
 /**
  * Insert the method's description here.
  * Creation date: (6.12.2001 22:46:06)
- * @param
  * @return
  */
 public String getAutoStartString()
@@ -155,7 +148,6 @@ public String getAutoStartString()
 /**
  * Insert the method's description here.
  * Creation date: (6.12.2001 22:46:06)
- * @param
  * @return
  */
 public String getDescription()
@@ -177,7 +169,6 @@ public String getDescription()
 /**
  * Insert the method's description here.
  * Creation date: (6.12.2001 22:46:06)
- * @param
  * @return
  */
 public String getName()
@@ -199,7 +190,6 @@ public String getName()
 /**
  * Insert the method's description here.
  * Creation date: (6.12.2001 22:46:06)
- * @param
  * @return
  */
 public Plugin getPlugin()
@@ -209,7 +199,6 @@ public Plugin getPlugin()
 /**
  * Insert the method's description here.
  * Creation date: (6.12.2001 22:46:06)
- * @param
  * @return
  */
 public int getStatus()
@@ -219,7 +208,6 @@ public int getStatus()
 /**
  * Insert the method's description here.
  * Creation date: (6.12.2001 22:46:06)
- * @param
  * @return
  */
 public String getStatusString()
@@ -242,7 +230,6 @@ public String getStatusString()
 /**
  * Insert the method's description here.
  * Creation date: (6.12.2001 22:46:06)
- * @param
  * @return
  */
 public String getVersion()
@@ -254,10 +241,7 @@ public String getVersion()
 }
 /**
  * Insert the method's description here.
- * Creation date: (6.12.2001 22:42:08)
- * @param
- * @return
- */
+ * Creation date: (6.12.2001 22:42:08) */
 public void init()
 {
 	if (plugin!=null)
@@ -283,7 +267,6 @@ public void init()
 /**
  * Insert the method's description here.
  * Creation date: (6.12.2001 22:42:08)
- * @param
  * @return
  */
 public boolean isAutoStart()
@@ -317,8 +300,9 @@ private void loadConfig(Element pluginNode)
 /**
  * Insert the method's description here.
  * Creation date: (7.12.2001 14:07:42)
- * @param
- * @return
+ * @param className
+ * @return 
+ * @throws java.lang.Throwable
  */
 public static Plugin loadPlugin(String className) throws Throwable
 {
@@ -342,9 +326,7 @@ public static Plugin loadPlugin(String className) throws Throwable
 /**
  * Insert the method's description here.
  * Creation date: (6.12.2001 22:42:08)
- * @param
- * @return
- */
+ * @param listener */
 public void removePropertyChangeListener(PropertyChangeListener listener)
 {
 	propChangeSupport.removePropertyChangeListener(listener);
@@ -352,6 +334,7 @@ public void removePropertyChangeListener(PropertyChangeListener listener)
 /**
  * Insert the method's description here.
  * Creation date: (7.12.2001 15:01:22)
+ * @param doc
  * @param pluginNode org.w3c.dom.Element
  */
 public void saveConfig(Document doc, Element pluginNode)
@@ -371,10 +354,7 @@ public void saveConfig(Document doc, Element pluginNode)
 }
 /**
  * Insert the method's description here.
- * Creation date: (6.12.2001 22:42:08)
- * @param
- * @return
- */
+ * Creation date: (6.12.2001 22:42:08) */
 public void setAutoStart(boolean autoStart)
 {
 	boolean oldAutoStart = autoStart;
@@ -385,8 +365,7 @@ public void setAutoStart(boolean autoStart)
 /**
  * Insert the method's description here.
  * Creation date: (6.12.2001 22:42:08)
- * @param
- * @return
+ * @param newStatus
  */
 private void setStatus(int newStatus)
 {
@@ -396,10 +375,7 @@ private void setStatus(int newStatus)
 }
 /**
  * Insert the method's description here.
- * Creation date: (6.12.2001 22:42:08)
- * @param
- * @return
- */
+ * Creation date: (6.12.2001 22:42:08) */
 public void start()
 {
 	if (plugin==null)
@@ -418,10 +394,7 @@ public void start()
 }
 /**
  * Insert the method's description here.
- * Creation date: (6.12.2001 22:42:08)
- * @param
- * @return
- */
+ * Creation date: (6.12.2001 22:42:08) */
 public void stop()
 {
 	if (plugin==null)

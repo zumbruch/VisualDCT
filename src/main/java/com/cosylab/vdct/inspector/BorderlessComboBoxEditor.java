@@ -37,19 +37,21 @@ import javax.swing.*;
  */
 public class BorderlessComboBoxEditor extends JTextField implements ComboBoxEditor {
 /**
- * BoerderlessComboBoxEditor constructor comment.
+ * BorderlessComboBoxEditor constructor comment.
  */
 public BorderlessComboBoxEditor() {
 	setBorder(null);
 	setColumns(9);
 }
  /** Return the component that should be added to the tree hierarchy for
-	* this editor
-	*/
+  * this editor
+  * @return 
+  */
 public java.awt.Component getEditorComponent() {
 	return this;
 }
- /** Return the edited item **/
+ /** Return the edited item
+  * @return  **/
 public Object getItem() {
 	return getText();
 }
@@ -58,7 +60,8 @@ public void selectAll() {
 	selectAll();
 	requestFocus();
 }
- /** Set the item that should be edited. Cancel any editing if necessary **/
+ /** Set the item that should be edited. Cancel any editing if necessary
+  * @param anObject **/
 public void setItem(Object anObject) {
 	if ( anObject != null )
 		setText(anObject.toString());

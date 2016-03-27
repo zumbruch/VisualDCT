@@ -166,8 +166,8 @@ public class PortDescriptionProperty implements InspectableProperty {
 			port.setDescription(value);
 		}
 
-		/**
-		 * @see com.cosylab.vdct.inspector.InspectableProperty#toString(String)
+		/** String representation.
+		 * @return name
 		 */
 		public String toString()
 		{

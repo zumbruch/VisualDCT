@@ -60,6 +60,8 @@ public class DBData {
 	
 /**
  * DBDData constructor comment.
+ * @param id java.lang.String
+ * @param fileName java.lang.String
  */
 public DBData(String id, String fileName) {
 	
@@ -116,7 +118,7 @@ public void addLine(DBLine ld) {
 
 /**
  * This method was created in VisualAge.
- * @param ld com.cosylab.vdct.db.DBEntry
+ * @param ed com.cosylab.vdct.db.DBEntry
  */
 public void addEntry(DBEntry ed) {
 	if (!structure.contains(ed))
@@ -125,7 +127,7 @@ public void addEntry(DBEntry ed) {
 
 /**
  * This method was created in VisualAge.
- * @param ld com.cosylab.vdct.db.DBBox
+ * @param bd com.cosylab.vdct.db.DBBox
  */
 public void addBox(DBBox bd) {
 	if (!boxes.containsKey(bd.getName()))
@@ -134,7 +136,7 @@ public void addBox(DBBox bd) {
 
 /**
  * This method was created in VisualAge.
- * @param ld com.cosylab.vdct.db.DBTextBox
+ * @param td com.cosylab.vdct.db.DBTextBox
  */
 public void addTextBox(DBTextBox td) {
 	if (!textboxes.containsKey(td.getName()))
@@ -156,7 +158,7 @@ public void addRecord(DBRecordData rd) {
 }
 /**
  * This method was created in VisualAge.
- * @param rd com.cosylab.vdct.db.DBTemplateInstance
+ * @param ti com.cosylab.vdct.db.DBTemplateInstance
  */
 public void addTemplateInstance(DBTemplateInstance ti) {
 	if (!templateInstances.containsKey(ti.getTemplateInstanceId())) {
@@ -169,7 +171,7 @@ public void addTemplateInstance(DBTemplateInstance ti) {
 
 /**
  * This method was created in VisualAge.
- * @param rd com.cosylab.vdct.db.DBTemplate
+ * @param t com.cosylab.vdct.db.DBTemplate
  */
 public void addTemplate(DBTemplate t) {
 	if (!templates.containsKey(t.getId())) {
@@ -184,6 +186,8 @@ public void addTemplate(DBTemplate t) {
  * Check is DTYP field is defined before INP and OUT fields...
  * Insert the method's description here.
  * Creation date: (18.11.1999 18:26:27)
+ * @param db
+ * @param dbd
  */
 
 public static void checkDTYPfield(DBData db, DBDData dbd) {

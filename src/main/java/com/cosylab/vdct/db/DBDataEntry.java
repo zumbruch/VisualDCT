@@ -37,6 +37,7 @@ public class DBDataEntry extends DBEntry
 
 	/**
 	 * Constructor.
+     * @param data
 	 */
 	public DBDataEntry(String data)
 	{

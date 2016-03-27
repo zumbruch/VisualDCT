@@ -99,6 +99,7 @@ public class Connector extends VisibleObject implements Descriptable, InLink, Mo
 /**
  * Insert the method's description here.
  * Creation date: (1.2.2001 17:22:29)
+ * @param id
  * @param parent com.cosylab.vdct.graphics.objects.Record
  * @param outlink com.cosylab.vdct.graphics.objects.OutLink
  * @param inlink com.cosylab.vdct.graphics.objects.InLink
@@ -228,6 +229,7 @@ public void accept(Visitor visitor) {}
 /**
  * Insert the method's description here.
  * Creation date: (4.2.2001 12:50:51)
+ * @return 
  */
 public Connector addConnector() {
     EPICSLink start = null;
@@ -324,6 +326,7 @@ public void destroy() {
 /**
  * This method destroys connector (connector should not be used afer this method was called)
  * Creation date: (29.1.2001 20:05:51)
+ * @param disconnector
  */
 public void disconnect(Linkable disconnector) {
 	if (!disconnected && ((inlink==disconnector) || (outlink==disconnector))) {
@@ -640,6 +643,7 @@ public void setID(java.lang.String newID) {
 /**
  * Insert the method's description here.
  * Creation date: (29.1.2001 20:05:52)
+ * @param input
  */
 public void setInput(InLink input) {
 	if (inlink==input) return;

@@ -55,7 +55,7 @@ public class NameChecker implements DocumentListener {
 	 * checked as a record name.
 	 * 
 	 * @param nameField
-	 * @param oldNameField
+     * @param oldNameLabel
 	 * @param group
 	 * @param confirmButton
 	 * @param description

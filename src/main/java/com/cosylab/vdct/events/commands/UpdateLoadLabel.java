@@ -38,7 +38,8 @@ import com.cosylab.vdct.events.Command;
 public class UpdateLoadLabel extends Command {
 
 	private VisualDCT visualDCT;
-	public UpdateLoadLabel(VisualDCT visualDCT) {
+
+    public UpdateLoadLabel(VisualDCT visualDCT) {
 		this.visualDCT = visualDCT;
 	}
 

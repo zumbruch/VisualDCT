@@ -114,6 +114,8 @@ public class RdbDataMapper {
 	}
 	
 	/** Returns Vector of String objects representing IOCs.
+     * @return 
+     * @throws java.sql.SQLException
 	 */ 
 	public Vector getIocs() throws SQLException {
 
@@ -129,6 +131,9 @@ public class RdbDataMapper {
 	}
 
 	/** Returns Vector of String objects representing db files under the given IOC.
+     * @param iocId
+     * @return 
+     * @throws java.sql.SQLException
 	 */ 
 	public Vector getRdbDatas(String iocId) throws SQLException {
 
@@ -144,6 +149,10 @@ public class RdbDataMapper {
 	}
 
 	/** Returns Vector of String objects representing versions of the given group.
+     * @param group
+     * @param iocId
+     * @return 
+     * @throws java.sql.SQLException 
 	 */ 
 	public Vector getVersions(String group, String iocId) throws SQLException {
 

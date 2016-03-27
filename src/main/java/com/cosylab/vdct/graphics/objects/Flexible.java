@@ -38,7 +38,9 @@ public interface Flexible {
  * Returns the copied instance or null if the object cannot be copied. 
  * 
  * Creation date: (4.2.2001 21:59:44)
+ * @param dsId
  * @param group java.lang.String
+ * @return 
  */
 Flexible copyToGroup(Object dsId, String group);
 /**
@@ -50,13 +52,17 @@ String getFlexibleName();
 /**
  * Insert the method's description here.
  * Creation date: (4.2.2001 22:00:01)
+ * @param dsId
  * @param group java.lang.String
+ * @return 
  */
 boolean moveToGroup(Object dsId, String group);
 /**
  * Insert the method's description here.
  * Creation date: (2.5.2001 23:23:17)
+ * @param dsId
  * @param newName java.lang.String
+ * @return 
  */
 boolean rename(Object dsId, String newName);
 /**

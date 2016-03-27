@@ -59,7 +59,7 @@ public VDBRecordData() {
 
 /**
  * This method was created in VisualAge.
- * @param dbd DBDData
+ * @return 
  */
 public String getDTYPLinkType() {
 

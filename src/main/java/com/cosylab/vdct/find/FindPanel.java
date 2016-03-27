@@ -167,6 +167,7 @@ public class FindPanel extends JPanel
     /**
      * Construct a search panel with start and stop actions, option panes and a
      * results list pane that can display up to DEFAULT_MAX_SEARCH_HITS items.
+     * @param owner
      */
     public FindPanel(Dialog owner) {
         super();
@@ -288,7 +289,7 @@ public class FindPanel extends JPanel
      * <b>killFind </b> to true. Also stops when number of search hits (matches)
      * equals <b>maxMatches </b>.
      *
-     * @param root	base group where to start search
+     * @param base	base group where to start search
      * @param filters
      *            matches must pass each filters in array
      * @exception InterruptedException
@@ -412,6 +413,7 @@ public class FindPanel extends JPanel
 
     /**
      * Invoked by FindAction objects to start and stop searches.
+     * @param command
      */
     public void action(String command)
     {

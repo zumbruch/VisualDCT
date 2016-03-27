@@ -82,15 +82,14 @@ public PopUpMenu() {
 	
 }
 /**
- * Insert the method's description here.
- * Creation date: (3.2.2001 10:37:54)
+ * Insert the method's description here.Creation date: (3.2.2001 10:37:54)
+ * @param count
  * @return javax.swing.JMenu
- * @param menuItem javax.swing.JMenuItem
+ * @param item javax.swing.JMenuItem
  * @param menu javax.swing.JMenu
  */
-
 public static JMenu addItem(JMenuItem item, JMenu menu, int count) {
-	return addItem(item, menu, count, ITEMS_PER_MENU);
+    return addItem(item, menu, count, ITEMS_PER_MENU);
 }
 
 public static JMenu addItem(JMenuItem item, JMenu menu, int count, int itemsPerMenu) {
@@ -182,6 +181,7 @@ class VisiblePopupMenuHandler implements ActionListener {
 /**
  * Insert the method's description here.
  * Creation date: (2.2.2001 20:17:37)
+ * @param dsId
  * @param object com.cosylab.vdct.graphics.popup.Popupable
  * @param component javax.swing.JComponent
  * @param x int
@@ -300,6 +300,9 @@ private void populate(Vector items, JComponent component, int x, int y) {
 
 /**
  * Helper method which adds plugin items
+ * @param dsId
+ * @param menu
+ * @param object
  */
 public static void addPluginItems(Object dsId, JPopupMenu menu, Popupable object)
 {

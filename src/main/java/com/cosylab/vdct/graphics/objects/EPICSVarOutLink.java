@@ -182,6 +182,7 @@ private com.cosylab.vdct.graphics.objects.EPICSVarOutLink.PopupMenuHandler creat
 	/**
 	 * Insert the method's description here.
 	 * Creation date: (29.1.2001 21:23:04)
+     * @param disconnector
 	 */
 	public void disconnect(Linkable disconnector) {
 		if (/*!disconnected &&*/ (outlinks.contains(disconnector) || disconnector==inlink)) {
@@ -445,6 +446,7 @@ public java.util.Vector getItems() {
 /**
  * Insert the method's description here.
  * Creation date: (4.2.2001 12:50:51)
+ * @return 
  */
 public Connector addConnector() {
 	if (inlink instanceof Connector)

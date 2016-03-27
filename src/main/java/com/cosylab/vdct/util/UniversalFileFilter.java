@@ -43,12 +43,15 @@ import javax.swing.filechooser.*;
  * Example - create a new filter that filerts out all files
  * but gif and jpg image files:
  *
+ * <pre>
+ * {@code
  *     JFileChooser chooser = new JFileChooser();
  *     UniversalFileFilter filter = new UniversalFileFilter(
  *                   new String{"gif", "jpg"}, "JPEG & GIF Images")
  *     chooser.addChoosableFileFilter(filter);
  *     chooser.showOpenDialog(this);
- *
+ * }
+ * </pre>
  */
 public class UniversalFileFilter extends FileFilter {
 
@@ -127,7 +130,7 @@ public class UniversalFileFilter extends FileFilter {
 	 * Files that begin with "." are ignored.
 	 *
 	 * @see #getExtension
-	 * @see FileFilter#accepts
+	 * @see UniversalFileFilter#accept(java.io.File)
 	 */
 	public boolean accept(File f) {
 	if(f != null) {

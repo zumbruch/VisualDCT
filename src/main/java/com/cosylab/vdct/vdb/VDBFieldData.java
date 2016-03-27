@@ -512,7 +512,7 @@ public void setVisibility(int visibility)
 /**
  * Insert the method's description here.
  * Creation date: (11.1.2001 21:30:04)
- * @param java.awt.Component
+ * @param component java.awt.Component
  * @param x
  * @param y
  */

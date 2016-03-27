@@ -51,8 +51,8 @@ public class DeleteConnectorAction extends ActionObject {
  * Insert the method's description here.
  * Creation date: (3.5.2001 16:27:58)
  * @param object com.cosylab.vdct.graphics.objects.VisibleObject
- * @param x int
- * @param y int
+ * @param inlink
+ * @param outlink
  */
 public DeleteConnectorAction(com.cosylab.vdct.graphics.objects.Connector object, String inlink, String outlink) {
 	this.object=object;
@@ -71,8 +71,9 @@ public String getDescription() {
 }
 /**
  * This method was created in VisualAge.
+ * @param str
+ * @return 
  */
-
 public Object getSubObject(String str) {
 	int pos = str.indexOf(Constants.FIELD_SEPARATOR);
 	if (str.equals(nullString)) return null;

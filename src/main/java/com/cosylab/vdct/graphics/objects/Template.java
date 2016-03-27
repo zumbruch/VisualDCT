@@ -169,6 +169,7 @@ public class Template
 	 * Creation date: (21.12.2000 20:40:53)
 	 * @param parent com.cosylab.vdct.graphics.objects.ContainerObject
 	 * @param templateData The templateData to set
+     * @param initializeFields
 	 */
 	public Template(ContainerObject parent, VDBTemplateInstance templateData, boolean initializeFields) {
 		super(parent);
@@ -966,6 +967,7 @@ public void initializeLinkFields()
 
 /**
  * @param port
+     * @return 
  */
 public EPICSLink addPortField(VDBPort port) {
 	// check if not already added (order preservation)
@@ -983,6 +985,7 @@ public EPICSLink addPortField(VDBPort port) {
 
 /**
  * @param macro
+ * @return 
  */
 public EPICSLink addMacroField(VDBMacro macro) {
 	// check if not already added (order preservation)
@@ -1487,6 +1490,7 @@ public void renameProperty(InspectableProperty property)
 }
 
 /**
+ * @param field
  */
 public void addInvalidLink(EPICSLink field)
 {
@@ -1495,6 +1499,7 @@ public void addInvalidLink(EPICSLink field)
 }
 
 /**
+ * @param field
  */
 public void removeInvalidLink(EPICSLink field)
 {
@@ -1525,7 +1530,7 @@ public void setDestroyed(boolean newDestroyed) {
 }
 
 /**
- * @see com.cosylab.vdct.graphics.objects.Flexible#copyToGroup(String)
+ * @see com.cosylab.vdct.graphics.objects.Flexible#copyToGroup(java.lang.Object, java.lang.String)
  */
 public Flexible copyToGroup(Object dsId, java.lang.String group) {
 
@@ -1602,7 +1607,6 @@ public Flexible copyToGroup(Object dsId, java.lang.String group) {
 /**
  * Insert the method's description here.
  * Creation date: (5.2.2001 9:42:29)
- * @param e java.util.Enumeration list of VDBFieldData fields
  * @param prevGroup java.lang.String
  * @param group java.lang.String
  */
@@ -1658,7 +1662,7 @@ public void fixMacrosOnCopy(String prevGroup, String group) {
 
 
 /**
- * @see com.cosylab.vdct.graphics.objects.Flexible#moveToGroup(String)
+ * @see com.cosylab.vdct.graphics.objects.Flexible#moveToGroup(java.lang.Object, java.lang.String) 
  */
 public boolean moveToGroup(Object dsId, String group) {
 	String currentParent = Group.substractParentName(templateData.getName());
@@ -1707,7 +1711,7 @@ public boolean moveToGroup(Object dsId, String group) {
 }
 
 /**
- * @see com.cosylab.vdct.graphics.objects.Flexible#rename(String)
+ * @see com.cosylab.vdct.graphics.objects.Flexible#rename(java.lang.Object, java.lang.String) 
  */
 public boolean rename(Object dsId, String newName) {
 	
@@ -1779,7 +1783,7 @@ protected void undestroyFields() {
 
 
 /**
- * @see com.cosylab.vdct.graphics.objects.SaveInterface#writeObjects(DataOutputStream, String)
+ * @see com.cosylab.vdct.graphics.objects.SaveInterface#writeObjects(java.io.DataOutputStream, com.cosylab.vdct.graphics.objects.NamingContext, boolean)
  */
 public void writeObjects(DataOutputStream file, NamingContext context, boolean export)
 	throws IOException
@@ -1924,7 +1928,10 @@ public void writeObjects(DataOutputStream file, NamingContext context, boolean e
 
 /**
  * Insert the method's description here.
+ * @param templateData
  * @param substitutions <code>group</code> current substitutions
+ * @param ports
+ * @return 
  */
 public static Map prepareSubstitutions(VDBTemplateInstance templateData, Map substitutions, Map ports)
 {
@@ -1968,7 +1975,10 @@ public static Map prepareSubstitutions(VDBTemplateInstance templateData, Map sub
 
 /**
  * Insert the method's description here
+ * @param group
  * @param substitutions <code>group</code> current substitutions
+ * @param namer
+ * @return 
  */
 public static Map preparePorts(Group group, Map substitutions, NameManipulator namer)
 {
@@ -2035,7 +2045,7 @@ public static Map preparePorts(Group group, Map substitutions, NameManipulator n
 }
 
 /**
- * @see com.cosylab.vdct.graphics.objects.SaveInterface#writeVDCTData(DataOutputStream, String)
+ * @see com.cosylab.vdct.graphics.objects.SaveInterface#writeVDCTObjects(java.io.DataOutputStream, com.cosylab.vdct.graphics.objects.NamingContext, boolean) 
  */
 public void writeVDCTObjects(DataOutputStream file, NamingContext renamer, boolean export)
 	throws IOException
@@ -2052,9 +2062,7 @@ public ArrayList getModeNames()
 }
 
 /**
- * @param linkableMacros
  * @param macros
- * @param deep
  */
 public void generateMacros(HashMap macros) {
 	Object obj;
@@ -2102,9 +2110,8 @@ public void fieldSideChange(EPICSLink link, boolean isRight)
 }
 
 /**
- * @param field
- * @param oldValue
- * @param newValue
+ * @param fieldData
+ * @param newVisible
  */
 public void fieldVisibilityChange(VDBFieldData fieldData, boolean newVisible)
 {
@@ -2172,6 +2179,7 @@ public boolean isFirstField(Field field) {
  * Insert the method's description here.
  * Creation date: (3.5.2001 22:53:47)
  * @param field com.cosylab.vdct.graphics.objects.Field
+ * @return 
  */
 public boolean isLastField(Field field) {
 	EPICSLink ef = (EPICSLink)field;

@@ -41,6 +41,7 @@ public class Border extends ContainerObject implements Selectable, SaveObject,
 	private static final String nullString = "";
 	
 	/**
+     * @param name
 	 * @param parent
 	 */
 	public Border(String name, Group parent) {
@@ -48,8 +49,9 @@ public class Border extends ContainerObject implements Selectable, SaveObject,
 	}
 
 	/**
-	 * @param parent
+     * @param parName
 	 * @param useHashtable
+     * @param parentGroup
 	 */
 	public Border(String parName, Group parentGroup, boolean useHashtable) {
 		super(parentGroup, useHashtable);

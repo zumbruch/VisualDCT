@@ -132,7 +132,8 @@ public class VDBPort implements InspectableProperty, Descriptable, ChangableVisi
 
 	/**
 	 * Sets the target.
-	 * @param target The target to set
+     */
+	/* @param target The target to set
 	 */
 /*	public void setTarget(String target)
 	{
@@ -193,6 +194,7 @@ public class VDBPort implements InspectableProperty, Descriptable, ChangableVisi
 	/**
 	 * Returns port name
 	 * @param templateInstanceName The name of the template instance
+     * @return 
 	 */
 	public String getPortDefinition(String templateInstanceName)
 	{

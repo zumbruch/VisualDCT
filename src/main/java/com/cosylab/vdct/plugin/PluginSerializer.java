@@ -38,14 +38,17 @@ public interface PluginSerializer
 /**
  * Insert the method's description here.
  * Creation date: (7.12.2001 14:47:43)
- * @param
- * @return
+ * @param fileName
+ * @param pluginManager
+ * @throws java.lang.Exception
  */
 public void exportPlugins(String fileName, PluginManager pluginManager) throws Exception;
 /**
  * Insert the method's description here.
  * Creation date: (7.12.2001 14:48:14)
- * @param
+ * @param fileName
+ * @param pluginManager
+ * @throws java.lang.Exception
  */
 public void importPlugins(String fileName, PluginManager pluginManager) throws Exception;
 }

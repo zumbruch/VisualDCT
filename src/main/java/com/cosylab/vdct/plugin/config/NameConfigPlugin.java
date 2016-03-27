@@ -38,21 +38,26 @@ public interface NameConfigPlugin extends Plugin {
 	/**
 	 * If name is valid, the function returns null, otherwise it returns a
 	 * String with the description of the error. 
+     * @param name
+     * @return 
 	 */
 	public String checkValidity(String name);
 	
 	/**
 	 * Returns the description of the valid names. Can be null.    
+     * @return 
 	 */
 	public String getNameDescription();
 
 	/**
 	 * Returns the default name. Can be null.
+     * @return 
 	 */
 	public String getDefaultName();
 
 	/**
 	 * Returns true if the plugin has not been stopped since the last start.
+     * @return 
 	 */
 	public boolean isRunning();
 }

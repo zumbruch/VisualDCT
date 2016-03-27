@@ -72,7 +72,7 @@ public static String color2string(java.awt.Color color) {
 /**
  * This method was created in VisualAge.
  * @param fileName java.lang.String
- * @param newFN java.lang.String
+ * @return 
  */
 public static String getFileName(String fileName) {
 	// fileName can contain path!
@@ -125,11 +125,12 @@ public static String quoteIfMacro(String str) {
 /**
  * This method was created in VisualAge.
  * @param str java.lang.String
- * @param begining java.lang.String
+ * @param beginning java.lang.String
+ * @return 
  */
-public static String removeBegining(String str, String begining) {
-	if (begining.equals(nullString)) return str;
-	else if (str.startsWith(begining)) return str.substring(begining.length());
+public static String removeBeginning(String str, String beginning) {
+	if (beginning.equals(nullString)) return str;
+	else if (str.startsWith(beginning)) return str.substring(beginning.length());
 	else return str;
 }
 /**
@@ -148,9 +149,10 @@ public static String replaceEnding(String str, String s1, String s2) {
 }
 /**
  * This method was created in VisualAge.
- * @param str java.lang.String
- * @param s1 java.lang.String
- * @param s2 java.lang.String
+ * @param source java.lang.String
+ * @param from java.lang.String
+ * @param to java.lang.String
+ * @return 
  */
 public static String replace(String source, String from, String to)
   {
@@ -169,6 +171,7 @@ public static String replace(String source, String from, String to)
  * This method was created in VisualAge.
  * @param fileName java.lang.String
  * @param newFN java.lang.String
+ * @return 
  */
 public static String replaceFileName(String fileName, String newFN) {
 	// fileName can contain path!
@@ -238,8 +241,9 @@ public static String removeQuotes(String str) {
 /**
  * Insert the method's description here.
  * Creation date: (23.4.2001 18:52:04)
- * @return java.awt.Color
- * @param str java.lang.String
+ * @param newName
+ * @param suffix
+ * @return
  */
 public static String incrementName(String newName, String suffix)
 {
