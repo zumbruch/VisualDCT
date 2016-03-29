@@ -1,8 +1,8 @@
-# Visual Database Configuration Tool (VDCT, VisualDCT)
+# VisualDCT (aka VDCT)
 
 ## What is VisualDCT?
 
-VisualDCT is The Visual Database Configuration Tool for
+VisualDCT is the Visual Database Configuration Tool for
 [EPICS](http://www.aps.anl.gov/epics/) Databases.
 
 It was developed by [Cosylab](http://www.cosylab.com/).
@@ -30,5 +30,6 @@ in the GitHub project.
 Pull requests are always welcome.
 
 For non-trivial changes and additions, please first contact the authors
-and/or use the [tech-talk](http://www.aps.anl.gov/epics/tech-talk/index.php)
-mail exploder to discuss and review your plans.
+and/or use the EPICS
+[Tech-Talk](http://www.aps.anl.gov/epics/tech-talk/index.php) mail exploder
+to discuss and review your plans.
