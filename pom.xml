@@ -34,8 +34,9 @@
         <url>https://github.com/epics-extensions/VisualDCT/issues</url>
     </issueManagement>
     <scm>
-        <connection>https://github.com/epics-extensions/VisualDCT.git</connection>
+        <connection>scm:git:https://github.com/epics-extensions/VisualDCT.git</connection>
         <url>https://github.com/epics-extensions/VisualDCT</url>
+        <tag>HEAD</tag>
     </scm>
 
     <groupId>com.cosylab.vdct</groupId>
@@ -44,6 +45,7 @@
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
 
     <build>
@@ -95,15 +97,11 @@
                         <descriptor>src/assembly/dist.xml</descriptor>
                     </descriptors>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.5</version>
             </plugin>
 
         </plugins>
@@ -113,7 +111,35 @@
                 <directory>src/resources</directory>
             </resource>
         </resources>
-
     </build>
+
+    <reporting>
+        <plugins>
+
+            <plugin>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>2.9</version>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.10.3</version>
+                <reportSets>
+                    <reportSet>
+                        <id>html</id>
+                        <reports>
+                            <report>javadoc</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-jxr-plugin</artifactId>
+                <version>2.5</version>
+            </plugin>
+
+        </plugins>
+    </reporting>
 
 </project>
