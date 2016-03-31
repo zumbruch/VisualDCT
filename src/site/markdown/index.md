@@ -20,6 +20,7 @@ VisualDCT is a [Maven](https://maven.apache.org/) project.
 Any recent Java IDE should be able to open and compile it.
 
 Apart from the default lifecycle, two additional Maven goals are useful:
+
   * **site** Generate the website with user, reference and project documentation
   * **assembly:single** Generate the distribution archives as tar and zip
 
