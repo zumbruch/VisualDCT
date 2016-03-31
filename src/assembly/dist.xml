@@ -1,7 +1,7 @@
 <assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.3" 
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.3 http://maven.apache.org/xsd/assembly-1.1.3.xsd">
-  <id>dist</id>
+  <id>distribution</id>
   <formats>
     <format>tar.gz</format>
     <format>zip</format>
@@ -14,6 +14,9 @@
         <include>README*</include>
         <include>LICENSE*</include>
         <include>NOTICE*</include>
+        <include>flatdb</include>
+        <include>runScript</include>
+        <include>pom.xml</include>
       </includes>
     </fileSet>
     <fileSet>
@@ -25,7 +28,7 @@
     </fileSet>
     <fileSet>
       <directory>${project.build.directory}/site</directory>
-      <outputDirectory>docs</outputDirectory>
+      <outputDirectory>site</outputDirectory>
     </fileSet>
   </fileSets>
 </assembly>
