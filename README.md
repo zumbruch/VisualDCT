@@ -10,14 +10,18 @@ This development was funded by SLS, APS, Diamond and SNS.
 
 ## Downloads
 
-Download tarfiles of released versions (containing binaries,
-sources, javadoc, and documentation) are available from the
-[APS VDCT page](http://www.aps.anl.gov/epics/extensions/VisualDCT/index.php).
+Distribution archives of released versions (containing binaries,
+sources, javadoc, and the documentation web site) are available from the
+[APS VDCT page](http://www.aps.anl.gov/epics/extensions/vdct/index.php).
 
 ## Building
 
 VisualDCT is a [Maven](https://maven.apache.org/) project.
 Any recent Java IDE should be able to open and compile it.
+
+Apart from the default lifecycle, two additional Maven goals are useful:
+  * **site** Generate the website with user, reference and project documentation
+  * **assembly:single** Generate the distribution archives as tar and zip
 
 ## Bugs
 
