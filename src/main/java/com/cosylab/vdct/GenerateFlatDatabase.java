@@ -290,7 +290,6 @@ public class GenerateFlatDatabase
 	{
 		System.out.println("Visual Database Configuration Tool v"
 		    + Version.VERSION);
-		System.out.println("build " + Version.BUILD);
 		System.out.println("\nCopyright (c) 2003 by Cosylab d.o.o.");
 	}
 }

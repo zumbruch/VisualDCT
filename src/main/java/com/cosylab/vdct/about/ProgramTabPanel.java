@@ -546,12 +546,8 @@ private javax.swing.JPanel getJPanelURLs() {
 	
 	getJLabelProgramNameProperty().setText(ptm.getProductName());
 	getJLabelProgramVersionProperty().setText(ptm.getProductVersion());
-	
-	if (isProgramPropertyEmpty(ptm.getProductBuild())) {
-		getJPanelName().remove(getJLabelProgramBuildProperty());
-	} else {
-		getJLabelProgramBuildProperty().setText(ptm.getProductBuild());		
-	}
+	getJPanelName().remove(getJLabelProgramBuildProperty());
+
 	if (isProgramPropertyEmpty(ptm.getProductBuildDate())) {
 		getJPanelName().remove(getJLabelProgramBuildDateProperty());
 	} else {

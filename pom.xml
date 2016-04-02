@@ -66,6 +66,9 @@
                     <archive>
                         <manifest>
                             <mainClass>com.cosylab.vdct.VisualDCT</mainClass>
+                            <addDefaultImplementationEntries>
+                                true
+                            </addDefaultImplementationEntries>
                         </manifest>
                     </archive>
                 </configuration>

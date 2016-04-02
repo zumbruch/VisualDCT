@@ -55,14 +55,6 @@ public class VisualDCTProgramTabModel implements ProgramTabModel {
 	}
 
 	/**
-	 * @see com.cosylab.vdct.about.ProgramTabModel#getProductBuild()
-	 */
-	public String getProductBuild()
-	{
-		return "build "+Version.BUILD;
-	}
-
-	/**
 	 * @see com.cosylab.vdct.about.ProgramTabModel#getProductBuildDate()
 	 */
 	public String getProductBuildDate()

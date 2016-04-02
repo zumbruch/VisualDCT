@@ -6117,7 +6117,7 @@ public static void main(final java.lang.String[] args) {
     	    }
     	}
     
-		System.out.println("Loading VisualDCT v"+Version.VERSION+" build "+Version.BUILD+"...\n");
+		System.out.println("Loading VisualDCT v"+Version.VERSION+"...\n");
 		
 		String javaVersion = (String)System.getProperties().get("java.version");
 		if (javaVersion!=null && javaVersion.compareTo(Version.JAVA_VERSION_REQUIRED) == -1)
@@ -6183,7 +6183,7 @@ public static void main(final java.lang.String[] args) {
 		
 		/* Parameters */
 		ConsoleInterface console = Console.getInstance();
-		console.silent("Loading VisualDCT v"+Version.VERSION+" build "+Version.BUILD+"...\n");
+		console.silent("Loading VisualDCT v"+Version.VERSION+"...\n");
 
 		/* Recent files */
 		Settings.getInstance().loadRecentFiles();

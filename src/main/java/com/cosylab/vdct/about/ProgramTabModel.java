@@ -45,7 +45,6 @@ public interface ProgramTabModel extends AboutTabModel
 	public Icon getProductLogoImage();
 	public String getProductName();
 	public String getProductVersion();
-	public String getProductBuild();
 	public String getProductBuildDate();
 	public URL	getProductURL();
 	public URL getProductDocsURL();
