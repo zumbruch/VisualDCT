@@ -116,6 +116,17 @@
             </plugin>
 
             <plugin>
+                <artifactId>maven-scm-publish-plugin</artifactId>
+                <version>1.1</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <content>${project.build.directory}/site</content>
+                    <scmBranch>gh-pages</scmBranch>
+                    <pubScmUrl>${project.scm.developerConnection}</pubScmUrl>
+                </configuration>
+            </plugin>
+
+            <plugin>
                 <artifactId>maven-release-plugin</artifactId>
                 <version>2.5.3</version>
                 <configuration>
