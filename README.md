@@ -1,12 +1,20 @@
 # VisualDCT (aka VDCT)
 
-## What is VisualDCT?
-
 VisualDCT is the Visual Database Configuration Tool for
 [EPICS](http://www.aps.anl.gov/epics/) Databases.
 
 It was developed by [Cosylab](http://www.cosylab.com/).
 This development was funded by SLS, APS, Diamond and SNS. 
+
+## Web Site
+
+VisualDCT has a generated web site that contains a wealth of information,
+including user manuals, release notes, reference and project documentation.
+
+There are two versions available on-line:
+
+ * [latest release](http://epics-extensions.github.io/VisualDCT/)
+ * [development version](https://openepics.ci.cloudbees.com/job/ext-VisualDCT-master-site/site/)
 
 ## Downloads
 
@@ -23,6 +31,12 @@ Apart from the default lifecycle, two additional Maven goals are useful:
 
   * **site** Generate the website with user, reference and project documentation
   * **assembly:single** Generate the distribution archives as tar and zip
+
+## Continuous Integration
+
+CI is provided through Jenkins as part of the
+[EPICS Extensions CI](https://openepics.ci.cloudbees.com/view/EPICS%20Extensions/)
+on the [CloudBees](https://www.cloudbees.com/) _Jenkins in the cloud_ platform.
 
 ## Bugs
 
