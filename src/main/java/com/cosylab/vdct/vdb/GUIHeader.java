@@ -42,7 +42,7 @@ public class GUIHeader implements InspectableProperty {
 	protected String name;
 	protected int visibility;
 	
-	protected static GUIHeader defaultHeader = new GUIHeader("Name", "Value", InspectableProperty.ALWAYS_VISIBLE);
+	protected static GUIHeader defaultHeader = new GUIHeader("Value", "Name", InspectableProperty.ALWAYS_VISIBLE);
 
 /**
  * GUISeparator constructor comment.

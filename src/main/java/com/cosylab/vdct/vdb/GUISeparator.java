@@ -40,6 +40,6 @@ public class GUISeparator extends GUIHeader {
 	 * GUISeparator constructor comment.
 	 */
 	public GUISeparator(String title) {
-		super(title, title, InspectableProperty.UNDEFINED_VISIBILITY);
+		super("", title, InspectableProperty.UNDEFINED_VISIBILITY);
 	}
 }
