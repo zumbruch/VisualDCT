@@ -192,7 +192,7 @@ public String checkValueValidity(String value) {
  * @see com.cosylab.vdct.inspector.InspectableProperty#getGuiGroup()
  */
 public Integer getGuiGroup() {
-	return new Integer(field.getGUI_type());
+	return new Integer(field.getGui_group().getIndex());
 }
 
 }

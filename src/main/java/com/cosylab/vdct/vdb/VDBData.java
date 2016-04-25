@@ -158,7 +158,7 @@ public static void copyVDBFieldData(VDBFieldData sourceField, VDBFieldData targe
 	targetField.setName(sourceField.getName());
 	targetField.setValueSilently(sourceField.getValue());
 	targetField.setInit_value(sourceField.getInit_value());
-	targetField.setGUI_type(sourceField.getGUI_type());
+	targetField.setGui_group(sourceField.getGui_group());
 	targetField.setDbdData(sourceField.getDbdData());
 	targetField.setVisibility(sourceField.getVisibility());
 }
@@ -528,7 +528,7 @@ public static VDBFieldData generateVDBFieldData(Object dsId, DBDData dbd, DBReco
 	vdbField.setName(dbdField.getName());
 	vdbField.setValue(dbdField.getInit_value());
 	vdbField.setInit_value(dbdField.getInit_value());
-	vdbField.setGUI_type(dbdField.getGUI_type());
+	vdbField.setGui_group(dbdField.getGui_group());
 	vdbField.setDbdData(dbdField);
 
 	if (dbRecord!=null) {
