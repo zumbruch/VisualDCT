@@ -590,7 +590,10 @@ public String checkValueValidity(String value) {
  * @see com.cosylab.vdct.inspector.InspectableProperty#getGuiGroup()
  */
 public Integer getGuiGroup() {
-    return new Integer(dbdData.getGui_group().getIndex());
+    if (dbdData.getGui_group() != null)
+        return dbdData.getGui_group().getIndex();
+    else
+        return 0;
 }
 
 private Pattern getPattern()
