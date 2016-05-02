@@ -14,6 +14,7 @@ import com.cosylab.vdct.dbd.DBDConstants;
 import com.cosylab.vdct.dbd.DBDData;
 import com.cosylab.vdct.dbd.DBDDeviceData;
 import com.cosylab.vdct.dbd.DBDFieldData;
+import com.cosylab.vdct.dbd.DBDGuiGroupData;
 import com.cosylab.vdct.dbd.DBDMenuData;
 import com.cosylab.vdct.dbd.DBDResolver;
 import com.cosylab.vdct.graphics.objects.Debuggable;
@@ -60,7 +61,7 @@ import com.cosylab.vdct.util.StringUtils;
  */
 public class VDBFieldData implements InspectableProperty, Debuggable, ChangableVisibility, LinkSource {
 	protected int type;
-	protected int GUI_type;
+	protected DBDGuiGroupData gui_group;
 	protected String name;
 	protected String value;
 	protected String init_value;
@@ -126,8 +127,8 @@ public String getFullName() {
  * Creation date: (9.12.2000 18:11:46)
  * @return int
  */
-public int getGUI_type() {
-	return GUI_type;
+public DBDGuiGroupData getGui_group() {
+	return gui_group;
 }
 /**
  * Insert the method's description here.
@@ -345,10 +346,10 @@ public void setDebugValue(String newValue, Date timeStamp, short severity)
 /**
  * Insert the method's description here.
  * Creation date: (9.12.2000 18:11:46)
- * @param newGUI_type int
+ * @param newGui_group String
  */
-public void setGUI_type(int newGUI_type) {
-	GUI_type = newGUI_type;
+public void setGui_group(DBDGuiGroupData newGui_group) {
+	gui_group = newGui_group;
 }
 /**
  * Insert the method's description here.
@@ -589,7 +590,10 @@ public String checkValueValidity(String value) {
  * @see com.cosylab.vdct.inspector.InspectableProperty#getGuiGroup()
  */
 public Integer getGuiGroup() {
-	return new Integer(getGUI_type());
+    if (dbdData.getGui_group() != null)
+        return dbdData.getGui_group().getIndex();
+    else
+        return 0;
 }
 
 private Pattern getPattern()

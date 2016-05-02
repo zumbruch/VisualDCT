@@ -694,9 +694,7 @@ public Vector getLinkMenus(Enumeration vdbFields) {
 					default:
 
 						 // no not add fields with undefined GUI type
-						 // DBD VAL promptgroup workaround
-						 if (!portOrTemplateMacro2All &&
-						 	(field.getGUI_type() == DBDConstants.GUI_UNDEFINED && !field.getName().equals("VAL")))
+						 if (!portOrTemplateMacro2All && field.getGui_group() != null)
 						 	break;
 
 						 menuitem = new JMenuItem(field.getName());

@@ -40,6 +40,7 @@ public class DBDData {
 	protected Hashtable records = null;
 	protected Hashtable menus = null;
 	protected Hashtable devices = null;
+	protected Map<String, DBDGuiGroupData> gui_groups = null;
 /**
  * DBDData constructor comment.
  */
@@ -47,6 +48,7 @@ public DBDData() {
 	records = new Hashtable();
 	menus = new Hashtable();
 	devices = new Hashtable();
+    gui_groups = new Hashtable<String, DBDGuiGroupData>();
 }
 /**
  * This method was created in VisualAge.
@@ -79,6 +81,20 @@ public void addRecord(DBDRecordData rd) {
 		records.put(rd.name, rd);
 	else
 		Console.getInstance().println("Record "+rd.getName()+" already exists in DBD - ignoring this definition.");
+}
+/**
+ * Find gui_group tag in global table and return index.
+ *
+ * @param tag promptgroup tag string
+ * @return gui_group data object
+ */
+public DBDGuiGroupData findOrAddGuiGroup(String tag) {
+    DBDGuiGroupData gg = gui_groups.get(tag);
+	if (gg == null) {
+        gg = new DBDGuiGroupData(tag,gui_groups.size()+1);
+		gui_groups.put(tag, gg);
+    }
+    return gg;
 }
 /**
  * This method was created in VisualAge.

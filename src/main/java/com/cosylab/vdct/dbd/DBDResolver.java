@@ -134,73 +134,6 @@ public static String getFieldType(int type) {
 
 /**
  * This method was created in VisualAge.
- * @return java.lang.String
- * @param GUItype int
- */
-public static String getGUIString(int GUItype) {
-	if (GUItype==DBDConstants.GUI_COMMON) return "GUI_COMMON";
-	else if (GUItype==DBDConstants.GUI_ALARMS) return "GUI_ALARMS";
-	else if (GUItype==DBDConstants.GUI_BITS1) return "GUI_BITS1";
-	else if (GUItype==DBDConstants.GUI_BITS2) return "GUI_BITS2";
-	else if (GUItype==DBDConstants.GUI_CALC) return "GUI_CALC";
-	else if (GUItype==DBDConstants.GUI_CLOCK) return "GUI_CLOCK";
-	else if (GUItype==DBDConstants.GUI_COMPRESS) return "GUI_COMPRESS";
-	else if (GUItype==DBDConstants.GUI_CONVERT) return "GUI_CONVERT";
-	else if (GUItype==DBDConstants.GUI_DISPLAY) return "GUI_DISPLAY";
-	else if (GUItype==DBDConstants.GUI_HIST) return "GUI_HIST";
-	else if (GUItype==DBDConstants.GUI_INPUTS) return "GUI_INPUTS";
-	else if (GUItype==DBDConstants.GUI_LINKS) return "GUI_LINKS";
-	else if (GUItype==DBDConstants.GUI_MBB) return "GUI_MBB";
-	else if (GUItype==DBDConstants.GUI_MOTOR) return "GUI_MOTOR";
-	else if (GUItype==DBDConstants.GUI_OUTPUT) return "GUI_OUTPUT";
-	else if (GUItype==DBDConstants.GUI_PID) return "GUI_PID";
-	else if (GUItype==DBDConstants.GUI_PULSE) return "GUI_PULSE";
-	else if (GUItype==DBDConstants.GUI_SELECT) return "GUI_SELECT";
-	else if (GUItype==DBDConstants.GUI_SEQ1) return "GUI_SEQ1";
-	else if (GUItype==DBDConstants.GUI_SEQ2) return "GUI_SEQ2";
-	else if (GUItype==DBDConstants.GUI_SEQ3) return "GUI_SEQ3";
-	else if (GUItype==DBDConstants.GUI_SUB) return "GUI_SUB";
-	else if (GUItype==DBDConstants.GUI_TIMER) return "GUI_TIMER";
-	else if (GUItype==DBDConstants.GUI_WAVE) return "GUI_WAVE";
-	else if (GUItype==DBDConstants.GUI_SCAN) return "GUI_SCAN";
-	else return "Undefined";
-}
-/**
- * This method was created in VisualAge.
- * @return int
- * @param gui java.lang.String
- */
-public static int getGUIType(String gui) {
-	if (gui == null) return DBDConstants.GUI_UNDEFINED;
-	else if (gui.equalsIgnoreCase("GUI_COMMON")) return DBDConstants.GUI_COMMON;
-	else if (gui.equalsIgnoreCase("GUI_ALARMS")) return DBDConstants.GUI_ALARMS;
-	else if (gui.equalsIgnoreCase("GUI_BITS1")) return DBDConstants.GUI_BITS1;
-	else if (gui.equalsIgnoreCase("GUI_BITS2")) return DBDConstants.GUI_BITS2;
-	else if (gui.equalsIgnoreCase("GUI_CALC")) return DBDConstants.GUI_CALC;
-	else if (gui.equalsIgnoreCase("GUI_CLOCK")) return DBDConstants.GUI_CLOCK;
-	else if (gui.equalsIgnoreCase("GUI_COMPRESS")) return DBDConstants.GUI_COMPRESS;
-	else if (gui.equalsIgnoreCase("GUI_CONVERT")) return DBDConstants.GUI_CONVERT;
-	else if (gui.equalsIgnoreCase("GUI_DISPLAY")) return DBDConstants.GUI_DISPLAY;
-	else if (gui.equalsIgnoreCase("GUI_HIST")) return DBDConstants.GUI_HIST;
-	else if (gui.equalsIgnoreCase("GUI_INPUTS")) return DBDConstants.GUI_INPUTS;
-	else if (gui.equalsIgnoreCase("GUI_LINKS")) return DBDConstants.GUI_LINKS;
-	else if (gui.equalsIgnoreCase("GUI_MBB")) return DBDConstants.GUI_MBB;
-	else if (gui.equalsIgnoreCase("GUI_MOTOR")) return DBDConstants.GUI_MOTOR;
-	else if (gui.equalsIgnoreCase("GUI_OUTPUT")) return DBDConstants.GUI_OUTPUT;
-	else if (gui.equalsIgnoreCase("GUI_PID")) return DBDConstants.GUI_PID;
-	else if (gui.equalsIgnoreCase("GUI_PULSE")) return DBDConstants.GUI_PULSE;
-	else if (gui.equalsIgnoreCase("GUI_SELECT")) return DBDConstants.GUI_SELECT;
-	else if (gui.equalsIgnoreCase("GUI_SEQ1")) return DBDConstants.GUI_SEQ1;
-	else if (gui.equalsIgnoreCase("GUI_SEQ2")) return DBDConstants.GUI_SEQ2;
-	else if (gui.equalsIgnoreCase("GUI_SEQ3")) return DBDConstants.GUI_SEQ3;
-	else if (gui.equalsIgnoreCase("GUI_SUB")) return DBDConstants.GUI_SUB;
-	else if (gui.equalsIgnoreCase("GUI_TIMER")) return DBDConstants.GUI_TIMER;
-	else if (gui.equalsIgnoreCase("GUI_WAVE")) return DBDConstants.GUI_WAVE;
-	else if (gui.equalsIgnoreCase("GUI_SCAN")) return DBDConstants.GUI_SCAN;
-	else return DBDConstants.GUI_UNDEFINED;
-}
-/**
- * This method was created in VisualAge.
  * @return java.io.EnhancedStreamTokenizer
  * @param fileName java.lang.String
  */
@@ -272,7 +205,7 @@ public static void processDBD(DBDData data, EnhancedStreamTokenizer tokenizer, S
 						(tokenizer.ttype == DBDConstants.quoteChar)) rd.setName(tokenizer.sval);
 					else throw (new DBDParseException("Invalid record_type...", tokenizer, fileName));
 
-					processFields(rd, tokenizer, fileName, paths);
+					processFields(data, rd, tokenizer, fileName, paths);
 					data.addRecord(rd);
 				}
 				
@@ -379,7 +312,7 @@ public static void processDBD(DBDData data, EnhancedStreamTokenizer tokenizer, S
  * @param paths
  * @throws java.lang.Exception
  */
-public static void processFields(DBDRecordData rd, EnhancedStreamTokenizer tokenizer, String fileName, PathSpecification paths) throws Exception {
+public static void processFields(DBDData data, DBDRecordData rd, EnhancedStreamTokenizer tokenizer, String fileName, PathSpecification paths) throws Exception {
 
 	DBDFieldData fd;
 
@@ -449,8 +382,12 @@ public static void processFields(DBDRecordData rd, EnhancedStreamTokenizer token
 
 						else if (tokenizer.sval.equalsIgnoreCase(PROMPTGROUP)) {
 							tokenizer.nextToken();
-							if (tokenizer.ttype == EnhancedStreamTokenizer.TT_WORD) fd.setGUI_type(getGUIType(tokenizer.sval));
-							else throw (new DBDParseException("Invalid gui_gruop...", tokenizer, fileName));
+							if ((tokenizer.ttype == DBDConstants.quoteChar) ||
+								(tokenizer.ttype == EnhancedStreamTokenizer.TT_WORD)) {
+                                DBDGuiGroupData gg = data.findOrAddGuiGroup(tokenizer.sval);
+                                fd.setGui_group(gg);
+                            }
+							else throw (new DBDParseException("Invalid gui_group...", tokenizer, fileName));
 						}
 
 						else tokenizer.nextToken();			// "read"/skip data
@@ -469,7 +406,7 @@ public static void processFields(DBDRecordData rd, EnhancedStreamTokenizer token
 
 				File file = paths.search4File(include_filename);
 				inctokenizer = getEnhancedStreamTokenizer(file.getAbsolutePath());
-				if (inctokenizer!=null) processFields(rd, inctokenizer, include_filename, new PathSpecification(file.getParentFile().getAbsolutePath(), paths));
+				if (inctokenizer!=null) processFields(data, rd, inctokenizer, include_filename, new PathSpecification(file.getParentFile().getAbsolutePath(), paths));
 
 			}	
 						

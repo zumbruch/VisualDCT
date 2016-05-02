@@ -36,10 +36,10 @@ public class DBDFieldData {
 	private static String nullString = "";
 	
 	protected String name;	
-	protected int GUI_type = DBDConstants.GUI_UNDEFINED;
+	protected DBDGuiGroupData gui_group;
 	protected int field_type = DBDConstants.NOT_DEFINED;
 	protected String init_value = nullString;
-	protected String prompt_value = nullString; 	
+	protected String prompt_value = nullString;
 
 	// for integer fields
 	protected int base_type = DBDConstants.DECIMAL;
@@ -66,12 +66,11 @@ public int getField_type() {
 	return field_type;
 }
 /**
- * Insert the method's description here.
- * Creation date: (9.12.2000 16:25:01)
- * @return int
+ * gui_group getter.
+ * @return gui_group numerical index
  */
-public int getGUI_type() {
-	return GUI_type;
+public DBDGuiGroupData getGui_group() {
+	return gui_group;
 }
 /**
  * Insert the method's description here.
@@ -130,12 +129,11 @@ public void setField_type(int newField_type) {
 	field_type = newField_type;
 }
 /**
- * Insert the method's description here.
- * Creation date: (9.12.2000 16:25:01)
- * @param newGUI_type int
+ * Gui group setter.
+ * @param newGui_group int
  */
-public void setGUI_type(int newGUI_type) {
-	GUI_type = newGUI_type;
+public void setGui_group(DBDGuiGroupData newGui_group) {
+	gui_group = newGui_group;
 }
 /**
  * Insert the method's description here.
