@@ -36,7 +36,8 @@ Apart from the default lifecycle, two additional Maven goals are useful:
 
 CI is provided through Jenkins as part of the
 [EPICS Extensions CI](https://openepics.ci.cloudbees.com/view/EPICS%20Extensions/)
-on the [CloudBees](https://www.cloudbees.com/) _Jenkins in the cloud_ platform.
+on the [CloudBees](https://www.cloudbees.com/) _Jenkins in the cloud_ platform,
+and on [Travis](https://travis-ci.org/epics-extensions/VisualDCT).
 
 ## Bugs
 
