@@ -31,7 +31,7 @@
     <url>https://github.com/epics-extensions/VisualDCT</url>
     <scm>
         <connection>scm:git:https://github.com/epics-extensions/VisualDCT.git</connection>
-        <developerConnection>scm:git:git@github.com/epics-extensions/VisualDCT.git</developerConnection>
+        <developerConnection>scm:git:ssh://git@github.com/epics-extensions/VisualDCT.git</developerConnection>
         <url>https://github.com/epics-extensions/VisualDCT</url>
         <tag>HEAD</tag>
     </scm>
