@@ -1,4 +1,4 @@
-# VisualDCT (aka VDCT)
+# VisualDCT (aka VDCT) [![Build Status](https://travis-ci.org/epics-extensions/VisualDCT.svg?branch=master)](https://travis-ci.org/epics-extensions/VisualDCT)
 
 VisualDCT is the Visual Database Configuration Tool for
 [EPICS](http://www.aps.anl.gov/epics/) Databases.
