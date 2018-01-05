@@ -234,10 +234,10 @@ public static String substituteTabsAndNewLinesWithSpaces(String str) {
  */
 // TASK:STRUTILOPT: implement more efficient algorithm
 public static String removeQuotes(String str) {
-	if (str.indexOf('"')>=0)
-		str = str.replaceAll("\\\"", "\\\\\"");
-	return str;
-}
+    return str
+            .replaceAll("\\\\", "\\\\\\\\")
+            .replaceAll("\\\"", "\\\\\"");
+    }
 /**
  * Insert the method's description here.
  * Creation date: (23.4.2001 18:52:04)

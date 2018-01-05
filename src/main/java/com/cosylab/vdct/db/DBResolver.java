@@ -216,7 +216,7 @@ public class DBResolver {
 	 * @param tokenizer java.io.EnhancedStreamTokenizer
 	 */
 	public static void initializeTokenizer(EnhancedStreamTokenizer tokenizer) {
-		tokenizer.setParseEscapeSequences(false);
+		tokenizer.setParseEscapeSequences(true);
 		tokenizer.resetSyntax();
 		tokenizer.whitespaceChars(0, 32);
 		tokenizer.wordChars(33, 255);			// reset
