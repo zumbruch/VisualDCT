@@ -1,7 +1,15 @@
 # Release Notes
 
-## 2.6.1281 (not released yet)
-[View diff](https://github.com/epics-extensions/VisualDCT/compare/v2.6.1280...master)
+## 2.7.1 (not released yet)
+[View diff](https://github.com/epics-extensions/VisualDCT/compare/v2.7.0...master)
+
+## 2.7.0 (05 Jan 2018)
+[View diff](https://github.com/epics-extensions/VisualDCT/compare/v2.6.1280...v2.7.0)
+
+ * Add support for 64bit integer database fields (introduced in Base 3.16)
+ * Bugfix: Handle escaped quotes and backslashed in field values
+ * Enhancement: Use Writer for file output to support UTF character encoding in DB files
+   (Required for use with EPICS Base 3.16 and EPICS 7.)
 
 ## 2.6.1280 (02 May 2016)
 [View diff](https://github.com/epics-extensions/VisualDCT/compare/8f714da...v2.6.1280)
