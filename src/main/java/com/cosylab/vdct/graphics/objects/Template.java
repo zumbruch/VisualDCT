@@ -34,7 +34,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.DataOutputStream;
+import java.io.Writer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -1780,12 +1780,7 @@ protected void undestroyFields() {
 	}
 }
 
-
-
-/**
- * @see com.cosylab.vdct.graphics.objects.SaveInterface#writeObjects(java.io.DataOutputStream, com.cosylab.vdct.graphics.objects.NamingContext, boolean)
- */
-public void writeObjects(DataOutputStream file, NamingContext context, boolean export)
+public void writeObjects(Writer writer, NamingContext context, boolean export)
 	throws IOException
 {
 	// do not generate template data if not is export mode
@@ -1801,10 +1796,10 @@ public void writeObjects(DataOutputStream file, NamingContext context, boolean e
 		
 	 	// write comment
 	 	if (getTemplateData().getComment()!=null)
-	 		file.writeBytes(nl+getTemplateData().getComment());
+	 		writer.write(nl+getTemplateData().getComment());
 		
 		// expand start
-		file.writeBytes(nl+DBResolver.EXPAND+"(\""+getTemplateData().getTemplate().getId()+"\""+
+		writer.write(nl+DBResolver.EXPAND+"(\""+getTemplateData().getTemplate().getId()+"\""+
 						comma + 
 							StringUtils.quoteIfMacro(getTemplateData().getName())
 						 + ") {"+nl);
@@ -1815,11 +1810,11 @@ public void writeObjects(DataOutputStream file, NamingContext context, boolean e
 		while (i.hasNext())
 		{
 			String name = i.next().toString();
-			file.writeBytes(macro + name + comma + quote + StringUtils.removeQuotes(macros.get(name).toString()) + quote + ending);
+			writer.write(macro + name + comma + quote + StringUtils.removeQuotes(macros.get(name).toString()) + quote + ending);
 		}
 			
 		// export end
-		file.writeBytes("}"+nl);
+		writer.write("}"+nl);
 
 		return;
 	}
@@ -1876,7 +1871,7 @@ public void writeObjects(DataOutputStream file, NamingContext context, boolean e
 */	 
 	 //NameManipulator newNamer = new DefaultNamer(namer.getFile(),removedPrefix, addedPrefix, properties, ports, export); 
 
-	 file.writeBytes("\n# expand(\""+getTemplateData().getTemplate().getFileName()+"\", "+templateName+")\n");
+	 writer.write("\n# expand(\""+getTemplateData().getTemplate().getFileName()+"\", "+templateName+")\n");
 
      Group group = getTemplateData().getTemplate().getGroup();
      Object dsId = group.getDsId();
@@ -1885,13 +1880,13 @@ public void writeObjects(DataOutputStream file, NamingContext context, boolean e
 	 try
 	 {
 		Group.setRoot(dsId, group);
-		group.writeObjects(file, context.createNamingContextFor(getTemplateData()), export);
+		group.writeObjects(writer, context.createNamingContextFor(getTemplateData()), export);
 	 }
 	 finally
 	 {
 	 	Group.setRoot(dsId, currentRoot);	
 	 }
-	 file.writeBytes("\n# end("+templateName+")\n");
+	 writer.write("\n# end("+templateName+")\n");
 	 
 }
 
@@ -2044,10 +2039,7 @@ public static Map preparePorts(Group group, Map substitutions, NameManipulator n
 	return map;
 }
 
-/**
- * @see com.cosylab.vdct.graphics.objects.SaveInterface#writeVDCTObjects(java.io.DataOutputStream, com.cosylab.vdct.graphics.objects.NamingContext, boolean) 
- */
-public void writeVDCTObjects(DataOutputStream file, NamingContext renamer, boolean export)
+public void writeVDCTObjects(Writer writer, NamingContext renamer, boolean export)
 	throws IOException
 {
 	// No-op (done by writeObjects() method).
