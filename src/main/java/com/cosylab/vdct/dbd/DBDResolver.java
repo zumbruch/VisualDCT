@@ -84,13 +84,15 @@ public static int getBaseType(String bt) {
  */
 public static int getFieldType(String stype) {
 	if (stype == null) return DBDConstants.NOT_DEFINED;
-	else if (stype.equalsIgnoreCase("DBF_STRING"))	     return (DBDConstants.DBF_STRING);
+	else if (stype.equalsIgnoreCase("DBF_STRING"))	 return (DBDConstants.DBF_STRING);
 	else if (stype.equalsIgnoreCase("DBF_CHAR"))     return (DBDConstants.DBF_CHAR);
 	else if (stype.equalsIgnoreCase("DBF_UCHAR"))    return (DBDConstants.DBF_UCHAR);
 	else if (stype.equalsIgnoreCase("DBF_SHORT"))    return (DBDConstants.DBF_SHORT);
 	else if (stype.equalsIgnoreCase("DBF_USHORT"))   return (DBDConstants.DBF_USHORT);
 	else if (stype.equalsIgnoreCase("DBF_LONG"))     return (DBDConstants.DBF_LONG);
 	else if (stype.equalsIgnoreCase("DBF_ULONG"))    return (DBDConstants.DBF_ULONG);
+	else if (stype.equalsIgnoreCase("DBF_INT64"))    return (DBDConstants.DBF_INT64);
+	else if (stype.equalsIgnoreCase("DBF_UINT64"))   return (DBDConstants.DBF_UINT64);
 	else if (stype.equalsIgnoreCase("DBF_FLOAT"))    return (DBDConstants.DBF_FLOAT);
 	else if (stype.equalsIgnoreCase("DBF_DOUBLE"))   return (DBDConstants.DBF_DOUBLE);
 	else if (stype.equalsIgnoreCase("DBF_ENUM"))     return (DBDConstants.DBF_ENUM);
@@ -118,6 +120,8 @@ public static String getFieldType(int type) {
 		case DBDConstants.DBF_USHORT:	return "DBF_USHORT";
 		case DBDConstants.DBF_LONG:		return "DBF_LONG";
 		case DBDConstants.DBF_ULONG:	return "DBF_ULONG";
+		case DBDConstants.DBF_INT64:	return "DBF_INT64";
+		case DBDConstants.DBF_UINT64:	return "DBF_UINT64";
 		case DBDConstants.DBF_FLOAT:	return "DBF_FLOAT";
 		case DBDConstants.DBF_DOUBLE:	return "DBF_DOUBLE";
 		case DBDConstants.DBF_ENUM:		return "DBF_ENUM";

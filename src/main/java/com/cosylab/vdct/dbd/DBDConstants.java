@@ -40,15 +40,17 @@ public interface DBDConstants {
 	public static final int DBF_USHORT	=  4;
 	public static final int DBF_LONG	=  5;
 	public static final int DBF_ULONG	=  6;
-	public static final int DBF_FLOAT	=  7;
-	public static final int DBF_DOUBLE	=  8;
-	public static final int DBF_ENUM	=  9;
-	public static final int DBF_MENU	= 10;
-	public static final int DBF_DEVICE	= 11;
-	public static final int DBF_INLINK	= 12;
-	public static final int DBF_OUTLINK	= 13;
-	public static final int DBF_FWDLINK	= 14;
-	public static final int DBF_NOACCESS= 15;
+	public static final int DBF_INT64	=  7;
+	public static final int DBF_UINT64	=  8;
+	public static final int DBF_FLOAT	=  9;
+	public static final int DBF_DOUBLE	= 10;
+	public static final int DBF_ENUM	= 11;
+	public static final int DBF_MENU	= 12;
+	public static final int DBF_DEVICE	= 13;
+	public static final int DBF_INLINK	= 14;
+	public static final int DBF_OUTLINK	= 15;
+	public static final int DBF_FWDLINK	= 16;
+	public static final int DBF_NOACCESS= 17;
 
 	// artificial type
 	public static final int DBF_PORT	 		= Integer.MAX_VALUE-1;
