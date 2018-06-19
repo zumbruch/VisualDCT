@@ -1869,7 +1869,11 @@ public class DBResolver {
 
 						// read field_value
 						tokenizer.nextToken();
-						if (tokenizer.ttype == DBConstants.quoteChar) value=tokenizer.sval;
+						// Do not send a Exception when it is a number value
+						// Issue https://github.com/epics-extensions/VisualDCT/issues/21
+						if (tokenizer.ttype == DBConstants.quoteChar || tokenizer.ttype == EnhancedStreamTokenizer.TT_NUMBER){
+							value=tokenizer.sval;// See change in EnhancedStreamTokenizer class sval = null when it is a Number
+						}
 						else throw (new DBParseException("Invalid field value...", tokenizer, fileName));
 
 						DBFieldData fd = new DBFieldData(name, value);
