@@ -47,21 +47,63 @@ public class DBResolver {
 	private static final String nullString = "";
 
 	// DB definitions
-	public static final String FIELD		= "field";
-	public static final String RECORD	= "record";
-	public static final String GRECORD	= "grecord";
-	public static final String INCLUDE	= "include";
-	public static final String INFO	= "info";
 
-	public static final String PATH  	 = "path";
-	public static final String ADDPATH  	 = "addpath";
+    /**
+     *
+     */
+	public static final String FIELD		= "field";
+
+    /**
+     *
+     */
+    public static final String RECORD	= "record";
+
+    /**
+     *
+     */
+    public static final String GRECORD	= "grecord";
+
+    /**
+     *
+     */
+    public static final String INCLUDE	= "include";
+
+    /**
+     *
+     */
+    public static final String INFO	= "info";
+
+    /**
+     *
+     */
+    public static final String PATH  	 = "path";
+
+    /**
+     *
+     */
+    public static final String ADDPATH  	 = "addpath";
 
 	// new R3.15
-	public static final String TEMPLATE	= "template";
-	public static final String PORT		= "port";
 
-	public static final String EXPAND	= "expand";
-	public static final String MACRO		= "macro";
+    /**
+     *
+     */
+	public static final String TEMPLATE	= "template";
+
+    /**
+     *
+     */
+    public static final String PORT		= "port";
+
+    /**
+     *
+     */
+    public static final String EXPAND	= "expand";
+
+    /**
+     *
+     */
+    public static final String MACRO		= "macro";
 
 
 	// internal
@@ -75,76 +117,188 @@ public class DBResolver {
 	// #! SKIP					
 	// skip n lines
 	// #! SKIP(number of lines)
+
+    /**
+     *
+     */
 	public static final String VDCTSKIP = "SKIP";
 
 	// visual data
 	// used format #! View(xoffset, yoffset, scale)
+
+    /**
+     *
+     */
 	public static final String VDCTVIEW = "View";
 	// used format #! SpreadsheetView("type", "name", ...)
 	// deprecated format #! SpreadsheetView("type", "name", "mode name", "show all rows", background color, ...)
+
+    /**
+     *
+     */
 	public static final String VDCTSPREADSHEET_VIEW = "SpreadsheetView";
 
 	/* The following are inside the SpreadsheetView(...) 
 	 */
 	// deprecated, used for backward compatibility; used format #! Col("name")
+
+    /**
+     *
+     */
 	public static final String VDCTSPREADSHEET_COL = "Col";
 
 	// used format #! ColumnOrder("mode name")
+
+    /**
+     *
+     */
 	public static final String VDCTSPREADSHEET_COLUMNORDER = "ColumnOrder";
 	// used format #! ShowAllRows("true/false")
+
+    /**
+     *
+     */
 	public static final String VDCTSPREADSHEET_SHOWALLROWS = "ShowAllRows";
 	// used format #! GroupColumnsByGuiGroup("true/false")
+
+    /**
+     *
+     */
 	public static final String VDCTSPREADSHEET_GROUPCOLUMNSBYGUIGROUP = "GroupColumnsByGuiGroup";
 	// used format #! BackgroundColor("color")
+
+    /**
+     *
+     */
 	public static final String VDCTSPREADSHEET_BACKGROUNDCOLOR = "BackgroundColor";
 	// used format #! Column("name", "hidden" [, Width(...) [, Width(...), ...]])
+
+    /**
+     *
+     */
 	public static final String VDCTSPREADSHEET_COLUMN = "Column";
 	// used format #! Width(split index, nondefault width)
+
+    /**
+     *
+     */
 	public static final String VDCTSPREADSHEET_WIDTH = "Width";
 	// used format #! HiddenRow("name")
+
+    /**
+     *
+     */
 	public static final String VDCTSPREADSHEET_HIDDENROW = "HiddenRow";
 	// used format #! RowOrder("column name", "split index", "order string")
+
+    /**
+     *
+     */
 	public static final String VDCTSPREADSHEET_ROWORDER = "RowOrder";
 	// used format #! SplitCol("column name", "is delimiter string", "pattern string")
+
+    /**
+     *
+     */
 	public static final String VDCTSPREADSHEET_SPLITCOLUMN = "SplitCol";
 	// used format #! RecentSplit("is delimiter string", "delimiter or pattern")
+
+    /**
+     *
+     */
 	public static final String VDCTSPREADSHEET_RECENTSPLIT = "RecentSplit";
 
 
 	// used format #! Record(recordname, xpos, ypos, color, rotated, "description")
+
+    /**
+     *
+     */
 	public static final String VDCTRECORD = "Record";
 	// used format #! Group(groupname, xpos, ypos, color, "description")
+
+    /**
+     *
+     */
 	public static final String VDCTGROUP = "Group";
 	// used format #! Field(fieldname, color, rotated, "description")
+
+    /**
+     *
+     */
 	public static final String VDCTFIELD = "Field";
 	// used format #! Link(fieldname, inLinkID)
+
+    /**
+     *
+     */
 	public static final String VDCTLINK = "Link";
 	// used format #! Visibility(fieldname, visibility)
+
+    /**
+     *
+     */
 	public static final String VDCTVISIBILITY = "Visibility";
 	// used format #! Connector(id, outLinkID, xpos, ypos, color, "description" [, mode])
+
+    /**
+     *
+     */
 	public static final String VDCTCONNECTOR = "Connector";
 	//	 eg.       #! Record(ts:fanOut0, 124, 432, 324568, 0, "fanOut record")
 
 
 	// used format #! ConstantPort(portname, inLinkID, xpos, ypos, color, defaultVisibility, textPositionNorth)
+
+    /**
+     *
+     */
 	public static final String VDCT_CONSTANT_PORT = "ConstantPort";
 	// used format #! InputPort(portname, inLinkID, xpos, ypos, color, defaultVisibility, textPositionNorth)
+
+    /**
+     *
+     */
 	public static final String VDCT_INPUT_PORT = "InputPort";
 	// used format #! OutputPort(portname, inLinkID, xpos, ypos, color, defaultVisibility, textPositionNorth)
+
+    /**
+     *
+     */
 	public static final String VDCT_OUTPUT_PORT = "OutputPort";
 
 	// used format #! InputMacro(macroname, description, xpos, ypos, color, defaultVisibility, textPositionNorth)
 	// used format #! OutputMacro(macroname, description, xpos, ypos, color, defaultVisibility, textPositionNorth)
 	// textPositionNorth is optional; if exists value is true or false
+
+    /**
+     *
+     */
 	public static final String VDCT_INPUT_MACRO = "InputMacro";
-	public static final String VDCT_OUTPUT_MACRO = "OutputMacro";
+
+    /**
+     *
+     */
+    public static final String VDCT_OUTPUT_MACRO = "OutputMacro";
 
 	// used format #! Line(name, xpos, ypos, xpos2, ypos2, dashed, startArrow, endArrow, color, parentBorderID)
 	// used format #! Box(name, xpos, ypos, xpos2, ypos2, dashed, color, parentBorderID)
 	// used format #! TextBox(name, xpos, ypos, xpos2, ypos2, border, fontFamilyName, fontSize, fontStyle, color, "description", parentBorderID)
+
+    /**
+     *
+     */
 	public static final String VDCTLINE = "Line";
-	public static final String VDCTBOX = "Box";
-	public static final String VDCTTEXTBOX = "TextBox";
+
+    /**
+     *
+     */
+    public static final String VDCTBOX = "Box";
+
+    /**
+     *
+     */
+    public static final String VDCTTEXTBOX = "TextBox";
 
 	// not used yet
 	//public static final String VDCTBORDER = "Border";
@@ -160,16 +314,35 @@ public class DBResolver {
 	private static final String DBD_ENTRY_STR	= "DBD";
 	private static final String DBD_END_STR		= "DBDEND";
 
-	public static final String DBD_START	= "#! "+DBD_START_STR+"\n";
-	public static final String DBD_ENTRY	= "#! "+DBD_ENTRY_STR+"(\"";
-	public static final String DBD_END	= "#! "+DBD_END_STR+"\n";
+    /**
+     *
+     */
+    public static final String DBD_START	= "#! "+DBD_START_STR+"\n";
+
+    /**
+     *
+     */
+    public static final String DBD_ENTRY	= "#! "+DBD_ENTRY_STR+"(\"";
+
+    /**
+     *
+     */
+    public static final String DBD_END	= "#! "+DBD_END_STR+"\n";
 
 	// template 'instatiation'
 	// used format:
 	// #! TemplateInstance("template instance id", x, y, color, "desc")
 	// #! TemplateField("template instance id", "fieldName", color, isRight, visibility)
+
+    /**
+     *
+     */
 	public static final String TEMPLATE_INSTANCE = "TemplateInstance";
-	public static final String TEMPLATE_FIELD = "TemplateField";
+
+    /**
+     *
+     */
+    public static final String TEMPLATE_FIELD = "TemplateField";
 
 	/**
 	 * This method was created in VisualAge.
@@ -194,7 +367,7 @@ public class DBResolver {
 	}
 	/**
 	 * This method was created in VisualAge.
-     * @param is
+     * @param is is
 	 * @return java.io.EnhancedStreamTokenizer
 	 */
 	public static EnhancedStreamTokenizer getEnhancedStreamTokenizer(InputStream is) {
@@ -291,12 +464,12 @@ public class DBResolver {
 
 	/**
 	 * VisualDCT layout data is also processed here
-     * @param dsId
+     * @param dsId dsId
 	 * @param data com.cosylab.vdct.db.DBData
 	 * @param tokenizer java.io.EnhancedStreamTokenizer
-     * @param fileName
-     * @return 
-     * @throws java.lang.Exception
+     * @param fileName fileName
+     * @return something
+     * @throws java.lang.Exception foo
 	 */
 	public static String processComment(Object dsId, DBData data, EnhancedStreamTokenizer tokenizer, String fileName) throws Exception {
 
@@ -1265,11 +1438,11 @@ public class DBResolver {
 
 	/**
 	 * VisualDCT layout data is also processed here
-     * @param template
+     * @param template template
 	 * @param tokenizer java.io.EnhancedStreamTokenizer
-     * @param fileName
-     * @return 
-     * @throws java.lang.Exception
+     * @param fileName fileName
+     * @return something
+     * @throws java.lang.Exception foo
 	 */
 	public static String processTemplateComment(DBTemplate template, EnhancedStreamTokenizer tokenizer, String fileName) throws Exception {
 
@@ -1443,10 +1616,10 @@ public class DBResolver {
 
 	/**
 	 * VisualDCT layout data is also processed here
-     * @param linesToSkip
+     * @param linesToSkip linesToSkip
 	 * @param tokenizer java.io.EnhancedStreamTokenizer
-     * @param fileName
-     * @throws java.lang.Exception
+     * @param fileName fileName
+     * @throws java.lang.Exception foo
 	 */
 	public static void skipLines(int linesToSkip, EnhancedStreamTokenizer tokenizer, String fileName) throws Exception {
 
@@ -1466,10 +1639,10 @@ public class DBResolver {
 	
     /**
      *
-     * @param dsId
-     * @param data
-     * @param vdctData
-     * @param source
+     * @param dsId dsId
+     * @param data data
+     * @param vdctData vdctData
+     * @param source source
      */
     public static void readVdctData(Object dsId, DBData data, String vdctData, String source) {
 		StringReader reader = new StringReader(vdctData);
@@ -1489,14 +1662,14 @@ public class DBResolver {
 
 	/**
 	 * This method was created in VisualAge.
-     * @param dsId
+     * @param dsId dsId
 	 * @param data com.cosylab.vdct.db.DBData
 	 * @param tokenizer java.io.EnhancedStreamTokenizer
-     * @param loadStack
-     * @param paths
-     * @param fileName
-     * @param loadList
-     * @throws java.lang.Exception
+     * @param loadStack loadStack
+     * @param paths paths
+     * @param fileName fileName
+     * @param loadList loadList
+     * @throws java.lang.Exception foo
 	 */
 	public static void processDB(Object dsId, DBData data, EnhancedStreamTokenizer tokenizer, String fileName,
 			PathSpecification paths, Stack loadStack, ArrayList loadList) throws Exception
@@ -1700,11 +1873,11 @@ public class DBResolver {
 
 	/**
 	 * This method was created in VisualAge.
-     * @param dsId
-     * @param templateInstance
+     * @param dsId dsId
+     * @param templateInstance templateInstance
 	 * @param tokenizer java.io.EnhancedStreamTokenizer
-     * @param fileName
-     * @param paths
+     * @param fileName fileName
+     * @param paths paths
 	 * @exception java.lang.Exception The exception description.
 	 */
 	public static void processMacros(Object dsId, DBTemplateInstance templateInstance, EnhancedStreamTokenizer tokenizer, String fileName, PathSpecification paths) throws Exception {
@@ -1760,10 +1933,10 @@ public class DBResolver {
 
 	/**
 	 * This method was created in VisualAge.
-     * @param template
+     * @param template template
 	 * @param tokenizer java.io.EnhancedStreamTokenizer
-     * @param fileName
-     * @param paths
+     * @param fileName fileName
+     * @param paths paths
 	 * @exception java.lang.Exception The exception description.
 	 */
 	public static void processPorts(DBTemplate template, EnhancedStreamTokenizer tokenizer, String fileName, PathSpecification paths) throws Exception {
@@ -1835,11 +2008,11 @@ public class DBResolver {
 
 	/**
 	 * This method was created in VisualAge.
-     * @param dsId
+     * @param dsId dsId
 	 * @param rd com.cosylab.vdct.db.DBRecordData
 	 * @param tokenizer java.io.EnhancedStreamTokenizer
-     * @param fileName
-     * @param paths
+     * @param fileName fileName
+     * @param paths paths
 	 * @exception java.lang.Exception The exception description.
 	 */
 	public static void processFields(Object dsId, DBRecordData rd, EnhancedStreamTokenizer tokenizer, String fileName, PathSpecification paths) throws Exception {
@@ -1918,7 +2091,7 @@ public class DBResolver {
 	 * This method was created in VisualAge.
 	 * @return Vector
 	 * @param fileName java.lang.String
-     * @throws java.io.IOException
+     * @throws java.io.IOException foo
 	 */
 	public static String[] resolveIncodedDBDs(String fileName) throws IOException {
 
@@ -1968,9 +2141,9 @@ public class DBResolver {
 
 	/**
 	 * This method was created in VisualAge.
-     * @param dsId
-     * @param loadList
-     * @param loadStack
+     * @param dsId dsId
+     * @param loadList loadList
+     * @param loadStack loadStack
 	 * @return Vector
 	 * @param fileName java.lang.String
 	 */
@@ -2008,10 +2181,10 @@ public class DBResolver {
 
 	/**
 	 * This method was created in VisualAge.
-     * @param dsId
-     * @param is
-     * @param loadList
-     * @param loadStack
+     * @param dsId dsId
+     * @param is is
+     * @param loadList loadList
+     * @param loadStack loadStack
 	 * @return Vector
 	 */
 	public static DBData resolveDB(Object dsId, InputStream is, Stack loadStack, ArrayList loadList) {
@@ -2044,10 +2217,10 @@ public class DBResolver {
 
 	/**
 	 * This method was created in VisualAge.
-     * @param dsId
+     * @param dsId dsId
 	 * @return Vector
 	 * @param fileName java.lang.String
-     * @throws java.lang.Exception
+     * @throws java.lang.Exception foo
 	 */
 	public static DBData resolveDB(Object dsId, String fileName) throws Exception {
 		Stack loadStack = new Stack();
@@ -2057,10 +2230,10 @@ public class DBResolver {
 
 	/**
 	 * This method was created in VisualAge.
-     * @param dsId
-     * @param is
+     * @param dsId dsId
+     * @param is is
 	 * @return Vector
-     * @throws java.lang.Exception
+     * @throws java.lang.Exception foo
 	 */
 	public static DBData resolveDB(Object dsId, InputStream is) throws Exception {
 		Stack loadStack = new Stack();
@@ -2071,9 +2244,9 @@ public class DBResolver {
 
 	/**
 	 * This method was created in VisualAge.
-     * @param url
+     * @param url url
 	 * @return Vector
-     * @throws java.lang.Exception
+     * @throws java.lang.Exception foo
 	 */
 	public static DBData resolveDBasURL(java.net.URL url) throws Exception {
 

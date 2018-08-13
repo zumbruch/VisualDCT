@@ -67,6 +67,11 @@ public static int getBaseType(String bt) {
 	else return DBDConstants.NOT_DEFINED;
 }
 
+    /**
+     *
+     * @param type type
+     * @return something
+     */
     public static String getBaseType(int type) {
 	switch (type)
 	{
@@ -177,9 +182,9 @@ public static void initializeTokenizer(EnhancedStreamTokenizer tokenizer) {
  * This method was created in VisualAge.
  * @param data com.cosylab.vdct.dbd.DBDData
  * @param tokenizer java.io.EnhancedStreamTokenizer
- * @param fileName
- * @param paths
- * @throws java.lang.Exception
+ * @param fileName fileName
+ * @param paths paths
+ * @throws java.lang.Exception foo
  */
 public static void processDBD(DBDData data, EnhancedStreamTokenizer tokenizer, String fileName, PathSpecification paths) throws Exception {
 	
@@ -310,11 +315,12 @@ public static void processDBD(DBDData data, EnhancedStreamTokenizer tokenizer, S
 }
 /**
  * This method was created in VisualAge.
- * @param rd
+     * @param data data
+ * @param rd rd
  * @param tokenizer java.io.EnhancedStreamTokenizer
- * @param fileName
- * @param paths
- * @throws java.lang.Exception
+ * @param fileName fileName
+ * @param paths paths
+ * @throws java.lang.Exception foo
  */
 public static void processFields(DBDData data, DBDRecordData rd, EnhancedStreamTokenizer tokenizer, String fileName, PathSpecification paths) throws Exception {
 
@@ -421,8 +427,8 @@ public static void processFields(DBDData data, DBDRecordData rd, EnhancedStreamT
  * This method was created in VisualAge.
  * @param md com.cosylab.vdct.dbd.DBDMenuData
  * @param tokenizer java.io.EnhancedStreamTokenizer
- * @param fileName
- * @param paths
+ * @param fileName fileName
+ * @param paths paths
  * @exception java.lang.Exception The exception description.
  */
 public static void processMenuChoices(DBDMenuData md, EnhancedStreamTokenizer tokenizer, String fileName, PathSpecification paths) throws Exception {
@@ -474,7 +480,7 @@ public static void processMenuChoices(DBDMenuData md, EnhancedStreamTokenizer to
 }
 /**
  * This method was created in VisualAge.
- * @param data
+ * @param data data
  * @return Vector
  * @param fileName java.lang.String
  */
@@ -507,7 +513,7 @@ public static DBDData resolveDBD(DBDData data, String fileName) {
 }
 /**
  * This method was created in VisualAge.
- * @param data
+ * @param data data
  * @param url java.net.URL
  * @return Vector
  */

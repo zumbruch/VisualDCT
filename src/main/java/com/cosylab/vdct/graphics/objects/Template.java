@@ -122,19 +122,58 @@ public class Template
 	private boolean initialized = false; 
 
 	// properties field
+
+    /**
+     *
+     */
 	protected int rfieldLabelX;
-	protected int rfieldLabelY;
-	protected double rfieldRowHeight;
-	protected Font fieldFont = null;
+
+    /**
+     *
+     */
+    protected int rfieldLabelY;
+
+    /**
+     *
+     */
+    protected double rfieldRowHeight;
+
+    /**
+     *
+     */
+    protected Font fieldFont = null;
 
 	// templateid (fileName) label
-	protected int ridLabelX;
-	protected int ridLabelY;
-	protected String idlabel;
-	protected Font idFont = null;
 
-	protected int initY;
-	protected int rlinkY;
+    /**
+     *
+     */
+	protected int ridLabelX;
+
+    /**
+     *
+     */
+    protected int ridLabelY;
+
+    /**
+     *
+     */
+    protected String idlabel;
+
+    /**
+     *
+     */
+    protected Font idFont = null;
+
+    /**
+     *
+     */
+    protected int initY;
+
+    /**
+     *
+     */
+    protected int rlinkY;
 
 	private static GUISeparator templateSeparator = null;
 
@@ -147,18 +186,39 @@ public class Template
 
 	private final static String fieldMaxStr = "01234567890123456789012345";
 
-	protected long portsID = -1;
-	protected long macrosID = -1;
+    /**
+     *
+     */
+    protected long portsID = -1;
 
-	protected Vector invalidLinks = null;
+    /**
+     *
+     */
+    protected long macrosID = -1;
+
+    /**
+     *
+     */
+    protected Vector invalidLinks = null;
 	
-	protected int fields = 0;
-	protected int leftFields = 0;
-	protected int rightFields = 0;
+    /**
+     *
+     */
+    protected int fields = 0;
+
+    /**
+     *
+     */
+    protected int leftFields = 0;
+
+    /**
+     *
+     */
+    protected int rightFields = 0;
 	
 	/**
-	 * @param parent
-	 * @param templateData
+	 * @param parent parent
+	 * @param templateData templateData
 	 */
 	public Template(ContainerObject parent, VDBTemplateInstance templateData) {
 		this(parent, templateData, true);
@@ -169,7 +229,7 @@ public class Template
 	 * Creation date: (21.12.2000 20:40:53)
 	 * @param parent com.cosylab.vdct.graphics.objects.ContainerObject
 	 * @param templateData The templateData to set
-     * @param initializeFields
+     * @param initializeFields initializeFields
 	 */
 	public Template(ContainerObject parent, VDBTemplateInstance templateData, boolean initializeFields) {
 		super(parent);
@@ -297,6 +357,7 @@ public class Template
 	}
 
 	/**
+     * @return something
 	 * @see com.cosylab.vdct.graphics.objects.VisibleObject#getHashID()
 	 */
 	public String getHashID()
@@ -739,6 +800,7 @@ public class Template
 	}
 
 	/**
+     * @param visitor visitor
 	 * @see com.cosylab.vdct.graphics.objects.Visitable#accept(Visitor)
 	 */
 	public void accept(Visitor visitor)
@@ -966,8 +1028,8 @@ public void initializeLinkFields()
 }
 
 /**
- * @param port
-     * @return 
+ * @param port port
+     * @return something
  */
 public EPICSLink addPortField(VDBPort port) {
 	// check if not already added (order preservation)
@@ -984,8 +1046,8 @@ public EPICSLink addPortField(VDBPort port) {
 }
 
 /**
- * @param macro
- * @return 
+ * @param macro macro
+ * @return something
  */
 public EPICSLink addMacroField(VDBMacro macro) {
 	// check if not already added (order preservation)
@@ -1308,6 +1370,8 @@ public void fieldChanged(VDBFieldData field) {
 }
 
 /**
+     * @param name name
+     * @return something
  */
 public VDBFieldData getField(String name) {
 	EPICSLink el = (EPICSLink)getSubObject(name);
@@ -1320,6 +1384,14 @@ public VDBFieldData getField(String name) {
 /* (non-Javadoc)
  * @see com.cosylab.vdct.vdb.CreatorPropertyListener#addProperty(java.lang.Object, java.lang.String)
  */
+
+    /**
+     *
+     * @param key key
+     * @param value value
+     * @return something
+     */
+
 public InspectableProperty  addProperty(String key, String value) {
 
 	if (templateData.getProperties().containsKey(key) || getSubObject(key) != null) {
@@ -1393,6 +1465,7 @@ public void addProperty()
 }
 
 /**
+     * @param property property
  * @see com.cosylab.vdct.vdb.MonitoredPropertyListener#propertyChanged(InspectableProperty)
  */
 public void propertyChanged(InspectableProperty property)
@@ -1412,6 +1485,7 @@ public void propertyChanged(InspectableProperty property)
 }
 
 /**
+     * @param property property
  * @see com.cosylab.vdct.vdb.MonitoredPropertyListener#removeProperty(InspectableProperty)
  */
 public void removeProperty(InspectableProperty property)
@@ -1429,6 +1503,7 @@ public void removeProperty(InspectableProperty property)
 }
 
 /**
+     * @param property property
  * @see com.cosylab.vdct.vdb.MonitoredPropertyListener#renameProperty(InspectableProperty)
  */
 public void renameProperty(InspectableProperty property)
@@ -1490,7 +1565,7 @@ public void renameProperty(InspectableProperty property)
 }
 
 /**
- * @param field
+ * @param field field
  */
 public void addInvalidLink(EPICSLink field)
 {
@@ -1499,7 +1574,7 @@ public void addInvalidLink(EPICSLink field)
 }
 
 /**
- * @param field
+ * @param field field
  */
 public void removeInvalidLink(EPICSLink field)
 {
@@ -1923,10 +1998,10 @@ public void writeObjects(Writer writer, NamingContext context, boolean export)
 
 /**
  * Insert the method's description here.
- * @param templateData
+ * @param templateData templateData
  * @param substitutions <code>group</code> current substitutions
- * @param ports
- * @return 
+ * @param ports ports
+ * @return something
  */
 public static Map prepareSubstitutions(VDBTemplateInstance templateData, Map substitutions, Map ports)
 {
@@ -1970,10 +2045,10 @@ public static Map prepareSubstitutions(VDBTemplateInstance templateData, Map sub
 
 /**
  * Insert the method's description here
- * @param group
+ * @param group group
  * @param substitutions <code>group</code> current substitutions
- * @param namer
- * @return 
+ * @param namer namer
+ * @return something
  */
 public static Map preparePorts(Group group, Map substitutions, NameManipulator namer)
 {
@@ -2054,7 +2129,7 @@ public ArrayList getModeNames()
 }
 
 /**
- * @param macros
+ * @param macros macros
  */
 public void generateMacros(HashMap macros) {
 	Object obj;
@@ -2077,8 +2152,8 @@ private Template.PopupMenuHandler createPopupmenuHandler() {
 }
 
 /**
- * @param link
- * @param isRight
+ * @param link link
+ * @param isRight isRight
  */
 public void fieldSideChange(EPICSLink link, boolean isRight)
 {
@@ -2102,8 +2177,8 @@ public void fieldSideChange(EPICSLink link, boolean isRight)
 }
 
 /**
- * @param fieldData
- * @param newVisible
+ * @param fieldData fieldData
+ * @param newVisible newVisible
  */
 public void fieldVisibilityChange(VDBFieldData fieldData, boolean newVisible)
 {
@@ -2171,7 +2246,7 @@ public boolean isFirstField(Field field) {
  * Insert the method's description here.
  * Creation date: (3.5.2001 22:53:47)
  * @param field com.cosylab.vdct.graphics.objects.Field
- * @return 
+ * @return something
  */
 public boolean isLastField(Field field) {
 	EPICSLink ef = (EPICSLink)field;
@@ -2261,6 +2336,7 @@ public void moveFieldUp(Field field) {
 }
 
 /**
+     * @return something
  * @see com.cosylab.vdct.graphics.objects.Morphable#getType()
  */
 public String getType() {
@@ -2302,7 +2378,7 @@ public boolean morph(String newType) {
 }
 
 /**
- * @param templateInstance
+ * @param templateInstance templateInstance
  */
 public void setTemplateInstance(VDBTemplateInstance templateInstance)
 {
@@ -2316,6 +2392,7 @@ public void setTemplateInstance(VDBTemplateInstance templateInstance)
 
 
 /**
+     * @return something
  * @see com.cosylab.vdct.graphics.objects.Morphable#getTargets()
  */
 public Object[] getTargets() {

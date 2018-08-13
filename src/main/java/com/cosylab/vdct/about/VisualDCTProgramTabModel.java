@@ -37,7 +37,7 @@ import javax.swing.ImageIcon;
 import com.cosylab.vdct.Version;
 
 /**
- * @author 
+ * @author cosylab
  *
  * To change this generated comment edit the template variable "typecomment":
  * Window&gt;Preferences&gt;Java&gt;Templates.
@@ -48,14 +48,14 @@ public class VisualDCTProgramTabModel implements ProgramTabModel {
 
 	/**
 	 * Constructor for DefaultProgramTabModel.
-     * @param toAbout
+     * @param toAbout toAbout
 	 */
 	public VisualDCTProgramTabModel(Object toAbout) {
 		super();
 	}
 
 	/**
-     * @return 
+     * @return something
 	 * @see com.cosylab.vdct.about.ProgramTabModel#getProductBuildDate()
 	 */
 	public String getProductBuildDate()
@@ -64,7 +64,7 @@ public class VisualDCTProgramTabModel implements ProgramTabModel {
 	}
 
 	/**
-     * @return 
+     * @return something
 	 * @see com.cosylab.vdct.about.ProgramTabModel#getProductDocsURL()
 	 */
 	public URL getProductDocsURL()
@@ -79,7 +79,7 @@ public class VisualDCTProgramTabModel implements ProgramTabModel {
 	}
 
 	/**
-     * @return 
+     * @return something
 	 * @see com.cosylab.vdct.about.ProgramTabModel#getProductLogoImage()
 	 */
 	public Icon getProductLogoImage()
@@ -94,7 +94,7 @@ public class VisualDCTProgramTabModel implements ProgramTabModel {
 	}
 
 	/**
-     * @return 
+     * @return something
 	 * @see com.cosylab.vdct.about.ProgramTabModel#getProductName()
 	 */
 	public String getProductName()
@@ -103,7 +103,7 @@ public class VisualDCTProgramTabModel implements ProgramTabModel {
 	}
 
 	/**
-     * @return 
+     * @return something
 	 * @see com.cosylab.vdct.about.ProgramTabModel#getProductURL()
 	 */
 	public URL getProductURL()
@@ -118,7 +118,7 @@ public class VisualDCTProgramTabModel implements ProgramTabModel {
 	}
 
 	/**
-     * @return 
+     * @return something
 	 * @see com.cosylab.vdct.about.ProgramTabModel#getProductVersion()
 	 */
 	public String getProductVersion()
@@ -127,7 +127,7 @@ public class VisualDCTProgramTabModel implements ProgramTabModel {
 	}
 
 	/**
-     * @return 
+     * @return something
 	 * @see com.cosylab.vdct.about.ProgramTabModel#getVendor()
 	 */
 	public String getVendor()
@@ -136,7 +136,7 @@ public class VisualDCTProgramTabModel implements ProgramTabModel {
 	}
 
 	/**
-     * @return 
+     * @return something
 	 * @see com.cosylab.vdct.about.ProgramTabModel#getVendorEmail()
 	 */
 	public String getVendorEmail()
@@ -145,7 +145,7 @@ public class VisualDCTProgramTabModel implements ProgramTabModel {
 	}
 
 	/**
-     * @return 
+     * @return something
 	 * @see com.cosylab.vdct.about.ProgramTabModel#getVendorURL()
 	 */
 	public URL getVendorURL()
