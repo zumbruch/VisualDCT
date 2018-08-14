@@ -14,16 +14,16 @@
         <include>README*</include>
         <include>LICENSE*</include>
         <include>NOTICE*</include>
-        <include>flatdb</include>
-        <include>runScript</include>
         <include>pom.xml</include>
       </includes>
     </fileSet>
     <fileSet>
-      <directory>${project.build.directory}</directory>
+      <directory>${project.basedir}</directory>
       <outputDirectory>.</outputDirectory>
+      <fileMode>0755</fileMode>
       <includes>
-        <include>*.jar</include>
+        <include>flatdb.sh</include>
+        <include>visualdct.sh</include>
       </includes>
     </fileSet>
     <fileSet>
