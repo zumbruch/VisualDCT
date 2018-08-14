@@ -2042,7 +2042,14 @@ public class DBResolver {
 
 						// read field_value
 						tokenizer.nextToken();
-						if (tokenizer.ttype == DBConstants.quoteChar) value=tokenizer.sval;
+						// allow numbers without quotes
+						// see issue https://github.com/epics-extensions/VisualDCT/issues/21
+						if ((tokenizer.ttype == EnhancedStreamTokenizer.TT_WORD)
+                                                        || (tokenizer.ttype == DBConstants.quoteChar)
+                                                        || (tokenizer.ttype == '-')
+                                                        || (tokenizer.ttype == EnhancedStreamTokenizer.TT_NUMBER)) {
+							value=tokenizer.sval;
+						}
 						else throw (new DBParseException("Invalid field value...", tokenizer, fileName));
 
 						DBFieldData fd = new DBFieldData(name, value);

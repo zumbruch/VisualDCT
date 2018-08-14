@@ -568,6 +568,10 @@ public class EnhancedStreamTokenizer {
 	}
 
 	if ((ctype & CT_DIGIT) != 0) {
+            // set sval for numbers to allow numbers without quotes  
+            // see issue https://github.com/epics-extensions/VisualDCT/issues/21
+            setSVal(c, ct);
+		
 	    boolean neg = false;
 	    if (c == '-') {
 		c = read();
@@ -606,21 +610,7 @@ public class EnhancedStreamTokenizer {
 	}
 
 	if ((ctype & CT_ALPHA) != 0) {
-	    int i = 0;
-	    do {
-		if (i >= buf.length) {
-		    char nb[] = new char[buf.length * 2];
-		    System.arraycopy(buf, 0, nb, 0, buf.length);
-		    buf = nb;
-		}
-		buf[i++] = (char) c;
-		c = read();
-		ctype = c < 0 ? CT_WHITESPACE : c < 256 ? ct[c] : CT_ALPHA;
-	    } while ((ctype & (CT_ALPHA | CT_DIGIT)) != 0);
-	    peekc = c;
-	    sval = String.copyValueOf(buf, 0, i);
-	    if (forceLower)
-		sval = sval.toLowerCase();
+            setSVal(c, ct);
 	    return ttype = TT_WORD;
 	}
 
@@ -756,6 +746,28 @@ public class EnhancedStreamTokenizer {
 
 	return ttype = c;
     }
+    
+    private void setSVal(int c, byte[] ct) throws IOException {
+        int i = 0;
+        int actype = 0;
+	    do {
+	    	if (i >= buf.length) {
+	    		char nb[] = new char[buf.length * 2];
+	    		System.arraycopy(buf, 0, nb, 0, buf.length);
+	    		buf = nb;
+	    	}
+		
+	    	buf[i++] = (char) c;
+	    	c = read();
+	    	actype = c < 0 ? CT_WHITESPACE : c < 256 ? ct[c] : CT_ALPHA;
+	    }
+	    while ((actype & (CT_ALPHA | CT_DIGIT)) != 0);
+	    
+	    peekc = c;
+	    sval = String.copyValueOf(buf, 0, i);
+	    sval = forceLower ? sval.toLowerCase(): sval;
+    }
+
 
     /**
      * Causes the next call to the <code>nextToken</code> method of this
