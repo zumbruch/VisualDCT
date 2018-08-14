@@ -31,4 +31,21 @@
       <outputDirectory>site</outputDirectory>
     </fileSet>
   </fileSets>
+  <files>
+    <file>
+      <source>${project.build.directory}/${artifact.artifactId}-${artifact.version}.jar</source>
+      <outputDirectory>.</outputDirectory>
+      <destName>${artifact.artifactId}.jar</destName>
+    </file>
+    <file>
+      <source>${project.build.directory}/${artifact.artifactId}-${artifact.version}-javadoc.jar</source>
+      <outputDirectory>.</outputDirectory>
+      <destName>${artifact.artifactId}-javadoc.jar</destName>
+    </file>
+    <file>
+      <source>${project.build.directory}/${artifact.artifactId}-${artifact.version}-sources.jar</source>
+      <outputDirectory>.</outputDirectory>
+      <destName>${artifact.artifactId}-sources.jar</destName>
+    </file>
+  </files>
 </assembly>
