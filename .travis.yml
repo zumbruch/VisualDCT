@@ -19,7 +19,7 @@ jobs:
         - jdk: oraclejdk8
           env: FULL=true
           script:
-            - mvn site assembly:single
+            - mvn -q verify site assembly:single
 
 deploy:
     - provider: pages
