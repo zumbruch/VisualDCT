@@ -1,7 +1,16 @@
 # Release Notes
 
-## 2.7.1 (not released yet)
-[View diff](https://github.com/epics-extensions/VisualDCT/compare/v2.7.0...master)
+## 2.8.1 (not released yet)
+[View diff](https://github.com/epics-extensions/VisualDCT/compare/v2.8.0...master)
+
+## 2.8.0 (27 Aug 2018)
+[View diff](https://github.com/epics-extensions/VisualDCT/compare/v2.7.0...v2.8.0)
+
+ * Add support for unquoted values in database files (by Katy Saintin)
+ * Add support for compilation on Java 10
+ * Enhancement: Rename and greatly improve run scripts (by Luca Cavalli)
+ * Drop version number from jars in distribution archives (by Luca Cavalli)
+ * Drop CloudBees, improve support for deployment on Travis-CI
 
 ## 2.7.0 (05 Jan 2018)
 [View diff](https://github.com/epics-extensions/VisualDCT/compare/v2.6.1280...v2.7.0)
