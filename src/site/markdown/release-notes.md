@@ -1,7 +1,13 @@
 # Release Notes
 
-## 2.8.1 (not released yet)
-[View diff](https://github.com/epics-extensions/VisualDCT/compare/v2.8.0...master)
+## 2.8.2 (not released yet)
+[View diff](https://github.com/epics-extensions/VisualDCT/compare/v2.8.1...master)
+
+## 2.8.1 (04 Sep 2018)
+[View diff](https://github.com/epics-extensions/VisualDCT/compare/v2.8.0...v2.8.1)
+
+ * Bugfix: DB parser can't parse visual data (#24; introduced in v2.8.0)
+ * Travis-CI: add job for MacOS and switch to openjdk for Java 10
 
 ## 2.8.0 (27 Aug 2018)
 [View diff](https://github.com/epics-extensions/VisualDCT/compare/v2.7.0...v2.8.0)
