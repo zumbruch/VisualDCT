@@ -1,7 +1,7 @@
 # VisualDCT (aka VDCT) [![Build Status](https://travis-ci.org/epics-extensions/VisualDCT.svg?branch=master)](https://travis-ci.org/epics-extensions/VisualDCT)
 
 VisualDCT is the Visual Database Configuration Tool for
-[EPICS](https://epics.anl.gov/) Databases.
+[EPICS](https://epics-controls.org/) Databases.
 
 It was developed by [Cosylab](http://www.cosylab.com/).
 This development was funded by SLS, APS, Diamond and SNS. 
@@ -49,5 +49,5 @@ Pull requests are always welcome.
 
 For non-trivial changes and additions, please first contact the authors
 and/or use the EPICS
-[Tech-Talk](https://epics.anl.gov/tech-talk/index.php) mail exploder
+[Tech-Talk](https://epics-controls.org/resources-and-support/mailing-lists/) mail exploder
 to discuss and review your plans.
